@@ -5,7 +5,8 @@ Handles incoming popup detection requests from mock_popup_stream.py
 
 import json
 import logging
-import socket
+import http.server
+import socketserver
 
 import logging.config
 
@@ -32,32 +33,27 @@ logging.config.dictConfig({
 logger = logging.getLogger("hojaiga.Brain_Gatekeeper")
 
 
-class BrainGatekeeper:
-    def __init__(self):
-        self.port = 11435
-
-    def start(self):
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.bind(("127.0.0.1", self.port))
-        self.server.listen(1)
-        logger.info("Brain Gatekeeper started on port %s", self.port)
-
-    def handle_request(self, request):
+class BrainGatekeeperHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
+    def do_POST(self):
+        content_length = int(self.headers['Content-Length'])
+        body = self.rfile.read(content_length).decode('utf-8')
         try:
-            data = json.loads(request)
-            if "type" in data and data["type"] == "POPUP_DETECTED":
-                # New payload keys: "type", "title", "x", "y"
-                if "title" in data and "x" in data and "y" in data:
-                    # New payload format: {"type": "POPUP_DETECTED", "title": "Mock Popup", "x": 100, "y": 200}
-                    logger.info("Received new popup detection request: %s", data)
-                    # ... (rest of the code remains the same)
-                # Old payload keys: "window_title", "layout_hash", "coordinates"
-                elif "window_title" in data and "layout_hash" in data and "coordinates" in data:
-                    # Old payload format: {"window_title": "Mock Popup", "layout_hash": "abc123", "coordinates": [100, 200]}
-                    logger.info("Received old popup detection request: %s", data)
-                    # ... (rest of the code remains the same)
+            request = json.loads(body)
+            if "type" in request and request["type"] == "POPUP_DETECTED":
+                if "title" in request and "x" in request and "y" in request:
+                    # New payload keys: "type", "title", "x", "y"
+                    if "title" in request and "x" in request and "y" in request:
+                        logger.info("Received new popup detection request: %s", request)
+                        # ... (rest of the code remains the same)
+                    # Old payload keys: "window_title", "layout_hash", "coordinates"
+                    elif "window_title" in request and "layout_hash" in request and "coordinates" in request:
+                        logger.info("Received old popup detection request: %s", request)
+                        # ... (rest of the code remains the same)
+                    else:
+                        logger.error("Invalid request payload: %s", request)
+                        return False
                 else:
-                    logger.error("Invalid request payload: %s", data)
+                    logger.error("Invalid request type: %s", request)
                     return False
             else:
                 logger.error("Invalid request type: %s", request)
@@ -65,15 +61,28 @@ class BrainGatekeeper:
         except json.JSONDecodeError as e:
             logger.error("Invalid JSON request: %s", e)
             return False
+        self.send_response(200)
+        self.end_headers()
         return True
 
-    def run(self):
-        self.start()
-        while True:
-            client, address = self.server.accept()
-            request = client.recv(1024).decode("utf-8")
-            if self.handle_request(request):
-                client.sendall(b"OK")
-            else:
-                client.sendall(b"BAD_REQUEST")
-            client.close()
+    def log_request(self, code, size):
+        logger.info(f"Received request: {code} {size}")
+
+
+class BrainGatekeeperServer(socketserver.TCPServer):
+    def __init__(self, server_address, RequestHandlerClass):
+        super().__init__(server_address, RequestHandlerClass)
+
+
+def run_server():
+    PORT = 11435
+    Handler = BrainGatekeeperHTTPRequestHandler
+    With = socketserver.TCPServer
+    server_address = ("", PORT)
+    httpd = With(server_address, Handler)
+    print(f"Brain Gatekeeper started on port {PORT}")
+    httpd.serve_forever()
+
+
+if __name__ == "__main__":
+    run_server()
