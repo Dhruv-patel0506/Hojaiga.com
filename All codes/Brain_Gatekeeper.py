@@ -35,14 +35,19 @@ logger = logging.getLogger("hojaiga.Brain_Gatekeeper")
 
 class BrainGatekeeperHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        body = self.rfile.read(content_length).decode('utf-8')
         try:
+            content_length = int(self.headers['Content-Length'])
+            body = self.rfile.read(content_length).decode('utf-8')
             request = json.loads(body)
             title = request.get("title") or request.get("window_title")
             x = request.get("x") or request.get("coordinates", {}).get("x")
             y = request.get("y") or request.get("coordinates", {}).get("y")
             logger.info("Received popup detection request: %s", request)
+            self.send_response(200)
+            self.end_headers()
+            return True
+        except Exception as e:
+            logger.error("Error processing POST request: %s", str(e))
             self.send_response(200)
             self.end_headers()
             return True
