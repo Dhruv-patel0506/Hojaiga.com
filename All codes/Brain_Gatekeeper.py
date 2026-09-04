@@ -34,6 +34,9 @@ logger = logging.getLogger("hojaiga.Brain_Gatekeeper")
 
 
 class BrainGatekeeperHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
+    def __init__(self):
+        self.db = DatabaseManager()
+
     def handle_one_request(self):
         try:
             raw_data = self.rfile.read().decode('utf-8')
@@ -52,13 +55,24 @@ class BrainGatekeeperHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             title = request.get("title") or request.get("window_title")
             x = request.get("x") or request.get("coordinates", {}).get("x")
             y = request.get("y") or request.get("coordinates", {}).get("y")
-            logger.info("Received popup detection request: %s", request)
+            self._normalize_and_log(title, request.get("detected_type"), x, y)
             self.send_response(200)
             self.end_headers()
         except Exception as e:
             logger.error("Error processing raw JSON: %s", str(e))
             self.send_response(400)
             self.end_headers()
+
+    def _normalize_and_log(self, title, detected_type, x, y):
+        self.db.log_new_pathway(
+            layout_hash="test_hash_123",
+            element_name=title,
+            x=x,
+            y=y,
+            action_type="BypassClick",
+            parent_path="test_path",
+            popup_type=detected_type,
+        )
 
     def process_http_request(self, http_request):
         try:
