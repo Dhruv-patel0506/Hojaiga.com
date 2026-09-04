@@ -39,31 +39,13 @@ class BrainGatekeeperHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         body = self.rfile.read(content_length).decode('utf-8')
         try:
             request = json.loads(body)
-            if "type" in request and request["type"] == "POPUP_DETECTED":
-                if "title" in request and "x" in request and "y" in request:
-                    # New payload keys: "type", "title", "x", "y"
-                    if "title" in request and "x" in request and "y" in request:
-                        logger.info("Received new popup detection request: %s", request)
-                        # ... (rest of the code remains the same)
-                    # Old payload keys: "window_title", "layout_hash", "coordinates"
-                    elif "window_title" in request and "layout_hash" in request and "coordinates" in request:
-                        logger.info("Received old popup detection request: %s", request)
-                        # ... (rest of the code remains the same)
-                    else:
-                        logger.error("Invalid request payload: %s", request)
-                        return False
-                else:
-                    logger.error("Invalid request type: %s", request)
-                    return False
-            else:
-                logger.error("Invalid request type: %s", request)
-                return False
-        except json.JSONDecodeError as e:
-            logger.error("Invalid JSON request: %s", e)
-            return False
-        self.send_response(200)
-        self.end_headers()
-        return True
+            title = request.get("title") or request.get("window_title")
+            x = request.get("x") or request.get("coordinates", {}).get("x")
+            y = request.get("y") or request.get("coordinates", {}).get("y")
+            logger.info("Received popup detection request: %s", request)
+            self.send_response(200)
+            self.end_headers()
+            return True
 
     def log_request(self, code, size):
         logger.info(f"Received request: {code} {size}")
