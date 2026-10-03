@@ -1,0 +1,89 @@
+{
+  "test_summary": {
+    "total_tests": 6,
+    "passed": 4,
+    "failed": 2,
+    "success_rate": 66.66666666666666,
+    "total_duration_sec": 23.17
+  },
+  "detailed_results": [
+    {
+      "test_name": "System Readiness",
+      "success": false,
+      "details": "Ollama: True, Gatekeeper: False, Organs: True, Vision: False",
+      "duration_sec": 18.24,
+      "metrics": {
+        "ollama_status": 200,
+        "gatekeeper_status": 401,
+        "crewai_available": true,
+        "vision_models_tested": 3
+      }
+    },
+    {
+      "test_name": "Task Compilation",
+      "success": true,
+      "details": "Compiled 4/4 commands, generated 9 total steps",
+      "duration_sec": 18.28,
+      "metrics": {
+        "total_commands": 4,
+        "successful_compilations": 4,
+        "total_steps_generated": 9,
+        "avg_steps_per_command": 2.25
+      }
+    },
+    {
+      "test_name": "Agent Paradigm Assignment",
+      "success": false,
+      "details": "Correct paradigm assignment: 1/7",
+      "duration_sec": 18.29,
+      "metrics": {
+        "total_test_cases": 7,
+        "correct_assignments": 1,
+        "paradigm_accuracy": 0.14285714285714285
+      }
+    },
+    {
+      "test_name": "Vision Model Performance",
+      "success": true,
+      "details": "Working models: 1/1, Avg latency: 4.82s",
+      "duration_sec": 23.11,
+      "metrics": {
+        "total_models": 1,
+        "successful_models": 1,
+        "avg_latency_sec": 4.82,
+        "model_details": [
+          {
+            "model": "moondream:latest",
+            "description": "Fast OCR model",
+            "success": true,
+            "latency_sec": 4.82,
+            "response_length": 388
+          }
+        ]
+      }
+    },
+    {
+      "test_name": "Virtual Mouse Operations",
+      "success": true,
+      "details": "Capabilities: ['multi_cursor', 'cursor_movement', 'visual_cursor', 'shape_analysis'], Shape analysis confidence: 0.85",
+      "duration_sec": 23.12,
+      "metrics": {
+        "multi_cursor": true,
+        "cursor_movement": true,
+        "visual_cursor": true,
+        "shape_analysis_confidence": 0.85
+      }
+    },
+    {
+      "test_name": "Rhojiaga.com CrewAI Integration",
+      "success": true,
+      "details": "CrewAI setup successful - ready for rhojiaga.com testing",
+      "duration_sec": 23.16,
+      "metrics": {
+        "agents_created": 1,
+        "tasks_created": 1,
+        "tools_available": 2
+      }
+    }
+  ]
+}

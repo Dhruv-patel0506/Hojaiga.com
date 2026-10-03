@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOJAIGA // WORLD 01: UI App Scanner &amp; Popup Interceptor</title>
+  <link rel="icon" href="data:," />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=JetBrains+Mono:wght@300;400;600&display=swap');
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #01080e;
+      font-family: 'JetBrains Mono', monospace;
+      user-select: none;
+    }
+
+    .font-display { font-family: 'Orbitron', sans-serif; }
+
+    .hud-grid-overlay {
+      background:
+        radial-gradient(circle at center, transparent 50%, rgba(1, 8, 14, 0.9) 100%),
+        repeating-linear-gradient(90deg, rgba(0,255,200,0.025) 0px, rgba(0,255,200,0.025) 1px, transparent 1px, transparent 40px),
+        repeating-linear-gradient(0deg, rgba(0,255,200,0.025) 0px, rgba(0,255,200,0.025) 1px, transparent 1px, transparent 40px);
+      pointer-events: none;
+    }
+
+    .glass-panel {
+      background: rgba(4, 18, 28, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 255, 200, 0.32);
+      box-shadow: 0 0 30px rgba(0, 255, 200, 0.14), inset 0 0 15px rgba(0, 255, 200, 0.06);
+    }
+
+    /* Lightweight labels: transform-only compositing, no backdrop blur (60+ FPS) */
+    .node-label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translate(-50%, -145%);
+      pointer-events: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      white-space: nowrap;
+      padding: 3px 8px;
+      font-size: 10px;
+      line-height: 1.3;
+      background: rgba(3, 20, 28, 0.75);
+      border: 1px solid rgba(0, 255, 200, 0.4);
+      border-radius: 8px;
+      will-change: transform;
+    }
+    .node-label.targeted {
+      border-color: #f43f5e !important;
+      box-shadow: 0 0 20px rgba(244, 63, 94, 0.6) !important;
+      z-index: 5;
+    }
+
+    #hand-cursor {
+      position: fixed;
+      width: 38px; height: 38px;
+      margin-left: -19px; margin-top: -19px;
+      border: 2px solid #00ffc8;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 40;
+      transition: transform 0.12s ease, border-color 0.15s ease, background-color 0.15s ease;
+      box-shadow: 0 0 18px rgba(0, 255, 200, 0.85);
+      display: none;
+    }
+    #hand-cursor.pinching {
+      transform: scale(0.62);
+      border-color: #f43f5e;
+      background-color: rgba(244, 63, 94, 0.35);
+      box-shadow: 0 0 25px rgba(244, 63, 94, 1);
+    }
+
+    #warp-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle, #00ffc8 0%, #01080e 70%);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.55s ease;
+    }
+  </style>
+</head>
+<body class="text-emerald-100">
+
+  <div id="warp-overlay"></div>
+  <div id="canvas-container" class="fixed inset-0 z-0"></div>
+  <div class="fixed inset-0 z-10 hud-grid-overlay"></div>
+
+  <div id="hand-cursor">
+    <div class="w-1.5 h-1.5 bg-emerald-300 rounded-full m-auto mt-3.5"></div>
+  </div>
+
+  <div id="labels-container" class="fixed inset-0 z-20 pointer-events-none overflow-hidden"></div>
+
+  <!-- TOP HUD BAR -->
+  <header class="fixed top-4 left-4 right-4 z-30 flex flex-wrap items-center justify-between gap-4 pointer-events-none">
+    <div class="glass-panel px-5 py-3 rounded-xl pointer-events-auto flex items-center gap-4">
+      <div class="flex flex-wrap items-center gap-2">
+        <a href="index.html" id="warp-back" data-warp="index.html"
+           class="px-3 py-1.5 rounded-lg bg-cyan-500/20 border border-cyan-400 text-cyan-200 text-xs font-display tracking-wider hover:bg-cyan-500/40 transition">
+          &larr; HUB
+        </a>
+        <button onclick="warpTo('llm-world.html')"
+          class="px-2.5 py-1.5 rounded-lg text-xs bg-slate-900/70 border border-purple-400/40 text-purple-300 hover:bg-purple-500/20 transition">
+          Sector 02: LLM Bridge
+        </button>
+        <button onclick="warpTo('execution-world.html')"
+          class="px-2.5 py-1.5 rounded-lg text-xs bg-slate-900/70 border border-amber-400/40 text-amber-300 hover:bg-amber-500/20 transition">
+          Sector 03: Execution
+        </button>
+      </div>
+      <div>
+        <h1 class="font-display text-sm md:text-base font-extrabold tracking-widest text-emerald-300">
+          SECTOR 01 // UI APP SCANNER &amp; POPUP INTERCEPTOR
+        </h1>
+        <p class="text-[11px] text-emerald-200/70 tracking-wider">
+          INTERIOR SUB-DIVISION WORLD &bull; <span id="fps-counter" class="text-emerald-400 font-semibold">60 FPS</span>
+          &bull; POPUPS NEUTRALIZED: <span id="kill-counter" class="text-rose-400 font-bold">142</span>
+          &bull; <span id="gesture-readout" class="text-amber-300 font-semibold">STANDBY</span>
+          &bull; <span id="cns-status" class="text-rose-400 font-semibold">CNS LINKING&hellip;</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="glass-panel px-3 py-2 rounded-xl pointer-events-auto flex items-center gap-2">
+      <button onclick="triggerLaserPurge()"
+        class="px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wider bg-rose-500/25 border border-rose-400 text-rose-200 hover:bg-rose-500/40 transition">
+        &#128680; EMP Popup Purge (Space / Hand Swipe)
+      </button>
+    </div>
+  </header>
+
+  <!-- LEFT LIVE OCR & BOUNDING BOX TELEMETRY FEED -->
+  <aside class="fixed bottom-4 left-4 z-30 glass-panel p-4 rounded-xl w-80 pointer-events-auto hidden md:block">
+    <div class="text-xs font-display font-bold tracking-widest text-emerald-300 uppercase mb-2 flex items-center justify-between">
+      <span>&#127919; Live Interceptor Feed</span>
+      <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-400/40 animate-pulse">SCANNING</span>
+    </div>
+    <div id="live-scanner-log" class="space-y-1.5 text-[11px] font-mono text-emerald-200/85 max-h-36 overflow-hidden">
+      <div>[COORD] Foreground HWND #8821: (120, 84, 1440x900)</div>
+      <div>[OCR] Tokenized 64 UI labels in 14.2ms</div>
+      <div class="text-rose-300">[INTERCEPT] Blocked modal "Update_Alert.exe"</div>
+      <div>[SQL_LOG] Signature #99B1 committed to SQLite</div>
+    </div>
+  </aside>
+
+  <!-- SUB-PROCESS DETAIL MODAL -->
+  <div id="node-modal" class="fixed inset-0 z-40 flex items-center justify-center p-4 pointer-events-none opacity-0 transition-opacity duration-300">
+    <div id="node-modal-card" class="glass-panel rounded-2xl max-w-lg w-full p-6 border border-emerald-400/50 transform scale-95 transition-transform duration-300 pointer-events-auto">
+      <div class="flex items-start justify-between gap-4 border-b border-emerald-500/30 pb-4">
+        <div>
+          <span id="modal-badge" class="text-[10px] font-display uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400 text-emerald-300">
+            SUB-PROCESS ENGINE
+          </span>
+          <h2 id="modal-title" class="font-display text-xl font-bold text-white mt-2">Sub-Process Name</h2>
+          <p id="modal-subtitle" class="text-xs text-emerald-200/70 mt-0.5">Diagnostic Specification</p>
+        </div>
+        <button onclick="closeNodeModal()" class="px-3 py-1 rounded-lg bg-rose-500/20 border border-rose-400/50 text-rose-200 text-xs hover:bg-rose-500/40 transition">
+          &#10005; ESC
+        </button>
+      </div>
+      <div id="modal-metrics" class="mt-4 space-y-2.5"></div>
+      <div class="mt-4 bg-slate-950/90 border border-emerald-500/30 rounded-xl p-3 font-mono text-xs text-emerald-300 whitespace-pre-wrap" id="modal-code"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM-RIGHT WEBCAM PREVIEW -->
+  <div class="fixed bottom-4 right-4 z-30 glass-panel rounded-xl overflow-hidden w-56 sm:w-64 border border-emerald-400/40 pointer-events-auto">
+    <div class="px-3 py-1.5 bg-slate-950/80 border-b border-emerald-500/30 flex items-center justify-between">
+      <span class="text-[10px] font-display tracking-wider uppercase text-emerald-300 flex items-center gap-1.5">
+        <span id="cam-indicator" class="w-2 h-2 rounded-full bg-amber-400"></span>
+        Scanner Hand Cam
+      </span>
+      <button onclick="initCameraTracking(true)" class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-400/50 text-emerald-200">
+        Sync
+      </button>
+    </div>
+    <div class="relative aspect-video bg-slate-950 flex items-center justify-center">
+      <video id="webcam-video" class="hidden" playsinline></video>
+      <canvas id="webcam-canvas" class="w-full h-full object-cover transform -scale-x-100"></canvas>
+      <div id="cam-overlay-msg" class="absolute inset-0 flex flex-col items-center justify-center text-center p-3 bg-slate-950/80 text-[11px] text-emerald-200/80">
+        <span>Syncing Hand Telemetry...</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================================================
+    // 1. BRANCH 1 SUB-PROCESS STATIONS
+    // ==========================================================================
+    const SCANNER_STATIONS = [
+      {
+        id: 'viewport-core',
+        role: 'SECTOR HUB',
+        name: 'Viewport Laser Interceptor Core',
+        position: new THREE.Vector3(0, 0, 0),
+        color: 0x00ffc8,
+        radius: 2.2,
+        type: 'core',
+        description: 'Continuously sweeps active OS window handles at 120Hz and locks laser beams onto unauthorized modal popups.',
+        metrics: [
+          { label: 'Scan Frequency', val: '120 Hz', state: 'LOCKED' },
+          { label: 'Active OS Windows Tracked', val: '14 HWNDs', state: 'LIVE' },
+          { label: 'Popup Neutralization Time', val: '3.8 ms', state: 'OPTIMAL' }
+        ],
+        code: '// Real-time Popup Interceptor Loop\nwhile (osViewport.isScanning()) {\n  const modal = detectAnomalousZOrderPopup();\n  if (modal) interceptor.killAndCache(modal.hwnd);\n}'
+      },
+      {
+        id: 'ocr-engine',
+        role: 'SUB-PROCESS 01',
+        name: 'Real-Time OCR Engine',
+        position: new THREE.Vector3(-6.8, 2.4, 1.5),
+        color: 0x38bdf8,
+        radius: 1.35,
+        type: 'ocr',
+        description: 'Extracts structured text tokens, button labels, and error strings from raw window framebuffers.',
+        metrics: [
+          { label: 'Token Extraction Speed', val: '1,420 words/sec', state: 'STREAMING' },
+          { label: 'Confidence Threshold', val: '98.4%', state: 'VERIFIED' },
+          { label: 'Shared Memory Buffer', val: '64 MB Ring', state: 'ACTIVE' }
+        ],
+        code: '// OCR Tensor Pipeline\nconst tokens = await ocrEngine.extractROI(frameBuffer, bbox);\ncnsBridge.publish(\'OCR_TOKENS_READY\', tokens);'
+      },
+      {
+        id: 'coord-engine',
+        role: 'SUB-PROCESS 02',
+        name: 'Window Coordinates Engine',
+        position: new THREE.Vector3(6.8, 2.2, 1.2),
+        color: 0xf59e0b,
+        radius: 1.35,
+        type: 'coords',
+        description: 'Computes normalized (X, Y, W, H) bounding boxes and DPI-aware screen coordinates for PyAutoGUI targeting.',
+        metrics: [
+          { label: 'DPI Scaling Matrix', val: '200% Retina', state: 'CALIBRATED' },
+          { label: 'Bounding Box Precision', val: '+/-0.5 px', state: 'EXACT' },
+          { label: 'Z-Order Depth Tracking', val: '32 Layers', state: 'SYNCED' }
+        ],
+        code: '// Bounding Box Normalizer\nconst rect = win32.GetWindowRect(hwnd);\nreturn normalizeToDPI(rect.x, rect.y, rect.width, rect.height);'
+      },
+      {
+        id: 'sql-cache',
+        role: 'SUB-PROCESS 03',
+        name: 'SQL Cache Log Vault',
+        position: new THREE.Vector3(0, -5.4, 2.0),
+        color: 0xa855f7,
+        radius: 1.4,
+        type: 'sql',
+        description: 'High-speed SQLite WAL database storing historical UI layouts, popup hashes, and instant coordinate lookups.',
+        metrics: [
+          { label: 'Cached UI Signatures', val: '18,940 rows', state: 'INDEXED' },
+          { label: 'Query Lookup Latency', val: '0.32 ms', state: 'ULTRA-FAST' },
+          { label: 'Write-Ahead Log (WAL)', val: 'COMMITTED', state: 'HEALTHY' }
+        ],
+        code: "INSERT INTO popup_signatures (hash, hwnd_class, action_taken)\nVALUES ('0x9F4A', 'ModalDialog_v2', 'AUTO_DISMISSED');"
+      },
+      {
+        id: 'warp-hub',
+        role: 'DIMENSIONAL PORTAL',
+        name: '<< Warp to Main Orchestrator',
+        position: new THREE.Vector3(0, 5.6, -2.5),
+        color: 0xf43f5e,
+        radius: 1.2,
+        type: 'portal',
+        description: 'Pinch or click this portal to jump back to the Main Orchestrator constellation (index.html).'
+      }
+    ];
+
+    // ==========================================================================
+    // 2. THREE.JS SCENE & HOLOGRAPHIC SCANNER RIG
+    // ==========================================================================
+    const container = document.getElementById('canvas-container');
+    const labelsContainer = document.getElementById('labels-container');
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x01080e, 0.025);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 200);
+    const defaultCamPos = new THREE.Vector3(0, 1.2, 17);
+    camera.position.copy(defaultCamPos);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    const worldGroup = new THREE.Group();
+    scene.add(worldGroup);
+
+    scene.add(new THREE.AmbientLight(0x224455, 1.4));
+
+    const floorGrid = new THREE.PolarGridHelper(24, 16, 8, 64, 0x00ffc8, 0x004438);
+    floorGrid.position.y = -8;
+    worldGroup.add(floorGrid);
+
+    const interactiveMeshes = [];
+    const stationObjects = {};
+
+    const laserPlaneGeo = new THREE.PlaneGeometry(4.6, 3.2);
+    const laserPlaneMat = new THREE.MeshBasicMaterial({
+      color: 0x00ffc8,
+      transparent: true,
+      opacity: 0.22,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const laserScanBar = new THREE.Mesh(
+      new THREE.BoxGeometry(4.8, 0.08, 0.2),
+      new THREE.MeshBasicMaterial({ color: 0x00ffc8 })
+    );
+
+    SCANNER_STATIONS.forEach((st) => {
+      const hitMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(st.radius * 1.45, 16, 16),
+        new THREE.MeshBasicMaterial({ visible: false })
+      );
+      hitMesh.position.copy(st.position);
+      hitMesh.userData = { stationData: st };
+      worldGroup.add(hitMesh);
+      interactiveMeshes.push(hitMesh);
+
+      const group = new THREE.Group();
+      group.position.copy(st.position);
+
+      if (st.type === 'core') {
+        for (let i = -1; i <= 1; i++) {
+          const frameEdges = new THREE.EdgesGeometry(new THREE.BoxGeometry(4.4, 2.8, 0.06));
+          const frameLine = new THREE.LineSegments(
+            frameEdges,
+            new THREE.LineBasicMaterial({ color: 0x00ffc8, transparent: true, opacity: 0.75 })
+          );
+          frameLine.position.z = i * 0.65;
+          group.add(frameLine);
+        }
+        group.add(new THREE.Mesh(laserPlaneGeo, laserPlaneMat));
+        group.add(laserScanBar);
+      } else if (st.type === 'ocr') {
+        group.add(new THREE.LineSegments(
+          new THREE.EdgesGeometry(new THREE.OctahedronGeometry(st.radius, 1)),
+          new THREE.LineBasicMaterial({ color: st.color })
+        ));
+      } else if (st.type === 'coords') {
+        const boxWire = new THREE.LineSegments(
+          new THREE.EdgesGeometry(new THREE.BoxGeometry(2.1, 2.1, 2.1)),
+          new THREE.LineBasicMaterial({ color: st.color })
+        );
+        group.add(boxWire);
+        group.add(new THREE.AxesHelper(1.5));
+      } else if (st.type === 'sql') {
+        for (let i = -1; i <= 1; i++) {
+          const cylWire = new THREE.LineSegments(
+            new THREE.EdgesGeometry(new THREE.CylinderGeometry(1.25, 1.25, 0.45, 24)),
+            new THREE.LineBasicMaterial({ color: st.color })
+          );
+          cylWire.position.y = i * 0.65;
+          group.add(cylWire);
+        }
+      } else if (st.type === 'portal') {
+        group.add(new THREE.Mesh(
+          new THREE.TorusGeometry(1.1, 0.12, 16, 48),
+          new THREE.MeshBasicMaterial({ color: st.color, wireframe: true })
+        ));
+      }
+
+      if (st.type !== 'core') {
+        const lineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), st.position]);
+        worldGroup.add(new THREE.Line(lineGeo, new THREE.LineBasicMaterial({
+          color: st.color, transparent: true, opacity: 0.45
+        })));
+      }
+
+      worldGroup.add(group);
+
+      const labelEl = document.createElement('div');
+      labelEl.className = 'node-label text-center';
+      labelEl.innerHTML =
+        '<div class="text-[9px] font-display tracking-widest text-emerald-300 uppercase">' + st.role + '</div>' +
+        '<div class="font-bold text-white">' + st.name + '</div>';
+      labelsContainer.appendChild(labelEl);
+
+      stationObjects[st.id] = { data: st, hitMesh: hitMesh, group: group, labelEl: labelEl };
+    });
+
+    // ==========================================================================
+    // 3. AUTONOMOUS POPUP INTERCEPTOR SIMULATION
+    // ==========================================================================
+    const roguePopups = [];
+    let popupsNeutralized = 142;
+    const killCounterEl = document.getElementById('kill-counter');
+    const liveLogEl = document.getElementById('live-scanner-log');
+
+    function logFeed(text, rose) {
+      const entry = document.createElement('div');
+      if (rose) entry.className = 'text-rose-400 font-semibold';
+      entry.textContent = text;
+      liveLogEl.prepend(entry);
+      while (liveLogEl.children.length > 6) liveLogEl.removeChild(liveLogEl.lastElementChild);
+    }
+
+    function spawnRoguePopup() {
+      if (roguePopups.length >= 5) return;
+      const wire = new THREE.LineSegments(
+        new THREE.EdgesGeometry(new THREE.BoxGeometry(0.9, 0.65, 0.15)),
+        new THREE.LineBasicMaterial({ color: 0xf43f5e })
+      );
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 4.2 + Math.random() * 4.5;
+      wire.position.set(Math.cos(angle) * dist, (Math.random() - 0.5) * 5, Math.sin(angle) * dist);
+      worldGroup.add(wire);
+
+      const laserLine = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), wire.position]),
+        new THREE.LineBasicMaterial({ color: 0xf43f5e, transparent: true, opacity: 0.85 })
+      );
+      worldGroup.add(laserLine);
+
+      roguePopups.push({ mesh: wire, laser: laserLine, life: 1.0 });
+      logFeed('[INTERCEPT] Rogue modal detected @ (' +
+        Math.round(wire.position.x) + ', ' + Math.round(wire.position.y) + ', ' + Math.round(wire.position.z) + ')', true);
+    }
+
+    setInterval(spawnRoguePopup, 1400);
+
+    const empRing = new THREE.Mesh(
+      new THREE.RingGeometry(0.5, 1.2, 64),
+      new THREE.MeshBasicMaterial({
+        color: 0xf43f5e, side: THREE.DoubleSide, transparent: true,
+        opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending
+      })
+    );
+    worldGroup.add(empRing);
+
+    function triggerLaserPurge() {
+      empRing.scale.set(0.5, 0.5, 0.5);
+      empRing.material.opacity = 1.0;
+      const killed = roguePopups.length;
+      roguePopups.forEach((p) => {
+        worldGroup.remove(p.mesh);
+        worldGroup.remove(p.laser);
+        p.mesh.geometry.dispose();
+        p.laser.geometry.dispose();
+        popupsNeutralized++;
+      });
+      roguePopups.length = 0;
+      killCounterEl.textContent = popupsNeutralized;
+      logFeed('[EMP_PURGE] Flushed ' + killed + ' rogue modals -> SQLite WAL', true);
+    }
+    window.triggerLaserPurge = triggerLaserPurge;
+
+    // ==========================================================================
+    // 4. MODAL, PORTAL WARP ROUTING & LERP HAND TRACKING
+    // ==========================================================================
+    const raycaster = new THREE.Raycaster();
+    const targetHandNDC = new THREE.Vector2(0, 0);
+    const smoothedHandNDC = new THREE.Vector2(0, 0);
+    const camTargetPos = new THREE.Vector3().copy(defaultCamPos);
+    const camLookAtTarget = new THREE.Vector3(0, 0, 0);
+    const currentLookAt = new THREE.Vector3(0, 0, 0);
+
+    let hoveredStationId = null;
+    let activeModalId = null;
+    let isHandTracked = false;
+
+    function warpTo(url) {
+      const warp = document.getElementById('warp-overlay');
+      warp.style.opacity = '1';
+      setTimeout(() => { window.location.href = url; }, 450);
+    }
+
+    function activateStation(stationData) {
+      if (stationData.type === 'portal') {
+        warpTo('index.html');
+        return;
+      }
+      activeModalId = stationData.id;
+      const worldPos = new THREE.Vector3();
+      stationObjects[stationData.id].hitMesh.getWorldPosition(worldPos);
+      camLookAtTarget.copy(worldPos);
+      camTargetPos.copy(worldPos).add(new THREE.Vector3(0, 0.6, 5.8));
+
+      document.getElementById('modal-badge').textContent = stationData.role;
+      document.getElementById('modal-title').textContent = stationData.name;
+      document.getElementById('modal-subtitle').textContent = stationData.description;
+
+      document.getElementById('modal-metrics').innerHTML = stationData.metrics.map((m) =>
+        '<div class="p-3 rounded-xl bg-slate-900/80 border border-emerald-500/30 flex items-center justify-between">' +
+        '<div><div class="text-xs font-bold text-white">' + m.label + '</div>' +
+        '<div class="text-[11px] text-emerald-300">' + m.val + '</div></div>' +
+        '<span class="text-[10px] font-display px-2.5 py-1 rounded bg-emerald-500/20 border border-emerald-400/50 text-emerald-300">' +
+        '&#9679; ' + m.state + '</span></div>'
+      ).join('');
+
+      document.getElementById('modal-code').textContent = stationData.code;
+
+      const modal = document.getElementById('node-modal');
+      const card = document.getElementById('node-modal-card');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-95');
+      card.classList.add('scale-100');
+    }
+
+    function closeNodeModal() {
+      if (!activeModalId) return;
+      activeModalId = null;
+      camLookAtTarget.set(0, 0, 0);
+      camTargetPos.copy(defaultCamPos);
+      const modal = document.getElementById('node-modal');
+      const card = document.getElementById('node-modal-card');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-100');
+      card.classList.add('scale-95');
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      if (isHandTracked) return;
+      targetHandNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
+      targetHandNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target.closest('header, aside, #node-modal-card')) return;
+      if (hoveredStationId) {
+        activateStation(stationObjects[hoveredStationId].data);
+      } else if (activeModalId) {
+        closeNodeModal();
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Escape') closeNodeModal();
+      if (e.code === 'Space') { e.preventDefault(); triggerLaserPurge(); }
+    });
+
+    document.getElementById('warp-back').addEventListener('click', (e) => {
+      e.preventDefault();
+      warpTo('index.html');
+    });
+
+    // ==========================================================================
+    // 5. MEDIAPIPE HANDS
+    // ==========================================================================
+    const videoElement = document.getElementById('webcam-video');
+    const canvasElement = document.getElementById('webcam-canvas');
+    const canvasCtx = canvasElement.getContext('2d');
+    const handCursor = document.getElementById('hand-cursor');
+    const gestureReadout = document.getElementById('gesture-readout');
+    const camOverlayMsg = document.getElementById('cam-overlay-msg');
+    const camIndicator = document.getElementById('cam-indicator');
+    let prevPalmPos = null;
+    let pinchFrames = 0;
+    let openFrames = 0;
+    let camRunning = false;
+
+    function onHandResults(results) {
+      canvasElement.width = results.image.width;
+      canvasElement.height = results.image.height;
+      canvasCtx.save();
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        isHandTracked = true;
+        const lm = results.multiHandLandmarks[0];
+        drawConnectors(canvasCtx, lm, HAND_CONNECTIONS, { color: '#00ffc8', lineWidth: 2 });
+        drawLandmarks(canvasCtx, lm, { color: '#f43f5e', lineWidth: 1, radius: 2.5 });
+
+        const mirroredX = 1.0 - lm[9].x;
+        const normY = lm[9].y;
+        targetHandNDC.x = mirroredX * 2 - 1;
+        targetHandNDC.y = -(normY * 2 - 1);
+
+        const pinchDist = Math.hypot(lm[8].x - lm[4].x, lm[8].y - lm[4].y);
+        const wrist = lm[0];
+        const middleCurl = Math.hypot(lm[12].x - wrist.x, lm[12].y - wrist.y);
+        const isPinch = pinchDist < 0.055 || middleCurl < 0.22;
+
+        if (prevPalmPos && Math.hypot(mirroredX - prevPalmPos.x, normY - prevPalmPos.y) > 0.16) {
+          triggerLaserPurge();
+        }
+        prevPalmPos = { x: mirroredX, y: normY };
+
+        if (isPinch) {
+          pinchFrames++;
+          openFrames = 0;
+          handCursor.classList.add('pinching');
+          gestureReadout.textContent = activeModalId ? '\u{1F590}\uFE0F HOLD OPEN HAND TO EXIT' : '\u{1F92F} PINCH LOCK';
+          if (activeModalId) {
+            if (openFrames > 45) closeNodeModal();
+          } else if (pinchFrames === 6 && hoveredStationId) {
+            activateStation(stationObjects[hoveredStationId].data);
+          }
+        } else {
+          pinchFrames = 0;
+          openFrames++;
+          handCursor.classList.remove('pinching');
+          if (activeModalId) {
+            gestureReadout.textContent = openFrames > 45
+              ? '\u{1F590}\uFE0F HOLDING... EXITING'
+              : '\u{1F590}\uFE0F HOLD OPEN HAND ~1.5s TO EXIT';
+            if (openFrames > 50) closeNodeModal();
+          } else {
+            gestureReadout.textContent = '\u{1F590}\uFE0F HAND ORBIT';
+          }
+        }
+      } else {
+        isHandTracked = false;
+        prevPalmPos = null;
+        pinchFrames = 0;
+        openFrames = 0;
+      }
+      canvasCtx.restore();
+    }
+
+    let mpCamera = null;
+    async function initCameraTracking(retry) {
+      if (camRunning && !retry) return;
+      if (camRunning && mpCamera && mpCamera.stop) { try { mpCamera.stop(); } catch (e) {} camRunning = false; }
+      camOverlayMsg.style.display = 'flex';
+      try {
+        const hands = new Hands({ locateFile: (f) => 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/' + f });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.65, minTrackingConfidence: 0.65 });
+        hands.onResults(onHandResults);
+        mpCamera = new Camera(videoElement, {
+          onFrame: async () => { await hands.send({ image: videoElement }); },
+          width: 320, height: 180
+        });
+        await mpCamera.start();
+        camRunning = true;
+        camOverlayMsg.style.display = 'none';
+        camIndicator.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+      } catch (e) {
+        camRunning = false;
+        camOverlayMsg.innerHTML = '<span class="text-amber-300">Mouse Fallback Active</span>';
+        camIndicator.className = 'w-2 h-2 rounded-full bg-rose-500';
+      }
+    }
+    window.initCameraTracking = initCameraTracking;
+
+    if (!window.location.search.includes('nocam')) {
+      initCameraTracking(false);
+    } else {
+      camOverlayMsg.innerHTML = '<span class="text-emerald-300">Camera skipped (?nocam=1)</span>';
+      camIndicator.className = 'w-2 h-2 rounded-full bg-emerald-400';
+    }
+
+    // ==========================================================================
+    // 6. 60+ FPS RENDER LOOP
+    // ==========================================================================
+    const clock = new THREE.Clock();
+    let frameCount = 0;
+    let lastFpsUpdate = performance.now();
+    const fpsEl = document.getElementById('fps-counter');
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsed = clock.getElapsedTime();
+      const now = performance.now();
+
+      frameCount++;
+      if (now - lastFpsUpdate >= 500) {
+        fpsEl.textContent = Math.round((frameCount * 1000) / (now - lastFpsUpdate)) + ' FPS';
+        frameCount = 0;
+        lastFpsUpdate = now;
+      }
+
+      smoothedHandNDC.lerp(targetHandNDC, 0.08);
+
+      if (isHandTracked) {
+        handCursor.style.display = 'block';
+        handCursor.style.left = (((smoothedHandNDC.x + 1) / 2) * window.innerWidth) + 'px';
+        handCursor.style.top = (((-smoothedHandNDC.y + 1) / 2) * window.innerHeight) + 'px';
+      } else {
+        handCursor.style.display = 'none';
+      }
+
+      if (!activeModalId) {
+        camTargetPos.x = smoothedHandNDC.x * 7.0;
+        camTargetPos.y = 1.2 + smoothedHandNDC.y * 4.5;
+        camTargetPos.z = 17;
+        worldGroup.rotation.y = elapsed * 0.08;
+      }
+      camera.position.lerp(camTargetPos, 0.06);
+      currentLookAt.lerp(camLookAtTarget, 0.08);
+      camera.lookAt(currentLookAt);
+
+      laserScanBar.position.y = Math.sin(elapsed * 3.2) * 1.3;
+      laserPlaneMat.opacity = 0.16 + 0.1 * (0.5 + 0.5 * Math.sin(elapsed * 3.2));
+
+      for (let i = roguePopups.length - 1; i >= 0; i--) {
+        const p = roguePopups[i];
+        p.mesh.rotation.x += 0.03;
+        p.mesh.rotation.y += 0.04;
+        p.life -= 0.008;
+        p.laser.material.opacity = 0.35 + 0.55 * Math.abs(Math.sin(elapsed * 6));
+        if (p.life <= 0) {
+          worldGroup.remove(p.mesh);
+          worldGroup.remove(p.laser);
+          p.mesh.geometry.dispose();
+          p.laser.geometry.dispose();
+          roguePopups.splice(i, 1);
+          popupsNeutralized++;
+          killCounterEl.textContent = popupsNeutralized;
+        }
+      }
+
+      if (empRing.material.opacity > 0.01) {
+        empRing.scale.addScalar(0.5);
+        empRing.lookAt(camera.position);
+        empRing.material.opacity *= 0.9;
+      }
+
+      raycaster.setFromCamera(smoothedHandNDC, camera);
+      const hits = raycaster.intersectObjects(interactiveMeshes, false);
+      hoveredStationId = hits.length > 0 ? hits[0].object.userData.stationData.id : null;
+
+      Object.values(stationObjects).forEach((obj) => {
+        const isTargeted = hoveredStationId === obj.data.id;
+        if (obj.data.type !== 'core') obj.group.rotation.y = elapsed * 0.65;
+        const s = isTargeted ? 1.22 : 1.0;
+        const cs = obj.group.scale.x + (s - obj.group.scale.x) * 0.12;
+        obj.group.scale.setScalar(cs);
+
+        const worldPos = new THREE.Vector3();
+        obj.hitMesh.getWorldPosition(worldPos);
+        worldPos.y += obj.data.radius + 0.6;
+        worldPos.project(camera);
+        obj.labelEl.style.transform = 'translate(-50%,-145%) translate(' +
+          ((worldPos.x * 0.5 + 0.5) * window.innerWidth).toFixed(1) + 'px,' +
+          ((-(worldPos.y * 0.5) + 0.5) * window.innerHeight).toFixed(1) + 'px)';
+        obj.labelEl.style.visibility = worldPos.z > 1 ? 'hidden' : 'visible';
+        obj.labelEl.classList.toggle('targeted', isTargeted);
+      });
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    window.__SCAN_READY = true;
+    window.__SCAN = {
+      stations: stationObjects,
+      activate: activateStation,
+      close: closeNodeModal,
+      purge: triggerLaserPurge
+    };
+  </script>
+
+  <!-- Ability #38: Real-Time CNS Telemetry Streamer (live from server.py) -->
+  <script>
+    (function () {
+      var statusEl = document.getElementById('cns-status');
+      var sseStarted = false;
+      function setStatus(txt, live) {
+        if (!statusEl) return;
+        statusEl.textContent = txt;
+        statusEl.className = live ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold';
+      }
+      function handle(ev) {
+        window.__CNS_COUNT = (window.__CNS_COUNT || 0) + 1;
+        window.__CNS_LAST = ev;
+        setStatus('CNS \u25CF ' + (ev.log_line || ev.event_type || '').slice(0, 52), true);
+        try { if (window.handleCNS) window.handleCNS(ev); } catch (e) {}
+      }
+      function startSSE() {
+        if (sseStarted) return;
+        if (!window.EventSource) { setStatus('CNS \u2716 OFFLINE', false); return; }
+        sseStarted = true;
+        var es = new EventSource('/api/stream');
+        es.onopen = function () { setStatus('CNS \u25CF LINK LIVE (SSE)', true); };
+        es.onmessage = function (e) { try { handle(JSON.parse(e.data)); } catch (err) {} };
+        es.onerror = function () { setStatus('CNS \u25D0 RETRY', false); };
+      }
+      function startWS() {
+        var ws, opened = false;
+        try { ws = new WebSocket('ws://' + (location.hostname || 'localhost') + ':8765'); }
+        catch (e) { return startSSE(); }
+        ws.onopen = function () { opened = true; setStatus('CNS \u25CF LINK LIVE', true); };
+        ws.onmessage = function (e) { try { handle(JSON.parse(e.data)); } catch (err) {} };
+        ws.onerror = function () { try { ws.close(); } catch (e) {} };
+        ws.onclose = function () {
+          if (!opened) { startSSE(); }
+          else { setStatus('CNS \u25D0 RETRY', false); setTimeout(startWS, 3000); }
+        };
+      }
+      setStatus('CNS \u25C6 LINKING\u2026', false);
+      startWS();
+    })();
+
+    // Scanner world: stream live OCR / intercept events into the feed
+    window.handleCNS = function (ev) {
+      if (ev.sector !== 'scanner' && ev.sector !== 'hub') return;
+      var log = document.getElementById('live-scanner-log');
+      if (log && ev.log_line) {
+        var d = document.createElement('div');
+        d.className = ev.event_type === 'POPUP_INTERCEPTED' ? 'text-rose-400 font-semibold' : 'text-emerald-300';
+        d.textContent = ev.log_line;
+        log.prepend(d);
+        while (log.children.length > 6) log.removeChild(log.lastElementChild);
+      }
+      if (ev.event_type === 'POPUP_INTERCEPTED') {
+        var kc = document.getElementById('kill-counter');
+        kc.textContent = String((parseInt(kc.textContent, 10) || 0) + 1);
+      }
+    };
+  </script>
+</body>
+</html>

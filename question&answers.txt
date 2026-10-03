@@ -1,0 +1,1381 @@
+1. Does the automation launch successfully from the terminal?
+Status: PASS
+Evidence: system_boot.py:318 (if __name__ == "__main__": start_system()).
+Observed Behavior: Running python system_boot.py successfully orchestrates the startup script.
+Expected Behavior: System launches from the terminal command.
+2. Does the main UI appear after startup?
+Status: PASS
+Evidence: system_boot.py:316 (organ_13_interface_layer.run_manual_interface()) and organ_13_interface_layer.py:922 (root = tk.Tk(), root.mainloop()).
+Observed Behavior: The Tkinter manual input box and floating "Hojaiga Voice" window appear successfully.
+Expected Behavior: Main GUI components render on startup.
+3. Does the system remain idle until the user explicitly activates it?
+Status: PARTIAL
+Evidence: organ_13_interface_layer.py:948 (def on_submit(): ... submit_task(text)).
+Observed Behavior: The Voice subsystem remains idle and locked behind the biometric/password check. However, the Text GUI allows a user to type and submit a task to the CNS immediately, bypassing the voice boot/security sequence entirely.
+Expected Behavior: The entire system should reject/queue tasks until the global boot sequence unlocks the system.
+Fix Required: The text UI's on_submit function needs to verify voice_interface.is_booted before dispatching to the CNS.
+4. Does holding the Left Ctrl key activate the voice-input mode?
+Status: PASS
+Evidence: organ_13_interface_layer.py:790 (if not keyboard.is_pressed('left ctrl'):).
+Observed Behavior: The loop polls keyboard.is_pressed('left ctrl') and only opens the microphone stream while it is held down.
+Expected Behavior: Push-to-talk via Left Ctrl.
+5. Does the boot up command actually initiate system boot?
+Status: PASS
+Evidence: organ_13_interface_layer.py:823 (if "boot up" in text:).
+Observed Behavior: Detecting "boot up" in the transcribed text successfully triggers the biometric and password sequence.
+Expected Behavior: "Boot up" initiates the security handshake.
+6. Is the security question presented before boot?
+Status: PASS
+Evidence: organ_13_interface_layer.py:826 (self.speak(self.security_question)).
+Observed Behavior: The system audibly asks "What is the name of your grandmother?" before granting access.
+Expected Behavior: Security question precedes system unlock.
+7. Is the security answer validated correctly?
+Status: PASS
+Evidence: organ_13_interface_layer.py:834 (if any(ans in ans_text for ans in self.security_answers):).
+Observed Behavior: Transcribes the user's spoken answer and checks if it matches any accepted alias in self.security_answers.
+Expected Behavior: Matches verbal answer against accepted list.
+8. Does an incorrect security answer prevent boot?
+Status: PASS
+Evidence: organ_13_interface_layer.py:838 (self.speak("Incorrect password...")).
+Observed Behavior: Aborts the sequence and does not set is_booted = True.
+Expected Behavior: Denies access.
+9. Does a correct security answer continue boot?
+Status: PASS
+Evidence: organ_13_interface_layer.py:835 (self.is_booted = True).
+Observed Behavior: Sets the boolean flag allowing subsequent voice commands to be passed to submit_callback().
+Expected Behavior: Unlocks the voice command interface.
+10. Does boot initialize all mandatory organs?
+Status: FAIL
+Evidence: system_boot.py:118, 129, 139, 149, 182.
+Observed Behavior: system_boot.py only instantiates the CNS, Audit, Brain, and Interface Layer at startup. The Workflow Compiler, Decision Engine, Agents Organ, Controllers, and External Connectors are instantiated inside handle_new_task dynamically for every task.
+Expected Behavior: All organs should be initialized once at system boot and persist their state.
+Fix Required: Move organ instantiations (WorkflowCompilerKernel(), DecisionEngineCore(), etc.) to start_system() so they are singletons available to handle incoming events, rather than being re-created per task.
+11. Does boot initialize the CNS?
+Status: PASS
+Evidence: system_boot.py:25 (cns = EventBus()).
+Observed Behavior: EventBus is initialized early.
+Expected Behavior: CNS must be up first.
+12. Does boot initialize the Brain?
+Status: PASS
+Evidence: system_boot.py:31 (brain = BrainOrgan()).
+Observed Behavior: Brain is instantiated successfully during start_system().
+Expected Behavior: Brain is ready for intent resolution.
+13. Does boot initialize the LLM runtime?
+Status: PARTIAL
+Evidence: organ_37_llm_gateway.py (Called by BrainOrgan.__init__).
+Observed Behavior: BrainOrgan instantiates LLMGateway, but the gateway does not proactively ping/wake up Ollama or Groq at boot. It waits for the first request (which takes a few seconds longer).
+Expected Behavior: LLMs should be warmed up at boot.
+Fix Required: Add a warm-up ping to LLMGateway.__init__ to ensure the local Ollama daemon is active and models are loaded into VRAM.
+14. Does boot initialize the controllers?
+Status: FAIL
+Evidence: system_boot.py:149 (controllers = ControllersCore()).
+Observed Behavior: Controllers are booted dynamically mid-task.
+Expected Behavior: Should boot at startup.
+Fix Required: Move to start_system().
+15. Does boot initialize the agent system?
+Status: FAIL
+Evidence: system_boot.py:139 (agents_organ = AgentsOrgan()).
+Observed Behavior: Agent registry is booted dynamically mid-task.
+Expected Behavior: Should boot at startup.
+Fix Required: Move to start_system().
+16. Does boot initialize the event/session bus?
+Status: PASS
+Evidence: system_boot.py:25 and system_boot.py:275 (loop.create_datagram_endpoint(...)).
+Observed Behavior: Internal EventBus and external UDP listeners are both activated correctly.
+Expected Behavior: Communication channels open on boot.
+17. Does boot initialize the visualization system?
+Status: FAIL
+Evidence: live_visualization_ui.py.
+Observed Behavior: system_boot.py sends UDP packets blindly to 127.0.0.1:9999, but it does not launch the visualizer. The user must manually start Terminal 1.
+Expected Behavior: Automation should ideally spin up its own visualizer process if it's considered part of the core system.
+Fix Required: Use subprocess.Popen in system_boot.py to auto-launch the visualizer if it isn't running.
+18. Does boot initialize the audit system?
+Status: PASS
+Evidence: system_boot.py:28 (audit = AuditSystem(storage_dir="./audit_logs")).
+Observed Behavior: The file-based audit subsystem is created.
+Expected Behavior: Auditing is available from the first millisecond.
+19. Does boot initialize the state system?
+Status: NOT IMPLEMENTED
+Evidence: No global state management organ (e.g., Organ 11 or 12) is instantiated in system_boot.py.
+Observed Behavior: State is passed ephemerally through variables inside handle_new_task or isolated within ConnectorGateway.
+Expected Behavior: A centralized State/Memory organ should be booted to persist system-wide state between tasks.
+Fix Required: Implement and initialize the State Management Organ at boot.
+20. Does boot report which organs successfully initialized?
+Status: FAIL
+Evidence: system_boot.py:24-32.
+Observed Behavior: The logger prints a few hardcoded strings (Initializing Brain Organ...), but there is no systemic health-check or handshake where organs report "ONLINE" back to the CNS.
+Expected Behavior: The CNS should query all registered organs for a health status and print a summarized boot report before unlocking the interface.
+Fix Required: Implement a SYS_PING / SYS_PONG handshake over the EventBus during boot.
+-------------------------------------------
+-------------------------------------------
+
+1. Is the UI available after startup?
+Status: PASS
+Evidence: organ_13_interface_layer.py:922 (root = tk.Tk(), root.mainloop()).
+Observed Behavior: The Tkinter GUI opens automatically at the end of system_boot.py.
+Expected Behavior: UI is ready.
+2. Can the user provide text input?
+Status: PASS
+Evidence: organ_13_interface_layer.py:945 (text_box = tk.Text(...)).
+Observed Behavior: The user can type into a multi-line text box and click "Submit to CNS".
+Expected Behavior: Text input is fully supported.
+3. Can the user provide voice input?
+Status: PASS
+Evidence: organ_13_interface_layer.py:783 (def run_loop(self):).
+Observed Behavior: A background thread constantly runs voice_interface.run_loop() and reads from the PyAudio microphone stream.
+Expected Behavior: Voice input is fully supported.
+4. Can the user activate voice input using Left Ctrl?
+Status: PASS
+Evidence: organ_13_interface_layer.py:790 (if not keyboard.is_pressed('left ctrl'):).
+Observed Behavior: The system strictly polls for the Left Ctrl key and only captures frames while it is actively held down.
+Expected Behavior: Push-to-talk works seamlessly.
+5. Does the system correctly detect when the user starts speaking?
+Status: PASS
+Evidence: organ_13_interface_layer.py:800 (while keyboard.is_pressed('left ctrl'): buffer = source.stream.read(...)).
+Observed Behavior: It relies on the hardware key (push-to-talk) to define the exact window of speech rather than relying on unreliable Voice Activity Detection (VAD).
+Expected Behavior: Hardware-gated detection.
+6. Does speech-to-text correctly transcribe the user's speech?
+Status: PASS
+Evidence: organ_13_interface_layer.py:817 (text = self.stt_engine.transcribe(audio, prompt="boot up, hojaiga").lower().strip()).
+Observed Behavior: It successfully uses the LocalSTTEngine (Whisper) to transcribe the raw audio bytes into text.
+Expected Behavior: Audio is converted to text correctly.
+7. Does the UI show the transcribed input?
+Status: FAIL
+Evidence: organ_13_interface_layer.py:879 and 882.
+Observed Behavior: The UI label cycles through Recording..., Transcribing..., and Processing.... It never updates the label or the text box with the actual words it transcribed.
+Expected Behavior: The user needs to see what the system heard to know if a transcription error occurred.
+Fix Required: Add self.set_ui_status(f"Heard: {text}") before triggering the submit_callback.
+8. Does the system accept informal natural-language commands?
+Status: PASS
+Evidence: organ_01_brain.py:107 (TaskRequest(raw_text=command)) and system_boot.py:108 (plan = brain.handle_task(t_req)).
+Observed Behavior: Raw, unstructured text is passed directly to the Brain (LLM) which is tasked with intent normalization and parsing.
+Expected Behavior: The intelligence layer parses informal language.
+9. Does it accept formal commands?
+Status: PASS
+Evidence: organ_01_brain.py:107.
+Observed Behavior: Because the LLM handles all input text, it parses formal structured commands just as well as informal language.
+Expected Behavior: The intelligence layer parses formal language.
+10. Does it accept long multi-step commands?
+Status: PASS
+Evidence: organ_01_brain.py:45 (context_size: int = 8192) and organ_01_brain.py:187 (agent_tasks: list[AgentTask]).
+Observed Behavior: The Brain's context window is 8192 tokens, and the ExecutionPlan dataclass natively supports generating an arbitrary-length list of AgentTask objects from a single request.
+Expected Behavior: Large multi-step goals are supported.
+11. Does it accept short commands?
+Status: PASS
+Evidence: organ_01_brain.py:107.
+Observed Behavior: The system accepts strings of any length (provided they aren't totally empty).
+Expected Behavior: Short commands work normally.
+12. Does it accept commands containing URLs?
+Status: PASS
+Evidence: organ_13_interface_layer.py:210 (InputValidator._SAFE_STRING_RE).
+Observed Behavior: The validation regex allows @, /, ., and : characters (r"^[\w\s\-\.\,\:\/@]{0,4096}$"), explicitly permitting URLs through the gateway.
+Expected Behavior: URLs are valid payload strings.
+13. Does it accept commands referring to files?
+Status: PASS
+Evidence: organ_13_interface_layer.py:210.
+Observed Behavior: The validation regex permits file paths (slashes, dots, dashes).
+Expected Behavior: File references are accepted.
+14. Does it accept commands referring to applications?
+Status: PASS
+Evidence: organ_01_brain.py (No application keyword restrictions).
+Observed Behavior: No blacklists exist in the input parser for application names.
+Expected Behavior: Application names are accepted.
+15. Does it accept commands referring to browser tabs?
+Status: PASS
+Evidence: system_boot.py:191 (target_connector = ConnectorType.BROWSER).
+Observed Behavior: The Brain natively routes commands to the BrowserAgent if browser terminology is detected and authorized.
+Expected Behavior: Browser context is supported.
+16. Does it accept commands containing multiple objectives?
+Status: PASS
+Evidence: organ_01_brain.py:187 (agent_tasks: list[AgentTask] = field(default_factory=list)).
+Observed Behavior: The Brain is structurally designed to return a list of multiple distinct agent objectives for a single user prompt.
+Expected Behavior: Multiple tasks can be spawned simultaneously.
+17. Does it preserve the complete user request without truncation?
+Status: PASS
+Evidence: organ_01_brain.py:134 (raw_text: str).
+Observed Behavior: The raw_text field does not slice or truncate the string anywhere before it reaches the LLM prompt formatting.
+Expected Behavior: Unmodified strings are retained.
+18. Does it correctly identify when the user has finished speaking?
+Status: PASS
+Evidence: organ_13_interface_layer.py:800 (while keyboard.is_pressed('left ctrl'):).
+Observed Behavior: Because it is push-to-talk, the exact millisecond the user lifts the Left Ctrl key, the audio buffer is closed and shipped to the transcription engine.
+Expected Behavior: Hardware key release signals completion perfectly.
+19. Can the system reject malformed or unintelligible input safely?
+Status: PASS
+Evidence: organ_13_interface_layer.py:819 (if not text.strip(): continue).
+Observed Behavior: If the STT engine returns empty space, or if the user holds the key but says nothing intelligible, the loop safely ignores it and resets.
+Expected Behavior: Junk audio is discarded safely.
+20. Can the system tell the user what it understood?
+Status: FAIL
+Evidence: organ_13_interface_layer.py:882-883 (self.speak("Processing..."); self.submit_callback(text)).
+Observed Behavior: The system does not echo the recognized intent or transcribed text back to the user before submitting it to the CNS. The user has no idea if the system misheard them until it starts executing the wrong task.
+Expected Behavior: The voice system should verbally confirm ("Executing: [parsed text]") or ask for confirmation on high-risk tasks before dispatching.
+Fix Required: Add self.speak(f"Executing: {text}") so the user gets verbal feedback of the transcribed command.
+
+--------------------------------------------
+--------------------------------------------
+
+1. Does every user task reach the Brain?
+Status: PASS
+Evidence: system_boot.py:108 (plan = brain.handle_task(t_req)) is the single ingress point in the main execution pipeline.
+Observed Behavior: No commands bypass the Brain.
+Expected Behavior: Brain is the universal cognitive gateway.
+2. Does the Brain actually invoke the configured LLM?
+Status: PASS
+Evidence: organ_01_brain.py:483 (self._gateway.execute_inference(...)) and organ_37_llm_gateway.py:105.
+Observed Behavior: The Brain synchronously calls out to the LLM Gateway.
+Expected Behavior: Execution requires the LLM.
+3. Is the Ollama runtime discoverable?
+Status: PASS
+Evidence: organ_37_llm_gateway.py:28 (self.ollama_url = "http://127.0.0.1:11434/api/chat").
+Observed Behavior: It expects the local daemon on the default Ollama port.
+Expected Behavior: Automatically networks to the local daemon.
+4. Is the configured Ollama model actually available?
+Status: PARTIAL
+Evidence: organ_37_llm_gateway.py:47 ("model": "llama3").
+Observed Behavior: It hardcodes a request for llama3. If llama3 isn't pulled locally, Ollama will throw a 404.
+Fix Required: The model name should be configurable via .env rather than hardcoded.
+5. Does the system report an LLM failure instead of silently bypassing the LLM?
+Status: PASS
+Evidence: organ_37_llm_gateway.py:128 (raise LLMGatewayError(...)).
+Observed Behavior: If Ollama, Groq, and OpenRouter all fail sequentially, a hard exception is thrown rather than yielding an empty JSON plan.
+Expected Behavior: Graceful degradation followed by hard crash.
+6. Does the Brain understand the user's intent?
+Status: PASS
+Evidence: organ_01_brain.py:456 ("intent_analysis": "[Detailed reasoning about what the human truly wants...]")
+Observed Behavior: Forces the LLM to write out an intent analysis block before planning, utilizing Chain of Thought.
+Expected Behavior: LLM accurately deduces intent.
+7. Does it distinguish intent from literal wording?
+Status: PASS
+Evidence: organ_01_brain.py:450 ("decode unstructured, informal, or rambling user intent").
+Observed Behavior: The system prompt explicitly commands the model to decode intent rather than parse literally.
+Expected Behavior: Robust against bad grammar or rambling.
+8. Can it understand informal language?
+Status: PASS
+Evidence: System prompt explicitly expects "informal" and "rambling".
+Observed Behavior: Passes naturally through LLMs.
+9. Can it understand ambiguous language?
+Status: PASS
+Evidence: organ_01_brain.py:452 ("Rely on your own logic and context to deduce the intent.").
+Observed Behavior: The LLM is forced to guess rather than crash.
+10. Can it understand long instructions?
+Status: PASS
+Evidence: The prompt and context fit within standard 8K context windows.
+11. Can it identify the desired final outcome?
+Status: PASS
+Evidence: organ_01_brain.py:462 ("objective": "[High-level objective for this Permanent Agent]").
+Observed Behavior: It forces the LLM to state a clear objective for each generated sub-agent task.
+12. Can it identify required applications?
+Status: PASS
+Evidence: organ_01_brain.py:458 ("controller_access": [...]).
+Observed Behavior: The LLM is required to request OS/Desktop/Browser access tokens based on its context parsing.
+13. Can it identify required browser/profile requirements?
+Status: PASS
+Evidence: Uses BrowserAgent definitions natively in the prompt schema.
+14. Can it identify required files or resources?
+Status: PASS
+Evidence: Uses FileAgent definitions natively in the prompt schema.
+15. Can it identify dependencies between subtasks?
+Status: FAIL
+Evidence: organ_01_brain.py:159 (AgentTask dataclass) and JSON schema.
+Observed Behavior: The AgentTask structure is a flat list. There is no depends_on array or directed acyclic graph (DAG) metadata to tell the system how tasks rely on one another.
+Expected Behavior: Complex tasks require sequence/dependency tracking.
+Fix Required: Add a dependencies: list[str] field to the AgentTask JSON schema and dataclass.
+16. Can it determine which tasks can run in parallel?
+Status: FAIL
+Evidence: Lack of dependency graph or run_in_parallel: bool flags.
+Observed Behavior: The system compiles a list of tasks but has no data-driven way to know if they can run concurrently.
+Expected Behavior: The execution engine should know what can be parallelized.
+Fix Required: Incorporate concurrency flags into the Brain's prompt JSON format.
+17. Can it determine which tasks must run sequentially?
+Status: FAIL
+Evidence: See #15 and #16. The JSON structure is too simple to express sequence constraints robustly (it relies only on list order, which is brittle).
+18. Does it convert raw human language into a structured representation?
+Status: PASS
+Evidence: organ_01_brain.py:490 (_parse converts JSON string into ExecutionPlan dataclasses).
+Observed Behavior: Generates an ExecutionPlan and strict AgentTask objects.
+Expected Behavior: Reliable struct instantiation.
+19. Does it preserve the user's original intent during compilation?
+Status: PASS
+Evidence: organ_01_brain.py:193 (intent_analysis is stored in the ExecutionPlan and preserved for logging/auditing).
+20. Does it explain what it believes the user wants before execution when necessary?
+Status: FAIL
+Evidence: organ_01_brain.py:451 ("You MUST NOT ask for clarification or pause for verification.").
+Observed Behavior: The Brain is explicitly hardcoded never to pause for verification or ask questions, even for high-risk or ambiguous requests. It executes blindly on its best guess.
+Expected Behavior: High-risk tasks should trigger a user-confirmation loop before dispatching to the EventBus.
+Fix Required: The system prompt should allow the LLM to return requires_escalation: true if it detects high risk, triggering a UI prompt.
+-----------------------------------------
+----------------------------------------
+
+
+1. Does every task pass through the Workflow Compiler?
+Status: PASS
+Evidence: system_boot.py:118 (compiler = WorkflowCompilerKernel()).
+Observed Behavior: It is hardcoded sequentially into the main event loop immediately after the Brain.
+Expected Behavior: Every plan must be compiled.
+2. Can any raw user command bypass the compiler?
+Status: PASS
+Evidence: system_boot.py:108 and system_boot.py:118.
+Observed Behavior: The pipeline is strictly deterministic. No manual UI tasks can skip the compile_workflow step.
+Expected Behavior: Bypassing compilation is impossible.
+3. Does the compiler create a structured execution plan?
+Status: PASS
+Evidence: organ_36_workflow_compiler.py:1533 (compile_workflow(...) -> Dict[str, Any]).
+Observed Behavior: It returns a dictionary containing a validated AST (Abstract Syntax Tree) and a DAG (Directed Acyclic Graph).
+Expected Behavior: Raw JSON turns into verified IR.
+4. Does the compiler divide complex tasks into subtasks?
+Status: FAIL
+Evidence: organ_36_workflow_compiler.py:17 (Universal Law 3: ... It performs ZERO runtime execution... and ZERO Brain-level strategic reasoning.).
+Observed Behavior: The Compiler acts solely as a deterministic parser. The actual intelligence of dividing tasks into subtasks is done by the Brain (Organ 01) via the LLM prompt. The Compiler just validates what the Brain guessed.
+Expected Behavior: Sub-tasking is an intelligence layer job, not a compiler job.
+5. Does it assign objectives to permanent agents?
+Status: FAIL
+Evidence: See #4. The Brain assigns objectives in its JSON output. The compiler just checks for syntax errors.
+6. Does it define individual steps for each objective?
+Status: FAIL
+Evidence: The Brain defines the steps.
+7. Does it define dependencies between steps?
+Status: PASS
+Evidence: organ_36_workflow_compiler.py:559 (class DependencyResolver).
+Observed Behavior: While the Brain currently fails to output dependsOn arrays, the Compiler is fully implemented to ingest them, build an adjacency matrix, run a Kahn topological sort, and detect circular dependencies.
+Expected Behavior: Compiler verifies DAG integrity.
+8. Does it create checkpoints?
+Status: PARTIAL
+Evidence: organ_36_workflow_compiler.py:550 (sync_points: Set[str] = field(default_factory=set)).
+Observed Behavior: The DAG structure supports injection of sync_points during resolution, but currently they aren't actively populated by the DependencyResolver._insert_sync_points() logic based on user input.
+Expected Behavior: System pauses at sync boundaries.
+9. Does it identify required controllers?
+Status: FAIL
+Evidence: The Brain populates controller_access in the JSON. The Compiler does no controller inference.
+10. Does it identify required applications?
+Status: FAIL
+Evidence: The Brain infers this.
+11. Does it identify required Chrome profiles?
+Status: FAIL
+Evidence: Neither the Brain nor the Compiler natively extracts specific Chrome profiles (e.g., "Personal" vs "Work"). It just delegates to BrowserAgent.
+12. Does it identify the required execution paradigm?
+Status: FAIL
+Evidence: organ_10_agents.py:166 (class AgentParadigm).
+Observed Behavior: While execution paradigms exist in the Agent registry, the Compiler does not dynamically parse or validate paradigms in the AST.
+Fix Required: The Compiler needs an optimization pass that maps task intents to AgentParadigm enums.
+13. Can the compiler automatically select a paradigm?
+Status: FAIL
+Evidence: The logic does not exist in organ_36_workflow_compiler.py.
+14. Can the system ask the user to select a paradigm when required?
+Status: FAIL
+Evidence: The compiler is 100% deterministic and headless; it has no interface for user interruption.
+15. Can the system ask clarification questions when genuinely necessary?
+Status: FAIL
+Evidence: organ_36_workflow_compiler.py has no interactive components, and organ_01_brain.py is explicitly forbidden from asking questions in its system prompt.
+16. Does compilation finish before execution begins?
+Status: PASS
+Evidence: system_boot.py:118-130.
+Observed Behavior: The DecisionEngineCore and AgentsOrgan are not invoked until compiler.compile_workflow() returns synchronously.
+Expected Behavior: Compilation strictly precedes execution.
+17. Does the system prevent execution while compilation is incomplete?
+Status: PASS
+Evidence: The linear blocking architecture of handle_new_task in system_boot.py inherently prevents out-of-order execution.
+18. Can the compiled plan be inspected?
+Status: PASS
+Evidence: organ_36_workflow_compiler.py:224 (DiagnosticsEngine).
+Observed Behavior: The compiler produces a highly structured report of Warnings, Errors, and AST layouts which can be read natively in JSON format.
+19. Is the compiled plan stored for auditing?
+Status: PARTIAL
+Evidence: organ_36_workflow_compiler.py:1552 (CompilationCache.compute_key).
+Observed Behavior: The Compiler caches the output into a local SQLite database for performance, but the actual "Audit" logging of the AST is currently just a generic COMPILATION_COMPLETED UDP event in system_boot.py, which drops the actual payload.
+Fix Required: Attach compiled_plan to the COMPILATION_COMPLETED event payload so Organ 16 (Audit) records it to disk.
+20. Can the Brain recompile a task when execution fails?
+Status: FAIL
+Evidence: system_boot.py:102-140.
+Observed Behavior: The pipeline is a one-way waterfall. If an agent crashes or hits an execution error, the script dies or stops. There is no feedback loop piping errors back into the Brain or Compiler to dynamically generate a new plan.
+Expected Behavior: Autonomic healing / recompilation loop.
+Fix Required: Wrap the pipeline in a while loop that listens for EXECUTION_FAILED events and loops back to the Brain with the error trace.
+
+-----------------------------------
+-----------------------------------
+
+1. Does the compiled task reach the CNS?
+Status: FAIL / PARTIAL
+Evidence: system_boot.py:122 (await cns.publish(EventEnvelope(topic="sys.events", payload={"event_type": "COMPILATION_COMPLETED"}))).
+Observed Behavior: The COMPILATION_COMPLETED event reaches the CNS, but the actual compiled_plan dictionary is completely dropped and never serialized into the EventEnvelope payload.
+Expected Behavior: The AST/DAG should be published to the CNS so downstream organs can read it.
+Fix Required: Attach compiled_plan to the event payload.
+2. Can the compiler bypass the CNS?
+Status: PASS (It currently bypasses it)
+Evidence: system_boot.py:118 (compiler = WorkflowCompilerKernel()).
+Observed Behavior: system_boot.py instantiates WorkflowCompilerKernel directly and calls it as a standard Python object.
+Expected Behavior: The strict black-box architecture requires the system to emit a COMPILATION_REQUEST event to the CNS, which the compiler should listen for via its IPC socket instead of being instantiated locally.
+Fix Required: Refactor system_boot.py to use EventBus.publish() instead of direct instantiation.
+3. Does the CNS receive the complete execution plan?
+Status: FAIL
+Evidence: See #1. The payload is dropped.
+4. Does the CNS understand agent dependencies?
+Status: FAIL
+Evidence: organ_02_cns_single_file.py (EventBus class).
+Observed Behavior: The CNS is strictly implemented as a Pub/Sub message broker. It contains absolutely no execution scheduling logic, DAG traversal, or dependency tracking.
+Expected Behavior: If the CNS is truly the central nervous system orchestrating execution, it needs a DAG Scheduler, not just a message bus.
+Fix Required: Implement a DAG Scheduler inside the CNS or a dedicated Scheduler Organ.
+5. Does the CNS schedule permanent agents?
+Status: FAIL
+Evidence: system_boot.py:135 (agents_organ = AgentsOrgan()).
+Observed Behavior: Scheduling is rigidly hardcoded as sequential code blocks in system_boot.py. The CNS itself schedules nothing; it just passes string events.
+6. Does it manage parallel execution?
+Status: FAIL
+Evidence: There is no asyncio.gather or threading pool implemented for agent execution in system_boot.py or the CNS.
+7. Does it manage sequential execution?
+Status: PARTIAL
+Evidence: system_boot.py forces a sequential execution pipeline via await calls, but the CNS Organ itself is unaware of the sequence.
+8. Does it manage resource allocation?
+Status: FAIL
+Evidence: No resource locking (e.g., locking the mouse for Agent A so Agent B doesn't fight it) is implemented in the EventBus or pipeline.
+9. Does it know which controller each agent requires?
+Status: FAIL
+Evidence: The CNS does not parse controller permissions.
+10. Does it know which application/environment each agent requires?
+Status: FAIL
+11. Does it track agent status?
+Status: FAIL
+Evidence: organ_02_cns_single_file.py (EventBus).
+Observed Behavior: The EventBus is stateless. It does not track which agents are ONLINE, OFFLINE, or BUSY.
+12. Does it track checkpoint status?
+Status: FAIL
+13. Does it prevent conflicting agents from controlling the same resource?
+Status: FAIL
+Evidence: No mutexes, lock manager, or resource tokens are issued by the CNS.
+14. Does it know when a subtask has completed?
+Status: FAIL
+Evidence: The CNS only knows a generic AGENTS_COMPLETED event fired at the end of the hardcoded pipeline loop. It does not track sub-DAG task completions.
+15. Does it know when a subtask has failed?
+Status: FAIL
+16. Does it support replanning?
+Status: FAIL
+Evidence: system_boot.py is a one-way script. There is no logic to handle a failure and loop back to the Brain.
+17. Does it prevent execution before receiving a valid compiled plan?
+Status: PASS
+Evidence: system_boot.py executes synchronously, so the Decision Engine cannot run until the Python compile_workflow() function returns.
+18. Does it report its scheduling decisions?
+Status: FAIL
+19. Can the CNS recover from an agent failure?
+Status: FAIL
+Evidence: No global try/except or panic recovery loop exists in system_boot.py or the CNS. If an agent crashes, the pipeline dies.
+20. Can the CNS safely terminate a corrupted execution?
+Status: FAIL
+Evidence: There is no SYSTEM_ABORT or ESCAPE_HATCH event listener that gracefully terminates or kills sub-organs if something goes wrong.
+---------------------------------------------
+---------------------------------------------
+
+1. Are the permanent agents initialized correctly?
+Status: PARTIAL
+Evidence: system_boot.py:135 (agents_organ = AgentsOrgan()).
+Observed Behavior: The generic AgentsOrgan singleton is instantiated, but the system never actually spins up persistent "Permanent Agents" (e.g., a permanent BrowserAgent and a permanent CodeAgent) running in the background listening for tasks.
+Expected Behavior: Permanent agents should be spawned at boot time and kept alive indefinitely.
+2. Are permanent agents assigned tasks only by the CNS?
+Status: FAIL
+Evidence: organ_10_agents.py:1041 (InMemoryCNSGateway).
+Observed Behavior: By default, the system uses an in-memory mock gateway instead of the actual EventBus. Tasks are manually dispatched via python function calls, completely bypassing the CNS.
+3. Can a permanent agent understand its objective?
+Status: PASS
+Evidence: organ_10_agents.py:870 (request_reasoning(..., system_prompt, context)).
+Observed Behavior: The agent is given a specific role_id (which dictates its system prompt) and an assigned_sub_goal. The LLM receives this to parse the objective.
+4. Can a permanent agent break its objective into smaller steps?
+Status: PASS
+Evidence: organ_10_agents.py:821 (while step_index < self._max_steps:).
+Observed Behavior: The TaskRunner uses an autonomous while loop. The LLM can dynamically output one tool call at a time and respond with CONTINUE until it finally outputs FINISH.
+5. Does the permanent agent create checkpoints?
+Status: FAIL
+Evidence: organ_10_agents.py:946 (self._trace.record_step(...)).
+Observed Behavior: The agent logs a "trace" of its steps to SQLite, but it does not create actual system-level "checkpoints" (sync points where it pauses or saves a snapshot that the DAG scheduler respects).
+6. Does it spawn sub-agents when necessary?
+Status: PASS
+Evidence: organ_10_agents.py:993 (DelegationEngine.spawn_child_agent).
+Observed Behavior: Parent agents have the RPC tooling required to ask the DelegationEngine to spawn a child agent.
+7. Do sub-agents receive clearly defined objectives?
+Status: PASS
+Evidence: organ_10_agents.py:1014 (assigned_sub_goal=sub_goal).
+8. Do sub-agents receive their required steps?
+Status: FAIL
+Evidence: The parent passes an objective (sub_goal), but it cannot pre-compute or pass down an explicit array of "steps" to the child. The child has to figure out its own steps from scratch.
+9. Can sub-agents spawn temporary agents?
+Status: PASS
+Evidence: DelegationEngine.spawn_child_agent() relies purely on an agent_handle. It does not restrict children from becoming parents (nesting is supported).
+10. Are temporary agents created according to the number of required steps?
+Status: FAIL
+Evidence: Temporary agents are created on-the-fly dynamically when a parent decides to delegate, not pre-allocated upfront based on DAG execution requirements.
+11. Does each temporary agent have a clearly defined responsibility?
+Status: PASS
+Evidence: They are bound to a strict role_id (e.g., "BrowserAgent") which heavily scopes their system prompt.
+12. Does each temporary agent report its result?
+Status: PARTIAL
+Evidence: organ_10_agents.py:831 (AgentState.AWAITING_CONFIRMATION).
+Observed Behavior: When a temporary agent finishes, it pauses and waits for confirmation, emitting an event. However, it does not automatically return its answer payload to the parent agent.
+13. Are checkpoints updated after successful steps?
+Status: FAIL
+Evidence: There is no checkpoint system implemented inside organ_10_agents.py.
+14. Are failed checkpoints reported?
+Status: FAIL
+15. Are sub-agent results returned to the permanent agent?
+Status: FAIL
+Evidence: organ_10_agents.py:1000.
+Observed Behavior: Spawning a child is asynchronous ("fire and forget"). There is no code inside TaskRunner that injects the child's final output back into the parent's ContextScopeManager room. The parent is currently blind to the child's final result.
+16. Are permanent-agent results returned to the CNS?
+Status: FAIL
+Evidence: organ_10_agents.py:953.
+Observed Behavior: The agent emits AGENT_STEP_COMPLETED events, but when the overall task is finished, the actual string result is trapped inside the local SQLite database. It is never bubbled up to the CNS for the user to see.
+17. Can an agent accidentally execute another agent's task?
+Status: PASS (It cannot happen)
+Evidence: organ_10_agents.py:813 (self._scope.bind_room(record.room_id)).
+Observed Behavior: Memory context is strictly partitioned by room_id. Agents cannot see or interfere with another agent's context.
+18. Can agents execute without authorization?
+Status: PASS (It cannot happen)
+Evidence: organ_10_agents.py:914 (if capability not in record.allowed_capabilities:).
+Observed Behavior: The TaskRunner explicitly blocks and terminates the step if the agent tries to use a tool it wasn't spawned with.
+19. Can agents access required controllers?
+Status: PASS
+Evidence: organ_10_agents.py:938 (dispatch_tool(...)).
+Observed Behavior: If authorized, the agent's action correctly calls out to the Controllers organ via the Gateway.
+20. Can agents recover from failed subtasks?
+Status: PASS
+Evidence: organ_10_agents.py:837-841.
+Observed Behavior: The TaskRunner implements an internal MAX_RETRIES = 2 loop. If a step fails, the agent is allowed to retry before throwing a fatal failure.
+
+-------------------------------------------
+-------------------------------------------
+
+1. Are temporary agents created only when required?
+Status: PASS
+Evidence: organ_10_agents.py:993 (DelegationEngine.spawn_child_agent).
+Observed Behavior: Temporary agents are not pre-allocated; they are spawned purely dynamically when a parent agent makes an RPC delegation call.
+2. Does each temporary agent have an isolated execution context?
+Status: PARTIAL
+Evidence: organ_10_agents.py:1009 (room = session_room_id or parent.room_id).
+Observed Behavior: By default, if a child is spawned without an explicit new room, it inherits the parent's room_id. This means the child will inject its thoughts into the parent's memory context array, potentially causing context pollution.
+Expected Behavior: Sub-agents should always get a strict scratchpad context that folds back to the parent later, instead of directly writing to the parent's room.
+3. Does it know exactly which step it is responsible for?
+Status: FAIL
+Evidence: As verified in previous sections, the Brain passes down an abstract sub_goal, not discrete granular steps.
+4. Does it report completion?
+Status: PASS
+Evidence: organ_10_agents.py:831 (_transition(record, self._store, AgentState.AWAITING_CONFIRMATION)).
+Observed Behavior: When a temporary agent returns FINISH, the runner reports it and shifts the agent state cleanly.
+5. Does it report failure?
+Status: PASS
+Evidence: organ_10_agents.py:978 (_fail method).
+Observed Behavior: Emits AGENT_FAILED with the trace and reason.
+6. Does it preserve useful execution evidence?
+Status: PASS
+Evidence: organ_10_agents.py:946 (self._trace.record_step(...)).
+Observed Behavior: Saves the reasoning string, tool used, execution time, and status to the SQLite agent_traces table.
+7. Does it clean up its temporary resources?
+Status: PARTIAL
+Evidence: organ_10_agents.py:854 (self._scope.release(record.room_id)).
+Observed Behavior: The agent framework cleans up memory references and locks. However, it does not explicitly track or clean up external IO resources like orphaned Chrome browser processes or loose files.
+8. Does it leave Chrome history untouched?
+Status: FAIL
+Evidence: There is no isolation logic natively built into organ_10_agents.py to enforce that BrowserAgents strictly use incognito/stateless profiles.
+9. Does it close only the tabs/windows it owns?
+Status: FAIL
+Evidence: The framework does not issue window handles to specific agents, making it impossible to guarantee an agent won't close another agent's tab.
+10. Does it remain alive until its task is successfully completed?
+Status: PASS
+Evidence: organ_10_agents.py:821 (while step_index < self._max_steps:).
+Observed Behavior: The agent runs in a continuous loop until it explicitly requests a FINISH action or hits a hard timeout/max-step limit.
+11. Does it require the appropriate completion condition before destruction?
+Status: PASS
+Evidence: organ_10_agents.py:831 (AgentState.AWAITING_CONFIRMATION).
+Observed Behavior: Explicitly coded so agent_tier == "temporary" suspends itself rather than auto-destructing like a permanent agent.
+12. Does user confirmation control destruction where required?
+Status: PARTIAL
+Evidence: The state is correctly shifted to AWAITING_CONFIRMATION, but there is absolutely no mechanism implemented in organ_10_agents.py to allow the user to actually Confirm or Reject it. The agent just sits suspended in memory forever.
+Fix Required: Add a resume_agent(handle, user_feedback) RPC endpoint.
+13. Can a failed temporary agent be retried?
+Status: FAIL
+Evidence: The TaskRunner will retry an individual tool step up to 2 times, but if the agent ultimately throws AGENT_FAILED, there is no supervisor loop in the parent agent or CNS to spin up a new temporary agent to try again.
+14. Can the CNS replace a failed temporary agent?
+Status: FAIL
+Evidence: The CNS (EventBus) is completely stateless. It does not monitor agent health.
+
+-----------------------------------------------------
+-----------------------------------------------------
+
+1. Is the Domain Controller available?
+Status: PASS
+Evidence: organ_05_controllers.py:158 (IBaseController interface) and organ_05_controllers.py:424 (MasterController).
+Observed Behavior: The system successfully implements the Domain Controller pattern, utilizing a Master Controller to route requests to specific domain handlers (App, Tool, Task, History).
+2. Is the Environment Controller available?
+Status: FAIL
+Evidence: organ_05_controllers.py:59 (TargetController Enum).
+Observed Behavior: There is absolutely no EnvironmentController implemented in the code. It is missing from the enum and has no class implementation.
+3. Is the Execution Controller available?
+Status: PASS
+Evidence: organ_05_controllers.py:230 (class ExecutionController).
+Observed Behavior: Safely wraps asyncio.create_subprocess_exec and handles process timeouts and Windows-specific creation flags.
+4. Are controllers initialized before execution?
+Status: PASS
+Evidence: organ_05_controllers.py:509 (for controller in self._registry.values(): controller.initialize({})).
+Observed Behavior: ControllersCore statically initializes all registered controllers at boot.
+5. Can controllers receive instructions directly from raw user text?
+Status: PASS (Meaning, no they cannot)
+Evidence: organ_05_controllers.py:82 (ControllerTaskRequest dataclass).
+Observed Behavior: Controllers will only accept strongly-typed Pydantic/dataclass payloads. They crash if given raw strings.
+6. If yes, is that forbidden by architecture?
+Status: N/A (The architecture correctly forbids it, and the code honors this).
+7. Do controllers receive structured instructions?
+Status: PASS
+Evidence: See #5.
+8. Are controller actions authorized by the execution plan?
+Status: FAIL
+Evidence: organ_05_controllers.py:296 (GovernanceController).
+Observed Behavior: The GovernanceController only checks if the action is in a hardcoded PROTECTED_ACTIONS list (like modify_architecture). It does not cross-reference the action against the DAG execution plan to see if it was actually pre-approved by the compiler.
+9. Are controller actions logged?
+Status: PASS
+Evidence: organ_05_controllers.py:318 (class HistoryController).
+Observed Behavior: An append-only log array strictly tracks every dispatched action, status, and error payload.
+10. Can controller failures be reported to the responsible agent?
+Status: PASS
+Evidence: organ_05_controllers.py:204 (Exception handler returns ExecutionStatus.FAILED). The TaskRunner in organ_10_agents.py receives this.
+11. Can controller failures trigger replanning?
+Status: FAIL
+Evidence: The Brain/Compiler has no feedback loop. If the Controller fails and the Agent runs out of its 2 retries, the entire task dies.
+12. Can two agents issue conflicting controller commands simultaneously?
+Status: FAIL
+Evidence: organ_05_controllers.py:449 (Scheduler).
+Observed Behavior: The Scheduler is just an asyncio.PriorityQueue. There is zero resource locking (e.g., locking the mouse or keyboard for Agent A so Agent B doesn't type over it). Two agents can dispatch commands simultaneously.
+13. Is controller ownership tracked?
+Status: FAIL
+Evidence: organ_05_controllers.py:82 (ControllerTaskRequest).
+Observed Behavior: The request schema has no source_agent_id or token. The controller blindly executes whoever drops a request in the queue.
+14. Can controller access be revoked safely?
+Status: FAIL
+Evidence: Because ownership isn't tracked in the controller, it cannot safely revoke a specific agent's access without freezing the whole controller.
+15. Does every controller action have a traceable source agent?
+Status: FAIL
+Evidence: Same as #13. The HistoryController logs the task_id, but it lacks the agent_handle that executed it.
+---------------------------------------------
+--------------------------------------------
+
+1. Is Chrome CDP Runtime available?
+Status: PASS
+Evidence: organ_19_chrome_cdp_runtime.py is fully implemented as a standalone length-prefixed binary IPC server running independent CDP multiplexing.
+2. Can the system detect available Chrome instances?
+Status: PASS
+Evidence: organ_19_chrome_cdp_runtime.py declares a BrowserDiscoveryEngine in its architecture and class definitions, which is designed to scan for/attach to Chromium processes.
+3. Can it identify the correct Chrome profile?
+Status: PARTIAL
+Evidence: organ_19_chrome_cdp_runtime.py implements a robust BrowserProfileManager (which creates isolated user-data-dir profiles). However, the logic to actually figure out which profile is required for a specific task is missing.
+4. Can the compiler determine which profile is required?
+Status: FAIL
+Evidence: As verified during the Workflow Compiler audit, the WorkflowCompilerKernel does not parse or output Chrome profile requirements in its DAG.
+5. Can the system ask the user which profile to use?
+Status: FAIL
+Evidence: There is no UI prompt or interactive interruption mechanism built into the Compiler or the TaskRunner to halt and ask the user for profile selection.
+6. Can it create or reuse browser sessions correctly?
+Status: PASS
+Evidence: organ_19_chrome_cdp_runtime.py implements TargetRouter mapping sessionId <-> targetId and a RecoveryEngine to manage and restore sessions.
+7. Can it open a requested website?
+Status: PASS
+Evidence: Organ19OpCode.NAVIGATE (0x0120) is defined and handled by the runtime.
+8. Can it navigate to a URL?
+Status: PASS
+Evidence: Handled via the NAVIGATE IPC frame.
+9. Can it distinguish a URL from a natural-language command?
+Status: PASS
+Evidence: Handled correctly upstream. The Brain's LLM (organ_01_brain.py) converts the natural language intent into a structured tool call (dispatch_tool("navigate", {"url": ...})).
+10. Can it interact with browser elements?
+Status: PASS
+Evidence: organ_19_chrome_cdp_runtime.py implements DOMAccessibilityEngine and VirtualInputEngine, supporting opcodes like CLICK, TYPE_TEXT, and SCROLL.
+11. Can it detect page changes?
+Status: PASS
+Evidence: The CDPEventBus natively captures Page.loadEventFired, Page.domContentEventFired, and DOM.documentUpdated, translating them into AOSEventType.DOM_MUTATED etc.
+12. Can it detect browser pop-ups?
+Status: PASS
+Evidence: The runtime maps Target.targetCreated (for new pop-up windows) and Page.javascriptDialogOpening (for alert/confirm pop-ups) via the _CDP_EVENT_CATALOG.
+13. Can it recover from navigation failures?
+Status: PARTIAL
+Evidence: The RecoveryEngine is built to detect crashes and respawn sessions, but standard HTTP navigation failures (like 404s or network timeouts) simply bubble up a NETWORK_FAILED event which the currently dumb organ_10_agents.py will likely just choke on after 2 retries.
+14. Can it prevent accidental interaction with the wrong tab?
+Status: PASS
+Evidence: TargetRouter strictly segregates execution. CDP commands are wrapped in sessionId, ensuring a command meant for Tab A physically cannot execute in Tab B.
+15. Does it preserve browser history unless explicitly instructed otherwise?
+Status: PASS
+Evidence: BrowserProfileManager.create_profile() forces the use of a persistent user_data_dir by default, preserving history and cookies natively, with an explicit incognito: bool flag required to bypass it.
+
+------------------------------
+-------------------------------
+1. Does the App Scanner detect an application?
+Status: PARTIAL
+Evidence: organ_30_app_scanner.py:163 (def scan_app_active(self, app_id: str, version: str, root_wrapper)).
+Observed Behavior: The scanner does not actively "detect" or hunt for applications on its own. It relies on a caller (presumably an environment controller or interface layer) to pass in a root_wrapper (the pywinauto application handle) along with the app_id.
+2. Can it identify the application's name?
+Status: PARTIAL
+Evidence: Requires app_id as a parameter. It does not figure out the name dynamically.
+3. Can it identify the application's version?
+Status: PARTIAL
+Evidence: Requires version as a parameter. It does not read file metadata or window headers to figure out the version.
+4. Can it identify the application's window?
+Status: PASS
+Evidence: organ_30_app_scanner.py:111 (wrapper.rectangle()).
+Observed Behavior: Successfully grabs the window bounds (left, right, top, bottom).
+5. Can it scan visible controls?
+Status: PASS
+Evidence: organ_30_app_scanner.py:125 (if not child.is_visible(): continue).
+Observed Behavior: Iterates through children, skipping hidden ones.
+6. Can it identify button names?
+Status: PASS
+Evidence: organ_30_app_scanner.py:114 (class_name=wrapper.class_name(), text=wrapper.window_text()).
+7. Can it identify menus?
+Status: PASS
+Evidence: Extracts class_name and uses it for inference. MenuItem is explicitly supported in line 120.
+8. Can it identify text fields, checkboxes, dropdowns, toolbars?
+Status: PASS
+Evidence: Pywinauto wraps all standard Windows common controls into standard class names (Edit, CheckBox, ComboBox, ToolbarWindow32). The scanner records the class_name generically for all of them.
+9. Can it identify the functionality associated with controls?
+Status: PASS
+Evidence: organ_30_app_scanner.py:82 (_infer_intent method).
+Observed Behavior: Uses LLMGateway (the OS UI Analyzer prompt) to convert a class and text into a 1-sentence functionality prediction.
+10. Can it recursively scan child dialogs?
+Status: PASS
+Evidence: organ_30_app_scanner.py:105 (def _active_explore_tree... child_node = self._active_explore_tree(app_name, child, depth + 1, max_depth)).
+Observed Behavior: Safely recurses through the UI DOM up to max_depth=4.
+11. Can it scan controls revealed after clicking another control?
+Status: PARTIAL
+Evidence: organ_30_app_scanner.py:136 (child.click_input()).
+Observed Behavior: The scanner physically clicks "safe" buttons and detects if the screen hash changes (meaning a menu/dialog popped up). However, a developer comment at line 147 states: "In a full run, we would re-run... to find the newly spawned top-level dialog. For now, we restore state by clicking again." It detects that a child can be spawned, but it currently aborts actually mapping the newly spawned child.
+12. Can it map parent-child UI relationships?
+Status: PASS
+Evidence: organ_30_app_scanner.py:156 (node.children.append(child_node)).
+13. Does it maintain an application knowledge base?
+Status: PASS
+Evidence: organ_30_app_scanner.py:73 (_save_db). Saves to ui_knowledge_base.json.
+14. Does it associate knowledge with an application version?
+Status: PASS
+Evidence: organ_30_app_scanner.py:181 (app_record["versions"][version] = ...).
+Observed Behavior: Nests UI trees strictly under their version hash.
+15. Can it detect when an application's version changes?
+Status: FAIL
+Evidence: The scanner is passive in this regard; it trusts whatever version string the caller passes to scan_app_active.
+16. Does it update existing knowledge instead of duplicating everything?
+Status: PASS
+Evidence: organ_30_app_scanner.py:177 (if app_record["versions"][version].get("tree_hash") == tree_hash: return {"status": "unchanged"}).
+Observed Behavior: Hashes the serialized UI tree and prevents duplicate writes.
+17. Can it rescan only changed UI areas?
+Status: FAIL
+Evidence: It rescans and hashes the entire tree starting from root_wrapper. It has no differential DOM-diffing logic to only scan changed nodes.
+18. Can the Brain query the application knowledge base?
+Status: FAIL
+Evidence: There are no query endpoints, EventBus subscriptions, or IPC listeners implemented in organ_30_app_scanner.py. The Brain currently has no way to fetch data from this organ.
+
+-------------------------
+------------------------
+
+1. Can the automation see the current screen?
+Status: PASS
+Evidence: organ_31_visual_perception.py:57 (self._desktop = pywinauto.Desktop(backend="uia")).
+Observed Behavior: It successfully hooks into the Windows UIAutomation (UIA) framework to "see" the screen structurally.
+2. Can it capture the current desktop state?
+Status: PASS
+Evidence: organ_31_visual_perception.py:93 (for w in self._desktop.windows():).
+3. Can it identify active windows?
+Status: PASS
+Evidence: Evaluates top-level visible UIA elements (w.is_visible() and w.window_text()).
+4. Can it identify visible applications?
+Status: PASS
+Evidence: Same as #3.
+5. Can it identify dialogs?
+Status: PASS
+Evidence: Dialogs are parsed as standard UIA nodes in the tree recursion.
+6. Can it identify buttons and controls?
+Status: PASS
+Evidence: organ_31_visual_perception.py:74 (for child in wrapper.children():).
+7. Can it combine accessibility information with visual information?
+Status: FAIL
+Evidence: The current implementation relies entirely on accessibility (UIA). There is zero computer vision, OCR, or pixel-based analysis implemented to handle non-standard GUI frameworks (like custom game engines or heavy canvas apps).
+8. Can it determine what is currently happening on screen?
+Status: PARTIAL
+Evidence: It can dump the structural DOM state, but unlike organ_30_app_scanner.py, the VisualPerceptionOrgan does not invoke an LLM to infer the semantic meaning (the "what is happening") of the current state.
+9. Can the Brain request a current-screen description?
+Status: PASS
+Evidence: organ_31_visual_perception.py:84 (def describe_screen(self)).
+Observed Behavior: Specifically designed as a synchronous query interface for the Brain, returning a clean JSON model.
+10. Can the system answer "What is currently on my screen?"
+Status: PASS
+Evidence: Handled seamlessly via describe_screen().
+11. Can it detect visual changes?
+Status: PASS
+Evidence: organ_31_visual_perception.py:105 (async def _monitor_loop(self)).
+Observed Behavior: It polls describe_screen() every 1 second, hashes the JSON, and compares it to the last hash.
+12. Can it detect when a new dialog appears?
+Status: PASS
+Evidence: A new dialog modifies the UIA tree, causing a hash mismatch, which successfully emits a SCREEN_STATE_CHANGED event.
+13. Can it detect when a window disappears?
+Status: PASS
+Evidence: Same as #12.
+14. Can it associate visual state with the current execution step?
+Status: FAIL
+Evidence: The VisualPerceptionOrgan runs asynchronously in the background and is entirely decoupled. It blindly emits SCREEN_STATE_CHANGED events to the CNS. It has absolutely no context regarding what step the Agents or TaskRunner are currently executing, and the Agents do not currently cross-reference their traces against these events.
+15. Is visual perception read-only and separated from execution control?
+Status: PASS
+Evidence: The organ strictly reads the state. It imports no controllers and cannot execute clicks or keystrokes.
+
+------------------------------
+----------------------------
+
+1. Can the Pop-Up Handler detect unexpected dialogs?
+Status: PASS
+Evidence: organ_29_popup_handler.py:783 (refresh() enumerates all windows via backend).
+2. Can it read the dialog contents?
+Status: PASS
+Evidence: organ_29_popup_handler.py:868 (_read_with_fallback).
+Observed Behavior: It uses a robust fallback ladder: 1. Native Accessibility -> 2. OCR Engine -> 3. Human Escalation.
+3. Can it classify the error?
+Status: PASS
+Evidence: organ_29_popup_handler.py:786 (n.win_type = self.classifier.classify(n)).
+Observed Behavior: Maps dialogs into strong enums like MESSAGE_BOX, SECURITY_PROMPT, or CRASH_REPORTER.
+4. Can it identify known errors?
+Status: FAIL
+Evidence: While organ_25_error_catalog.py exists in the system, organ_29_popup_handler.py never imports it or sends payloads to it during intercept_popup(). It treats all popups generically without cross-referencing known application error signatures.
+5. Can it map errors to the Error Catalog?
+Status: FAIL
+Evidence: Same as #4.
+6. Can it determine whether an error is recoverable?
+Status: FAIL
+Evidence: Because it doesn't query the Error Catalog, it has no hardcoded knowledge of whether an error dialog represents a fatal application crash or a minor warning.
+7. Can it attempt an approved recovery?
+Status: FAIL
+Evidence: It does not trigger predefined recovery playbooks. It simply bounces the raw OCR text over to the Brain for generic LLM evaluation.
+8. Can it escalate unknown errors?
+Status: PASS
+Evidence: organ_29_popup_handler.py:816 (If security policy blocks it or OCR fails, it sends a human_operator socket message).
+9. Can the Brain reason about unknown errors?
+Status: PASS
+Evidence: organ_29_popup_handler.py:837 (destination="brain", payload={"action": "evaluate_popup", ...}).
+Observed Behavior: The DIM sends the raw text and window class to the Brain, allowing the LLM to figure out what the error means on the fly.
+10. Does an unexpected popup stop unsafe execution?
+Status: PASS
+Evidence: organ_29_popup_handler.py:803 (await self.sockets.workflow_pause.send(...)).
+Observed Behavior: Immediately halts the TaskRunner / Scheduler before attempting to read or click the popup.
+11. Is the popup event logged?
+Status: PASS
+Evidence: Logs locally via logger.info, and the state changes emit SocketMessages which the CNS/History controllers theoretically record.
+12. Can the system continue after a successful recovery?
+Status: PASS
+Evidence: organ_29_popup_handler.py:863 (await self.sockets.workflow_resume.send(...)).
+Observed Behavior: The DIM verifies the dialog was actually closed (DeadlockGuard.wait_until), restores previous window focus, and then explicitly resumes the Scheduler.
+
+---------------------
+-----------------------
+
+1. Does every major organ emit state/events?
+Status: PARTIAL
+Evidence: While the infrastructure (organ_32_state_catalog.py and organ_26_event_catalog.py) exists and is highly robust, previous audits of the execution layers (organ_10_agents.py, organ_05_controllers.py, organ_19_chrome_cdp_runtime.py) revealed that organs frequently declare their own isolated enums (like AgentState, ControllerState) and emit events locally instead of consistently pushing transitions through the global CNS.
+2. Does the Event Catalog define those events?
+Status: PASS
+Evidence: organ_26_event_catalog.py rigorously defines EventCategory, EventPriority, PermissionLevel, and EventState.
+3. Does the Session Bus distribute events correctly?
+Status: PARTIAL
+Evidence: organ_02_cns_single_file.py implements a functional Pub/Sub EventBus that distributes what it receives. However, as discovered in the Workflow Compiler audit, organs frequently bypass the bus entirely (e.g., the Brain directly invoking the Compiler, Agents directly instantiating Controllers).
+4. Can the system identify the current execution state?
+Status: PARTIAL
+Evidence: The StateCatalogOrgan (organ_32_state_catalog.py) is capable of deterministic state tracking, but because the execution layer bypasses it, the system's actual ability to definitively identify the real-time execution state of a stray agent is flawed.
+5. Can it distinguish idle, listening, compiling, scheduled, executing, waiting, failed, and completed states?
+Status: PASS
+Evidence: organ_32_state_catalog.py (class StateName(str, Enum)) explicitly defines IDLE, WAITING, QUEUED, RUNNING (executing), FAILED, COMPLETED, PAUSED, BLOCKED, etc.
+6. Are state transitions validated?
+Status: PASS
+Evidence: organ_32_state_catalog.py:64 (TransitionValidator).
+Observed Behavior: It strictly enforces a state machine transition matrix, blocking illegal out-of-band state jumps.
+7. Can an organ incorrectly claim completion?
+Status: PARTIAL
+Evidence: The TransitionValidator enforces legal state flow (e.g., an organ must be RUNNING before it can transition to COMPLETED), but it has no mechanism to cryptographically or contextually verify that the physical work was actually accomplished. It trusts the organ's transition request.
+8. Are events timestamped?
+Status: PASS
+Evidence: Embedded directly in the event and state dataclasses (datetime, timezone / time.time()).
+9. Are events associated with a task ID?
+Status: PASS
+Evidence: State records link using entity_id and correlation_id (Task IDs).
+10. Are events associated with an agent ID?
+Status: PASS
+Evidence: The entity_id field correctly captures the UUID of the Agent invoking the state change.
+11. Can the visualization subscribe to these events?
+Status: PASS
+Evidence: live_visualization_ui.py successfully hooks into EventBus.subscribe() to render the live terminal graph.
+12. Can the system recover its state after a restart?
+Status: PASS
+Evidence: organ_32_state_catalog.py:68 (StateHistory (SQLite WAL, hash-chained ledger)) and RecoveryManager.
+Observed Behavior: Implements a durable, append-only SQLite WAL ledger and a recovery engine to auto-repair and replay state (FAILED/BLOCKED/UNKNOWN) across hard process restarts.
+
+------------------------
+-----------------------
+
+1. Does the n8n visualization start with the automation?
+Status: PASS (Manually)
+Evidence: As noted in your links.txt, the visualizer is a dedicated script (python live_visualization_ui.py) run in Terminal 1, completely separate from the main boot in Terminal 2.
+2. Does it mirror the actual automation state?
+Status: PARTIAL
+Evidence: It mirrors the messages it receives via UDP (highlighting nodes for 1500ms when a message passes between them). It does not hold or display persistent state (like a node permanently changing color to indicate "Running" vs "Idle").
+3. Does user input appear as an incoming event?
+Status: PASS
+Evidence: The UI has a dedicated task-input-container that captures text, sends it via WebSocket, which the python backend forwards to port 9997 (the bootloader).
+4. Does the visualization show the Brain, Compiler, CNS, Agents, and Controllers becoming active?
+Status: PASS
+Evidence: visualizer_frontend.html:187 statically defines all 36 organs as nodes in a graph (vis.DataSet). If a UDP message declares start: "BRAIN", end: "COMPILER", both nodes get an orange glowing shadow for 1.5 seconds.
+5. Does it show completion?
+Status: FAIL
+Evidence: There is no specific UI element or logic in the JavaScript to display a green "Completed" checkmark or persistent status text. It just flashes the OUTPUT node momentarily.
+6. Does it show failure?
+Status: FAIL
+Evidence: There is zero logic in visualizer_frontend.html to handle error events or turn nodes red. If an agent crashes, the graph simply stops flashing.
+7. Does it visually indicate which organ is currently active?
+Status: PASS
+Evidence: It applies a temporary shadow: { color: '#ff6d00', size: 20 } to nodes actively communicating.
+8. Does it wait for the actual completion event before moving forward?
+Status: FAIL
+Evidence: The visualizer is totally asynchronous. It blindly renders whatever UDP packets arrive. It enforces no execution locks.
+9. Can the visualization ever claim progress that hasn't actually happened?
+Status: PASS (It can hallucinate progress)
+Evidence: Because it just blindly reacts to start/end string payloads via UDP, if an organ sends a message saying "I am sending this to the Output" but crashes mid-flight, the visualizer will still flash the OUTPUT node.
+10. Is the visualization read-only with respect to execution?
+Status: FAIL
+Evidence: It is highly interactive. visualizer_frontend.html:322 implements a Configuration Modal (REQUEST_CONFIG) which can intercept the boot sequence and force the user to select the Execution Paradigm, Chrome Profile, and Tab Strategy, injecting that back into the execution flow.
+11. Can the user trace a task from input to final result?
+Status: FAIL
+Evidence: The graph is strictly a live, ephemeral representation. Nodes flash and immediately fade. There is no historical trace view, log pane, or persistent path highlighting implemented in the frontend.
+12. Can the user inspect what happened inside each major stage?
+Status: FAIL
+Evidence: Clicking or hovering on a node does nothing. You cannot click the BRAIN node to see the LLM prompt, or the COMPILER node to see the generated DAG.
+That concludes the System Verification Questionnaire based entirely on the actual codebase implementation. Let me know if you would like me to compile these major architectural gaps into the implementation_plan.md to begin fixing them!
+
+----------------------------
+---------------------------
+This unhandled exception bubbles up, crashing the execution loop for that agent immediately.
+
+3. What if we fixed that bug? (Still FAIL)
+Even if we patched system_boot.py to avoid the "scan_app" crash, the system lacks the mechanical primitives to execute the rest of the prompt:
+
+"Determine the active display": organ_31_visual_perception.py is fully disconnected from the execution loop. The agent is completely blind and cannot "see" OBS.
+"Create a Display Capture source": The DesktopConnector uses pygetwindow and pyautogui to launch apps via the Windows Start Menu (_gui_search_launch), but it does not contain any code to actually click on X/Y coordinates or locate UI elements inside an application. It literally cannot click a button.
+"Record for 30 seconds": The workflow compiler (organ_36) has no state-machine primitives for sleep() or wait(). The agent would try to execute "Start Recording" and "Stop Recording" in the exact same millisecond.
+"Report where it was saved": The agent does not have FileSystemConnector access wired into system_boot.py to dynamically search the user's Video folder, nor can it read the OBS settings menu to find the path.
+Summary
+The Golden End-to-End Test proves that while the Organs are beautifully documented and structurally typed, the system_boot.py composition root is a facade. It is hardcoded to fail on desktop actions, and even if it didn't, the agent has no eyes, no hands, and no memory connected to it.
+
+We absolutely need to fix this architecture before adding any more features!
+
+------------------------------------
+
+-------------------------------------
+
+The Golden End-to-End Chain Test
+
+Chain to prove:
+User Input → UI → Brain → Intent Understanding → LLM → Workflow Compiler → Structured Plan → Paradigm/Resource Questions → CNS → Permanent Agent → Sub-Agent → Temporary Agents → App Scanner/Visual Perception → Controllers → OBS execution → Checkpoints → Verification → Result → Audit → Visualization
+
+Status: CATASTROPHIC FAILURE. The chain is broken in multiple places based on the current implementation in system_boot.py.
+
+Breakdown of the Chain:
+1. User Input → UI: PASS. (system_boot.py runs a UDP listener on port 9995 that receives input from live_visualization_ui.py).
+2. Brain → Intent Understanding → LLM: PASS. (system_boot.py routes input to organ_01_brain.py, which parses intent via organ_37_llm_gateway.py).
+3. Workflow Compiler → Structured Plan: PASS. (system_boot.py executes WorkflowCompilerKernel which returns a compiled plan).
+4. Paradigm/Resource Questions: PARTIAL. (system_boot.py requests "Execution Configuration" from the UI before execution, but it does not dynamically query resource needs).
+5. CNS: FAIL. (Instead of the CNS orchestrating the flow via pub/sub events, system_boot.py hardcodes a synchronous script that just emits fake "STARTED" and "COMPLETED" events for the UI while bypassing actual CNS routing).
+6. Permanent Agent: PASS. (Agent objects are instantiated based on the plan).
+7. Sub-Agent / Temporary Agents: FAIL. (No temporary agent lifecycle or sub-agent delegation exists in the system_boot.py execution loop).
+8. App Scanner/Visual Perception: FAIL. (organs 30 and 31 are completely disconnected. The system is blind).
+9. Controllers: FAIL. (organ_05_controllers.py is bypassed. system_boot.py routes directly to ConnectorGateway, which immediately crashes on Desktop tasks).
+10. OBS execution: FAIL. (The DesktopConnector lacks any mechanical primitives to click UI elements or capture screens).
+11. Checkpoints / Verification: FAIL. (Checkpoints are noted in logs but never mechanically verified during execution).
+12. Result: PASS. (The script eventually emits a TASK_COMPLETED or TASK_FAILED event).
+13. Audit: FAIL. (organ_16_audit_system.py is entirely disconnected).
+14. Visualization: FAIL. (The UI flashes nodes blindly based on the fake UDP events emitted by system_boot.py, without verifying actual mechanical state transitions).
+
+Conclusion: 
+The architecture is beautifully designed in theory, but system_boot.py bypasses the vast majority of the chain. If one skipped link means failure, this test fails 9 times over.
+--------------------------
+
+1. Are Constitution files read before modifying anything?
+Status: FAIL
+Evidence: There is no execution engine logic in the TaskRunner or WorkflowCompiler that proactively opens, parses, or validates actions against written markdown governance documents before taking action.
+2. Are Laws/Policies read before modifying anything?
+Status: FAIL
+Evidence: Same as #1.
+3. Does the agentic IDE inspect all governance documents before changing code?
+Status: FAIL
+Evidence: The Brain relies entirely on whatever context is injected into its initial prompt. It does not perform a prerequisite search of the OS lawbook prior to emitting a tool call.
+4. Can any implementation violate those documents?
+Status: PASS (It can violate them easily)
+Evidence: Because the policy documents are purely theoretical and not bound to the execution runtime as hardcoded constraints, an agent hallucinating a bad command will execute successfully as long as the syntax is correct.
+5. Is security initialization mandatory?
+Status: FAIL
+Evidence: We verified system_boot.py (the composition root). organ_07_security.py is entirely missing from the bootloader. Security initialization is currently bypassed completely.
+6. Is unauthorized execution blocked?
+Status: FAIL
+Evidence: organ_05_controllers.py and organ_19_chrome_cdp_runtime.py accept arbitrary incoming commands. They do not request or validate a CapabilityToken from organ_07 before executing native OS clicks, keystrokes, or bash commands.
+7. Are sensitive credentials protected?
+Status: FAIL
+Evidence: organ_07_security.py contains a robust SecureVault for PBKDF2HMAC AES-GCM encrypted credentials. However, because it isn't wired into the bootloader or the LLM context injector, the system defaults to passing credentials in plaintext JSON if needed.
+8. Are API keys stored securely?
+Status: FAIL
+Evidence: Same as #7.
+9. Can agents expose credentials in logs?
+Status: PASS (They do leak them)
+Evidence: system_boot.py relies on a generic TerminalLogger that blindly print()s the full JSON trace of LLM reasoning and controller payloads. There is no redaction middleware applied to standard output.
+10. Are permissions checked before dangerous actions?
+Status: FAIL
+Evidence: The ControllersCore blindly routes the ControllerTaskRequest to the requested target. There is no privilege elevation check.
+11. Are security events audited?
+Status: FAIL
+Evidence: organ_16_audit_system.py exists on disk but is not invoked by the primary execution flow (Brain -> TaskRunner -> Controllers).
+12. Can the system safely shut down after a security violation?
+Status: FAIL
+Evidence: The SecurityKernel has a LOCKDOWN state modeled in organ_07, but since the organ isn't running, it can never detect a breach threshold, and even if it did, it lacks a mechanism to forcefully kill the asyncio event loop running in system_boot.py.
+This concludes the full System Verification Questionnaire.
+
+We have definitively established the reality of the codebase: It is an incredibly sophisticated architectural design that has been heavily implemented in isolated silos (highly robust individual organs), but the central nervous system and composition root (system_boot.py / organ_10_agents.py) are bypassing almost all of the advanced features (Security, Audit, Visual Perception, App Scanner, CNS Event Bus).
+
+Should I transition to Planning Mode and draft an implementation_plan.md to begin fixing these critical wiring gaps (such as hooking up the Environment Controller, enforcing EventBus communication, and fixing the bootloader)?
+
+------------------------------
+-------------------------------
+
+1. Is Ollama installed / Is the service running / Is the configured model installed?
+Status: N/A (Environment Dependent)
+Evidence: The codebase explicitly targets http://127.0.0.1:11434/api/chat and hardcodes the model string "llama3". Whether it is physically installed on the host OS is outside the scope of the code itself.
+2. Can the Brain successfully connect to Ollama / send a prompt / receive a response?
+Status: PASS
+Evidence: organ_37_llm_gateway.py implements a standard HTTP requests.post() to the Ollama /api/chat endpoint, formatting the system and user messages according to the Ollama API specification.
+3. Is the model response parsed correctly?
+Status: PASS
+Evidence: Yes, resp.json().get("message", {}).get("content", "") correctly extracts the generation text.
+4. Is there a timeout?
+Status: PASS
+Evidence: execute_inference accepts a timeout: float = 30.0 argument, which is strictly passed to requests.post(..., timeout=timeout).
+5. Is there retry logic?
+Status: FAIL (Sort of)
+Evidence: There is no same-provider exponential backoff retry logic (e.g., waiting 5 seconds and trying Groq again if Groq returns 429). It instantly abandons the provider on failure.
+6. Is there fallback behavior?
+Status: PASS (Excellent Implementation)
+Evidence: organ_37_llm_gateway.py:105 (execute_inference) implements a flawless Waterfall Graceful Degradation pattern. It wraps each call in a try/except block.
+Priority 1: Local Ollama
+Priority 2: Groq (llama-3.1-8b-instant)
+Priority 3: OpenRouter (meta-llama/llama-3.1-8b-instruct:free)
+7. Does an LLM failure prevent silent execution?
+Status: PASS
+Evidence: If all three providers fail (or rate limit), it executes raise LLMGatewayError("Gateway exhausted all LLM providers. Execution halted."), which crashes the pipeline loudly rather than hallucinating an empty response.
+8. Is the selected model appropriate for the task / Can lightweight tasks use smaller models?
+Status: FAIL
+Evidence: Model selection is completely static. The gateway hardcodes "llama3" for local, and "llama-3.1-8b-instant" for cloud. It ignores the model_id parameter entirely. A simple "click a button" task and a complex "debug this python script" task are forced through the exact same 8B parameter model.
+9. Are LLM calls logged for debugging without exposing secrets?
+Status: FAIL
+Evidence: LLMGateway itself only logs routing information (logger.info("Gateway: Routing request to Groq...")). However, as established in the Security audit, system_boot.py employs a TerminalLogger that intercepts and blindly prints the raw, unredacted JSON inputs and outputs of the LLM to standard out, meaning any secrets fed into the prompt are exposed.
+17. Memory & Knowledge
+1. Does the Memory organ work?
+Status: PARTIAL (Structurally PASS, Execution FAIL)
+Evidence: organ_03_memory.py and organ_04_knowledge.py are extraordinarily well-implemented (SQLite WAL, LRU caching, mmap support, hybrid search). However, they are isolated. The execution pipeline in system_boot.py does not actively route data through them.
+2. Can the system remember application knowledge?
+Status: FAIL
+Evidence: organ_04_knowledge.py defines an APP_PROFILE_SCHEMA, but organ_30_app_scanner.py never actually writes to it. It just scans the DOM and infers intent locally.
+3. Can it remember previous successful workflows?
+Status: PARTIAL
+Evidence: organ_01_brain.py has a ReflectionEngine that appends successful tasks to learning_store.jsonl, but the WorkflowCompiler does not actively query this file to preempt compilation.
+4. Can it distinguish historical knowledge from current screen state?
+Status: FAIL
+Evidence: Because organ_04 (Knowledge) and organ_31 (Visual Perception) aren't linked in the runtime, the Brain is forced to parse all context as flat text strings, relying entirely on the LLM to differentiate past from present.
+5. Can it update outdated knowledge?
+Status: PASS (Structurally)
+Evidence: organ_04_knowledge.py supports incremental append-only merging, and organ_03_memory.py has TTL expiration.
+6. Does it avoid duplicating existing knowledge?
+Status: PASS (Structurally)
+Evidence: organ_04_knowledge.py explicitly states "Incremental Knowledge Evolution (append-only merge)" preventing overwrite duplication.
+7. Can the Brain query memory?
+Status: FAIL (In practice)
+Evidence: While organ_01_brain.py defines query_memory(), the runtime LLM prompt does not expose a QUERY_MEMORY tool call to the model, meaning the agent cannot dynamically recall facts during execution.
+8. Can the App Scanner update memory?
+Status: FAIL
+Evidence: As established in the section 10 audit, organ_30 does not emit EVENT_APP_PROFILE_UPDATED or interface with organ_04.
+9. Can memory corruption be detected?
+Status: PASS
+Evidence: organ_03_memory.py implements EVENT_MEMORY_CORRUPTION_DETECTED and uses LZ4/SQLite checksums.
+10. Can memory be backed up?
+Status: PASS
+Evidence: organ_03_memory.py explicitly configures hdd_archive_dir for long-term cold storage.
+
+-------------------------
+---------------------------
+
+
+-------------------------
+---------------------------
+
+18. Audit, Backup & Recovery
+1. Is every task assigned a unique execution ID?
+Status: PASS
+Evidence: organ_01_brain.py and system_boot.py assign a UUID (correlation_id) to every incoming task.
+2. Is every major event logged?
+Status: PARTIAL (Stdout PASS, Structured Audit FAIL)
+Evidence: system_boot.py uses a TerminalLogger to print events to standard out, but organ_16_audit_system.py (which implements a cryptographic append-only ledger) is completely disconnected from the execution loop.
+3. Is every agent action traceable?
+Status: PARTIAL
+Evidence: Actions are printed to stdout, but there is no structured, cryptographically verifiable trace in organ_16.
+4. Is every controller action traceable?
+Status: PARTIAL
+Evidence: Same as #3.
+5. Are failures recorded?
+Status: PASS
+Evidence: Python exceptions and LLM failures are caught and logged to stdout in system_boot.py.
+6. Are retries recorded?
+Status: N/A
+Evidence: As established in Section 16, there is no true LLM exponential backoff retry logic implemented in organ_37_llm_gateway.py (it just falls back to a different provider), so there are no retries to record.
+7. Are LLM decisions recorded appropriately?
+Status: FAIL
+Evidence: LLM decisions are blindly printed to stdout in JSON format, causing any sensitive credentials or API keys included in the prompt to be leaked into the plain-text logs.
+8. Can a completed workflow be reconstructed from the audit log?
+Status: FAIL
+Evidence: A human can read the stdout logs, but the system itself cannot programmatically reconstruct the workflow because organ_16_audit_system.py is not being written to.
+9. Does the Backup Manager work?
+Status: FAIL (In practice)
+Evidence: organ_17_backup_manager.py exists, but is not initialized or triggered by the CNS during execution.
+10. Can the system restore configuration?
+Status: FAIL
+Evidence: Same as #9.
+11. Can the system recover from partial failure?
+Status: FAIL
+Evidence: If a controller crashes, the unhandled exception propagates up the call stack and kills the asyncio event loop in system_boot.py, halting the entire system.
+12. Can the automation restart without corrupting existing state?
+Status: PASS (By default)
+Evidence: Because the system doesn't successfully persist active execution state (organ_32 is bypassed), a restart simply boots fresh without any corrupted half-state.
+
+19. Configuration & System Integrity
+1. Is the Configuration Manager functional?
+Status: FAIL (In practice)
+Evidence: organ_20_config.py exists but system_boot.py relies largely on hardcoded defaults and environment variables.
+2. Is the Configuration Schema validated?
+Status: FAIL (In practice)
+Evidence: organ_21_configuration_schema.py provides JSON validation, but is not enforced on boot.
+3. Is the System Manifest accurate?
+Status: FAIL
+Evidence: organ_33_system_manifest.py statically lists organs, but does not dynamically reflect that 80% of them are currently disconnected.
+4. Is the Capability Registry accurate?
+Status: FAIL
+Evidence: organ_18_capability_registry.py exists but is completely unused by the execution layer.
+5. Are all 36 organs registered?
+Status: PARTIAL
+Evidence: They are registered in the visualizer_frontend.html UI and exist as files, but they are not registered in the actual runtime boot sequence.
+6. Does every organ have a defined purpose?
+Status: PASS
+Evidence: Every organ has extensive, rigorous docstrings and strictly isolated data contracts.
+7. Does every organ expose its expected interface?
+Status: PASS
+Evidence: The structural typing (dataclasses, enums) across the organs is pristine.
+8. Are dependencies between organs valid?
+Status: PASS (Structurally)
+Evidence: Code is well-architected without messy cross-imports.
+9. Are there circular dependencies?
+Status: PASS (None exist)
+Evidence: The standalone nature of the files prevents circular imports.
+10. Are there unused or disconnected organs?
+Status: FAIL (Yes, severely)
+Evidence: This is the crux of the audit. Security, Audit, Memory, App Scanner, Visual Perception, Popup Handler, and State Catalog are all disconnected from the primary execution path.
+11. Are there duplicate implementations of the same responsibility?
+Status: PASS (No duplicates)
+Evidence: Responsibilities are strictly segregated.
+
+20. The Most Important Architecture Tests
+1. Can raw user input directly execute an action without Brain processing?
+Status: PASS (It cannot)
+Evidence: system_boot.py strictly routes all raw input through organ_01_brain.py first.
+2. Can raw user input bypass Workflow Compiler?
+Status: FAIL (It can bypass it)
+Evidence: In organ_01_brain.py, the handle_task() function can directly execute heuristic_plan() and skip the compiler for simple tasks.
+3. Can a task bypass CNS?
+Status: FAIL (It can bypass it)
+Evidence: system_boot.py has the Brain directly invoking Agents, skipping the formal CNS PubSub event bus.
+4. Can an agent execute without an assigned objective?
+Status: PASS (It cannot)
+Evidence: organ_10_agents.py requires an AgentTask object containing an objective to function.
+5. Can a temporary agent execute without a checkpoint?
+Status: FAIL
+Evidence: Checkpoint enforcement is not implemented in the active execution loop.
+6. Can a controller execute without an authorized execution plan?
+Status: FAIL
+Evidence: organ_05_controllers.py accepts arbitrary ControllerTaskRequests from any caller without verifying a CapabilityToken from organ_07_security.py.
+7. Can execution begin before compilation finishes?
+Status: PASS (It cannot)
+Evidence: Execution in system_boot.py is strictly sequential (await plan, then await agents).
+8. Can CNS claim a task is ready when compilation isn't complete?
+Status: PASS (It cannot)
+Evidence: The synchronous/sequential execution model prevents this race condition.
+9. Can the visualization claim a stage is complete when it isn't?
+Status: FAIL
+Evidence: The UI simply flashes nodes for 1500ms based on asynchronous UDP triggers; it does not verify state completion.
+10. Can an LLM failure cause the system to silently fall back to direct execution?
+Status: PASS (It cannot)
+Evidence: organ_37_llm_gateway.py raises an unhandled exception if all LLM providers fail, loudly crashing the system rather than silently hallucinating.
+11. Can an unknown popup cause uncontrolled execution?
+Status: FAIL (It can)
+Evidence: Because organ_29_popup_handler.py is disconnected, unexpected system dialogs are not intercepted, and the active agent will blindly continue attempting to execute clicks.
+12. Can an application change break the App Scanner knowledge base?
+Status: FAIL (It can)
+Evidence: Because organ_30_app_scanner.py doesn't write to organ_04_knowledge.py, it has no persistent knowledge base to break, meaning it scans the DOM blindly every time.
+13. Can the system determine what is currently on screen?
+Status: FAIL (In practice)
+Evidence: organ_31_visual_perception.py works, but it is not injected into the Brain's prompt context during system_boot.py execution.
+14. Can the Brain explain what the user intended?
+Status: PASS
+Evidence: The LLM outputs structured intent_analysis in the ExecutionPlan.
+15. Can the Workflow Compiler explain exactly what will be executed?
+Status: PASS
+Evidence: It outputs a deterministic list of PhaseSteps and AgentTasks.
+16. Can the CNS explain why each agent was selected?
+Status: FAIL
+Evidence: The CNS doesn't select the agents; the Brain and Compiler statically assign them.
+17. Can every action be traced back to the original user request?
+Status: PASS
+Evidence: Through the stdout correlation_id (Task ID) logs.
+18. Can every checkpoint be traced back to a compiled task step?
+Status: FAIL
+Evidence: Checkpoints are not actively enforced in the runtime.
+19. Can the entire execution be reconstructed from events and audit logs?
+Status: FAIL
+Evidence: The structured organ_16_audit_system.py is inactive.
+20. Can the entire system fail safely instead of bypassing the architecture?
+Status: FAIL
+Evidence: Unhandled exceptions cause raw crashes rather than triggering a graceful LOCKDOWN state via organ_07_security.py.
+--------------------
+---------------------
+
+18. Audit, Backup & Recovery
+1. Is every task assigned a unique execution ID? Status: PASS Evidence: organ_01_brain.py and system_boot.py assign a UUID (correlation_id) to every incoming task upon generation.
+
+2. Is every major event logged? Status: PARTIAL (Stdout PASS, Structured Audit FAIL) Evidence: system_boot.py uses a TerminalLogger to print events to standard out, but organ_16_audit_system.py (which implements a cryptographic append-only ledger) is completely disconnected from the execution loop.
+
+3. Is every agent action traceable? Status: PARTIAL Evidence: Actions are printed to stdout, but there is no structured, cryptographically verifiable trace being written to organ_16_audit_system.py.
+
+4. Is every controller action traceable? Status: PARTIAL Evidence: Same as #3. They appear in standard out but are not securely logged in the audit ledger.
+
+5. Are failures recorded? Status: PASS Evidence: Python exceptions and LLM failures are caught and logged to stdout in system_boot.py.
+
+6. Are retries recorded? Status: N/A Evidence: As established in the LLM Gateway audit, there is no true LLM exponential backoff retry logic implemented in organ_37_llm_gateway.py (it just instantly falls back to a different provider), so there are no "retries" happening to record.
+
+7. Are LLM decisions recorded appropriately? Status: FAIL Evidence: LLM decisions are blindly printed to stdout in raw JSON format. This causes any sensitive credentials or API keys included in the prompt to be leaked directly into the plain-text terminal logs.
+
+8. Can a completed workflow be reconstructed from the audit log? Status: FAIL Evidence: A human can read the stdout logs to figure it out, but the system itself cannot programmatically reconstruct the workflow because organ_16_audit_system.py is not actually being written to.
+
+9. Does the Backup Manager work? Status: FAIL (In practice) Evidence: organ_17_backup_manager.py exists, but is not initialized or triggered by the CNS during execution.
+
+10. Can the system restore configuration? Status: FAIL Evidence: Same as #9. The organ exists but is disconnected.
+
+11. Can the system recover from partial failure? Status: FAIL Evidence: If a controller crashes, the unhandled exception propagates up the call stack and kills the asyncio event loop in system_boot.py, halting the entire system instead of gracefully recovering.
+
+12. Can the automation restart without corrupting existing state? Status: PASS (By default) Evidence: Because the system doesn't successfully persist active execution state (because organ_32_state_catalog.py is bypassed), a restart simply boots fresh without any corrupted half-state.
+--------------------------
+-------------------------
+
+19. Configuration & System Integrity
+1. Is the Configuration Manager functional? Status: FAIL (In practice) Evidence: organ_20_config.py exists, but system_boot.py relies largely on hardcoded defaults and environment variables rather than actively querying the configuration manager.
+
+2. Is the Configuration Schema validated? Status: FAIL (In practice) Evidence: organ_21_configuration_schema.py provides robust JSON schema validation, but it is not actively enforced during the system_boot.py execution sequence.
+
+3. Is the System Manifest accurate? Status: FAIL Evidence: organ_33_system_manifest.py statically lists all 36 organs, but does not dynamically reflect the reality that 80% of them are currently disconnected from the execution loop.
+
+4. Is the Capability Registry accurate? Status: FAIL Evidence: organ_18_capability_registry.py exists but is completely unused by the execution layer.
+
+5. Are all 36 organs registered? Status: PARTIAL Evidence: They are registered in the visualizer_frontend.html UI and exist as files in the directory, but they are not registered or initialized in the actual runtime boot sequence (system_boot.py).
+
+6. Does every organ have a defined purpose? Status: PASS Evidence: Every organ file has extensive, rigorous docstrings and strictly isolated data contracts.
+
+7. Does every organ expose its expected interface? Status: PASS Evidence: The structural typing (dataclasses, enums) across the organs is pristine.
+
+8. Are dependencies between organs valid? Status: PASS (Structurally) Evidence: The code is well-architected without messy or overlapping cross-imports.
+
+9. Are there circular dependencies? Status: PASS (None exist) Evidence: The standalone nature of the files prevents circular imports.
+
+10. Are there unused or disconnected organs? Status: FAIL (Yes, severely) Evidence: This is the crux of the entire audit. Security, Audit, Memory, App Scanner, Visual Perception, Popup Handler, and State Catalog are all structurally brilliant but totally disconnected from the primary execution path.
+
+11. Are there duplicate implementations of the same responsibility? Status: PASS (No duplicates) Evidence: Responsibilities are strictly segregated to their designated files.
+------------------------------
+--------------------------------
+
+20. The Most Important Architecture Tests
+1. Can raw user input directly execute an action without Brain processing? Status: PASS (It cannot) Evidence: system_boot.py strictly routes all raw input through organ_01_brain.py first.
+
+2. Can raw user input bypass Workflow Compiler? Status: FAIL (It can bypass it) Evidence: In organ_01_brain.py, the handle_task() function can directly execute heuristic_plan() and skip the compiler entirely for what it deems "simple tasks".
+
+3. Can a task bypass CNS? Status: FAIL (It can bypass it) Evidence: system_boot.py has the Brain directly invoking Agents, skipping the formal CNS PubSub event bus.
+
+4. Can an agent execute without an assigned objective? Status: PASS (It cannot) Evidence: organ_10_agents.py hard-requires an AgentTask object containing an objective to function.
+
+5. Can a temporary agent execute without a checkpoint? Status: FAIL Evidence: Checkpoint enforcement is simply not implemented in the active execution loop.
+
+6. Can a controller execute without an authorized execution plan? Status: FAIL Evidence: organ_05_controllers.py accepts arbitrary ControllerTaskRequests from any caller without verifying a CapabilityToken from organ_07_security.py.
+
+7. Can execution begin before compilation finishes? Status: PASS (It cannot) Evidence: Execution in system_boot.py is strictly sequential (it awaits the plan, then it awaits the agents).
+
+8. Can CNS claim a task is ready when compilation isn't complete? Status: PASS (It cannot) Evidence: The synchronous/sequential execution model prevents this race condition.
+
+9. Can the visualization claim a stage is complete when it isn't? Status: FAIL Evidence: The UI simply flashes nodes for 1500ms based on asynchronous UDP triggers; it does not verify state completion mechanically.
+
+10. Can an LLM failure cause the system to silently fall back to direct execution? Status: PASS (It cannot) Evidence: organ_37_llm_gateway.py raises an unhandled exception if all LLM providers fail, loudly crashing the system rather than silently hallucinating.
+
+11. Can an unknown popup cause uncontrolled execution? Status: FAIL (It can) Evidence: Because organ_29_popup_handler.py is disconnected, unexpected system dialogs are not intercepted, and the active agent will blindly continue attempting to execute clicks on a blocked screen.
+
+12. Can an application change break the App Scanner knowledge base? Status: FAIL (It can) Evidence: Because organ_30_app_scanner.py doesn't write to organ_04_knowledge.py, it has no persistent knowledge base to "break", meaning it scans the DOM blindly every time.
+
+13. Can the system determine what is currently on screen? Status: FAIL (In practice) Evidence: organ_31_visual_perception.py works, but its output is not injected into the Brain's prompt context during the system_boot.py execution sequence.
+
+14. Can the Brain explain what the user intended? Status: PASS Evidence: The LLM outputs structured intent_analysis in the ExecutionPlan.
+
+15. Can the Workflow Compiler explain exactly what will be executed? Status: PASS Evidence: It outputs a deterministic list of PhaseSteps and AgentTasks.
+
+16. Can the CNS explain why each agent was selected? Status: FAIL Evidence: The CNS doesn't select the agents; the Brain and Compiler statically assign them.
+
+17. Can every action be traced back to the original user request? Status: PASS Evidence: Through the stdout correlation_id (Task ID) logs.
+
+18. Can every checkpoint be traced back to a compiled task step? Status: FAIL Evidence: Checkpoints are not actively enforced in the runtime.
+
+19. Can the entire execution be reconstructed from events and audit logs? Status: FAIL Evidence: The structured organ_16_audit_system.py is inactive.
+
+20. Can the entire system fail safely instead of bypassing the architecture? Status: FAIL Evidence: Unhandled exceptions cause raw process crashes rather than triggering a graceful LOCKDOWN state via organ_07_security.py.
+--------------------------------------
+------------------------------------
+
+
+If we feed that exact "Golden End-to-End Test" prompt into the system right now, based on the actual codebase implementation (system_boot.py and organ_15_external_connectors.py), it will catastrophically fail on step 1.
+
+Here is the exact autopsy of what the code will mechanically do if given that prompt:
+
+1. Intent & Planning (PASS - Mostly)
+The prompt enters system_boot.py and is sent to organ_01_brain.py. The LLM (llama3/Groq) will correctly parse this as a Desktop task and generate an ExecutionPlan requesting desktop controller access, splitting the task into multiple AgentTasks (e.g., Launch OBS, Click Record, Wait, Click Stop).
+
+2. Execution Crash (FAIL - Fatal)
+When system_boot.py attempts to execute the very first agent task, it routes it to the ConnectorGateway as a ConnectorType.DESKTOP task.
+
+At line 224 in system_boot.py, the code does this:
+
+python
+resp_scan = await executor.route(ConnectorCommandRequest(connector_type=ConnectorType.DESKTOP, action_name="scan_app", ...))
+However, if we look at organ_15_external_connectors.py (lines 751-764), the DesktopConnector only implements three actions:
+
+"list_windows"
+"focus_window"
+"gui_search_launch"
+Because system_boot.py hardcodes the action "scan_app", the DesktopConnector will immediately hit line 764:
+
+python
+raise ConnectorExecutionError(f"Unknown desktop action 'scan_app'")
+This unhandled exception bubbles up, crashing the execution loop for that agent immediately.
+
+3. What if we fixed that bug? (Still FAIL)
+Even if we patched system_boot.py to avoid the "scan_app" crash, the system lacks the mechanical primitives to execute the rest of the prompt:
+
+"Determine the active display": organ_31_visual_perception.py is fully disconnected from the execution loop. The agent is completely blind and cannot "see" OBS.
+"Create a Display Capture source": The DesktopConnector uses pygetwindow and pyautogui to launch apps via the Windows Start Menu (_gui_search_launch), but it does not contain any code to actually click on X/Y coordinates or locate UI elements inside an application. It literally cannot click a button.
+"Record for 30 seconds": The workflow compiler (organ_36) has no state-machine primitives for sleep() or wait(). The agent would try to execute "Start Recording" and "Stop Recording" in the exact same millisecond.
+"Report where it was saved": The agent does not have FileSystemConnector access wired into system_boot.py to dynamically search the user's Video folder, nor can it read the OBS settings menu to find the path.
+Summary
+The Golden End-to-End Test proves that while the Organs are beautifully documented and structurally typed, the system_boot.py composition root is a facade. It is hardcoded to fail on desktop actions, and even if it didn't, the agent has no eyes, no hands, and no memory connected to it.
+
+We absolutely need to fix this architecture before adding any more features!
+
+------------------------------------
+
+-------------------------------------
+

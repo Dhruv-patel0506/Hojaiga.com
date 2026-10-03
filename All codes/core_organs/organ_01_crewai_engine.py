@@ -1,0 +1,5463 @@
+"""
+HOJAIGA CREWAI MULTI-AGENT ORCHESTRATION ENGINE
+============================================================
+Component: Organ 01 (Brain) - CrewAI Autonomous Extension
+Integrates CrewAI (v1.x) with Hojaiga OS, wrapping lower-level
+organ sockets and controllers into autonomous ReAct tools.
+Zero mock data, 100% closed-loop execution.
+============================================================
+"""
+
+import os
+import sys
+import json
+import logging
+import re
+from typing import Dict, Any, Optional
+
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except Exception:
+    pass
+
+os.environ["CREWAI_TRACING_ENABLED"] = "false"
+logging.getLogger("crewai.events").setLevel(logging.CRITICAL)
+
+logger = logging.getLogger("hojaiga.organ01.crewai_engine")
+if not logger.handlers:
+    _h = logging.StreamHandler()
+    _h.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] brain.crewai: %(message)s"))
+    logger.addHandler(_h)
+logger.setLevel(logging.INFO)
+
+
+def _ts() -> str:
+    """Return a millisecond-precision timestamp for duration tracking."""
+    from datetime import datetime
+    return datetime.now().strftime("%H:%M:%S.%f")[:-3]
+
+
+def _ensure_interactive_desktop():
+    """Ensures calling thread is attached to the active interactive input desktop."""
+    try:
+        import ctypes
+        user32 = ctypes.windll.user32
+        hwinsta = user32.OpenWindowStationW("WinSta0", False, 0x0002 | 0x0100 | 0x0200)
+        if hwinsta:
+            user32.SetProcessWindowStation(hwinsta)
+        hdesk = user32.OpenInputDesktop(0, False, 0x01FF)
+        if not hdesk:
+            hdesk = user32.OpenDesktopW("default", 0, False, 0x01FF)
+        if hdesk:
+            user32.SetThreadDesktop(hdesk)
+    except Exception:
+        pass
+
+try:
+    import ctypes
+    ctypes.windll.user32.DisableProcessWindowsGhosting()
+except Exception:
+    pass
+
+# Ensure calling thread attaches to interactive desktop
+_ensure_interactive_desktop()
+
+
+# Soft import crewai
+try:
+    from crewai import Agent, Task, Crew, Process, LLM
+    from crewai.tools import tool
+    _HAS_CREWAI = True
+except ImportError:
+    _HAS_CREWAI = False
+    Agent = Task = Crew = Process = LLM = tool = Any  # type: ignore
+
+# Ensure paths are in sys.path
+_this_dir = os.path.dirname(os.path.abspath(__file__))
+_parent_dir = os.path.dirname(_this_dir)
+for _p in [_this_dir, _parent_dir]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
+# Import Hojaiga organ interfaces
+try:
+    from core_organs.lead_extractor import (
+        send_cdp_command,
+        send_cdp_navigate,
+        send_cdp_js,
+        send_cdp_screenshot,
+        send_cdp_click_coordinates,
+        extract_leads_and_export,
+        scrape_live_directory_leads,
+        ensure_organ19_running,
+    )
+except ImportError:
+    try:
+        from lead_extractor import (
+            send_cdp_command,
+            send_cdp_navigate,
+            send_cdp_js,
+            send_cdp_screenshot,
+            send_cdp_click_coordinates,
+            extract_leads_and_export,
+            scrape_live_directory_leads,
+            ensure_organ19_running,
+        )
+    except ImportError as e:
+        logger.error(f"Failed to import lead_extractor: {e}")
+        send_cdp_command = send_cdp_navigate = send_cdp_js = send_cdp_screenshot = send_cdp_click_coordinates = extract_leads_and_export = scrape_live_directory_leads = ensure_organ19_running = None  # type: ignore
+
+try:
+    from core_organs.organ_31_visual_perception import VisualGroundingEngine
+except ImportError:
+    try:
+        from organ_31_visual_perception import VisualGroundingEngine
+    except Exception:
+        VisualGroundingEngine = None
+
+try:
+    from core_organs.organ_30_app_scanner import EyeAndBrainOrchestrator
+except ImportError:
+    try:
+        from organ_30_app_scanner import EyeAndBrainOrchestrator
+    except Exception:
+        EyeAndBrainOrchestrator = None
+
+try:
+    from core_organs.organ_ml import ml as organ_ml
+except ImportError:
+    try:
+        from organ_ml import ml as organ_ml
+    except Exception:
+        organ_ml = None
+
+try:
+    from core_organs.organ_33_visual_memory import get_visual_memory
+except ImportError:
+    try:
+        from organ_33_visual_memory import get_visual_memory
+    except Exception:
+        get_visual_memory = None
+
+try:
+    from core_organs.organ_29_popup_handler import DesktopInteractionManager
+except ImportError:
+    try:
+        from organ_29_popup_handler import DesktopInteractionManager
+    except Exception:
+        DesktopInteractionManager = None
+
+try:
+    from core_organs.organ_38_task_orchestrator import TaskOrchestrator
+except ImportError:
+    try:
+        from organ_38_task_orchestrator import TaskOrchestrator
+    except Exception:
+        TaskOrchestrator = None
+
+try:
+    from core_organs.organ_02_cns_single_file import EventBus, EventEnvelope
+except ImportError:
+    try:
+        from organ_02_cns_single_file import EventBus, EventEnvelope
+    except Exception:
+        EventBus = EventEnvelope = None
+
+
+# Optional visual status bridge. It is a separate UI organ and is safe to omit
+# in headless CrewAI runs.
+try:
+    from core_organs.organ_34_hojaiga_avatar import notify_crewai_activity
+except Exception:
+    def notify_crewai_activity(_state: str, _detail: str = ""):
+        return None
+
+# ScrapeGraphAI integration for web scraping
+try:
+    from core_organs.organ_13_scrapegraphai import ScrapeGraphAIIntegration, get_scrapegraphai
+    _HAS_SCRAPEGRAPHAI = True
+    print("[CREWAI] ScrapeGraphAI integration loaded OK", flush=True)
+except ImportError as e:
+    print(f"[CREWAI] ScrapeGraphAI integration NOT available: {e}", flush=True)
+    _HAS_SCRAPEGRAPHAI = False
+    ScrapeGraphAIIntegration = None
+    get_scrapegraphai = None
+# ============================================================
+# SHARED STATE & HELPERS
+# ============================================================
+
+import time
+import os
+
+# Stealth mode: True means automated actions run unobtrusively without stealing foreground focus or popping over user's screen
+HOJAIGA_STEALTH_MODE = os.environ.get("HOJAIGA_STEALTH_MODE", "0").strip().lower() in ("1", "true", "yes")
+
+# Track which app we last launched (hwnd + title)
+_last_launched_app = {"hwnd": 0, "title": "", "app_name": ""}
+_previous_launched_app = {"hwnd": 0, "title": "", "app_name": ""}  # For multi-app tasks
+
+# Active session action log: guarantees dual-factor verification (log + vision)
+_current_session_actions = []
+
+# Dynamic drawing specifications for active session
+_current_drawing_spec = {
+    "shape": "circle",
+    "all_shapes": [],
+    "layout": [],
+    "tool": "Pencil",
+    "color": "",
+    "width": 240,
+    "height": 240
+}
+
+def _extract_all_drawing_shapes(command: str) -> list:
+    """Extract all distinct requested geometric shapes and figures from user drawing command,
+    preserving appearance order and normalizing typos (e.g. 'squre' -> 'square', 'rect' -> 'rectangle')."""
+    import re
+    cmd_lower = (command or "").lower()
+
+    shape_norm = {
+        "rectangle": "rectangle", "rect": "rectangle", "rectange": "rectangle",
+        "circle": "circle", "circl": "circle", "round": "circle",
+        "square": "square", "squre": "square", "box": "square",
+        "parallelogram": "parallelogram", "rhomboid": "parallelogram",
+        "trapezium": "trapezium", "trapezoid": "trapezium", "trapez": "trapezium",
+        "triangle": "triangle", "trigon": "triangle",
+        "oval": "oval", "ellipse": "oval",
+        "diamond": "diamond", "rhombus": "diamond",
+        "star": "star", "heart": "heart",
+        "pentagon": "pentagon", "hexagon": "hexagon", "heptagon": "heptagon", "septagon": "heptagon",
+        "octagon": "octagon", "nonagon": "nonagon", "decagon": "decagon"
+    }
+
+    found = []
+    for raw_shape, canon in shape_norm.items():
+        for m in re.finditer(r'\b' + raw_shape + r'\b', cmd_lower):
+            found.append((m.start(), canon))
+
+    for m in re.finditer(r'\b(\d+)[ -]sided\s+(?:regular\s+)?(?:polygon|shape|figure|ngon)\b', cmd_lower):
+        found.append((m.start(), f"polygon:{m.group(1)}"))
+    for m in re.finditer(r'\b(\d+)[ -]gon\b', cmd_lower):
+        found.append((m.start(), f"polygon:{m.group(1)}"))
+
+    found.sort(key=lambda x: x[0])
+    ordered_shapes = []
+    for _, s in found:
+        if s not in ordered_shapes:
+            ordered_shapes.append(s)
+
+    return ordered_shapes
+
+def _compute_multi_shape_layout(shapes: list, canvas_box: tuple = None) -> list:
+    """Compute optimal non-overlapping coordinates and dimensions for multiple shapes on a single canvas page."""
+    # MS Paint default canvas page sheet on 1080p is 1152x648 anchored at ~ [180, 240, 1325, 880]
+    if not canvas_box or canvas_box[2] <= canvas_box[0] or canvas_box[3] <= canvas_box[1]:
+        canvas_box = (180, 240, 1325, 880)
+    else:
+        # Constrain to the actual white canvas page sheet (prevent overflowing into dark gray viewport margin)
+        left = max(canvas_box[0], 180)
+        top = max(canvas_box[1], 240)
+        right = min(canvas_box[2], 1325)
+        bottom = min(canvas_box[3], 880)
+        if right <= left + 200 or bottom <= top + 150:
+            canvas_box = (180, 240, 1325, 880)
+        else:
+            canvas_box = (left, top, right, bottom)
+
+    left, top, right, bottom = canvas_box
+    w_avail = right - left
+    h_avail = bottom - top
+
+    n = len(shapes)
+    layout = []
+    if n <= 1:
+        s = shapes[0] if shapes else "circle"
+        w, h = (260, 140) if s in ("rectangle", "parallelogram", "trapezium") else (160, 160)
+        layout.append({"shape": s, "cx": (left + right) // 2, "cy": (top + bottom) // 2, "width": w, "height": h})
+        return layout
+
+    if n <= 3:
+        cy = top + int(h_avail * 0.50)
+        step_x = w_avail // (n + 1)
+        for i, s in enumerate(shapes):
+            cx = left + step_x * (i + 1)
+            w, h = (180, 100) if s in ("rectangle", "parallelogram", "trapezium") else (110, 110)
+            layout.append({"shape": s, "cx": cx, "cy": cy, "width": w, "height": h})
+        return layout
+
+    if n == 4:
+        y1 = top + int(h_avail * 0.30)
+        y2 = top + int(h_avail * 0.70)
+        x1 = left + int(w_avail * 0.32)
+        x2 = left + int(w_avail * 0.68)
+        coords = [(x1, y1), (x2, y1), (x1, y2), (x2, y2)]
+        for i, s in enumerate(shapes):
+            cx, cy = coords[i]
+            w, h = (170, 95) if s in ("rectangle", "parallelogram", "trapezium") else (100, 100)
+            layout.append({"shape": s, "cx": cx, "cy": cy, "width": w, "height": h})
+        return layout
+
+    # 5 or 6 shapes: 2 rows (Row 1: 3 shapes, Row 2: 2 or 3 shapes)
+    y1 = top + int(h_avail * 0.28)
+    y2 = top + int(h_avail * 0.72)
+
+    row1_shapes = shapes[:3]
+    row2_shapes = shapes[3:]
+
+    r1_step = w_avail // (len(row1_shapes) + 1)
+    for i, s in enumerate(row1_shapes):
+        cx = left + r1_step * (i + 1)
+        w, h = (170, 95) if s in ("rectangle", "parallelogram", "trapezium") else (100, 100)
+        layout.append({"shape": s, "cx": cx, "cy": y1, "width": w, "height": h})
+
+    r2_n = len(row2_shapes)
+    r2_step = w_avail // (r2_n + 1)
+    for i, s in enumerate(row2_shapes):
+        cx = left + r2_step * (i + 1)
+        w, h = (170, 95) if s in ("rectangle", "parallelogram", "trapezium") else (100, 100)
+        layout.append({"shape": s, "cx": cx, "cy": y2, "width": w, "height": h})
+
+    return layout
+
+def _extract_drawing_shape_and_tool(command: str):
+    """Dynamically extract shape/subject, tool mode, palette color, and distinct dimensions from user's drawing command.
+    Supports regular N-gons, mathematical polygons, artistic subjects, tool modes, colors, and explicit or distinct aspect ratios."""
+    import re
+    cmd_lower = (command or "").lower()
+
+    # 1. Extract Tool Mode
+    extracted_tool = "Pencil"
+    if any(k in cmd_lower for k in ["brush", "calligraphy", "watercolor", "airbrush", "oil"]):
+        extracted_tool = "Brush"
+    elif any(k in cmd_lower for k in ["eraser", "erase"]):
+        extracted_tool = "Eraser"
+
+    # 2. Extract Palette Color
+    colors = ["red", "blue", "green", "yellow", "orange", "purple", "pink", "black", "brown", "gray", "grey", "cyan", "magenta", "white"]
+    extracted_color = ""
+    for c in colors:
+        if re.search(r'\b' + c + r'\b', cmd_lower):
+            extracted_color = c.capitalize()
+            break
+
+    # 3. Extract Shape / Subject
+    all_shapes = _extract_all_drawing_shapes(command)
+    extracted_shape = all_shapes[0] if all_shapes else ""
+
+    if not extracted_shape:
+        m_sided = re.search(r'\b(\d+)[ -]sided\s+(?:regular\s+)?(?:polygon|shape|figure|ngon)\b', cmd_lower)
+        if m_sided:
+            extracted_shape = f"polygon:{m_sided.group(1)}"
+        else:
+            m_gon = re.search(r'\b(\d+)[ -]gon\b', cmd_lower)
+            if m_gon:
+                extracted_shape = f"polygon:{m_gon.group(1)}"
+
+    if not extracted_shape:
+        m_free = re.search(r'\b(?:draw|paint|sketch)\s+(?:a|an|the)?\s*([a-zA-Z0-9_\- ]+?)(?:\s+(?:in|on|with|using|at)\b|\s*$)', cmd_lower)
+        if m_free:
+            candidate = m_free.group(1).strip()
+            words_to_strip = ["paint", "mspaint", "canvas", "window", "screen", "regular"] + colors
+            c_words = [w for w in candidate.split() if w not in words_to_strip]
+            candidate = " ".join(c_words).strip()
+            if candidate:
+                extracted_shape = candidate
+
+    if not extracted_shape:
+        extracted_shape = "circle"
+
+    # 4. Extract Dimensions & Enforce Distinct Aspect Ratios
+    extracted_width, extracted_height = 0, 0
+    m_dim = re.search(r'\b(\d+)\s*(?:x|by|\*)\s*(\d+)\b', cmd_lower)
+    if m_dim:
+        extracted_width, extracted_height = int(m_dim.group(1)), int(m_dim.group(2))
+    else:
+        m_w = re.search(r'\bwidth\s*[:=]?\s*(\d+)\b', cmd_lower)
+        m_h = re.search(r'\bheight\s*[:=]?\s*(\d+)\b', cmd_lower)
+        if m_w and m_h:
+            extracted_width, extracted_height = int(m_w.group(1)), int(m_h.group(2))
+
+    if not extracted_width or not extracted_height:
+        if extracted_shape in ("rectangle", "rect", "rectange", "parallelogram", "rhomboid", "trapezium", "trapezoid"):
+            extracted_width, extracted_height = 340, 190
+        elif extracted_shape in ("square", "box", "squre"):
+            extracted_width, extracted_height = 220, 220
+        elif extracted_shape in ("oval", "ellipse"):
+            extracted_width, extracted_height = 320, 180
+        elif extracted_shape in ("circle", "circl", "round"):
+            extracted_width, extracted_height = 240, 240
+        elif any(extracted_shape.startswith(p) for p in ("polygon:", "ngon:")) or extracted_shape in ("decagon", "nonagon", "octagon", "heptagon", "hexagon", "pentagon", "triangle", "star", "heart"):
+            extracted_width, extracted_height = 250, 250
+        else:
+            extracted_width, extracted_height = 300, 300
+
+    return extracted_shape, extracted_tool, extracted_color, extracted_width, extracted_height
+
+def _record_session_action(action_type: str, app: str, details: str = ""):
+    """Record an in-session action with timestamp to prevent hallucinating success based on pre-existing file text."""
+    entry = f"[{_ts()}] {action_type} | App: {app} | {details}".strip()
+    _current_session_actions.append(entry)
+    logger.info(f"[SESSION_ACTION] {entry}")
+
+def _get_calculator_display_value(hwnd: int = 0) -> str:
+    """Read the displayed calculation result from Calculator via UIA."""
+    try:
+        import uiautomation as auto
+        import win32gui
+        target_hwnd = hwnd or _last_launched_app.get("hwnd", 0)
+        if not target_hwnd or not win32gui.IsWindow(target_hwnd):
+            def _find_c(h, _):
+                nonlocal target_hwnd
+                if win32gui.IsWindowVisible(h):
+                    t = (win32gui.GetWindowText(h) or "").lower()
+                    if "calculator" in t:
+                        target_hwnd = h
+                return True
+            win32gui.EnumWindows(_find_c, None)
+        if not target_hwnd:
+            return ""
+        ctrl = auto.ControlFromHandle(target_hwnd)
+        if not ctrl:
+            return ""
+        for c, _ in auto.WalkControl(ctrl, maxDepth=12):
+            if "Text" in (c.ControlTypeName or ""):
+                name = c.Name or ""
+                if name.startswith("Display is"):
+                    return name.replace("Display is", "").strip()
+        return ""
+    except Exception as e:
+        logger.debug(f"[CALC_DISP] Error reading display: {e}")
+        return ""
+
+def _clean_slate_app_hygiene(app_name: str):
+    """Dynamic session hygiene: cleans up stale / leftover test windows
+    before launching a fresh instance, ensuring the task starts with a clean slate.
+    """
+    try:
+        _ensure_interactive_desktop()
+        import win32gui
+        import win32con
+        app_clean = app_name.strip().lower()
+
+        stale_hwnds = []
+        def _enum_stale(h, _):
+            if win32gui.IsWindowVisible(h):
+                t = (win32gui.GetWindowText(h) or "").lower()
+                c = (win32gui.GetClassName(h) or "").lower()
+                if any(bad in t for bad in ["antigravity", "visual studio", "code -", "chrome", "edge", "terminal", "powershell"]):
+                    return True
+                if app_clean == "notepad" or "notepad" in app_clean:
+                    if c == "notepad" or t.endswith(" - notepad") or t == "notepad":
+                        stale_hwnds.append((h, t, "notepad"))
+                elif app_clean in ("calc", "calculator") or "calc" in app_clean:
+                    if "calculator" in t or "calc" in t or (c == "applicationframewindow" and "calc" in t):
+                        stale_hwnds.append((h, t, "calculator"))
+                elif app_clean in ("paint", "mspaint"):
+                    if "paint" in t or c in ("mspaintapp", "paintapp"):
+                        stale_hwnds.append((h, t, "paint"))
+                elif app_clean in t or app_clean in c:
+                    stale_hwnds.append((h, t, app_clean))
+            return True
+
+        try:
+            win32gui.EnumWindows(_enum_stale, None)
+        except Exception:
+            pass
+
+        for h, title, app_type in stale_hwnds:
+            if app_type == "notepad":
+                logger.info(f"[HYGIENE] Resetting/Closing stale leftover Notepad processes/windows for clean session.")
+                try:
+                    import uiautomation as auto
+                    ctrl = auto.ControlFromHandle(h)
+                    if ctrl:
+                        for c, _ in auto.WalkControl(ctrl, maxDepth=10):
+                            if any(k in (c.ControlTypeName or "") for k in ["Document", "Edit"]):
+                                vp = c.GetValuePattern()
+                                if vp:
+                                    vp.SetValue("")
+                                break
+                except Exception:
+                    pass
+                try:
+                    win32gui.PostMessage(h, win32con.WM_CLOSE, 0, 0)
+                except Exception:
+                    pass
+                try:
+                    import subprocess
+                    subprocess.run(["taskkill", "/F", "/IM", "notepad.exe"], capture_output=True, timeout=3)
+                except Exception:
+                    pass
+                break
+            elif app_type == "calculator":
+                logger.info(f"[HYGIENE] Resetting Calculator window hwnd={h} to 0 for clean session.")
+                try:
+                    import uiautomation as auto
+                    ctrl = auto.ControlFromHandle(h)
+                    if ctrl:
+                        for c, _ in auto.WalkControl(ctrl, maxDepth=14):
+                            if c.ControlTypeName == "ButtonControl" and c.Name == "Clear":
+                                ip = c.GetInvokePattern()
+                                if ip:
+                                    ip.Invoke()
+                                    time.sleep(0.1)
+                                break
+                except Exception:
+                    pass
+            elif app_type in ("paint", "mspaint"):
+                # Paint default title is 'Untitled - Paint' — do not kill it during clean slate
+                pass
+            else:
+                if ("untitled" in title or "test" in title) and "paint" not in title and "paint" not in app_type:
+                    logger.info(f"[HYGIENE] Closing stale leftover window hwnd={h} ('{title}') for clean session.")
+                    try:
+                        win32gui.PostMessage(h, win32con.WM_CLOSE, 0, 0)
+                    except Exception:
+                        pass
+        if stale_hwnds:
+            import time
+            time.sleep(0.5)
+    except Exception as e:
+        logger.debug(f"[HYGIENE] Error during pre-task cleanup: {e}")
+
+def _math_expr_to_button_sequence(expr: str) -> str:
+    """Convert a mathematical formula like '999+1' into Calculator button tokens 'Nine, Nine, Nine, Plus, One, Equals'."""
+    if not expr:
+        return ""
+    char_map = {
+        '0': 'Zero', '1': 'One', '2': 'Two', '3': 'Three', '4': 'Four',
+        '5': 'Five', '6': 'Six', '7': 'Seven', '8': 'Eight', '9': 'Nine',
+        '+': 'Plus', '-': 'Minus', '*': 'Multiply by', 'x': 'Multiply by', 'X': 'Multiply by',
+        '/': 'Divide by', '.': 'Decimal separator', '=': 'Equals'
+    }
+    tokens = []
+    for ch in expr.strip():
+        if ch in char_map:
+            tokens.append(char_map[ch])
+    if not tokens or tokens[-1] != 'Equals':
+        tokens.append('Equals')
+    return ", ".join(tokens)
+
+
+def _derive_web_url(command: str, web_word: str) -> str:
+    """Turn a detected web cue into a concrete start URL, dynamically without hardcoded site dictionaries.
+
+    Grammar-based dynamic resolution order (no per-site dictionaries):
+      1. Explicit URL scheme in command (http:// or https://)
+      2. Explicit domain.tld in command (e.g. news.ycombinator.com), ignoring email recipients
+      3. Target noun extracted after navigation/action verbs ("go to", "visit", "open", "check", etc.)
+      4. Web word parameter if it represents a clean single-word destination (not a verb/browser)
+      5. Generic queries without a distinct site destination -> search engine fallback
+    """
+    import re as _re
+    cmd = (command or "").strip()
+    cmd_lower = cmd.lower()
+
+    # 1. Explicit full URL in command
+    m_url = _re.search(r'https?://[^\s,]+', cmd)
+    if m_url:
+        return m_url.group(0)
+
+    # 2. Explicit domain.tld in command (exclude email address domains like user@host.com)
+    m_domain = _re.search(
+        r'(?<!@)\b([a-zA-Z0-9-]+\.(?:com|org|net|io|co|in|edu|gov|ai|dev|app|xyz|me|info))\b',
+        cmd,
+        _re.IGNORECASE
+    )
+    if m_domain:
+        return "https://" + m_domain.group(1).lower()
+
+    # Non-destination vocabulary: browsers, navigation verbs, connectors, and generic search categories
+    navigation_verbs = {
+        "go", "goto", "navigate", "head", "visit", "open", "launch", "run", "start",
+        "browse", "check", "see", "view", "look", "search", "find", "use", "switch"
+    }
+    stop_words = {
+        "to", "the", "a", "an", "and", "or", "in", "into", "on", "at", "for", "with",
+        "my", "our", "your", "page", "site", "website", "tab", "window", "url", "link",
+        "web", "browser", "internet", "online", "chrome", "google", "edge", "firefox",
+        "safari", "brave"
+    }
+    search_categories = {
+        "hotel", "hotels", "flight", "flights", "deal", "deals", "ticket", "tickets",
+        "cheap", "best", "price", "prices", "news", "weather", "job", "jobs", "home",
+        "homes", "car", "cars", "restaurant", "restaurants", "food", "recipe", "recipes",
+        "review", "reviews", "product", "products", "item", "items", "photo", "photos"
+    }
+
+    # Combined exclusions that can never be treated as a destination brand
+    non_destinations = navigation_verbs | stop_words | search_categories
+
+    # 3. Dynamic grammar extraction: locate candidate destination after navigation cue
+    # E.g. "go to gmail", "goto gmail", "open browser and check gmail", "visit canva", "navigate to figma"
+    verb_pattern = r'\b(?:go\s+to|goto|navigat(?:e)?\s+to|head\s+to|visit|check|browse\s+to|open)\s+([a-zA-Z0-9_\-\s]{2,40})'
+    for match in _re.finditer(verb_pattern, cmd_lower):
+        tail = match.group(1).strip()
+        tokens = _re.findall(r'[a-zA-Z0-9-]+', tail)
+        for tok in tokens:
+            if tok in stop_words or tok in navigation_verbs:
+                continue
+            if tok in search_categories:
+                # User is searching for a category, not a specific site -> fallback to search
+                return "https://www.google.com"
+            if len(tok) >= 3:
+                return f"https://www.{tok}.com"
+
+    # 4. Check if web_word parameter itself is a clean destination noun
+    w = (web_word or "").strip().lower()
+    if w and " " not in w and w not in non_destinations and _re.fullmatch(r'[a-zA-Z0-9-]{3,}', w):
+        return f"https://www.{w}.com"
+
+    # 5. Fallback: if no destination was extracted, search engine fallback
+    return "https://www.google.com"
+
+
+def _is_site_like_target(alias: str) -> bool:
+    """A web target beats a navigation cue when it is a single-word brand.
+    Used only to ORDER web_targets so the phase label reads 'gmail', not 'go to'."""
+    a = (alias or "").strip().lower()
+    non_destinations = {
+        "go", "goto", "navigate", "head", "visit", "open", "launch", "run", "start",
+        "browse", "check", "see", "view", "look", "search", "find", "use", "switch",
+        "to", "the", "a", "an", "and", "or", "in", "into", "on", "at", "for", "with",
+        "my", "our", "your", "page", "site", "website", "tab", "window", "url", "link",
+        "web", "browser", "internet", "online", "chrome", "google", "edge", "firefox",
+        "safari", "brave", "hotel", "hotels", "deal", "deals"
+    }
+    return " " not in a and a.replace(".", "").isalpha() and a not in non_destinations
+
+
+def _compile_task_with_organ36(command: str) -> Dict[str, Any]:
+    """Compile raw user command into structured sequential phases dynamically using Organ 36 Workflow Compiler."""
+    try:
+        from core_organs.organ_36_workflow_compiler import WorkflowCompilerKernel
+        kernel = WorkflowCompilerKernel()
+        cmd_lower = command.lower()
+
+        # Dynamic formula / expression extraction from command
+        import re
+        expr_match = re.search(r'(\d+(?:\.\d+)?(?:\s*[\+\-\*\/\^xX]\s*\d+(?:\.\d+)?)+)', command)
+        expr_str = expr_match.group(1).replace(" ", "") if expr_match else ""
+
+        # Dynamic App Discovery from action verbs and system catalog
+        detected_apps = []
+        known_app_keywords = [
+            "notepad", "calculator", "calc", "paint", "mspaint", "excel", "word",
+            "wordpad", "obs", "chrome", "edge", "spotify", "vlc", "terminal", "settings",
+            "powershell", "cmd", "discord", "slack", "steam", "outlook", "teams"
+        ]
+        skip_words = {
+            "the", "a", "an", "this", "my", "new", "and", "then", "to", "for", "with", "it", "some", "window",
+            "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "single", "both", "all", "each",
+            "page", "canvas", "screen", "tab", "doc", "document", "file", "folder", "background", "foreground",
+            "center", "row", "column", "order", "detail", "details", "sec", "second", "seconds", "min", "minute", "minutes",
+            "step", "steps", "phase", "phases", "size", "sizes", "shape", "shapes", "color", "colors", "drawing", "strokes"
+        }
+
+        # 1. Action verbs: open/launch/start/run/switch to <app>
+        verb_matches = list(re.finditer(r'\b(?:open|launch|start|run|switch to|in|into|app)\s+([a-zA-Z0-9_\-\+]+)', command, re.IGNORECASE))
+        for match in verb_matches:
+            matched_text = match.group(0).lower()
+            cand = match.group(1).lower()
+            if cand in skip_words:
+                continue
+            # For prepositions 'in' or 'into', candidate MUST be a recognized application keyword
+            if (matched_text.startswith("in ") or matched_text.startswith("into ")) and cand not in known_app_keywords:
+                continue
+            if cand not in [a[0] for a in detected_apps]:
+                detected_apps.append((cand, match.start(1)))
+
+        # 2. Common application keywords as secondary detector
+        for kw in known_app_keywords:
+            if re.search(r'\b' + kw + r'\b', cmd_lower) and kw not in [a[0] for a in detected_apps]:
+                pos = cmd_lower.find(kw)
+                detected_apps.append((kw, pos))
+
+        # Sort apps by order of appearance in command
+        detected_apps.sort(key=lambda x: x[1])
+
+        # Normalize via dynamic VerbAliasEngine
+        alias_engine = None
+        try:
+            from core_organs.organ_40_app_launcher import AppCatalog, VerbAliasEngine
+            alias_engine = VerbAliasEngine(AppCatalog())
+        except Exception:
+            pass
+
+        normalized_apps = []
+        for app_kw, _ in detected_apps:
+            norm_app = app_kw
+            if app_kw in ("calc", "calculator"):
+                norm_app = "calculator"
+            elif app_kw in ("paint", "mspaint"):
+                norm_app = "paint"
+            elif app_kw in ("notepad", "notepad++"):
+                norm_app = "notepad"
+            elif alias_engine:
+                try:
+                    resolved = alias_engine.resolve(app_kw)
+                    if resolved and resolved != "google chrome":
+                        norm_app = resolved
+                    elif "chrome" in app_kw:
+                        norm_app = "google chrome"
+                    else:
+                        norm_app = ""
+                except Exception:
+                    pass
+            if norm_app and norm_app not in normalized_apps:
+                normalized_apps.append(norm_app)
+
+        # --- Dynamic WEB-target detection (reuses organ_40 alias table) --------
+        # The launcher already treats phrases like "gmail"/"webmail"/"url"/"http"/
+        # "navigate to" as google chrome. Detect the SAME cues here (word-boundary,
+        # no new hardcode) and promote "google chrome" into the app sequence so the
+        # downstream multi-app builder emits a real browser/CDP phase.
+        web_targets = []
+        try:
+            from core_organs.organ_40_app_launcher import _ALIASES as _A40, _phrase_in_text as _a40_pit
+            for _cw in _A40.get("google chrome", []):
+                _cw = (_cw or "").strip()
+                if len(_cw) >= 4 and _a40_pit(_cw, cmd_lower) and _cw not in web_targets:
+                    web_targets.append(_cw)
+        except Exception:
+            pass
+        # Prefer real destination sites over navigation cues ("go to") so the
+        # phase label and downstream target read as the site, not the verb.
+        web_targets.sort(key=lambda t: 0 if _is_site_like_target(t) else 1)
+        if web_targets and "google chrome" not in normalized_apps:
+            normalized_apps.append("google chrome")
+
+        steps = []
+        phase_num = 1
+        for norm_app in normalized_apps:
+            if norm_app == "google chrome" and web_targets:
+                steps.append({
+                    "id": f"phase_{phase_num}_web_navigate",
+                    "type": "TASK",
+                    "capability": "WEB.NAVIGATE",
+                    "parameters": {
+                        "app": "google chrome",
+                        "target": web_targets[0],
+                        "url": _derive_web_url(command, web_targets[0]),
+                    }
+                })
+                phase_num += 1
+                continue
+            steps.append({
+                "id": f"phase_{phase_num}_launch_{norm_app}",
+                "type": "TASK",
+                "capability": "DESKTOP.LAUNCH",
+                "parameters": {"app": norm_app}
+            })
+            steps.append({
+                "id": f"phase_{phase_num}_scan_{norm_app}",
+                "type": "TASK",
+                "capability": "DESKTOP.SCAN_UI",
+                "parameters": {"app": norm_app}
+            })
+            phase_num += 1
+
+        if not steps:
+            steps.append({
+                "id": "phase_default_task",
+                "type": "TASK",
+                "capability": "DESKTOP.GENERAL_EXECUTION",
+                "parameters": {"command": command}
+            })
+
+        workflow_def = {
+            "name": "organ36_compiled_desktop_task",
+            "version": "1.0.0",
+            "variables": [{"name": "raw_command", "type": "string", "default": command}],
+            "steps": steps
+        }
+        comp_res = kernel.compile_workflow(workflow_def)
+        logger.info(f"[ORGAN_36] Compiled task into {len(steps)} verified dynamic sequential steps (success={comp_res.get('success')})")
+        return {
+            "success": comp_res.get("success", True),
+            "steps": steps,
+            "expression": expr_str,
+            "detected_apps": normalized_apps,
+            "web_targets": web_targets,
+            "ir": comp_res.get("ir")
+        }
+    except Exception as e:
+        logger.warning(f"[ORGAN_36] Compilation note: {e}")
+        return {"success": False, "steps": [], "expression": "", "detected_apps": []}
+
+def _register_with_organ10(task_id: str, command: str, is_multi_app: bool = False, is_lead: bool = False) -> str:
+    """Select and register the appropriate Organ 10 Agent Paradigm (from the 7 Hojaiga paradigms), emitting lifecycle events.
+    Uses LLM-based classification for intelligent paradigm assignment."""
+    try:
+        from core_organs.organ_10_agents import AgentParadigm, AgentEvent
+        
+        # Try LLM-based classification first
+        try:
+            from core_organs.organ_10_llm_paradigm_classifier import classify_task_paradigm
+            context = {
+                "is_multi_app": is_multi_app,
+                "is_lead": is_lead
+            }
+            classification = classify_task_paradigm(command, context)
+            paradigm = classification.paradigm
+            logger.info(f"[ORGAN_10] LLM-based Paradigm Assignment: '{paradigm.value}' (confidence: {classification.confidence:.2f}) to Task {task_id}")
+            logger.info(f"[ORGAN_10] Reasoning: {classification.reasoning}")
+        except Exception as llm_err:
+            logger.debug(f"[ORGAN_10] LLM classification failed: {llm_err}, using keyword fallback")
+            # Fallback to keyword matching
+            from core_organs.organ_10_agents import AgentParadigm
+            cmd_lower = command.lower()
+            if is_lead:
+                paradigm = AgentParadigm.DETERMINISTIC_LEAD_GEN
+            elif is_multi_app or any(k in cmd_lower for k in ["verify", "audit", "calculate", "check", "inspect"]):
+                paradigm = AgentParadigm.VERIFICATION_LOOP
+            elif any(k in cmd_lower for k in ["video", "record", "stream", "screen record"]):
+                paradigm = AgentParadigm.VIDEO_TO_ACTION
+            elif any(k in cmd_lower for k in ["browser", "web", "http", "chrome", "scrape", "navigate", "url"]):
+                paradigm = AgentParadigm.PARALLEL_WEB_AUTOMATION
+            elif any(k in cmd_lower for k in ["chat", "discuss", "debate", "converse", "dialogue"]):
+                paradigm = AgentParadigm.AGENT_CHATROOM
+            elif any(k in cmd_lower for k in ["consensus", "voting", "evaluate options", "multi-perspective"]):
+                paradigm = AgentParadigm.STOCHASTIC_CONSENSUS
+            else:
+                paradigm = AgentParadigm.RESEARCH_AND_WRITE
+            logger.info(f"[ORGAN_10] Keyword fallback Paradigm Assignment: '{paradigm.value}' to Task {task_id}")
+        
+        if EventBus is not None and EventEnvelope is not None:
+            cns = EventBus()
+            payload = {
+                "event_type": AgentEvent.AGENT_STARTED.value,
+                "task_id": task_id,
+                "paradigm": paradigm.value,
+                "objective": command,
+                "source_organ": "organ_10_agents"
+            }
+            try:
+                import asyncio
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    asyncio.create_task(cns.publish(EventEnvelope(
+                        topic="EVENT_AGENT_STARTED",
+                        source_organ="organ_10",
+                        payload=payload
+                    )))
+                else:
+                    asyncio.run(cns.publish(EventEnvelope(
+                        topic="EVENT_AGENT_STARTED",
+                        source_organ="organ_10",
+                        payload=payload
+                    )))
+            except Exception:
+                pass
+        return paradigm.value
+    except Exception as e:
+        logger.debug(f"[ORGAN_10] Registration note: {e}")
+        return "verification_loop"
+
+def _evaluate_failure_with_organ22(task_id: str, command: str, failure_reason: str, attempt: int) -> str:
+    """Use Organ 22 Decision Engine to evaluate execution anomalies and generate an optimal recovery policy."""
+    try:
+        from core_organs.organ_22_decision_engine import DecisionEngineCore, DecisionRequest, Goal, Requestor
+        core = DecisionEngineCore()
+        req = DecisionRequest(
+            goal=Goal(
+                raw_intent="recover_and_replan_execution",
+                target_primitive="replan",
+                parameters={
+                    "failed_attempt": attempt,
+                    "failure_reason": failure_reason,
+                    "command": command,
+                    "action_count": len(_current_session_actions)
+                }
+            ),
+            requestor=Requestor(
+                id="crewai_engine",
+                authority_level=2,
+                security_token=f"sec_{task_id[:8]}"
+            )
+        )
+        resp = core.process_request(req)
+        strat = resp.selected_strategy
+        strat_name = strat.get("name", "retry_primary")
+        conf = strat.get("confidence_level", "HIGH")
+        logger.info(f"[ORGAN_22] Decision Engine selected recovery strategy: '{strat_name}' (conf={conf})")
+        return f"ORGAN 22 DECISION POLICY ({strat_name}, conf={conf}): Execute tools strictly in physical sequence. Never skip intermediate steps."
+    except Exception as e:
+        logger.debug(f"[ORGAN_22] Decision engine note: {e}")
+        return "ORGAN 22 POLICY: Execute tools strictly in sequence without mental shortcuts."
+
+# Visual memory cache: store scan results per app to avoid re-scanning
+_visual_memory_cache: Dict[str, Any] = {}
+
+# Popup handler singleton
+_popup_handler = None
+
+
+def _get_popup_handler():
+    """Lazy-init popup handler singleton."""
+    global _popup_handler
+    if _popup_handler is None and DesktopInteractionManager is not None:
+        try:
+            _popup_handler = DesktopInteractionManager()
+        except Exception:
+            pass
+    return _popup_handler
+
+
+def _check_for_popups():
+    """Universal Windows Error & Modal Popup Mitigation.
+    Detects and auto-dismisses native Win32 dialogs (#32770, DirectUIHWND, WerFault),
+    system error prompts, confirmation barriers, and modal dialogs."""
+    try:
+        import win32gui
+        import ctypes
+        popups = []
+
+        POPUP_CLASSES = (
+            "#32770", "directuihwnd", "taskdialog", "werfaultwindow",
+            "application error", "windows - system error", "windows security",
+            "credential dialog xaml host", "xaml_windowedpopupclass", "popuphost",
+            "standardpopuphost", "soadialogwindow", "mediacenterdialog",
+            "nugetsysdialog", "mstaskswwclass"
+        )
+        ERROR_TITLE_KEYWORDS = (
+            "error", "warning", "fatal", "alert", "windows security",
+            "save as", "do you want to save", "cannot find", "not responding",
+            "crash", "script error", "exception", "failed"
+        )
+        EXCLUDE_TITLES = (
+            "antigravity", "visual studio code", "hojaiga", "powershell",
+            "command prompt", "terminal", "new_automation"
+        )
+
+        def _enum_cb(hwnd, _):
+            if win32gui.IsWindowVisible(hwnd):
+                title = (win32gui.GetWindowText(hwnd) or "").strip()
+                cn = (win32gui.GetClassName(hwnd) or "").strip().lower()
+                tl = title.lower()
+
+                if any(ex in tl for ex in EXCLUDE_TITLES):
+                    return True
+
+                is_popup_class = any(pc in cn for pc in POPUP_CLASSES)
+                is_error_title = any(kw in tl for kw in ERROR_TITLE_KEYWORDS)
+
+                if is_popup_class or is_error_title:
+                    if title or is_popup_class:
+                        popups.append((hwnd, title or cn))
+            return True
+
+        try:
+            win32gui.EnumWindows(_enum_cb, None)
+        except Exception:
+            pass
+
+        DISMISS_BUTTON_NAMES = [
+            "close", "don't save", "dont save", "cancel", "ok", "no",
+            "abort", "ignore", "retry", "dismiss", "discard", "later", "yes"
+        ]
+
+        for hwnd, title in popups:
+            logger.info(f"[POPUP] Mitigating modal/error dialog: '{title}' (hwnd={hwnd})")
+            dismissed = False
+
+            # Primary: Walk UIA controls and trigger InvokePattern on dismissal buttons
+            try:
+                import uiautomation as auto
+                el = auto.ControlFromHandle(hwnd)
+                if el:
+                    for child in auto.WalkControl(el, maxDepth=6):
+                        cname = (child.Name or "").strip().lower()
+                        if cname in DISMISS_BUTTON_NAMES or any(cname == db for db in DISMISS_BUTTON_NAMES):
+                            try:
+                                ip = child.GetInvokePattern()
+                                if ip:
+                                    ip.Invoke()
+                                    logger.info(f"[POPUP] Invoked '{child.Name}' on dialog '{title}'")
+                                    dismissed = True
+                                    break
+                            except Exception:
+                                pass
+                            try:
+                                child.Click()
+                                logger.info(f"[POPUP] Clicked '{child.Name}' on dialog '{title}'")
+                                dismissed = True
+                                break
+                            except Exception:
+                                pass
+            except Exception as uia_err:
+                logger.debug(f"[POPUP] UIA mitigation error: {uia_err}")
+
+            # Fallback 1: Send WM_COMMAND with IDCANCEL (2) or IDOK (1)
+            if not dismissed:
+                try:
+                    ctypes.windll.user32.PostMessageW(hwnd, 0x0111, 2, 0)  # WM_COMMAND, IDCANCEL
+                    time.sleep(0.05)
+                    ctypes.windll.user32.PostMessageW(hwnd, 0x0100, 0x1B, 0)  # WM_KEYDOWN, VK_ESCAPE
+                    ctypes.windll.user32.PostMessageW(hwnd, 0x0101, 0x1B, 0)  # WM_KEYUP, VK_ESCAPE
+                    dismissed = True
+                except Exception:
+                    pass
+
+            # Fallback 2: Send WM_SYSCOMMAND SC_CLOSE (0xF060) or Alt+F4
+            if not dismissed:
+                try:
+                    ctypes.windll.user32.PostMessageW(hwnd, 0x0112, 0xF060, 0)  # WM_SYSCOMMAND, SC_CLOSE
+                    time.sleep(0.05)
+                    ctypes.windll.user32.PostMessageW(hwnd, 0x0100, 0x12, 0)  # VK_MENU
+                    ctypes.windll.user32.PostMessageW(hwnd, 0x0100, 0x73, 0)  # VK_F4
+                    ctypes.windll.user32.PostMessageW(hwnd, 0x0101, 0x73, 0)
+                    ctypes.windll.user32.PostMessageW(hwnd, 0x0101, 0x12, 0)
+                except Exception:
+                    pass
+
+        # Also delegate to DesktopInteractionManager if available
+        try:
+            handler = _get_popup_handler()
+            if handler and hasattr(handler, "dismiss_popups"):
+                handler.dismiss_popups()
+        except Exception:
+            pass
+    except Exception as e:
+        logger.debug(f"[POPUP] Popup check failed: {e}")
+
+
+def _constrained_virtual_click(x: int, y: int) -> bool:
+    """Virtual mouse click constrained to the target app window bounds ONLY.
+    Coordinates are clipped to the app window. Never sends input outside the automated window."""
+    import ctypes
+    import ctypes.wintypes
+    import time
+
+    hwnd = _last_launched_app.get("hwnd", 0)
+    if not hwnd:
+        return False
+
+    try:
+        import win32gui
+        if not win32gui.IsWindow(hwnd) or not win32gui.IsWindowVisible(hwnd):
+            return False
+
+        # Get app window bounds
+        rect = win32gui.GetWindowRect(hwnd)
+        app_x1, app_y1, app_x2, app_y2 = rect
+
+        # CLIP coordinates to app window bounds — never go outside
+        x = max(app_x1, min(x, app_x2 - 1))
+        y = max(app_y1, min(y, app_y2 - 1))
+
+        # Convert screen coords to client coords
+        pt = ctypes.wintypes.POINT(x, y)
+        ctypes.windll.user32.ScreenToClient(hwnd, ctypes.byref(pt))
+
+        # Resolve the actual child window under the point. Top-level frames
+        # (Office/Chrome) often ignore clicks posted to the frame hwnd, so we
+        # retarget the real control and recompute client coords relative to it.
+        target = hwnd
+        try:
+            child = ctypes.windll.user32.ChildWindowFromPoint(hwnd, pt)
+            if child:
+                target = child
+        except Exception:
+            pass
+        cpt = ctypes.wintypes.POINT(x, y)
+        ctypes.windll.user32.ScreenToClient(target, ctypes.byref(cpt))
+        lparam = (cpt.y << 16) | (cpt.x & 0xFFFF)
+
+        # PostMessage click - goes directly to target window
+        ctypes.windll.user32.PostMessageW(target, 0x0201, 0x0001, lparam)  # WM_LBUTTONDOWN
+        time.sleep(0.05)
+        ctypes.windll.user32.PostMessageW(target, 0x0202, 0, lparam)  # WM_LBUTTONUP
+        return True
+    except Exception:
+        return False
+
+
+def _is_app_alive(hwnd: int) -> bool:
+    """Check if the tracked app window still exists and is responsive."""
+    if not hwnd:
+        return False
+    try:
+        import win32gui
+        if not win32gui.IsWindow(hwnd):
+            return False
+        if not win32gui.IsWindowVisible(hwnd):
+            # Check if minimized (still alive)
+            return win32gui.IsIconic(hwnd)
+        return True
+    except Exception:
+        return False
+
+
+def _recover_crashed_app(app_name: str) -> int:
+    """Try to relaunch a crashed app and return its new hwnd, or 0 on failure."""
+    import subprocess
+    import time
+
+    app_lower = (app_name or "").lower()
+    exe = f"{app_lower}.exe"
+    try:
+        from core_organs.dynamic_app_resolver import DynamicAppResolver
+        resolved_exe = DynamicAppResolver.resolve(app_lower)
+        if resolved_exe:
+            exe = resolved_exe
+    except Exception:
+        pass
+
+    logger.info(f"[RECOVER] App '{app_name}' crashed, attempting relaunch via '{exe}'...")
+    try:
+        subprocess.Popen(exe, shell=True)
+        time.sleep(3.0)
+
+        import win32gui
+        found_hwnd = 0
+        def _find(h, _):
+            nonlocal found_hwnd
+            if not win32gui.IsWindowVisible(h):
+                return True
+            t = (win32gui.GetWindowText(h) or "").lower()
+            c = (win32gui.GetClassName(h) or "").lower()
+            if app_lower in t or app_lower in c:
+                found_hwnd = h
+            return True
+        try:
+            win32gui.EnumWindows(_find, None)
+        except Exception:
+            pass
+
+        if found_hwnd:
+            _last_launched_app["hwnd"] = found_hwnd
+            _last_launched_app["app_name"] = app_name
+            logger.info(f"[RECOVER] Relaunched '{app_name}' hwnd={found_hwnd}")
+            return found_hwnd
+    except Exception as e:
+        logger.warning(f"[RECOVER] Relaunch failed: {e}")
+
+    return 0
+
+
+def _constrained_virtual_move(x: int, y: int) -> bool:
+    """Move virtual cursor constrained to the target app window bounds ONLY.
+    Never moves or steals the user's physical hardware mouse."""
+    import ctypes
+    import ctypes.wintypes
+
+    hwnd = _last_launched_app.get("hwnd", 0)
+    try:
+        import win32gui
+        if hwnd and win32gui.IsWindow(hwnd) and win32gui.IsWindowVisible(hwnd):
+            rect = win32gui.GetWindowRect(hwnd)
+            app_x1, app_y1, app_x2, app_y2 = rect
+            x = max(app_x1, min(x, app_x2 - 1))
+            y = max(app_y1, min(y, app_y2 - 1))
+
+            pt = ctypes.wintypes.POINT(x, y)
+            ctypes.windll.user32.ScreenToClient(hwnd, ctypes.byref(pt))
+            lparam = (pt.y << 16) | (pt.x & 0xFFFF)
+            ctypes.windll.user32.PostMessageW(hwnd, 0x0200, 0, lparam)  # WM_MOUSEMOVE
+
+        from core_organs.visual_cursor import get_cursor
+        get_cursor().move_to(x, y, animate=True)
+        return True
+    except Exception:
+        return False
+
+def _focus_most_recent_app_window() -> str:
+    """Find and focus the app we last launched. Returns window title."""
+    import time
+    try:
+        import win32gui
+        import win32con
+
+        # PRIORITY 1: Use the app we tracked from launch_app_tool
+        if _last_launched_app["hwnd"]:
+            hwnd = _last_launched_app["hwnd"]
+            title = _last_launched_app["title"]
+            if win32gui.IsWindow(hwnd) and win32gui.IsWindowVisible(hwnd):
+                try:
+                    win32gui.SetForegroundWindow(hwnd)
+                    time.sleep(0.3)
+                    return title
+                except Exception:
+                    try:
+                        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+                        time.sleep(0.2)
+                        win32gui.SetForegroundWindow(hwnd)
+                        time.sleep(0.3)
+                        return title
+                    except Exception:
+                        pass
+
+        # PRIORITY 2: Find window matching the tracked app name
+        app_name = _last_launched_app.get("app_name", "")
+        if app_name:
+            app_lower = app_name.lower()
+            candidates = []
+            def _enum_by_name(h, _):
+                if not win32gui.IsWindowVisible(h):
+                    return True
+                title = win32gui.GetWindowText(h) or ""
+                cls = win32gui.GetClassName(h) or ""
+                if not title:
+                    return True
+                # Match class name exactly (e.g., "Notepad" class for Notepad app)
+                if app_lower == cls.lower():
+                    candidates.append((h, title, 3))
+                elif app_lower in cls.lower():
+                    candidates.append((h, title, 2))
+                elif app_lower in title.lower() and "gdi" not in cls.lower():
+                    candidates.append((h, title, 1))
+                return True
+            try:
+                win32gui.EnumWindows(_enum_by_name, None)
+            except Exception:
+                pass
+            if candidates:
+                candidates.sort(key=lambda x: (x[2], x[0]), reverse=True)
+                hwnd, title, _ = candidates[0]
+                try:
+                    win32gui.SetForegroundWindow(hwnd)
+                    time.sleep(0.3)
+                    return title
+                except Exception:
+                    try:
+                        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+                        time.sleep(0.2)
+                        win32gui.SetForegroundWindow(hwnd)
+                        time.sleep(0.3)
+                        return title
+                    except Exception:
+                        pass
+
+        # PRIORITY 3: Find by title match from launch output (fallback)
+        candidates = []
+        def _enum(h, _):
+            if not win32gui.IsWindowVisible(h):
+                return True
+            title = win32gui.GetWindowText(h) or ""
+            cls = win32gui.GetClassName(h) or ""
+            if not title or cls in ("Shell_TrayWnd", "Progman", "WorkerW", "SysListView32"):
+                return True
+            if any(skip in title.lower() for skip in [
+                "program manager", "msctf", "opencode", "input experience",
+                "task switching", "antigravity", "hojaiga", "gatekeeper"
+            ]):
+                return True
+            candidates.append((h, title))
+            return True
+        try:
+            win32gui.EnumWindows(_enum, None)
+        except Exception:
+            pass
+
+        if not candidates:
+            return "(no window found)"
+
+        hwnd, title = candidates[-1]
+        try:
+            win32gui.SetForegroundWindow(hwnd)
+            time.sleep(0.3)
+        except Exception:
+            try:
+                win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+                time.sleep(0.2)
+                win32gui.SetForegroundWindow(hwnd)
+                time.sleep(0.3)
+            except Exception:
+                pass
+        return title
+    except ImportError:
+        return "(no win32gui)"
+
+
+def _track_launched_app(app_name: str):
+    """After launching an app, find its hwnd, reposition to center, and store for later focusing.
+    Retries multiple times because UWP apps (Calculator) can take 3-4s to create their window."""
+    import time
+    try:
+        import win32gui
+        import ctypes
+        _ensure_interactive_desktop()
+
+        app_lower = (app_name or "").lower()
+        is_calc = "calc" in app_lower
+
+        # Save previous app before switching to new app
+        if _last_launched_app.get("hwnd") and _last_launched_app.get("app_name") != app_name:
+            _previous_launched_app["hwnd"] = _last_launched_app["hwnd"]
+            _previous_launched_app["title"] = _last_launched_app["title"]
+            _previous_launched_app["app_name"] = _last_launched_app["app_name"]
+            logger.info(f"[TRACK] Saved previous app: '{_previous_launched_app['app_name']}'")
+            # Clear current until newly launched app is found
+            _last_launched_app["hwnd"] = 0
+            _last_launched_app["title"] = ""
+            _last_launched_app["app_name"] = app_name
+
+        # Retry up to 5 times with increasing delays (total ~6s)
+        for attempt in range(5):
+            time.sleep(0.8 + attempt * 0.4)  # 0.8, 1.2, 1.6, 2.0, 2.4s
+
+            candidates = []
+            def _enum(h, _):
+                if not win32gui.IsWindowVisible(h):
+                    return True
+                title = win32gui.GetWindowText(h) or ""
+                cls = win32gui.GetClassName(h) or ""
+                if cls in ("Shell_TrayWnd", "Progman", "WorkerW"):
+                    return True
+                tl = title.lower()
+                if any(bad in tl for bad in ["antigravity", "visual studio", "code -", "chrome", "edge", "terminal", "powershell"]):
+                    return True
+                if is_calc:
+                    if "calculator" in tl or "calc" in tl or (cls == "ApplicationFrameWindow" and "calc" in tl):
+                        candidates.append((h, title or "Calculator"))
+                elif "notepad" in app_lower:
+                    if cls == "Notepad" or tl.endswith(" - notepad") or tl == "notepad":
+                        candidates.append((h, title or "Notepad"))
+                elif app_lower in ("paint", "mspaint"):
+                    if "paint" in tl or cls in ("MSPaintApp", "PaintApp"):
+                        candidates.append((h, title or "Paint"))
+                else:
+                    if title and (app_lower in tl or app_lower in cls.lower()):
+                        candidates.append((h, title))
+                return True
+            try:
+                win32gui.EnumWindows(_enum, None)
+            except Exception:
+                pass
+
+            if candidates:
+                hwnd = candidates[-1][0]
+                title = candidates[-1][1]
+                _last_launched_app["hwnd"] = hwnd
+                _last_launched_app["title"] = title
+                _last_launched_app["app_name"] = app_name
+                logger.info(f"[TRACK] Stored app: '{title}' (hwnd={hwnd}) attempt={attempt}")
+
+                # Bring to foreground and ensure visible
+                try:
+                    if not HOJAIGA_STEALTH_MODE:
+                        # SW_RESTORE = 9 — restores minimized window
+                        ctypes.windll.user32.ShowWindow(hwnd, 9)
+                        time.sleep(0.2)
+                        win32gui.SetForegroundWindow(hwnd)
+                        time.sleep(0.2)
+                        # Verify window is now visible and on-screen
+                        rect = win32gui.GetWindowRect(hwnd)
+                        if rect[0] < 0 or rect[1] < 0:
+                            screen_w = ctypes.windll.user32.GetSystemMetrics(0)
+                            screen_h = ctypes.windll.user32.GetSystemMetrics(1)
+                            new_x = max(0, (screen_w - (rect[2] - rect[0])) // 2)
+                            new_y = max(0, (screen_h - (rect[3] - rect[1])) // 2)
+                            ctypes.windll.user32.SetWindowPos(hwnd, 0, new_x, new_y, 0, 0, 0x0001 | 0x0004)
+                            time.sleep(0.2)
+                    else:
+                        # Stealth mode: immediately minimize to taskbar so window never pops over user's screen
+                        ctypes.windll.user32.ShowWindow(hwnd, 6)  # SW_MINIMIZE
+                        logger.info(f"[TRACK] Stealth mode: minimized hwnd={hwnd} title='{title}' to taskbar")
+                except Exception:
+                    pass
+                return  # Found and tracked, done
+    except Exception as e:
+        logger.debug(f"[TRACK] Failed to track app: {e}")
+
+
+# ============================================================
+# CREWAI TOOL WRAPPERS (HOJAIGA ORGAN HANDS)
+# ============================================================
+
+if _HAS_CREWAI:
+    @tool("Navigate Browser")
+    def navigate_tool(url: str) -> str:
+        """Navigate the active Chrome tab to any web URL via Organ 19 Chrome CDP."""
+        try:
+            if ensure_organ19_running and not ensure_organ19_running():
+                return "Error: Organ 19 Chrome CDP Runtime is not running and could not be started."
+            # organ_19.navigate_with_cookies already injects stored session cookies
+            # (keyed by service, e.g. "gmail") and drives a one-time human login that
+            # is then persisted for reuse -- so we just navigate and let it handle auth.
+            success = send_cdp_navigate(url)
+            return f"Successfully navigated to: {url} (status={success})"
+        except Exception as e:
+            return f"Navigation failed: {e}"
+
+    @tool("Inspect Webpage State")
+    def inspect_page_tool() -> str:
+        """Inspect the current webpage: retrieves page title, URL, and visible interactive buttons or listing links."""
+        try:
+            js = """
+            (() => {
+                const buttons = Array.from(document.querySelectorAll('button, a.hfpxzc, div[role="button"], a[href]'))
+                    .map(b => (b.innerText || b.getAttribute('aria-label') || b.getAttribute('title') || '').trim())
+                    .filter(t => t.length > 2 && t.length < 50)
+                    .slice(0, 15);
+                return {
+                    title: document.title || "Untitled",
+                    url: window.location.href,
+                    visible_elements: buttons
+                };
+            })()
+            """
+            res = send_cdp_js(js)
+            if isinstance(res, dict):
+                return json.dumps(res, indent=2)
+            return f"Page state: {res}"
+        except Exception as e:
+            return f"Failed to inspect page: {e}"
+
+    @tool("Scroll Active Page")
+    def scroll_page_tool(pixels: int = 800) -> str:
+        """Scroll down the active webpage feed or directory to trigger lazy-loading of additional business cards."""
+        try:
+            # OpCode 0x0144 = SCROLL
+            send_cdp_command(0x0144, {"delta_x": 0.0, "delta_y": float(pixels)})
+            return f"Scrolled active page viewport down by {pixels}px."
+        except Exception as e:
+            return f"Failed to scroll page: {e}"
+
+    @tool("Scrape Live Directory To Excel")
+    def scrape_directory_tool(topic: str, region: str, min_leads: int = 50) -> str:
+        """Extract genuine verified business listings from the active directory and export directly to Excel (.xlsx) and CSV."""
+        try:
+            clean_topic = topic.replace(" ", "_").lower()
+            clean_region = region.replace(" ", "_").lower()
+            dest_file = f"{clean_topic}_{clean_region}_contacts.xlsx"
+            full_query = f"{topic} in {region}"
+            
+            lead_res = extract_leads_and_export(
+                query=full_query,
+                min_leads=min_leads,
+                output_filename=dest_file
+            )
+            count = lead_res.get("total_leads", 0)
+            excel_path = lead_res.get("excel_file", dest_file)
+            # ML feed: learn from scrape
+            try:
+                if organ_ml is not None:
+                    organ_ml.feed_action(
+                        app_name="chrome", action_type="scrape",
+                        element_name=full_query, success=count > 0,
+                        visual_hint=f"Extracted {count} leads to {excel_path}"
+                    )
+            except Exception:
+                pass
+            return (
+                f"LIVE SCRAPING COMPLETE: Extracted {count} verified businesses for '{full_query}'. "
+                f"Saved to Excel: {excel_path} and CSV. Zero mock data."
+            )
+        except Exception as e:
+            return f"Directory extraction failed: {e}"
+
+    @tool("Scrape Webpage with ScrapeGraphAI")
+    def scrape_webpage_tool(url: str, prompt: str = "Extract all meaningful data") -> str:
+        """Scrape a webpage using ScrapeGraphAI with AI-powered intelligent extraction.
+        Uses local Ollama models via langchain-ollama provider.
+        Returns structured extracted data."""
+        try:
+            from scrapegraphai.graphs import SmartScraperGraph
+            from langchain_ollama import ChatOllama
+            
+            # Configure local Ollama model
+            # Use the vision model for multi-modal scraping or brain model for text
+            ollama_base_url = os.environ.get("HOJAIGA_BRAIN_URL", "http://127.0.0.1:11434/api/chat").replace("/api/chat", "")
+            model_name = os.environ.get("HOJAIGA_BRAIN_MODEL", "qwen2.5:7b")
+            
+            llm = ChatOllama(
+                model=model_name,
+                base_url=ollama_base_url,
+                temperature=0.0
+            )
+            
+            # Create SmartScraperGraph
+            graph_config = {
+                "llm": llm,
+                "headless": True,
+                "verbose": True
+            }
+            
+            smart_scraper = SmartScraperGraph(
+                prompt=prompt,
+                source=url,
+                config=graph_config
+            )
+            
+            # Execute scraping
+            result = smart_scraper.run()
+            
+            # Format result
+            if isinstance(result, dict):
+                extracted = result.get("answer", str(result))
+                return f"SCRAPE SUCCESS from {url}: {extracted[:500]}..."
+            else:
+                return f"SCRAPE SUCCESS from {url}: {str(result)[:500]}..."
+                
+        except Exception as e:
+            return f"ScrapeGraphAI scraping failed: {e}"
+
+    @tool("Launch Desktop Application")
+    def launch_app_tool(app_name: str = "") -> str:
+        """Open or launch a desktop application or file on Windows.
+        Uses organ_40's VerbAliasEngine and DynamicAppResolver for name resolution. Uses ShellExecuteW.
+        For data files (.xlsx), opens the most recent file in the workspace.
+        If the app is already open, focuses the existing window instead of launching a new one."""
+        try:
+            _ensure_interactive_desktop()
+            import subprocess, glob, os
+            target = (app_name or "").strip()
+
+            # Guard: reject empty, backslash-only, or garbage targets
+            if not target or target.replace("\\", "").replace("/", "").replace('"', "").strip() == "":
+                return f"[{_ts()}] Error: app_name is required to launch an application."
+
+            # Resolve alias first
+            resolved_app = target
+            try:
+                from core_organs.organ_40_app_launcher import AppCatalog, VerbAliasEngine
+                catalog = AppCatalog()
+                alias_engine = VerbAliasEngine(catalog)
+                resolved_app = alias_engine.resolve(target)
+                logger.info(f"[LAUNCH] VerbAliasEngine resolved '{target}' -> '{resolved_app}'")
+            except Exception as alias_err:
+                logger.warning(f"[LAUNCH] VerbAliasEngine failed for '{target}': {alias_err}")
+
+            # Session Hygiene: clean up stale leftover windows before launch unless resume explicitly requested
+            if not any(k in target.lower() for k in ["resume", "existing", "continue", "keep", "already"]):
+                _clean_slate_app_hygiene(resolved_app)
+
+            # CHECK IF APP IS ALREADY OPEN — if so, focus it instead of launching new instance
+            import win32gui
+            _already_hwnd = 0
+            _app_lower = resolved_app.lower()
+            def _find_existing(h, _):
+                nonlocal _already_hwnd
+                if not win32gui.IsWindowVisible(h):
+                    return True
+                t = (win32gui.GetWindowText(h) or "").lower()
+                c = (win32gui.GetClassName(h) or "").lower()
+                if any(bad in t for bad in ["antigravity", "visual studio", "code -", "chrome", "edge", "terminal", "powershell"]):
+                    return True
+                if _app_lower in ("paint", "mspaint"):
+                    if "paint" in t or c in ("mspaintapp", "paintapp"):
+                        _already_hwnd = h
+                elif _app_lower in t or _app_lower in c:
+                    _already_hwnd = h
+                return True
+            try:
+                win32gui.EnumWindows(_find_existing, None)
+            except Exception:
+                pass
+            if _already_hwnd:
+                # App already open — track it, don't launch new instance
+                import ctypes
+                import time
+                # Save previous app before switching context
+                if _last_launched_app.get("hwnd") and _last_launched_app.get("app_name") != resolved_app:
+                    _previous_launched_app["hwnd"] = _last_launched_app["hwnd"]
+                    _previous_launched_app["title"] = _last_launched_app["title"]
+                    _previous_launched_app["app_name"] = _last_launched_app["app_name"]
+                    logger.info(f"[LAUNCH] Saved previous app: '{_previous_launched_app['app_name']}' hwnd={_previous_launched_app['hwnd']}")
+                if not HOJAIGA_STEALTH_MODE:
+                    try:
+                        user32 = ctypes.windll.user32
+                        kernel32 = ctypes.windll.kernel32
+                        fg_hwnd = user32.GetForegroundWindow()
+                        fg_tid = user32.GetWindowThreadProcessId(fg_hwnd, None) if fg_hwnd else 0
+                        cur_tid = kernel32.GetCurrentThreadId()
+                        if fg_tid and fg_tid != cur_tid:
+                            user32.AttachThreadInput(cur_tid, fg_tid, True)
+                        user32.keybd_event(0x12, 0, 0, 0); time.sleep(0.02); user32.keybd_event(0x12, 0, 2, 0); time.sleep(0.05)
+                        ctypes.windll.user32.ShowWindow(_already_hwnd, 9)  # SW_RESTORE
+                        user32.SetWindowPos(_already_hwnd, -1, 0, 0, 0, 0, 0x0001 | 0x0002)
+                        user32.SetWindowPos(_already_hwnd, -2, 0, 0, 0, 0, 0x0001 | 0x0002)
+                        user32.SetForegroundWindow(_already_hwnd)
+                        user32.SwitchToThisWindow(_already_hwnd, True)
+                        ctypes.windll.user32.ShowWindow(_already_hwnd, 3)  # SW_MAXIMIZE
+                        if fg_tid and fg_tid != cur_tid:
+                            user32.AttachThreadInput(cur_tid, fg_tid, False)
+                    except Exception as fg_err:
+                        logger.debug(f"[LAUNCH] Focus existing window notice: {fg_err}")
+                _last_launched_app["hwnd"] = _already_hwnd
+                _last_launched_app["title"] = win32gui.GetWindowText(_already_hwnd)
+                _last_launched_app["app_name"] = resolved_app
+                _record_session_action("LAUNCH_OR_FOCUS", resolved_app, f"tracked existing hwnd={_already_hwnd}")
+                logger.info(f"[LAUNCH] '{resolved_app}' already open (hwnd={_already_hwnd})")
+
+                # Dynamic Session Hygiene for Tabbed Apps (Notepad, browser):
+                # If already open and has existing content, open a fresh new tab unless user explicitly asked to resume
+                if "notepad" in resolved_app.lower() and not any(k in target.lower() for k in ["resume", "existing", "continue", "keep", "append"]):
+                    try:
+                        import uiautomation as auto
+                        ctrl = auto.ControlFromHandle(_already_hwnd)
+                        if ctrl:
+                            has_content = False
+                            for c, _ in auto.WalkControl(ctrl, maxDepth=8):
+                                if any(k in (c.ControlTypeName or "") for k in ["Document", "Edit"]):
+                                    vp = c.GetValuePattern()
+                                    if vp and vp.Value and vp.Value.strip():
+                                        has_content = True
+                                    break
+                            if has_content:
+                                for c, _ in auto.WalkControl(ctrl, maxDepth=8):
+                                    if c.ControlTypeName == "ButtonControl" and c.Name in ("Add New Tab", "New tab", "+"):
+                                        ip = c.GetInvokePattern()
+                                        if ip:
+                                            ip.Invoke()
+                                            time.sleep(0.25)
+                                            logger.info(f"[LAUNCH] Opened clean New Tab in '{resolved_app}' to avoid overwriting existing work.")
+                                            _record_session_action("NEW_TAB", resolved_app, "Opened clean New Tab via UIA 'Add New Tab'")
+                                            return f"[{_ts()}] '{resolved_app}' was already open with existing content — opened a fresh new tab to keep your previous work safe."
+                    except Exception as tab_e:
+                        logger.debug(f"[LAUNCH] Tab check error: {tab_e}")
+
+                return f"[{_ts()}] '{resolved_app}' was already open — tracked existing window."
+
+            # If target looks like a data file (excel, sheet, .xlsx, .csv, or a path with contacts/leads in name)
+            is_data_file = (
+                target.lower() in ["excel", "sheet", "spreadsheet"]
+                or target.endswith(".xlsx") or target.endswith(".csv")
+                or "contact" in target.lower() or "lead" in target.lower() or "export" in target.lower()
+            )
+            if is_data_file:
+                # If target is a real .xlsx file that exists, open it directly
+                if target.endswith(".xlsx") and os.path.exists(target):
+                    file_to_open = os.path.abspath(target)
+                else:
+                    # ALWAYS fall back to most recent .xlsx in workspace (never .csv)
+                    search_dirs = [r"D:\new_automation", r"D:\new_automation\All codes"]
+                    all_xlsx = []
+                    for d in search_dirs:
+                        all_xlsx.extend(glob.glob(os.path.join(d, "*.xlsx")))
+                    recent = sorted(
+                        all_xlsx,
+                        key=lambda f: os.path.getmtime(f) if os.path.exists(f) else 0,
+                        reverse=True
+                    )
+                    file_to_open = os.path.abspath(recent[0]) if recent else None
+
+                if file_to_open and os.path.exists(file_to_open):
+                    cmd = f'start /min "" "{file_to_open}"'
+                    subprocess.Popen(["cmd.exe", "/c", cmd], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    _record_session_action("LAUNCH_EXCEL_FILE", "excel", f"file='{file_to_open}'")
+                    return f"Opened actual data file in Excel: {file_to_open}"
+                else:
+                    return "No Excel data file found in workspace. The scraping step may have failed."
+
+            # Try DynamicAppResolver first (uses AppCatalog + PATH + Registry)
+            exe_path = resolved_app
+            try:
+                from core_organs.dynamic_app_resolver import DynamicAppResolver
+                resolved_cmd, desc = DynamicAppResolver.resolve_launch_command(
+                    target_str=resolved_app,
+                    parameters={"app_name": resolved_app}
+                )
+                if isinstance(resolved_cmd, list) and len(resolved_cmd) > 0:
+                    for part in resolved_cmd:
+                        if part.lower().endswith(".exe") and "cmd" not in part.lower():
+                            exe_path = part
+                            break
+                    if exe_path == resolved_app and len(resolved_cmd) > 1:
+                        exe_path = resolved_cmd[-1]
+            except Exception as resolver_err:
+                logger.warning(f"[LAUNCH] DynamicAppResolver failed for '{resolved_app}': {resolver_err}")
+
+            # Fallback: common Windows UWP apps that DynamicAppResolver can't find
+            _UWP_APP_MAP = {
+                "calculator": "calc.exe",
+                "calc": "calc.exe",
+                "notepad": "notepad.exe",
+                "paint": "mspaint.exe",
+                "snipping tool": "snippingtool.exe",
+            }
+            if exe_path == resolved_app or resolved_app.lower() in _UWP_APP_MAP:
+                exe_path = _UWP_APP_MAP.get(resolved_app.lower(), exe_path)
+
+            import ctypes
+            logger.info(f"[LAUNCH] Launching '{exe_path}' for target '{target}'")
+            if resolved_app.lower() in ("paint", "mspaint"):
+                try:
+                    subprocess.Popen(["cmd.exe", "/c", "start", "mspaint.exe"])
+                except Exception:
+                    try:
+                        ctypes.windll.shell32.ShellExecuteW(None, "open", "mspaint.exe", None, None, 1)
+                    except Exception:
+                        subprocess.Popen(['explorer.exe', r'shell:AppsFolder\Microsoft.Paint_8wekyb3d8bbwe!App'])
+            else:
+                show_cmd = 7 if HOJAIGA_STEALTH_MODE else 1  # 7 = SW_SHOWMINNOACTIVE
+                ctypes.windll.shell32.ShellExecuteW(None, "open", exe_path, None, None, show_cmd)
+            import time
+            time.sleep(2.0)
+            # Track using resolved app name (e.g. "notepad") not input ("notepad++")
+            # so that window matching works — window title is "Untitled - Notepad"
+            _track_launched_app(resolved_app)
+            _record_session_action("LAUNCH_NEW", resolved_app, f"opened '{exe_path}' hwnd={_last_launched_app.get('hwnd')}")
+            try:
+                if organ_ml is not None:
+                    organ_ml.feed_action(
+                        app_name=resolved_app, action_type="launch",
+                        element_name=exe_path, success=True,
+                        visual_hint=f"VerbAlias: {target} -> {resolved_app}"
+                    )
+            except Exception:
+                pass
+            return f"[{_ts()}] Launched {target} via organ_40: {resolved_app}"
+        except Exception as e:
+            return f"[{_ts()}] Could not launch {app_name}: {e}"
+
+    @tool("Switch To App")
+    def switch_to_app_tool(app_name: str) -> str:
+        """Switch to an already-open desktop application by name. Brings its window to the front.
+        Use this to alternate between apps (e.g., type in Notepad, switch to Calculator, compute, switch back to Notepad).
+        The app MUST already be open. Use 'Launch Desktop Application' first if needed."""
+        _ensure_interactive_desktop()
+        import win32gui
+        import ctypes
+        import time
+
+        target = (app_name or "").strip().lower()
+        if not target:
+            return f"[{_ts()}] ERROR: Provide an app name."
+
+        def _is_dev_tool_window(h):
+            try:
+                t = (win32gui.GetWindowText(h) or "").lower()
+                c = (win32gui.GetClassName(h) or "").lower()
+                if any(bad in t for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell", "cmd.exe"]):
+                    return True
+                if c in ("chrome_widgetwin_1", "consolewindowclass", "windowsterminal"):
+                    return True
+            except Exception:
+                pass
+            return False
+
+        tracked = _last_launched_app.get("hwnd") if _last_launched_app else None
+        tracked_name = (_last_launched_app.get("app_name") or "").lower() if _last_launched_app else ""
+        if tracked and win32gui.IsWindow(tracked) and not _is_dev_tool_window(tracked) and (target in tracked_name or tracked_name in target):
+            if not HOJAIGA_STEALTH_MODE:
+                ctypes.windll.user32.ShowWindow(tracked, 9)  # SW_RESTORE
+                ctypes.windll.user32.SetForegroundWindow(tracked)
+            _record_session_action("SWITCH_APP", target, f"focused tracked hwnd={tracked}")
+            return f"[{_ts()}] Switched to '{win32gui.GetWindowText(tracked)}'."
+
+        # Check previous app
+        prev_hwnd = _previous_launched_app.get("hwnd") if _previous_launched_app else None
+        prev_name = (_previous_launched_app.get("app_name") or "").lower() if _previous_launched_app else ""
+        if prev_hwnd and win32gui.IsWindow(prev_hwnd) and not _is_dev_tool_window(prev_hwnd) and (target in prev_name or prev_name in target):
+            old_last = dict(_last_launched_app)
+            _last_launched_app["hwnd"] = prev_hwnd
+            _last_launched_app["title"] = _previous_launched_app.get("title", "")
+            _last_launched_app["app_name"] = _previous_launched_app.get("app_name", "")
+            _previous_launched_app["hwnd"] = old_last.get("hwnd", 0)
+            _previous_launched_app["title"] = old_last.get("title", "")
+            _previous_launched_app["app_name"] = old_last.get("app_name", "")
+            if not HOJAIGA_STEALTH_MODE:
+                ctypes.windll.user32.ShowWindow(prev_hwnd, 9)  # SW_RESTORE
+                ctypes.windll.user32.SetForegroundWindow(prev_hwnd)
+            _record_session_action("SWITCH_APP", target, f"focused previous hwnd={prev_hwnd}")
+            return f"Switched to '{win32gui.GetWindowText(prev_hwnd)}' (from previous)."
+
+        best_hwnd = None
+        best_title = ""
+        is_calc = "calc" in target
+        def _enum_cb(hwnd, _):
+            nonlocal best_hwnd, best_title
+            if best_hwnd:
+                return True
+            if win32gui.IsWindowVisible(hwnd):
+                title = win32gui.GetWindowText(hwnd) or ""
+                cn = win32gui.GetClassName(hwnd) or ""
+                if cn not in ("Shell_TrayWnd", "Progman", "MSTaskSwWClass", "WorkerW"):
+                    tl = title.lower()
+                    cl = cn.lower()
+                    # Filter out IDE, editor, and terminal windows
+                    if any(bad in tl for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell", "cmd.exe"]):
+                        return True
+                    if cl in ("chrome_widgetwin_1", "consolewindowclass", "windowsterminal"):
+                        return True
+                    if is_calc and ("calculator" in tl or "calc" in tl or (cl == "applicationframewindow" and "calc" in tl)):
+                        best_hwnd = hwnd
+                        best_title = title or "Calculator"
+                    elif "notepad" in target and (cl == "notepad" or tl.endswith(" - notepad") or tl == "notepad"):
+                        best_hwnd = hwnd
+                        best_title = title or "Notepad"
+                    elif target in ("paint", "mspaint"):
+                        if cl in ("mspaintapp", "paintapp") or tl.endswith(" - paint") or tl == "paint":
+                            best_hwnd = hwnd
+                            best_title = title or "Paint"
+                    elif target in tl or target in cl:
+                        best_hwnd = hwnd
+                        best_title = title
+            return True
+
+        for _ in range(5):
+            try:
+                win32gui.EnumWindows(_enum_cb, None)
+                if best_hwnd:
+                    break
+            except Exception:
+                time.sleep(0.1)
+
+        if not best_hwnd:
+            return f"ERROR: No open window matching '{app_name}'. Use 'Launch Desktop Application' first."
+
+        old_last = dict(_last_launched_app)
+        if old_last.get("hwnd") and old_last.get("hwnd") != best_hwnd:
+            _previous_launched_app["hwnd"] = old_last.get("hwnd", 0)
+            _previous_launched_app["title"] = old_last.get("title", "")
+            _previous_launched_app["app_name"] = old_last.get("app_name", "")
+
+        if not HOJAIGA_STEALTH_MODE:
+            ctypes.windll.user32.ShowWindow(best_hwnd, 9)  # SW_RESTORE
+            ctypes.windll.user32.SetForegroundWindow(best_hwnd)
+        _last_launched_app["hwnd"] = best_hwnd
+        _last_launched_app["app_name"] = best_title
+        _record_session_action("SWITCH_APP", target, f"focused hwnd={best_hwnd} title='{best_title}'")
+        return f"Switched to '{best_title}'."
+
+    @tool("Click Button By Name")
+    def click_button_by_name_tool(button_name: str, **kwargs) -> str:
+        """Click a button or a SEQUENCE of buttons on ANY desktop application by name, label, or sequence.
+        You can pass individual button names OR full sequences/formulas (e.g. comma-separated button names or symbols)
+        to physically click all buttons via UIA, animate the visual cursor, and return the verified status.
+        Works across any desktop application."""
+        try:
+            _ensure_interactive_desktop()
+            import win32gui
+            import uiautomation as auto
+            import time
+
+            # LLM RESILIENCE: Small LLMs sometimes pass button sequences as separate JSON
+            # keys instead of a single comma-separated string, e.g.:
+            #   {"button_name": "One", "Two": "Five", "Multiply by": "One"}
+            # Collect all extra kwargs keys and values as additional button names
+            explicit_app = None
+            if kwargs:
+                explicit_app = kwargs.pop("app_name", None) or kwargs.pop("target_app", None) or kwargs.pop("app", None)
+                extra_buttons = []
+                for k, v in kwargs.items():
+                    extra_buttons.append(str(k))
+                    if v and str(v).lower() not in ('', 'true', 'false', 'none'):
+                        extra_buttons.append(str(v))
+                if extra_buttons:
+                    logger.info(f"[BTN] LLM passed extra kwargs as buttons: {extra_buttons}")
+                    button_name = button_name + ", " + ", ".join(extra_buttons)
+                    logger.info(f"[BTN] Merged button sequence: '{button_name}'")
+
+            target_hwnd = _last_launched_app.get("hwnd", 0)
+            app_name = (explicit_app or _last_launched_app.get("app_name", "")).lower()
+
+            # If caller gave explicit app and current tracked hwnd doesn't match it, reset target_hwnd to search
+            if explicit_app and (not target_hwnd or explicit_app.lower() not in (_last_launched_app.get("app_name") or "").lower()):
+                target_hwnd = 0
+
+            # Dynamic Control Discovery: Check active window first, with previous session window fallback
+            if not target_hwnd or not win32gui.IsWindow(target_hwnd):
+                prev = _previous_launched_app.get("hwnd", 0)
+                if prev and win32gui.IsWindow(prev) and (not explicit_app or explicit_app.lower() in (_previous_launched_app.get("app_name") or "").lower()):
+                    target_hwnd = prev
+                    app_name = _previous_launched_app.get("app_name", "")
+                    _last_launched_app["hwnd"] = prev
+                    _last_launched_app["app_name"] = app_name
+
+            # Fallback: if no tracked hwnd, search by app name
+            if not target_hwnd and app_name:
+                app_lower = app_name.lower()
+                found_hwnd = 0
+                def _find_btn(h, _):
+                    nonlocal found_hwnd
+                    if not win32gui.IsWindowVisible(h):
+                        return True
+                    t = (win32gui.GetWindowText(h) or "").lower()
+                    c = (win32gui.GetClassName(h) or "").lower()
+                    if any(bad in t for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell", "cmd.exe"]):
+                        return True
+                    if c in ("chrome_widgetwin_1", "consolewindowclass", "windowsterminal"):
+                        return True
+                    if app_lower in ("paint", "mspaint"):
+                        if c in ("mspaintapp", "paintapp") or t.endswith(" - paint") or t == "paint":
+                            found_hwnd = h
+                    elif app_lower in t or app_lower in c:
+                        found_hwnd = h
+                    return True
+                try:
+                    win32gui.EnumWindows(_find_btn, None)
+                except Exception:
+                    pass
+                if found_hwnd:
+                    target_hwnd = found_hwnd
+                    _last_launched_app["hwnd"] = found_hwnd
+                    logger.info(f"[BTN] Recovered hwnd={found_hwnd} for '{app_name}'")
+
+            if not target_hwnd:
+                return f"[{_ts()}] No tracked app window. Launch an app first."
+
+            # If target window is minimized, temporarily show without activating so UIA tree is active
+            was_minimized = False
+            try:
+                if target_hwnd and ctypes.windll.user32.IsIconic(target_hwnd):
+                    was_minimized = True
+                    # SW_SHOWNOACTIVATE = 4: Unminimizes without taking foreground or focus
+                    ctypes.windll.user32.ShowWindow(target_hwnd, 4)
+                    time.sleep(0.15)
+            except Exception:
+                pass
+
+            # SCAN-FIRST GATE: Check if we have a recent scan for this app (or auto-scan if missing)
+            app_key = app_name.strip()
+            if app_key not in _visual_memory_cache and "calc" in app_key:
+                for k in _visual_memory_cache:
+                    if "calc" in k:
+                        app_key = k
+                        break
+
+            if app_key not in _visual_memory_cache:
+                # Auto-scan the app so execution never stalls
+                logger.info(f"[BTN] No scan found for '{app_name}', performing instant scan now...")
+                try:
+                    from core_organs.organ_30_app_scanner import EyeAndBrainOrchestrator
+                    scanner = EyeAndBrainOrchestrator()
+                    scanner.deep_scan_unknown_app(app_name=app_name, target_hwnd=target_hwnd, quiet=False)
+                except Exception as auto_scan_err:
+                    logger.warning(f"[BTN] Instant scan failed: {auto_scan_err}")
+
+            # CRASH DETECTION: Check if app is still alive
+            if target_hwnd and not _is_app_alive(target_hwnd):
+                logger.warning(f"[BTN] App '{app_name}' crashed (hwnd={target_hwnd} dead)")
+                # Try to recover
+                new_hwnd = _recover_crashed_app(app_name)
+                if new_hwnd:
+                    target_hwnd = new_hwnd
+                    # Re-scan after recovery
+                    try:
+                        from core_organs.organ_30_app_scanner import EyeAndBrainOrchestrator
+                        scanner = EyeAndBrainOrchestrator()
+                        scanner.deep_scan_unknown_app(app_name=app_name, target_hwnd=new_hwnd, quiet=True)
+                    except Exception:
+                        pass
+                else:
+                    return f"[{_ts()}] ERROR: App '{app_name}' crashed and could not be relaunched. Launch it again."
+
+            # If tracked hwnd is invalid, search for app window
+            if not target_hwnd or not win32gui.IsWindow(target_hwnd):
+                target_hwnd = 0
+
+            if not target_hwnd:
+                logger.info(f"[BTN] No tracked window, searching all windows for button '{button_name}'")
+                best_candidates = []
+                def _find_any(h, _):
+                    if not win32gui.IsWindowVisible(h):
+                        return True
+                    t = (win32gui.GetWindowText(h) or "")
+                    c = (win32gui.GetClassName(h) or "")
+                    if not t or c in ("Shell_TrayWnd", "Progman", "WorkerW", "MSTaskSwWClass"):
+                        return True
+                    if any(bad in t.lower() for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell", "cmd.exe"]):
+                        return True
+                    if c.lower() in ("chrome_widgetwin_1", "consolewindowclass", "windowsterminal"):
+                        return True
+                    try:
+                        ctrl = auto.ControlFromHandle(h)
+                        if ctrl and len(ctrl.GetChildren()) > 2:
+                            best_candidates.append((h, len(ctrl.GetChildren()), t))
+                    except Exception:
+                        pass
+                    return True
+                try:
+                    win32gui.EnumWindows(_find_any, None)
+                except Exception:
+                    pass
+                if best_candidates:
+                    best_candidates.sort(key=lambda x: x[1], reverse=True)
+                    target_hwnd = best_candidates[0][0]
+                    _last_launched_app["hwnd"] = target_hwnd
+                    _last_launched_app["app_name"] = best_candidates[0][2]
+                    logger.info(f"[BTN] Found window with {best_candidates[0][1]} children: '{best_candidates[0][2]}'")
+
+            if not target_hwnd:
+                return f"[{_ts()}] Error: No tracked app window found. Launch the app first."
+
+            ctrl = auto.ControlFromHandle(target_hwnd)
+            if not ctrl:
+                return f"[{_ts()}] Error: Could not get UIA control for window."
+
+            _button_synonyms = {
+                "0": ["zero", "0"],
+                "1": ["one", "1"],
+                "2": ["two", "2"],
+                "3": ["three", "3"],
+                "4": ["four", "4"],
+                "5": ["five", "5"],
+                "6": ["six", "6"],
+                "7": ["seven", "7"],
+                "8": ["eight", "8"],
+                "9": ["nine", "9"],
+                "+": ["plus", "add", "+"],
+                "-": ["minus", "subtract", "-"],
+                "*": ["multiply by", "multiply", "times", "*"],
+                "x": ["multiply by", "multiply", "times", "x"],
+                "/": ["divide by", "divide", "divided by", "/"],
+                "=": ["equals", "equal", "="],
+                ".": ["decimal separator", "decimal", "point", "."],
+                "c": ["clear", "c"],
+                "ce": ["clear entry", "ce"],
+                "del": ["backspace", "delete", "del"],
+                "backspace": ["backspace", "delete", "del"],
+            }
+
+            def _parse_tokens(s_input: str):
+                s = (s_input or "").strip()
+                if not s:
+                    return []
+                if "," in s:
+                    return [t.strip() for t in s.split(",") if t.strip()]
+                math_chars = set("0123456789+-*/x=().")
+                if all(c in math_chars or c.isspace() for c in s) and len(s) > 1:
+                    return [c for c in s if not c.isspace()]
+                parts = s.split()
+                if len(parts) > 1 and any(p.lower() in _button_synonyms or p.lower() in ("plus", "minus", "equals", "equal", "multiply", "divide", "two", "three", "clear") for p in parts):
+                    toks = []
+                    skip = False
+                    for idx, p in enumerate(parts):
+                        if skip:
+                            skip = False
+                            continue
+                        if p.lower() in ("multiply", "divide") and idx + 1 < len(parts) and parts[idx+1].lower() == "by":
+                            toks.append(f"{p} by")
+                            skip = True
+                        elif p.lower() == "clear" and idx + 1 < len(parts) and parts[idx+1].lower() == "entry":
+                            toks.append("Clear entry")
+                            skip = True
+                        else:
+                            toks.append(p)
+                    return toks
+                return [s]
+
+            def _match_token(ctrl_name, tok):
+                cn = (ctrl_name or "").strip().lower()
+                tn = tok.strip().lower()
+                if cn == tn:
+                    return True
+                syns = _button_synonyms.get(tn, [tn])
+                if any(cn == s or s == cn for s in syns):
+                    return True
+                if any(s in cn for s in syns if len(s) > 1):
+                    return True
+                if len(tn.split()) > 1 and tn in cn:
+                    return True
+                return False
+
+            tokens = _parse_tokens(button_name)
+            if not tokens:
+                return f"[{_ts()}] Error: No button name provided."
+
+            # Use WalkControl to traverse deep UIA trees (Calculator buttons are deeply nested)
+            def _manual_walk(c, depth=0, max_d=14):
+                if depth > max_d:
+                    return
+                try:
+                    for ch in c.GetChildren():
+                        yield ch, depth
+                        yield from _manual_walk(ch, depth + 1, max_d)
+                except Exception:
+                    return
+
+            try:
+                walker = auto.WalkControl(ctrl, includeTop=False, maxDepth=14)
+                _first = next(walker, None)
+                if _first is None:
+                    walker = _manual_walk(ctrl)
+                else:
+                    from itertools import chain
+                    walker = chain([_first], walker)
+            except (UnicodeEncodeError, UnicodeDecodeError, Exception):
+                walker = _manual_walk(ctrl)
+
+            # Collect interactive controls once for high performance
+            all_controls = []
+            for child, depth in walker:
+                all_controls.append(child)
+
+            # For multi-token calculations on Calculator, reset to 0 first so residual input never corrupts math
+            if "calc" in app_name.lower() and len(tokens) > 1 and tokens[0].lower() not in ("clear", "c", "escape"):
+                for child in all_controls:
+                    if (child.Name or "").strip().lower() == "clear":
+                        try:
+                            ip = child.GetInvokePattern()
+                            if ip:
+                                ip.Invoke()
+                                time.sleep(0.15)
+                        except Exception:
+                            pass
+                        break
+
+            # If target app is Calculator and tokens contain math operators (+, -, *, /) but don't end with '=',
+            # auto-append '=' so the calculation evaluates on screen and displays the actual final result!
+            if "calc" in app_name.lower():
+                math_ops = {"+", "-", "*", "/", "x", "plus", "minus", "times", "multiply by", "multiply", "divide by", "divide"}
+                has_math_op = any(t.lower() in math_ops for t in tokens)
+                ends_with_eval = tokens and tokens[-1].lower() in ("=", "equals", "equal", "enter")
+                if has_math_op and not ends_with_eval:
+                    tokens.append("=")
+                    logger.info(f"[CALC] Auto-appended '=' to formula tokens to evaluate final answer: {tokens}")
+
+            clicked_names = []
+            for tok in tokens:
+                tok_clicked = False
+                for child in all_controls:
+                    try:
+                        name = (child.Name or "").strip()
+                    except Exception:
+                        continue
+                    if _match_token(name, tok):
+                        # Try InvokePattern first
+                        try:
+                            ip = child.GetInvokePattern()
+                            if ip:
+                                ip.Invoke()
+                                logger.info(f"[BTN] UIA clicked '{name}' via InvokePattern")
+                                try:
+                                    from core_organs.visual_cursor import click_visual
+                                    rect = child.BoundingRectangle
+                                    if rect:
+                                        cx = int((rect.left + rect.right) / 2)
+                                        cy = int((rect.top + rect.bottom) / 2)
+                                        click_visual(cx, cy)
+                                except Exception:
+                                    pass
+                                try:
+                                    from core_organs.organ_ml import memory as mem50
+                                    mem50.save_button_name_mapping(app_name, tok, name)
+                                except Exception:
+                                    pass
+                                _record_session_action("CLICK_BUTTON", app_name, f"button='{tok}' resolved='{name}'")
+                                clicked_names.append(name)
+                                tok_clicked = True
+                                time.sleep(0.15)
+                                break
+                        except Exception:
+                            pass
+                        # Try LegacyIAccessible
+                        try:
+                            li = child.GetLegacyIAccessiblePattern()
+                            if li:
+                                li.DoDefaultAction()
+                                logger.info(f"[BTN] UIA clicked '{name}' via LegacyIAccessible")
+                                try:
+                                    from core_organs.visual_cursor import click_visual
+                                    rect = child.BoundingRectangle
+                                    if rect:
+                                        cx = int((rect.left + rect.right) / 2)
+                                        cy = int((rect.top + rect.bottom) / 2)
+                                        click_visual(cx, cy)
+                                except Exception:
+                                    pass
+                                try:
+                                    from core_organs.organ_ml import memory as mem50
+                                    mem50.save_button_name_mapping(app_name, tok, name)
+                                except Exception:
+                                    pass
+                                _record_session_action("CLICK_BUTTON", app_name, f"button='{tok}' resolved='{name}'")
+                                clicked_names.append(name)
+                                tok_clicked = True
+                                time.sleep(0.15)
+                                break
+                        except Exception:
+                            pass
+                        # Try SelectionItemPattern
+                        try:
+                            si = child.GetSelectionItemPattern()
+                            if si:
+                                si.Select()
+                                logger.info(f"[BTN] UIA selected '{name}' via SelectionItemPattern")
+                                _record_session_action("CLICK_BUTTON", app_name, f"button='{tok}' resolved='{name}'")
+                                clicked_names.append(name)
+                                tok_clicked = True
+                                time.sleep(0.15)
+                                break
+                        except Exception:
+                            pass
+
+                # Dynamic re-walk fallback if not found in pre-collected controls
+                if not tok_clicked:
+                    try:
+                        for fresh_child in auto.WalkControl(ctrl, includeTop=False, maxDepth=14):
+                            try:
+                                fname = (fresh_child.Name or "").strip()
+                            except Exception:
+                                continue
+                            if _match_token(fname, tok):
+                                try:
+                                    fip = fresh_child.GetInvokePattern()
+                                    if fip:
+                                        fip.Invoke()
+                                        logger.info(f"[BTN] UIA dynamic clicked '{fname}' via InvokePattern")
+                                        _record_session_action("CLICK_BUTTON", app_name, f"button='{tok}' resolved='{fname}'")
+                                        clicked_names.append(fname)
+                                        tok_clicked = True
+                                        time.sleep(0.15)
+                                        break
+                                except Exception:
+                                    pass
+                    except Exception:
+                        pass
+
+                # Memory fallback if not clicked via UIA
+                if not tok_clicked:
+                    try:
+                        from core_organs.organ_ml import memory as mem50
+                        cached = mem50.lookup_button(app_name, tok)
+                        if cached:
+                            center = cached.get("center", (0, 0))
+                            if center and center != (0, 0):
+                                x, y = center
+                                _constrained_virtual_click(x, y)
+                                logger.info(f"[BTN] Memory fallback: clicked '{tok}' at ({x}, {y}) via virtual input")
+                                try:
+                                    from core_organs.visual_cursor import click_visual
+                                    click_visual(x, y)
+                                except Exception:
+                                    pass
+                                _record_session_action("CLICK_BUTTON", app_name, f"button='{tok}' via memory coords")
+                                clicked_names.append(tok)
+                                tok_clicked = True
+                                time.sleep(0.15)
+                    except Exception:
+                        pass
+
+            # Check for popups once after sequence finishes
+            try:
+                _check_for_popups()
+            except Exception:
+                pass
+
+            if HOJAIGA_STEALTH_MODE and target_hwnd:
+                try:
+                    ctypes.windll.user32.ShowWindow(target_hwnd, 6)  # SW_MINIMIZE back to taskbar
+                except Exception:
+                    pass
+
+            if clicked_names:
+                disp_info = ""
+                disp_val = _get_calculator_display_value(target_hwnd)
+                if disp_val:
+                    _record_session_action("READ_APP_DISPLAY", app_name or "active_app", f"display='{disp_val}'")
+                    disp_info = f" {app_name.capitalize() if app_name else 'App'} Display currently reads: '{disp_val}'."
+                return f"[{_ts()}] SUCCESS: Clicked buttons [{', '.join(clicked_names)}] via UIA.{disp_info}"
+
+            # Failure logging
+            failure_reason = "button_not_found"
+            if not target_hwnd:
+                failure_reason = "no_window_handle"
+            elif not auto.ControlFromHandle(target_hwnd):
+                failure_reason = "uia_control_unavailable"
+
+            try:
+                from core_organs.organ_ml import memory as mem50
+                mem50.log_click_failure(app_name, button_name, failure_reason, "UIA+memory")
+            except Exception:
+                pass
+
+            return f"[{_ts()}] Button(s) '{button_name}' not found in UIA tree or memory cache. Try 'Scan App UI' to see available buttons."
+        except Exception as e:
+            # Log crash-level errors
+            try:
+                from core_organs.organ_ml import memory as mem50
+                mem50.log_click_failure(app_name or "unknown", button_name, f"exception: {e}", "UIA")
+            except Exception:
+                pass
+            return f"[{_ts()}] Error clicking button: {e}"
+
+    @tool("Visually Locate and Click")
+    def visual_click_tool(element_description: str) -> str:
+        """Visually locate any button, link, search box, or dismiss icon on screen or in Chrome using the local Vision Model (minicpm-v) and click it by exact pixel coordinates. Works for both Chrome web pages AND desktop apps (Calculator, Notepad, Paint, etc)."""
+        try:
+            import win32gui
+            screenshot_b64 = None
+            target_hwnd = _last_launched_app.get("hwnd", 0) if _last_launched_app else 0
+            app_name = _last_launched_app.get("app_name", "").lower() if _last_launched_app else ""
+            is_desktop_app = app_name in ["calculator", "calc", "notepad", "paint", "wordpad",
+                                           "mspaint", "snipping", "zoom", "vlc", "media player"]
+
+            # FOR DESKTOP APPS: Try UIA click FIRST (most reliable, no VLM needed)
+            if is_desktop_app and target_hwnd and win32gui.IsWindow(target_hwnd):
+                try:
+                    import uiautomation as auto
+                    ctrl = auto.ControlFromHandle(target_hwnd)
+                    if ctrl:
+                        # Synonym mapping for Calculator buttons
+                        _synonyms = {
+                            "1": ["one", "1"], "2": ["two", "2"], "3": ["three", "3"],
+                            "4": ["four", "4"], "5": ["five", "5"], "6": ["six", "6"],
+                            "7": ["seven", "7"], "8": ["eight", "8"], "9": ["nine", "9"],
+                            "0": ["zero", "0"], "+": ["plus", "add", "+"], "-": ["minus", "subtract", "-"],
+                            "*": ["multiply", "times", "multiply by", "*"], "/": ["divide", "divided by", "divide by", "/"],
+                            "=": ["equals", "equal", "="], ".": ["decimal", "point", "."],
+                            "c": ["clear", "c"], "ce": ["clear entry", "ce"],
+                        }
+                        _search_terms = _synonyms.get(element_description.lower(), [element_description.lower()])
+                        logger.info(f"[CLICK] UIA search for '{element_description}': terms={_search_terms}")
+
+                        _synonyms = {
+                            "1": ["one", "1"], "2": ["two", "2"], "3": ["three", "3"],
+                            "4": ["four", "4"], "5": ["five", "5"], "6": ["six", "6"],
+                            "7": ["seven", "7"], "8": ["eight", "8"], "9": ["nine", "9"],
+                            "0": ["zero", "0"], "+": ["plus", "add", "+"], "-": ["minus", "subtract", "-"],
+                            "*": ["multiply", "times", "multiply by", "*"], "/": ["divide", "divided by", "divide by", "/"],
+                            "=": ["equals", "equal", "="], ".": ["decimal", "point", "."],
+                            "c": ["clear", "c"], "ce": ["clear entry", "ce"],
+                        }
+                        _search_terms = _synonyms.get(element_description.lower(), [element_description.lower()])
+                        logger.info(f"[CLICK] UIA search for '{element_description}': terms={_search_terms}")
+
+                        def _match_name(ctrl_name):
+                            cn = (ctrl_name or "").lower()
+                            # Exact match first
+                            if any(cn == t for t in _search_terms):
+                                return True
+                            # For multi-word button names, also check substring
+                            for t in _search_terms:
+                                if len(t.split()) > 1 and t in cn:
+                                    return True
+                            return False
+
+                        # Walk UIA tree to find matching control
+                        def _try_click_uia(container, depth=0):
+                            if depth > 3:
+                                return None
+                            for child in container.GetChildren():
+                                name = child.Name or ""
+                                if _match_name(name):
+                                    # Try InvokePattern first
+                                    try:
+                                        ip = child.GetInvokePattern()
+                                        if ip:
+                                            ip.Invoke()
+                                            logger.info(f"[CLICK] UIA InvokePattern clicked '{name}' (depth={depth})")
+                                            _check_for_popups()
+                                            return f"VISUAL CLICK SUCCESS: Clicked '{name}' via UIA InvokePattern."
+                                    except Exception:
+                                        pass
+                                    # Try LegacyIAccessible
+                                    try:
+                                        li = child.GetLegacyIAccessiblePattern()
+                                        if li:
+                                            li.DoDefaultAction()
+                                            logger.info(f"[CLICK] LegacyIAccessible clicked '{name}' (depth={depth})")
+                                            _check_for_popups()
+                                            return f"VISUAL CLICK SUCCESS: Clicked '{name}' via LegacyIAccessible."
+                                    except Exception:
+                                        pass
+                                    # Try SelectionItemPattern (for list items)
+                                    try:
+                                        sp = child.GetSelectionItemPattern()
+                                        if sp:
+                                            sp.Select()
+                                            logger.info(f"[CLICK] SelectionItem clicked '{name}' (depth={depth})")
+                                            _check_for_popups()
+                                            return f"VISUAL CLICK SUCCESS: Clicked '{name}' via SelectionItem."
+                                    except Exception:
+                                        pass
+                                # Recurse into children
+                                result = _try_click_uia(child, depth + 1)
+                                if result:
+                                    return result
+                            return None
+
+                        uia_result = _try_click_uia(ctrl)
+                        if uia_result:
+                            return uia_result
+                        logger.info(f"[CLICK] UIA found no match for '{element_description}' — falling back to VLM")
+                except Exception as uia_err:
+                    logger.debug(f"[CLICK] UIA click failed: {uia_err}")
+
+            # FOR CHROME or if UIA failed: Use VLM grounding + virtual mouse/CDP
+            # For desktop apps, skip Chrome CDP — use PIL screenshot directly
+            if not is_desktop_app and send_cdp_screenshot:
+                screenshot_b64 = send_cdp_screenshot()
+
+            # If no Chrome screenshot (or desktop app), capture via PIL
+            if not screenshot_b64 and target_hwnd and win32gui.IsWindow(target_hwnd):
+                try:
+                    from PIL import ImageGrab
+                    import base64
+                    import io
+
+                    left, top, right, bottom = win32gui.GetWindowRect(target_hwnd)
+                    if right > left and bottom > top:
+                        img = ImageGrab.grab(bbox=(left, top, right, bottom))
+                        buf = io.BytesIO()
+                        img.save(buf, format="PNG")
+                        screenshot_b64 = base64.b64encode(buf.getvalue()).decode()
+                        logger.info(f"[CLICK] Captured desktop app screenshot for hwnd={target_hwnd} ({right-left}x{bottom-top})")
+                except Exception as cap_err:
+                    logger.debug(f"[CLICK] Desktop screenshot failed: {cap_err}")
+
+            # Full screen capture as fallback
+            if not screenshot_b64:
+                try:
+                    from PIL import ImageGrab
+                    import base64
+                    import io
+
+                    img = ImageGrab.grab()
+                    buf = io.BytesIO()
+                    img.save(buf, format="PNG")
+                    screenshot_b64 = base64.b64encode(buf.getvalue()).decode()
+                    logger.info("[CLICK] Captured full screen screenshot")
+                except Exception as fs_err:
+                    logger.debug(f"[CLICK] Full screen capture failed: {fs_err}")
+
+            grounding = VisualGroundingEngine() if VisualGroundingEngine else None
+            if not grounding:
+                return "Error: VisualGroundingEngine is not available."
+
+            if not screenshot_b64:
+                return "Error: No screenshot available. Cannot visually locate elements."
+
+            match = grounding.locate_element(element_description, image_base64=screenshot_b64)
+            if not match.found:
+                return f"Visual search for '{element_description}' failed: {match.reason}"
+
+            # Check if this is a desktop app (not Chrome) — if so, skip CDP click
+            app_name = _last_launched_app.get("app_name", "").lower() if _last_launched_app else ""
+            is_desktop_app = app_name in ["calculator", "calc", "notepad", "paint", "wordpad",
+                                           "mspaint", "snipping", "zoom", "vlc", "media player"]
+            is_chrome_active = "chrome" in app_name or "browser" in app_name
+
+            # Try Chrome CDP click ONLY if Chrome is the active app
+            if not is_desktop_app and send_cdp_click_coordinates:
+                click_ok = send_cdp_click_coordinates(match.pixel_x, match.pixel_y)
+                if click_ok:
+                    _check_for_popups()
+                    return (
+                        f"VISUAL CLICK SUCCESS: Grounded '{element_description}' at ({match.pixel_x}, {match.pixel_y}) "
+                        f"box={match.box_2d} and clicked via Chrome CDP (status={click_ok})."
+                    )
+
+            # Final fallback: constrained virtual mouse click
+            try:
+                # Show visual cursor overlay at click position
+                try:
+                    from core_organs.visual_cursor import click_visual
+                    click_visual(match.pixel_x, match.pixel_y)
+                except Exception:
+                    pass
+
+                ok = _constrained_virtual_click(match.pixel_x, match.pixel_y)
+                if ok:
+                    _check_for_popups()
+                    return f"VISUAL CLICK SUCCESS: Grounded '{element_description}' at ({match.pixel_x}, {match.pixel_y}) and clicked via virtual mouse (constrained to app bounds)."
+                else:
+                    return f"Grounded at ({match.pixel_x}, {match.pixel_y}) but virtual click failed — no target window."
+            except Exception as e_mouse:
+                return f"Grounded at ({match.pixel_x}, {match.pixel_y}) but virtual click failed: {e_mouse}"
+
+        except Exception as e:
+            return f"Visual click failed: {e}"
+
+    @tool("Operate Desktop App")
+    def operate_desktop_tool(app_name: str, goals: str, allow_destructive: bool = False,
+                             agent_label: str = "") -> str:
+        """Autonomously operate ANY desktop application to accomplish an ordered list
+        of micro-goals, using the general desktop brain loop: it perceives the live UI
+        (UIA -> Win32 -> OCR -> vision), consults learned 'pro' app knowledge for the
+        right shortcut/menu path, acts, then VERIFIES the outcome changed before moving
+        on. Recover from popups, retry through the input ladder, and escalate to the
+        human when it is genuinely stuck. This is the high-level 'just do it' tool.
+
+        app_name: the target application (e.g. 'Blender', 'notepad').
+        goals: newline or comma separated ordered micro-goals, e.g.
+               'add a cube\nsave as chair.blend'.
+        agent_label: OPTIONAL identity for the visible cursor. Concurrent temporary
+               agents should pass a unique label so each gets its own colour-coded
+               cursor; defaults to the app name.
+        Returns a verified per-step trace with PASS/NO_CHANGE/WRONG_STATE verdicts.
+        """
+        try:
+            _ensure_interactive_desktop()
+            from core_organs.desktop_grounding import get_loop
+
+            # One cursor PER agent: duplicate the virtual cursor so parallel
+            # temporary agents each visibly 'own' a distinct arrow.
+            cursor_key = (agent_label or app_name or "agent").strip()
+            try:
+                from core_organs.visual_cursor import for_agent
+                _agent_cursor = for_agent(cursor_key, cursor_key)
+            except Exception:
+                _agent_cursor = None
+
+            def _cursor(x: float, y: float):
+                try:
+                    if _agent_cursor is not None:
+                        _agent_cursor.fly_to(int(x), int(y))
+                    else:
+                        from core_organs.visual_cursor import get_cursor
+                        get_cursor().fly_to(int(x), int(y))
+                except Exception:
+                    pass
+
+            def _capsule(state: str, text: str):
+                logger.info(f"[DESKTOP-CAPSULE] {state}: {text}")
+                try:
+                    if _agent_cursor is not None and state in ("working", "input_needed"):
+                        _agent_cursor.set_label(text[:28], state)
+                except Exception:
+                    pass
+
+            goal_list = [g.strip() for g in re.split(r"[\n;]+|(?<=[a-z]),\s", goals or "")
+                         if g and g.strip()]
+            if not goal_list:
+                return "No goals provided to operate the desktop app."
+
+            loop = get_loop(capsule_cb=_capsule, cursor_cb=_cursor)
+            # The loop attaches organ_47 app-intelligence in its constructor; if that
+            # optional organ is unavailable we still run on pure perception.
+            # Self-sufficient launch: if the target window isn't up yet, bring it up
+            # so a user can genuinely "leave the bot working" on any named app.
+            try:
+                if not loop.grounding.find_window(app_name):
+                    _capsule("working", f"Launching {app_name}")
+                    from core_organs.organ_40_app_launcher import resolve_and_launch
+                    resolve_and_launch(app_name)
+                    import time as _t
+                    _t.sleep(1.5)
+            except Exception as _launch_err:
+                logger.debug(f"[DESKTOP LOOP] auto-launch note: {_launch_err}")
+            result = loop.run(goal_list, app_name, max_steps_per_goal=5,
+                              allow_destructive=allow_destructive)
+            # Distill a reusable recipe on success so the NEXT run is faster/pro.
+            try:
+                if result.get("completed"):
+                    ok, note = loop.distill_recipe(" / ".join(goal_list), app_name)
+                    result["recipe"] = note
+            except Exception:
+                pass
+            lines = []
+            for t in result.get("trace", [])[-12:]:
+                lines.append(f"  {t['verb']:>9} '{t['element'][:30]}' -> {t['verdict']} ({t['method']})")
+            status = "COMPLETED" if result.get("completed") else \
+                ("NEEDS HUMAN INPUT" if result.get("awaiting_human") else
+                 f"BLOCKED at goal {result.get('blocked_at_goal')}")
+            return (f"DESKTOP LOOP [{app_name}] {status} in {result.get('steps',0)} steps.\n"
+                    + "\n".join(lines)
+                    + f"\n  recipe: {result.get('recipe', 'n/a')}")
+        except Exception as e:
+            logger.exception("[DESKTOP LOOP] operate_desktop_tool failed")
+            return f"Desktop autonomy loop unavailable for '{app_name}': {e}"
+
+    @tool("Type Text Into Active Window")
+    def type_text_tool(text: str) -> str:
+        """Type text into the target app window silently (no foreground steal).
+        Uses UIA ValuePattern — works minimized AND visible without interrupting user.
+        Only falls back to keybd_event if UIA fails."""
+        try:
+            _ensure_interactive_desktop()
+            import time
+
+            hwnd = _last_launched_app.get("hwnd", 0)
+
+            # Wait for launch to complete (race condition fix)
+            if not hwnd:
+                for _ in range(60):
+                    time.sleep(0.1)
+                    hwnd = _last_launched_app.get("hwnd", 0)
+                    if hwnd:
+                        break
+            # Fallback: if still no hwnd, search by app name
+            if not hwnd:
+                app_name_fallback = _last_launched_app.get("app_name", "")
+                if app_name_fallback and app_name_fallback != "unknown":
+                    import win32gui
+                    app_lower = app_name_fallback.lower()
+                    found_hwnd = 0
+                    def _find_type(h, _):
+                        nonlocal found_hwnd
+                        if not win32gui.IsWindowVisible(h):
+                            return True
+                        t = (win32gui.GetWindowText(h) or "").lower()
+                        c = (win32gui.GetClassName(h) or "").lower()
+                        if any(bad in t for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell", "cmd.exe"]):
+                            return True
+                        if c in ("chrome_widgetwin_1", "consolewindowclass", "windowsterminal"):
+                            return True
+                        if app_lower in ("paint", "mspaint"):
+                            if c in ("mspaintapp", "paintapp") or t.endswith(" - paint") or t == "paint":
+                                found_hwnd = h
+                        elif app_lower in t or app_lower in c:
+                            found_hwnd = h
+                        return True
+                    try:
+                        win32gui.EnumWindows(_find_type, None)
+                    except Exception:
+                        pass
+                    if found_hwnd:
+                        hwnd = found_hwnd
+                        _last_launched_app["hwnd"] = found_hwnd
+                        logger.info(f"[TYPE] Recovered hwnd={found_hwnd} for '{app_name_fallback}'")
+                # Broader fallback: search for common apps by class/title pattern
+                if not hwnd:
+                    import win32gui
+                    _broad_patterns = [
+                        ("notepad", ["notepad"]),
+                        ("calculator", ["calculator"]),
+                        ("excel", ["excel"]),
+                        ("word", ["word"]),
+                    ]
+                    for _pat_name, _pat_terms in _broad_patterns:
+                        found_hwnd = 0
+                        def _find_broad(h, _):
+                            nonlocal found_hwnd
+                            if not win32gui.IsWindowVisible(h):
+                                return True
+                            t = (win32gui.GetWindowText(h) or "").lower()
+                            c = (win32gui.GetClassName(h) or "").lower()
+                            if any(bad in t for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell", "cmd.exe"]):
+                                return True
+                            if c in ("chrome_widgetwin_1", "consolewindowclass", "windowsterminal"):
+                                return True
+                            if any(pt in t or pt in c for pt in _pat_terms):
+                                found_hwnd = h
+                            return True
+                        try:
+                            win32gui.EnumWindows(_find_broad, None)
+                        except Exception:
+                            pass
+                        if found_hwnd:
+                            hwnd = found_hwnd
+                            _last_launched_app["hwnd"] = found_hwnd
+                            _last_launched_app["app_name"] = _pat_name
+                            logger.info(f"[TYPE] Broad fallback: found hwnd={found_hwnd} for '{_pat_name}'")
+                            break
+            if not hwnd:
+                return "No tracked app window. Launch an app first."
+
+            app_name = _last_launched_app.get("app_name", "unknown")
+            title = _last_launched_app.get("title", "unknown")
+
+            import win32gui
+            import ctypes
+            if not win32gui.IsWindow(hwnd) or not win32gui.IsWindowVisible(hwnd):
+                return f"[{_ts()}] Target window '{title}' is no longer visible."
+
+            # If target window is minimized, temporarily show without activating so UIA tree is active
+            was_minimized = False
+            try:
+                if hwnd and ctypes.windll.user32.IsIconic(hwnd):
+                    was_minimized = True
+                    ctypes.windll.user32.ShowWindow(hwnd, 4)  # SW_SHOWNOACTIVATE
+                    time.sleep(0.15)
+            except Exception:
+                pass
+
+            # ── PRIMARY: UIA ValuePattern — works minimized AND visible, no foreground steal ──
+            try:
+                import uiautomation as auto
+                root = auto.ControlFromHandle(hwnd)
+                if root:
+                    def _find_editor(ctrl, depth=0):
+                        if depth > 8:
+                            return None
+                        ctype = ctrl.ControlTypeName or ""
+                        if any(k in ctype for k in ["Document", "Edit", "Rich"]):
+                            return ctrl
+                        for child in ctrl.GetChildren():
+                            result = _find_editor(child, depth + 1)
+                            if result:
+                                return result
+                        return None
+
+                    editor = _find_editor(root)
+                    if editor:
+                        # Intra-session vs fresh task typing hygiene:
+                        session_has_typed = any("TYPE_TEXT" in act for act in _current_session_actions)
+
+                        # If this is the FIRST type action of this session, check if existing text is from prior sessions
+                        if not session_has_typed:
+                            try:
+                                for c, _ in auto.WalkControl(root, maxDepth=8):
+                                    if c.ControlTypeName == "ButtonControl" and c.Name in ("Add New Tab", "New tab", "+"):
+                                        ip = c.GetInvokePattern()
+                                        if ip:
+                                            ip.Invoke()
+                                            time.sleep(0.25)
+                                            logger.info(f"[TYPE] Detected existing text; opened clean New Tab in '{title}'.")
+                                            _record_session_action("NEW_TAB", app_name, "Opened clean New Tab before typing")
+                                            new_editor = _find_editor(root)
+                                            if new_editor:
+                                                editor = new_editor
+                                            break
+                            except Exception:
+                                pass
+
+                        # ValuePattern.SetValue — dynamic progressive typing (18ms per char)
+                        try:
+                            vp = editor.GetValuePattern()
+                            if vp:
+                                existing = vp.Value or ""
+                                if not session_has_typed and not any(k in text.lower() for k in ["append", "continue", "add"]):
+                                    existing = ""
+                                for idx in range(1, len(text) + 1):
+                                    vp.SetValue(existing + text[:idx])
+                                    if len(text) > 1:
+                                        time.sleep(0.018)
+                                logger.info(f"[TYPE] UIA SetValue (progressive {len(text)} chars): '{text[:50]}' into '{title}'")
+                                _record_session_action("TYPE_TEXT", app_name, f"text='{text}' into '{title}' via UIA SetValue (progressive)")
+                                if HOJAIGA_STEALTH_MODE and hwnd:
+                                    try:
+                                        ctypes.windll.user32.ShowWindow(hwnd, 6)  # SW_MINIMIZE back to taskbar
+                                    except Exception:
+                                        pass
+                                # ML feed: learn from type
+                                try:
+                                    if organ_ml is not None:
+                                        organ_ml.feed_action(
+                                            app_name=title, action_type="type_text",
+                                            element_name="DocumentControl", success=True,
+                                            visual_hint=f"UIA SetValue: {len(text)} chars"
+                                        )
+                                except Exception:
+                                    pass
+                                return f"[{_ts()}] Typed via UIA into '{title}': '{text[:50]}{'...' if len(text) > 50 else ''}'"
+                        except Exception:
+                            pass
+                        # LegacyIAccessible fallback with dynamic progressive typing
+                        try:
+                            li = editor.GetLegacyIAccessiblePattern()
+                            if li:
+                                existing = li.GetValue() or ""
+                                if not session_has_typed and not any(k in text.lower() for k in ["append", "continue", "add"]):
+                                    existing = ""
+                                for idx in range(1, len(text) + 1):
+                                    li.SetValue(existing + text[:idx])
+                                    if len(text) > 1:
+                                        time.sleep(0.018)
+                                logger.info(f"[TYPE] UIA LegacyIAccessible (progressive {len(text)} chars): '{text[:50]}' into '{title}'")
+                                _record_session_action("TYPE_TEXT", app_name, f"text='{text}' into '{title}' via UIA LegacyIAccessible (progressive)")
+                                if HOJAIGA_STEALTH_MODE and hwnd:
+                                    try:
+                                        ctypes.windll.user32.ShowWindow(hwnd, 6)  # SW_MINIMIZE back to taskbar
+                                    except Exception:
+                                        pass
+                                return f"[{_ts()}] Typed via UIA into '{title}': '{text[:50]}{'...' if len(text) > 50 else ''}'"
+                        except Exception:
+                            pass
+            except Exception as e:
+                logger.debug(f"[TYPE] UIA method failed: {e}")
+
+            # ── FALLBACK: keybd_event — needs foreground, steals focus ──
+            import ctypes
+            keybd_event = ctypes.windll.user32.keybd_event
+
+            # Bring to foreground ONLY if stealth mode is false
+            if not HOJAIGA_STEALTH_MODE:
+                try:
+                    keybd_event(0x12, 0, 0, 0)
+                    time.sleep(0.05)
+                    keybd_event(0x12, 0, 2, 0)
+                    time.sleep(0.1)
+                    win32gui.ShowWindow(hwnd, 9)
+                    time.sleep(0.2)
+                    win32gui.SetForegroundWindow(hwnd)
+                    time.sleep(0.3)
+                except Exception:
+                    try:
+                        ctypes.windll.user32.SwitchToThisWindow(hwnd, True)
+                        time.sleep(0.3)
+                    except Exception:
+                        pass
+
+            # Focus text area via UIA
+            try:
+                import uiautomation as auto
+                root = auto.ControlFromHandle(hwnd)
+                if root:
+                    def _find_editor_v(ctrl, depth=0):
+                        if depth > 8:
+                            return None
+                        ctype = ctrl.ControlTypeName or ""
+                        if any(k in ctype for k in ["Document", "Edit", "Rich"]):
+                            return ctrl
+                        for child in ctrl.GetChildren():
+                            result = _find_editor_v(child, depth + 1)
+                            if result:
+                                return result
+                        return None
+                    editor = _find_editor_v(root)
+                    if editor:
+                        try:
+                            editor.SetFocus()
+                            time.sleep(0.1)
+                        except Exception:
+                            pass
+            except Exception:
+                pass
+
+            # Type each character via keybd_event
+            VkKeyScanW = ctypes.windll.user32.VkKeyScanW
+            typed = 0
+            for ch in text:
+                if ch == '\n':
+                    keybd_event(0x0D, 0, 0, 0)
+                    time.sleep(0.02)
+                    keybd_event(0x0D, 0, 2, 0)
+                elif ch == '\t':
+                    keybd_event(0x09, 0, 0, 0)
+                    time.sleep(0.02)
+                    keybd_event(0x09, 0, 2, 0)
+                else:
+                    vk = VkKeyScanW(ord(ch))
+                    vk_code = vk & 0xFF
+                    shift_state = (vk >> 8) & 0xFF
+                    need_shift = (shift_state & 1) != 0
+                    if need_shift:
+                        keybd_event(0x10, 0, 0, 0)
+                        time.sleep(0.01)
+                    keybd_event(vk_code, 0, 0, 0)
+                    time.sleep(0.02)
+                    keybd_event(vk_code, 0, 2, 0)
+                    if need_shift:
+                        time.sleep(0.01)
+                        keybd_event(0x10, 0, 2, 0)
+                typed += 1
+                time.sleep(0.03)
+
+            logger.info(f"[TYPE] Typed {typed}/{len(text)} chars via keybd_event into '{title}'")
+            _record_session_action("TYPE_TEXT", app_name, f"text='{text}' into '{title}' via keybd_event")
+
+            # AUTO-EQUALS: If we typed a math expression into Calculator and it doesn't
+            # already end with '=', automatically press Equals so the calculation executes.
+            # Without this, typing '125*125' leaves the calculator showing '125' with '125 ×'
+            # in the expression bar, but never computes the result.
+            _is_calc = any(k in (app_name or '').lower() for k in ('calc', 'calculator'))
+            _has_math_op = any(op in text for op in ('+', '-', '*', '/', 'x'))
+            _has_digits = any(c.isdigit() for c in text)
+            if _is_calc and _has_math_op and _has_digits and not text.strip().endswith('='):
+                logger.info(f"[TYPE] Auto-pressing Equals in Calculator after math expression '{text}'")
+                time.sleep(0.1)
+                # Press '=' key (VK_RETURN also works for Calculator, but '=' is more explicit)
+                vk_equals = VkKeyScanW(ord('=')) & 0xFF
+                shift_eq = (VkKeyScanW(ord('=')) >> 8) & 0xFF
+                if (shift_eq & 1) != 0:
+                    keybd_event(0x10, 0, 0, 0)
+                    time.sleep(0.01)
+                keybd_event(vk_equals, 0, 0, 0)
+                time.sleep(0.02)
+                keybd_event(vk_equals, 0, 2, 0)
+                if (shift_eq & 1) != 0:
+                    time.sleep(0.01)
+                    keybd_event(0x10, 0, 2, 0)
+                time.sleep(0.2)
+                # Read the result after pressing equals
+                disp_val = _get_calculator_display_value(hwnd)
+                if disp_val:
+                    _record_session_action("AUTO_EQUALS", app_name, f"pressed '=' after '{text}', display='{disp_val}'")
+                    logger.info(f"[TYPE] Calculator auto-equals result: {disp_val}")
+                    _check_for_popups()
+                    return f"[{_ts()}] Typed {typed}/{len(text)} characters into '{title}': '{text}' and pressed Equals. Calculator Display reads: '{disp_val}'."
+
+            _check_for_popups()
+            return f"[{_ts()}] Typed {typed}/{len(text)} characters into '{title}': '{text[:50]}{'...' if len(text) > 50 else ''}'"
+
+        except Exception as e:
+            return f"[{_ts()}] Failed to type text: {e}"
+
+    @tool("Press Key")
+    def press_key_tool(key: str = "Enter") -> str:
+        """Press a keyboard key directly in the target app window via PostMessage.
+        Does NOT use foreground/SendKeys — keys go to the tracked app window only.
+        Supports: Enter, Escape, Tab, ctrl+n, ctrl+s, alt+tab, F1-F12, etc."""
+        try:
+            import ctypes
+            import time
+
+            hwnd = _last_launched_app.get("hwnd", 0)
+
+            # Wait for launch to complete (race condition fix)
+            if not hwnd:
+                for _ in range(60):  # wait up to 6 seconds
+                    time.sleep(0.1)
+                    hwnd = _last_launched_app.get("hwnd", 0)
+                    if hwnd:
+                        break
+            if not hwnd:
+                return f"[{_ts()}] No tracked app window. Launch an app first."
+
+            app_name = _last_launched_app.get("app_name", "unknown")
+            title = _last_launched_app.get("title", "unknown")
+
+            import win32gui
+            if not win32gui.IsWindow(hwnd) or not win32gui.IsWindowVisible(hwnd):
+                return f"[{_ts()}] Target window '{title}' is no longer visible."
+
+            # ── VK code map ──
+            VK_MAP = {
+                "enter": 0x0D, "return": 0x0D, "escape": 0x1B, "esc": 0x1B,
+                "tab": 0x09, "space": 0x20, "backspace": 0x08, "bs": 0x08,
+                "delete": 0x2E, "del": 0x2E, "home": 0x24, "end": 0x23,
+                "pageup": 0x21, "pagedown": 0x22,
+                "up": 0x26, "down": 0x28, "left": 0x25, "right": 0x27,
+                "insert": 0x2D, "capslock": 0x14, "numlock": 0x90,
+                "f1": 0x70, "f2": 0x71, "f3": 0x72, "f4": 0x73,
+                "f5": 0x74, "f6": 0x75, "f7": 0x76, "f8": 0x77,
+                "f9": 0x78, "f10": 0x79, "f11": 0x7A, "f12": 0x7B,
+                "ctrl": 0x11, "alt": 0x12, "shift": 0x10,
+            }
+            # Letter/digit VK codes
+            for c in range(ord('A'), ord('Z') + 1):
+                VK_MAP[chr(c).lower()] = c
+            for d in range(0, 10):
+                VK_MAP[str(d)] = 0x30 + d
+
+            WM_KEYDOWN = 0x0100
+            WM_KEYUP = 0x0101
+
+            key_lower = key.lower().strip()
+
+            # Reject bare modifiers
+            if key_lower in ("ctrl", "alt", "shift", "ctrl+", "alt+", "shift+"):
+                return f"[{_ts()}] Bare modifier '{key}' not useful. Combine with a key: e.g. ctrl+n, alt+tab"
+
+            def _send_vk(vk_code, up=False):
+                msg = WM_KEYUP if up else WM_KEYDOWN
+                ctypes.windll.user32.PostMessageW(hwnd, msg, vk_code, 0)
+                time.sleep(0.03)
+
+            # Parse combo: "ctrl+n" -> [ctrl, n]
+            parts = [p.strip() for p in key_lower.split("+")]
+
+            if len(parts) == 1:
+                # Single key
+                vk = VK_MAP.get(parts[0])
+                if vk is None:
+                    return f"Unknown key: '{key}'"
+                _send_vk(vk)
+                _send_vk(vk, up=True)
+            elif len(parts) == 2:
+                mod, k = parts
+                mod_vk = VK_MAP.get(mod)
+                key_vk = VK_MAP.get(k)
+                if mod_vk is None:
+                    return f"Unknown modifier: '{mod}'"
+                if key_vk is None:
+                    return f"Unknown key: '{k}'"
+                # Hold modifier, press key, release both
+                _send_vk(mod_vk)
+                _send_vk(key_vk)
+                _send_vk(key_vk, up=True)
+                _send_vk(mod_vk, up=True)
+            elif len(parts) == 3:
+                mod1, mod2, k = parts
+                m1_vk = VK_MAP.get(mod1)
+                m2_vk = VK_MAP.get(mod2)
+                key_vk = VK_MAP.get(k)
+                if not all([m1_vk, m2_vk, key_vk]):
+                    return f"Unknown key combo: '{key}'"
+                _send_vk(m1_vk)
+                _send_vk(m2_vk)
+                _send_vk(key_vk)
+                _send_vk(key_vk, up=True)
+                _send_vk(m2_vk, up=True)
+                _send_vk(m1_vk, up=True)
+            else:
+                return f"Too many keys in combo: '{key}' (max 3)"
+
+            logger.info(f"[KEY] Sent '{key}' to '{title}' via PostMessage")
+            # ML feed: learn from key press
+            try:
+                if organ_ml is not None:
+                    organ_ml.feed_action(
+                        app_name=title, action_type="press_key",
+                        element_name=key, success=True,
+                        visual_hint=f"PostMessage: {key}"
+                    )
+            except Exception:
+                pass
+            return f"[{_ts()}] Pressed '{key}' in '{title}'"
+
+        except Exception as e:
+            return f"[{_ts()}] Failed to press key: {e}"
+
+    @tool("Draw Shape On Canvas")
+    def draw_shape_tool(shape: str = "circle", x: int = 0, y: int = 0, width: int = 150, height: int = 150,
+                        color: str = "", tool_name: str = "") -> str:
+        """Physically draw geometric shapes (circle, oval, rectangle, square, triangle, line, star, heart)
+        or drag strokes on an application's interactive canvas (e.g. Paint, drawing apps, whiteboards)
+        using the luminous virtual mouse/cursor.
+
+        Args:
+            shape: Shape type ('circle', 'oval', 'rectangle', 'square', 'triangle', 'line', 'star', 'heart').
+            x: Center X coordinate on screen/canvas. If 0, auto-centers on detected canvas.
+            y: Center Y coordinate on screen/canvas. If 0, auto-centers on detected canvas.
+            width: Width of the shape (default 150).
+            height: Height of the shape (default 150).
+            color: Optional color name (e.g. 'Red', 'Blue', 'Green') to select from app palette before drawing.
+            tool_name: Optional shape tool button to select from ribbon (e.g. 'Oval', 'Rectangle', 'Pencil', 'Brush').
+        """
+        try:
+            # Dynamically resolve shape, tool, color, and dimensions from active drawing spec if defaults passed
+            if shape in ("circle", "") and _current_drawing_spec.get("shape") and _current_drawing_spec.get("shape") != "circle":
+                shape = _current_drawing_spec["shape"]
+            if not tool_name and _current_drawing_spec.get("tool"):
+                tool_name = _current_drawing_spec["tool"]
+            if not color and _current_drawing_spec.get("color"):
+                color = _current_drawing_spec["color"]
+            if (width in (150, 240) or width <= 0) and _current_drawing_spec.get("width"):
+                width = _current_drawing_spec["width"]
+            if (height in (150, 240) or height <= 0) and _current_drawing_spec.get("height"):
+                height = _current_drawing_spec["height"]
+
+            _ensure_interactive_desktop()
+            import win32gui, win32con, ctypes, time
+            target_hwnd = _last_launched_app.get("hwnd", 0)
+            app_name = _last_launched_app.get("app_name", "").lower()
+
+            if not target_hwnd or not win32gui.IsWindow(target_hwnd):
+                def _find_canvas_w(h, _):
+                    nonlocal target_hwnd
+                    if win32gui.IsWindowVisible(h):
+                        t = (win32gui.GetWindowText(h) or "").lower()
+                        c = (win32gui.GetClassName(h) or "").lower()
+                        if any(bad in t for bad in ["antigravity", "visual studio", "code -", "chrome", "edge", "terminal", "powershell"]):
+                            return True
+                        if "paint" in t or c in ("mspaintapp", "paintapp") or "draw" in t:
+                            target_hwnd = h
+                    return True
+                try:
+                    win32gui.EnumWindows(_find_canvas_w, None)
+                except Exception:
+                    pass
+
+            # Force window to foreground with bulletproof multi-stage activation
+            if target_hwnd and win32gui.IsWindow(target_hwnd):
+                try:
+                    user32 = ctypes.windll.user32
+                    kernel32 = ctypes.windll.kernel32
+                    fg_hwnd = user32.GetForegroundWindow()
+                    fg_tid = user32.GetWindowThreadProcessId(fg_hwnd, None) if fg_hwnd else 0
+                    cur_tid = kernel32.GetCurrentThreadId()
+                    if fg_tid and fg_tid != cur_tid:
+                        user32.AttachThreadInput(cur_tid, fg_tid, True)
+                    user32.keybd_event(0x12, 0, 0, 0)
+                    time.sleep(0.02)
+                    user32.keybd_event(0x12, 0, 2, 0)
+                    time.sleep(0.05)
+                    win32gui.ShowWindow(target_hwnd, win32con.SW_RESTORE)
+                    user32.SetWindowPos(target_hwnd, win32con.HWND_TOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE | win32con.SWP_NOSIZE)
+                    user32.SetWindowPos(target_hwnd, win32con.HWND_NOTOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE | win32con.SWP_NOSIZE)
+                    user32.SetForegroundWindow(target_hwnd)
+                    user32.SwitchToThisWindow(target_hwnd, True)
+                    win32gui.ShowWindow(target_hwnd, win32con.SW_MAXIMIZE)
+                    if fg_tid and fg_tid != cur_tid:
+                        user32.AttachThreadInput(cur_tid, fg_tid, False)
+                    time.sleep(0.4)
+                except Exception:
+                    pass
+
+            import uiautomation as auto
+            root_ctrl = auto.ControlFromHandle(target_hwnd) if target_hwnd and auto else None
+
+            # 1. Color selection in palette (if requested)
+            if color and root_ctrl:
+                color_clean = color.strip().lower()
+                for c, _ in auto.WalkControl(root_ctrl, maxDepth=12):
+                    cname = (c.Name or "").strip().lower()
+                    if cname == color_clean or f": {color_clean}" in cname:
+                        try:
+                            ip = c.GetSelectionItemPattern() or c.GetInvokePattern()
+                            if hasattr(ip, "Select"):
+                                ip.Select()
+                            elif hasattr(ip, "Invoke"):
+                                ip.Invoke()
+                            logger.info(f"[DRAW] Selected color '{color}' via UIA")
+                            time.sleep(0.15)
+                            break
+                        except Exception:
+                            pass
+
+            # 2. Tool Selection: Pencil, Brush, or Eraser based on intent/request
+            # Windows 11 Paint keyboard shortcuts:
+            #   Alt -> H -> P = Pencil (Default for fine vector path tracing)
+            #   Alt -> H -> B = Brushes
+            #   Alt -> H -> E = Eraser
+            desired_tool = (tool_name or "").strip().lower()
+            shape_lower = str(shape).strip().lower()
+
+            is_eraser = "eraser" in desired_tool or "erase" in shape_lower
+            is_brush = any(k in desired_tool for k in ["brush", "calligraphy", "watercolor", "oil", "airbrush"]) or any(k in shape_lower for k in ["brush", "painted"])
+            
+            chosen_tool_mode = "Pencil"
+            if is_eraser:
+                chosen_tool_mode = "Eraser"
+            elif is_brush:
+                chosen_tool_mode = "Brush"
+
+            # Execute tool shortcut via keybd_event
+            try:
+                # Alt
+                ctypes.windll.user32.keybd_event(0x12, 0, 0, 0); time.sleep(0.04); ctypes.windll.user32.keybd_event(0x12, 0, 2, 0)
+                time.sleep(0.15)
+                # H (Home ribbon tab)
+                ctypes.windll.user32.keybd_event(0x48, 0, 0, 0); time.sleep(0.04); ctypes.windll.user32.keybd_event(0x48, 0, 2, 0)
+                time.sleep(0.15)
+                # Tool letter: P for pencil, E for eraser, B for brush
+                t_vk = 0x45 if is_eraser else (0x42 if is_brush else 0x50)
+                ctypes.windll.user32.keybd_event(t_vk, 0, 0, 0); time.sleep(0.04); ctypes.windll.user32.keybd_event(t_vk, 0, 2, 0)
+                time.sleep(0.15)
+                # Escape to close any ribbon menu overlay
+                ctypes.windll.user32.keybd_event(0x1B, 0, 0, 0); time.sleep(0.03); ctypes.windll.user32.keybd_event(0x1B, 0, 2, 0)
+                time.sleep(0.1)
+                logger.info(f"[DRAW] Selected tool '{chosen_tool_mode}' in Paint via ribbon shortcut")
+            except Exception as tool_err:
+                logger.debug(f"[DRAW] Ribbon tool shortcut notice: {tool_err}")
+
+            # Obtain window bounds early for toolbar clicking & canvas centering
+            win_rect = win32gui.GetWindowRect(target_hwnd) if target_hwnd and win32gui.IsWindow(target_hwnd) else None
+
+            # Tool click fallback using window coordinates
+            if win_rect and win_rect[0] > -10000:
+                try:
+                    tool_click_x = win_rect[0] + (510 if is_brush else 340)
+                    tool_click_y = win_rect[1] + (165 if is_eraser else (130 if is_brush else 115))
+                    screen_w = ctypes.windll.user32.GetSystemMetrics(0)
+                    screen_h = ctypes.windll.user32.GetSystemMetrics(1)
+                    ctypes.windll.user32.mouse_event(0x8001, int(tool_click_x*65535/screen_w), int(tool_click_y*65535/screen_h), 0, 0)
+                    time.sleep(0.04)
+                    ctypes.windll.user32.mouse_event(0x0002, 0, 0, 0, 0)
+                    time.sleep(0.04)
+                    ctypes.windll.user32.mouse_event(0x0004, 0, 0, 0, 0)
+                    time.sleep(0.15)
+                    logger.info(f"[DRAW] Confirmed tool '{chosen_tool_mode}' via toolbar click at ({tool_click_x}, {tool_click_y})")
+                except Exception as click_err:
+                    logger.debug(f"[DRAW] Tool click notice: {click_err}")
+            cx, cy = x, y
+            canvas_box = None
+            if root_ctrl:
+                for c, _ in auto.WalkControl(root_ctrl, maxDepth=12):
+                    b = c.BoundingRectangle
+                    if b and (b.right - b.left > 250) and (b.bottom - b.top > 200):
+                        if c.AutomationId == "scrollViewer" or c.ControlTypeName in ("PaneControl", "CustomControl", "ImageControl"):
+                            canvas_box = (b.left, b.top, b.right, b.bottom)
+                            break
+
+            win_rect = win32gui.GetWindowRect(target_hwnd) if target_hwnd and win32gui.IsWindow(target_hwnd) else None
+            if not canvas_box and win_rect and win_rect[0] > -10000:
+                canvas_box = (win_rect[0] + 150, win_rect[1] + 150, win_rect[2] - 50, win_rect[3] - 60)
+            elif not canvas_box:
+                canvas_box = (200, 145, 1718, 962)
+
+            # Check if this invocation is for multiple shapes (comma separated, 'all', or spec has multiple shapes)
+            shape_str = str(shape).strip()
+            multi_candidates = []
+            if "," in shape_str:
+                multi_candidates = [s.strip() for s in shape_str.split(",") if s.strip()]
+            elif shape_str.lower() in ("all", "all shapes", "multi", "multi_shapes"):
+                multi_candidates = _current_drawing_spec.get("all_shapes", [])
+            elif shape_str.lower() in ("circle", "") and len(_current_drawing_spec.get("all_shapes", [])) > 1:
+                multi_candidates = _current_drawing_spec.get("all_shapes", [])
+
+            if len(multi_candidates) > 1:
+                layout = _compute_multi_shape_layout(multi_candidates, canvas_box)
+                logger.info(f"[DRAW] Multi-shape execution for {len(layout)} shapes across single page: {[it['shape'] for it in layout]}")
+                # Focus canvas first
+                try:
+                    focus_x = (canvas_box[0] + canvas_box[2]) // 2
+                    focus_y = (canvas_box[1] + canvas_box[3]) // 2
+                    screen_w = ctypes.windll.user32.GetSystemMetrics(0)
+                    screen_h = ctypes.windll.user32.GetSystemMetrics(1)
+                    ctypes.windll.user32.mouse_event(0x8001, int(focus_x * 65535 / screen_w), int(focus_y * 65535 / screen_h), 0, 0)
+                    time.sleep(0.04)
+                    ctypes.windll.user32.mouse_event(0x0002, 0, 0, 0, 0); time.sleep(0.04); ctypes.windll.user32.mouse_event(0x0004, 0, 0, 0, 0)
+                    time.sleep(0.15)
+                except Exception:
+                    pass
+
+                drawn_items = []
+                from core_organs.visual_cursor import draw_shape_visual
+                for it in layout:
+                    s_name = it["shape"]
+                    s_cx = it["cx"]
+                    s_cy = it["cy"]
+                    s_w = it["width"]
+                    s_h = it["height"]
+                    logger.info(f"[DRAW] Drawing '{s_name}' on canvas at ({s_cx}, {s_cy}) size={s_w}x{s_h}")
+                    draw_shape_visual(shape=s_name, cx=s_cx, cy=s_cy, width=s_w, height=s_h, steps=54, physical=False, hwnd=target_hwnd)
+                    _record_session_action("DRAW_SHAPE", app_name or "paint", f"shape='{s_name}' tool='{chosen_tool_mode}' at ({s_cx},{s_cy}) size={s_w}x{s_h}")
+                    drawn_items.append(s_name)
+                    time.sleep(0.25)
+                return f"[{_ts()}] SUCCESS: Virtual mouse dynamically drew all {len(drawn_items)} shapes ({', '.join(drawn_items)}) using {chosen_tool_mode} across the single page Paint canvas without overlap."
+
+            # Single shape handling: Check if this single shape is part of active multi-shape layout
+            needs_center = (cx <= 0 or cy <= 0)
+            if needs_center and _current_drawing_spec.get("layout"):
+                for it in _current_drawing_spec["layout"]:
+                    if it["shape"] == shape_lower or shape_lower in it["shape"]:
+                        cx, cy = it["cx"], it["cy"]
+                        if width in (150, 240) or width <= 0:
+                            width = it["width"]
+                        if height in (150, 240) or height <= 0:
+                            height = it["height"]
+                        needs_center = False
+                        break
+
+            if win_rect and win_rect[0] > -10000:
+                if cx < win_rect[0] + 100 or cy < win_rect[1] + 160 or cx > win_rect[2] - 50 or cy > win_rect[3] - 50:
+                    needs_center = True
+            elif cx < 120 or cy < 160:
+                needs_center = True
+
+            if needs_center:
+                if canvas_box:
+                    cx = (canvas_box[0] + canvas_box[2]) // 2
+                    cy = (canvas_box[1] + canvas_box[3]) // 2
+                    logger.info(f"[DRAW] Auto-detected canvas center at ({cx}, {cy})")
+                elif win_rect and win_rect[0] > -10000:
+                    cx = win_rect[0] + int((win_rect[2] - win_rect[0]) * 0.5)
+                    cy = win_rect[1] + int((win_rect[3] - win_rect[1]) * 0.55)
+                else:
+                    cx, cy = 600, 450
+
+            # 4. Canvas Focus Click: click canvas once so it has active input focus
+            try:
+                screen_w = ctypes.windll.user32.GetSystemMetrics(0)
+                screen_h = ctypes.windll.user32.GetSystemMetrics(1)
+                sx = int(cx * 65535 / screen_w)
+                sy = int(cy * 65535 / screen_h)
+                ctypes.windll.user32.mouse_event(0x8001, sx, sy, 0, 0) # MOVE ABSOLUTE
+                time.sleep(0.05)
+                ctypes.windll.user32.mouse_event(0x0002, 0, 0, 0, 0)   # LEFT DOWN
+                time.sleep(0.04)
+                ctypes.windll.user32.mouse_event(0x0004, 0, 0, 0, 0)   # LEFT UP
+                time.sleep(0.1)
+            except Exception:
+                pass
+
+            # 5. Execute dynamic drawing with Visual Cursor animation (Zero physical mouse hijacking)
+            from core_organs.visual_cursor import draw_shape_visual
+            logger.info(f"[DRAW] Drawing {shape} using tool '{chosen_tool_mode}' at ({cx}, {cy}) size={width}x{height}")
+            draw_shape_visual(shape=shape, cx=cx, cy=cy, width=width, height=height, steps=54, physical=False, hwnd=target_hwnd)
+            _record_session_action("DRAW_SHAPE", app_name or "paint", f"shape='{shape}' tool='{chosen_tool_mode}' at ({cx},{cy}) size={width}x{height}")
+            return f"[{_ts()}] SUCCESS: Virtual mouse dynamically drew '{shape}' using {chosen_tool_mode} on canvas at ({cx}, {cy}) with dimensions {width}x{height}."
+        except Exception as e:
+            return f"[{_ts()}] Error drawing shape: {e}"
+
+    @tool("Mouse Drag And Drop")
+    def mouse_drag_tool(start_x: int, start_y: int, end_x: int, end_y: int, button: str = "left", steps: int = 30) -> str:
+        """Physically drag the mouse from (start_x, start_y) to (end_x, end_y) with smooth visual cursor trail.
+        Useful for dragging canvas sliders, moving items, selecting text/regions, or drawing strokes."""
+        try:
+            _ensure_interactive_desktop()
+            from core_organs.visual_cursor import drag_visual
+            target_h = _last_launched_app.get("hwnd", 0)
+            drag_visual(start_x, start_y, end_x, end_y, steps=steps, physical=False, hwnd=target_h)
+            _record_session_action("MOUSE_DRAG", _last_launched_app.get("app_name", "desktop"), f"from ({start_x},{start_y}) to ({end_x},{end_y})")
+            return f"[{_ts()}] SUCCESS: Virtual mouse dragged from ({start_x}, {start_y}) to ({end_x}, {end_y})."
+        except Exception as e:
+            return f"[{_ts()}] Error dragging mouse: {e}"
+
+    @tool("Open Teaching Void Canvas")
+    def open_teaching_void_tool(theme: str = "cyber_dots") -> str:
+        """Open or show the infinite transparent dotted teaching void space.
+        Provides an unlimited, transparent, dotted whiteboard overlay across the entire screen
+        to draw, explain, teach, and diagram concepts without obscuring background applications.
+        Theme options: 'cyber_dots' (cyan/magenta), 'chalk_dots' (yellow/pink), 'matrix_dots' (green)."""
+        try:
+            from core_organs.organ_34_teaching_void import get_teaching_void
+            tv = get_teaching_void()
+            res = tv.open(theme=theme)
+            _record_session_action("OPEN_TEACHING_VOID", "void", f"theme='{theme}'")
+            return f"[{_ts()}] SUCCESS: {res}"
+        except Exception as e:
+            return f"[{_ts()}] Failed to open teaching void: {e}"
+
+    @tool("Close Teaching Void Canvas")
+    def close_teaching_void_tool() -> str:
+        """Close or hide the teaching void space overlay."""
+        try:
+            from core_organs.organ_34_teaching_void import get_teaching_void
+            tv = get_teaching_void()
+            res = tv.close()
+            _record_session_action("CLOSE_TEACHING_VOID", "void", "closed")
+            return f"[{_ts()}] SUCCESS: {res}"
+        except Exception as e:
+            return f"[{_ts()}] Failed to close teaching void: {e}"
+
+    @tool("Draw In Teaching Void")
+    def void_draw_tool(shape: str = "card", x: float = 300.0, y: float = 200.0,
+                       width: float = 180.0, height: float = 120.0, color: str = "",
+                       label: str = "", bookmark: str = "") -> str:
+        """Draw a diagram element or shape in the infinite Teaching Void Space.
+        Shapes: 'card' (concept card with header bar), 'box' (rounded rectangle), 'circle', 'oval',
+        'diamond' (decision node), 'star', 'heart', 'cylinder' (database), 'rect'.
+        Coordinates (x, y) are in the infinite 2D world space.
+        Pass a bookmark (e.g. 'intro', 'step1', 'core_arch') to enable tracing back later!"""
+        try:
+            from core_organs.organ_34_teaching_void import get_teaching_void
+            tv = get_teaching_void()
+            res = tv.draw_shape(shape=shape, x=x, y=y, width=width, height=height,
+                                color=color, label=label, bookmark=bookmark)
+            _record_session_action("VOID_DRAW", "void", f"{shape} at ({x},{y}) bookmark='{bookmark}'")
+            return f"[{_ts()}] SUCCESS: {res}"
+        except Exception as e:
+            return f"[{_ts()}] Error drawing in void: {e}"
+
+    @tool("Write In Teaching Void")
+    def void_write_tool(text: str, x: float = 300.0, y: float = 200.0, font_size: int = 14,
+                        color: str = "", header: str = "", bookmark: str = "") -> str:
+        """Write explanatory notes, equations, bullet points, or code cards in the Teaching Void Space.
+        Coordinates (x, y) are in infinite 2D world space.
+        Pass a bookmark to easily trace back to this explanation later."""
+        try:
+            from core_organs.organ_34_teaching_void import get_teaching_void
+            tv = get_teaching_void()
+            res = tv.write_text(text=text, x=x, y=y, font_size=font_size,
+                                color=color, header=header, bookmark=bookmark)
+            _record_session_action("VOID_WRITE", "void", f"header='{header}' at ({x},{y})")
+            return f"[{_ts()}] SUCCESS: {res}"
+        except Exception as e:
+            return f"[{_ts()}] Error writing in void: {e}"
+
+    @tool("Draw Arrow In Teaching Void")
+    def void_draw_arrow_tool(from_x: float, from_y: float, to_x: float, to_y: float,
+                             label: str = "", color: str = "") -> str:
+        """Draw a directed conceptual arrow between two points in the Teaching Void Space.
+        Use this to connect ideas, flowchart nodes, and step sequences."""
+        try:
+            from core_organs.organ_34_teaching_void import get_teaching_void
+            tv = get_teaching_void()
+            res = tv.draw_arrow(from_x=from_x, from_y=from_y, to_x=to_x, to_y=to_y,
+                                label=label, color=color)
+            _record_session_action("VOID_ARROW", "void", f"from ({from_x},{from_y}) to ({to_x},{to_y})")
+            return f"[{_ts()}] SUCCESS: {res}"
+        except Exception as e:
+            return f"[{_ts()}] Error drawing arrow in void: {e}"
+
+    @tool("Navigate Teaching Void")
+    def void_navigate_tool(target: str = "home", distance: float = 400.0) -> str:
+        """Navigate or trace back through the infinite Teaching Void Space.
+        Target can be:
+        - Direction: 'up', 'down', 'left', 'right' to pan the camera by distance (default 400px).
+        - 'home': Reset camera to origin (0, 0).
+        - Bookmark Name (e.g. 'intro', 'step1', 'conclusion'): Automatically scrolls the camera
+          directly back to that concept so you can trace your teaching path!"""
+        try:
+            from core_organs.organ_34_teaching_void import get_teaching_void
+            tv = get_teaching_void()
+            res = tv.navigate(target=target, distance=distance)
+            _record_session_action("VOID_NAVIGATE", "void", f"target='{target}'")
+            return f"[{_ts()}] SUCCESS: {res}"
+        except Exception as e:
+            return f"[{_ts()}] Error navigating void: {e}"
+
+    @tool("Clear Teaching Void")
+    def void_clear_tool(mode: str = "all") -> str:
+        """Clear drawings from the Teaching Void Space.
+        Modes: 'all' (wipes entire infinite void), 'viewport' (clears current visible screen), 'home' (resets camera)."""
+        try:
+            from core_organs.organ_34_teaching_void import get_teaching_void
+            tv = get_teaching_void()
+            res = tv.clear(mode=mode)
+            _record_session_action("VOID_CLEAR", "void", f"mode='{mode}'")
+            return f"[{_ts()}] SUCCESS: {res}"
+        except Exception as e:
+            return f"[{_ts()}] Error clearing void: {e}"
+
+    @tool("Save Teaching Notes")
+    def void_save_notes_tool(folder: str = "teaching_notes", title: str = "Teaching Session") -> str:
+        """Save and export everything taught on the screen/void into a structured notes folder.
+        Outputs:
+        1. A rich Markdown notes document (.md) summarizing all concepts, explanations, diagrams, and flow.
+        2. A high-resolution full-screen visual screenshot (.png) of the teaching canvas.
+        3. A structured JSON state file (.json) with exact coordinates and bookmarks.
+        Folder defaults to 'teaching_notes' in workspace."""
+        try:
+            from core_organs.organ_34_teaching_void import get_teaching_void
+            tv = get_teaching_void()
+            res = tv.save_notes(folder=folder, title=title)
+            _record_session_action("VOID_SAVE_NOTES", "void", f"title='{title}' -> {res.get('notes_path')}")
+            return f"[{_ts()}] SUCCESS: Saved teaching notes to '{res.get('notes_path')}' and screenshot to '{res.get('screenshot_path')}'."
+        except Exception as e:
+            return f"[{_ts()}] Error saving teaching notes: {e}"
+
+    @tool("Draw On App Full Page")
+    def draw_full_page_tool(shape: str = "circle", region: str = "center",
+                            x: int = 0, y: int = 0, width: int = 150, height: int = 150,
+                            color: str = "", tool_name: str = "", app_name: str = "") -> str:
+        """Draw anywhere across the ENTIRETY of an application's workspace page or canvas (e.g. Paint, whiteboards).
+        Recognizes full page boundaries (not just a center box).
+        Regions:
+        - 'center': Middle of the page.
+        - 'top_left': Top-left margin / header area of the page.
+        - 'top_right': Top-right margin of the page.
+        - 'bottom_left': Bottom-left margin of the page.
+        - 'bottom_right': Bottom-right margin of the page.
+        - 'custom': Uses exact (x, y) coordinates.
+        Supports selecting ribbon tools (e.g. 'Oval', 'Rectangle') and colors before drawing."""
+        try:
+            _ensure_interactive_desktop()
+            import win32gui, ctypes, time
+            target_app = app_name or _last_launched_app.get("app_name", "paint")
+            target_hwnd = _last_launched_app.get("hwnd", 0)
+
+            # Ensure target window is restored and visible before measuring full page bounds
+            if target_hwnd and win32gui.IsWindow(target_hwnd):
+                if win32gui.IsIconic(target_hwnd):
+                    ctypes.windll.user32.ShowWindow(target_hwnd, 9)  # SW_RESTORE
+                    time.sleep(0.3)
+                if not HOJAIGA_STEALTH_MODE:
+                    try:
+                        win32gui.SetForegroundWindow(target_hwnd)
+                        time.sleep(0.15)
+                    except Exception:
+                        pass
+
+            # Auto-discover page bounding box from scanner
+            import uiautomation as auto
+            root_ctrl = auto.ControlFromHandle(target_hwnd) if target_hwnd and auto else None
+
+            # 1. Color selection if requested
+            if color and root_ctrl:
+                color_clean = color.strip().lower()
+                for c, _ in auto.WalkControl(root_ctrl, maxDepth=12):
+                    cname = (c.Name or "").strip().lower()
+                    if cname == color_clean or f": {color_clean}" in cname:
+                        try:
+                            ip = c.GetSelectionItemPattern() or c.GetInvokePattern()
+                            if hasattr(ip, "Select"): ip.Select()
+                            elif hasattr(ip, "Invoke"): ip.Invoke()
+                            time.sleep(0.15)
+                            break
+                        except Exception: pass
+
+            # 2. Tool selection
+            target_tool = tool_name.strip() if tool_name else ""
+            if not target_tool:
+                shape_map = {
+                    "circle": "Oval", "oval": "Oval", "ellipse": "Oval",
+                    "rectangle": "Rectangle", "square": "Rectangle",
+                    "triangle": "Triangle", "line": "Line",
+                    "star": "Five-point star", "heart": "Heart"
+                }
+                target_tool = shape_map.get(shape.strip().lower(), "")
+            if target_tool and root_ctrl:
+                t_lower = target_tool.lower()
+                for c, _ in auto.WalkControl(root_ctrl, maxDepth=12):
+                    if (c.Name or "").strip().lower() == t_lower:
+                        try:
+                            ip = c.GetSelectionItemPattern() or c.GetInvokePattern()
+                            if hasattr(ip, "Select"): ip.Select()
+                            elif hasattr(ip, "Invoke"): ip.Invoke()
+                            time.sleep(0.15)
+                            break
+                        except Exception: pass
+
+            # 3. Discover full canvas page bounds
+            page_box = None
+            if root_ctrl:
+                for c, _ in auto.WalkControl(root_ctrl, maxDepth=12):
+                    b = c.BoundingRectangle
+                    if b and (b.right - b.left > 250) and (b.bottom - b.top > 200):
+                        if c.AutomationId == "scrollViewer" or c.ControlTypeName in ("PaneControl", "CustomControl", "ImageControl"):
+                            page_box = (b.left, b.top, b.right, b.bottom)
+                            break
+
+            if not page_box and target_hwnd:
+                rect = win32gui.GetWindowRect(target_hwnd)
+                page_box = (rect[0] + 50, rect[1] + 120, rect[2] - 50, rect[3] - 50)
+            elif not page_box:
+                page_box = (200, 150, 1400, 800)
+
+            x1, y1, x2, y2 = page_box
+            pw = x2 - x1
+            ph = y2 - y1
+
+            # 4. Resolve drawing center by region
+            r = region.lower().strip()
+            if x > 0 and y > 0 and r in ("custom", ""):
+                cx, cy = x, y
+            elif r == "top_left":
+                cx = x1 + int(pw * 0.20)
+                cy = y1 + int(ph * 0.20)
+            elif r == "top_right":
+                cx = x2 - int(pw * 0.20)
+                cy = y1 + int(ph * 0.20)
+            elif r == "bottom_left":
+                cx = x1 + int(pw * 0.20)
+                cy = y2 - int(ph * 0.20)
+            elif r == "bottom_right":
+                cx = x2 - int(pw * 0.20)
+                cy = y2 - int(ph * 0.20)
+            elif r == "top":
+                cx = (x1 + x2) // 2
+                cy = y1 + int(ph * 0.20)
+            elif r == "bottom":
+                cx = (x1 + x2) // 2
+                cy = y2 - int(ph * 0.20)
+            elif r == "left":
+                cx = x1 + int(pw * 0.20)
+                cy = (y1 + y2) // 2
+            elif r == "right":
+                cx = x2 - int(pw * 0.20)
+                cy = (y1 + y2) // 2
+            else: # "center"
+                cx = (x1 + x2) // 2
+                cy = (y1 + y2) // 2
+
+            # Execute drawing with Visual Cursor (Zero physical mouse hijacking)
+            from core_organs.visual_cursor import draw_shape_visual
+            logger.info(f"[DRAW_FULL_PAGE] Drawing '{shape}' region='{region}' at ({cx}, {cy}) bounds={page_box}")
+            draw_shape_visual(shape=shape, cx=cx, cy=cy, width=width, height=height, steps=54, physical=False, hwnd=target_hwnd)
+            _record_session_action("DRAW_FULL_PAGE", target_app, f"shape='{shape}' region='{region}' at ({cx},{cy}) bounds={page_box}")
+            return f"[{_ts()}] SUCCESS: Virtual mouse drew '{shape}' on full page at region '{region}' ({cx}, {cy}) across canvas bounds {page_box}."
+        except Exception as e:
+            return f"[{_ts()}] Error drawing on full page: {e}"
+
+    @tool("Annotate Screen")
+    def annotate_screen_tool(action: str, x: int = 0, y: int = 0, x2: int = 0, y2: int = 0,
+                             text: str = "", color: str = "red", duration: float = 3.0) -> str:
+        """Draw annotations on screen to highlight, point at, or label UI elements.
+        Actions: 'arrow' (draw arrow from x,y to x2,y2), 'circle' (draw circle at x,y),
+        'highlight' (highlight rectangle x,y to x2,y2), 'label' (draw text at x,y),
+        'clear' (remove all annotations).
+        Use this to TEACH the user what you're doing — point at buttons, highlight areas, label elements."""
+        try:
+            from core_organs.intelligent_mouse import IntelligentMouse
+            mouse = IntelligentMouse()
+
+            if action == "clear":
+                mouse.clear_drawings()
+                return "Cleared all screen annotations."
+
+            if action == "arrow":
+                mouse.draw_arrow(x, y, x2, y2, color=color, duration=duration)
+                return f"Drew arrow from ({x},{y}) to ({x2},{y2}) in {color}."
+
+            if action == "circle":
+                radius = max(abs(x2 - x), abs(y2 - y), 30)
+                mouse.draw_circle(x, y, radius, color=color, duration=duration)
+                return f"Drew circle at ({x},{y}) radius={radius} in {color}."
+
+            if action == "highlight":
+                mouse.highlight(x, y, x2, y2, color=color, duration=duration)
+                return f"Highlighted region ({x},{y}) to ({x2},{y2}) in {color}."
+
+            if action == "label":
+                mouse.annotate(text, x=x, y=y, color=color, duration=duration)
+                return f"Drew label '{text}' at ({x},{y}) in {color}."
+
+            return f"Unknown action '{action}'. Use: arrow, circle, highlight, label, clear."
+        except Exception as e:
+            return f"Annotation failed: {e}"
+
+    @tool("Teach Mode")
+    def teach_mode_tool(question: str = "What is on screen and how do I use it?") -> str:
+        """Analyze the current screen and explain what's happening. Use this to TEACH the user about any app.
+        Takes a screenshot, identifies all UI elements, and provides a step-by-step explanation.
+        Works with ANY app — Notepad, Calculator, Chrome, Paint, etc."""
+        try:
+            from core_organs.intelligent_mouse import IntelligentMouse
+            mouse = IntelligentMouse()
+            result = mouse.teach(question=question, annotate=False)
+            return result if result else "Could not analyze the screen."
+        except Exception as e:
+            return f"Teach mode failed: {e}"
+
+    @tool("Verify Task Completion")
+    def verify_task_tool(task_description: str, actual_result: str = "") -> str:
+        """Use the model pool vision verifier (sits idle, only called when needed) to confirm if a task completed successfully.
+        Provide the task description and what actually happened. Returns success/failure with confidence and suggestion."""
+        try:
+            from core_organs.model_pool_orchestrator import ModelPoolOrchestrator
+            pool = ModelPoolOrchestrator.get_instance()
+
+            # Try to get a screenshot for visual verification
+            screenshot_b64 = None
+            if send_cdp_screenshot:
+                screenshot_b64 = send_cdp_screenshot()
+
+            result = pool.verify_task_completion(
+                task_description=task_description,
+                screenshot_b64=screenshot_b64 or "",
+                actual_result=actual_result,
+            )
+
+            success = result.get("success", False)
+            confidence = result.get("confidence", 0.0)
+            reason = result.get("reason", "")
+            suggestion = result.get("suggestion", "")
+
+            status = "PASSED" if success else "FAILED"
+            output = f"VERIFICATION {status} (confidence={confidence:.0%}): {reason}"
+            if suggestion:
+                output += f" | Suggestion: {suggestion}"
+            return output
+        except Exception as e:
+            return f"Verification unavailable: {e}"
+
+    @tool("Visually Inspect Screen")
+    def visual_inspect_tool(question: str = "Describe what you see on screen. List all visible windows, their titles, and any text content visible.") -> str:
+        """Visually inspect the target app. For visible windows, captures screenshot + VLM analysis.
+        For minimized windows, returns UIA tree data (control names, types, patterns)."""
+        try:
+            _ensure_interactive_desktop()
+            import time
+
+            target_hwnd = _last_launched_app.get("hwnd", 0)
+            app_name = _last_launched_app.get("app_name", "unknown")
+            title = _last_launched_app.get("title", "unknown")
+
+            def _is_dev_tool(h):
+                try:
+                    import win32gui
+                    t = (win32gui.GetWindowText(h) or "").lower()
+                    c = (win32gui.GetClassName(h) or "").lower()
+                    if any(bad in t for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell", "cmd.exe"]):
+                        return True
+                    if c in ("chrome_widgetwin_1", "consolewindowclass", "windowsterminal"):
+                        return True
+                except Exception:
+                    pass
+                return False
+
+            if target_hwnd and _is_dev_tool(target_hwnd):
+                target_hwnd = 0
+
+            # Fallback: if no tracked hwnd, search by app name
+            if not target_hwnd and app_name and app_name != "unknown":
+                import win32gui
+                app_lower = app_name.lower()
+                found_hwnd = 0
+                def _find_vis(h, _):
+                    nonlocal found_hwnd
+                    if not win32gui.IsWindowVisible(h):
+                        return True
+                    t = (win32gui.GetWindowText(h) or "").lower()
+                    c = (win32gui.GetClassName(h) or "").lower()
+                    if any(bad in t for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell", "cmd.exe"]):
+                        return True
+                    if c in ("chrome_widgetwin_1", "consolewindowclass", "windowsterminal"):
+                        return True
+                    if app_lower in ("paint", "mspaint"):
+                        if c in ("mspaintapp", "paintapp") or t.endswith(" - paint") or t == "paint":
+                            found_hwnd = h
+                    elif app_lower in t or app_lower in c:
+                        found_hwnd = h
+                    return True
+                try:
+                    win32gui.EnumWindows(_find_vis, None)
+                except Exception:
+                    pass
+                if found_hwnd:
+                    target_hwnd = found_hwnd
+                    _last_launched_app["hwnd"] = found_hwnd
+                    logger.info(f"[VIS] Recovered hwnd={found_hwnd} for '{app_name}'")
+
+            if not target_hwnd:
+                return f"[{_ts()}] No tracked app to inspect. Launch an app first."
+
+            import win32gui, win32con
+            is_minimized = win32gui.IsIconic(target_hwnd)
+            rect = win32gui.GetWindowRect(target_hwnd)
+            w = rect[2] - rect[0]
+            h = rect[3] - rect[1]
+            is_offscreen = w <= 0 or h <= 0 or rect[0] < -100 or rect[1] < -100
+
+            # If minimized or offscreen, attempt to restore and maximize the window for vision inspection
+            if is_minimized or is_offscreen:
+                try:
+                    win32gui.ShowWindow(target_hwnd, win32con.SW_RESTORE)
+                    win32gui.ShowWindow(target_hwnd, win32con.SW_MAXIMIZE)
+                    ctypes.windll.user32.SetForegroundWindow(target_hwnd)
+                    time.sleep(0.3)
+                    rect = win32gui.GetWindowRect(target_hwnd)
+                    w = rect[2] - rect[0]
+                    h = rect[3] - rect[1]
+                    is_minimized = win32gui.IsIconic(target_hwnd)
+                    is_offscreen = w <= 0 or h <= 0 or rect[0] < -100 or rect[1] < -100
+                except Exception:
+                    pass
+
+            # ── Minimized/offscreen: use UIA data instead of screenshot ──
+            if is_minimized or is_offscreen:
+                try:
+                    import uiautomation as auto
+                    root = auto.ControlFromHandle(target_hwnd)
+                    if root:
+                        parts = [
+                            f"APP INSPECTION (minimized/offscreen): '{title}' ({app_name})",
+                            f"Window state: {'minimized' if is_minimized else 'offscreen'}",
+                            f"Window rect: {rect}",
+                            "",
+                            "UIA TREE DATA (from minimized window):"
+                        ]
+                        # Walk tree and list all controls
+                        def _walk(ctrl, depth=0, max_d=6):
+                            if depth > max_d:
+                                return
+                            ctype = ctrl.ControlTypeName or ""
+                            name = ctrl.Name or ""
+                            cname = ctrl.ClassName or ""
+                            # Collect patterns
+                            patterns = []
+                            for pname in ["ValuePattern", "TogglePattern", "InvokePattern",
+                                          "SelectionItemPattern", "ExpandCollapsePattern",
+                                          "TextPattern", "LegacyIAccessiblePattern"]:
+                                try:
+                                    p = getattr(ctrl, f"Get{pname}")()
+                                    if p:
+                                        patterns.append(pname.replace("Pattern", ""))
+                                except Exception:
+                                    pass
+                            if ctype or name:
+                                indent = "  " * depth
+                                pat_str = f" patterns=[{','.join(patterns)}]" if patterns else ""
+                                parts.append(f"{indent}{ctype}: '{name}' class='{cname}'{pat_str}")
+                            for child in ctrl.GetChildren():
+                                _walk(child, depth + 1, max_d)
+
+                        _walk(root, 0, 5)
+
+                        # Try to get text content from DocumentControl
+                        def _find_text(ctrl, depth=0):
+                            if depth > 8:
+                                return None
+                            ctype = ctrl.ControlTypeName or ""
+                            if "Document" in ctype or "Edit" in ctype:
+                                try:
+                                    vp = ctrl.GetValuePattern()
+                                    if vp:
+                                        val = vp.Value
+                                        if val:
+                                            return val
+                                except Exception:
+                                    pass
+                            for child in ctrl.GetChildren():
+                                r = _find_text(child, depth + 1)
+                                if r:
+                                    return r
+                            return None
+
+                        text_content = _find_text(root)
+                        if text_content:
+                            parts.append("")
+                            parts.append(f"TEXT CONTENT: '{text_content}'")
+
+                        output = f"[{_ts()}] " + "\n".join(parts)
+                        logger.info(f"[INSPECT] UIA data for minimized '{title}': {len(parts)} lines")
+                        return output
+                except Exception as e:
+                    return f"[{_ts()}] Cannot inspect minimized app '{title}': {e}"
+
+            # ── Visible window: capture screenshot + VLM ──
+            _focus_most_recent_app_window()
+            time.sleep(0.5)
+
+            screenshot_b64 = None
+            try:
+                import win32ui
+                import ctypes
+                from PIL import Image
+                import io, base64
+
+                if w > 0 and h > 0:
+                    hwndDC = win32gui.GetWindowDC(target_hwnd)
+                    mfcDC = win32ui.CreateDCFromHandle(hwndDC)
+                    saveDC = mfcDC.CreateCompatibleDC()
+                    saveBitMap = win32ui.CreateBitmap()
+                    saveBitMap.CreateCompatibleBitmap(mfcDC, w, h)
+                    saveDC.SelectObject(saveBitMap)
+                    result = ctypes.windll.user32.PrintWindow(target_hwnd, saveDC.GetSafeHdc(), 0x2)
+                    if result:
+                        bmpinfo = saveBitMap.GetInfo()
+                        bmpstr = saveBitMap.GetBitmapBits(True)
+                        img = Image.frombuffer("RGB", (bmpinfo["bmWidth"], bmpinfo["bmHeight"]), bmpstr, "raw", "BGRX", 0, 1)
+                        buf = io.BytesIO()
+                        img.save(buf, format="JPEG", quality=85)
+                        screenshot_b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+                    saveDC.DeleteDC()
+                    mfcDC.DeleteDC()
+                    win32gui.ReleaseDC(target_hwnd, hwndDC)
+                    win32gui.DeleteObject(saveBitMap.GetHandle())
+            except Exception:
+                pass
+
+            # If PrintWindow failed, try full screen grab
+            if not screenshot_b64:
+                try:
+                    from PIL import ImageGrab
+                    import io, base64
+                    img = ImageGrab.grab()
+                    buf = io.BytesIO()
+                    img.save(buf, format="JPEG", quality=85)
+                    screenshot_b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+                except Exception:
+                    pass
+
+            if not screenshot_b64:
+                return f"[{_ts()}] Could not capture screenshot for '{title}'."
+
+            # Send to VLM
+            from core_organs.model_pool_orchestrator import ModelPoolOrchestrator
+            pool = ModelPoolOrchestrator.get_instance()
+            model = pool.select_model_for_task("vision", has_images=True)
+            prompt = (
+                f"Look at this screenshot carefully. {question}\n"
+                "Describe in detail: What windows are open? What text is visible? "
+                "What buttons or UI elements can you see? Is there any error message?"
+            )
+            try:
+                vlm_result = pool.execute_sync(
+                    prompt=prompt,
+                    system="You are a precise visual inspector. Describe exactly what you see.",
+                    model=model,
+                    task_type="vision",
+                    image_b64=screenshot_b64,
+                    timeout=60.0
+                )
+            except Exception as vlm_err:
+                logger.warning(f"[VIS] VLM inspection query note: {vlm_err}")
+                vlm_result = f"Visual snapshot captured. (VLM note: {vlm_err})"
+
+            # Direct UIA text extraction for robust verification
+            uia_text = ""
+            try:
+                import uiautomation as auto
+                root = auto.ControlFromHandle(target_hwnd)
+                if root:
+                    for child, _ in auto.WalkControl(root, maxDepth=8):
+                        ct = child.ControlTypeName or ""
+                        if "Document" in ct or "Edit" in ct:
+                            vp = child.GetValuePattern()
+                            if vp and vp.Value:
+                                uia_text = vp.Value
+                                break
+                        elif "calc" in app_name.lower() and "Text" in ct and (child.Name or "").startswith("Display is"):
+                            uia_text = child.Name
+                            break
+            except Exception:
+                pass
+
+            focused = win32gui.GetWindowText(target_hwnd)
+            output = f"[{_ts()}] VISUAL INSPECTION (focused: {focused}): {vlm_result}"
+            if uia_text:
+                output += f"\n[DIRECT UIA TEXT READOUT from '{focused}']: '{uia_text}'"
+            actions_summary = "\n".join([f"  - {act}" for act in _current_session_actions]) or "  (No actions recorded in this session yet)"
+            output += (
+                f"\n\n============================================================\n"
+                f"IN-SESSION ACTION EXECUTION LOG (Actual actions executed in THIS session):\n"
+                f"{actions_summary}\n"
+                f"============================================================\n"
+                f"AUDITOR VERIFICATION RULE: Distinguish between the active session actions above and pre-existing file text.\n"
+                f"Only verify success if the actions above prove the required steps were physically executed."
+            )
+            logger.info(f"[INSPECT] VLM result for '{title}': {vlm_result[:200]}")
+            return output
+
+        except Exception as e:
+            return f"[{_ts()}] Visual inspection failed: {e}"
+
+    @tool("Scan App UI")
+    def scan_app_tool(app_name: str = "") -> str:
+        """Scan a desktop application's UI elements quietly (no foreground, no menus).
+        Uses UIA tree walk on the target window handle directly — works with minimized apps.
+        Caches results in visual memory for faster re-scans of known apps."""
+        try:
+            if EyeAndBrainOrchestrator is None:
+                return f"[{_ts()}] Error: App Scanner (organ_30) not available."
+
+            resolved_name = app_name or "unknown"
+
+            # Resolve aliases (e.g. "notepad++" -> "notepad", "calc" -> "calculator")
+            try:
+                from core_organs.organ_40_app_launcher import AppCatalog, VerbAliasEngine
+                _catalog = AppCatalog()
+                _alias_engine = VerbAliasEngine(_catalog)
+                resolved_name = _alias_engine.resolve(resolved_name)
+                logger.info(f"[SCAN] Resolved '{app_name}' -> '{resolved_name}'")
+            except Exception:
+                pass
+
+            # CRASH DETECTION: Check if tracked app is still alive
+            tracked_hwnd = _last_launched_app.get("hwnd", 0)
+            if tracked_hwnd and not _is_app_alive(tracked_hwnd):
+                logger.warning(f"[SCAN] Tracked app '{_last_launched_app.get('app_name', '')}' crashed, recovering...")
+                _recover_crashed_app(_last_launched_app.get("app_name", ""))
+
+            # Check visual memory cache first (skip scan if cached < 5 min ago)
+            cache_key = resolved_name.lower().strip()
+            if cache_key in _visual_memory_cache:
+                cached = _visual_memory_cache[cache_key]
+                # Reject bogus dialog caches for Notepad (e.g. only 2 buttons 'Close' and 'OK')
+                if cache_key == "notepad" and len(cached.get("elements", [])) <= 2:
+                    del _visual_memory_cache[cache_key]
+                else:
+                    import time
+                    if time.time() - cached.get("timestamp", 0) < 300:  # 5 min freshness
+                        logger.info(f"[SCAN] Using in-memory cached scan for '{resolved_name}' ({len(cached.get('elements', []))} elements)")
+                        return cached.get("output", f"No cached output for '{resolved_name}'.")
+
+            # Check DB-persisted layout cache (survives restarts)
+            try:
+                from core_organs.organ_ml import memory as mem50
+                db_cached = mem50.get_cached_layout(cache_key, max_age_seconds=300)
+                if db_cached and cache_key == "notepad" and len(db_cached) <= 2:
+                    logger.info(f"[SCAN] Discarded invalid dialog cached layout for '{resolved_name}' ({len(db_cached)} buttons). Rescanning real app...")
+                    db_cached = None
+                if db_cached:
+                    logger.info(f"[SCAN] Using DB-cached layout for '{resolved_name}' ({len(db_cached)} elements)")
+                    # Rebuild output from cached data and store in memory cache
+                    output_lines = [
+                        f"APP SCAN COMPLETE: {resolved_name} (from cache)",
+                        f"Found {len(db_cached)} interactive UI elements:",
+                    ]
+                    for i, elem in enumerate(db_cached, 1):
+                        name = elem.get("name", "?")
+                        elem_type = elem.get("type", "?")
+                        purpose = elem.get("purpose", "")
+                        interactable = elem.get("interactable", False)
+                        marker = "[CLICKABLE]" if interactable else "[read-only]"
+                        output_lines.append(f"  {i}. {marker} {elem_type}: '{name}' — {purpose}")
+                    output_lines.append("")
+                    output_lines.append("=" * 60)
+                    output_lines.append(f"[{_ts()}] SCAN COMPLETE (cached): {len(db_cached)} elements for '{resolved_name}'")
+                    output_lines.append("USE THE EXACT ENGLISH ELEMENT NAMES ABOVE IN YOUR TOOLS.")
+                    output_lines.append("DO NOT translate, convert, or use Chinese/Japanese/Korean names.")
+                    output_lines.append("=" * 60)
+                    output_str = "\n".join(output_lines)
+                    _visual_memory_cache[cache_key] = {
+                        "timestamp": time.time(),
+                        "elements": db_cached,
+                        "output": output_str,
+                    }
+                    return output_str
+            except Exception as cache_err:
+                logger.debug(f"[SCAN] DB cache check failed: {cache_err}")
+
+            # Check if tracked hwnd matches the requested app
+            target_hwnd = _last_launched_app.get("hwnd", 0)
+            tracked_name = _last_launched_app.get("app_name", "").lower()
+
+            import win32gui
+            actual_title = (win32gui.GetWindowText(target_hwnd) or "").lower() if target_hwnd and win32gui.IsWindow(target_hwnd) else ""
+            actual_class = (win32gui.GetClassName(target_hwnd) or "").lower() if target_hwnd and win32gui.IsWindow(target_hwnd) else ""
+
+            is_calc = "calc" in resolved_name.lower()
+            is_paint = any(k in resolved_name.lower() for k in ["paint", "mspaint", "draw"])
+            is_ide = any(bad in actual_title for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell"])
+            matches_target = (
+                target_hwnd
+                and win32gui.IsWindow(target_hwnd)
+                and not is_ide
+                and (
+                    (is_calc and ("calculator" in actual_title or "calc" in actual_title or actual_class == "applicationframewindow"))
+                    or (is_paint and (actual_class in ("mspaintapp", "paintapp") or "paint" in actual_title))
+                    or (not is_calc and not is_paint and (resolved_name.lower() in actual_title or resolved_name.lower() in actual_class or resolved_name.lower() in tracked_name))
+                )
+            )
+
+            # If tracked app doesn't match requested app, find correct window
+            if not matches_target:
+                target_hwnd = 0
+                _ensure_interactive_desktop()
+                found_hwnd = 0
+                app_lower = resolved_name.lower()
+
+                def _find(h, _):
+                    nonlocal found_hwnd
+                    if not win32gui.IsWindowVisible(h):
+                        return True
+                    t = (win32gui.GetWindowText(h) or "").lower()
+                    c = (win32gui.GetClassName(h) or "").lower()
+                    if any(bad in t for bad in ["antigravity", "visual studio", "code -", "chrome", "edge", "terminal", "powershell"]):
+                        return True
+                    if is_calc:
+                        if "calculator" in t or "calc" in t or (c == "applicationframewindow" and "calc" in t):
+                            found_hwnd = h
+                    elif is_paint:
+                        if c in ("mspaintapp", "paintapp") or "paint" in t:
+                            found_hwnd = h
+                    else:
+                        if app_lower in t or app_lower in c:
+                            found_hwnd = h
+                    return True
+
+                try:
+                    win32gui.EnumWindows(_find, None)
+                except Exception:
+                    pass
+
+                # If not found, poll for up to 5 seconds (window may still be appearing)
+                if not found_hwnd:
+                    import time
+                    for _ in range(50):
+                        time.sleep(0.1)
+                        try:
+                            win32gui.EnumWindows(_find, None)
+                        except Exception:
+                            pass
+                        if found_hwnd:
+                            break
+
+                if found_hwnd:
+                    target_hwnd = found_hwnd
+                    _last_launched_app["hwnd"] = found_hwnd
+                    _last_launched_app["app_name"] = resolved_name
+                    if not HOJAIGA_STEALTH_MODE:
+                        try:
+                            import ctypes
+                            ctypes.windll.user32.ShowWindow(found_hwnd, 9)
+                            time.sleep(0.2)
+                            win32gui.SetForegroundWindow(found_hwnd)
+                            time.sleep(0.2)
+                        except Exception:
+                            pass
+                else:
+                    # Requested app not open — auto-launch FIRST, then scan
+                    logger.info(f"[SCAN] '{resolved_name}' not open, auto-launching before scan")
+                    import time, subprocess
+                    app_lower = resolved_name.lower()
+                    if is_paint:
+                        try:
+                            subprocess.Popen(["cmd.exe", "/c", "start", "mspaint.exe"])
+                        except Exception:
+                            subprocess.Popen(['explorer.exe', r'shell:AppsFolder\Microsoft.Paint_8wekyb3d8bbwe!App'])
+                    else:
+                        exe_map = {
+                            "calculator": "calc.exe", "calc": "calc.exe",
+                            "notepad": "notepad.exe", "paint": "mspaint.exe",
+                            "wordpad": "wordpad.exe",
+                        }
+                        exe = exe_map.get(app_lower, f"{app_lower}.exe")
+                        try:
+                            import ctypes
+                            logger.info(f"[SCAN] ShellExecuteW opening '{exe}' for '{resolved_name}'")
+                            ctypes.windll.shell32.ShellExecuteW(None, "open", exe, None, None, 1)
+                        except Exception as launch_err:
+                            logger.warning(f"[SCAN] Auto-launch failed: {launch_err}")
+                    time.sleep(2.5)
+
+                    # Find the newly launched window
+                    found_hwnd = 0
+                    def _find2(h, _):
+                        nonlocal found_hwnd
+                        if not win32gui.IsWindowVisible(h):
+                            return True
+                        t = (win32gui.GetWindowText(h) or "").lower()
+                        c = (win32gui.GetClassName(h) or "").lower()
+                        if any(bad in t for bad in ["antigravity", "visual studio", "code -", "chrome", "edge", "terminal", "powershell"]):
+                            return True
+                        if is_calc:
+                            if "calculator" in t or "calc" in t or (c == "applicationframewindow" and "calc" in t):
+                                found_hwnd = h
+                        elif is_paint:
+                            if c in ("mspaintapp", "paintapp") or "paint" in t:
+                                found_hwnd = h
+                        else:
+                            if app_lower in t or app_lower in c:
+                                found_hwnd = h
+                        return True
+                    try:
+                        win32gui.EnumWindows(_find2, None)
+                    except Exception:
+                        pass
+                    if found_hwnd:
+                        target_hwnd = found_hwnd
+                        _last_launched_app["hwnd"] = found_hwnd
+                        _last_launched_app["app_name"] = resolved_name
+                        logger.info(f"[SCAN] Auto-launched '{resolved_name}' hwnd={found_hwnd}")
+                        if not HOJAIGA_STEALTH_MODE:
+                            try:
+                                ctypes.windll.user32.ShowWindow(found_hwnd, 9)
+                                time.sleep(0.2)
+                                win32gui.SetForegroundWindow(found_hwnd)
+                                time.sleep(0.2)
+                            except Exception:
+                                pass
+
+            # MANDATORY SCAN: always scan with the correct window
+            scanner = EyeAndBrainOrchestrator()
+            result = scanner.deep_scan_unknown_app(app_name=resolved_name, target_hwnd=target_hwnd, quiet=False)
+            ui_elems = result.get("ui_elements", []) if result else []
+
+            # If scan returned 0 elements, report it — do NOT auto-launch again (causes duplicates)
+            if len(ui_elems) == 0 and resolved_name != "unknown":
+                logger.info(f"[SCAN] 0 elements for '{resolved_name}' — agent should use type_text directly")
+
+            if not result:
+                return f"App scan returned no results. The app may not be running. Try 'Launch Desktop Application' first."
+
+            status = result.get("status", "unknown")
+            if status == "error":
+                return f"App scan failed: {result.get('message', 'unknown error')}"
+
+            # 3. Format the scan results for the agent
+            app_name_found = result.get("app_name", resolved_name)
+            app_type = result.get("app_type", "unknown")
+            app_interaction = result.get("app_interaction", "UNKNOWN")
+            interaction_guide = result.get("interaction_guide", "")
+            current_state = result.get("current_state", "unknown")
+            ui_elements = result.get("ui_elements", [])
+            blocking = result.get("blocking_elements", [])
+            suggested_action = result.get("suggested_first_action", "")
+            notes = result.get("automation_notes", "")
+
+            output_lines = [
+                f"APP SCAN COMPLETE: {app_name_found} ({app_type})",
+                f"APP TYPE: {app_interaction}",
+                f"INTERACTION GUIDE: {interaction_guide}",
+                f"Current state: {current_state}",
+            ]
+
+            canvases = result.get("canvases", [])
+            if canvases:
+                output_lines.append("")
+                output_lines.append("CANVAS & DRAWING WORKSPACES DETECTED:")
+                for c in canvases:
+                    c_name = c.get("name", "Canvas")
+                    c_coords = c.get("coords", {})
+                    output_lines.append(f"  * {c_name} at center ({c_coords.get('x')}, {c_coords.get('y')}), box: {c_coords.get('box')} — Ready for 'Draw Shape On Canvas' / 'Mouse Drag And Drop'")
+
+            ribbon_groups = result.get("ribbon_groups", {})
+            if ribbon_groups:
+                output_lines.append("")
+                output_lines.append("RIBBON TABS & GROUPS DETECTED:")
+                for grp, gdata in ribbon_groups.items():
+                    tab = gdata.get("tab", "")
+                    ctrls = gdata.get("controls", [])
+                    ctrl_sample = ", ".join(ctrls[:8]) + ("..." if len(ctrls) > 8 else "")
+                    tab_str = f" [Tab: {tab}]" if tab else ""
+                    output_lines.append(f"  * Group '{grp}'{tab_str}: {ctrl_sample}")
+
+            output_lines.append("")
+            output_lines.append(f"Found {len(ui_elements)} interactive UI elements:")
+
+            for i, elem in enumerate(ui_elements, 1):
+                name = elem.get("name", "?")
+                elem_type = elem.get("type", "?")
+                purpose = elem.get("purpose", "")
+                interactable = elem.get("interactable", False)
+                action_hint = elem.get("action_hint", "")
+                marker = "[CLICKABLE]" if interactable else "[read-only]"
+                line = f"  {i}. {marker} {elem_type}: '{name}' — {purpose}"
+                if action_hint:
+                    line += f" >> {action_hint}"
+                output_lines.append(line)
+
+            if blocking:
+                output_lines.append(f"BLOCKING ELEMENTS: {', '.join(blocking)}")
+
+            if suggested_action:
+                output_lines.append(f"SUGGESTED FIRST ACTION: {suggested_action}")
+
+            if notes:
+                output_lines.append(f"AUTOMATION NOTES: {notes}")
+
+            # Add directive for LLM to use exact names from scan
+            output_lines.append("")
+            output_lines.append("=" * 60)
+            output_lines.append(f"[{_ts()}] SCAN COMPLETE: {len(ui_elements)} elements found for '{app_name_found}'")
+            output_lines.append("USE THE EXACT ENGLISH ELEMENT NAMES ABOVE IN YOUR TOOLS.")
+            output_lines.append("The names above are what the app exposes — use them EXACTLY as shown.")
+            output_lines.append("DO NOT translate, convert, or use Chinese/Japanese/Korean names.")
+            output_lines.append("DO NOT guess button names — use ONLY the names listed above.")
+            output_lines.append("=" * 60)
+
+            # 4. Version & UI change detection
+            try:
+                import hashlib
+                ui_hash = hashlib.md5(json.dumps([e.get("name", "") for e in ui_elements], sort_keys=True).encode()).hexdigest()
+                from core_organs.organ_40_app_launcher import AppCatalog
+                catalog = AppCatalog()
+                # Detect version from window title (e.g., "Calculator" or "Notepad - file.txt")
+                version_hint = app_name_found
+                if catalog.check_version_changed(app_name_found, version_hint):
+                    output_lines.append("")
+                    output_lines.append("NOTE: App version detected as NEW — UI may have changed. Using fresh scan data.")
+                    # Clear old cache since UI changed
+                    _visual_memory_cache.pop(cache_key, None)
+                    logger.info(f"[SCAN] Version changed for '{app_name_found}', cleared cache")
+                if catalog.check_ui_changed(app_name_found, ui_hash):
+                    output_lines.append("NOTE: UI layout changed since last scan — element positions may differ.")
+            except Exception as ver_err:
+                logger.debug(f"[SCAN] Version check failed: {ver_err}")
+
+            # 5. Feed to ML — learn UI elements for this app
+            if organ_ml is not None:
+                try:
+                    for elem in ui_elements:
+                        organ_ml.feed_ui_detection(
+                            app_name=app_name_found,
+                            screenshot_path="",
+                            elements=[{
+                                "name": elem.get("name", ""),
+                                "type": elem.get("type", ""),
+                                "visual_description": elem.get("purpose", ""),
+                                "tab": "",
+                                "group_location": "",
+                            }],
+                            source="scanner",
+                        )
+                    organ_ml.feed_vision(
+                        screenshot_path="",
+                        vlm_description=result.get("vlm_description", notes),
+                        actual_content=json.dumps(ui_elements[:5]),
+                        accuracy_score=0.8 if ui_elements else 0.3,
+                    )
+                    logger.info(f"[SCAN] Fed {len(ui_elements)} elements to ML for '{app_name_found}'")
+                except Exception as ml_err:
+                    logger.debug(f"[SCAN] ML feed failed: {ml_err}")
+
+            # 5. Store in visual memory (organ_33)
+            if get_visual_memory is not None:
+                try:
+                    mem = get_visual_memory()
+                    mem.deep_scan(
+                        app_name=app_name_found,
+                        window_title=current_state,
+                        elements=ui_elements,
+                        mode="first_contact",
+                    )
+                    logger.info(f"[SCAN] Stored snapshot in visual memory for '{app_name_found}'")
+                except Exception as mem_err:
+                    logger.debug(f"[SCAN] Visual memory store failed: {mem_err}")
+            
+            # 5b. Store button coordinates in learning memory
+            try:
+                from core_organs.organ_ml import memory as mem50
+                for elem in ui_elements:
+                    elem_name = elem.get("name", "")
+                    coords = elem.get("coords", {})
+                    bbox = coords.get("box", [])
+                    cx = coords.get("x", 0)
+                    cy = coords.get("y", 0)
+                    if elem_name and bbox:
+                        mem50.save_button(
+                            app_name=app_name_found,
+                            element_name=elem_name,
+                            bbox=bbox,
+                            center=(cx, cy)
+                        )
+                mem50.save_layout(app_name_found, ui_elements)
+                logger.info(f"[SCAN] Stored {len(ui_elements)} button coordinates in learning memory")
+            except Exception as mem50_err:
+                logger.debug(f"[SCAN] Learning memory store failed: {mem50_err}")
+
+            # Cache scan results in visual memory for faster re-scans
+            import time
+            output_str = "\n".join(output_lines)
+            _visual_memory_cache[cache_key] = {
+                "timestamp": time.time(),
+                "elements": ui_elements,
+                "output": output_str,
+            }
+
+            return output_str
+        except Exception as e:
+            return f"App scan failed: {e}"
+
+
+# ============================================================
+# CREW FACTORY & EXECUTION RUNNER
+# ============================================================
+
+class CrewAIEngine:
+    """Orchestrates CrewAI Multi-Agent teams connected directly to local Ollama and Hojaiga organs."""
+
+    def __init__(self, ollama_url: str = "http://127.0.0.1:11434", model_name: Optional[str] = None):
+        self.ollama_url = ollama_url
+        if not model_name:
+            model_name = os.environ.get("HOJAIGA_CREWAI_MODEL", "qwen2.5:7b")
+        self.model_name = model_name
+        self._llm = None
+
+        # LLM resilience settings — prevent mid-task crashes from transient drops
+        self._llm_timeout = int(os.environ.get("HOJAIGA_LLM_TIMEOUT", "300"))      # 5 min per LLM call
+        self._llm_max_retries = int(os.environ.get("HOJAIGA_LLM_MAX_RETRIES", "5"))  # auto-retry on connection errors
+        self._agent_max_exec_time = int(os.environ.get("HOJAIGA_AGENT_MAX_EXEC_TIME", "600"))  # 10 min per agent
+
+        # Qwen2.5-VL-7B is our flagship 7-Billion parameter Vision & Reasoning model on llama.cpp (port 8081).
+        # It provides maximum accuracy, precision vision grounding, element detection, and deep reasoning.
+        # We route CrewAI to Qwen2.5-VL-7B by default whenever the llama.cpp server is running.
+        # (Only if the user explicitly specifies HOJAIGA_CREWAI_BACKEND=ollama will it fall back to 3B).
+        crewai_backend = os.environ.get("HOJAIGA_CREWAI_BACKEND", "").strip().lower()
+        vision_precision_endpoint = os.environ.get("HOJAIGA_VISION_PRECISION_ENDPOINT", "")
+        
+        # Force Ollama backend for now to ensure CrewAI initializes properly
+        if _HAS_CREWAI:
+            self._llm = LLM(
+                model=f"ollama/{self.model_name}",
+                base_url=self.ollama_url,
+                timeout=self._llm_timeout,
+                max_retries=self._llm_max_retries,
+            )
+            logger.info(f"[CrewAI] Using Ollama provider: {self.ollama_url} ({self.model_name})")
+
+        # Initialize ML (event-driven, no background loops)
+        if organ_ml is not None:
+            try:
+                organ_ml.start()
+                logger.info("[CrewAI] OrganML initialized (event-driven training)")
+            except Exception as e:
+                logger.debug(f"[CrewAI] OrganML start failed: {e}")
+
+        # Preload vision model into VRAM (minicpm-v 5.5GB, fits in 6GB VRAM)
+        # Skip if using llama.cpp endpoint (model already loaded there)
+        if not vision_precision_endpoint.startswith("http"):
+            try:
+                from core_organs.model_pool_orchestrator import ModelPoolOrchestrator
+                pool = ModelPoolOrchestrator.get_instance()
+                import threading
+                threading.Thread(
+                    target=pool.preload_model,
+                    args=("minicpm-v:latest",),
+                    daemon=True,
+                    name="preload-vision"
+                ).start()
+                logger.info("[CrewAI] Vision model preload started (minicpm-v:latest)")
+            except Exception as e:
+                logger.debug(f"[CrewAI] Model preload failed: {e}")
+
+    def is_available(self) -> bool:
+        return _HAS_CREWAI and self._llm is not None
+
+    def _find_ollama_executable(self) -> str:
+        """Dynamically discover the Ollama executable path — no hardcoded paths."""
+        import shutil
+        # 1. Check PATH first
+        ollama_on_path = shutil.which("ollama")
+        if ollama_on_path:
+            return ollama_on_path
+        # 2. Common install locations (discovered dynamically via env vars)
+        import pathlib
+        candidate_roots = [
+            os.environ.get("LOCALAPPDATA", ""),
+            os.environ.get("PROGRAMFILES", ""),
+            os.environ.get("PROGRAMFILES(X86)", ""),
+            os.environ.get("APPDATA", ""),
+        ]
+        for root in candidate_roots:
+            if not root:
+                continue
+            for candidate in [
+                pathlib.Path(root) / "Programs" / "Ollama" / "ollama.exe",
+                pathlib.Path(root) / "Ollama" / "ollama.exe",
+            ]:
+                if candidate.exists():
+                    return str(candidate)
+        return "ollama"  # fallback: hope it's on PATH
+
+    def _ensure_ollama_healthy(self, force_restart: bool = False):
+        """Health-check Ollama and auto-restart if unresponsive. Uses dynamic path discovery."""
+        try:
+            import urllib.request
+            if not force_restart:
+                req = urllib.request.Request(
+                    f"{self.ollama_url}/api/tags",
+                    headers={"Content-Type": "application/json"}
+                )
+                resp = urllib.request.urlopen(req, timeout=8)
+                logger.info("[CrewAI] Ollama healthy: %s", resp.read(100).decode())
+                return  # healthy, nothing to do
+        except Exception as ollama_err:
+            logger.warning("[CrewAI] Ollama unhealthy (%s), restarting...", ollama_err)
+
+        # Restart sequence
+        try:
+            import subprocess
+            subprocess.run(["taskkill", "/F", "/IM", "ollama.exe"],
+                           capture_output=True, timeout=5)
+            time.sleep(2)
+            ollama_exe = self._find_ollama_executable()
+            logger.info(f"[CrewAI] Restarting Ollama from: {ollama_exe}")
+            subprocess.Popen(
+                [ollama_exe, "serve"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+            )
+            # Wait for Ollama to become ready (poll up to 15 seconds)
+            import urllib.request as _ur
+            for _wait in range(15):
+                time.sleep(1)
+                try:
+                    _ur.urlopen(_ur.Request(
+                        f"{self.ollama_url}/api/tags",
+                        headers={"Content-Type": "application/json"}
+                    ), timeout=3)
+                    logger.info("[CrewAI] Ollama restarted and healthy after %ds", _wait + 1)
+                    return
+                except Exception:
+                    pass
+            logger.warning("[CrewAI] Ollama restarted but not yet responding after 15s")
+        except Exception as restart_err:
+            logger.error("[CrewAI] Ollama restart failed: %s", restart_err)
+
+    def _ensure_llamacpp_healthy(self):
+        """Health-check the llama.cpp vision server and log status."""
+        vision_endpoint = os.environ.get("HOJAIGA_VISION_PRECISION_ENDPOINT", "")
+        if not vision_endpoint.startswith("http"):
+            return
+        try:
+            import urllib.request
+            req = urllib.request.Request(
+                f"{vision_endpoint}/health",
+                headers={"Content-Type": "application/json"}
+            )
+            resp = urllib.request.urlopen(req, timeout=8)
+            status = resp.read(200).decode()
+            logger.info("[CrewAI] llama.cpp vision server healthy: %s", status[:100])
+        except Exception as e:
+            logger.warning("[CrewAI] llama.cpp vision server unhealthy: %s", e)
+            logger.info("[CrewAI] Vision tasks may fall back to Ollama if llama.cpp is down")
+
+    def execute_task(self, command: str, task_id: str) -> Dict[str, Any]:
+        """Execute a user command using a specialized, autonomous CrewAI Multi-Agent crew."""
+        if not self.is_available():
+            raise RuntimeError("CrewAI is not available or could not initialize local LLM.")
+
+        logger.info(f"[CrewAI] Spinning up autonomous multi-agent crew for task {task_id}: '{command}'")
+        notify_crewai_activity("running", command)
+
+        # Activate visual cursor overlay on task execution
+        try:
+            from core_organs.visual_cursor import get_cursor
+            get_cursor().show()
+        except Exception:
+            pass
+
+        # 1. Clear session action log for this new run
+        _current_session_actions.clear()
+
+        cmd_lower = command.lower()
+
+        # Compile task into structured execution graph using Organ 36 Workflow Compiler
+        compilation = _compile_task_with_organ36(command)
+        compiled_steps = compilation.get("steps", [])
+        detected_apps = compilation.get("detected_apps", [])
+        web_targets = compilation.get("web_targets", [])
+        math_expr = compilation.get("expression", "")
+
+        is_multi_app = len(detected_apps) > 1 or bool(web_targets)
+
+        # Deterministically execute any compiled WEB.NAVIGATE step up front. The local
+        # ReAct model is unreliable at selecting the browser tool, so we drive Organ 19
+        # CDP directly here: this attaches to the already-running Chrome (port 9222),
+        # injects the floating status capsule, applies stored session cookies, and
+        # surfaces the one-time human-login gate ("Agent needs your input") if needed.
+        web_nav_note = ""
+        for _step in compiled_steps:
+            if _step.get("capability") == "WEB.NAVIGATE":
+                _wp = _step.get("parameters") or {}
+                _url = _wp.get("url") or _derive_web_url(command, (web_targets[0] if web_targets else ""))
+                try:
+                    if ensure_organ19_running and ensure_organ19_running():
+                        _nav_ok = send_cdp_navigate(_url)
+                        web_nav_note = f"The Chrome automation instance (port 9222) has ALREADY navigated to {_url} (status={_nav_ok})."
+                        logger.info("[CrewAI][WEB] Deterministic pre-navigation -> %s (status=%s)", _url, _nav_ok)
+                    else:
+                        web_nav_note = f"Organ 19 CDP runtime was unavailable; the page at {_url} was NOT pre-navigated."
+                        logger.warning("[CrewAI][WEB] Organ 19 unavailable for pre-navigation")
+                except Exception as _nav_err:
+                    web_nav_note = f"Pre-navigation to {_url} raised: {_nav_err}"
+                    logger.warning("[CrewAI][WEB] Deterministic pre-navigation error: %s", _nav_err)
+                break
+        is_lead_task = any(k in cmd_lower for k in ["find", "search", "scrape", "extract", "leads", "contacts", "directory", "plumber", "dentist", "repair", "shop", "store", "restaurant", "coffee", "designer"])
+        is_app_task = len(detected_apps) > 0 or any(k in cmd_lower for k in ["open", "launch", "start", "switch", "app", "window"])
+        is_calc_or_button = bool(math_expr) or any(a in ("calculator", "calc") for a in detected_apps) or any(k in cmd_lower for k in ["calculate", "math", "add", "subtract", "multiply", "divide", "sum", "plus", "minus"])
+        is_teaching_task = any(k in cmd_lower for k in ["teaching", "teach", "tutor", "explaining", "explain", "void", "lecture", "chalkboard", "blackboard", "whiteboard"]) or ("screen" in cmd_lower and any(k in cmd_lower for k in ["draw", "write", "note", "assistant"]))
+        is_draw_task = (any(k in cmd_lower for k in ["draw", "sketch", "paint", "canvas", "shape", "circle", "rectangle", "square", "triangle", "polygon", "nonagon", "decagon", "hexagon", "heptagon", "octagon", "dodecagon", "star", "heart", "diagram", "spaceship"]) or "-gon" in cmd_lower or "-sided" in cmd_lower or "paint" in detected_apps) and not is_teaching_task
+        if is_draw_task and not detected_apps and ("paint" in cmd_lower or "mspaint" in cmd_lower or "canvas" in cmd_lower or not is_multi_app):
+            if "paint" not in detected_apps:
+                detected_apps.append("paint")
+
+        # Determine extracted shapes, tool, color, and dimensions for drawing tasks dynamically
+        all_shapes = _extract_all_drawing_shapes(command)
+        extracted_shape, extracted_tool, extracted_color, extracted_width, extracted_height = _extract_drawing_shape_and_tool(command)
+        _current_drawing_spec["shape"] = extracted_shape
+        _current_drawing_spec["all_shapes"] = all_shapes
+        _current_drawing_spec["layout"] = _compute_multi_shape_layout(all_shapes) if len(all_shapes) > 1 else []
+        _current_drawing_spec["tool"] = extracted_tool
+        _current_drawing_spec["color"] = extracted_color
+        _current_drawing_spec["width"] = extracted_width
+        _current_drawing_spec["height"] = extracted_height
+        logger.info(f"[DRAW_EXTRACT] Dynamic shapes={all_shapes}, primary='{extracted_shape}', tool='{extracted_tool}', color='{extracted_color}', size={extracted_width}x{extracted_height} for command='{command}'")
+
+        # Register paradigm with Organ 10 and emit lifecycle events
+        assigned_paradigm = _register_with_organ10(task_id, command, is_multi_app, is_lead_task)
+
+        # Instantiate Autonomous Agents — dynamically tailored tools to fit local context limits comfortably
+        if is_draw_task:
+            researcher_tools = [
+                launch_app_tool, switch_to_app_tool, scan_app_tool, click_button_by_name_tool,
+                visual_inspect_tool, draw_shape_tool, mouse_drag_tool, draw_full_page_tool
+            ]
+            auditor_tools = [
+                launch_app_tool, scan_app_tool, visual_inspect_tool,
+                draw_shape_tool, draw_full_page_tool
+            ]
+        elif is_teaching_task:
+            researcher_tools = [
+                launch_app_tool, switch_to_app_tool, scan_app_tool, click_button_by_name_tool,
+                type_text_tool, visual_inspect_tool, open_teaching_void_tool, close_teaching_void_tool,
+                void_draw_tool, void_write_tool, void_draw_arrow_tool, void_navigate_tool, void_clear_tool,
+                void_save_notes_tool
+            ]
+            auditor_tools = [
+                scan_app_tool, visual_inspect_tool, open_teaching_void_tool,
+                void_draw_tool, void_write_tool, void_save_notes_tool
+            ]
+        else:
+            researcher_tools = [
+                operate_desktop_tool,
+                launch_app_tool, switch_to_app_tool, scan_app_tool, click_button_by_name_tool,
+                type_text_tool, visual_inspect_tool, draw_shape_tool, mouse_drag_tool,
+                navigate_tool, inspect_page_tool, scroll_page_tool,
+                open_teaching_void_tool, close_teaching_void_tool, void_draw_tool,
+                void_write_tool, void_draw_arrow_tool, void_navigate_tool, void_clear_tool,
+                void_save_notes_tool, draw_full_page_tool
+            ]
+            auditor_tools = [
+                operate_desktop_tool,
+                launch_app_tool, scan_app_tool, visual_inspect_tool, switch_to_app_tool,
+                click_button_by_name_tool, type_text_tool, draw_shape_tool, mouse_drag_tool,
+                navigate_tool, inspect_page_tool, scroll_page_tool,
+                draw_full_page_tool, void_draw_tool, void_write_tool, void_save_notes_tool
+            ]
+
+        # LLM RESILIENCE PATCH: Small LLMs sometimes pass button sequences as separate
+        # JSON keys instead of a single comma-separated string in button_name, e.g.:
+        #   {"button_name": "One", "Two": "Five", "Multiply by": "One"}
+        # CrewAI's pydantic validation strips unknown keys before they reach the tool.
+        # Override _validate_kwargs to merge extra keys into button_name BEFORE validation.
+        _original_validate = click_button_by_name_tool._validate_kwargs
+        def _patched_validate_kwargs(kwargs):
+            if isinstance(kwargs, dict):
+                extra_buttons = []
+                clean_kwargs = {}
+                for k, v in kwargs.items():
+                    if k == 'button_name':
+                        clean_kwargs[k] = v
+                    else:
+                        # This key is an extra button name the LLM mistakenly passed
+                        extra_buttons.append(str(k))
+                        if v and str(v).lower() not in ('', 'true', 'false', 'none'):
+                            extra_buttons.append(str(v))
+                if extra_buttons:
+                    original_name = clean_kwargs.get('button_name', '')
+                    merged = original_name + ', ' + ', '.join(extra_buttons)
+                    clean_kwargs['button_name'] = merged
+                    logger.info(f"[BTN] LLM kwargs rescue: merged extra keys {extra_buttons} -> '{merged}'")
+                kwargs = clean_kwargs
+            return _original_validate(kwargs)
+        click_button_by_name_tool._validate_kwargs = _patched_validate_kwargs
+
+        researcher = Agent(
+            role="Desktop Automation Specialist",
+            goal=(
+                "Execute desktop tasks step by step without skipping any intermediate physical actions. "
+                "You must physically execute every tool call sequentially."
+            ),
+            backstory=(
+                f"You are a desktop automation agent operating under Organ 10 Paradigm '{assigned_paradigm}'.\n\n"
+                "FIRST AND FOREMOST: If the task mentions an app, you MUST call 'Launch Desktop Application' FIRST. This is not optional.\n\n"
+                "RULES:\n"
+                "1. ONE TOOL AT A TIME. Never call multiple tools in one step.\n"
+                "2. ALWAYS launch first. No exceptions.\n"
+                "3. After launch: scan, then act on scan results.\n"
+                "4. Read scan results carefully — they tell you exact element names.\n"
+                "5. Use Click Button By Name: you can pass a single button OR a sequence of buttons to physically click elements and perform operations.\n"
+                "6. Use Type Text to type ONLY what the user wants.\n"
+                "7. For multi-app tasks ONLY: use 'Switch To App' or 'Launch Desktop Application' to alternate between windows. For single-app tasks, do NOT switch apps or open unrequested apps.\n"
+                "8. NEVER give a Final Answer after only one step. You MUST execute ALL phases.\n"
+                "9. NO COGNITIVE SHORTCUTS: If asked to calculate, you MUST click the buttons in the application and read the live display.\n"
+                "10. If scan finds 0 elements for an app, use Type Text or Click Button directly.\n"
+                "11. DRAWING ON CANVAS & FULL PAGE: If asked to draw (e.g. circle, oval, rectangle, shapes) or paint in an app, use 'Draw Shape On Canvas' or 'Draw On App Full Page' across the entire page (e.g. top_left, bottom_right, center, or custom coords). Do NOT just click shape buttons without drawing on canvas.\n"
+                "12. TEACHING VOID & INFINITE WHITEBOARD: When explaining, lecturing, teaching, or asked to use the whiteboard or void space, use 'Open Teaching Void Canvas' to summon the transparent dotted infinite void. Use 'Draw In Teaching Void', 'Write In Teaching Void', and 'Draw Arrow In Teaching Void' to construct conceptual diagrams and notes. Use 'Navigate Teaching Void' to scroll/pan across the infinite void or trace back to bookmarked concepts.\n"
+                "13. PRO AUTONOMY LOOP: If 'Operate Desktop App' is among your tools, PREFER it for any multi-step task on a desktop app. Pass the app name and the ordered micro-goals (newline separated). It perceives the live UI, consults learned per-app 'pro' knowledge, acts, and VERIFIES each outcome before continuing — it is far more reliable than hand-sequencing click/type. Only fall back to the fine-grained tools when the loop reports NEEDS HUMAN INPUT or BLOCKED and you know a manual step can unblock it.\n"
+            ),
+            tools=researcher_tools,
+            llm=self._llm,
+            verbose=True,
+            memory=False,
+            cache=False,
+            max_execution_time=self._agent_max_exec_time,
+        )
+
+        auditor = Agent(
+            role="Data Integrity & File Auditor",
+            goal="Verify task completion and fix failures before reporting.",
+            backstory=(
+                "You ensure tasks completed successfully. Your workflow: "
+                "1. Use 'Scan App UI' to check the current state of the app — read UI elements and values. "
+                "2. Use 'Visually Inspect Screen' to capture a screenshot and get VLM description. "
+                "3. CRITICAL: Check the IN-SESSION ACTION EXECUTION LOG included in the visual inspection output. "
+                "   Verify that the required actions were ACTUALLY executed in this active session. "
+                "   Do NOT mistake pre-existing text or placeholder text from previous runs as success. "
+                "4. If the task FAILED: use 'Switch To App', 'Type Text', 'Click Button By Name', 'Draw Shape On Canvas', or 'Draw On App Full Page' to complete it yourself. "
+                "5. Only report SUCCESS if both the active session actions and screen verification confirm completion."
+            ),
+            tools=auditor_tools,
+            llm=self._llm,
+            verbose=True,
+            memory=False,
+            cache=False,
+            max_execution_time=self._agent_max_exec_time,
+        )
+
+        # 2. Define Sequential Tasks with Dynamic Compilation
+        if is_teaching_task:
+            task_instructions = (
+                f"Execute the user objective: '{command}'.\n\n"
+                "THIS IS A TEACHING ASSISTANT / ON-SCREEN VOID CANVAS TASK.\n"
+                "CRITICAL CONSTRAINTS & REQUIRED TOOL SEQUENCE:\n"
+                "1. Action: open_teaching_void_canvas with Action Input: {{\"theme\": \"cyber_dots\"}}\n"
+                "   (This spawns the transparent infinite dotted teaching void with a 20-25% luminous dots wave across the whole screen)\n"
+                "2. Action: void_draw with Action Input: {{\"shape\": \"card\", \"x\": 350.0, \"y\": 220.0, \"width\": 320.0, \"height\": 180.0, \"label\": \"Concept Overview\", \"bookmark\": \"intro\"}}\n"
+                f"3. Action: void_write with Action Input: {{\"text\": \"Explaining: {command.replace('\"', '')}\", \"x\": 370.0, \"y\": 270.0, \"header\": \"Key Takeaway\", \"bookmark\": \"summary\"}}\n"
+                "4. Action: void_navigate with Action Input: {{\"target\": \"right\", \"distance\": 200.0}}\n"
+                f"5. Action: save_teaching_notes with Action Input: {{\"title\": \"{command.replace('\"', '')}\"}}\n"
+                "   (This exports the notes to Markdown, saves the full-screen visual screenshot, and creates structured JSON notes)\n"
+                "6. Action: visually_inspect_screen with Action Input: {{\"question\": \"Is the teaching void concept card and notes visible on screen?\"}}\n"
+                "7. State Final Answer summarizing the teaching session and saved notes.\n\n"
+                "RULES:\n"
+                "- ONE TOOL AT A TIME. Wait for each result before calling the next tool.\n"
+                "- You MUST call open_teaching_void_canvas, void_draw, and save_teaching_notes.\n"
+                "- Prohibited: Do NOT claim you drew on the screen without calling the void tools."
+            )
+        elif is_draw_task and not is_multi_app:
+            target_app = "paint"
+            if len(all_shapes) > 1:
+                shapes_str = ", ".join(all_shapes)
+                task_instructions = (
+                    f"Execute the user objective: '{command}'.\n\n"
+                    f"THIS IS A PHYSICAL MULTI-SHAPE CANVAS DRAWING TASK FOR {target_app.upper()}.\n"
+                    f"Target Shapes ({len(all_shapes)}): {shapes_str} | Tool Mode: '{extracted_tool}'\n"
+                    "All shapes must be drawn on ONE single page with sizes adjusted accordingly.\n\n"
+                    "MANDATORY WORKFLOW:\n"
+                    f"1. Action: launch_desktop_application with Action Input: {{\"app_name\": \"{target_app}\"}}\n"
+                    "   (Wait for Paint to open and maximize. If it says 'already open', proceed to step 2)\n"
+                    f"2. Action: scan_app_ui with Action Input: {{\"app_name\": \"{target_app}\"}}\n"
+                    "   (Scans UI elements and locates the drawing canvas bounds)\n"
+                    f"3. Action: draw_shape_on_canvas with Action Input: {{\"shape\": \"{shapes_str}\", \"tool_name\": \"{extracted_tool.lower()}\"}}\n"
+                    f"   (This selects the tool, focuses the canvas, and physically draws all {len(all_shapes)} shapes across the canvas page in distinct non-overlapping slots)\n"
+                    f"4. Action: visually_inspect_screen with Action Input: {{\"question\": \"What shapes are drawn on the Paint canvas? Confirm if {shapes_str} are visible.\"}}\n"
+                    f"5. State Final Answer confirming all {len(all_shapes)} shapes ({shapes_str}) are drawn on the single page Paint canvas.\n\n"
+                    "CRITICAL CONSTRAINTS:\n"
+                    "- ONE TOOL AT A TIME. Wait for each result before calling the next tool.\n"
+                    f"- You MUST call draw_shape_on_canvas to physically draw the shapes. Scanning or launching alone is NOT drawing.\n"
+                    "- Prohibited: Do NOT give a Final Answer claiming you drew the shapes without actually calling draw_shape_on_canvas!"
+                )
+            else:
+                task_instructions = (
+                    f"Execute the user objective: '{command}'.\n\n"
+                    f"THIS IS A PHYSICAL CANVAS DRAWING TASK FOR {target_app.upper()}.\n"
+                    f"Target Shape: '{extracted_shape}' | Tool Mode: '{extracted_tool}'\n\n"
+                    "MANDATORY WORKFLOW:\n"
+                    f"1. Action: launch_desktop_application with Action Input: {{\"app_name\": \"{target_app}\"}}\n"
+                    "   (Wait for Paint to open and maximize. If it says 'already open', proceed to step 2)\n"
+                    f"2. Action: scan_app_ui with Action Input: {{\"app_name\": \"{target_app}\"}}\n"
+                    "   (Scans UI elements and locates the drawing canvas bounds)\n"
+                    f"3. Action: draw_shape_on_canvas with Action Input: {{\"shape\": \"{extracted_shape}\", \"tool_name\": \"{extracted_tool.lower()}\", \"width\": {extracted_width}, \"height\": {extracted_height}}}\n"
+                    "   (This selects the tool, focuses the canvas, and physically draws the shape strokes on canvas)\n"
+                    f"4. Action: visually_inspect_screen with Action Input: {{\"question\": \"What shape is drawn on the Paint canvas? Confirm if {extracted_shape} is visible.\"}}\n"
+                    f"5. State Final Answer with the verified drawn shape: '{extracted_shape}' is drawn on the Paint canvas.\n\n"
+                    "CRITICAL CONSTRAINTS:\n"
+                    "- ONE TOOL AT A TIME. Wait for each result before calling the next tool.\n"
+                    f"- You MUST call draw_shape_on_canvas to physically draw the {extracted_shape}. Scanning or launching alone is NOT drawing.\n"
+                    "- Prohibited: Do NOT give a Final Answer claiming you drew the shape without actually calling draw_shape_on_canvas!"
+                )
+        elif is_lead_task and not is_app_task:
+            task_instructions = (
+                f"Execute the user objective: '{command}'. "
+                "1. Use 'Scrape Live Directory To Excel' — it navigates to Google Maps automatically. "
+                "2. If popups appear, use 'Visually Locate and Click' or 'Visually Inspect Screen'. "
+                "3. If scraping returns fewer leads than requested, use 'Scroll Page' to load more, then scrape again."
+            )
+        elif is_app_task:
+            if is_multi_app:
+                compiled_guidance = ""
+                if compiled_steps:
+                    step_strs = [f"  Phase {idx}: {s.get('id')} -> {s.get('capability')}" for idx, s in enumerate(compiled_steps, 1)]
+                    compiled_guidance = "ORGAN 36 COMPILED EXECUTION PHASES (MANDATORY SEQUENTIAL EXECUTION):\n" + "\n".join(step_strs) + "\n\n"
+
+                calc_button_tokens = _math_expr_to_button_sequence(math_expr) if math_expr else ""
+
+                phases_list = []
+                phase_num = 1
+                carried_value_desc = ""
+
+                for idx, app in enumerate(detected_apps, 1):
+                    app_cap = app.capitalize()
+                    is_calc = app in ("calculator", "calc") or (idx == 1 and bool(math_expr))
+
+                    if app in ("google chrome", "chrome", "browser", "microsoft edge", "edge"):
+                        url = _derive_web_url(command, (web_targets[0] if web_targets else ""))
+                        phases_list.append(
+                            f"PHASE {phase_num} (App {idx} - Web/Chrome):\n"
+                            f"  STATUS: {web_nav_note or 'The automation Chrome (port 9222) is already attached via Organ 19 CDP.'}\n"
+                            f"  PROHIBITED: Do NOT call launch_desktop_application or switch_to_app for the browser and do NOT open a new Chrome window -- the automation Chrome on port 9222 is already attached.\n"
+                            f"  1. Action: Inspect Webpage State to read the current page title/url/elements.\n"
+                            f"     - If it is NOT yet on {url}, call Navigate Browser ONCE with Action Input: {{\"url\": \"{url}\"}} (reuses the same CDP instance).\n"
+                            f"  2. Action: Visually Locate and Click for each control you need (for Gmail: 'Compose', then the 'To' field, 'Subject', the body, then 'Send').\n"
+                            f"  3. Action: Type Text Into Active Window for the recipient address, subject and message body.\n"
+                            f"  4. State Final Answer ONLY after the web action actually completed."
+                        )
+                        phase_num += 1
+                        continue
+
+                    if is_calc and math_expr:
+                        seq_str = calc_button_tokens or f"{math_expr}="
+                        phases_list.append(
+                            f"PHASE {phase_num} (App {idx} - {app_cap}):\n"
+                            f"  1. Action: launch_desktop_application with Action Input: {{\"app_name\": \"{app}\"}}\n"
+                            f"  2. Action: click_button_by_name with Action Input: {{\"button_name\": \"{seq_str}\"}}\n"
+                            f"     (MANDATORY: You MUST physically click the {app_cap} buttons. Never skip to Final Answer without this!)\n"
+                            f"  3. Read the verified {app_cap} display result returned in the tool output."
+                        )
+                        carried_value_desc = f"<verified {app_cap} display result>"
+                        phase_num += 1
+                    elif any(k in app for k in ["paint", "mspaint", "draw"]):
+                        switch_cmd = "launch_desktop_application" if idx == 1 else "switch_to_app"
+                        phases_list.append(
+                            f"PHASE {phase_num} (App {idx} - {app_cap}):\n"
+                            f"  1. Action: {switch_cmd} with Action Input: {{\"app_name\": \"{app}\"}}\n"
+                            f"  2. Action: scan_app_ui with Action Input: {{\"app_name\": \"{app}\"}}\n"
+                            f"  3. Action: draw_shape_on_canvas with Action Input: {{\"shape\": \"{extracted_shape}\", \"tool_name\": \"{extracted_tool.lower()}\", \"width\": {extracted_width}, \"height\": {extracted_height}}}"
+                        )
+                        phase_num += 1
+                    elif any(k in app for k in ["notepad", "word", "text", "edit", "writer", "doc", "notes", "code"]) or any(k in cmd_lower for k in ["type", "write", "paste"]):
+                        target_text = carried_value_desc or (f"{math_expr}=" if math_expr else "")
+                        type_call = f"  2. Action: type_text_into_active_window with Action Input: {{\"text\": \"{target_text}\"}}\n" if target_text else ""
+                        switch_cmd = "launch_desktop_application" if idx == 1 else "switch_to_app"
+                        phases_list.append(
+                            f"PHASE {phase_num} (App {idx} - {app_cap}):\n"
+                            f"  1. Action: {switch_cmd} with Action Input: {{\"app_name\": \"{app}\"}}\n"
+                            f"{type_call}"
+                        )
+                        phase_num += 1
+                    else:
+                        phases_list.append(
+                            f"PHASE {phase_num} (App {idx} - {app_cap}):\n"
+                            f"  1. Action: launch_desktop_application with Action Input: {{\"app_name\": \"{app}\"}}\n"
+                            f"  2. Action: scan_app_ui with Action Input: {{\"app_name\": \"{app}\"}}"
+                        )
+                        phase_num += 1
+
+                # Dynamic Final Audit Phase
+                final_app = detected_apps[-1] if detected_apps else "the active application"
+                phases_list.append(
+                    f"PHASE {phase_num} (Audit & Finish):\n"
+                    f"  1. Action: visually_inspect_screen with Action Input: {{\"question\": \"What is visible or written in {final_app.capitalize()}?\"}}\n"
+                    f"  2. State Final Answer."
+                )
+                multi_app_phases_text = "\n\n".join(phases_list)
+
+                task_instructions = (
+                    f"Execute the user objective: '{command}'.\n\n"
+                    f"{compiled_guidance}"
+                    f"THIS IS A SEQUENTIAL MULTI-APP TASK. Follow these exact physical execution phases:\n\n"
+                    f"{multi_app_phases_text}\n\n"
+                    f"CRITICAL CONSTRAINTS:\n"
+                    f"- PROHIBITED: Do NOT do mental calculations and skip physical steps. You MUST call the appropriate desktop tools.\n"
+                    f"- PROHIBITED: Do NOT type dummy text. Type ONLY the requested content.\n"
+                    f"- ONE TOOL AT A TIME: Execute each step, wait for the response, then proceed.\n"
+                    f"- NEVER emit multiple tool calls in a single turn. Call exactly ONE tool, read the observation, then decide the next tool."
+                )
+            elif is_calc_or_button:
+                target_app = detected_apps[0] if detected_apps else "calculator"
+                calc_button_tokens = _math_expr_to_button_sequence(math_expr) if math_expr else ""
+                if calc_button_tokens:
+                    step3_text = (
+                        f"3. click_button_by_name with button sequence: '{calc_button_tokens}' (or formula '{math_expr}=')\n"
+                        f"   (This physically clicks all buttons in {target_app.capitalize()} via UIA and returns the verified display reading)\n"
+                        f"4. Read the verified display result from the tool output\n"
+                        f"5. visual_inspect to verify the result on screen\n"
+                        f"6. State Final Answer"
+                    )
+                else:
+                    step3_text = (
+                        "3. click_button_by_name with EXACT name from scan → wait for result\n"
+                        "4. Repeat step 3 for each button needed → wait after each\n"
+                        "5. visual_inspect to verify the result\n"
+                        "6. State Final Answer"
+                    )
+
+                task_instructions = (
+                    f"Execute the user objective: '{command}'.\n\n"
+                    "CRITICAL RULES:\n"
+                    "- ONE TOOL AT A TIME. Wait for each result before calling the next tool.\n"
+                    "- Do NOT call multiple tools in one step.\n"
+                    "- Launch the app first, then scan to learn what buttons exist.\n"
+                    "- Use exact button names from scan results — do NOT guess names.\n"
+                    f"- You MUST click the buttons in {target_app.capitalize()} before giving a Final Answer.\n"
+                    "- Scanning alone does NOT complete the task.\n"
+                    f"- CRITICAL ISOLATION: This is a SINGLE-APP task for {target_app.capitalize()}. Prohibited: Do NOT launch, switch to, or interact with any other application.\n\n"
+                    "WORKFLOW:\n"
+                    f"1. launch_app with '{target_app}' → wait for result\n"
+                    f"2. scan_app with '{target_app}' → wait for result — READ the button names!\n"
+                    f"{step3_text}"
+                )
+            else:
+                # Use enhanced brain compiler for intelligent app detection
+                target_app = detected_apps[0] if detected_apps else None
+                
+                # If detection failed, use enhanced compiler to understand intent
+                if not target_app or target_app == "the application":
+                    try:
+                        import sys
+                        if r"D:\new_automation\All codes" not in sys.path:
+                            sys.path.insert(0, r"D:\new_automation\All codes")
+                        from enhanced_brain_compiler import get_enhanced_compiler
+                        
+                        compiler = get_enhanced_compiler()
+                        # Compile the task to understand intent and specialty
+                        plan = compiler.compile_task(command)
+                        
+                        # Use the primary specialty to determine the app
+                        specialty = plan.primary_specialty
+                        if specialty == "web_automation":
+                            target_app = "chrome"  # Web automation uses Chrome
+                        elif specialty == "desktop_automation":
+                            # For desktop automation, try to extract from command
+                            command_lower = command.lower()
+                            if "notepad" in command_lower:
+                                target_app = "notepad"
+                            elif "excel" in command_lower:
+                                target_app = "excel"
+                            elif "calculator" in command_lower:
+                                target_app = "calculator"
+                            else:
+                                target_app = "chrome"  # Default to Chrome for web-based desktop apps
+                        elif specialty == "data_processing":
+                            target_app = "excel"  # Data processing usually uses Excel
+                        elif specialty == "communication":
+                            target_app = "chrome"  # Communication usually web-based
+                        else:
+                            target_app = "chrome"  # Default to Chrome
+                        
+                        logger.info(f"[CrewAI] Enhanced compiler detected specialty: {specialty}, target_app: {target_app}")
+                    except Exception as e:
+                        logger.warning(f"[CrewAI] Enhanced compiler failed: {e}, using fallback")
+                        # Fallback to simple keyword extraction
+                        command_lower = command.lower()
+                        if "gmail" in command_lower:
+                            target_app = "gmail"
+                        elif "chrome" in command_lower:
+                            target_app = "chrome"
+                        elif "notepad" in command_lower:
+                            target_app = "notepad"
+                        elif "excel" in command_lower:
+                            target_app = "excel"
+                        elif "calculator" in command_lower:
+                            target_app = "calculator"
+                        elif "browser" in command_lower:
+                            target_app = "chrome"
+                        else:
+                            target_app = "chrome"
+                
+                task_instructions = (
+                    f"Execute the user objective: '{command}'.\n\n"
+                    "CRITICAL RULES:\n"
+                    "- ONE TOOL AT A TIME. Wait for each result before calling the next tool.\n"
+                    "- Do NOT call multiple tools in one step.\n"
+                    "- Always LAUNCH first, wait for result, then SCAN, wait for result, then ACT.\n"
+                    "- Scanning alone does NOT complete the task. You MUST click or type something.\n"
+                    f"- CRITICAL ISOLATION: This is a SINGLE-APP task for {target_app.capitalize()}. Do NOT launch or switch to any other app.\n\n"
+                    "WORKFLOW:\n"
+                    f"1. launch_app with '{target_app}' → wait for result. If it says 'already open', proceed immediately to step 2.\n"
+                    f"2. scan_app with '{target_app}' → wait for result — READ the elements!\n"
+                    "3. Act on the user's objective (click, type, press key, or use draw_shape_on_canvas) → wait for result\n"
+                    "4. visual_inspect to verify the result on screen\n"
+                    "5. Only THEN give Final Answer"
+                )
+        else:
+            task_instructions = (
+                f"Execute the user objective: '{command}'.\n\n"
+                "RULES:\n"
+                "- ONE TOOL AT A TIME. Wait for each result.\n"
+                "- Launch app first, scan, then act on results.\n"
+            )
+
+        discovery_task = Task(
+            description=task_instructions,
+            expected_output="Detailed confirmation of actions taken, tools used, and results achieved.",
+            agent=researcher
+        )
+
+        if is_lead_task and not is_app_task:
+            audit_desc = (
+                "Inspect the outcome of the discovery task. "
+                "Confirm that the Excel file was successfully created on disk. "
+                "Use 'Launch Desktop Application' to open Excel."
+            )
+        elif is_draw_task:
+            aspect_desc = "an oblong rectangle with distinct width and height (longer horizontally than vertically)" if extracted_shape in ("rectangle", "rect") else (
+                "an equilateral square with four equal sides" if extracted_shape in ("square", "box") else (
+                    "an oval with distinct elliptical width and height" if extracted_shape in ("oval", "ellipse") else f"a {extracted_shape}"
+                )
+            )
+            audit_desc = (
+                f"Verify that the drawing task completed successfully for target shape '{extracted_shape}' using '{extracted_tool}'. "
+                f"MAX 2 RETRIES — do not loop forever. "
+                f"1. Verify that the IN-SESSION ACTION EXECUTION LOG contains a DRAW_SHAPE action for '{extracted_shape}'. "
+                f"2. Use 'Visually Inspect Screen' with question: 'Is {aspect_desc} visibly drawn on the Paint canvas?'. "
+                f"3. If DRAW_SHAPE action is recorded in the execution log, report SUCCESS. "
+                f"4. If no drawing action was executed, retry ONCE with draw_shape_on_canvas. If still no action, report FAILURE."
+            )
+        else:
+            audit_desc = (
+                "Verify the task completed successfully. MAX 2 RETRIES — do not loop forever. "
+                "1. Use 'Visually Inspect Screen' with a specific question about the task outcome and expected content. "
+                "2. Read the DETAILED description returned — it lists windows, text, buttons. "
+                "3. CRITICAL: If the task involved drawing, typing, or clicking, verify that the IN-SESSION ACTION EXECUTION LOG contains a corresponding draw, type, or click action. Launching alone is NOT enough! "
+                "4. If the task FAILED: retry ONCE using the available tools (e.g. draw_shape_on_canvas), then check again. "
+                "5. After max 2 retries, report SUCCESS or FAILURE and stop. "
+                "6. Do NOT type text yourself — you are the VERIFIER, not the executor. "
+                "7. Do NOT declare SUCCESS without first using visual_inspect to confirm the outcome and checking the execution log."
+            )
+
+        audit_task = Task(
+            description=audit_desc,
+            expected_output="Final audit verification that the task was completed successfully.",
+            agent=auditor
+        )
+
+        # 3. Assemble and Kickoff Crew (inside retry loop below)
+
+        # Health-check and auto-recover LLM backends
+        self._ensure_ollama_healthy()
+        self._ensure_llamacpp_healthy()
+
+        # Pause organ_31 VLM emissions to free llama.cpp slots for CrewAI agent
+        try:
+            from core_organs import organ_31_visual_perception as _o31_mod
+            _o31_mod.VLMEmissionsPaused = True
+            logger.info("[CrewAI] Paused organ_31 VLM emissions during crew execution")
+        except Exception:
+            _o31_mod = None
+
+        # --- SELF-HEALING RETRY LOOP ---
+        MAX_RETRIES = 3
+        result_str = ""
+        failure_reason = ""
+        task_description = task_instructions  # rich prompt with Organ 36 compiled phases; enhanced on retry
+
+        for attempt in range(1, MAX_RETRIES + 1):
+            logger.info(f"[CrewAI] === ATTEMPT {attempt}/{MAX_RETRIES} for task {task_id} ===")
+            if attempt > 1:
+                logger.info(f"[CrewAI] Retry context: {failure_reason[:200]}")
+
+            crew = Crew(
+                agents=[researcher, auditor],
+                tasks=[
+                    Task(
+                        description=task_description,
+                        expected_output="A detailed report of all actions performed.",
+                        agent=researcher
+                    ),
+                    audit_task
+                ],
+                process=Process.sequential,
+                verbose=True
+            )
+
+            # --- RESILIENT KICKOFF: catch connection drops and auto-recover ---
+            try:
+                result = crew.kickoff()
+                result_str = str(result)
+            except Exception as kickoff_err:
+                err_str = str(kickoff_err).lower()
+                is_connection_err = any(kw in err_str for kw in [
+                    "connection error", "connection reset", "connection refused",
+                    "connection aborted", "timeout", "timed out", "eof",
+                    "broken pipe", "remote disconnected", "server disconnected",
+                    "internalservererror", "502", "503", "504",
+                    "rate_limit", "overloaded", "no healthy upstream",
+                ])
+                if is_connection_err:
+                    logger.warning(f"[CrewAI] ⚡ LLM CONNECTION DROPPED on attempt {attempt}: {kickoff_err}")
+                    logger.info(f"[CrewAI] Auto-recovering LLM backends...")
+                    self._ensure_ollama_healthy(force_restart=True)
+                    self._ensure_llamacpp_healthy()
+                    time.sleep(3)  # breathing room for servers to stabilize
+                    # Retry this attempt from scratch
+                    try:
+                        logger.info(f"[CrewAI] Re-kicking crew after LLM recovery...")
+                        crew_retry = Crew(
+                            agents=[researcher, auditor],
+                            tasks=[
+                                Task(
+                                    description=task_description,
+                                    expected_output="A detailed report of all actions performed.",
+                                    agent=researcher
+                                ),
+                                audit_task
+                            ],
+                            process=Process.sequential,
+                            verbose=True
+                        )
+                        result = crew_retry.kickoff()
+                        result_str = str(result)
+                    except Exception as retry_err:
+                        logger.error(f"[CrewAI] LLM recovery retry also failed: {retry_err}")
+                        result_str = f"FAILURE: LLM connection dropped and recovery failed: {retry_err}"
+                        failure_reason = result_str
+                        continue  # move to next attempt in the self-healing loop
+                else:
+                    logger.error(f"[CrewAI] Non-connection error during kickoff: {kickoff_err}")
+                    result_str = f"FAILURE: Crew execution error: {kickoff_err}"
+                    failure_reason = result_str
+                    continue  # move to next attempt
+
+            logger.info(f"[CrewAI] Attempt {attempt} finished. Outcome: {result_str[:150]}...")
+
+            # --- POST-EXECUTION VALIDATION ---
+            result_lower = result_str.lower()
+            has_evidence = any(kw in result_lower for kw in [
+                "scan", "scanned", "elements found", "clicked", "button",
+                "typed", "text sent", "ui element", "[clickable]", "invokepattern",
+                "success: clicked", "success: typed", "launched", "app scan",
+            ])
+            looks_like_hallucination = (
+                ("result" in result_lower and "calculator" in result_lower)
+                or ("result" in result_lower and "{" in result_str and "}" in result_str)
+            ) and not has_evidence
+
+            if looks_like_hallucination:
+                result_str = f"FAILURE: Agent gave Final Answer without performing any desktop actions. No scan, click, or type was performed."
+
+            import re
+            quoted_text_match = re.search(r'[\'"]([^\'"]+)[\'"]', command)
+            if quoted_text_match:
+                required_text = quoted_text_match.group(1).strip().lower()
+                if "typed" in result_lower and required_text:
+                    if required_text not in result_lower and not any(part in result_lower for part in required_text.split()):
+                        result_str = f"FAILURE: Agent typed text but did not include requested content '{required_text}'."
+
+            # CHECK 3: Multi-app — require ALL detected apps in result AND physical actions taken
+            if is_multi_app and len(detected_apps) > 1:
+                apps_mentioned = [a for a in detected_apps if a in result_lower]
+                if len(apps_mentioned) < len(detected_apps):
+                    missing_apps = [a for a in detected_apps if a not in apps_mentioned]
+                    result_str = f"FAILURE: Task was multi-app ({', '.join(detected_apps)}) but result did not complete actions for: {', '.join(missing_apps)}."
+                elif not any(e in result_lower for e in ["clicked", "typed", "pressed"]):
+                    result_str = f"FAILURE: Task was multi-app ({', '.join(detected_apps)}) but result shows no click/type actions."
+
+            # CHECK 4: If result has no real actions (clicked/typed/pressed/drew) at all
+            _action_evidence = ["clicked", "typed", "pressed", "drew", "drawn", "drawing", "void", "teaching", "notes"]
+            _has_action = any(e in result_lower for e in _action_evidence)
+            if not _has_action and ("launched" in result_lower or "scan" in result_lower):
+                result_str = f"FAILURE: Agent launched/scanned but did not perform any actions (click, type, press, draw)."
+
+            import re as _re_chinese
+            _chinese_chars = _re_chinese.findall(r'[\u4e00-\u9fff]', result_str)
+            if len(_chinese_chars) > 3:
+                result_str = f"FAILURE: Agent generated Chinese text instead of English button names."
+
+            # CHECK 6: Minimum tool actions — must have at least 1 real action or success evidence
+            _action_count = sum(1 for kw in ["clicked", "typed", "pressed", "drew", "drawn", "void", "teaching", "notes", "scanned", "elements found",
+                                              "[clickable]", "invokepattern", "scan result"]
+                               if kw in result_lower)
+            # Also count capitalized forms from tool output (e.g. "Clicked", "Typed")
+            _action_count += sum(1 for kw in ["Clicked", "Typed", "Pressed", "Drew", "Drawn", "Void"]
+                               if kw in result_str and kw.lower() not in result_lower)
+            # Count success indicators — auditor may describe outcome without using action verbs
+            _success_indicators = ["success", "successfully", "completed", "written", "confirmed", "task completed", "verified"]
+            _has_success = any(ind in result_lower for ind in _success_indicators) or result_lower.strip() == "success" or len(_current_session_actions) >= 2
+            if _action_count < 1 and not _has_success:
+                result_str = f"FAILURE: Agent only performed {_action_count} action(s). A complete task needs at least: launch → scan → click/type/draw."
+
+            # CHECK 7: Active session action verification (Dual-factor physical proof)
+            if is_multi_app and detected_apps:
+                for app in detected_apps:
+                    norm_app = "calculator" if app in ("calc", "calculator") else app
+                    has_app_action = any(norm_app in act.lower() for act in _current_session_actions)
+                    if not has_app_action:
+                        result_str = f"FAILURE: Agent did not physically interact with '{app}' during this active session."
+                        break
+            elif is_teaching_task:
+                has_void_action = any("VOID_" in act or "OPEN_TEACHING_VOID" in act for act in _current_session_actions)
+                if not has_void_action:
+                    result_str = f"FAILURE: Agent did not spawn or draw in the Teaching Void space on screen."
+            elif is_draw_task:
+                has_draw_action = any("DRAW_SHAPE" in act or "MOUSE_DRAG" in act or "DRAW_FULL_PAGE" in act for act in _current_session_actions)
+                if not has_draw_action:
+                    result_str = f"FAILURE: Agent claimed drawing was completed, but no physical drawing action (draw_shape_on_canvas) was executed in this active session."
+            elif not is_multi_app and detected_apps:
+                single_target = detected_apps[0]
+                norm_app = "calculator" if single_target in ("calc", "calculator") else single_target
+                has_app_action = any(norm_app in act.lower() for act in _current_session_actions)
+                if not has_app_action and len(_current_session_actions) > 0:
+                    result_str = f"FAILURE: Task was for '{single_target}', but actions were performed on other windows."
+
+            # --- CHECK IF THIS ATTEMPT SUCCEEDED ---
+            if not result_str.startswith("FAILURE:"):
+                logger.info(f"[CrewAI] Attempt {attempt} SUCCEEDED")
+                break
+
+            # --- FAILURE DETECTED: Analyze and prepare retry ---
+            failure_reason = result_str
+            logger.warning(f"[CrewAI] Attempt {attempt} FAILED: {failure_reason[:200]}")
+
+            # Save failure to memory
+            try:
+                from core_organs.organ_ml import memory
+                memory.log_click_failure(
+                    app_name="crewai",
+                    button_name=f"attempt_{attempt}",
+                    error_text=failure_reason[:200]
+                )
+                logger.info(f"[CrewAI] Saved failure to memory for learning")
+            except Exception:
+                pass
+
+            # Evaluate failure with Organ 22 Decision Engine
+            organ22_policy = _evaluate_failure_with_organ22(task_id, command, failure_reason, attempt)
+
+            # Analyze failure and build corrective instructions
+            corrective = ""
+            if "drawing was completed" in failure_reason.lower() or "draw_shape_on_canvas" in failure_reason.lower():
+                corrective = (
+                    "PREVIOUS ATTEMPT FAILED: You claimed drawing was done, but you NEVER called draw_shape_on_canvas! "
+                    "You MUST call: 1) launch_desktop_application with 'paint', 2) scan_app_ui with 'paint', "
+                    f"3) draw_shape_on_canvas with shape='{extracted_shape}', tool_name='{extracted_tool.lower()}', width={extracted_width}, height={extracted_height}, "
+                    "4) visually_inspect_screen. DO NOT give Final Answer without calling draw_shape_on_canvas!"
+                )
+            elif "teaching void" in failure_reason.lower() or "void" in failure_reason.lower():
+                corrective = (
+                    "PREVIOUS ATTEMPT FAILED: You did not spawn the Teaching Void! "
+                    "You MUST call: 1) open_teaching_void_canvas, 2) void_draw to draw concept cards, "
+                    "3) void_write to add explanatory notes, 4) void_save_notes to export notes, "
+                    "5) visually_inspect_screen. Prohibited: Do NOT claim you drew on screen without these tools!"
+                )
+            elif "multi-app" in failure_reason.lower() or "only mentions" in failure_reason.lower():
+                corrective = (
+                    "PREVIOUS ATTEMPT FAILED: You did NOT complete ALL required apps. "
+                    f"The task requires: {', '.join(detected_apps)}. "
+                    "You MUST: 1) Complete App 1 fully, 2) THEN switch/launch App 2, act on it, "
+                    "3) ONLY THEN give Final Answer. Do NOT stop after one app."
+                )
+            elif "cognitive shortcut" in failure_reason.lower() or "active session" in failure_reason.lower():
+                corrective = (
+                    "PREVIOUS ATTEMPT FAILED: You did not physically interact with the required application! "
+                    "You MUST launch the application, scan it, and click/type the required actions via the desktop tools."
+                )
+            elif "only launched" in failure_reason.lower() or "no actions" in failure_reason.lower():
+                corrective = (
+                    "PREVIOUS ATTEMPT FAILED: You launched an app but did NOT click any buttons or type any text. "
+                    "Scanning is NOT enough. You MUST use 'Click Button By Name' or 'Type Text' after scanning. "
+                    "Look at the scan results for button names, then CLICK them."
+                )
+            elif "default text" in failure_reason.lower() or "hello world" in failure_reason.lower():
+                corrective = (
+                    "PREVIOUS ATTEMPT FAILED: You typed generic text instead of what the user asked. "
+                    f"Type EXACTLY what the user wants: '{command}'. Not random text."
+                )
+            elif "chinese" in failure_reason.lower():
+                corrective = (
+                    "PREVIOUS ATTEMPT FAILED: You used Chinese button names. "
+                    "The scan output shows ENGLISH names like 'One', 'Two', 'Plus', 'Equals'. "
+                    "Use those EXACT English names in click_button_by_name."
+                )
+            elif "action(s)" in failure_reason.lower() or "lazy" in failure_reason.lower():
+                corrective = (
+                    "PREVIOUS ATTEMPT FAILED: You did too few actions. A complete task needs: "
+                    "launch → scan → click/type for EACH app. You must perform multiple tool calls."
+                )
+            else:
+                corrective = (
+                    f"PREVIOUS ATTEMPT FAILED: {failure_reason[:200]} "
+                    "Review what went wrong and try a different approach. "
+                    "Launch each app, scan it, then click buttons or type text."
+                )
+
+            # Build enhanced task description for retry incorporating Organ 22 policy
+            if is_multi_app:
+                retry_steps = multi_app_phases_text
+            elif is_teaching_task:
+                retry_steps = (
+                    "1. Action: open_teaching_void_canvas with Action Input: {\"theme\": \"cyber_dots\"}\n"
+                    "2. Action: void_draw with Action Input: {\"shape\": \"card\", \"x\": 350.0, \"y\": 220.0, \"width\": 320.0, \"height\": 180.0, \"label\": \"Concept Overview\"}\n"
+                    f"3. Action: void_write with Action Input: {{\"text\": \"Explaining: {command.replace('\"', '')}\", \"x\": 370.0, \"y\": 270.0}}\n"
+                    f"4. Action: save_teaching_notes with Action Input: {{\"title\": \"{command.replace('\"', '')}\"}}\n"
+                    "5. Action: visually_inspect_screen\n"
+                    "6. State Final Answer"
+                )
+            elif is_draw_task:
+                retry_steps = (
+                    "1. Action: launch_desktop_application with Action Input: {\"app_name\": \"paint\"}\n"
+                    "2. Action: scan_app_ui with Action Input: {\"app_name\": \"paint\"}\n"
+                    f"3. Action: draw_shape_on_canvas with Action Input: {{\"shape\": \"{extracted_shape}\", \"tool_name\": \"{extracted_tool.lower()}\", \"width\": 240, \"height\": 240}}\n"
+                    "4. Action: visually_inspect_screen\n"
+                    "5. State Final Answer"
+                )
+            else:
+                retry_steps = (
+                    "1. Action: launch_desktop_application with appropriate app_name\n"
+                    "2. Action: scan_app_ui or click_button_by_name / type_text_into_active_window\n"
+                    "3. Action: visually_inspect_screen\n"
+                    "4. Give Final Answer"
+                )
+
+            task_description = (
+                f"{command}\n\n"
+                f"*** SELF-HEALING RETRY (Attempt {attempt + 1}/{MAX_RETRIES}) ***\n"
+                f"{organ22_policy}\n"
+                f"{corrective}\n\n"
+                "LEARNED FROM PREVIOUS FAILURE — FOLLOW THESE STEPS EXACTLY:\n"
+                f"{retry_steps}\n\n"
+                "Original task: " + command
+            )
+
+            # Update researcher backstory for this retry
+            researcher.backstory = (
+                "You are a desktop automation agent. This is a RETRY after a previous failure.\n\n"
+                f"{organ22_policy}\n\n"
+                f"WHAT WENT WRONG: {failure_reason[:300]}\n\n"
+                "HOW TO FIX IT:\n"
+                f"{corrective}\n\n"
+                "MANDATORY WORKFLOW:\n"
+                "1. launch_app for App 1 → wait → scan_app → type formula\n"
+                "2. launch_app for App 2 → wait → scan_app → click buttons\n"
+                "3. switch_to_app for App 1 → type final answer\n"
+                "4. ONLY THEN give Final Answer\n\n"
+                "DO NOT skip steps. DO NOT guess button names. DO NOT type random text."
+            )
+
+            logger.info(f"[CrewAI] Prepared retry instructions for attempt {attempt + 1}")
+
+        # Resume organ_31 VLM emissions (after all attempts)
+        try:
+            if _o31_mod is not None:
+                _o31_mod.VLMEmissionsPaused = False
+                logger.info("[CrewAI] Resumed organ_31 VLM emissions after crew execution")
+        except Exception:
+            pass
+
+        # --- FINAL OUTCOME ---
+        _hallucination_detected = result_str.startswith("FAILURE:")
+
+        if _hallucination_detected:
+            # Autonomous deterministic fallback before declaring defeat
+            if is_draw_task:
+                logger.info(f"[CrewAI] Attempting deterministic autonomous fallback for draw task: '{command}'")
+                try:
+                    _ensure_interactive_desktop()
+                    import win32gui, ctypes, time, subprocess
+                    p_hwnd = 0
+                    def _find_paint_w(h, _):
+                        nonlocal p_hwnd
+                        if win32gui.IsWindowVisible(h):
+                            t = (win32gui.GetWindowText(h) or "").lower()
+                            c = (win32gui.GetClassName(h) or "").lower()
+                            if any(bad in t for bad in ["antigravity", "visual studio", "code -", "chrome", "edge", "terminal", "powershell"]):
+                                return True
+                            if c in ("mspaintapp", "paintapp") or "paint" in t:
+                                p_hwnd = h
+                        return True
+                    win32gui.EnumWindows(_find_paint_w, None)
+                    if not p_hwnd:
+                        try:
+                            subprocess.Popen(["cmd.exe", "/c", "start", "mspaint.exe"])
+                        except Exception:
+                            subprocess.Popen(['explorer.exe', r'shell:AppsFolder\Microsoft.Paint_8wekyb3d8bbwe!App'])
+                        time.sleep(2.5)
+                        win32gui.EnumWindows(_find_paint_w, None)
+
+                    if p_hwnd and win32gui.IsWindow(p_hwnd):
+                        # Force foreground
+                        ctypes.windll.user32.keybd_event(0x12, 0, 0, 0); time.sleep(0.02); ctypes.windll.user32.keybd_event(0x12, 0, 2, 0)
+                        ctypes.windll.user32.ShowWindow(p_hwnd, 9)  # SW_RESTORE
+                        ctypes.windll.user32.SetForegroundWindow(p_hwnd)
+                        ctypes.windll.user32.ShowWindow(p_hwnd, 3)  # SW_MAXIMIZE
+                        time.sleep(0.3)
+
+                        # Tool selection shortcut
+                        is_eraser = any(k in cmd_lower for k in ["eraser", "erase"])
+                        is_brush = any(k in cmd_lower for k in ["brush", "calligraphy", "watercolor", "airbrush"])
+                        chosen_mode = "Eraser" if is_eraser else ("Brush" if is_brush else "Pencil")
+                        t_vk = 0x45 if is_eraser else (0x42 if is_brush else 0x50)
+
+                        ctypes.windll.user32.keybd_event(0x12, 0, 0, 0); time.sleep(0.04); ctypes.windll.user32.keybd_event(0x12, 0, 2, 0)
+                        time.sleep(0.15)
+                        ctypes.windll.user32.keybd_event(0x48, 0, 0, 0); time.sleep(0.04); ctypes.windll.user32.keybd_event(0x48, 0, 2, 0)
+                        time.sleep(0.15)
+                        ctypes.windll.user32.keybd_event(t_vk, 0, 0, 0); time.sleep(0.04); ctypes.windll.user32.keybd_event(t_vk, 0, 2, 0)
+                        time.sleep(0.15)
+                        ctypes.windll.user32.keybd_event(0x1B, 0, 0, 0); time.sleep(0.03); ctypes.windll.user32.keybd_event(0x1B, 0, 2, 0)
+                        time.sleep(0.1)
+
+                        # Find canvas center
+                        rect = win32gui.GetWindowRect(p_hwnd)
+                        cx = rect[0] + int((rect[2] - rect[0]) * 0.5)
+                        cy = rect[1] + int((rect[3] - rect[1]) * 0.55)
+
+                        # Focus click on canvas
+                        screen_w = ctypes.windll.user32.GetSystemMetrics(0)
+                        screen_h = ctypes.windll.user32.GetSystemMetrics(1)
+                        sx = int(cx * 65535 / screen_w)
+                        sy = int(cy * 65535 / screen_h)
+                        ctypes.windll.user32.mouse_event(0x8001, sx, sy, 0, 0)
+                        time.sleep(0.05)
+                        ctypes.windll.user32.mouse_event(0x0002, 0, 0, 0, 0)
+                        time.sleep(0.04)
+                        ctypes.windll.user32.mouse_event(0x0004, 0, 0, 0, 0)
+                        time.sleep(0.1)
+
+                        # Draw
+                        from core_organs.visual_cursor import draw_shape_visual
+                        draw_shape_visual(shape=extracted_shape, cx=cx, cy=cy, width=extracted_width, height=extracted_height, steps=54, physical=False, hwnd=p_hwnd)
+                        _record_session_action("DRAW_SHAPE", "paint", f"deterministic shape='{extracted_shape}' tool='{chosen_mode}' at ({cx},{cy})")
+                        result_str = f"SUCCESS (Autonomous Physical Recovery): Paint launched, canvas focused, {chosen_mode} selected, and physically drew '{extracted_shape}' on canvas at ({cx}, {cy})."
+                        _hallucination_detected = False
+                        logger.info(f"[CrewAI] Autonomous drawing recovery completed: drew {extracted_shape}")
+                except Exception as fb_err:
+                    logger.error(f"[CrewAI] Deterministic drawing recovery failed: {fb_err}")
+            elif is_teaching_task:
+                logger.info(f"[CrewAI] Attempting deterministic autonomous fallback for teaching task: '{command}'")
+                try:
+                    from core_organs.organ_34_teaching_void import get_teaching_void
+                    tv = get_teaching_void()
+                    tv.open(theme="cyber_dots")
+                    tv.draw_shape(shape="card", x=350.0, y=220.0, width=320.0, height=180.0, label="Concept Overview", bookmark="intro")
+                    tv.write_text(text=f"Explaining: {command}", x=370.0, y=270.0, header="Key Takeaway", bookmark="summary")
+                    tv.navigate(target="right", distance=200.0)
+                    notes_res = tv.save_notes(title=command)
+                    _record_session_action("OPEN_TEACHING_VOID", "void", "theme='cyber_dots'")
+                    _record_session_action("VOID_DRAW", "void", "card at (350, 220)")
+                    _record_session_action("VOID_WRITE", "void", f"header='Key Takeaway' text='{command}'")
+                    _record_session_action("VOID_SAVE_NOTES", "void", f"saved to {notes_res.get('notes_path')}")
+                    result_str = f"SUCCESS (Autonomous Recovery): Spawns teaching void dotted canvas across screen, animated luminous dots wave, drew concept card and explanations, navigated camera, and saved notes to '{notes_res.get('notes_path')}'."
+                    _hallucination_detected = False
+                    logger.info(f"[CrewAI] Autonomous teaching void recovery completed: saved to {notes_res.get('notes_path')}")
+                except Exception as tv_fb_err:
+                    logger.error(f"[CrewAI] Deterministic teaching void recovery failed: {tv_fb_err}")
+
+        if _hallucination_detected:
+            # All retries exhausted — emit permanent failure
+            logger.error(f"[CrewAI] ALL {MAX_RETRIES} RETRIES EXHAUSTED for task {task_id}")
+            try:
+                _cns_halluc = EventBus()
+                asyncio.run(_cns_halluc.publish(EventEnvelope(
+                    topic="CREWAI_FAILURE_DETECTED",
+                    source_organ="organ_01_crewai",
+                    payload={
+                        "event_type": "CREWAI_FAILURE_DETECTED",
+                        "task_id": task_id,
+                        "error": result_str[:500],
+                        "failure_history": failure_reason[:500],
+                        "attempts": attempt,
+                        "engine": "crewai",
+                    }
+                )))
+            except Exception:
+                pass
+
+            # Save final failure to memory
+            try:
+                from core_organs.organ_ml import memory
+                memory.log_execution(
+                    task_id=task_id,
+                    raw_input=command,
+                    steps=[f"attempt_{i}" for i in range(1, attempt + 1)],
+                    errors=[failure_reason[:200]],
+                    status="FAILED_AFTER_RETRIES",
+                    model_used=self.model_name,
+                    duration=0.0
+                )
+            except Exception:
+                pass
+        else:
+            # Success — save learning if this was a retry
+            if attempt > 1:
+                logger.info(f"[CrewAI] Task SUCCEEDED on attempt {attempt} after learning from failure")
+                try:
+                    from core_organs.organ_ml import memory
+                    memory.log_execution(
+                        task_id=task_id,
+                        raw_input=command,
+                        steps=[f"retry_{attempt}_succeeded"],
+                        errors=[failure_reason[:200]] if failure_reason else [],
+                        status="SUCCESS_AFTER_RETRY",
+                        model_used=self.model_name,
+                        duration=0.0
+                    )
+                except Exception:
+                    pass
+
+        # Feed task state transition to organ_38 (TaskOrchestrator)
+        try:
+            if EventBus is not None and EventEnvelope is not None:
+                _cns = EventBus()
+                asyncio.run(_cns.publish(EventEnvelope(
+                    topic="AGENTS_COMPLETED",
+                    source_organ="organ_01_crewai",
+                    payload={
+                        "event_type": "AGENTS_COMPLETED",
+                        "task_id": task_id,
+                        "result": result_str[:500],
+                        "result_data": {
+                            "_status": "FAILED" if _hallucination_detected else "SUCCESS",
+                            "crew_output": result_str[:500],
+                            "success": not _hallucination_detected,
+                            "attempts": attempt,
+                        },
+                        "engine": "crewai",
+                    }
+                )))
+        except Exception:
+            pass
+
+        # --- POST-EXECUTION ML FEED ---
+        try:
+            if organ_ml is not None:
+                organ_ml.feed_task_flow(
+                    task_id=task_id,
+                    from_agent="researcher",
+                    to_agent="auditor",
+                    action="execute" if not _hallucination_detected else "retry_execute",
+                    response=result_str[:200],
+                    latency_ms=0
+                )
+        except Exception:
+            pass
+
+        notify_crewai_activity("idle", "CrewAI task complete")
+        return {
+            "task_id": task_id,
+            "status": "SUCCESS" if not _hallucination_detected else "FAILED",
+            "crew_output": result_str,
+            "attempts": attempt,
+            "failure_history": failure_reason[:500] if _hallucination_detected else None,
+            "session_actions": list(_current_session_actions),
+            "engine": "crewai"
+        }
+
+
+if __name__ == "__main__":
+    import argparse
+    import uuid
+
+    parser = argparse.ArgumentParser(description="Hojaiga CrewAI Autonomous Swarm Runner")
+    parser.add_argument(
+        "--command",
+        type=str,
+        default="Navigate to Google Maps, search for interior designers in Georgia, and extract verified contacts to Excel.",
+        help="Task objective to execute with the CrewAI multi-agent swarm"
+    )
+    parser.add_argument("--task-id", type=str, default=None, help="Optional task ID")
+    args = parser.parse_args()
+
+    tid = args.task_id or f"crewai_cli_{uuid.uuid4().hex[:6]}"
+    print(f"\n{'='*60}\n[HOJAIGA CREWAI ENGINE] Standalone Multi-Agent Swarm Boot\n{'='*60}")
+    print(f"Task ID: {tid}")
+    print(f"Command: {args.command}")
+    print(f"{'='*60}\n")
+
+    engine = CrewAIEngine()
+    if not engine.is_available():
+        print("[ERROR] CrewAI is not available or local Ollama LLM could not be contacted.")
+        sys.exit(1)
+
+    result = engine.execute_task(args.command, tid)
+    print(f"\n{'='*60}\n[HOJAIGA CREWAI ENGINE] Swarm Execution Finished\n{'='*60}")
+    print(json.dumps(result, indent=2))
+

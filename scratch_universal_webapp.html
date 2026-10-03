@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hojaiga Universal Webapp Benchmark</title>
+  <style>
+    body { font-family: sans-serif; background: #121212; color: #fff; padding: 20px; }
+    .card { background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    button, input, select { margin: 6px; padding: 8px 12px; border-radius: 4px; font-size: 14px; }
+    button { background: #2563eb; color: white; border: none; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; background: #222; border-top: 2px solid #2563eb; padding: 16px; display: flex; justify-content: space-between; align-items: center; z-index: 9999; }
+    dialog { background: #1e1e1e; color: #fff; border: 1px solid #555; border-radius: 8px; padding: 20px; max-width: 400px; }
+  </style>
+</head>
+<body>
+  <h1>Hojaiga Webapp Benchmark Surface</h1>
+  <p>Test surface for verifying universal DOM control crawling, active probing, and popup handling.</p>
+
+  <div class="card">
+    <h2>Actionable Web Form Controls</h2>
+    <input type="text" id="username_field" placeholder="Enter username" aria-label="Username Input">
+    <select id="environment_select" aria-label="Target Environment">
+      <option value="prod">Production</option>
+      <option value="stage">Staging</option>
+      <option value="dev">Development</option>
+    </select>
+    <button id="btn_submit_payload" aria-label="Submit Payload">Submit Payload</button>
+    <button id="btn_refresh_metrics" aria-label="Refresh Metrics">Refresh Metrics</button>
+  </div>
+
+  <div class="card">
+    <h2>Interactive Web Actions & Dialog Triggers</h2>
+    <button id="btn_open_settings" onclick="document.getElementById('web_settings_modal').showModal()">Open Settings Dialog</button>
+    <button id="btn_trigger_alert" onclick="alert('System alert notification message')">Trigger Web Alert</button>
+    <a href="#view_details" id="link_view_details" style="color: #60a5fa; margin-left: 10px;">View Diagnostics Details</a>
+  </div>
+
+  <!-- In-Window Modal Dialog -->
+  <dialog id="web_settings_modal" role="dialog" aria-modal="true" aria-labelledby="modal_title">
+    <h3 id="modal_title">Web Application Settings</h3>
+    <p>Configure pipeline parameters and real-time scanning thresholds.</p>
+    <button id="btn_modal_save" onclick="document.getElementById('web_settings_modal').close()">Save Changes</button>
+    <button id="btn_modal_cancel" onclick="document.getElementById('web_settings_modal').close()">Cancel</button>
+  </dialog>
+
+  <!-- Cookie Consent Banner -->
+  <div class="cookie-banner" id="cookie_consent_banner" role="dialog" aria-modal="true">
+    <span>We value your privacy. This application uses cookies to ensure autonomous optimization.</span>
+    <div>
+      <button id="btn_accept_cookies" onclick="document.getElementById('cookie_consent_banner').style.display='none'">Accept All</button>
+      <button id="btn_dismiss_cookies" onclick="document.getElementById('cookie_consent_banner').style.display='none'" style="background: #4b5563;">Dismiss</button>
+    </div>
+  </div>
+</body>
+</html>

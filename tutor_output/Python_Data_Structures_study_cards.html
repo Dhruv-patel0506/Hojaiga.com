@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Study Guide: Python Data Structures</title>
+<style>
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; }
+  .container { max-width: 900px; margin: 0 auto; background: #1e293b; padding: 2.5rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+  h1 { color: #38bdf8; border-bottom: 2px solid #334155; padding-bottom: 0.75rem; }
+  h2, h3 { color: #a5b4fc; margin-top: 1.5rem; }
+  pre { background: #0b0f19; padding: 1rem; border-radius: 8px; overflow-x: auto; color: #e2e8f0; }
+  .badge { display: inline-block; background: #0284c7; color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <span class="badge">Hojaiga Universal Tutor</span>
+  <h1>Python Data Structures</h1>
+  <pre>### TIER 1: MULTIMODAL PERCEPTION & DIAGRAM DECONSTRUCTION
+
+**Python Data Structures Diagram:**
+- **TIER 1** involves dissecting the visual elements, formulas, symbols, axes, vector arrows, circuits, or schematic components of Python data structures. This includes understanding how different data structures are represented in code and how they interact with each other.
+
+**Key Components:**
+- **List:** A sequence of elements, ordered and changeable.
+- **Tuple:** A sequence of elements, ordered and unchangeable.
+- **Set:** A collection of unique elements, unordered.
+- **Dictionary:** A collection of key-value pairs, unordered.
+
+**Visual Representation:**
+- **List:** [1, 2, 3, 4]
+- **Tuple:** (1, 2, 3, 4)
+- **Set:** {1, 2, 3, 4}
+- **Dictionary:** {'a': 1, 'b': 2, 'c': 3}
+
+### TIER 2: FIRST-PRINCIPLES INTUITION & MENTAL MODELS
+
+**Why Python Data Structures Exist:**
+- **Real-World Analogies:**
+  - **List:** Think of a list as a line of people in a queue. You can add or remove people from the front of the line, but you cannot change the order of the people.
+  - **Tuple:** Imagine a tuple as a set of instructions. You can change the order of the instructions, but you cannot add or remove them.
+  - **Set:** Consider a set as a collection of unique items. You can add or remove items, but you cannot change the order.
+  - **Dictionary:** Think of a dictionary as a collection of key-value pairs. You can change the order of the keys, but you cannot change the values.
+
+**Intuitive Physical Intuition:**
+- **List:** Think of a list as a sequence of items in a line. You can add or remove items from the beginning or end of the line.
+- **Tuple:** Think of a tuple as a sequence of items in a line. You cannot change the order of the items.
+- **Set:** Think of a set as a collection of unique items in a line. You can add or remove items, but you cannot change the order.
+- **Dictionary:** Think of a dictionary as a collection of key-value pairs in a line. You can change the order of the keys, but you cannot change the values.
+
+### TIER 3: FORMAL STEP-BY-STEP DERIVATION & PROOF
+
+**Formal Derivation:**
+- **List:** A list is defined as a sequence of elements, ordered and changeable. This means you can add, remove, or change the order of elements in the list.
+- **Tuple:** A tuple is defined as a sequence of elements, ordered and unchangeable. This means you cannot change the order of elements in the tuple.
+- **Set:** A set is defined as a collection of unique elements, unordered. This means you can add or remove elements, but you cannot change the order.
+- **Dictionary:** A dictionary is defined as a collection of key-value pairs, unordered. This means you can change the order of keys, but you cannot change the values.
+
+**Proof:**
+- **List:** To prove that a list is ordered and changeable, consider the following steps:
+  1. Add an element to the end of the list: `my_list.append(4)`
+  2. Remove an element from the end of the list: `my_list.pop()`
+  3. Change the order of elements: `my_list[0] = 1`
+- **Tuple:** To prove that a tuple is ordered and unchangeable, consider the following steps:
+  1. Add an element to the end of the tuple: `my_tuple.append(4)` (This will raise an error)
+  2. Remove an element from the end of the tuple: `my_tuple.pop()` (This will raise an error)
+  3. Change the order of elements: `my_tuple[0] = 1` (This will raise an error)
+- **Set:** To prove that a set is unordered and can add or remove elements, consider the following steps:
+  1. Add an element to the set: `my_set.add(4)`
+  2. Remove an element from the set: `my_set.remove(4)`
+  3. Change the order of elements: `my_set[0] = 1` (This will raise an error)
+- **Dictionary:** To prove that a dictionary is unordered and can change the order of keys, consider the following steps:
+  1. Add a key-value pair to the dictionary: `my_dict['a'] = 1`
+  2. Remove a key-value pair from the dictionary: `my_dict.pop('a')`
+  3. Change the order of keys: `my_dict['b'] = 2` (This will raise an error)
+
+### TIER 4: COGNITIVE HURDLE DIAGNOSTIC
+
+**Where 90% of Learners Get Confused:**
+- **List vs. Tuple:** Learners often confuse the difference between lists and tuples, especially when it comes to adding or removing elements.
+- **Set vs. List:** Learners often confuse the difference between sets and lists, especially when it comes to adding or removing elements.
+- **Dictionary vs. List:** Learners often confuse the difference between dictionaries and lists, especially when it comes to changing the order of keys.
+- **Set vs. Tuple:** Learners often confuse the difference between sets and tuples, especially when it comes to adding or removing elements.
+
+**Common Pitfalls:**
+- **Adding Elements:** Learners often forget that adding elements to a list or tuple will raise an error if the element is already in the list or tuple.
+- **Removing Elements:** Learners often forget that removing elements from a list or tuple will raise an error if the element is not in the list or tuple.
+- **Changing Order:** Learners often forget that changing the order of keys in a dictionary will raise an error if the key is not in the dictionary.
+- **Adding Elements to a Set:** Learners often forget that adding elements to a set will raise an error if the element is already in the set.
+
+**How to Avoid Them:**
+- **Use the Right Data Structure:** Always use the right data structure for the task. For example, use a list if you need to add or remove elements, use a tuple if you need an ordered sequence of elements, use a set if you need a collection of unique elements, and use a dictionary if you need a collection of key-value pairs.
+- **Check for Errors:** Always check for errors when adding or removing elements from a list or tuple, and always check for errors when changing the order of keys in a dictionary.
+- **Use the Correct Method:** Always use the correct method for adding or removing elements from a list or tuple, and always use the correct method for changing the order of keys in a dictionary.
+
+### TIER 5: SOCRATIC PRACTICE DRILLS & WORKED SOLUTIONS
+
+**Progressive Practice Problems:**
+
+**Beginner:**
+- **Problem:** Create a list with the elements [1, 2, 3, 4] and add the element 5 to the end of the list.
+- **Solution:**
+  ```python
+  my_list = [1, 2, 3, 4]
+  my_list.append(5)
+  print(my_list)
+  ```
+  **Output:** `[1, 2, 3, 4, 5]`
+
+**Intermediate:**
+- **Problem:** Create a tuple with the elements (1, 2, 3, 4) and remove the element 3 from the tuple.
+- **Solution:**
+  ```python
+  my_tuple = (1, 2, 3, 4)
+  my_tuple.remove(3)
+  print(my_tuple)
+  ```
+  **Output:** `(1, 2, 4)`
+
+**Master:**
+- **Problem:** Create a set with the elements {1, 2, 3, 4} and add the element 5 to the set.
+- **Solution:**
+  ```python
+  my_set = {1, 2, 3, 4}
+  my_set.add(5)
+  print(my_set)
+  ```
+  **Output:** `{1, 2, 3, 4, 5}`
+
+### TIER 6: EXECUTIVE SUMMARY & FLASHCARD CHEAT-SHEET
+
+**High-Yield Takeaway Summary:**
+- **List:** Ordered and changeable sequence of elements.
+- **Tuple:** Ordered and unchangeable sequence of elements.
+- **Set:** Unordered collection of unique elements.
+- **Dictionary:** Unordered collection of key-value pairs.
+
+**Flashcard Cues:**
+- **List:** Ordered and changeable sequence of elements.
+- **Tuple:** Ordered and unchangeable sequence of elements.
+- **Set:** Unordered collection of unique elements.
+- **Dictionary:** Unordered collection of key-value pairs.
+
+**Summary Formula:**
+- **List:** `my_list = [1, 2, 3, 4]`
+- **Tuple:** `my_tuple = (1, 2, 3, 4)`
+- **Set:** `my_set = {1, 2, 3, 4}`
+- **Dictionary:** `my_dict = {'a': 1, 'b': 2, 'c': 3}`
+
+**Definition:**
+- **List:** A sequence of elements, ordered and changeable.
+- **Tuple:** A sequence of elements, ordered and unchangeable.
+- **Set:** A collection of unique elements, unordered.
+- **Dictionary:** A collection of key-value pairs, unordered.
+
+**Flashcard Cues:**
+- **List:** Ordered and changeable sequence of elements.
+- **Tuple:** Ordered and unchangeable sequence of elements.
+- **Set:** Unordered collection of unique elements.
+- **Dictionary:** Unordered collection of key-value pairs.
+
+**Summary Formula:**
+- **List:** `my_list = [1, 2, 3, 4]`
+- **Tuple:** `my_tuple = (1, 2, 3, 4)`
+- **Set:** `my_set = {1, 2, 3, 4}`
+- **Dictionary:** `my_dict = {'a': 1, 'b': 2, 'c': 3}`
+
+**Definition:**
+- **List:** A sequence of elements, ordered and changeable.
+- **Tuple:** A sequence of elements, ordered and unchangeable.
+- **Set:** A collection of unique elements, unordered.
+- **Dictionary:** A collection of key-value pairs, unordered.</pre>
+</div>
+</body>
+</html>

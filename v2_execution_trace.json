@@ -1,0 +1,160 @@
+[
+  {
+    "execution_id": "exec_interface_b51a5a",
+    "node_name": "Interface",
+    "status": "SUCCESS",
+    "predecessor": null,
+    "successor": "cns",
+    "start_time": 1786515304.4411542,
+    "end_time": 1786515304.4411542,
+    "input_received": {
+      "command": "Multi-step interact on http://127.0.0.1:9995"
+    },
+    "output_produced": "Submitted to CNS",
+    "reason": "User requested task"
+  },
+  {
+    "execution_id": "exec_cns_5a1dea",
+    "node_name": "CNS",
+    "status": "SUCCESS",
+    "predecessor": "interface",
+    "successor": "brain",
+    "start_time": 1786515304.4411542,
+    "end_time": 1786515304.4411542,
+    "input_received": "Interface message",
+    "output_produced": "Routed to Brain via Orchestrator",
+    "reason": "Message bus routing"
+  },
+  {
+    "execution_id": "exec_brain_b16e86",
+    "node_name": "Brain",
+    "status": "SUCCESS",
+    "predecessor": "cns",
+    "successor": "memory",
+    "start_time": 1786515306.5245764,
+    "end_time": 1786515306.5237765,
+    "input_received": "Multi-step interact on http://127.0.0.1:9995",
+    "output_produced": "Intent normalized",
+    "reason": "Processed raw user intent"
+  },
+  {
+    "execution_id": "exec_memory_e638b8",
+    "node_name": "Memory/Knowledge",
+    "status": "SKIPPED",
+    "predecessor": "brain",
+    "successor": "compiler",
+    "start_time": 1786515331.7408876,
+    "end_time": 1786515331.7408886,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "Not required for synthetic fallback offline multi-step task"
+  },
+  {
+    "execution_id": "exec_compiler_66bb68",
+    "node_name": "Workflow Compiler",
+    "status": "SKIPPED",
+    "predecessor": "memory",
+    "successor": "decision",
+    "start_time": 1786515331.7408936,
+    "end_time": 1786515331.7408953,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "Not required for synthetic fallback offline multi-step task"
+  },
+  {
+    "execution_id": "exec_decision_90afad",
+    "node_name": "Decision Engine",
+    "status": "SKIPPED",
+    "predecessor": "compiler",
+    "successor": "security",
+    "start_time": 1786515331.7408967,
+    "end_time": 1786515331.7408972,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "Not required for synthetic fallback offline multi-step task"
+  },
+  {
+    "execution_id": "exec_security_5ae8b2",
+    "node_name": "Security/Governance",
+    "status": "SKIPPED",
+    "predecessor": "decision",
+    "successor": "orchestrator",
+    "start_time": 1786515331.7408984,
+    "end_time": 1786515331.740899,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "Not required for synthetic fallback offline multi-step task"
+  },
+  {
+    "execution_id": "exec_orchestrator_e629a3",
+    "node_name": "Task Orchestrator",
+    "status": "SKIPPED",
+    "predecessor": "security",
+    "successor": "agent",
+    "start_time": 1786515331.7408998,
+    "end_time": 1786515331.7409003,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "Not required for synthetic fallback offline multi-step task"
+  },
+  {
+    "execution_id": "exec_agent_62a649",
+    "node_name": "Agent",
+    "status": "SKIPPED",
+    "predecessor": "orchestrator",
+    "successor": "controller",
+    "start_time": 1786515331.7409017,
+    "end_time": 1786515331.7409022,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "Not required for synthetic fallback offline multi-step task"
+  },
+  {
+    "execution_id": "exec_controller_dae732",
+    "node_name": "Controller",
+    "status": "SKIPPED",
+    "predecessor": "agent",
+    "successor": "verification",
+    "start_time": 1786515331.7409034,
+    "end_time": 1786515331.7409039,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "Not required for synthetic fallback offline multi-step task"
+  },
+  {
+    "execution_id": "exec_verification_6db7d8",
+    "node_name": "Verification",
+    "status": "SKIPPED",
+    "predecessor": "controller",
+    "successor": "audit",
+    "start_time": 1786515331.7409053,
+    "end_time": 1786515331.7409055,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "Not required for synthetic fallback offline multi-step task"
+  },
+  {
+    "execution_id": "exec_audit_6a9c7c",
+    "node_name": "Audit",
+    "status": "SUCCESS",
+    "predecessor": "verification",
+    "successor": "completion",
+    "start_time": 1786515331.740844,
+    "end_time": 1786515331.7408483,
+    "input_received": "All events",
+    "output_produced": "Saved to audit_logs_autonomy_556986",
+    "reason": "Continuous trace logging"
+  },
+  {
+    "execution_id": "exec_completion_1f3a1d",
+    "node_name": "Completion",
+    "status": "SKIPPED",
+    "predecessor": "audit",
+    "successor": null,
+    "start_time": 1786515331.740907,
+    "end_time": 1786515331.7409074,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "Not required for synthetic fallback offline multi-step task"
+  }
+]

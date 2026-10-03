@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOJAIGA // Holographic Organ &amp; Engine Constellation</title>
+  <link rel="icon" href="data:," />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=JetBrains+Mono:wght@300;400;600&display=swap');
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #02040a;
+      font-family: 'JetBrains Mono', monospace;
+      user-select: none;
+    }
+    .font-display { font-family: 'Orbitron', sans-serif; }
+
+    .hud-overlay {
+      background:
+        radial-gradient(circle at center, transparent 55%, rgba(0, 5, 15, 0.85) 100%),
+        repeating-linear-gradient(0deg, rgba(0,255,255,0.02) 0px, rgba(0,255,255,0.02) 1px, transparent 1px, transparent 3px);
+      pointer-events: none;
+    }
+
+    .glass-panel {
+      background: rgba(6, 14, 28, 0.68);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 240, 255, 0.28);
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.12), inset 0 0 15px rgba(0, 240, 255, 0.06);
+    }
+
+    .neon-text-cyan { text-shadow: 0 0 10px rgba(0,240,255,0.8), 0 0 22px rgba(0,240,255,0.4); }
+
+    .node-label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translate(-50%, -140%);
+      pointer-events: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      white-space: nowrap;
+      padding: 3px 8px;
+      font-size: 10px;
+      line-height: 1.3;
+      background: rgba(4, 12, 24, 0.72);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      border-radius: 8px;
+      will-change: transform;
+    }
+    .node-label .label-inner {
+      display: block;
+      transition: transform 0.2s ease;
+    }
+    .node-label.organ { display: none; }
+    .node-label.organ.targeted { display: block; }
+    .labels-dim .node-label:not(.targeted) { opacity: 0.15; }
+
+    .node-label.targeted {
+      border-color: #fbbf24 !important;
+      box-shadow: 0 0 18px rgba(251, 191, 36, 0.55) !important;
+      z-index: 5;
+    }
+    .node-label.targeted .label-inner { transform: scale(1.12); }
+
+    #hand-cursor {
+      position: fixed;
+      width: 36px; height: 36px;
+      margin-left: -18px; margin-top: -18px;
+      border: 2px solid #00f0ff;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 60;
+      transition: transform 0.12s ease, border-color 0.15s ease, background-color 0.15s ease;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.8);
+      display: none;
+    }
+    #hand-cursor.pinching {
+      transform: scale(0.65);
+      border-color: #f59e0b;
+      background-color: rgba(245, 158, 11, 0.35);
+      box-shadow: 0 0 24px rgba(245, 158, 11, 1);
+    }
+
+    #node-panel { transition: transform 0.35s cubic-bezier(.2,.9,.3,1), opacity 0.3s ease; }
+    #node-panel.hidden-panel {
+      transform: translateX(-125%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .panel-scroll::-webkit-scrollbar { width: 6px; }
+    .panel-scroll::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.35); border-radius: 4px; }
+
+    kbd {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(0,240,255,0.35);
+      border-radius: 4px;
+      padding: 0 5px;
+      font-size: 10px;
+    }
+
+    #warp-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle, #00f0ff 0%, #01080e 70%);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+  </style>
+</head>
+<body class="text-cyan-100">
+
+  <div id="warp-overlay"></div>
+  <div id="canvas-container" class="fixed inset-0 z-0"></div>
+  <div class="fixed inset-0 z-10 hud-overlay"></div>
+
+  <div id="hand-cursor">
+    <div class="w-1.5 h-1.5 bg-cyan-300 rounded-full m-auto mt-3.5"></div>
+  </div>
+
+  <div id="labels-container" class="fixed inset-0 z-20 pointer-events-none overflow-hidden"></div>
+
+  <!-- TOP HUD -->
+  <header class="fixed top-4 left-4 right-4 z-30 flex flex-wrap items-start justify-between gap-4 pointer-events-none">
+    <div class="glass-panel px-5 py-3 rounded-xl pointer-events-auto flex items-center gap-4">
+      <div class="relative flex h-3.5 w-3.5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-cyan-400"></span>
+      </div>
+      <div>
+        <h1 class="font-display text-sm md:text-base font-extrabold tracking-widest text-cyan-300 neon-text-cyan">
+          HOJAIGA // ORGAN &amp; ENGINE CONSTELLATION
+        </h1>
+        <p class="text-[11px] text-cyan-200/70 tracking-wider">
+          <span id="fps-counter" class="text-emerald-400 font-semibold">60 FPS</span>
+          &bull; NODES: <span id="node-count" class="text-cyan-300 font-semibold">--</span>
+          &bull; <span id="gesture-readout" class="text-amber-300 font-semibold">MOUSE / STANDBY</span>
+          &bull; <span id="cns-status" class="text-rose-400 font-semibold">CNS LINKING&hellip;</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="glass-panel px-3 py-2 rounded-xl pointer-events-auto flex flex-wrap items-center gap-2">
+      <span class="text-[11px] text-cyan-300/80 uppercase tracking-wider px-2 hidden sm:inline">World:</span>
+      <button id="btn-theme-cosmic" onclick="setWorldTheme('cosmic')"
+        class="px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wider transition bg-cyan-500/30 border border-cyan-400 text-cyan-100 shadow-[0_0_12px_rgba(0,240,255,0.4)]">
+        1 &#127756; Cosmic Void
+      </button>
+      <button id="btn-theme-cyber" onclick="setWorldTheme('cyber')"
+        class="px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wider transition bg-slate-900/60 border border-cyan-500/30 text-cyan-300/70 hover:text-cyan-100">
+        2 &#128508; Cyberpunk Matrix
+      </button>
+      <button onclick="triggerWakeUpFlare()"
+        class="ml-1 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wider bg-amber-500/20 border border-amber-400/60 text-amber-300 hover:bg-amber-500/30 transition"
+        title="Shortcut: Spacebar or Quick Hand Motion">
+        &#9889; Flare
+      </button>
+    </div>
+
+    <!-- Ability #27: Omni-Portal Cross-World Nav Bar -->
+    <div class="glass-panel px-3 py-2 rounded-xl pointer-events-auto flex flex-wrap items-center gap-2">
+      <span class="text-[11px] text-cyan-300/80 uppercase tracking-wider px-1 hidden lg:inline">Portal:</span>
+      <button onclick="warpTo('scanner-world.html')"
+        class="px-2.5 py-1.5 rounded-lg text-xs bg-slate-900/70 border border-emerald-400/40 text-emerald-300 hover:bg-emerald-500/20 transition"
+        title="World 01: UI App Scanner & Popup Interceptor">
+        &#128270; Sector 01
+      </button>
+      <button onclick="warpTo('llm-world.html')"
+        class="px-2.5 py-1.5 rounded-lg text-xs bg-slate-900/70 border border-purple-400/40 text-purple-300 hover:bg-purple-500/20 transition"
+        title="World 02: Local LLM Bridge">
+        &#129504; Sector 02
+      </button>
+      <button onclick="warpTo('execution-world.html')"
+        class="px-2.5 py-1.5 rounded-lg text-xs bg-slate-900/70 border border-amber-400/40 text-amber-300 hover:bg-amber-500/20 transition"
+        title="World 03: Execution Engine">
+        &#128433;&#65039; Sector 03
+      </button>
+      <button onclick="warpTo('living-interface.html')"
+        class="px-2.5 py-1.5 rounded-lg text-xs bg-slate-900/70 border border-fuchsia-400/40 text-fuchsia-300 hover:bg-fuchsia-500/20 transition"
+        title="Step 1: Living Interface - realistic cosmos intent view">
+        &#10024; Living
+      </button>
+    </div>
+  </header>
+
+  <!-- LEGEND -->
+  <aside id="legend" class="fixed bottom-4 left-4 z-30 glass-panel p-4 rounded-xl max-w-xs pointer-events-auto hidden md:block transition-opacity duration-300">
+    <div class="text-xs font-display font-bold tracking-widest text-cyan-300 uppercase mb-2 flex items-center justify-between">
+      <span>&#128302; Spatial Gesture Matrix</span>
+      <span class="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 border border-cyan-400/30">LERP ACTIVE</span>
+    </div>
+    <ul class="space-y-1.5 text-[11px] text-cyan-100/80 leading-relaxed">
+      <li><strong class="text-cyan-300">&#128400;&#65039; Open Hand:</strong> orbits the constellation &amp; moves the reticle.</li>
+      <li><strong class="text-amber-300">&#9994; Fist / &#129295; Pinch on a node:</strong> warps into it and opens live telemetry.</li>
+      <li><strong class="text-rose-300">&#128400;&#65039; Hold open hand (~1.5s) while inside:</strong> warps back out.</li>
+      <li><strong class="text-pink-400">&#9889; Quick swipe / clap:</strong> fires the wake-up shockwave on the Brain.</li>
+      <li><strong class="text-emerald-300">Mouse:</strong> hover to steer, click to dive, <kbd>Esc</kbd> exit, <kbd>Space</kbd> flare, <kbd>1</kbd>/<kbd>2</kbd> theme.</li>
+    </ul>
+    <div class="mt-2 pt-2 border-t border-cyan-500/20 text-[10px] text-cyan-200/60">
+      Inner rings = 40 Hojaiga organs &bull; Outer galaxy / city blocks = 36 tutor engines
+    </div>
+  </aside>
+
+  <!-- FOCUS TELEMETRY PANEL (docked left) -->
+  <aside id="node-panel" class="hidden-panel fixed left-4 top-24 bottom-4 z-40 w-[24rem] max-w-[calc(100vw-2rem)] glass-panel rounded-2xl pointer-events-auto flex flex-col overflow-hidden">
+    <div class="px-5 pt-5 pb-4 border-b border-cyan-500/30">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <span id="modal-badge" class="text-[10px] font-display uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400 text-cyan-300">NODE</span>
+          <h2 id="modal-title" class="font-display text-lg font-bold text-white mt-2 neon-text-cyan">Node</h2>
+          <p id="modal-subtitle" class="text-[11px] text-cyan-200/70 mt-1 leading-relaxed">-</p>
+        </div>
+        <button onclick="closeNodeModal()" class="shrink-0 px-2.5 py-1 rounded-lg bg-rose-500/20 border border-rose-400/50 text-rose-200 text-xs hover:bg-rose-500/40 transition">
+          &#10005; <kbd>Esc</kbd>
+        </button>
+      </div>
+      <div class="mt-3 flex flex-wrap items-center gap-2 text-[10px] text-cyan-300/80">
+        <span id="modal-viz" class="px-2 py-0.5 rounded bg-slate-950/70 border border-cyan-500/30">VISUAL: -</span>
+        <span id="modal-layer" class="px-2 py-0.5 rounded bg-slate-950/70 border border-cyan-500/30">LAYER: -</span>
+        <a id="enter-world-btn" href="scanner-world.html" onclick="return enterWorldWarp(event)"
+          class="hidden px-2.5 py-1 rounded-lg text-[10px] font-semibold tracking-wider bg-emerald-500/20 border border-emerald-400/60 text-emerald-300 hover:bg-emerald-500/35 transition">
+          &#128640; Enter 3D World
+        </a>
+      </div>
+    </div>
+
+    <div class="panel-scroll flex-1 overflow-y-auto px-5 py-4">
+      <div class="text-[10px] font-display uppercase tracking-wider text-cyan-300/90 mb-2">Sub-processes &amp; Daemons</div>
+      <div id="modal-processes" class="space-y-2"></div>
+
+      <div class="mt-4 text-[10px] font-display uppercase tracking-wider text-cyan-300/90 mb-2">Local behaviour hologram</div>
+      <div class="text-[11px] text-cyan-100/75 leading-relaxed bg-slate-950/60 border border-cyan-500/20 rounded-xl p-3">
+        A procedural animation is running on this node inside the 3D scene right now &mdash; generated from what this file actually does.
+      </div>
+
+      <div class="mt-4 bg-slate-950/80 border border-cyan-500/25 rounded-xl p-3 font-mono">
+        <div class="flex items-center justify-between text-[10px] text-cyan-400/70 border-b border-cyan-500/20 pb-1 mb-1.5">
+          <span>CNS_BRIDGE_STREAM // LIVE LOG</span>
+          <span class="animate-pulse text-emerald-400">&#9679; ONLINE</span>
+        </div>
+        <div id="modal-terminal" class="space-y-1 text-[11px] text-emerald-300/90 max-h-44 overflow-y-auto panel-scroll"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- WEBCAM PREVIEW -->
+  <div class="fixed bottom-4 right-4 z-30 glass-panel rounded-xl overflow-hidden w-52 sm:w-64 border border-cyan-400/40 pointer-events-auto">
+    <div class="px-3 py-1.5 bg-slate-950/80 border-b border-cyan-500/30 flex items-center justify-between">
+      <span class="text-[10px] font-display tracking-wider uppercase text-cyan-300 flex items-center gap-1.5">
+        <span id="cam-indicator" class="w-2 h-2 rounded-full bg-amber-400"></span>
+        MediaPipe Hand Cam
+      </span>
+      <button id="toggle-cam-btn" onclick="initCameraTracking(true)" class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-400/50 text-cyan-200 hover:bg-cyan-500/40 transition">
+        Reconnect
+      </button>
+    </div>
+    <div class="relative aspect-video bg-slate-950 flex items-center justify-center">
+      <video id="webcam-video" class="hidden" playsinline></video>
+      <canvas id="webcam-canvas" class="w-full h-full object-cover transform -scale-x-100"></canvas>
+      <div id="cam-overlay-msg" class="absolute inset-0 flex flex-col items-center justify-center text-center p-3 bg-slate-950/85 text-[11px] text-cyan-200/80">
+        <span>Initializing MediaPipe Hands...</span>
+        <span class="text-[10px] text-cyan-400/60 mt-1">Allow camera access for hand control</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================================================
+    // 0. HELPERS
+    // ==========================================================================
+    const $ = (id) => document.getElementById(id);
+    function hashStr(s) {
+      let h = 2166136261;
+      for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+      return h >>> 0;
+    }
+
+    // ==========================================================================
+    // 1. DATA - HOJAIGA ORGAN RING (centre) + FINAL HOJAIGA TUTOR ENGINES (outer)
+    // ==========================================================================
+    const ORGAN_RAW = [
+      ['01','Brain','Central cognition core. Routes goals, parses intent and decomposes tasks.','loop'],
+      ['01','CrewAI Engine','Multi-agent crew runtime: roles, delegation and joint task execution.','tree'],
+      ['02','CNS','Central Nervous System bus. Pub/sub message fabric linking every organ.','stream'],
+      ['03','Memory','Episodic and semantic memory store with recall and forgetting.','grid'],
+      ['04','Knowledge','Knowledge graph, embeddings and grounded fact retrieval.','tree'],
+      ['05','Controllers','Mouse, keyboard and gamepad abstraction for safe input control.','target'],
+      ['06','Automation','Workflow engine: triggers, scripted task graphs and retries.','loop'],
+      ['07','Security','Permission gates, sandbox policy and threat screening.','shield'],
+      ['08','Learning','Online learning loop that scores outcomes and improves skills.','loop'],
+      ['10','Agents','Worker agent pool: spawn, supervise, retire and audit.','orbit'],
+      ['10','Extended Capabilities','Plugin surface exposing third-party skills to the system.','grid'],
+      ['11','Interface','UI contracts and widget adapters shared by all surfaces.','windows'],
+      ['12','Integration','Integration bus for webhooks, RPC and external services.','stream'],
+      ['13','Interface Layer','OS window and screen layer: capture, focus and z-order.','scan'],
+      ['14','LLM Runtime','Local model runtime: loading, context windows, sampling.','stream'],
+      ['15','External Connectors','Connectors for browser, email, files and cloud APIs.','tree'],
+      ['17','Backup Manager','Snapshots, rollback and crash recovery of system state.','loop'],
+      ['18','Capability Registry','Registry of capabilities, versions and availability.','grid'],
+      ['19','Chrome CDP Runtime','Chrome DevTools Protocol driver for browser automation.','scan'],
+      ['20','Configuration Manager','Loads, validates and hot-reloads runtime configuration.','grid'],
+      ['21','Configuration Schema','Schema definitions and constraint validation rules.','tree'],
+      ['22','Decision Engine','Scores options by cost and risk, then selects actions.','loop'],
+      ['23','Rule Engine','Event-to-rule evaluation pipeline with priority ordering.','loop'],
+      ['24','DAP','Debug Adapter Protocol control: breakpoints, stepping, stack.','type'],
+      ['25','Error Catalog','Central error taxonomy with causes and remediation hints.','shield'],
+      ['26','Event Catalog','Typed event catalogue and emission contracts.','stream'],
+      ['29','Popup Handler','Detects and dismisses unexpected modal and system popups.','windows'],
+      ['30','App Scanner','Scans desktop UI trees and extracts text with OCR.','scan'],
+      ['31','Visual Perception','Understands screenshots, regions and visual targets.','scan'],
+      ['32','State Catalog','Global state machines, transitions and guards.','tree'],
+      ['33','System Manifest','Manifest of files, ports, versions and dependencies.','grid'],
+      ['33','Visual Memory','Screenshot archive with similarity search and recall.','grid'],
+      ['34','Hojaiga Avatar','Animated avatar presence, gestures and idle behaviour.','orbit'],
+      ['34','Teaching Void','Immersive teaching space with whiteboard and drawings.','type'],
+      ['35','Update Manager','Self-update, dependency patching and safe rollback.','loop'],
+      ['36','Workflow Compiler','Compiles natural language goals into executable graphs.','tree'],
+      ['37','LLM Gateway','Routes requests across local and remote model endpoints.','stream'],
+      ['38','Task Orchestrator','Queues, schedules and parallelises incoming tasks.','loop'],
+      ['39','Target Pause','Pause, resume and precision targeting of OS actions.','target'],
+      ['40','App Launcher','Launches, focuses and terminates desktop applications.','windows']
+    ];
+
+    const ENGINE_RAW = [
+      ['CompanionManager','Orchestrates the companion avatar, moods, responses and presence.','orbit'],
+      ['ClaudeAPI','Anthropic client: streaming requests, retries and token budgets.','stream'],
+      ['OverlayWindowManager','Creates and positions floating overlay windows above apps.','windows'],
+      ['MemoryPalaceEngine','Spatial memory palace for recalling lessons and artefacts.','grid'],
+      ['AutoRepairLoopEngine','Detects failures, patches code and re-verifies automatically.','loop'],
+      ['GitTimeMachineAndConflictResolver','Traverses commit history and resolves merge conflicts.','tree'],
+      ['SQLQueryPlanAndSchemaVisualizer','Renders query plans, indexes and schema relationships.','grid'],
+      ['ChartPatternTutor','Teaches chart patterns on live candlestick data.','bars'],
+      ['GamingAimAndSensEngine','Aim training, sensitivity curves and recoil control drills.','target'],
+      ['CyberDefenseTutorEngine','Interactive cyber defence scenarios and threat drills.','shield'],
+      ['InterviewCoachEngine','Runs mock interviews with scoring and feedback.','wave'],
+      ['VisualAlgorithmStepDebugger','Steps through algorithms with animated state.','bars'],
+      ['LiveIDEPairProgrammer','Real-time pair programming with inline suggestions.','type'],
+      ['PolyglotVisualArchitectCoder','Designs and codes multi-language system architectures.','tree'],
+      ['RegexAndParserVisualWorkbench','Visualises regex matching and parser token streams.','stream'],
+      ['BugRootCauseAutopsyEngine','Traces symptoms back to root causes with evidence.','tree'],
+      ['FullStackScaffoldAndVerifyEngine','Scaffolds full-stack projects and verifies they boot.','windows'],
+      ['SandboxTestExecutor','Runs tests in an isolated sandbox and reports results.','loop'],
+      ['WorkspaceSafetyManager','Enforces workspace boundaries and destructive-action guards.','shield'],
+      ['DynamicAppScannerAndTeacher','Scans running apps and teaches their interfaces live.','scan'],
+      ['LiveScreenTranslator','Translates on-screen text in real time while you work.','type'],
+      ['HardwareSchematicTutor','Explains hardware schematics and circuit behaviour.','tree'],
+      ['HomeworkSocraticTutor','Socratic tutor that guides students to the answer.','orbit'],
+      ['ProVideoEditorDirector','Directs edits, cuts and pacing on a video timeline.','wave'],
+      ['GhostwritingEngine','Writes in a matched voice across formats and lengths.','type'],
+      ['UGCContentEngine','Generates user-generated content concepts and copy.','windows'],
+      ['UIUXAccessibilityAndDesignCritic','Audits UI/UX and accessibility, then proposes fixes.','scan'],
+      ['APILoadAndLatencySimulator','Simulates load, latency and failure modes on APIs.','bars'],
+      ['ClickyAnalytics','Tracks clicks and funnels into live analytics charts.','bars'],
+      ['HojaigaIntegrationBridge','Bridges tutor engines into the Hojaiga organ system.','loop'],
+      ['ElevenLabsTTSClient','Neural text-to-speech streaming with voice controls.','wave'],
+      ['BuddyDictationManager','Manages push-to-talk dictation sessions end to end.','wave'],
+      ['GlobalPushToTalkShortcutMonitor','Watches the global hotkey that arms dictation.','target'],
+      ['MenuBarPanelManager','Builds and updates the menu bar panel and its tray.','windows'],
+      ['CompanionScreenCaptureUtility','Captures screen regions for the companion to read.','scan'],
+      ['WindowsNativeWrappers','Thin wrappers over native Windows APIs and dialogs.','windows']
+    ];
+
+    const NODES = [{
+      id: 'hub', kind: 'hub', name: 'Hojaiga Brain / Main Engine',
+      desc: 'organ_01_brain.py - the master cognition core. Every orbiting organ reads from it and every galaxy engine reports back to it.',
+      viz: 'core', layer: 'CORE'
+    }];
+
+    ORGAN_RAW.forEach((o, i) => {
+      NODES.push({
+        id: 'organ-' + i, kind: 'organ', num: o[0], name: o[1], desc: o[2],
+        viz: o[3], layer: 'ORGAN ' + o[0],
+        hue: (parseInt(o[0], 10) * 0.11 + i * 0.017) % 1
+      });
+    });
+
+    ENGINE_RAW.forEach((e, i) => {
+      NODES.push({
+        id: 'engine-' + i, kind: 'engine', name: e[0], desc: e[1],
+        viz: e[2], layer: 'TUTOR ENGINE',
+        hue: 0.36 + (i % 9) * 0.045
+      });
+    });
+
+    const ORGAN_COUNT = ORGAN_RAW.length;
+    $('node-count').textContent = NODES.length + ' TOTAL';
+
+    // ==========================================================================
+    // 2. SCENE / RENDERER / LIGHTS
+    // ==========================================================================
+    const container = $('canvas-container');
+    const labelsContainer = $('labels-container');
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x02040a, 0.0095);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 400);
+    const defaultCamPos = new THREE.Vector3(0, 1.5, 34);
+    camera.position.copy(defaultCamPos);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    scene.add(new THREE.AmbientLight(0x223355, 1.6));
+    const coreLight = new THREE.PointLight(0xffaa00, 3.2, 120);
+    scene.add(coreLight);
+
+    const universeGroup = new THREE.Group();
+    scene.add(universeGroup);
+
+    const cosmicGroup = new THREE.Group();
+    const cyberGroup = new THREE.Group();
+    cyberGroup.visible = false;
+    universeGroup.add(cosmicGroup);
+    universeGroup.add(cyberGroup);
+
+    const focusGroup = new THREE.Group();
+    focusGroup.visible = false;
+    scene.add(focusGroup);
+
+    // ==========================================================================
+    // 3. GLSL SUN (the Brain core, cosmic theme)
+    // ==========================================================================
+    const sunShaderMaterial = new THREE.ShaderMaterial({
+      uniforms: { uTime: { value: 0 }, uFlare: { value: 0.0 } },
+      vertexShader: [
+        'varying vec3 vNormal;',
+        'varying vec3 vPosition;',
+        'uniform float uTime;',
+        'uniform float uFlare;',
+        'float wave(vec3 p) {',
+        '  return sin(p.x * 3.0 + uTime * 2.2) * cos(p.y * 3.0 - uTime * 1.8) * sin(p.z * 3.0 + uTime * 2.5);',
+        '}',
+        'void main() {',
+        '  vNormal = normalize(normalMatrix * normal);',
+        '  float displacement = wave(position) * (0.10 + uFlare * 0.35);',
+        '  vec3 newPos = position + normal * displacement;',
+        '  vPosition = newPos;',
+        '  gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'varying vec3 vNormal;',
+        'varying vec3 vPosition;',
+        'uniform float uTime;',
+        'uniform float uFlare;',
+        'void main() {',
+        '  float pulse = 0.5 + 0.5 * sin(uTime * 3.0 + length(vPosition) * 2.0);',
+        '  vec3 baseColor = mix(vec3(1.0, 0.38, 0.02), vec3(1.0, 0.88, 0.35), pulse);',
+        '  vec3 flareColor = vec3(0.2, 0.95, 1.0);',
+        '  vec3 finalColor = mix(baseColor, flareColor, clamp(uFlare, 0.0, 1.0));',
+        '  float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 1.8);',
+        '  finalColor += vec3(1.0, 0.7, 0.2) * fresnel * (1.2 + uFlare * 2.0);',
+        '  gl_FragColor = vec4(finalColor, 1.0);',
+        '}'
+      ].join('\n')
+    });
+
+    // ==========================================================================
+    // 4. LAYOUTS - cosmic spiral galaxy vs cyberpunk street grid
+    // ==========================================================================
+    function cosmicLayout(data, idx) {
+      if (data.kind === 'hub') return new THREE.Vector3(0, 0, 0);
+      if (data.kind === 'organ') {
+        const ringIdx = idx < 20 ? 0 : 1;
+        const per = 20;
+        const k = idx % per;
+        const r = ringIdx === 0 ? 7.0 : 10.3;
+        const a = (k / per) * Math.PI * 2 + ringIdx * 0.16;
+        return new THREE.Vector3(Math.cos(a) * r, Math.sin(a) * r * 0.92, Math.sin(a * 3.0) * 1.1);
+      }
+      const k = idx % 12;
+      const arm = Math.floor(idx / 12) % 3;
+      const r = 14.5 + k * 0.78;
+      const a = arm * (Math.PI * 2 / 3) + k * 0.30;
+      return new THREE.Vector3(Math.cos(a) * r, Math.sin(a) * r * 0.62, Math.sin(k * 0.7 + arm) * 2.4);
+    }
+
+    function cyberLayout(data, idx) {
+      if (data.kind === 'hub') return new THREE.Vector3(0, 0, 0);
+      if (data.kind === 'organ') {
+        const half = 9.6;
+        const per = 10;
+        const side = Math.floor(idx / per);
+        const k = idx % per;
+        const t = (k + 0.5) / per;
+        const corners = [
+          [-half, -half], [half, -half], [half, half], [-half, half], [-half, -half]
+        ];
+        const a = corners[side], b = corners[side + 1];
+        return new THREE.Vector3(
+          a[0] + (b[0] - a[0]) * t,
+          a[1] + (b[1] - a[1]) * t,
+          0
+        );
+      }
+      const col = idx % 6, row = Math.floor(idx / 6);
+      return new THREE.Vector3((col - 2.5) * 5.4, (row - 2.5) * 4.0, ((col + row) % 2) ? 0.9 : -0.9);
+    }
+
+    // ==========================================================================
+    // 5. GLOW SPRITE HELPER
+    // ==========================================================================
+    function makeGlowTexture(hexColor) {
+      const c = document.createElement('canvas');
+      c.width = c.height = 128;
+      const ctx = c.getContext('2d');
+      const grad = ctx.createRadialGradient(64, 64, 4, 64, 64, 64);
+      const col = new THREE.Color(hexColor);
+      const r = Math.floor(col.r * 255), g = Math.floor(col.g * 255), b = Math.floor(col.b * 255);
+      grad.addColorStop(0, 'rgba(255,255,255,1)');
+      grad.addColorStop(0.25, 'rgba(' + r + ',' + g + ',' + b + ',0.85)');
+      grad.addColorStop(0.6, 'rgba(' + r + ',' + g + ',' + b + ',0.25)');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 128, 128);
+      return new THREE.CanvasTexture(c);
+    }
+
+    // ==========================================================================
+    // 6. BUILD EVERY NODE (hub + organs + engines) for BOTH themes
+    // ==========================================================================
+    const interactiveMeshes = [];
+    const nodeObjects = [];
+
+    NODES.forEach((data, i) => {
+      const idx = data.kind === 'hub' ? -1
+        : (data.kind === 'organ' ? i - 1 : i - 1 - ORGAN_COUNT);
+
+      data.cosColor = data.kind === 'hub'
+        ? new THREE.Color(0xffaa00)
+        : new THREE.Color().setHSL(data.hue !== undefined ? data.hue : 0.12, 0.92, 0.6);
+      data.cybColor = data.kind === 'hub'
+        ? new THREE.Color(0x00f0ff)
+        : new THREE.Color().setHSL(0.47 + ((i * 37) % 11) * 0.014, 0.95, 0.58);
+
+      const baseRadius = data.kind === 'hub' ? 2.5 : data.kind === 'organ' ? 0.44 : 1.05;
+      data.radius = baseRadius;
+      const hitRadius = data.kind === 'hub' ? 3.2 : data.kind === 'organ' ? 0.95 : 1.6;
+
+      const hit = new THREE.Mesh(
+        new THREE.SphereGeometry(hitRadius, 12, 12),
+        new THREE.MeshBasicMaterial({ visible: false })
+      );
+      hit.userData = { nodeData: data };
+      universeGroup.add(hit);
+      interactiveMeshes.push(hit);
+
+      // --- cosmic visual ---
+      const gCos = new THREE.Group();
+      if (data.kind === 'hub') {
+        gCos.add(new THREE.Mesh(new THREE.SphereGeometry(baseRadius, 48, 48), sunShaderMaterial));
+      } else {
+        const seg = data.kind === 'organ' ? 14 : 32;
+        if (data.kind === 'organ') {
+          gCos.add(new THREE.Mesh(
+            new THREE.SphereGeometry(baseRadius, seg, seg),
+            new THREE.MeshBasicMaterial({ color: data.cosColor })
+          ));
+        } else {
+          gCos.add(new THREE.Mesh(
+            new THREE.SphereGeometry(baseRadius, seg, seg),
+            new THREE.MeshStandardMaterial({
+              color: data.cosColor, emissive: data.cosColor,
+              emissiveIntensity: 0.6, roughness: 0.35, metalness: 0.65
+            })
+          ));
+        }
+        if (data.kind === 'engine') {
+          const ring = new THREE.Mesh(
+            new THREE.RingGeometry(baseRadius * 1.45, baseRadius * 1.8, 30),
+            new THREE.MeshBasicMaterial({
+              color: data.cosColor, side: THREE.DoubleSide,
+              transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending
+            })
+          );
+          ring.rotation.x = Math.PI / 2.6;
+          ring.rotation.y = i * 0.4;
+          gCos.add(ring);
+        }
+      }
+      const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: makeGlowTexture(data.cosColor),
+        color: 0xffffff, transparent: true,
+        blending: THREE.AdditiveBlending, depthWrite: false
+      }));
+      glow.scale.setScalar(baseRadius * (data.kind === 'organ' ? 3.8 : data.kind === 'hub' ? 5.2 : 4.2));
+      gCos.add(glow);
+      cosmicGroup.add(gCos);
+
+      // --- cyber visual ---
+      const gCyb = new THREE.Group();
+      if (data.kind !== 'hub') {
+        const glyphGeo = data.kind === 'organ'
+          ? new THREE.OctahedronGeometry(baseRadius * 1.5, 0)
+          : new THREE.OctahedronGeometry(baseRadius * 1.2, 0);
+        gCyb.add(new THREE.LineSegments(
+          new THREE.EdgesGeometry(glyphGeo),
+          new THREE.LineBasicMaterial({
+            color: data.cybColor, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending
+          })
+        ));
+        gCyb.add(new THREE.Mesh(
+          new THREE.IcosahedronGeometry(baseRadius * 0.55, 0),
+          new THREE.MeshBasicMaterial({ color: data.cybColor, wireframe: true })
+        ));
+      }
+      const glowCyb = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: makeGlowTexture(data.cybColor),
+        color: 0xffffff, transparent: true,
+        blending: THREE.AdditiveBlending, depthWrite: false
+      }));
+      glowCyb.scale.setScalar(baseRadius * (data.kind === 'organ' ? 3.6 : 4.2));
+      gCyb.add(glowCyb);
+      gCyb.visible = false;
+      cyberGroup.add(gCyb);
+
+      // --- floating HTML label ---
+      const label = document.createElement('div');
+      label.className = 'node-label text-center' +
+        (data.kind === 'organ' ? ' organ' : '');
+      label.innerHTML =
+        '<div class="label-inner">' +
+        '<div class="text-[9px] font-display tracking-widest text-cyan-300 uppercase">' + data.layer + '</div>' +
+        '<div class="font-bold text-white">' + data.name + '</div></div>';
+      labelsContainer.appendChild(label);
+
+      const obj = {
+        data: data, hit: hit, gCos: gCos, gCyb: gCyb,
+        glow: glow, glowCyb: glowCyb, label: label,
+        pCos: cosmicLayout(data, idx), pCyb: cyberLayout(data, idx),
+        cur: new THREE.Vector3()
+      };
+      obj.cur.copy(obj.pCos);
+      hit.position.copy(obj.cur);
+      gCos.position.copy(obj.cur);
+      gCyb.position.copy(obj.cur);
+      nodeObjects.push(obj);
+    });
+
+    // ==========================================================================
+    // 7. LINK LINES (rebuilt each frame so they morph on theme switch)
+    // ==========================================================================
+    function makeLinkGeometry(segmentsPerNode) {
+      const links = nodeObjects.filter((o) => o.data.kind !== 'hub');
+      const geo = new THREE.BufferGeometry();
+      const arr = new Float32Array(links.length * segmentsPerNode * 2 * 3);
+      geo.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+      return { geo: geo, links: links, arr: arr };
+    }
+    const cosLinks = makeLinkGeometry(1);
+    const cybLinks = makeLinkGeometry(3);
+    const cosLinkLines = new THREE.LineSegments(cosLinks.geo, new THREE.LineBasicMaterial({
+      color: 0x00f0ff, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending
+    }));
+    const cybLinkLines = new THREE.LineSegments(cybLinks.geo, new THREE.LineBasicMaterial({
+      color: 0x00ffcc, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending
+    }));
+    cybLinkLines.visible = false;
+    cosmicGroup.add(cosLinkLines);
+    cyberGroup.add(cybLinkLines);
+
+    function updateLinks() {
+      let a = cosLinks.arr;
+      cosLinks.links.forEach((o, i) => {
+        const p = o.cur, b = i * 6;
+        a[b] = 0; a[b + 1] = 0; a[b + 2] = 0;
+        a[b + 3] = p.x; a[b + 4] = p.y; a[b + 5] = p.z;
+      });
+      cosLinks.geo.attributes.position.needsUpdate = true;
+
+      a = cybLinks.arr;
+      cybLinks.links.forEach((o, i) => {
+        const p = o.cur, b = i * 18;
+        a[b] = 0; a[b + 1] = 0; a[b + 2] = 0;
+        a[b + 3] = p.x; a[b + 4] = 0; a[b + 5] = 0;
+        a[b + 6] = p.x; a[b + 7] = 0; a[b + 8] = 0;
+        a[b + 9] = p.x; a[b + 10] = p.y; a[b + 11] = 0;
+        a[b + 12] = p.x; a[b + 13] = p.y; a[b + 14] = 0;
+        a[b + 15] = p.x; a[b + 16] = p.y; a[b + 17] = p.z;
+      });
+      cybLinks.geo.attributes.position.needsUpdate = true;
+    }
+
+    // ==========================================================================
+    // 8. BACKGROUND - nebula, digital rain, cyber grid, shockwave
+    // ==========================================================================
+    function buildPoints(count, rMin, rSpread, colorFn, size) {
+      const geo = new THREE.BufferGeometry();
+      const pos = new Float32Array(count * 3);
+      const col = new Float32Array(count * 3);
+      for (let i = 0; i < count; i++) {
+        const r = rMin + Math.random() * rSpread;
+        const th = Math.random() * Math.PI * 2;
+        const ph = Math.acos(2 * Math.random() - 1);
+        pos[i * 3] = r * Math.sin(ph) * Math.cos(th);
+        pos[i * 3 + 1] = (r * Math.sin(ph) * Math.sin(th)) * 0.7;
+        pos[i * 3 + 2] = r * Math.cos(ph);
+        const c = colorFn(i);
+        col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
+      }
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+      return new THREE.Points(geo, new THREE.PointsMaterial({
+        size: size, vertexColors: true, transparent: true, opacity: 0.8,
+        blending: THREE.AdditiveBlending, depthWrite: false
+      }));
+    }
+
+    const nebula = buildPoints(1900, 14, 55,
+      () => new THREE.Color().setHSL(0.5 + Math.random() * 0.28, 0.9, 0.6), 0.16);
+    cosmicGroup.add(nebula);
+
+    const RAIN = 2200;
+    const rainGeo = new THREE.BufferGeometry();
+    const rainPos = new Float32Array(RAIN * 3);
+    for (let i = 0; i < RAIN; i++) {
+      rainPos[i * 3] = (Math.random() - 0.5) * 90;
+      rainPos[i * 3 + 1] = (Math.random() - 0.5) * 70;
+      rainPos[i * 3 + 2] = (Math.random() - 0.5) * 60 - 10;
+    }
+    rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
+    const rain = new THREE.Points(rainGeo, new THREE.PointsMaterial({
+      color: 0x00e0ff, size: 0.14, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending
+    }));
+    cyberGroup.add(rain);
+
+    const cyberGrid = new THREE.GridHelper(110, 55, 0x00f0ff, 0x00354d);
+    cyberGrid.position.y = -17;
+    cyberGrid.material.transparent = true;
+    cyberGrid.material.opacity = 0.28;
+    cyberGroup.add(cyberGrid);
+
+    const shockMat = new THREE.MeshBasicMaterial({
+      color: 0x00f0ff, side: THREE.DoubleSide, transparent: true,
+      opacity: 0, blending: THREE.AdditiveBlending
+    });
+    const shockwave = new THREE.Mesh(new THREE.RingGeometry(0.6, 1.3, 72), shockMat);
+    universeGroup.add(shockwave);
+    // ==========================================================================
+    // 9. FOCUS HOLOGRAMS - one procedural animation per file's function
+    // ==========================================================================
+    const VIZ = {
+      core: function () {
+        const g = new THREE.Group();
+        const rings = [];
+        const cols = [0x00f0ff, 0xffaa00, 0x00f0ff];
+        for (let i = 0; i < 3; i++) {
+          const m = new THREE.Mesh(
+            new THREE.TorusGeometry(3.6 + i * 0.8, 0.035, 8, 96),
+            new THREE.MeshBasicMaterial({
+              color: cols[i], transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending
+            })
+          );
+          m.rotation.set(i * 1.1, i * 0.7, 0);
+          g.add(m); rings.push(m);
+        }
+        const core = new THREE.Mesh(
+          new THREE.IcosahedronGeometry(1.5, 1),
+          new THREE.MeshBasicMaterial({ color: 0xffcc55, wireframe: true, transparent: true, opacity: 0.8 })
+        );
+        g.add(core);
+        g.userData.update = function (t) {
+          rings[0].rotation.x = t * 0.6; rings[0].rotation.y = t * 0.4;
+          rings[1].rotation.y = -t * 0.8; rings[1].rotation.z = t * 0.5;
+          rings[2].rotation.z = -t * 0.7; rings[2].rotation.x = t * 0.3;
+          core.scale.setScalar(1 + Math.sin(t * 2.4) * 0.12);
+          core.rotation.y = t * 0.9;
+        };
+        return g;
+      },
+
+      stream: function () {
+        const g = new THREE.Group();
+        const N = 160;
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(N * 3), 3));
+        g.add(new THREE.Points(geo, new THREE.PointsMaterial({
+          color: 0x7df9ff, size: 0.17, transparent: true, opacity: 0.95,
+          blending: THREE.AdditiveBlending, depthWrite: false
+        })));
+        const phase = new Float32Array(N);
+        for (let i = 0; i < N; i++) phase[i] = Math.random();
+        g.userData.update = function (t, dt) {
+          const a = geo.attributes.position.array;
+          for (let i = 0; i < N; i++) {
+            phase[i] = (phase[i] + dt * 0.3) % 1;
+            const u = phase[i];
+            const ang = u * Math.PI * 5 + i * 0.55;
+            const r = 0.5 + u * 3.6;
+            a[i * 3] = Math.cos(ang) * r;
+            a[i * 3 + 1] = Math.sin(ang) * r * 0.55;
+            a[i * 3 + 2] = Math.sin(u * 9 + i) * 0.9;
+          }
+          geo.attributes.position.needsUpdate = true;
+        };
+        return g;
+      },
+
+      orbit: function () {
+        const g = new THREE.Group();
+        const hub = new THREE.Mesh(new THREE.IcosahedronGeometry(0.7, 1),
+          new THREE.MeshBasicMaterial({ color: 0xffaa00, wireframe: true }));
+        g.add(hub);
+        const sat = [];
+        for (let i = 0; i < 6; i++) {
+          const m = new THREE.Mesh(new THREE.SphereGeometry(0.24, 12, 12),
+            new THREE.MeshBasicMaterial({ color: 0x00f0ff }));
+          g.add(m); sat.push(m);
+        }
+        const halo = new THREE.Mesh(new THREE.TorusGeometry(2.6, 0.03, 8, 80),
+          new THREE.MeshBasicMaterial({
+            color: 0x00f0ff, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending
+          }));
+        halo.rotation.x = Math.PI / 2;
+        g.add(halo);
+        g.userData.update = function (t) {
+          hub.rotation.y = t * 0.8;
+          for (let i = 0; i < sat.length; i++) {
+            const a = t * (0.9 + i * 0.12) + i * (Math.PI * 2 / 6);
+            const r = 2.6 + Math.sin(t * 1.5 + i) * 0.45;
+            sat[i].position.set(Math.cos(a) * r, Math.sin(a * 2 + i) * 0.7, Math.sin(a) * r);
+          }
+          halo.rotation.z = t * 0.4;
+        };
+        return g;
+      },
+
+      windows: function () {
+        const g = new THREE.Group();
+        const panes = [];
+        for (let i = 0; i < 7; i++) {
+          const w = 2.4 + (i % 3) * 0.7;
+          const m = new THREE.Mesh(new THREE.PlaneGeometry(w, w * 0.62),
+            new THREE.MeshBasicMaterial({
+              color: i % 2 ? 0x00f0ff : 0xffaa00, transparent: true, opacity: 0.28,
+              side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false
+            }));
+          m.position.set((i % 2 ? 1 : -1) * (0.5 + i * 0.28), (i - 3) * 0.75, (i - 3) * 0.55);
+          m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry),
+            new THREE.LineBasicMaterial({ color: 0x9ef7ff })));
+          g.add(m); panes.push(m);
+        }
+        g.userData.update = function (t) {
+          for (let i = 0; i < panes.length; i++) {
+            const m = panes[i];
+            m.position.y = (i - 3) * 0.75 + Math.sin(t * 1.6 + i) * 0.12;
+            m.rotation.y = Math.sin(t * 0.7 + i) * 0.28;
+            m.material.opacity = 0.18 + 0.28 * (0.5 + 0.5 * Math.sin(t * 2.2 + i * 0.9));
+          }
+        };
+        return g;
+      },
+
+      grid: function () {
+        const g = new THREE.Group();
+        const boxes = [];
+        const mat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.85 });
+        for (let x = 0; x < 6; x++) {
+          for (let y = 0; y < 6; y++) {
+            const m = new THREE.Mesh(new THREE.BoxGeometry(0.42, 1, 0.42), mat);
+            m.position.set((x - 2.5) * 0.75, 0, (y - 2.5) * 0.75);
+            m.userData.phase = x * 0.6 + y * 0.9;
+            g.add(m); boxes.push(m);
+          }
+        }
+        const base = new THREE.Mesh(new THREE.BoxGeometry(5.0, 0.06, 5.0),
+          new THREE.MeshBasicMaterial({ color: 0x0a3550, transparent: true, opacity: 0.7 }));
+        base.position.y = -0.5;
+        g.add(base);
+        g.userData.update = function (t) {
+          for (let i = 0; i < boxes.length; i++) {
+            const m = boxes[i];
+            const h = 0.35 + Math.abs(Math.sin(t * 2.0 + m.userData.phase)) * 1.8;
+            m.scale.y = h;
+            m.position.y = h / 2 - 0.5;
+          }
+        };
+        return g;
+      },
+
+      loop: function () {
+        const g = new THREE.Group();
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(2.6, 0.07, 10, 96),
+          new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending }));
+        ring.rotation.x = Math.PI / 2.4;
+        g.add(ring);
+        const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.8, 0.05, 10, 96),
+          new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending }));
+        ring2.rotation.x = Math.PI / 2.4;
+        g.add(ring2);
+        const marker = new THREE.Mesh(new THREE.SphereGeometry(0.28, 14, 14),
+          new THREE.MeshBasicMaterial({ color: 0xffcc33 }));
+        const marker2 = new THREE.Mesh(new THREE.SphereGeometry(0.2, 14, 14),
+          new THREE.MeshBasicMaterial({ color: 0x00f0ff }));
+        g.add(marker, marker2);
+        g.userData.update = function (t) {
+          const a = t * 2.0, b = -t * 2.7;
+          marker.position.set(Math.cos(a) * 2.6, Math.sin(a) * 0.6, Math.sin(a) * 2.6);
+          marker2.position.set(Math.cos(b) * 1.8, Math.sin(b) * 0.45, Math.sin(b) * 1.8);
+          ring.rotation.z = t * 0.5;
+          ring2.rotation.z = -t * 0.7;
+        };
+        return g;
+      },
+
+      tree: function () {
+        const g = new THREE.Group();
+        const nodes = [], pos = [], levels = 4;
+        for (let l = 0; l < levels; l++) {
+          const count = Math.pow(2, l);
+          for (let i = 0; i < count; i++) {
+            pos.push(new THREE.Vector3(((i + 0.5) / count - 0.5) * 7.5, 2.6 - l * 1.7, 0));
+          }
+        }
+        for (let i = 0; i < pos.length; i++) {
+          const m = new THREE.Mesh(new THREE.SphereGeometry(0.26, 12, 12),
+            new THREE.MeshBasicMaterial({ color: 0x00f0ff }));
+          m.position.copy(pos[i]);
+          g.add(m); nodes.push(m);
+        }
+        const seg = [];
+        for (let l = 0; l < levels - 1; l++) {
+          const start = Math.pow(2, l) - 1;
+          const childStart = Math.pow(2, l + 1) - 1;
+          const count = Math.pow(2, l);
+          for (let i = 0; i < count; i++) {
+            seg.push(pos[start + i], pos[childStart + i * 2]);
+            seg.push(pos[start + i], pos[childStart + i * 2 + 1]);
+          }
+        }
+        g.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(seg),
+          new THREE.LineBasicMaterial({ color: 0x2277aa, transparent: true, opacity: 0.75 })));
+        g.userData.update = function (t) {
+          const k = Math.floor(t * 3) % nodes.length;
+          for (let i = 0; i < nodes.length; i++) {
+            const active = i === k || i === (k + 1) % nodes.length;
+            nodes[i].scale.setScalar(active ? 2.0 : 1.0);
+            nodes[i].material.color.setHex(active ? 0xffcc33 : 0x00f0ff);
+          }
+        };
+        return g;
+      },
+
+      bars: function () {
+        const g = new THREE.Group();
+        const bars = [];
+        const mat = new THREE.MeshBasicMaterial({ color: 0x10b981 });
+        for (let i = 0; i < 14; i++) {
+          const m = new THREE.Mesh(new THREE.BoxGeometry(0.34, 1, 0.34), mat);
+          m.position.x = (i - 6.5) * 0.5;
+          g.add(m); bars.push(m);
+        }
+        g.add(new THREE.LineSegments(
+          new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(-4, -1.4, 0), new THREE.Vector3(4, -1.4, 0),
+            new THREE.Vector3(-4, -1.4, 0), new THREE.Vector3(-4, 2.6, 0)
+          ]),
+          new THREE.LineBasicMaterial({ color: 0x338899 })
+        ));
+        g.userData.update = function (t) {
+          for (let i = 0; i < bars.length; i++) {
+            const h = 0.3 + Math.abs(Math.sin(t * 1.7 + i * 0.55)) * 2.6;
+            bars[i].scale.y = h;
+            bars[i].position.y = h / 2 - 1.4;
+          }
+        };
+        return g;
+      },
+
+      target: function () {
+        const g = new THREE.Group();
+        const reticle = new THREE.Group();
+        reticle.add(new THREE.Mesh(new THREE.TorusGeometry(0.75, 0.035, 8, 64),
+          new THREE.MeshBasicMaterial({ color: 0xff3355 })));
+        reticle.add(new THREE.Mesh(new THREE.TorusGeometry(0.35, 0.03, 8, 48),
+          new THREE.MeshBasicMaterial({ color: 0xffcc33 })));
+        reticle.add(new THREE.LineSegments(
+          new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(-1.3, 0, 0), new THREE.Vector3(-0.9, 0, 0),
+            new THREE.Vector3(1.3, 0, 0), new THREE.Vector3(0.9, 0, 0),
+            new THREE.Vector3(0, -1.3, 0), new THREE.Vector3(0, -0.9, 0),
+            new THREE.Vector3(0, 1.3, 0), new THREE.Vector3(0, 0.9, 0)
+          ]),
+          new THREE.LineBasicMaterial({ color: 0xff5577 })
+        ));
+        g.add(reticle);
+        const targets = [];
+        for (let i = 0; i < 3; i++) {
+          const m = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 12),
+            new THREE.MeshBasicMaterial({ color: 0x00ff99 }));
+          g.add(m); targets.push(m);
+        }
+        g.userData.update = function (t) {
+          for (let i = 0; i < targets.length; i++) {
+            targets[i].position.set(
+              Math.sin(t * (1.1 + i * 0.4) + i * 2.1) * 3.2,
+              Math.cos(t * (0.9 + i * 0.5) + i) * 2.2,
+              Math.sin(t * 0.7 + i) * 1.4
+            );
+          }
+          const near = reticle.position.distanceTo(targets[0].position) <
+            reticle.position.distanceTo(targets[1].position) ? targets[0] : targets[1];
+          reticle.position.lerp(near.position, 0.06);
+          reticle.rotation.z = t * 0.8;
+        };
+        return g;
+      },
+
+      shield: function () {
+        const g = new THREE.Group();
+        const rings = [];
+        for (let i = 0; i < 3; i++) {
+          const m = new THREE.Mesh(new THREE.TorusGeometry(1.4, 0.05, 8, 72),
+            new THREE.MeshBasicMaterial({
+              color: 0x10b981, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending
+            }));
+          g.add(m); rings.push(m);
+        }
+        const shell = new THREE.Mesh(new THREE.IcosahedronGeometry(1.1, 1),
+          new THREE.MeshBasicMaterial({
+            color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.75
+          }));
+        g.add(shell);
+        g.userData.update = function (t) {
+          for (let i = 0; i < rings.length; i++) {
+            const k = (t * 0.6 + i / 3) % 1;
+            rings[i].scale.setScalar(0.6 + k * 2.4);
+            rings[i].material.opacity = 0.75 * (1 - k);
+            rings[i].rotation.x = Math.PI / 2.5 + Math.sin(t + i) * 0.3;
+            rings[i].rotation.y = t * 0.5;
+          }
+          shell.rotation.y = t * 0.7;
+          shell.rotation.x = t * 0.4;
+          shell.scale.setScalar(1 + Math.sin(t * 3) * 0.08);
+        };
+        return g;
+      },
+
+      wave: function () {
+        const g = new THREE.Group();
+        const SEG = 96;
+        const lines = [];
+        [0x00f0ff, 0xffaa00].forEach((color, k) => {
+          const geo = new THREE.BufferGeometry();
+          geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(SEG * 3), 3));
+          const line = new THREE.Line(geo, new THREE.LineBasicMaterial({
+            color: color, transparent: true, opacity: 0.95
+          }));
+          line.userData.offset = k * 1.7;
+          g.add(line); lines.push(line);
+        });
+        g.add(new THREE.LineSegments(
+          new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(-4.5, 0, 0), new THREE.Vector3(4.5, 0, 0),
+            new THREE.Vector3(-4.5, -1.6, 0), new THREE.Vector3(4.5, -1.6, 0),
+            new THREE.Vector3(-4.5, 1.6, 0), new THREE.Vector3(4.5, 1.6, 0)
+          ]),
+          new THREE.LineBasicMaterial({ color: 0x1b4f63 })
+        ));
+        g.userData.update = function (t) {
+          for (let li = 0; li < lines.length; li++) {
+            const ln = lines[li];
+            const a = ln.geometry.attributes.position.array;
+            const off = ln.userData.offset;
+            for (let i = 0; i < SEG; i++) {
+              const u = i / (SEG - 1);
+              a[i * 3] = (u - 0.5) * 9;
+              a[i * 3 + 1] = Math.sin(u * 14 + t * 4 + off) * (0.5 + 0.6 * Math.sin(u * 3 + t)) * 1.1;
+              a[i * 3 + 2] = Math.cos(u * 9 + t * 3 + off) * 0.4;
+            }
+            ln.geometry.attributes.position.needsUpdate = true;
+          }
+        };
+        return g;
+      },
+
+      type: function () {
+        const g = new THREE.Group();
+        const ROWS = 9, CHARS = 26;
+        const rows = [];
+        for (let r = 0; r < ROWS; r++) {
+          const pts = [];
+          for (let c = 0; c < CHARS; c++) {
+            const x = (c - CHARS / 2) * 0.26;
+            const y = -r * 0.42 + 1.7;
+            pts.push(new THREE.Vector3(x, y, 0), new THREE.Vector3(x + 0.17, y, 0));
+          }
+          const geo = new THREE.BufferGeometry().setFromPoints(pts);
+          const line = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({
+            color: r % 3 === 0 ? 0xffcc33 : 0x00f0ff, transparent: true, opacity: 0.95
+          }));
+          line.userData.total = CHARS * 2;
+          g.add(line); rows.push(line);
+        }
+        const caret = new THREE.Mesh(new THREE.PlaneGeometry(0.1, 0.3),
+          new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide }));
+        g.add(caret);
+        g.userData.update = function (t) {
+          const cycle = t * 9;
+          for (let r = 0; r < rows.length; r++) {
+            const ln = rows[r];
+            const raw = Math.floor(cycle - r * 7);
+            let shown = Math.max(0, Math.min(ln.userData.total, raw * 2));
+            if (raw > ln.userData.total / 2 + 16) shown = 0;
+            ln.geometry.setDrawRange(0, shown);
+            const activeRow = Math.min(ROWS - 1, Math.max(0, Math.floor(cycle / 7) % ROWS));
+            ln.material.opacity = (shown > 0 || r === activeRow) ? 0.95 : 0.14;
+          }
+          const activeRow = Math.min(ROWS - 1, Math.max(0, Math.floor(cycle / 7) % ROWS));
+          caret.position.set(((Math.floor(cycle) % CHARS) - CHARS / 2) * 0.26,
+            -activeRow * 0.42 + 1.7, 0.02);
+          caret.visible = Math.floor(t * 3) % 2 === 0;
+        };
+        return g;
+      },
+
+      scan: function () {
+        const g = new THREE.Group();
+        const COLS = 12, ROWS = 9, N = COLS * ROWS;
+        const geo = new THREE.BufferGeometry();
+        const pos = new Float32Array(N * 3);
+        const col = new Float32Array(N * 3);
+        let i = 0;
+        for (let x = 0; x < COLS; x++) {
+          for (let y = 0; y < ROWS; y++) {
+            pos[i * 3] = (x - COLS / 2) * 0.5;
+            pos[i * 3 + 1] = (y - ROWS / 2) * 0.5;
+            pos[i * 3 + 2] = 0;
+            col[i * 3] = 0.05; col[i * 3 + 1] = 0.25; col[i * 3 + 2] = 0.35;
+            i++;
+          }
+        }
+        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+        g.add(new THREE.Points(geo, new THREE.PointsMaterial({
+          size: 0.19, vertexColors: true, transparent: true, opacity: 0.95,
+          blending: THREE.AdditiveBlending, depthWrite: false
+        })));
+        const beam = new THREE.Mesh(
+          new THREE.PlaneGeometry(0.16, ROWS * 0.5 + 0.6),
+          new THREE.MeshBasicMaterial({
+            color: 0x00f0ff, transparent: true, opacity: 0.75,
+            blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false
+          })
+        );
+        g.add(beam);
+        g.add(new THREE.LineSegments(new THREE.EdgesGeometry(
+          new THREE.PlaneGeometry(COLS * 0.5 + 0.5, ROWS * 0.5 + 0.5)),
+          new THREE.LineBasicMaterial({ color: 0x0a5f77 })));
+        g.userData.update = function (t) {
+          const u = Math.sin(t * 1.2) * 0.5 + 0.5;
+          const bx = (u - 0.5) * COLS * 0.5;
+          beam.position.x = bx;
+          const arr = geo.attributes.color.array;
+          for (let k = 0; k < N; k++) {
+            const hot = Math.max(0, 1 - Math.abs(pos[k * 3] - bx) / 1.4);
+            arr[k * 3] = 0.05 + hot * 0.95;
+            arr[k * 3 + 1] = 0.25 + hot * 0.7;
+            arr[k * 3 + 2] = 0.35 + hot * 0.6;
+          }
+          geo.attributes.color.needsUpdate = true;
+        };
+        return g;
+      }
+    };
+
+    let focusViz = null;
+    let focused = null;
+
+    function buildFocusViz(nodeData) {
+      clearFocusViz();
+      const builder = VIZ[nodeData.viz] || VIZ.core;
+      focusViz = builder();
+      focusGroup.add(focusViz);
+      focusGroup.visible = true;
+    }
+
+    function clearFocusViz() {
+      if (!focusViz) return;
+      focusGroup.remove(focusViz);
+      focusViz.traverse(function (o) {
+        if (o.geometry) o.geometry.dispose();
+        if (o.material) {
+          if (Array.isArray(o.material)) o.material.forEach(function (m) { m.dispose(); });
+          else o.material.dispose();
+        }
+      });
+      focusViz = null;
+    }
+
+    // ==========================================================================
+    // 10. THEME SWITCH (both worlds are always built, positions morph across)
+    // ==========================================================================
+    let currentTheme = 'cosmic';
+    function setWorldTheme(theme) {
+      currentTheme = theme;
+      const isCosmic = theme === 'cosmic';
+      cosmicGroup.visible = isCosmic;
+      cyberGroup.visible = !isCosmic;
+      coreLight.color.setHex(isCosmic ? 0xffaa00 : 0x00f0ff);
+      scene.fog.color.setHex(isCosmic ? 0x02040a : 0x01060c);
+
+      const bC = $('btn-theme-cosmic'), bY = $('btn-theme-cyber');
+      const base = 'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wider transition ';
+      if (isCosmic) {
+        bC.className = base + 'bg-cyan-500/30 border border-cyan-400 text-cyan-100 shadow-[0_0_12px_rgba(0,240,255,0.4)]';
+        bY.className = base + 'bg-slate-900/60 border border-cyan-500/30 text-cyan-300/70 hover:text-cyan-100';
+      } else {
+        bY.className = base + 'bg-amber-500/30 border border-amber-400 text-amber-100 shadow-[0_0_12px_rgba(245,158,11,0.4)]';
+        bC.className = base + 'bg-slate-900/60 border border-cyan-500/30 text-cyan-300/70 hover:text-cyan-100';
+      }
+    }
+    // ==========================================================================
+    // 11. TELEMETRY PANEL (left dock)
+    // ==========================================================================
+    const STATUS = ['ACTIVE', 'STREAMING', 'SYNCED', 'GUARDING', 'BUSY', 'IDLE', 'LOCKED'];
+    let logTimer = null;
+
+    function nodeProcs(d) {
+      const s = hashStr(d.id);
+      const kinds = ['Worker Pool', 'State Cache', 'Watchdog'];
+      return kinds.map(function (kind, k) {
+        const seed = (s + k * 7919) % 100000;
+        return {
+          name: d.name + ' ' + kind,
+          status: STATUS[(seed + k) % STATUS.length],
+          load: (4 + (seed % 82)) + '%',
+          latency: (0.4 + ((seed % 450) / 100)).toFixed(1) + 'ms'
+        };
+      });
+    }
+
+    function nodeLogs(d) {
+      const s = hashStr(d.id);
+      const tag = d.kind === 'hub' ? 'HUB' : (d.layer || 'NODE').replace(/\s+/g, '_').toUpperCase();
+      return [
+        '> [' + tag + '] ' + d.desc,
+        '> [' + tag + '] heartbeat ok - cycle ' + (1000 + (s % 8000)) +
+          ' (' + (0.4 + (s % 400) / 100).toFixed(1) + 'ms)',
+        '> [' + tag + '] pushed ' + (1 + (s % 7)) + ' events onto the CNS bridge'
+      ];
+    }
+
+    function pushLiveLog(d) {
+      const tag = (d.layer || 'NODE').replace(/\s+/g, '_').toUpperCase();
+      const events = [
+        'tick reconciled - no drift detected',
+        'worker pool reported ' + (hashStr(d.id + Math.floor(performance.now() / 1000)) % 64 + 1) + '% throughput',
+        'CNS ack received in ' + (0.3 + Math.random() * 2).toFixed(2) + 'ms',
+        'cache hit ratio ' + (80 + Math.random() * 19).toFixed(1) + '%',
+        'no anomalies across the last ' + (hashStr(d.id) % 300 + 10) + ' cycles'
+      ];
+      const el = $('modal-terminal');
+      const div = document.createElement('div');
+      div.textContent = '> [' + tag + '] ' + events[Math.floor(Math.random() * events.length)];
+      el.appendChild(div);
+      while (el.children.length > 14) el.removeChild(el.firstChild);
+      el.scrollTop = el.scrollHeight;
+    }
+
+    // ==========================================================================
+    // 11b. OMNI-PORTAL CROSS-WORLD ROUTING (Ability #27 + dynamic Enter World)
+    // ==========================================================================
+    const WORLD_ROUTES = {
+      // World 01: UI App Scanner & Popup Interceptor
+      'App Scanner': 'scanner-world.html',
+      'Popup Handler': 'scanner-world.html',
+      'Visual Perception': 'scanner-world.html',
+      'DynamicAppScannerAndTeacher': 'scanner-world.html',
+      // World 02: Local LLM Bridge
+      'LLM Gateway': 'llm-world.html',
+      'ClaudeAPI': 'llm-world.html',
+      'Decision Engine': 'llm-world.html',
+      'Workflow Compiler': 'llm-world.html',
+      // World 03: Execution Engine
+      'Task Orchestrator': 'execution-world.html',
+      'Target Pause': 'execution-world.html',
+      'App Launcher': 'execution-world.html',
+      'WindowsNativeWrappers': 'execution-world.html',
+      'OverlayWindowManager': 'execution-world.html'
+    };
+
+    function warpTo(url) {
+      const ov = $('warp-overlay');
+      if (ov) ov.style.opacity = '1';
+      if (typeof flare !== 'undefined') flare = 1.6;
+      setTimeout(function () { window.location.href = url; }, 450);
+    }
+
+    function enterWorldWarp(e) {
+      const btn = $('enter-world-btn');
+      if (!btn || !btn.href) return false;
+      e.preventDefault();
+      warpTo(btn.getAttribute('href'));
+      return false;
+    }
+    window.warpTo = warpTo;
+
+    function openNodeModal(obj) {
+      if (!obj || focused === obj) return;
+      focused = obj;
+      const d = obj.data;
+
+      $('modal-badge').textContent = d.layer;
+      $('modal-title').textContent = d.name;
+      $('modal-subtitle').textContent = d.desc;
+      $('modal-viz').textContent = 'VISUAL: ' + d.viz.toUpperCase();
+      $('modal-layer').textContent = 'LAYER: ' + (d.kind === 'hub' ? 'CORE' : d.kind.toUpperCase());
+
+      const worldUrl = WORLD_ROUTES[d.name] || null;
+      const enterBtn = $('enter-world-btn');
+      if (worldUrl) {
+        enterBtn.setAttribute('href', worldUrl);
+        enterBtn.classList.remove('hidden');
+      } else {
+        enterBtn.classList.add('hidden');
+      }
+
+      $('modal-processes').innerHTML = nodeProcs(d).map(function (p) {
+        return '<div class="p-3 rounded-xl bg-slate-900/80 border border-cyan-500/30 flex items-center justify-between gap-3">' +
+          '<div><div class="text-xs font-bold text-white">' + p.name + '</div>' +
+          '<div class="text-[10px] text-cyan-300/70">Latency: ' + p.latency + ' &bull; Load: ' + p.load + '</div></div>' +
+          '<span class="text-[10px] font-display px-2 py-1 rounded bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 whitespace-nowrap">' +
+          '&#9679; ' + p.status + '</span></div>';
+      }).join('');
+
+      const term = $('modal-terminal');
+      term.innerHTML = nodeLogs(d).map(function (l) {
+        return '<div>' + l + '</div>';
+      }).join('');
+      if (logTimer) clearInterval(logTimer);
+      logTimer = setInterval(function () { pushLiveLog(d); }, 1500);
+
+      $('node-panel').classList.remove('hidden-panel');
+      $('legend').style.opacity = '0';
+      labelsContainer.classList.add('labels-dim');
+      obj.label.classList.add('targeted');
+      buildFocusViz(d);
+    }
+
+    function closeNodeModal() {
+      if (!focused) return;
+      focused = null;
+      if (logTimer) { clearInterval(logTimer); logTimer = null; }
+      clearFocusViz();
+      focusGroup.visible = false;
+      $('node-panel').classList.add('hidden-panel');
+      $('legend').style.opacity = '1';
+      labelsContainer.classList.remove('labels-dim');
+      camLookAtTarget.set(0, 0, 0);
+    }
+
+    // ==========================================================================
+    // 12. POINTER / CAMERA STATE
+    // ==========================================================================
+    const raycaster = new THREE.Raycaster();
+    const targetNDC = new THREE.Vector2(0, 0);
+    const smoothNDC = new THREE.Vector2(0, 0);
+    const camTargetPos = defaultCamPos.clone();
+    const camLookAtTarget = new THREE.Vector3(0, 0, 0);
+    const currentLookAt = new THREE.Vector3(0, 0, 0);
+
+    let hovered = null;
+    let flare = 0;
+    let lastFlare = 0;
+
+    function triggerWakeUpFlare() {
+      const now = performance.now();
+      if (now - lastFlare < 700) return;
+      lastFlare = now;
+      flare = 1.6;
+      shockwave.scale.setScalar(0.6);
+      shockMat.opacity = 1.0;
+      gestureReadout.textContent = '\u26A1 WAKE-UP FLARE PULSE!';
+    }
+
+    window.triggerWakeUpFlare = triggerWakeUpFlare;
+    window.setWorldTheme = setWorldTheme;
+    window.closeNodeModal = closeNodeModal;
+    window.openNodeModal = openNodeModal;
+
+    window.addEventListener('mousemove', function (e) {
+      if (isHandTracked) return;
+      targetNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
+      targetNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    window.addEventListener('click', function (e) {
+      if (e.target.closest('header, aside, #hand-cursor')) return;
+      if (focused) { closeNodeModal(); return; }
+      if (hovered) openNodeModal(hovered);
+    });
+
+    window.addEventListener('keydown', function (e) {
+      if (e.code === 'Escape') closeNodeModal();
+      if (e.code === 'Space') { e.preventDefault(); triggerWakeUpFlare(); }
+      if (e.key === '1') setWorldTheme('cosmic');
+      if (e.key === '2') setWorldTheme('cyber');
+    });
+
+    // ==========================================================================
+    // 13. MEDIAPIPE HAND TRACKING + GESTURE ENGINE
+    // ==========================================================================
+    const videoElement = $('webcam-video');
+    const canvasElement = $('webcam-canvas');
+    const canvasCtx = canvasElement.getContext('2d');
+    const handCursor = $('hand-cursor');
+    const gestureReadout = $('gesture-readout');
+    const camIndicator = $('cam-indicator');
+    const camOverlayMsg = $('cam-overlay-msg');
+
+    let isHandTracked = false;
+    let prevPalm = null;
+    let pinchFrames = 0;
+    let openFrames = 0;
+    let camRunning = false;
+
+    function onHandResults(results) {
+      canvasElement.width = results.image.width;
+      canvasElement.height = results.image.height;
+      canvasCtx.save();
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        isHandTracked = true;
+        const lm = results.multiHandLandmarks[0];
+        drawConnectors(canvasCtx, lm, HAND_CONNECTIONS, { color: '#00f0ff', lineWidth: 2 });
+        drawLandmarks(canvasCtx, lm, { color: '#ffaa00', lineWidth: 1, radius: 2.5 });
+
+        const palm = lm[9], indexTip = lm[8], thumbTip = lm[4], wrist = lm[0];
+        const mx = 1.0 - palm.x, my = palm.y;
+        targetNDC.x = mx * 2 - 1;
+        targetNDC.y = -(my * 2 - 1);
+
+        const pinchDist = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
+        const middleCurl = Math.hypot(lm[12].x - wrist.x, lm[12].y - wrist.y);
+        const isPinch = pinchDist < 0.055 || middleCurl < 0.22;
+
+        if (prevPalm) {
+          const velocity = Math.hypot(mx - prevPalm.x, my - prevPalm.y);
+          if (velocity > 0.16) triggerWakeUpFlare();
+        }
+        prevPalm = { x: mx, y: my };
+
+        if (isPinch) {
+          pinchFrames++;
+          openFrames = 0;
+          handCursor.classList.add('pinching');
+          if (focused) {
+            gestureReadout.textContent = '\u{1F590}\uFE0F RELEASE TO KEEP LOOKING';
+          } else {
+            gestureReadout.textContent = '\u270A PINCH / FIST LOCKED';
+            if (pinchFrames === 6 && hovered) openNodeModal(hovered);
+          }
+        } else {
+          pinchFrames = 0;
+          openFrames++;
+          handCursor.classList.remove('pinching');
+          if (focused) {
+            gestureReadout.textContent = openFrames > 45
+              ? '\u{1F590}\uFE0F EXITING...'
+              : '\u{1F590}\uFE0F HOLD OPEN HAND ~1.5s TO EXIT';
+            if (openFrames > 50) closeNodeModal();
+          } else {
+            gestureReadout.textContent = '\u{1F590}\uFE0F OPEN HAND ORBIT';
+          }
+        }
+      } else {
+        isHandTracked = false;
+        prevPalm = null;
+        pinchFrames = 0;
+        openFrames = 0;
+      }
+      canvasCtx.restore();
+    }
+
+    let mpCamera = null;
+    async function initCameraTracking(retry) {
+      if (camRunning && !retry) return;
+      if (camRunning && mpCamera && mpCamera.stop) {
+        try { mpCamera.stop(); } catch (e) {}
+        camRunning = false;
+      }
+      camOverlayMsg.style.display = 'flex';
+      try {
+        const hands = new Hands({
+          locateFile: function (f) { return 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/' + f; }
+        });
+        hands.setOptions({
+          maxNumHands: 1,
+          modelComplexity: 1,
+          minDetectionConfidence: 0.65,
+          minTrackingConfidence: 0.65
+        });
+        hands.onResults(onHandResults);
+        mpCamera = new Camera(videoElement, {
+          onFrame: async function () { await hands.send({ image: videoElement }); },
+          width: 320,
+          height: 180
+        });
+        await mpCamera.start();
+        camRunning = true;
+        camOverlayMsg.style.display = 'none';
+        camIndicator.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+        gestureReadout.textContent = '\u{1F590}\uFE0F CAMERA TRACKING LIVE';
+      } catch (err) {
+        camRunning = false;
+        camOverlayMsg.innerHTML = '<span class="text-amber-300">Camera offline / blocked</span>' +
+          '<span class="text-[10px] text-cyan-200/70 mt-1">Mouse orbit &amp; click mode active</span>';
+        camIndicator.className = 'w-2 h-2 rounded-full bg-rose-500';
+      }
+    }
+    window.initCameraTracking = initCameraTracking;
+
+    if (!window.location.search.includes('nocam')) {
+      initCameraTracking(false);
+    } else {
+      camOverlayMsg.innerHTML = '<span class="text-cyan-300">Camera skipped (?nocam=1)</span>' +
+        '<span class="text-[10px] text-cyan-200/70 mt-1">Mouse orbit &amp; click mode active</span>';
+      camIndicator.className = 'w-2 h-2 rounded-full bg-emerald-400';
+    }
+
+    // ==========================================================================
+    // 14. RENDER LOOP - lerp smoothing, raycast, label projection, 60+ FPS
+    // ==========================================================================
+    const clock = new THREE.Clock();
+    let frameCount = 0;
+    let lastFpsUpdate = performance.now();
+    let lowFpsStrikes = 0;
+    let qualityDropped = false;
+    const fpsEl = $('fps-counter');
+    const tmpWorld = new THREE.Vector3();
+    let labelTick = 0;
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const dt = Math.min(clock.getDelta(), 0.05);
+      const t = clock.getElapsedTime();
+      const now = performance.now();
+
+      frameCount++;
+      if (now - lastFpsUpdate >= 500) {
+        const fps = Math.round((frameCount * 1000) / (now - lastFpsUpdate));
+        fpsEl.textContent = fps + ' FPS';
+        if (fps < 45) {
+          lowFpsStrikes++;
+          if (lowFpsStrikes >= 4 && !qualityDropped) {
+            qualityDropped = true;
+            renderer.setPixelRatio(1);
+          }
+        } else {
+          lowFpsStrikes = 0;
+        }
+        frameCount = 0;
+        lastFpsUpdate = now;
+      }
+
+      // --- lerp pointer / hand coordinates (jitter-free damping) ---
+      smoothNDC.lerp(targetNDC, 0.08);
+
+      // --- virtual hand cursor ---
+      if (isHandTracked) {
+        handCursor.style.display = 'block';
+        handCursor.style.left = (((smoothNDC.x + 1) / 2) * window.innerWidth) + 'px';
+        handCursor.style.top = (((-smoothNDC.y + 1) / 2) * window.innerHeight) + 'px';
+      } else {
+        handCursor.style.display = 'none';
+      }
+
+      // --- node positions morph between the two world layouts ---
+      nodeObjects.forEach(function (o) {
+        const target = currentTheme === 'cosmic' ? o.pCos : o.pCyb;
+        o.cur.lerp(target, 0.05);
+        o.hit.position.copy(o.cur);
+        o.gCos.position.copy(o.cur);
+        o.gCyb.position.copy(o.cur);
+      });
+      updateLinks();
+
+      // --- hover raycast (disabled while zoomed into a node) ---
+      if (focused) {
+        hovered = null;
+      } else {
+        raycaster.setFromCamera(smoothNDC, camera);
+        const hits = raycaster.intersectObjects(interactiveMeshes, false);
+        hovered = hits.length > 0 ? hits[0].object : null;
+      }
+
+      // --- camera behaviour ---
+      if (focused) {
+        focused.hit.getWorldPosition(tmpWorld);
+        camLookAtTarget.copy(tmpWorld);
+        const dist = focused.data.kind === 'hub' ? 11 : focused.data.kind === 'organ' ? 4.4 : 7.2;
+        const outward = tmpWorld.lengthSq() > 1
+          ? tmpWorld.clone().normalize()
+          : new THREE.Vector3(0, 0, 1);
+        camTargetPos.copy(tmpWorld)
+          .add(outward.multiplyScalar(dist * 0.5))
+          .add(new THREE.Vector3(0, dist * 0.3, dist * 0.8));
+        focusGroup.position.copy(tmpWorld);
+        universeGroup.rotation.x *= 0.94;
+        universeGroup.rotation.y *= 0.94;
+      } else {
+        camTargetPos.set(smoothNDC.x * 12, 1.5 + smoothNDC.y * 6, 34 - Math.abs(smoothNDC.x) * 3);
+        camLookAtTarget.set(0, 0, 0);
+        universeGroup.rotation.y = t * 0.055;
+        universeGroup.rotation.x = Math.sin(t * 0.18) * 0.05;
+      }
+
+      camera.position.lerp(camTargetPos, focused ? 0.05 : 0.06);
+      currentLookAt.lerp(camLookAtTarget, 0.08);
+      camera.lookAt(currentLookAt);
+
+      // --- shader / flare animation ---
+      sunShaderMaterial.uniforms.uTime.value = t;
+      if (flare > 0.001) {
+        flare *= 0.93;
+        sunShaderMaterial.uniforms.uFlare.value = flare;
+        shockwave.scale.addScalar(0.5);
+        shockwave.lookAt(camera.position);
+        shockMat.opacity *= 0.91;
+      } else {
+        sunShaderMaterial.uniforms.uFlare.value = 0;
+      }
+
+      // --- background drift ---
+      nebula.rotation.y = t * 0.012;
+      const rp = rainGeo.attributes.position.array;
+      for (let i = 1; i < RAIN * 3; i += 3) {
+        rp[i] -= dt * 3.2;
+        if (rp[i] < -35) rp[i] = 35;
+      }
+      rainGeo.attributes.position.needsUpdate = true;
+
+      // --- per-node animation, hover scaling, label projection ---
+      labelTick++;
+      const updateLabels = labelTick % 2 === 0;
+      for (let i = 0; i < nodeObjects.length; i++) {
+        const o = nodeObjects[i];
+        const isTargeted = hovered === o.hit || focused === o;
+        o.gCos.rotation.y = t * 0.5;
+        o.gCyb.rotation.y = -t * 0.6;
+        o.gCyb.rotation.x = t * 0.35;
+
+        const targetScale = isTargeted ? 1.28 : 1.0;
+        const s = o.gCos.scale.x + (targetScale - o.gCos.scale.x) * 0.12;
+        o.gCos.scale.setScalar(s);
+        o.gCyb.scale.setScalar(s);
+
+        if (isTargeted) o.label.classList.add('targeted');
+        else o.label.classList.remove('targeted');
+
+        if (!updateLabels && !isTargeted) continue;
+
+        o.hit.getWorldPosition(tmpWorld);
+        const labelPos = tmpWorld.clone();
+        labelPos.y += o.data.radius + (o.data.kind === 'organ' ? 0.5 : 0.9);
+        labelPos.project(camera);
+        const lx = (labelPos.x * 0.5 + 0.5) * window.innerWidth;
+        const ly = (-(labelPos.y * 0.5) + 0.5) * window.innerHeight;
+        o.label.style.transform = 'translate(-50%,-140%) translate(' +
+          lx.toFixed(1) + 'px,' + ly.toFixed(1) + 'px)';
+        o.label.style.visibility = labelPos.z > 1 ? 'hidden' : 'visible';
+      }
+
+      // --- focused node hologram ---
+      if (focusViz && focusViz.userData.update) focusViz.userData.update(t, dt);
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    window.addEventListener('resize', function () {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    window.__HOJAIGA_READY = true;
+    window.__HOJAIGA = {
+      nodes: nodeObjects,
+      open: openNodeModal,
+      close: closeNodeModal,
+      theme: setWorldTheme,
+      flare: triggerWakeUpFlare,
+      parts: { nebula: nebula, rain: rain, labels: labelsContainer, links: [cosLinkLines, cybLinkLines], renderer: renderer }
+    };
+  </script>
+
+  <!-- Ability #38: Real-Time CNS Telemetry Streamer (live from server.py) -->
+  <script>
+    (function () {
+      var statusEl = document.getElementById('cns-status');
+      var sseStarted = false;
+      function setStatus(txt, live) {
+        if (!statusEl) return;
+        statusEl.textContent = txt;
+        statusEl.className = live ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold';
+      }
+      function handle(ev) {
+        window.__CNS_COUNT = (window.__CNS_COUNT || 0) + 1;
+        window.__CNS_LAST = ev;
+        setStatus('CNS \u25CF ' + (ev.log_line || ev.event_type || '').slice(0, 52), true);
+        try { if (window.handleCNS) window.handleCNS(ev); } catch (e) {}
+      }
+      function startSSE() {
+        if (sseStarted) return;
+        if (!window.EventSource) { setStatus('CNS \u2716 OFFLINE', false); return; }
+        sseStarted = true;
+        var es = new EventSource('/api/stream');
+        es.onopen = function () { setStatus('CNS \u25CF LINK LIVE (SSE)', true); };
+        es.onmessage = function (e) { try { handle(JSON.parse(e.data)); } catch (err) {} };
+        es.onerror = function () { setStatus('CNS \u25D0 RETRY', false); };
+      }
+      function startWS() {
+        var ws, opened = false;
+        try { ws = new WebSocket('ws://' + (location.hostname || 'localhost') + ':8765'); }
+        catch (e) { return startSSE(); }
+        ws.onopen = function () { opened = true; setStatus('CNS \u25CF LINK LIVE', true); };
+        ws.onmessage = function (e) { try { handle(JSON.parse(e.data)); } catch (err) {} };
+        ws.onerror = function () { try { ws.close(); } catch (e) {} };
+        ws.onclose = function () {
+          if (!opened) { startSSE(); }
+          else { setStatus('CNS \u25D0 RETRY', false); setTimeout(startWS, 3000); }
+        };
+      }
+      setStatus('CNS \u25C6 LINKING\u2026', false);
+      startWS();
+    })();
+
+    // Hub reaction: the constellation acknowledges agent boot with a flare pulse
+    window.handleCNS = function (ev) {
+      if (ev.event_type === 'ORCHESTRATOR_BOOT') triggerWakeUpFlare();
+    };
+  </script>
+</body>
+</html>

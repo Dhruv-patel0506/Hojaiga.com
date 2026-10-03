@@ -1,0 +1,53 @@
+================================================================================
+SOURCES-ONLY BLOCK - DEEP SCAN (revert-to-original enabled)
+Requested: Add Sources split-screen, what each button leads to, child windows
+Original UI: OBS 32.2.2 - Profile: Untitled - Scenes: Untitled (clean, no Scene 2)
+After scan: reverted to original via brain Cancel/Close handling (all popups closed)
+================================================================================
+
+[ORIGINAL SOURCES PANE - from obs_elements_dump.txt + live]
+[Pane] 'Sources'  rect=(0,522,350,977)
+          [ListItem] 'Display Capture'  rect=(3,557,345,594)
+          [Button] 'Add'  rect=(3,940,35,973)
+          [Button] 'Remove'  rect=(38,940,70,973)
+          [Button] 'Properties'  rect=(82,940,114,973)
+          [Button] 'Move Up'  rect=(126,940,158,973)
+          [Button] 'Move Down'  rect=(161,940,193,973)
+    [Button] 'Float'  rect=(322,526,348,551)
+
+[LIVE Add Source deep scan - left list -> right preview]
+  Left pane (18 options): Recently Created, Application Audio Capture (BETA), Audio Input Capture,
+  Audio Output Capture, Browser, Color, Display Capture, Game Capture, Image, Image Slide Show,
+  Media, Scene, Text (GDI+), Video Capture Device, Window Capture, Deprecated, Text (FreeType 2),
+  Add existing (bottom)
+
+  Right pane: for each left selection, shows Recently Created -> Mic/Aux + Desktop Audio cards
+  (select which source(s) to add), with [Add existing] + [ ] Make source visible + [Close]
+  Clicking a right card (e.g., 'Mic/Aux') spawns its own properties child window (further scan).
+  Example deep iteration handled by _deep_scan_list_dialog: select() each ListItem, 0.6s wait,
+  scan right pane via scan_window_tree(max_depth=5), then _click_and_capture_timed each right
+  actionable -> any child window spawned is scanned via _scan_child_window_fully recursively.
+
+(No live Add Source child yet - will appear after next deep scan)
+
+[DEEP HANDLING LOGIC]
+  - Add Source is detected as list_dialog (has_list>=3, no Edit) -> brain/heuristic picks Close,
+    should_select=True, so _deep_scan_list_dialog iterates all 18 left items via select()/virtual_click,
+    0.6s wait for right pane refresh, scans right pane via scan_window_tree(max_depth=5),
+    then for each right actionable it does _click_and_capture_timed (new handle via Win32 EnumWindows,
+    full _scan_child_window_fully recursively) -> any child window spawned is scanned as separate
+    window then closed. In --rapid cap 8 items, thorough 20.
+  - Original UI revert: baseline_handles captured at scan start (scan_app_active), each child
+    closed via _execute_intelligent_dismissal (Cancel for input_dialog, Close for list_dialog),
+    verified handle not in _top_level_hwnds(), fallback close()+ESC+X. No Scene 2 is created
+    because input_dialog uses Cancel (trial OK path available but reverted by deleting scene
+    if taken). After full scan, no Add Source / Delete Scene / Closing Dockable remains.
+  - Generic: same path works for Word shape picker, any app/website/webapp tab - per-window eye+brain
+    queue (moondream 429-safe) + per-tab log, not OBS-specific. Handles any popup in between,
+    never piles up small windows.
+
+[PATH TO PARTY EXAMPLE]
+  File > Add Source > Recently Created > Mic/Aux  == menu_path: Window:OBS ... > Pane:Sources > Button:Add > Window:Add Source > List:Recently Created > ListItem:Mic/Aux > Button:Close
+  History kept in ui_scanned (sig + bbox) so path can be resolved from original UI context,
+  not user-customized dock layout.
+

@@ -1,0 +1,59 @@
+# Standardize Console Logging and Hierarchical Task Distribution
+
+Based on your latest feedback, this is no longer just a logging format change. You are requesting a fundamental shift in how the automation engine compiles tasks and delegates work. I have updated the plan to outline this new architecture.
+
+## Proposed Changes
+
+### 1. Centralize Logging Format
+- Create a centralized logging utility that formats logs cleanly: `[HH:MM:SS] [Component] message`.
+- Remove JSON loggers from console output to ensure neat and readable logs.
+
+### 2. Hierarchical Agent Compilation (`organ_01_brain.py`)
+Update the `PromptCompiler` to synthesize tasks into a 3-tier hierarchy:
+1. **Permanent Agents**: Top-level managers with high-level checkpoints.
+2. **Sub-Agents**: Intermediate managers that break down permanent agent checkpoints into sub-checkpoints.
+3. **Temporary Agents**: Execution-level workers that receive precise instructions (e.g., how to use the virtual mouse, scroll, analyze pages with the "eye").
+
+The console output during compilation will print this exact tree cleanly, matching your example format:
+```text
+========================= PERMANENT AGENT 1: BrowserManager =========================
+Objective: Oversee web research task
+Checkpoints:
+  [ ] Spawn sub-agents for Google Search and Houzz
+  [ ] Aggregate reports from sub-agents
+
+    ========================= SUB-AGENT 1-A =========================
+    Objective: Research Luxury Home Builders in Texas
+    Checkpoints:
+      [ ] Spawn temporary agent for Google Maps data extraction
+      [ ] Spawn temporary agent for Google Search
+
+        ========================= TEMPORARY AGENT 1-A-i =========================
+        Objective: Extract data from Google Maps
+        Instructions: 
+          - Move virtual mouse to search bar, type query.
+          - Use vision "eye" to analyze search results.
+          - Scroll, select, and collect company names and addresses.
+        Search Queries: ["luxury home builders in Texas"]
+```
+
+### 3. Millisecond Checkpoint & Reporting Engine (`organ_38_task_orchestrator.py`)
+- Modify the orchestrator to track tasks hierarchically.
+- When a **Temporary Agent** completes an action, it instantly (in milliseconds) reports back to the orchestrator to mark the **Sub-Agent's** checkpoint as `[x] Completed`, `[/] Partially Completed`, or `[!] Failed`.
+- As sub-agents finish, the **Permanent Agent** compiles the data in parallel to generate a live report.
+- Once all checkpoints roll up to the top, the system outputs a final consolidated report with proof and documents.
+
+## User Review Required
+
+> [!WARNING]
+> This is a **massive architectural rewrite** of the `organ_01_brain.py` (compilation), `organ_38_task_orchestrator.py` (tracking), and `organ_10_agents.py` (execution) layers. It transforms the system from a flat 4-agent design into a recursive swarm architecture. 
+
+## Open Questions
+
+1. **Scope Confirmation**: Do you want me to pause the current baseline debugging (getting the initial single browser task to work) and immediately begin rewriting the core to support this 3-tier recursive swarm architecture?
+2. **Execution Reality vs Compilation**: While the compilation and task assignment can happen in milliseconds, real-world browser execution (loading pages, waiting for results) will take seconds per task. Are you comfortable with the *status reporting* happening in milliseconds while the *physical actions* take real time?
+
+## Verification Plan
+- I will write unit tests for the PromptCompiler to ensure it outputs the new 3-tier JSON structure.
+- I will verify the visual output in the console matches your requested format perfectly.
+- I will build a mock execution run to trace a temporary agent completing a task and rolling up to the permanent agent's final report.

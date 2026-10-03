@@ -1,0 +1,53 @@
+{
+  "rule:test_path:popup_block_informational:testpopup_throughput": {
+    "rule_id": "rule:test_path:popup_block_informational:testpopup_throughput",
+    "trigger_error": "TestPopup_ThroughputTest",
+    "target_app": "test_path",
+    "remedy_action": "click:OK",
+    "parameters": {
+      "x": 100,
+      "y": 200
+    },
+    "confidence": 0.95
+  },
+  "rule:powerpoint:window_capture_attach:window_title_match_t": {
+    "rule_id": "rule:powerpoint:window_capture_attach:window_title_match_t",
+    "trigger_error": "window title match timed out",
+    "target_app": "powerpoint",
+    "remedy_action": "switch_to_display_capture",
+    "parameters": {
+      "monitor": 0
+    },
+    "confidence": 0.95
+  },
+  "rule:chrome:element_not_found:stale_element_refere": {
+    "rule_id": "rule:chrome:element_not_found:stale_element_refere",
+    "trigger_error": "stale element reference",
+    "target_app": "chrome",
+    "remedy_action": "reload_page_and_retry",
+    "parameters": {
+      "wait": 2
+    },
+    "confidence": 0.95
+  },
+  "rule:general:process_crash:exit_code_1": {
+    "rule_id": "rule:general:process_crash:exit_code_1",
+    "trigger_error": "exit code 1",
+    "target_app": "general",
+    "remedy_action": "restart_via_uwp_launcher",
+    "parameters": {
+      "flags": "shell:AppsFolder"
+    },
+    "confidence": 0.95
+  },
+  "rule:obs:recording_busy:already_recording": {
+    "rule_id": "rule:obs:recording_busy:already_recording",
+    "trigger_error": "already recording",
+    "target_app": "obs",
+    "remedy_action": "query_obs_status",
+    "parameters": {
+      "action": "check_status"
+    },
+    "confidence": 0.95
+  }
+}

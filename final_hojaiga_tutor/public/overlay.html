@@ -1,0 +1,4116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Clicky Infinite Void Overlay</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      pointer-events: none;
+    }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: transparent !important;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    /* Full-screen translucent Infinite Void — visible only when drawings are active */
+    #infinite-void {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background:
+        radial-gradient(circle at 45% 45%, rgba(10, 16, 34, 0.72) 0%, rgba(4, 7, 16, 0.86) 100%),
+        radial-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+      background-size: 100% 100%, 28px 28px;
+      backdrop-filter: blur(3px);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      z-index: 5;
+    }
+    #infinite-void.active {
+      opacity: 1;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 10;
+    }
+
+    #subtitle-banner {
+      position: fixed;
+      bottom: 38px;
+      left: 43%;
+      transform: translateX(-50%);
+      max-width: 740px;
+      padding: 12px 22px;
+      border-radius: 14px;
+      background: rgba(8, 12, 24, 0.92);
+      border: 1.5px solid rgba(56, 189, 248, 0.45);
+      color: #f8fafc;
+      font-size: 15.5px;
+      font-weight: 500;
+      line-height: 1.48;
+      text-align: center;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
+      z-index: 30;
+      display: none;
+    }
+
+    /* ---- Buddy cursor (was missing from the drop-in file) ---- */
+    #buddy-root {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 22px;
+      height: 22px;
+      transform-origin: center center;
+      pointer-events: none;
+      will-change: transform, opacity;
+      z-index: 20;
+      transition: opacity 0.25s ease;
+    }
+    #triangle {
+      width: 18px;
+      height: 18px;
+      background: #3380FF;
+      clip-path: polygon(50% 6.7%, 0% 93.3%, 100% 93.3%);
+      filter: drop-shadow(0 0 8px #3380FF);
+    }
+    #waveform {
+      display: none;
+      align-items: center;
+      gap: 2px;
+      height: 18px;
+      filter: drop-shadow(0 0 6px rgba(51, 128, 255, 0.6));
+    }
+    .wave-bar { width: 2.5px; height: 4px; border-radius: 1.5px; background: #3380FF; }
+    #spinner {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2.5px solid rgba(51, 128, 255, 0.15);
+      border-top-color: #3380FF;
+      filter: drop-shadow(0 0 6px rgba(51, 128, 255, 0.6));
+      animation: clicky-spin 0.8s linear infinite;
+    }
+    @keyframes clicky-spin { to { transform: rotate(360deg); } }
+
+    #speech-bubble {
+      position: fixed;
+      background: #3380FF;
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 6px;
+      box-shadow: 0 0 12px rgba(51, 128, 255, 0.6);
+      white-space: nowrap;
+      opacity: 0;
+      transform: scale(0.5);
+      transform-origin: left center;
+      transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+      z-index: 21;
+    }
+
+    /* File 29 idea: floating prompt bar, visible only in interactive mode
+       (Ctrl+Shift+Space turns click-through off). The global * rule sets
+       pointer-events:none, so it is re-enabled here - only this bar is ever
+       clickable; the canvas never is. */
+    #prompt-bar {
+      position: fixed;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1.5px solid #38BDF8;
+      border-radius: 12px;
+      z-index: 30;
+      width: 620px;
+      max-width: calc(100vw - 48px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      pointer-events: auto;
+      user-select: text;
+    }
+    #prompt-bar.interactive {
+      display: flex;
+    }
+    #prompt-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #F8FAFC;
+      font-size: 14px;
+      font-family: inherit;
+      pointer-events: auto;
+      user-select: text;
+    }
+    #prompt-input::placeholder {
+      color: rgba(203, 213, 225, 0.55);
+    }
+    #mode-badge {
+      font-size: 11px;
+      color: #38BDF8;
+      align-self: center;
+      white-space: nowrap;
+    }
+
+    /* ---- ADDITIONAL ENHANCEMENTS: Pulse Ring & Fake Cursor for Teaching ---- */
+    .pulse-ring-enhanced {
+      position: fixed;
+      border: 3px solid #00a8ff;
+      border-radius: 50%;
+      animation: pulse-enhanced 1.5s ease-in-out infinite;
+      opacity: 0.8;
+      pointer-events: none;
+      z-index: 25;
+    }
+
+    @keyframes pulse-enhanced {
+      0% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+      50% {
+        transform: scale(1.3);
+        opacity: 0.4;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+    }
+
+    .fake-cursor-enhanced {
+      position: fixed;
+      width: 24px;
+      height: 24px;
+      background: radial-gradient(circle, #00a8ff 0%, transparent 70%);
+      border-radius: 50%;
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: 26;
+      transition: all 0.3s ease-out;
+    }
+
+    .cursor-arrow-enhanced {
+      position: fixed;
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-bottom: 18px solid #00a8ff;
+      transform: rotate(-45deg);
+      pointer-events: none;
+      z-index: 26;
+    }
+
+    .tooltip-enhanced {
+      position: fixed;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 14px;
+      white-space: nowrap;
+      z-index: 27;
+      pointer-events: none;
+      border: 2px solid #00a8ff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Virtual cursor - changes color based on state */
+    #virtual-cursor {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+      z-index: 40;
+      transition: transform 0.1s ease, filter 0.2s ease;
+      will-change: transform, left, top;
+    }
+
+    #virtual-cursor-arrow {
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 16px solid currentColor;
+      transform: rotate(-45deg);
+      filter: drop-shadow(0 0 8px currentColor);
+    }
+
+    #virtual-cursor.detached {
+      filter: drop-shadow(0 0 12px #FF00FF);
+    }
+
+    #virtual-cursor.detached #virtual-cursor-arrow {
+      border-bottom-color: #FF00FF;
+    }
+
+    #virtual-cursor.attached #virtual-cursor-arrow {
+      border-bottom-color: #FFFFFF;
+    }
+
+    #cursor-status {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: white;
+      z-index: 41;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #cursor-status.visible {
+      opacity: 1;
+    }
+
+    #cursor-status.detached {
+      background: rgba(255, 0, 255, 0.2);
+      border: 1px solid #FF00FF;
+    }
+
+    #cursor-status.attached {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid #FFFFFF;
+    }
+  </style>
+</head>
+<body>
+  <div id="infinite-void"></div>
+  <canvas id="overlay-canvas"></canvas>
+  <div id="subtitle-banner"></div>
+
+  <div id="buddy-root">
+    <div id="triangle"></div>
+    <div id="waveform">
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+    </div>
+    <div id="spinner"></div>
+  </div>
+
+  <div id="speech-bubble"></div>
+
+  <form id="prompt-bar" autocomplete="off">
+    <input
+      id="prompt-input"
+      type="text"
+      placeholder="Ask Clicky to teach, verify & code, scan app, or press Ctrl+Shift+X to clear..."
+      autocomplete="off"
+    />
+    <span id="mode-badge">INTERACTIVE (Ctrl+Shift+Space)</span>
+  </form>
+
+  <!-- Virtual Cursor for independent operation -->
+  <div id="virtual-cursor" class="attached">
+    <div id="virtual-cursor-arrow"></div>
+  </div>
+  <div id="cursor-status" class="attached">IDLE - Following Mouse</div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    const voidBackdrop = document.getElementById('infinite-void');
+    const canvas = document.getElementById('overlay-canvas');
+    const ctx = canvas.getContext('2d');
+    const subtitleBanner = document.getElementById('subtitle-banner');
+
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    let activeCommands = [];
+    let animationFrameId = null;
+    const MAX_COMMANDS = 500;
+
+    // =========================================================================
+    // 1. HIGH-LUMINANCE COLOR GUARD (Fixes invisible dark text like "Solve for a")
+    // =========================================================================
+    const PALETTE = {
+      red: '#ff5252',
+      blue: '#38bdf8',
+      green: '#4ade80',
+      yellow: '#facc15',
+      purple: '#c084fc',
+      orange: '#fb923c',
+      cyan: '#22d3ee',
+      pink: '#f472b6',
+      white: '#f8fafc'
+    };
+
+    function resolveBrightColor(rawColor, fallback = '#38bdf8') {
+      if (!rawColor || typeof rawColor !== 'string') return fallback;
+      const clean = rawColor.trim().toLowerCase();
+      if (PALETTE[clean]) return PALETTE[clean];
+
+      if (['black', 'gray', 'grey', 'darkgray', 'darkgrey', 'navy', 'darkblue', 'none', 'transparent'].includes(clean)) {
+        return fallback;
+      }
+
+      const hexMatch = clean.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+      if (hexMatch) {
+        let hex = hexMatch[1];
+        if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+        const r = parseInt(hex.slice(0, 2), 16);
+        const g = parseInt(hex.slice(2, 4), 16);
+        const b = parseInt(hex.slice(4, 6), 16);
+        const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+        if (lum < 95) return fallback;
+        return `#${hex}`;
+      }
+      return fallback;
+    }
+
+    // =========================================================================
+    // 2. SPATIAL COLLISION & TWO-ZONE AUTO-LAYOUT ENGINE
+    //    Left Zone (x: 80..520)  -> Shapes, Diagrams, Plots, 3D Wireframes
+    //    Right Zone (x: 550..)   -> Step-by-step Written Equations & Notes
+    // =========================================================================
+    let occupiedRects = [];
+    let noteColumns = [];
+
+    function resetLayoutState() {
+      occupiedRects = [
+        { x: window.innerWidth - 430, y: window.innerHeight - 380, w: 430, h: 380, kind: 'panel' },
+        { x: 180, y: window.innerHeight - 110, w: 780, h: 95, kind: 'subtitle' }
+      ];
+      noteColumns = [];
+    }
+    resetLayoutState();
+
+    function rectsIntersect(a, b, pad = 6) {
+      return !(
+        a.x + a.w + pad < b.x ||
+        a.x > b.x + b.w + pad ||
+        a.y + a.h + pad < b.y ||
+        a.y > b.y + b.h + pad
+      );
+    }
+
+    function claimFreeRect(x, y, w, h, kind = 'item', minX = 24) {
+      const leftBound = Math.max(24, minX);
+      let candidate = {
+        x: Math.max(leftBound, Math.min(window.innerWidth - w - 24, x)),
+        y: Math.max(28, Math.min(window.innerHeight - h - 95, y)),
+        w,
+        h,
+        kind
+      };
+
+      const offsets = [
+        [0, 32], [0, -32], [40, 0], [-40, 0],
+        [0, 60], [0, -60], [80, 28], [-80, 28],
+        [0, 90], [110, -28], [-110, -28], [0, 120]
+      ];
+
+      let attempt = 0;
+      while (attempt < 36 && occupiedRects.some(r => rectsIntersect(candidate, r, 6))) {
+        const off = offsets[attempt % offsets.length];
+        const scale = Math.floor(attempt / offsets.length) + 1;
+        candidate.x = Math.max(leftBound, Math.min(window.innerWidth - w - 24, x + off[0] * scale));
+        candidate.y = Math.max(28, Math.min(window.innerHeight - h - 95, y + off[1] * scale));
+        attempt++;
+      }
+
+      occupiedRects.push(candidate);
+      return candidate;
+    }
+
+    const NOTES_MIN_X = 540;
+
+    // Exhaustive grid scan inside the Diagram Zone (left of the notes column).
+    // Unlike the spiral search this cannot fail while free space exists, so
+    // shapes never end up stacked on each other or inside the notes column.
+    function claimDiagramRect(preferX, preferY, w, h, kind = 'diagram', shrink = null) {
+      const minX = 24;
+      const minY = 96;
+      const diagramBottom = () => Math.max(minY, window.innerHeight - 80);
+      // The subtitle banner is transient (only visible while speaking), so
+      // diagram shapes may pass through it; the Clicky panel never may.
+      const blocked = () =>
+        occupiedRects.filter(r => r.kind !== 'subtitle');
+      const fits = (x, y, cw, ch) =>
+        !blocked().some(r => rectsIntersect({ x, y, w: cw, h: ch }, r, 4));
+
+      const maxYFor = (ch) => Math.max(minY, diagramBottom() - ch);
+
+      const scan = (cw, ch) => {
+        const maxXlocal = Math.max(minX, NOTES_MIN_X - 24 - cw);
+        const maxY = maxYFor(ch);
+        const bx = Math.max(minX, Math.min(maxXlocal, preferX));
+        const by = Math.max(minY, Math.min(maxY, preferY));
+        if (fits(bx, by, cw, ch)) return { x: bx, y: by, w: cw, h: ch };
+        let best = null;
+        let bestDist = Infinity;
+        for (let y = minY; y <= maxY; y += 16) {
+          for (let x = minX; x <= maxXlocal; x += 16) {
+            if (!fits(x, y, cw, ch)) continue;
+            const d = (x - bx) * (x - bx) + (y - by) * (y - by);
+            if (d < bestDist) { bestDist = d; best = { x, y, w: cw, h: ch }; }
+          }
+          if (best && bestDist === 0) break;
+        }
+        return best;
+      };
+
+      let cw = w;
+      let ch = h;
+      let hit = scan(cw, ch);
+      // Tight screen: shrink the shape until it fits instead of overlapping.
+      const softMinW = shrink ? shrink.minW : 60;
+      const softMinH = shrink ? shrink.minH : 50;
+      while (!hit && (cw > 64 || ch > 54)) {
+        const rate = cw > softMinW && ch > softMinH ? 0.85 : 0.75;
+        cw = Math.max(60, Math.round(cw * rate));
+        ch = Math.max(50, Math.round(ch * rate));
+        hit = scan(cw, ch);
+      }
+
+      const rect = hit || {
+        x: Math.max(minX, Math.min(Math.max(minX, NOTES_MIN_X - 24 - cw), preferX)),
+        y: Math.max(minY, Math.min(maxYFor(ch), preferY)),
+        w: cw, h: ch
+      };
+      rect.kind = kind;
+      occupiedRects.push(rect);
+      return rect;
+    }
+
+    function isNoteCommand(cmd) {
+      return ['WRITE', 'TEXT', 'NOTE', 'EQUATION', 'LABEL'].includes(cmd.type);
+    }
+
+    // Deterministic vertical-flow allocator for note cards: every card is
+    // appended below the previous card of its column, so two notes can NEVER
+    // occupy the same pixels (no spiral search, no retries).
+    function commitNote(col, cardW, cardH) {
+      col.w = Math.max(col.w, cardW);
+      const rect = { x: col.x, y: col.y, w: cardW, h: cardH, kind: 'note' };
+      occupiedRects.push(rect);
+      col.y = rect.y + cardH + 10;
+      return rect;
+    }
+
+    function placeNoteCard(cardW, cardH) {
+      const usableBottom = Math.max(200, window.innerHeight - 135);
+      const panelTop = Math.max(160, window.innerHeight - 380);
+      // Columns beside the Clicky panel (bottom-right) must stay above it.
+      const limitFor = (col) =>
+        col.x + col.w <= window.innerWidth - 450 ? usableBottom : Math.max(120, panelTop - 12);
+
+      if (noteColumns.length > 0) {
+        for (const col of noteColumns) {
+          if (col.y + cardH <= limitFor(col)) return commitNote(col, cardW, cardH);
+        }
+        const rightmost = noteColumns.reduce((a, b) => (a.x > b.x ? a : b));
+        const newX = rightmost.x + rightmost.w + 40;
+        if (newX + cardW <= window.innerWidth - 24) {
+          const col = { x: Math.max(NOTES_MIN_X, newX), y: 105, w: cardW };
+          noteColumns.push(col);
+          return commitNote(col, cardW, cardH);
+        }
+        // Out of columns: continue in the emptiest one (may reach the panel
+        // band, but still never overlaps another note).
+        const col = noteColumns.reduce((a, b) => (a.y <= b.y ? a : b));
+        return commitNote(col, cardW, cardH);
+      }
+
+      const maxX = window.innerWidth - cardW - 24;
+      const x = maxX >= NOTES_MIN_X ? Math.max(NOTES_MIN_X, Math.min(550, maxX)) : Math.max(24, maxX);
+      const col = { x, y: 105, w: cardW };
+      noteColumns.push(col);
+      return commitNote(col, cardW, cardH);
+    }
+
+    function layoutCommand(cmd) {
+      cmd.type = (cmd.type || '').toUpperCase();
+
+      if (cmd.type === 'BOARD') {
+        if (cmd.label) {
+          cmd.type = 'TOPIC_BANNER';
+          cmd.x = 48;
+          cmd.y = 32;
+          occupiedRects.push({ x: 48, y: 32, w: 460, h: 44, kind: 'banner' });
+        } else {
+          cmd.skip = true;
+        }
+        return;
+      }
+
+      if (cmd.type === 'UIRECT') {
+        // Absolute screen-space highlight over a REAL scanned UI control
+        // (AppScanner / video-director path). Deliberately claims NO diagram
+        // rect and is never clamped into the left zone - the whole point is to
+        // point at the control's true screen position. Its label pill still
+        // goes through claimFreeRect inside drawLabelPill, so it can dodge
+        // note cards even when the control itself sits on the right side.
+        cmd.x = Number.isFinite(+cmd.x) ? +cmd.x : 120;
+        cmd.y = Number.isFinite(+cmd.y) ? +cmd.y : 160;
+        cmd.w = Math.max(40, Math.min(1200, +cmd.w || 160));
+        cmd.h = Math.max(24, Math.min(700, +cmd.h || 44));
+        cmd.color = resolveBrightColor(cmd.color, '#38bdf8');
+        return;
+      }
+
+      if (cmd.type === 'WRITE' || cmd.type === 'TEXT' || cmd.type === 'NOTE' || cmd.type === 'EQUATION' || cmd.type === 'LABEL') {
+        cmd.type = 'WRITE';
+        const rawText = (cmd.label || cmd.text || '').trim().replace(/^["']|["']$/g, '');
+        if (!rawText) { cmd.skip = true; return; }
+
+        ctx.font = '600 15.5px "Segoe UI", sans-serif';
+        const maxLineWidth = 380;
+        const words = rawText.split(/\s+/);
+        const lines = [];
+        let cur = '';
+
+        for (const w of words) {
+          const test = cur ? `${cur} ${w}` : w;
+          if (ctx.measureText(test).width > maxLineWidth && cur) {
+            lines.push(cur);
+            cur = w;
+          } else {
+            cur = test;
+          }
+        }
+        if (cur) lines.push(cur);
+
+        cmd.wrappedLines = lines;
+        const textW = Math.max(...lines.map(l => ctx.measureText(l).width));
+        const cardW = Math.min(maxLineWidth + 28, Math.max(150, textW + 28));
+        const cardH = lines.length * 23 + 14;
+
+        const rect = placeNoteCard(cardW, cardH);
+        cmd.x = rect.x;
+        cmd.y = rect.y;
+        cmd.cardW = cardW;
+        cmd.cardH = cardH;
+        cmd.color = resolveBrightColor(cmd.color, '#f8fafc');
+        return;
+      }
+
+      if (cmd.type === 'ANIMATE') {
+        // Continuous 60 FPS loop: claims its own diagram stage, and every preset
+        // is drawn in coordinates local to (60,100) then translated into place.
+        cmd.loop = true;
+        cmd.color = resolveBrightColor(cmd.color, '#22d3ee');
+        const rect = claimDiagramRect(60, 100, 470, 380, 'animate', { minW: 340, minH: 300 });
+        cmd._animRect = rect;
+        cmd._animDx = rect.x - 60;
+        cmd._animDy = rect.y - 100;
+        return;
+      }
+
+      if (cmd.type === 'ACTOR') {
+        // 15-joint kinematic rig stage: claims like every other diagram, then
+        // renders translated into place (design stage origin = 65,110).
+        cmd.loop = true;
+        cmd.color = resolveBrightColor(cmd.color, '#22d3ee');
+        const rect = claimDiagramRect(65, 110, 450, 360, 'actor', { minW: 320, minH: 290 });
+        cmd._actorRect = rect;
+        cmd._actDx = rect.x - 65;
+        cmd._actDy = rect.y - 110;
+        const pov = (cmd.pov || '3rd').toLowerCase();
+        if (pov.includes('1st') || pov.includes('fpv') || pov.includes('first')) {
+          cmd.cx = 285; // 1st-PERSON viewport is designed centred on the stage
+          cmd.cy = 295;
+        } else if (pov.includes('2nd') || pov.includes('front') || pov.includes('face')) {
+          cmd.cx = 275; // face-to-face camera stands centre stage
+        }
+        return;
+      }
+
+      if (cmd.type === 'KEYFRAMES') {
+        // LLM-invented keyframe path: claims a stage like ANIMATE; frame
+        // coordinates are assumed to live in the design space (60,100).
+        cmd.loop = true;
+        cmd.color = resolveBrightColor(cmd.color, '#22d3ee');
+        const rect = claimDiagramRect(60, 100, 460, 380, 'keyframes', { minW: 300, minH: 280 });
+        cmd._kfRect = rect;
+        cmd._kfDx = rect.x - 60;
+        cmd._kfDy = rect.y - 100;
+        return;
+      }
+
+      if (cmd.type === 'GRAPH') {
+        // Auto-layout: node positions are recomputed in rect-local space so
+        // any node count fits the claimed rect regardless of input coords.
+        cmd.loop = true;
+        cmd.color = resolveBrightColor(cmd.color, '#22d3ee');
+        const rect = claimDiagramRect(90, 120, 400, 340, 'graph', { minW: 300, minH: 250 });
+        cmd._gRect = rect;
+        cmd._gDx = rect.x;
+        cmd._gDy = rect.y;
+        const nodes = cmd.nodes || [];
+        const n = nodes.length;
+        const cols = Math.min(3, Math.max(1, Math.ceil(Math.sqrt(n || 1))));
+        const rows = Math.max(1, Math.ceil(n / cols));
+        const padX = 70;
+        const padY = 50;
+        const cellW = (rect.w - padX) / cols;
+        const cellH = (rect.h - padY) / rows;
+        const pos = {};
+        nodes.forEach((name, idx) => {
+          const c = idx % cols;
+          const r = Math.floor(idx / cols);
+          // Nodes may be plain strings OR objects ({id,label,color}); key by
+          // id/label so edges (which reference ids) resolve to the same slot.
+          const key = (name && typeof name === 'object')
+            ? String(name.id ?? name.label ?? idx)
+            : String(name);
+          pos[key] = {
+            x: padX / 2 + cellW * (c + 0.5),
+            y: padY / 2 + cellH * (r + 0.5),
+          };
+        });
+        cmd.nodePositions = pos;
+        return;
+      }
+
+      if (cmd.type === 'TRACE') {
+        cmd.loop = true;
+        cmd.color = resolveBrightColor(cmd.color, '#facc15');
+        const rect = claimDiagramRect(70, 150, 430, 240, 'trace', { minW: 320, minH: 180 });
+        cmd._traceRect = rect;
+        cmd._tDx = rect.x;
+        cmd._tDy = rect.y;
+        return;
+      }
+
+      if (cmd.type === 'FIELD') {
+        cmd.loop = true;
+        cmd.color = resolveBrightColor(cmd.color, '#fb923c');
+        const rect = claimDiagramRect(95, 150, 390, 290, 'field', { minW: 280, minH: 220 });
+        cmd._fieldRect = rect;
+        cmd._fDx = rect.x;
+        cmd._fDy = rect.y;
+        return;
+      }
+
+      if (cmd.type === 'DJ') {
+        cmd.loop = true;
+        cmd.color = resolveBrightColor(cmd.color, '#a78bfa');
+        const rect = claimDiagramRect(80, 140, 420, 320, 'dj', { minW: 300, minH: 250 });
+        cmd._djRect = rect;
+        cmd._djDx = rect.x;
+        cmd._djDy = rect.y;
+        return;
+      }
+
+      if (cmd.type === 'AIM_TRAINER') {
+        // Aim arena claims like every diagram; renderer draws in rect-local
+        // space (arena centred, telemetry HUD pinned to the bottom).
+        cmd.loop = true;
+        cmd.color = resolveBrightColor(cmd.color, '#22d3ee');
+        const rect = claimDiagramRect(70, 110, 440, 370, 'aim', { minW: 300, minH: 280 });
+        cmd._aimRect = rect;
+        cmd._aimDx = rect.x;
+        cmd._aimDy = rect.y;
+        return;
+      }
+
+      if (cmd.type === 'ANATOMY' || cmd.type === 'SVG') {
+        // Complex biology/vector stage: claims a diagram rect through the same
+        // collision engine, then the renderer draws centred in that rect.
+        cmd.loop = true;
+        cmd.color = resolveBrightColor(cmd.color, '#22d3ee');
+        if (cmd.type === 'ANATOMY') {
+          const rect = claimDiagramRect(55, 85, 460, 470, 'anatomy', { minW: 320, minH: 380 });
+          cmd._anatRect = rect;
+          // 0.78 keeps even the longest right-side callout left of the notes.
+          const fit = Math.min(rect.w / 460, rect.h / 470, 0.78);
+          cmd.scale = (cmd.scale || 1) * fit;
+          cmd.cx = rect.x + rect.w / 2;
+          cmd.cy = rect.y + rect.h / 2 + 8;
+        } else {
+          const rect = claimDiagramRect(120, 140, 300, 240, 'svg', { minW: 160, minH: 130 });
+          cmd._anatRect = rect;
+          // Fit happens at render time against the path's measured bounding box.
+          cmd.cx = rect.x + rect.w / 2;
+          cmd.cy = rect.y + rect.h / 2;
+        }
+        return;
+      }
+
+      if (cmd.type === 'BOX') {
+        cmd.w = Math.min(240, Math.max(80, cmd.w || 150));
+        cmd.h = Math.min(180, Math.max(60, cmd.h || 100));
+        const targetX = Math.min(340, Math.max(80, cmd.x || 160));
+        const targetY = Math.min(460, Math.max(120, cmd.y || 240));
+        const rect = claimDiagramRect(targetX, targetY, cmd.w, cmd.h, 'box', { minW: 80, minH: 60 });
+        cmd.x = rect.x;
+        cmd.y = rect.y;
+        cmd.w = rect.w;
+        cmd.h = rect.h;
+        cmd.color = resolveBrightColor(cmd.color, '#22d3ee');
+      }
+      else if (cmd.type === 'CIRCLE' || cmd.type === 'BEACON') {
+        const r = Math.min(90, Math.max(18, cmd.r || 42));
+        const cx = Math.min(420, Math.max(110, cmd.x || 240));
+        const cy = Math.min(480, Math.max(150, cmd.y || 280));
+        const rect = claimDiagramRect(cx - r, cy - r, r * 2, r * 2, 'circle', { minW: 44, minH: 44 });
+        cmd.r = rect.w / 2;
+        cmd.x = rect.x + rect.w / 2;
+        cmd.y = rect.y + rect.h / 2;
+        cmd.color = resolveBrightColor(cmd.color, '#facc15');
+      }
+      else if (cmd.type === 'PLOT') {
+        if (!isValidMathExpression(cmd.expr)) {
+          cmd.skip = true;
+          return;
+        }
+        cmd.w = Math.min(cmd.w || 400, 420);
+        cmd.h = Math.min(cmd.h || 310, 330);
+        const rect = claimDiagramRect(80, 125, cmd.w, cmd.h, 'plot', { minW: 220, minH: 170 });
+        cmd.w = rect.w;
+        cmd.h = rect.h;
+        cmd.x = rect.x;
+        cmd.y = rect.y;
+        cmd.color = resolveBrightColor(cmd.color, '#22d3ee');
+      }
+      else if (cmd.type === 'SHAPE3D') {
+        const size = Math.min(120, Math.max(65, cmd.size || 95));
+        const cx = Math.min(400, Math.max(160, cmd.cx || 270));
+        const cy = Math.min(460, Math.max(180, cmd.cy || 310));
+        // +40 padding so projected corners/labels never spill onto neighbours.
+        const rect = claimDiagramRect(cx - size - 20, cy - size - 20, size * 2 + 40, size * 2 + 40, 'shape3d', { minW: 110, minH: 110 });
+        cmd.size = Math.max(50, Math.round(rect.w / 2 - 20));
+        cmd.cx = rect.x + rect.w / 2;
+        cmd.cy = rect.y + rect.h / 2;
+        cmd.color = resolveBrightColor(cmd.color, '#facc15');
+      }
+      else if (cmd.type === 'POLY3D') {
+        const rect = claimDiagramRect(90, 130, 380, 340, 'poly3d', { minW: 220, minH: 180 });
+        cmd.cx = rect.x + rect.w / 2;
+        cmd.cy = rect.y + rect.h / 2;
+        cmd.color = resolveBrightColor(cmd.color, '#22d3ee');
+      }
+      else if (cmd.type === 'ARROW') {
+        cmd.color = resolveBrightColor(cmd.color, '#ff5252');
+      }
+      else if (cmd.type === 'CURVE' || cmd.type === 'POLYGON') {
+        cmd.color = resolveBrightColor(cmd.color, cmd.type === 'CURVE' ? '#4ade80' : '#22d3ee');
+      }
+      else if (cmd.type === 'POINT') {
+        cmd.color = resolveBrightColor(cmd.color, '#38bdf8');
+      }
+    }
+
+    // =========================================================================
+    // 3. VALIDATED DYNAMIC MATH EVALUATOR (strict: probe-evaluates, never x^2)
+    // =========================================================================
+    const FUNCTION_WORDS = /(sin|cos|tan|log|ln|sqrt|exp|abs|pi|max|min)/gi;
+
+    function normalizeMathShorthand(raw) {
+      return String(raw || '')
+        .replace(/×/g, '*').replace(/÷/g, '/')
+        .replace(/[−–—]/g, '-')
+        .replace(/²/g, '^2').replace(/³/g, '^3')
+        .replace(/\bsine\b/gi, 'sin(x)').replace(/\bcosine\b/gi, 'cos(x)')
+        .replace(/\btangent\b/gi, 'tan(x)')
+        .replace(/\b(sqrt|sin|cos|tan|log|ln|exp)\s*x(?![a-z0-9])/gi, '$1(x)')
+        .replace(/\b(sqrt|sin|cos|tan|log|ln|exp)x(?=\s|$|\))/gi, '$1(x)')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function isValidMathExpression(raw) {
+      if (typeof raw !== 'string') return false;
+      const expr = normalizeMathShorthand(raw);
+      if (!expr || expr.length > 120) return false;
+      if (!/x/i.test(expr) && !/(sin|cos|tan|log|ln|sqrt|exp)/i.test(expr)) return false;
+      if (/[-+*/^]\s*$/.test(expr) || /^\s*[-+*/^]/.test(expr)) return false;
+      if ((expr.match(/\(/g) || []).length !== (expr.match(/\)/g) || []).length) return false;
+
+      const letters = expr.replace(/[^a-zA-Z]/g, '');
+      const residue = letters.replace(FUNCTION_WORDS, '').replace(/[xe]/gi, '');
+      if (residue.length > 0) return false;
+
+      try {
+        const fn = compileMathExpression(expr);
+        let finite = 0;
+        for (const x of [-3, -1, 0.5, 2, 4]) {
+          if (Number.isFinite(fn(x))) finite += 1;
+        }
+        return finite >= 3;
+      } catch {
+        return false;
+      }
+    }
+
+    function compileMathExpression(rawExpr) {
+      let expr = normalizeMathShorthand(rawExpr)
+        .replace(/^y\s*=\s*/i, '')
+        .replace(/^f\s*\(\s*x\s*\)\s*=\s*/i, '')
+        .trim();
+
+      if (!expr) return function () { return NaN; };
+
+      expr = expr
+        .replace(/(\d)([a-zA-Z(])/g, '$1*$2')
+        .replace(/(\))(\d|[a-zA-Z(])/g, '$1*$2')
+        .replace(/(x)(\()/gi, '$1*$2');
+
+      expr = expr
+        .replace(/\^/g, '**')
+        .replace(/\b(asin|acos|atan|log10|sin|cos|tan|sqrt|abs|ln|log|exp)\s*\(/gi, 'Math.$1(')
+        .replace(/\bpi\b/gi, 'Math.PI');
+
+      const src = expr;
+      return function (xVal) {
+        try {
+          const fn = new Function('x', `return (${src});`);
+          const y = fn(xVal);
+          return Number.isFinite(y) ? y : NaN;
+        } catch {
+          return NaN;
+        }
+      };
+    }
+
+    // =========================================================================
+    // 4. 3D PERSPECTIVE & CATMULL-ROM SMOOTH SPLINE ENGINE
+    // =========================================================================
+    function project3DPoint(x, y, z, cx, cy, scale = 1, pitch = 0.42, yaw = 0.65) {
+      const x1 = x * Math.cos(yaw) - z * Math.sin(yaw);
+      const z1 = x * Math.sin(yaw) + z * Math.cos(yaw);
+      const y2 = y * Math.cos(pitch) - z1 * Math.sin(pitch);
+      const z2 = y * Math.sin(pitch) + z1 * Math.cos(pitch);
+      const depth = 600 / (600 + z2 * scale);
+      return { x: cx + x1 * scale * depth, y: cy - y2 * scale * depth };
+    }
+
+    function build3DShapeEdges(shapeType, cx, cy, size = 90, pitch = 0.42, yaw = 0.65) {
+      const s = size;
+      const edges = [];
+      const type = (shapeType || 'cube').toLowerCase();
+
+      if (type === 'cube' || type === 'box') {
+        const v = [
+          [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
+          [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]
+        ].map(pt => project3DPoint(pt[0], pt[1], pt[2], cx, cy, s, pitch, yaw));
+        [
+          [0,1,false],[1,2,false],[2,3,false],[3,0,false],
+          [4,5,true],[5,6,false],[6,7,false],[7,4,true],
+          [0,4,true],[1,5,false],[2,6,false],[3,7,false]
+        ].forEach(([a, b, dashed]) => edges.push({ p1: v[a], p2: v[b], dashed }));
+      } else if (type === 'pyramid' || type === 'cone') {
+        const apex = project3DPoint(0, 1.3, 0, cx, cy, s, pitch, yaw);
+        const base = [[-1,-1,-1],[1,-1,-1],[1,-1,1],[-1,-1,1]]
+          .map(pt => project3DPoint(pt[0], pt[1], pt[2], cx, cy, s, pitch, yaw));
+        edges.push({ p1: base[0], p2: base[1], dashed: false });
+        edges.push({ p1: base[1], p2: base[2], dashed: false });
+        edges.push({ p1: base[2], p2: base[3], dashed: true });
+        edges.push({ p1: base[3], p2: base[0], dashed: true });
+        base.forEach((bPt, i) => edges.push({ p1: apex, p2: bPt, dashed: i === 3 }));
+      } else if (type === 'cylinder') {
+        const segs = 24;
+        for (let i = 0; i < segs; i++) {
+          const a1 = (i / segs) * Math.PI * 2, a2 = ((i + 1) / segs) * Math.PI * 2;
+          const top1 = project3DPoint(Math.cos(a1), 1, Math.sin(a1), cx, cy, s, pitch, yaw);
+          const top2 = project3DPoint(Math.cos(a2), 1, Math.sin(a2), cx, cy, s, pitch, yaw);
+          const bot1 = project3DPoint(Math.cos(a1), -1, Math.sin(a1), cx, cy, s, pitch, yaw);
+          const bot2 = project3DPoint(Math.cos(a2), -1, Math.sin(a2), cx, cy, s, pitch, yaw);
+          edges.push({ p1: top1, p2: top2, dashed: false });
+          edges.push({ p1: bot1, p2: bot2, dashed: Math.sin(a1) > 0.2 });
+          if (i === 0 || i === segs / 2) edges.push({ p1: top1, p2: bot1, dashed: false });
+        }
+      } else if (type === 'sphere') {
+        const segs = 28;
+        [-0.5, 0, 0.5].forEach(ring => {
+          const r = Math.sqrt(1 - ring * ring);
+          for (let i = 0; i < segs; i++) {
+            const a1 = (i / segs) * Math.PI * 2, a2 = ((i + 1) / segs) * Math.PI * 2;
+            edges.push({
+              p1: project3DPoint(r * Math.cos(a1), ring, r * Math.sin(a1), cx, cy, s, pitch, yaw),
+              p2: project3DPoint(r * Math.cos(a2), ring, r * Math.sin(a2), cx, cy, s, pitch, yaw),
+              dashed: Math.sin(a1) > 0.3
+            });
+          }
+        });
+        for (let i = 0; i < segs; i++) {
+          const a1 = (i / segs) * Math.PI * 2, a2 = ((i + 1) / segs) * Math.PI * 2;
+          edges.push({
+            p1: project3DPoint(Math.cos(a1), Math.sin(a1), 0, cx, cy, s, pitch, yaw),
+            p2: project3DPoint(Math.cos(a2), Math.sin(a2), 0, cx, cy, s, pitch, yaw),
+            dashed: false
+          });
+        }
+      } else if (type === 'axes3d') {
+        const o = project3DPoint(0, 0, 0, cx, cy, s, pitch, yaw);
+        edges.push({ p1: o, p2: project3DPoint(1.4, 0, 0, cx, cy, s, pitch, yaw), dashed: false, color: '#ff5252', axisLabel: 'X' });
+        edges.push({ p1: o, p2: project3DPoint(0, 1.4, 0, cx, cy, s, pitch, yaw), dashed: false, color: '#4ade80', axisLabel: 'Y' });
+        edges.push({ p1: o, p2: project3DPoint(0, 0, 1.4, cx, cy, s, pitch, yaw), dashed: false, color: '#38bdf8', axisLabel: 'Z' });
+      }
+      return edges;
+    }
+
+    function getSmoothSplinePoints(pts, subdivisions = 16) {
+      if (!pts || pts.length < 2) return pts || [];
+      if (pts.length === 2) return pts;
+      const out = [];
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[i === 0 ? i : i - 1], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
+        for (let s = 0; s < subdivisions; s++) {
+          const t = s / subdivisions, t2 = t * t, t3 = t2 * t;
+          out.push({
+            x: 0.5 * ((2 * p1.x) + (-p0.x + p2.x) * t + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 + (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3),
+            y: 0.5 * ((2 * p1.y) + (-p0.y + p2.y) * t + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 + (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3)
+          });
+        }
+      }
+      out.push(pts[pts.length - 1]);
+      return out;
+    }
+
+    // =========================================================================
+    // 5. COLLISION-FREE PILL & CANVAS RENDERER
+    //    Pills compute their true center box and repel in 8 directions.
+    // =========================================================================
+    function drawLabelPill(cmd, text, anchorCenterX, anchorCenterY, bgColor = '#38bdf8') {
+      if (!text) return;
+      ctx.save();
+      ctx.font = '600 13px "Segoe UI", sans-serif';
+      const w = Math.ceil(ctx.measureText(text).width + 20);
+      const h = 26;
+
+      if (!cmd._pillRect) {
+        cmd._pillRect = claimFreeRect(anchorCenterX - w / 2, anchorCenterY - h / 2, w, h, 'pill');
+      }
+      const { x, y } = cmd._pillRect;
+
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+      ctx.strokeStyle = bgColor;
+      ctx.lineWidth = 1.6;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#f8fafc';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, x + w / 2, y + h / 2 + 1);
+      ctx.restore();
+    }
+
+    function drawPenTip(x, y, color = '#38bdf8') {
+      ctx.save();
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 14;
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // =========================================================================
+    // 5b. CONTINUOUS 60 FPS GIF-LIKE MOTION ENGINE ([ANIMATE:...])
+    //     Every preset draws in local coordinates anchored at (60,100) and is
+    //     translated into its claimed diagram rect by the caller. elapsedMs is
+    //     the command's age, so the motion phase loops for as long as it is on
+    //     screen instead of freezing after the 750ms draw-in.
+    // =========================================================================
+    function drawQuickArrow(x1, y1, x2, y2, color = '#ff5252', label = '') {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 2.8;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+
+      const angle = Math.atan2(y2 - y1, x2 - x1);
+      const head = 11;
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - head * Math.cos(angle - Math.PI / 6), y2 - head * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(x2 - head * Math.cos(angle + Math.PI / 6), y2 - head * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+
+      if (label) {
+        ctx.font = '600 12.5px "Segoe UI", sans-serif';
+        ctx.fillStyle = '#f8fafc';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText(label, x2 + 8, y2 - 6);
+      }
+      ctx.restore();
+    }
+
+    function renderAnimatedGifCommand(cmd, elapsedMs, color) {
+      const preset = (cmd.preset || 'wheel').toLowerCase();
+
+      // -----------------------------------------------------------------------
+      // A. ROLLING WHEEL (true cycloid + no-slip rotation theta = dx / r)
+      // -----------------------------------------------------------------------
+      if (preset === 'wheel' || preset === 'rolling_wheel' || preset === 'car') {
+        const x1 = cmd.x1 ?? 110;
+        const x2 = cmd.x2 ?? 460;
+        const yCenter = cmd.y1 ?? 310;
+        const r = Math.max(20, cmd.r || 54);
+        const groundY = yCenter + r;
+
+        const rollT = (elapsedMs % 3600) / 3600;
+        const easeRoll = rollT < 0.88 ? (rollT / 0.88) : 1 - ((rollT - 0.88) / 0.12);
+        const cx = x1 + (x2 - x1) * easeRoll;
+        const theta = (cx - x1) / r;
+
+        ctx.save();
+        // Ground road + distance ticks
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.75)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(x1 - 45, groundY);
+        ctx.lineTo(x2 + 55, groundY);
+        ctx.stroke();
+        for (let gx = x1 - 30; gx <= x2 + 45; gx += 28) {
+          ctx.beginPath();
+          ctx.moveTo(gx, groundY);
+          ctx.lineTo(gx - 10, groundY + 12);
+          ctx.stroke();
+        }
+
+        // Cycloid trail of the rim point
+        ctx.strokeStyle = 'rgba(250, 204, 21, 0.45)';
+        ctx.setLineDash([4, 4]);
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        const steps = 60;
+        for (let i = 0; i <= steps; i++) {
+          const u = (i / steps) * easeRoll;
+          const px = x1 + (x2 - x1) * u;
+          const ang = (px - x1) / r;
+          const rimX = px + r * Math.sin(ang);
+          const rimY = yCenter + r * Math.cos(ang);
+          if (i === 0) ctx.moveTo(rimX, rimY);
+          else ctx.lineTo(rimX, rimY);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Tire + inner rim
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(cx, yCenter, r, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(248, 250, 252, 0.45)';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.arc(cx, yCenter, r * 0.78, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 8 rotating spokes
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.4;
+        for (let s = 0; s < 8; s++) {
+          const ang = theta + (s * Math.PI) / 4;
+          ctx.beginPath();
+          ctx.moveTo(cx, yCenter);
+          ctx.lineTo(cx + r * Math.cos(ang), yCenter + r * Math.sin(ang));
+          ctx.stroke();
+        }
+
+        // Hub + glowing rim tracker point
+        ctx.fillStyle = '#f8fafc';
+        ctx.beginPath();
+        ctx.arc(cx, yCenter, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        const rimPointX = cx + r * Math.sin(theta);
+        const rimPointY = yCenter + r * Math.cos(theta);
+        ctx.fillStyle = '#ff5252';
+        ctx.shadowColor = '#ff5252';
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.arc(rimPointX, rimPointY, 6.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Velocity arrow v = omega * r
+        drawQuickArrow(cx, yCenter - r - 18, cx + 68, yCenter - r - 18, '#4ade80', 'v = w*r');
+        ctx.restore();
+      }
+
+      // -----------------------------------------------------------------------
+      // B. SPRING + MASS OSCILLATOR (simple harmonic motion)
+      // -----------------------------------------------------------------------
+      else if (preset === 'spring' || preset === 'shm' || preset === 'oscillator') {
+        const wallX = 95;
+        const eqX = 285;
+        const y = cmd.y1 ?? 300;
+        const amp = cmd.r || 75;
+        const omega = (elapsedMs / 1000) * 2.6;
+        const displacement = amp * Math.sin(omega);
+        const massX = eqX + displacement;
+
+        ctx.save();
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(wallX, y - 70);
+        ctx.lineTo(wallX, y + 45);
+        ctx.lineTo(490, y + 45);
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(250, 204, 21, 0.45)';
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(eqX, y - 65);
+        ctx.lineTo(eqX, y + 65);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        const coils = 14;
+        const springEnd = massX - 36;
+        const span = springEnd - wallX;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(wallX, y);
+        for (let i = 1; i < coils; i++) {
+          const sx = wallX + (i / coils) * span;
+          const sy = y + (i % 2 === 0 ? -18 : 18);
+          ctx.lineTo(sx, sy);
+        }
+        ctx.lineTo(springEnd, y);
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgba(34, 211, 238, 0.22)';
+        ctx.strokeStyle = '#22d3ee';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.roundRect(massX - 36, y - 35, 72, 70, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '700 14px "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText('m', massX, y + 5);
+
+        if (Math.abs(displacement) > 8) {
+          drawQuickArrow(massX, y - 50, massX - displacement * 0.75, y - 50, '#ff5252', 'F = -kx');
+        }
+        ctx.restore();
+      }
+
+      // -----------------------------------------------------------------------
+      // C. SWINGING PENDULUM
+      // -----------------------------------------------------------------------
+      else if (preset === 'pendulum') {
+        const pivotX = cmd.x1 ?? 280;
+        const pivotY = cmd.y1 ?? 145;
+        const L = Math.max(60, cmd.r || 190);
+        const maxAngle = 0.62;
+        const theta = maxAngle * Math.cos((elapsedMs / 1000) * 2.4);
+        const omega = -maxAngle * 2.4 * Math.sin((elapsedMs / 1000) * 2.4);
+
+        const bobX = pivotX + L * Math.sin(theta);
+        const bobY = pivotY + L * Math.cos(theta);
+
+        ctx.save();
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(pivotX - 60, pivotY);
+        ctx.lineTo(pivotX + 60, pivotY);
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.arc(pivotX, pivotY, L, Math.PI / 2 - maxAngle, Math.PI / 2 + maxAngle);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.strokeStyle = '#f8fafc';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(pivotX, pivotY);
+        ctx.lineTo(bobX, bobY);
+        ctx.stroke();
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(bobX, bobY, 22, 0, Math.PI * 2);
+        ctx.fill();
+
+        drawQuickArrow(bobX, bobY, bobX, bobY + 55, '#ff5252', 'mg');
+        if (Math.abs(omega) > 0.15) {
+          const vx = Math.cos(theta) * omega * 35;
+          const vy = -Math.sin(theta) * omega * 35;
+          drawQuickArrow(bobX, bobY, bobX + vx, bobY + vy, '#4ade80', 'v');
+        }
+        ctx.restore();
+      }
+
+      // -----------------------------------------------------------------------
+      // D. PARABOLIC PROJECTILE MOTION
+      // -----------------------------------------------------------------------
+      else if (preset === 'projectile') {
+        const x1 = cmd.x1 ?? 100;
+        const x2 = cmd.x2 ?? 460;
+        const groundY = cmd.y1 ?? 380;
+        const peakH = cmd.peakH || cmd.r || 170;
+        const u = (elapsedMs % 3000) / 3000;
+
+        ctx.save();
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(x1 - 20, groundY);
+        ctx.lineTo(x2 + 30, groundY);
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(250, 204, 21, 0.45)';
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        for (let i = 0; i <= 50; i++) {
+          const s = i / 50;
+          const px = x1 + (x2 - x1) * s;
+          const py = groundY - 4 * peakH * s * (1 - s);
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        const bx = x1 + (x2 - x1) * u;
+        const by = groundY - 4 * peakH * u * (1 - u);
+        const vy = -4 * peakH * (1 - 2 * u) * 0.25;
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(bx, by, 14, 0, Math.PI * 2);
+        ctx.fill();
+
+        drawQuickArrow(bx, by, bx + 48, by, '#4ade80', 'vx');
+        drawQuickArrow(bx, by, bx, by + Math.max(-70, Math.min(70, vy)), '#ff5252', 'vy');
+        ctx.restore();
+      }
+
+      // -----------------------------------------------------------------------
+      // E. TRAVELING WAVE
+      // -----------------------------------------------------------------------
+      else if (preset === 'wave' || preset === 'sine_wave') {
+        const xStart = cmd.x1 ?? 90;
+        const width = (cmd.x2 != null ? cmd.x2 : xStart + 400) - xStart;
+        const yMid = cmd.y1 ?? 290;
+        const amp = cmd.r || 65;
+        const phaseShift = (elapsedMs / 1000) * 4.2;
+
+        ctx.save();
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.45)';
+        ctx.beginPath();
+        ctx.moveTo(xStart, yMid);
+        ctx.lineTo(xStart + width, yMid);
+        ctx.stroke();
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        for (let i = 0; i <= 120; i++) {
+          const s = i / 120;
+          const px = xStart + s * width;
+          const py = yMid + amp * Math.sin(s * Math.PI * 4 - phaseShift);
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // -----------------------------------------------------------------------
+      // F. ORBIT / SOLAR / ATOM
+      // -----------------------------------------------------------------------
+      else if (preset === 'orbit' || preset === 'atom' || preset === 'planet') {
+        const cx = cmd.x1 ?? 280;
+        const cy = cmd.y1 ?? 295;
+        const rx = cmd.r || 135;
+        const ry = (cmd.r || 135) * 0.62;
+        const ang = (elapsedMs / 1000) * 2.1;
+
+        ctx.save();
+        ctx.fillStyle = '#facc15';
+        ctx.shadowColor = '#facc15';
+        ctx.shadowBlur = 18;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 24, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        const px = cx + rx * Math.cos(ang);
+        const py = cy + ry * Math.sin(ang);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(px, py, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // -----------------------------------------------------------------------
+      // G. CUSTOM MULTI-POINT PATH ("move": translate + spin along waypoints)
+      // -----------------------------------------------------------------------
+      else {
+        const pts = (cmd.points && cmd.points.length >= 2)
+          ? cmd.points
+          : [{ x: cmd.x1 ?? 110, y: cmd.y1 ?? 300 }, { x: cmd.x2 ?? 450, y: cmd.y2 ?? 300 }];
+        const rawPhase = (elapsedMs % 3800) / 3800;
+        const smoothPhase = 0.5 - 0.5 * Math.cos(rawPhase * Math.PI * 2);
+        const totalSegs = pts.length - 1;
+        const scaled = smoothPhase * totalSegs;
+        const idx = Math.min(totalSegs - 1, Math.floor(scaled));
+        const localT = scaled - idx;
+
+        const curX = pts[idx].x + (pts[idx + 1].x - pts[idx].x) * localT;
+        const curY = pts[idx].y + (pts[idx + 1].y - pts[idx].y) * localT;
+        const r = Math.max(16, cmd.r || 42);
+        const spin = (elapsedMs / 1000) * 3.2;
+
+        ctx.save();
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        pts.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.translate(curX, curY);
+        ctx.rotate(spin);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.moveTo(-r, 0); ctx.lineTo(r, 0);
+        ctx.moveTo(0, -r); ctx.lineTo(0, r);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    // =========================================================================
+    // 5c. COMPLEX HUMAN ANATOMY, INTERNAL ORGANS & CELLULAR BIOLOGY ENGINE
+    //     Drawn centred at (cmd.cx, cmd.cy) inside the claimed anatomy rect.
+    //     All time-based motion (pulses, beats, breath) loops at 60 FPS.
+    // =========================================================================
+    function drawHumanSilhouette(ctx, cx, cy, s = 1, alpha = 1) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(s, s);
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.55)';
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
+      ctx.lineWidth = 2.2;
+
+      ctx.beginPath();
+      // Head & Cranium
+      ctx.moveTo(0, -210);
+      ctx.bezierCurveTo(28, -210, 34, -180, 30, -158);
+      ctx.bezierCurveTo(27, -142, 18, -132, 12, -128);
+      // Neck right
+      ctx.lineTo(13, -112);
+      // Right shoulder & outer arm
+      ctx.bezierCurveTo(35, -110, 62, -102, 72, -82);
+      ctx.bezierCurveTo(84, -50, 96, 5, 102, 42);
+      // Right hand
+      ctx.bezierCurveTo(105, 55, 92, 60, 86, 46);
+      // Right inner arm & armpit
+      ctx.bezierCurveTo(78, 12, 66, -35, 52, -64);
+      // Right torso & hip
+      ctx.bezierCurveTo(48, -20, 42, 15, 48, 52);
+      // Right outer leg
+      ctx.bezierCurveTo(52, 105, 48, 165, 45, 215);
+      // Right foot
+      ctx.bezierCurveTo(45, 228, 22, 228, 20, 215);
+      // Right inner leg to crotch
+      ctx.bezierCurveTo(18, 165, 14, 110, 0, 68);
+      // Left inner leg
+      ctx.bezierCurveTo(-14, 110, -18, 165, -20, 215);
+      // Left foot
+      ctx.bezierCurveTo(-22, 228, -45, 228, -45, 215);
+      // Left outer leg
+      ctx.bezierCurveTo(-48, 165, -52, 105, -48, 52);
+      // Left torso & armpit
+      ctx.bezierCurveTo(-42, 15, -48, -20, -52, -64);
+      // Left inner arm & hand
+      ctx.bezierCurveTo(-66, -35, -78, 12, -86, 46);
+      ctx.bezierCurveTo(-92, 60, -105, 55, -102, 42);
+      // Left outer arm & shoulder
+      ctx.bezierCurveTo(-96, 5, -84, -50, -72, -82);
+      ctx.bezierCurveTo(-62, -102, -35, -110, -13, -112);
+      // Neck left & Head left
+      ctx.lineTo(-12, -128);
+      ctx.bezierCurveTo(-18, -132, -27, -142, -30, -158);
+      ctx.bezierCurveTo(-34, -180, -28, -210, 0, -210);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawOrganCallout(ctx, x1, y1, x2, y2, label, color) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 1.6;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.beginPath();
+      ctx.arc(x1, y1, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.font = '600 12px "Segoe UI", sans-serif';
+      const w = ctx.measureText(label).width + 14;
+      const h = 22;
+      const rx = x2 >= x1 ? x2 : x2 - w;
+      const ry = y2 - h / 2;
+
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.roundRect(rx, ry, w, h, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, rx + w / 2, ry + h / 2 + 0.5);
+      ctx.restore();
+    }
+
+    function renderAnatomyAndBiologyCommand(cmd, elapsedMs, ease) {
+      const system = (cmd.system || cmd.preset || 'nervous').toLowerCase();
+      const cx = cmd.cx || 285;
+      const cy = cmd.cy || 315;
+      const s = cmd.scale || 1;
+      const t = elapsedMs / 1000;
+
+      // -----------------------------------------------------------------------
+      // 1. HUMAN NERVOUS SYSTEM (Brain, Spinal Cord, Peripheral Nerves + Pulses)
+      // -----------------------------------------------------------------------
+      if (system.includes('nerv') || system.includes('brain') || system.includes('spin')) {
+        drawHumanSilhouette(ctx, cx, cy, s, ease);
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(s, s);
+
+        // Brain (Left & Right Hemispheres + Gyri folds)
+        ctx.fillStyle = 'rgba(244, 114, 182, 0.35)';
+        ctx.strokeStyle = '#f472b6';
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        ctx.ellipse(-9, -176, 15, 19, -0.15, 0, Math.PI * 2);
+        ctx.ellipse(9, -176, 15, 19, 0.15, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Cerebellum & Brainstem
+        ctx.fillStyle = 'rgba(192, 132, 252, 0.4)';
+        ctx.strokeStyle = '#c084fc';
+        ctx.beginPath();
+        ctx.ellipse(0, -154, 12, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Spinal Cord (Central Highway)
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 4.2;
+        ctx.shadowColor = '#facc15';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.moveTo(0, -148);
+        ctx.bezierCurveTo(0, -90, 0, -20, 0, 48);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Peripheral Nerve Pathways (Brachial, Intercostal, Sciatic, Femoral)
+        const nervePaths = [
+          [[0, -104], [-38, -94], [-68, -45], [-92, 35]],
+          [[0, -104], [38, -94], [68, -45], [92, 35]],
+          [[0, -96], [-52, -70], [-74, -10], [-82, 38]],
+          [[0, -96], [52, -70], [74, -10], [82, 38]],
+          [[0, -75], [-34, -62]], [[0, -75], [34, -62]],
+          [[0, -50], [-36, -36]], [[0, -50], [36, -36]],
+          [[0, -25], [-34, -10]], [[0, -25], [34, -10]],
+          [[0, 32], [-26, 65], [-34, 135], [-32, 205]],
+          [[0, 32], [26, 65], [34, 135], [32, 205]],
+          [[0, 42], [-18, 95], [-22, 160], [-24, 202]],
+          [[0, 42], [18, 95], [22, 160], [24, 202]]
+        ];
+
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2;
+        nervePaths.forEach(path => {
+          const smooth = getSmoothSplinePoints(path.map(p => ({ x: p[0], y: p[1] })), 10);
+          const maxPts = Math.max(2, Math.floor(smooth.length * ease));
+          ctx.beginPath();
+          ctx.moveTo(smooth[0].x, smooth[0].y);
+          for (let i = 1; i < maxPts; i++) ctx.lineTo(smooth[i].x, smooth[i].y);
+          ctx.stroke();
+
+          // Live Action-Potential neural pulses travelling along nerves at 60 FPS
+          if (ease > 0.8 && path.length >= 3) {
+            const pulseIdx = Math.floor(((t * 1.4) % 1) * (smooth.length - 1));
+            const pt = smooth[pulseIdx];
+            if (pt) {
+              ctx.save();
+              ctx.fillStyle = '#fde047';
+              ctx.shadowColor = '#fde047';
+              ctx.shadowBlur = 12;
+              ctx.beginPath();
+              ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.restore();
+            }
+          }
+        });
+
+        if (ease > 0.5) {
+          drawOrganCallout(ctx, 14, -178, 125, -185, 'Brain (CNS Control)', '#f472b6');
+          drawOrganCallout(ctx, 0, -65, 125, -125, 'Spinal Cord (Signal Highway)', '#facc15');
+          drawOrganCallout(ctx, -72, -32, -125, -110, 'Brachial Nerves (Arms)', '#38bdf8');
+          drawOrganCallout(ctx, 32, 125, 125, 125, 'Sciatic & Peripheral Nerves', '#38bdf8');
+        }
+        ctx.restore();
+      }
+
+      // -----------------------------------------------------------------------
+      // 2. CIRCULATORY SYSTEM & BEATING HEART (Arteries, Veins & Blood Flow)
+      // -----------------------------------------------------------------------
+      else if (system.includes('heart') || system.includes('circul') || system.includes('blood') || system.includes('cardio')) {
+        drawHumanSilhouette(ctx, cx, cy, s, ease);
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(s, s);
+
+        const vessels = [
+          { color: '#ff5252', pts: [[6, -58], [0, -115], [0, -170]] },
+          { color: '#38bdf8', pts: [[-8, -58], [-12, -115], [-8, -170]] },
+          { color: '#ff5252', pts: [[6, -58], [45, -88], [76, -20], [90, 35]] },
+          { color: '#38bdf8', pts: [[-6, -58], [-45, -88], [-76, -20], [-90, 35]] },
+          { color: '#ff5252', pts: [[6, -52], [4, 15], [28, 95], [32, 195]] },
+          { color: '#38bdf8', pts: [[-6, -52], [-6, 15], [-28, 95], [-32, 195]] }
+        ];
+
+        vessels.forEach(v => {
+          const smooth = getSmoothSplinePoints(v.pts.map(p => ({ x: p[0], y: p[1] })), 12);
+          ctx.strokeStyle = v.color;
+          ctx.lineWidth = 2.8;
+          ctx.beginPath();
+          ctx.moveTo(smooth[0].x, smooth[0].y);
+          smooth.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
+          ctx.stroke();
+
+          const cellIdx = Math.floor(((t * 1.2) % 1) * (smooth.length - 1));
+          const pt = smooth[cellIdx];
+          if (pt) {
+            ctx.fillStyle = v.color === '#ff5252' ? '#fca5a5' : '#93c5fd';
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+
+        // Pulsing 4-Chamber Heart (~72 BPM)
+        const beat = 1 + 0.14 * Math.pow(Math.sin(t * Math.PI * 2.4), 4);
+        ctx.save();
+        ctx.translate(6, -56);
+        ctx.scale(beat, beat);
+        ctx.fillStyle = '#ef4444';
+        ctx.strokeStyle = '#fecaca';
+        ctx.lineWidth = 2;
+        ctx.shadowColor = '#ef4444';
+        ctx.shadowBlur = 16;
+        ctx.beginPath();
+        ctx.moveTo(0, -10);
+        ctx.bezierCurveTo(14, -24, 28, -6, 0, 18);
+        ctx.bezierCurveTo(-28, -6, -14, -24, 0, -10);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+
+        if (ease > 0.5) {
+          drawOrganCallout(ctx, 12, -56, 130, -85, 'Heart (Pumps ~72 BPM)', '#ff5252');
+          drawOrganCallout(ctx, 4, 5, 130, 5, 'Aorta & Arteries (O2 Rich)', '#ff5252');
+          drawOrganCallout(ctx, -6, 5, -130, 5, 'Vena Cava & Veins (CO2)', '#38bdf8');
+        }
+        ctx.restore();
+      }
+
+      // -----------------------------------------------------------------------
+      // 3. RESPIRATORY SYSTEM & BREATHING LUNGS
+      // -----------------------------------------------------------------------
+      else if (system.includes('lung') || system.includes('respir') || system.includes('breath')) {
+        drawHumanSilhouette(ctx, cx, cy, s, ease);
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(s, s);
+
+        const breath = 1 + 0.08 * Math.sin(t * 2.2);
+
+        // Trachea & Bronchi
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(0, -125);
+        ctx.lineTo(0, -78);
+        ctx.moveTo(0, -78);
+        ctx.lineTo(-18, -62);
+        ctx.moveTo(0, -78);
+        ctx.lineTo(18, -62);
+        ctx.stroke();
+
+        // Lungs (expanding with the breath cycle)
+        ctx.save();
+        ctx.scale(breath, breath);
+        ctx.fillStyle = 'rgba(244, 114, 182, 0.38)';
+        ctx.strokeStyle = '#f472b6';
+        ctx.lineWidth = 2.5;
+
+        ctx.beginPath();
+        ctx.moveTo(-10, -82);
+        ctx.bezierCurveTo(-38, -80, -44, -35, -38, -18);
+        ctx.bezierCurveTo(-22, -14, -8, -22, -8, -40);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(10, -82);
+        ctx.bezierCurveTo(38, -80, 44, -35, 38, -18);
+        ctx.bezierCurveTo(22, -14, 8, -22, 8, -40);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+
+        // Diaphragm
+        const diaphY = -12 + 6 * Math.sin(t * 2.2);
+        ctx.strokeStyle = '#fb923c';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(-40, diaphY + 8);
+        ctx.quadraticCurveTo(0, diaphY - 12, 40, diaphY + 8);
+        ctx.stroke();
+
+        if (ease > 0.5) {
+          drawOrganCallout(ctx, 0, -105, 125, -125, 'Trachea (Windpipe)', '#38bdf8');
+          drawOrganCallout(ctx, 28, -55, 125, -60, 'Lungs (O2 / CO2 Exchange)', '#f472b6');
+          drawOrganCallout(ctx, 20, diaphY, 125, 10, 'Diaphragm Muscle', '#fb923c');
+        }
+        ctx.restore();
+      }
+
+      // -----------------------------------------------------------------------
+      // 4. DIGESTIVE SYSTEM
+      // -----------------------------------------------------------------------
+      else if (system.includes('digest') || system.includes('stomach') || system.includes('intestin') || system.includes('gut')) {
+        drawHumanSilhouette(ctx, cx, cy, s, ease);
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(s, s);
+
+        // Esophagus
+        ctx.strokeStyle = '#f472b6';
+        ctx.lineWidth = 4.5;
+        ctx.beginPath();
+        ctx.moveTo(0, -135);
+        ctx.lineTo(4, -32);
+        ctx.stroke();
+
+        // Liver
+        ctx.fillStyle = 'rgba(180, 83, 9, 0.65)';
+        ctx.strokeStyle = '#fb923c';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-36, -38);
+        ctx.quadraticCurveTo(-12, -48, 6, -30);
+        ctx.lineTo(-34, -16);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // J-Shaped Stomach
+        ctx.fillStyle = 'rgba(250, 204, 21, 0.38)';
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        ctx.moveTo(4, -34);
+        ctx.bezierCurveTo(28, -36, 34, -8, 16, 4);
+        ctx.bezierCurveTo(0, 10, -8, -4, 4, -34);
+        ctx.fill();
+        ctx.stroke();
+
+        // Large Intestine (Colon frame)
+        ctx.strokeStyle = '#4ade80';
+        ctx.lineWidth = 7;
+        ctx.beginPath();
+        ctx.moveTo(-28, 46);
+        ctx.lineTo(-28, 8);
+        ctx.lineTo(28, 8);
+        ctx.lineTo(28, 48);
+        ctx.lineTo(0, 56);
+        ctx.lineTo(0, 68);
+        ctx.stroke();
+
+        // Small Intestine (Coiled inner loops)
+        ctx.strokeStyle = '#fb923c';
+        ctx.lineWidth = 4.2;
+        ctx.beginPath();
+        ctx.moveTo(-16, 18);
+        ctx.bezierCurveTo(16, 16, -16, 28, 16, 28);
+        ctx.bezierCurveTo(-16, 38, 16, 42, 0, 48);
+        ctx.stroke();
+
+        if (ease > 0.5) {
+          drawOrganCallout(ctx, 2, -95, 125, -110, 'Esophagus', '#f472b6');
+          drawOrganCallout(ctx, -22, -30, -120, -50, 'Liver (Bile)', '#fb923c');
+          drawOrganCallout(ctx, 22, -16, 125, -35, 'Stomach (Acid/Enzymes)', '#facc15');
+          drawOrganCallout(ctx, 10, 30, 125, 35, 'Small & Large Intestines', '#4ade80');
+        }
+        ctx.restore();
+      }
+
+      // -----------------------------------------------------------------------
+      // 5. SKELETAL SYSTEM
+      // -----------------------------------------------------------------------
+      else if (system.includes('skelet') || system.includes('bone') || system.includes('skull') || system.includes('rib')) {
+        drawHumanSilhouette(ctx, cx, cy, s, 0.35);
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(s, s);
+        ctx.strokeStyle = '#f8fafc';
+        ctx.fillStyle = 'rgba(248, 250, 252, 0.2)';
+        ctx.lineWidth = 2.6;
+
+        // Skull & Jaw
+        ctx.beginPath();
+        ctx.arc(0, -176, 22, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.strokeRect(-11, -156, 22, 14);
+
+        // Spine
+        ctx.beginPath();
+        ctx.moveTo(0, -142);
+        ctx.lineTo(0, 45);
+        ctx.stroke();
+
+        // Ribcage (6 pairs)
+        for (let r = 0; r < 6; r++) {
+          const ry = -95 + r * 12;
+          const rw = 34 - r * 2;
+          ctx.beginPath();
+          ctx.ellipse(0, ry, rw, 6, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Pelvis
+        ctx.beginPath();
+        ctx.ellipse(-18, 46, 16, 12, -0.3, 0, Math.PI * 2);
+        ctx.ellipse(18, 46, 16, 12, 0.3, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Limb bones
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(-36, -102); ctx.lineTo(-68, -35); ctx.lineTo(-92, 36);
+        ctx.moveTo(36, -102); ctx.lineTo(68, -35); ctx.lineTo(92, 36);
+        ctx.moveTo(-26, 55); ctx.lineTo(-32, 135); ctx.lineTo(-32, 210);
+        ctx.moveTo(26, 55); ctx.lineTo(32, 135); ctx.lineTo(32, 210);
+        ctx.stroke();
+
+        if (ease > 0.5) {
+          drawOrganCallout(ctx, 20, -176, 125, -176, 'Cranium (Skull)', '#f8fafc');
+          drawOrganCallout(ctx, 30, -65, 125, -65, 'Thoracic Ribcage', '#22d3ee');
+          drawOrganCallout(ctx, 32, 115, 125, 115, 'Femur & Tibia', '#facc15');
+        }
+        ctx.restore();
+      }
+
+      // -----------------------------------------------------------------------
+      // 6. NEURON & SYNAPSE STRUCTURE
+      // -----------------------------------------------------------------------
+      else if (system.includes('neuron') || system.includes('synapse') || system.includes('axon') || system.includes('cell')) {
+        ctx.save();
+        ctx.translate(cx, cy - 20);
+        ctx.scale(s, s);
+
+        // Dendrites
+        ctx.strokeStyle = '#c084fc';
+        ctx.lineWidth = 3;
+        const dendrites = [
+          [[-120, 0], [-165, -45]], [[-165, -45], [-190, -65]], [[-165, -45], [-195, -30]],
+          [[-120, 0], [-175, 0]],   [[-175, 0], [-205, -15]],  [[-175, 0], [-205, 18]],
+          [[-120, 0], [-165, 45]],  [[-165, 45], [-195, 35]],  [[-165, 45], [-190, 68]]
+        ];
+        dendrites.forEach(([a, b]) => {
+          ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+        });
+
+        // Soma & Nucleus
+        ctx.fillStyle = 'rgba(192, 132, 252, 0.32)';
+        ctx.strokeStyle = '#c084fc';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(-115, 0, 38, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#f472b6';
+        ctx.beginPath();
+        ctx.arc(-115, 0, 14, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Axon
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(-77, 0);
+        ctx.lineTo(135, 0);
+        ctx.stroke();
+
+        // Myelin Sheath (Schwann cells)
+        ctx.fillStyle = 'rgba(34, 211, 238, 0.35)';
+        ctx.strokeStyle = '#22d3ee';
+        ctx.lineWidth = 2;
+        for (let m = 0; m < 4; m++) {
+          const mx = -65 + m * 48;
+          ctx.beginPath();
+          ctx.roundRect(mx, -14, 38, 28, 10);
+          ctx.fill();
+          ctx.stroke();
+        }
+
+        // Axon Terminals
+        ctx.strokeStyle = '#4ade80';
+        ctx.lineWidth = 3;
+        [[135, 0, 175, -35], [135, 0, 180, 0], [135, 0, 175, 35]].forEach(([x1, y1, x2, y2]) => {
+          ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+          ctx.fillStyle = '#4ade80';
+          ctx.beginPath(); ctx.arc(x2, y2, 5, 0, Math.PI * 2); ctx.fill();
+        });
+
+        // Live action-potential spike travelling down the axon
+        const spikeX = -75 + ((t * 140) % 210);
+        ctx.fillStyle = '#fde047';
+        ctx.shadowColor = '#fde047';
+        ctx.shadowBlur = 16;
+        ctx.beginPath();
+        ctx.arc(spikeX, 0, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        drawOrganCallout(ctx, -175, -45, -135, -95, 'Dendrites (Input)', '#c084fc');
+        drawOrganCallout(ctx, -115, -35, -20, -95, 'Soma & Nucleus', '#f472b6');
+        drawOrganCallout(ctx, 10, -14, 45, 75, 'Myelin Sheath (Insulation)', '#22d3ee');
+        drawOrganCallout(ctx, 175, -35, 125, -95, 'Axon Terminals (Synapse)', '#4ade80');
+        ctx.restore();
+      }
+
+      // -----------------------------------------------------------------------
+      // 7. DNA DOUBLE HELIX
+      // -----------------------------------------------------------------------
+      else if (system.includes('dna') || system.includes('gene') || system.includes('helix')) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        const rungs = 18;
+        for (let i = 0; i <= rungs; i++) {
+          const y = -165 + (i / rungs) * 330;
+          const phase = (i / rungs) * Math.PI * 3 + t * 2.2;
+          const x1 = Math.sin(phase) * 65;
+          const x2 = Math.sin(phase + Math.PI) * 65;
+
+          ctx.strokeStyle = i % 2 === 0 ? '#4ade80' : '#facc15';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(x1, y);
+          ctx.lineTo(x2, y);
+          ctx.stroke();
+
+          ctx.fillStyle = '#22d3ee';
+          ctx.beginPath(); ctx.arc(x1, y, 5, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#f472b6';
+          ctx.beginPath(); ctx.arc(x2, y, 5, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+
+    // =========================================================================
+    // 5d. DYNAMIC 3D 15-JOINT HUMAN KINEMATICS & MULTI-POV CAMERA ENGINE
+    // Supports: walk, run, sprint, jump, dive, swim, sit, wave, dance, kick,
+    // squat, emote + custom LLM joint parameters in 3rd, 2nd and 1st Person POV
+    // =========================================================================
+    function drawTaperedLimb(ctx, p1, p2, r1, r2, color, fillAlpha = 0.28) {
+      if (!p1 || !p2) return;
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const len = Math.hypot(dx, dy);
+      if (len < 1) return;
+      const nx = -dy / len;
+      const ny = dx / len;
+
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 2.4;
+
+      ctx.beginPath();
+      ctx.moveTo(p1.x + nx * r1, p1.y + ny * r1);
+      ctx.lineTo(p2.x + nx * r2, p2.y + ny * r2);
+      ctx.arc(p2.x, p2.y, r2, Math.atan2(ny, nx), Math.atan2(-ny, -nx), false);
+      ctx.lineTo(p1.x - nx * r1, p1.y - ny * r1);
+      ctx.arc(p1.x, p1.y, r1, Math.atan2(-ny, -nx), Math.atan2(ny, nx), false);
+      ctx.closePath();
+
+      ctx.globalAlpha = fillAlpha;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function computeDynamicRigJoints(action, tSec, customParams = {}) {
+      const act = (action || 'walk').toLowerCase();
+
+      let freq = customParams.freq || 2.8;
+      let legAmp = customParams.legAmp ?? 0.55;
+      let armAmp = customParams.armAmp ?? 0.5;
+      let lean = customParams.lean ?? 0.08;
+      let bounceAmp = customParams.bounce ?? 6;
+      let torsoPitch = 0;
+      let rootYOffset = 0;
+
+      if (act.includes('sprint')) {
+        freq = 6.2; legAmp = 1.15; armAmp = 1.25; lean = 0.38; bounceAmp = 14;
+      } else if (act.includes('run') || act.includes('jog')) {
+        freq = 4.4; legAmp = 0.88; armAmp = 0.95; lean = 0.22; bounceAmp = 11;
+      } else if (act.includes('walk')) {
+        freq = 2.5; legAmp = 0.52; armAmp = 0.45; lean = 0.06; bounceAmp = 5;
+      } else if (act.includes('swim')) {
+        freq = 3.2; legAmp = 0.35; armAmp = 1.35; torsoPitch = 1.35; bounceAmp = 6;
+      }
+
+      const phase = tSec * freq * Math.PI * 2;
+      let lHip = Math.sin(phase) * legAmp;
+      let rHip = -Math.sin(phase) * legAmp;
+      let lKnee = Math.max(0, -Math.cos(phase) * legAmp * 1.15 + 0.2);
+      let rKnee = Math.max(0, Math.cos(phase) * legAmp * 1.15 + 0.2);
+      let lShoulder = -Math.sin(phase) * armAmp;
+      let rShoulder = Math.sin(phase) * armAmp;
+      let lElbow = 0.45 + Math.max(0, -Math.sin(phase) * 0.5);
+      let rElbow = 0.45 + Math.max(0, Math.sin(phase) * 0.5);
+      let lSpread = 0, rSpread = 0;
+
+      if (act.includes('jump') || act.includes('leap')) {
+        const jPhase = (tSec % 2.0) / 2.0;
+        const air = Math.sin(jPhase * Math.PI);
+        rootYOffset = -air * 95;
+        lean = 0.15 * Math.cos(jPhase * Math.PI);
+        lHip = -0.45 * air; rHip = -0.45 * air;
+        lKnee = 0.85 * (1 - air * 0.6); rKnee = 0.85 * (1 - air * 0.6);
+        lShoulder = -2.2 * air; rShoulder = -2.2 * air;
+        lElbow = 0.25; rElbow = 0.25;
+      } else if (act.includes('dive') || act.includes('pool')) {
+        const dPhase = (tSec % 2.8) / 2.8;
+        if (dPhase < 0.32) {
+          const prep = dPhase / 0.32;
+          rootYOffset = 22;
+          lean = 0.25 + prep * 0.35;
+          lHip = -1.1; rHip = -1.1;
+          lKnee = 1.25; rKnee = 1.25;
+          lShoulder = -0.8 - prep * 1.4; rShoulder = -0.8 - prep * 1.4;
+        } else {
+          const airT = (dPhase - 0.32) / 0.68;
+          rootYOffset = -Math.sin(airT * Math.PI) * 85 + airT * 65;
+          torsoPitch = 0.4 + airT * 1.65;
+          lHip = 0.1; rHip = 0.1; lKnee = 0.1; rKnee = 0.1;
+          lShoulder = -2.8; rShoulder = -2.8;
+          lElbow = 0.05; rElbow = 0.05;
+        }
+      } else if (act.includes('sit')) {
+        rootYOffset = 28;
+        lean = 0.08 + 0.04 * Math.sin(tSec * 2);
+        lHip = -1.35; rHip = -1.35;
+        lKnee = 1.45; rKnee = 1.45;
+        lShoulder = 0.2 + 0.15 * Math.sin(tSec * 2.5);
+        rShoulder = 0.2 - 0.15 * Math.sin(tSec * 2.5);
+      } else if (act.includes('wave') || act.includes('greet') || act.includes('flirt') || act.includes('wingman')) {
+        lean = 0.04 * Math.sin(tSec * 3);
+        lHip = 0.05; rHip = -0.05; lKnee = 0.08; rKnee = 0.08;
+        rShoulder = -2.35;
+        rElbow = 0.55 + 0.45 * Math.sin(tSec * 8);
+        lShoulder = 0.25; lElbow = 0.4;
+        rSpread = 0.45;
+      } else if (act.includes('dance') || act.includes('emote') || act.includes('celebrate')) {
+        rootYOffset = -Math.abs(Math.sin(tSec * 6)) * 18;
+        lean = 0.12 * Math.sin(tSec * 3);
+        lSpread = 0.35 + 0.25 * Math.sin(tSec * 6);
+        rSpread = 0.35 - 0.25 * Math.sin(tSec * 6);
+        lShoulder = -1.6 + 0.7 * Math.sin(tSec * 6);
+        rShoulder = -1.6 - 0.7 * Math.sin(tSec * 6);
+        lKnee = 0.35 + 0.25 * Math.sin(tSec * 6);
+        rKnee = 0.35 - 0.25 * Math.sin(tSec * 6);
+      } else if (act.includes('squat') || act.includes('workout') || act.includes('athlete')) {
+        const sq = 0.5 - 0.5 * Math.cos(tSec * 3.2);
+        rootYOffset = sq * 42;
+        lean = sq * 0.32;
+        lHip = -sq * 1.25; rHip = -sq * 1.25;
+        lKnee = sq * 1.45; rKnee = sq * 1.45;
+        lShoulder = -sq * 1.45; rShoulder = -sq * 1.45;
+        lElbow = 0.2; rElbow = 0.2;
+      } else if (act.includes('kick')) {
+        const k = Math.max(0, Math.sin(tSec * 4));
+        rHip = -k * 1.55;
+        rKnee = (1 - k) * 0.65;
+        lHip = 0.1; lKnee = 0.15;
+        lean = -k * 0.22;
+      }
+
+      const bounce = Math.abs(Math.sin(phase)) * bounceAmp + rootYOffset;
+      const totalPitch = lean + torsoPitch;
+
+      const pelvis = { x: 0, y: -bounce, z: 0 };
+      const chest = {
+        x: pelvis.x + Math.sin(totalPitch) * 54,
+        y: pelvis.y - Math.cos(totalPitch) * 54,
+        z: 0
+      };
+      const neck = {
+        x: chest.x + Math.sin(totalPitch) * 14,
+        y: chest.y - Math.cos(totalPitch) * 14,
+        z: 0
+      };
+      const head = {
+        x: neck.x + Math.sin(totalPitch * 0.7) * 18,
+        y: neck.y - Math.cos(totalPitch * 0.7) * 18,
+        z: 0
+      };
+
+      function solveLimb(origin, sideZ, upperAng, bendAng, spread, L1, L2, isLeg) {
+        const a1 = totalPitch + upperAng;
+        const a2 = isLeg ? (a1 + bendAng) : (a1 - bendAng);
+        const mid = {
+          x: origin.x + Math.sin(a1) * L1,
+          y: origin.y + Math.cos(a1) * L1,
+          z: origin.z + sideZ + Math.sin(spread) * L1 * (sideZ > 0 ? 1 : -1)
+        };
+        const end = {
+          x: mid.x + Math.sin(a2) * L2,
+          y: mid.y + Math.cos(a2) * L2,
+          z: mid.z + Math.sin(spread) * L2 * 0.6 * (sideZ > 0 ? 1 : -1)
+        };
+        return { mid, end };
+      }
+
+      const lArm = solveLimb(chest, -18, lShoulder, lElbow, lSpread, 34, 30, false);
+      const rArm = solveLimb(chest,  18, rShoulder, rElbow, rSpread, 34, 30, false);
+      const lLeg = solveLimb(pelvis, -12, lHip, lKnee, lSpread * 0.5, 42, 40, true);
+      const rLeg = solveLimb(pelvis,  12, rHip, rKnee, rSpread * 0.5, 42, 40, true);
+
+      return {
+        pelvis, chest, neck, head,
+        lShoulder: { x: chest.x, y: chest.y, z: -18 },
+        rShoulder: { x: chest.x, y: chest.y, z:  18 },
+        lElbow: lArm.mid, lHand: lArm.end,
+        rElbow: rArm.mid, rHand: rArm.end,
+        lHip: { x: pelvis.x, y: pelvis.y, z: -12 },
+        rHip: { x: pelvis.x, y: pelvis.y, z:  12 },
+        lKnee: lLeg.mid, lFoot: lLeg.end,
+        rKnee: rLeg.mid, rFoot: rLeg.end,
+        phase, act
+      };
+    }
+
+    function renderDynamicActorCommand(cmd, elapsedMs, color) {
+      const tSec = elapsedMs / 1000;
+      const action = (cmd.action || cmd.preset || 'walk').toLowerCase();
+      const pov = (cmd.pov || '3rd').toLowerCase();
+      const scale = Math.max(0.55, Math.min(1.6, cmd.scale || 1));
+
+      // -----------------------------------------------------------------------
+      // CAMERA MODE 1: 1ST-PERSON POV (through the actor's eyes)
+      // -----------------------------------------------------------------------
+      if (pov.includes('1st') || pov.includes('fpv') || pov.includes('first')) {
+        const cx = cmd.cx || 285;
+        const cy = cmd.cy || 295;
+        const w = 390, h = 280;
+        const speed = action.includes('sprint') ? 5.8 : action.includes('run') ? 4.0 : 2.4;
+        const bobX = Math.sin(tSec * speed * Math.PI) * 12;
+        const bobY = Math.abs(Math.cos(tSec * speed * Math.PI)) * 10;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(cx - w / 2, cy - h / 2, w, h, 14);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.4;
+        ctx.stroke();
+        ctx.clip();
+
+        const horizonY = cy - 25 + bobY;
+
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.42)';
+        ctx.lineWidth = 1.6;
+        for (let i = -6; i <= 6; i++) {
+          ctx.beginPath();
+          ctx.moveTo(cx + bobX + i * 12, horizonY);
+          ctx.lineTo(cx + bobX + i * 95, cy + h / 2);
+          ctx.stroke();
+        }
+        const flowOffset = (tSec * speed * 0.6) % 1;
+        for (let d = 0; d < 7; d++) {
+          const zNorm = ((d + flowOffset) / 7);
+          const gy = horizonY + Math.pow(zNorm, 1.8) * (h / 2 + 25);
+          ctx.beginPath();
+          ctx.moveTo(cx - w / 2, gy);
+          ctx.lineTo(cx + w / 2, gy);
+          ctx.stroke();
+        }
+
+        const swing = Math.sin(tSec * speed * Math.PI * 2);
+        const lHandX = cx - 95 + swing * 22 + bobX * 0.5;
+        const lHandY = cy + 70 - Math.max(0, swing) * 55 + bobY;
+        const rHandX = cx + 95 - swing * 22 + bobX * 0.5;
+        const rHandY = cy + 70 - Math.max(0, -swing) * 55 + bobY;
+
+        drawTaperedLimb(ctx, { x: cx - 165, y: cy + 155 }, { x: lHandX, y: lHandY }, 18, 12, color, 0.45);
+        drawTaperedLimb(ctx, { x: cx + 165, y: cy + 155 }, { x: rHandX, y: rHandY }, 18, 12, color, 0.45);
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '700 12.5px "Segoe UI", sans-serif';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText(`1ST-PERSON POV - ${action.toUpperCase()}`, cx - w / 2 + 16, cy - h / 2 + 24);
+        ctx.restore();
+        return;
+      }
+
+      // -----------------------------------------------------------------------
+      // CAMERA MODES 2 & 3: 2ND-PERSON (face-to-face) & 3RD-PERSON (side/iso)
+      // -----------------------------------------------------------------------
+      const is2ndPOV = pov.includes('2nd') || pov.includes('front') || pov.includes('face');
+      const yaw = is2ndPOV ? (Math.sin(tSec * 1.2) * 0.18) : (cmd.yaw ?? 1.38);
+      const pitch = is2ndPOV ? 0.08 : (cmd.pitch ?? 0.15);
+
+      const x1 = cmd.x1 || 120;
+      const x2 = cmd.x2 || 440;
+      const baseY = cmd.y1 || 320;
+
+      const isLocomotion = /\b(walk|run|sprint|jog|swim|dive|move)\b/i.test(action) && !is2ndPOV;
+      const travelPhase = (tSec % 3.6) / 3.6;
+      const curX = isLocomotion ? (x1 + (x2 - x1) * travelPhase) : (cmd.cx || 275);
+      const curY = baseY;
+
+      ctx.save();
+      if (action.includes('dive') || action.includes('swim') || action.includes('pool')) {
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(75, baseY + 82);
+        ctx.lineTo(195, baseY + 82);
+        ctx.lineTo(195, baseY + 135);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let wx = 195; wx <= 485; wx += 8) {
+          const wy = baseY + 98 + Math.sin((wx * 0.06) - tSec * 5) * 6;
+          if (wx === 195) ctx.moveTo(wx, wy);
+          else ctx.lineTo(wx, wy);
+        }
+        ctx.stroke();
+      } else {
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.55)';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(85, baseY + 84);
+        ctx.lineTo(475, baseY + 84);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      const rig = computeDynamicRigJoints(action, tSec, cmd.params || {});
+
+      const proj = {};
+      for (const key of Object.keys(rig)) {
+        if (typeof rig[key] === 'object' && rig[key] !== null && 'x' in rig[key]) {
+          proj[key] = project3DPoint(
+            rig[key].z,
+            -rig[key].y,
+            rig[key].x,
+            curX,
+            curY,
+            scale,
+            pitch,
+            yaw
+          );
+        }
+      }
+      // Bail out cleanly if projection produced anything unusable.
+      for (const k of ['head', 'chest', 'pelvis', 'lFoot', 'rFoot', 'lHand', 'rHand']) {
+        if (!proj[k] || !Number.isFinite(proj[k].x) || !Number.isFinite(proj[k].y)) return;
+      }
+
+      const backColor = 'rgba(56, 189, 248, 0.62)';
+      drawTaperedLimb(ctx, proj.lHip, proj.lKnee, 7 * scale, 5.5 * scale, backColor, 0.2);
+      drawTaperedLimb(ctx, proj.lKnee, proj.lFoot, 5.5 * scale, 4 * scale, backColor, 0.2);
+      drawTaperedLimb(ctx, proj.lShoulder, proj.lElbow, 6 * scale, 4.5 * scale, backColor, 0.2);
+      drawTaperedLimb(ctx, proj.lElbow, proj.lHand, 4.5 * scale, 3.5 * scale, backColor, 0.2);
+
+      drawTaperedLimb(ctx, proj.chest, proj.pelvis, 13 * scale, 10 * scale, color, 0.32);
+
+      ctx.save();
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.8;
+      ctx.beginPath();
+      ctx.arc(proj.head.x, proj.head.y, 15 * scale, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#facc15';
+      if (is2ndPOV) {
+        ctx.beginPath();
+        ctx.arc(proj.head.x - 5 * scale, proj.head.y - 2 * scale, 2.5 * scale, 0, Math.PI * 2);
+        ctx.arc(proj.head.x + 5 * scale, proj.head.y - 2 * scale, 2.5 * scale, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.arc(proj.head.x + 8 * scale, proj.head.y - 2 * scale, 3 * scale, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      drawTaperedLimb(ctx, proj.rHip, proj.rKnee, 7.5 * scale, 5.5 * scale, color, 0.35);
+      drawTaperedLimb(ctx, proj.rKnee, proj.rFoot, 5.5 * scale, 4 * scale, color, 0.35);
+      drawTaperedLimb(ctx, proj.rShoulder, proj.rElbow, 6.5 * scale, 5 * scale, color, 0.35);
+      drawTaperedLimb(ctx, proj.rElbow, proj.rHand, 5 * scale, 3.8 * scale, color, 0.35);
+
+      ctx.save();
+      ctx.fillStyle = '#f8fafc';
+      [proj.chest, proj.pelvis, proj.rKnee, proj.lKnee, proj.rElbow, proj.lElbow].forEach(pt => {
+        if (!pt) return;
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 3 * scale, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.restore();
+
+      if (cmd.showProtractor) {
+        drawJointProtractor(proj.rHip, proj.rKnee, proj.rFoot, 'knee');
+        drawJointProtractor(proj.pelvis, proj.chest, proj.rShoulder, 'torso');
+        ctx.save();
+        ctx.setLineDash([5, 5]);
+        ctx.strokeStyle = 'rgba(250, 204, 21, 0.55)';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(proj.pelvis.x, proj.pelvis.y + 55);
+        ctx.lineTo(proj.pelvis.x, proj.pelvis.y - 70);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    // =========================================================================
+    // 5e. DYNAMIC KEYFRAME SEQUENCER - LLM invents any animation on the fly
+    // [KEYFRAMES:shape:t0,x0,y0,rot0,scale0->t1,x1,y1,rot1,scale1:label:color]
+    // =========================================================================
+    function kfDrawShape(shape, color) {
+      ctx.fillStyle = color;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 3;
+      if (shape === 'box' || shape === 'rect') {
+        ctx.beginPath();
+        ctx.roundRect(-24, -18, 48, 36, 6);
+        ctx.fill();
+      } else if (shape === 'arrow') {
+        ctx.beginPath();
+        ctx.moveTo(-26, -10);
+        ctx.lineTo(8, -10);
+        ctx.lineTo(8, -20);
+        ctx.lineTo(28, 0);
+        ctx.lineTo(8, 20);
+        ctx.lineTo(8, 10);
+        ctx.lineTo(-26, 10);
+        ctx.closePath();
+        ctx.fill();
+      } else if (shape === 'triangle') {
+        ctx.beginPath();
+        ctx.moveTo(0, -24);
+        ctx.lineTo(22, 18);
+        ctx.lineTo(-22, 18);
+        ctx.closePath();
+        ctx.fill();
+      } else if (shape === 'actor') {
+        ctx.beginPath();
+        ctx.arc(0, -22, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 3.4;
+        ctx.beginPath();
+        ctx.moveTo(0, -14);
+        ctx.lineTo(0, 10);
+        ctx.moveTo(-14, -6);
+        ctx.lineTo(14, -6);
+        ctx.moveTo(0, 10);
+        ctx.lineTo(-11, 26);
+        ctx.moveTo(0, 10);
+        ctx.lineTo(11, 26);
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.arc(0, 0, 20, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function renderKeyframesCommand(cmd, elapsed, color) {
+      const frames = cmd.keyframes || [];
+      if (frames.length < 2) return;
+      const last = frames[frames.length - 1];
+      const inSeconds = last.t > 1;
+      const span = Math.max(0.001, inSeconds ? last.t : 1);
+      const loopMs = Math.max(600, (inSeconds ? last.t : 3) * 1000);
+      const tt = ((elapsed % loopMs) / loopMs) * span;
+
+      ctx.save();
+      ctx.globalAlpha = 0.3;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      frames.forEach((f, i) => (i === 0 ? ctx.moveTo(f.x, f.y) : ctx.lineTo(f.x, f.y)));
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+      ctx.restore();
+
+      let i = 0;
+      while (i < frames.length - 2 && frames[i + 1].t <= tt) i++;
+      const a = frames[i];
+      const b = frames[i + 1];
+      const u = b.t === a.t ? 0 : Math.max(0, Math.min(1, (tt - a.t) / (b.t - a.t)));
+      const e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      const x = a.x + (b.x - a.x) * e;
+      const y = a.y + (b.y - a.y) * e;
+      const rot = ((a.rot + (b.rot - a.rot) * e) * Math.PI) / 180;
+      const sc = Math.max(0.1, a.scale + (b.scale - a.scale) * e);
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rot);
+      ctx.scale(sc, sc);
+      kfDrawShape((cmd.shape || 'circle').toLowerCase(), color);
+      ctx.restore();
+    }
+
+    // =========================================================================
+    // 5f. AUTO-LAYOUT FLOWCHART / MIND-MAP / SYSTEM GRAPH
+    // [GRAPH:From->To|From->To:label:color] - nodes laid out automatically,
+    // directed edges flow with animated dashes + travelling pulses.
+    // =========================================================================
+    function renderGraphCommand(cmd, elapsed, color) {
+      const nodes = cmd.nodes || [];
+      const pos = cmd.nodePositions || {};
+      const boxW = 116;
+      const boxH = 42;
+
+      for (const e of cmd.edges || []) {
+        const a = pos[e.from];
+        const b = pos[e.to];
+        if (!a || !b) continue;
+        ctx.save();
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.75)';
+        ctx.lineWidth = 2.4;
+        ctx.setLineDash([9, 7]);
+        ctx.lineDashOffset = -(elapsed / 45);
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        const t = (elapsed % 1600) / 1600;
+        const px = a.x + (b.x - a.x) * t;
+        const py = a.y + (b.y - a.y) * t;
+        ctx.fillStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(px, py, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      nodes.forEach((name, idx) => {
+        const key = (name && typeof name === 'object')
+          ? String(name.id ?? name.label ?? idx)
+          : String(name);
+        const p = pos[key];
+        if (!p) return;
+        const appear = Math.min(1, Math.max(0, (elapsed - idx * 160) / 380));
+        if (appear <= 0) return;
+        const s = 0.7 + 0.3 * (1 - Math.pow(1 - appear, 3));
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.scale(s, s);
+        ctx.globalAlpha = appear;
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.roundRect(-boxW / 2, -boxH / 2, boxW, boxH, 10);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#f8fafc';
+        let text = (name && typeof name === 'object')
+          ? String(name.label ?? name.id ?? key)
+          : String(name);
+        ctx.font = '700 12.5px "Segoe UI", sans-serif';
+        while (text.length > 3 && ctx.measureText(text).width > boxW - 14) text = text.slice(0, -1);
+        ctx.fillText(text, 0, 0);
+        ctx.restore();
+      });
+      ctx.restore();
+    }
+
+    // =========================================================================
+    // 5g. LIVE CODE / MEMORY / ALGORITHM STEP-TRACER
+    // [TRACE:v1,v2,...:swap=i,j:ptr=k:label:color] - array cells, swapping
+    // pairs animate across each other, pointer arrow bobs below an index.
+    // =========================================================================
+    function renderTraceCommand(cmd, elapsed, color) {
+      const vals = cmd.values || [];
+      const n = vals.length;
+      if (!n) return;
+      const W = (cmd._traceRect && cmd._traceRect.w) || 430;
+      const H = (cmd._traceRect && cmd._traceRect.h) || 240;
+      const gap = 8;
+      const cellW = Math.min(70, (W - gap * (n + 1)) / n);
+      const cellH = cellW * 1.15;
+      const totalW = n * cellW + (n - 1) * gap;
+      const x0 = (W - totalW) / 2;
+      const baseY = H * 0.4;
+
+      let swapOff = 0;
+      const swap = cmd.swapIndices || [];
+      if (swap.length === 2) {
+        const ph = (elapsed % 2400) / 2400;
+        const u = ph < 0.42 ? ph / 0.42 : ph < 0.5 ? 1 : ph < 0.92 ? 1 - (ph - 0.5) / 0.42 : 0;
+        swapOff = (u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2) * (cellW + gap);
+      }
+
+      for (let i = 0; i < n; i++) {
+        const isSwap = swap.includes(i);
+        let cx = x0 + i * (cellW + gap) + cellW / 2;
+        if (isSwap) cx += swap[0] === i ? swapOff : -swapOff;
+        const pulse = isSwap ? 0.5 + 0.5 * Math.abs(Math.sin(elapsed / 140)) : 0;
+        const y = baseY;
+        ctx.save();
+        ctx.fillStyle = `rgba(15, 23, 42, ${0.92 + pulse * 0.05})`;
+        ctx.strokeStyle = isSwap ? '#f87171' : color;
+        ctx.lineWidth = isSwap ? 3 + pulse * 1.6 : 2.2;
+        ctx.shadowColor = isSwap ? 'rgba(248, 113, 113, 0.8)' : 'transparent';
+        ctx.shadowBlur = isSwap ? 8 + pulse * 8 : 0;
+        ctx.beginPath();
+        ctx.roundRect(cx - cellW / 2, y, cellW, cellH, 8);
+        ctx.fill();
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = `700 ${Math.max(13, Math.min(19, cellW * 0.36))}px "Consolas", monospace`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(vals[i]), cx, y + cellH / 2);
+        if (i === (cmd.pointerIndex || 0)) {
+          const bob = Math.sin(elapsed / 180) * 4;
+          ctx.fillStyle = '#facc15';
+          ctx.beginPath();
+          ctx.moveTo(cx, y + cellH + 8 + bob);
+          ctx.lineTo(cx - 9, y + cellH + 24 + bob);
+          ctx.lineTo(cx + 9, y + cellH + 24 + bob);
+          ctx.closePath();
+          ctx.fill();
+          ctx.font = '700 11px "Segoe UI", sans-serif';
+          ctx.fillText('ptr', cx, y + cellH + 36 + bob);
+        }
+        ctx.restore();
+      }
+    }
+
+    // =========================================================================
+    // 5h. PARTICLE / VECTOR-FIELD / FLUID SIMULATOR
+    // [FIELD:gas|electric|magnetic|fluid:intensity:label:color]
+    // =========================================================================
+    function renderFieldCommand(cmd, elapsed, color) {
+      const W = (cmd._fieldRect && cmd._fieldRect.w) || 390;
+      const H = (cmd._fieldRect && cmd._fieldRect.h) || 290;
+      const kind = (cmd.fieldType || 'gas').toLowerCase();
+      const intensity = Math.max(10, Math.min(200, cmd.intensity || 60));
+      const speed = intensity / 60;
+
+      if (kind === 'gas') {
+        if (!cmd._fp) {
+          cmd._fp = [];
+          for (let i = 0; i < 30; i++) {
+            const ang = Math.random() * Math.PI * 2;
+            const v = 40 + Math.random() * 70;
+            cmd._fp.push({
+              x: Math.random() * W,
+              y: Math.random() * H,
+              px: 0,
+              py: 0,
+              vx: Math.cos(ang) * v,
+              vy: Math.sin(ang) * v,
+            });
+          }
+        }
+        const dt = 1 / 60;
+        ctx.save();
+        for (const p of cmd._fp) {
+          p.px = p.x;
+          p.py = p.y;
+          p.x += p.vx * dt * speed;
+          p.y += p.vy * dt * speed;
+          if (p.x < 4) { p.x = 4; p.vx *= -1; }
+          if (p.x > W - 4) { p.x = W - 4; p.vx *= -1; }
+          if (p.y < 4) { p.y = 4; p.vy *= -1; }
+          if (p.y > H - 4) { p.y = H - 4; p.vy *= -1; }
+          ctx.strokeStyle = 'rgba(251, 191, 36, 0.5)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(p.px, p.py);
+          ctx.lineTo(p.x, p.y);
+          ctx.stroke();
+          ctx.fillStyle = '#fbbf24';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 3.4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      } else if (kind === 'electric') {
+        const ax = W * 0.28;
+        const bx = W * 0.72;
+        const cy = H / 2;
+        ctx.save();
+        ctx.strokeStyle = 'rgba(96, 165, 250, 0.75)';
+        ctx.lineWidth = 2;
+        for (let k = -2; k <= 2; k++) {
+          const off = k * H * 0.16;
+          ctx.setLineDash([8, 6]);
+          ctx.lineDashOffset = -(elapsed / 35);
+          ctx.beginPath();
+          ctx.moveTo(ax, cy + off * 0.3);
+          ctx.bezierCurveTo(W * 0.45, cy + off, W * 0.55, cy + off, bx, cy + off * 0.3);
+          ctx.stroke();
+          const t = ((elapsed / 2200) + (k + 2) / 5) % 1;
+          const bez = (p0, p1, p2, p3, u) =>
+            Math.pow(1 - u, 3) * p0 + 3 * Math.pow(1 - u, 2) * u * p1 + 3 * (1 - u) * u * u * p2 + u * u * u * p3;
+          const px = bez(ax, W * 0.45, W * 0.55, bx, t);
+          const py = bez(cy + off * 0.3, cy + off, cy + off, cy + off * 0.3, t);
+          ctx.setLineDash([]);
+          ctx.fillStyle = '#93c5fd';
+          ctx.beginPath();
+          ctx.arc(px, py, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.setLineDash([]);
+        const drawCharge = (x, sign, col) => {
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
+          ctx.strokeStyle = col;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(x, cy, 20, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = col;
+          ctx.font = '800 24px "Segoe UI", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(sign, x, cy);
+        };
+        drawCharge(ax, '+', '#f87171');
+        drawCharge(bx, '−', '#60a5fa');
+        ctx.restore();
+      } else if (kind === 'magnetic') {
+        const cx = W / 2;
+        const cy = H / 2;
+        ctx.save();
+        ctx.strokeStyle = 'rgba(167, 139, 250, 0.8)';
+        ctx.lineWidth = 2.2;
+        ctx.setLineDash([9, 7]);
+        ctx.lineDashOffset = -(elapsed / 40);
+        for (let r = 1; r <= 4; r++) {
+          const rr = r * H * 0.11;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, rr * 0.85, rr, 0, Math.PI * 0.5, Math.PI * 1.5);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, rr * 0.85, rr, 0, Math.PI * 1.5, Math.PI * 0.5);
+          ctx.stroke();
+        }
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#f87171';
+        ctx.beginPath();
+        ctx.arc(cx, cy - 22, 13, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#60a5fa';
+        ctx.beginPath();
+        ctx.arc(cx, cy + 22, 13, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '800 15px "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('N', cx, cy - 22);
+        ctx.fillText('S', cx, cy + 22);
+        ctx.restore();
+      } else {
+        // fluid: laminar streamlines with flowing tracer dots
+        ctx.save();
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.55)';
+        ctx.lineWidth = 2;
+        for (let s = 0; s < 6; s++) {
+          const baseY = H * (0.16 + s * 0.136);
+          ctx.beginPath();
+          for (let x = 0; x <= W; x += 10) {
+            const y = baseY + Math.sin((x / W) * Math.PI * 2 + elapsed / 420 + s) * 10;
+            x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+          const t = ((elapsed / 2000) * speed + s / 6) % 1;
+          const dx = t * W;
+          const dy = baseY + Math.sin((dx / W) * Math.PI * 2 + elapsed / 420 + s) * 10;
+          ctx.fillStyle = '#7dd3fc';
+          ctx.beginPath();
+          ctx.arc(dx, dy, 5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+
+    // =========================================================================
+    // 5i. MOOD / ENVIRONMENT WEBAUDIO DJ + 60 FPS SPECTRUM VISUALIZER
+    // Real-time procedural beat (kick + sub-bass + chord pad + hi-hat) and a
+    // spectrum/equalizer display. Audio stops automatically when cleared.
+    // =========================================================================
+    const DJAudio = {
+      ctx: null,
+      master: null,
+      timer: null,
+      nextTime: 0,
+      step: 0,
+      genre: null,
+      bpm: 0,
+      root: 0,
+      ensure(genre, bpm, root) {
+        if (this.timer && this.genre === genre && this.bpm === bpm && this.root === root) return;
+        this.stop();
+        this.genre = genre;
+        this.bpm = bpm;
+        this.root = root;
+        try {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return;
+          if (!this.ctx) this.ctx = new AC();
+          if (this.ctx.state === 'suspended') this.ctx.resume();
+          this.master = this.ctx.createGain();
+          this.master.gain.value = 0.28;
+          this.master.connect(this.ctx.destination);
+          this.nextTime = this.ctx.currentTime + 0.12;
+          this.step = 0;
+          this.timer = setInterval(() => this.tick(), 30);
+        } catch (err) {
+          this.timer = null;
+        }
+      },
+      stop() {
+        if (this.timer) {
+          clearInterval(this.timer);
+          this.timer = null;
+        }
+        if (this.master) {
+          try {
+            this.master.gain.setTargetAtTime(0, this.ctx.currentTime, 0.05);
+            const m = this.master;
+            setTimeout(() => { try { m.disconnect(); } catch (e) {} }, 400);
+          } catch (e) {}
+          this.master = null;
+        }
+        this.genre = null;
+      },
+      tick() {
+        if (!this.ctx || !this.master) return;
+        const stepDur = 60 / this.bpm / 2;
+        while (this.nextTime < this.ctx.currentTime + 0.15) {
+          this.playStep(this.step, this.nextTime, stepDur);
+          this.step = (this.step + 1) % 16;
+          this.nextTime += stepDur;
+        }
+      },
+      env(node, t, dur, peak) {
+        const g = this.ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(peak, t + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        node.connect(g);
+        g.connect(this.master);
+        return g;
+      },
+      kick(t) {
+        const o = this.ctx.createOscillator();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(130, t);
+        o.frequency.exponentialRampToValueAtTime(42, t + 0.11);
+        this.env(o, t, 0.2, 0.9);
+        o.start(t);
+        o.stop(t + 0.25);
+      },
+      hat(t) {
+        const len = Math.floor(this.ctx.sampleRate * 0.05);
+        const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+        const d = buf.getChannelData(0);
+        for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+        const src = this.ctx.createBufferSource();
+        src.buffer = buf;
+        const hp = this.ctx.createBiquadFilter();
+        hp.type = 'highpass';
+        hp.frequency.value = 7000;
+        src.connect(hp);
+        this.env(hp, t, 0.05, 0.22);
+        src.start(t);
+        src.stop(t + 0.06);
+      },
+      bass(t, freq, dur) {
+        const o = this.ctx.createOscillator();
+        o.type = this.genre === 'synthwave' ? 'sawtooth' : 'triangle';
+        o.frequency.value = freq;
+        this.env(o, t, dur, 0.4);
+        o.start(t);
+        o.stop(t + dur + 0.05);
+      },
+      pad(t, freqs, dur) {
+        freqs.forEach((f) => {
+          const o = this.ctx.createOscillator();
+          o.type = this.genre === 'hype' ? 'square' : 'sine';
+          o.frequency.value = f;
+          this.env(o, t, dur, 0.12);
+          o.start(t);
+          o.stop(t + dur + 0.1);
+        });
+      },
+      playStep(step, t, stepDur) {
+        const beat = step % 4 === 0;
+        const kickSteps = this.genre === 'hype' ? [0, 4, 8, 12] : [0, 8];
+        if (kickSteps.includes(step)) this.kick(t);
+        if (step % 2 === 1) this.hat(t);
+        if (step % 8 === 0) {
+          const r = this.root;
+          this.bass(t, r / 2, stepDur * 7);
+          const third = this.genre === 'synthwave' ? 1.26 : 1.2;
+          this.pad(t, [r, r * third, r * 1.5], stepDur * 15);
+        } else if (this.genre !== 'hype' && step % 4 === 2) {
+          this.bass(t, this.root / 2 / 1.2, stepDur * 3);
+        }
+      },
+    };
+
+    function renderDjCommand(cmd, elapsed, color) {
+      const W = (cmd._djRect && cmd._djRect.w) || 420;
+      const H = (cmd._djRect && cmd._djRect.h) || 320;
+      const bpm = cmd.bpm || 84;
+      const beatMs = 60000 / bpm;
+      const beatPhase = (elapsed % beatMs) / beatMs;
+      DJAudio.ensure(cmd.genre || 'lofi', bpm, cmd.chordRoot || 261.63);
+
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '800 17px "Segoe UI", sans-serif';
+      ctx.fillText(`${(cmd.genre || 'lofi').toUpperCase()} • ${bpm} BPM`, W / 2, 30);
+
+      const bars = 26;
+      const bw = (W - 40) / bars;
+      const seedStep = Math.floor(elapsed / (beatMs / 2));
+      for (let i = 0; i < bars; i++) {
+        const envelope = 0.35 + 0.65 * Math.abs(Math.sin((i / bars) * Math.PI));
+        const wobble =
+          0.5 +
+          0.5 *
+            Math.sin(seedStep * 1.7 + i * 0.9 + (cmd.genre === 'hype' ? seedStep * 0.6 : 0));
+        const boost = i % 6 === Math.floor(beatPhase * 6) % 6 ? 0.25 : 0;
+        const h = Math.max(8, (H - 130) * envelope * (0.35 + 0.65 * wobble + boost) * 0.62);
+        const x = 20 + i * bw;
+        const grad = ctx.createLinearGradient(0, H - 60 - h, 0, H - 60);
+        grad.addColorStop(0, '#a78bfa');
+        grad.addColorStop(1, '#38bdf8');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.roundRect(x + 2, H - 60 - h, bw - 4, h, 3);
+        ctx.fill();
+      }
+
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.6)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(16, H - 58);
+      ctx.lineTo(W - 16, H - 58);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#a78bfa';
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      for (let x = 16; x <= W - 16; x += 6) {
+        const y =
+          H - 28 +
+          Math.sin(x / 22 + elapsed / 130) * 9 * Math.sin(beatPhase * Math.PI);
+        x === 16 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      const pr = 10 + (1 - beatPhase) * 14;
+      ctx.strokeStyle = 'rgba(167, 139, 250, 0.9)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(W - 34, 30, pr, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = '#a78bfa';
+      ctx.beginPath();
+      ctx.arc(W - 34, 30, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // =========================================================================
+    // 5j. ATHLETIC BIOMECHANICS PROTRACTOR (live joint angles on the ACTOR rig)
+    // =========================================================================
+    function jointAngleDeg(a, b, c) {
+      if (!a || !b || !c) return 180;
+      const v1x = a.x - b.x, v1y = a.y - b.y;
+      const v2x = c.x - b.x, v2y = c.y - b.y;
+      const m = Math.hypot(v1x, v1y) * Math.hypot(v2x, v2y);
+      if (!m) return 180;
+      const dot = (v1x * v2x + v1y * v2y) / m;
+      return (Math.acos(Math.max(-1, Math.min(1, dot))) * 180) / Math.PI;
+    }
+
+    function drawJointProtractor(a, b, c, label) {
+      if (!a || !b || !c) return;
+      const ang = jointAngleDeg(a, b, c);
+      const r = 30;
+      const a1 = Math.atan2(a.y - b.y, a.x - b.x);
+      const a2 = Math.atan2(c.y - b.y, c.x - b.x);
+      let delta = a2 - a1;
+      while (delta <= -Math.PI) delta += 2 * Math.PI;
+      while (delta > Math.PI) delta -= 2 * Math.PI;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(250, 204, 21, 0.9)';
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, r, a1, a1 + delta, delta < 0);
+      ctx.stroke();
+      const mid = a1 + delta / 2;
+      ctx.fillStyle = '#facc15';
+      ctx.font = '700 12px "Consolas", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const lx = b.x + Math.cos(mid) * (r + 20);
+      const ly = b.y + Math.sin(mid) * (r + 20);
+      ctx.fillText(`${Math.round(ang)}°`, lx, ly);
+      if (label) {
+        ctx.font = '600 10px "Segoe UI", sans-serif';
+        ctx.fillStyle = 'rgba(250, 204, 21, 0.8)';
+        ctx.fillText(label, lx, ly + 13);
+      }
+      ctx.restore();
+    }
+
+    // =========================================================================
+    // 5k. AIM TRAINER + LIVE HAND-TRACE TELEMETRY HUD
+    // Flick / tracking / micro drills with ideal-vs-actual trace and live
+    // Path Efficiency %, Overshoot %, Micro-Jitter px and peak velocity.
+    // =========================================================================
+    function renderAimTrainerCommand(cmd, elapsedMs, color) {
+      const W = (cmd._aimRect && cmd._aimRect.w) || 440;
+      const H = (cmd._aimRect && cmd._aimRect.h) || 370;
+      const t = elapsedMs / 1000;
+      const mode = (cmd.drillMode || 'flick').toLowerCase();
+      const cx = W / 2;
+      const cy = H * 0.44;
+      const rArea = Math.min(W * 0.4, H * 0.37);
+
+      ctx.save();
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.32)';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.arc(cx, cy, rArea, 0, Math.PI * 2);
+      ctx.arc(cx, cy, rArea * (mode === 'micro' ? 0.45 : 0.6), 0, Math.PI * 2);
+      ctx.moveTo(cx - rArea, cy);
+      ctx.lineTo(cx + rArea, cy);
+      ctx.moveTo(cx, cy - rArea);
+      ctx.lineTo(cx, cy + rArea);
+      ctx.stroke();
+      ctx.restore();
+
+      let tx, ty, px, py, flickP;
+      if (mode === 'tracking') {
+        tx = cx + Math.sin(t * 1.7) * rArea * 0.7;
+        ty = cy + Math.sin(t * 2.3 + 1.1) * rArea * 0.62;
+        px = cx + Math.sin((t - 0.06) * 1.7) * rArea * 0.7;
+        py = cy + Math.sin((t - 0.06) * 2.3 + 1.1) * rArea * 0.62;
+        flickP = 1;
+      } else {
+        const stepHz = mode === 'micro' ? 2.2 : 1.4;
+        const idx = Math.floor(t * stepHz);
+        flickP = Math.min(1, ((t * stepHz) % 1) * 1.6);
+        const amp = mode === 'micro' ? rArea * 0.34 : rArea * 0.72;
+        tx = cx + Math.sin(idx * 2.3) * amp;
+        ty = cy + Math.cos(idx * 1.7) * amp * 0.9;
+        px = cx + Math.sin((idx - 1) * 2.3) * amp;
+        py = cy + Math.cos((idx - 1) * 1.7) * amp * 0.9;
+      }
+
+      const ctrlX = (px + tx) / 2 + rArea * 0.14;
+      const ctrlY = (py + ty) / 2 - rArea * 0.14;
+      const quad = (u) => {
+        const iu = 1 - u;
+        return {
+          x: iu * iu * px + 2 * iu * u * ctrlX + u * u * tx,
+          y: iu * iu * py + 2 * iu * u * ctrlY + u * u * ty,
+        };
+      };
+
+      ctx.save();
+      ctx.strokeStyle = 'rgba(74, 222, 128, 0.55)';
+      ctx.setLineDash([5, 5]);
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(tx, ty);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.strokeStyle = 'rgba(34, 211, 238, 0.45)';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      for (let u = 0; u <= 1.001; u += 0.08) {
+        const p = quad(u);
+        u === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+
+      const e = flickP < 0.5 ? 2 * flickP * flickP : 1 - Math.pow(-2 * flickP + 2, 2) / 2;
+      const cur = quad(e);
+      const wob = rArea / 105;
+      const curX = cur.x + Math.sin(e * Math.PI * 2) * 11 * wob * (1 - e);
+      const curY = cur.y + Math.cos(e * Math.PI * 2) * 9 * wob * (1 - e);
+
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      for (let u = 0.08; u <= e + 0.001; u += 0.08) {
+        const p = quad(Math.min(1, u));
+        ctx.lineTo(p.x + Math.sin(u * Math.PI * 2) * 11 * wob * (1 - u), p.y + Math.cos(u * Math.PI * 2) * 9 * wob * (1 - u));
+      }
+      ctx.lineTo(curX, curY);
+      ctx.stroke();
+
+      ctx.fillStyle = '#ff5252';
+      ctx.shadowColor = '#ff5252';
+      ctx.shadowBlur = 16;
+      ctx.beginPath();
+      ctx.arc(tx, ty, mode === 'micro' ? 9 : 15, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      ctx.strokeStyle = '#4ade80';
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.arc(curX, curY, 6, 0, Math.PI * 2);
+      ctx.moveTo(curX - 11, curY);
+      ctx.lineTo(curX - 3, curY);
+      ctx.moveTo(curX + 3, curY);
+      ctx.lineTo(curX + 11, curY);
+      ctx.moveTo(curX, curY - 11);
+      ctx.lineTo(curX, curY - 3);
+      ctx.moveTo(curX, curY + 3);
+      ctx.lineTo(curX, curY + 11);
+      ctx.stroke();
+      ctx.restore();
+
+      // Live telemetry HUD - same straight-line metrics as the hand analyzer:
+      // efficiency = ideal / actual length, overshoot = projection past target,
+      // jitter = mean perpendicular deviation of the traced curve.
+      const ideal = Math.hypot(tx - px, ty - py) || 1;
+      const ux = (tx - px) / ideal;
+      const uy = (ty - py) / ideal;
+      let actual = 0;
+      let maxProj = 0;
+      let perpSum = 0;
+      let prev = { x: px, y: py };
+      for (let u = 0.05; u <= 1.0001; u += 0.05) {
+        const p = quad(Math.min(1, u));
+        const sx = p.x + Math.sin(u * Math.PI * 2) * 11 * wob * (1 - u);
+        const sy = p.y + Math.cos(u * Math.PI * 2) * 9 * wob * (1 - u);
+        actual += Math.hypot(sx - prev.x, sy - prev.y);
+        prev = { x: sx, y: sy };
+        const dx = sx - px;
+        const dy = sy - py;
+        const proj = dx * ux + dy * uy;
+        if (proj > maxProj) maxProj = proj;
+        perpSum += Math.abs(dx * -uy + dy * ux);
+      }
+      const eff = Math.min(100, Math.round((ideal / Math.max(ideal, actual)) * 100));
+      const over = Math.max(0, Math.round(((maxProj - ideal) / ideal) * 100));
+      const jit = (perpSum / 21).toFixed(1);
+      const flickSec = mode === 'tracking' ? 1 : Math.max(0.12, 1 / (mode === 'micro' ? 2.2 : 1.4) / 1.6);
+      const vel = Math.round(actual / flickSec);
+
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '800 13px "Segoe UI", sans-serif';
+      ctx.fillText(`${(mode || 'flick').toUpperCase()} DRILL${cmd.dpi ? ` • ${cmd.dpi} DPI` : ''}${cmd.cmPer360 ? ` • ${cmd.cmPer360} cm/360°` : ''}`, W / 2, H - 34);
+      ctx.fillStyle = '#7dd3fc';
+      ctx.font = '700 12.5px "Consolas", monospace';
+      ctx.fillText(`Path ${eff}% • Over ${over}% • Jitter ${jit}px • ${vel} px/s`, W / 2, H - 14);
+      ctx.restore();
+    }
+
+    function renderFrame(now) {
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      let stillAnimating = false;
+
+      for (const cmd of activeCommands) {
+        if (cmd.skip) continue;
+        const elapsed = now - cmd.startTime;
+        if (elapsed < 0) { stillAnimating = true; continue; }
+
+        const duration = cmd.duration || 750;
+        const progress = Math.min(1, elapsed / duration);
+        // loop commands (ANIMATE, rotating 3D shapes) keep the RAF chain alive forever
+        if (progress < 1 || cmd.loop) stillAnimating = true;
+
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const color = resolveBrightColor(cmd.color, '#38bdf8');
+
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = cmd.lineWidth || 3.2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 6;
+
+        if (cmd.type === 'TOPIC_BANNER') {
+          ctx.font = '700 16px "Segoe UI", sans-serif';
+          const w = Math.max(260, ctx.measureText(cmd.label).width + 36);
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.roundRect(cmd.x, cmd.y, w, 38, 10);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = '#38bdf8';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(cmd.label, cmd.x + 16, cmd.y + 19);
+        }
+
+        else if (cmd.type === 'ANIMATE') {
+          ctx.save();
+          ctx.translate(cmd._animDx || 0, cmd._animDy || 0);
+          renderAnimatedGifCommand(cmd, elapsed, color);
+          ctx.restore();
+          if (cmd.label && cmd._animRect) {
+            drawLabelPill(cmd, cmd.label, cmd._animRect.x + cmd._animRect.w / 2, cmd._animRect.y - 16, color);
+          }
+        }
+
+        else if (cmd.type === 'ACTOR') {
+          ctx.save();
+          ctx.translate(cmd._actDx || 0, cmd._actDy || 0);
+          renderDynamicActorCommand(cmd, elapsed, color);
+          ctx.restore();
+          if (cmd.label && cmd._actorRect) {
+            drawLabelPill(
+              cmd,
+              `${cmd.label} (${(cmd.pov || '3rd').toUpperCase()} POV)`,
+              cmd._actorRect.x + cmd._actorRect.w / 2,
+              cmd._actorRect.y - 16,
+              color
+            );
+          }
+        }
+
+        else if (cmd.type === 'KEYFRAMES') {
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(cmd._kfRect.x - 6, cmd._kfRect.y - 6, cmd._kfRect.w + 12, cmd._kfRect.h + 12, 12);
+          ctx.clip();
+          ctx.translate(cmd._kfDx || 0, cmd._kfDy || 0);
+          renderKeyframesCommand(cmd, elapsed, color);
+          ctx.restore();
+          if (cmd.label && cmd._kfRect) {
+            drawLabelPill(cmd, cmd.label, cmd._kfRect.x + cmd._kfRect.w / 2, cmd._kfRect.y - 16, color);
+          }
+        }
+
+        else if (cmd.type === 'GRAPH') {
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(cmd._gRect.x - 6, cmd._gRect.y - 6, cmd._gRect.w + 12, cmd._gRect.h + 12, 12);
+          ctx.clip();
+          ctx.translate(cmd._gDx || 0, cmd._gDy || 0);
+          renderGraphCommand(cmd, elapsed, color);
+          ctx.restore();
+          if (cmd.label && cmd._gRect) {
+            drawLabelPill(cmd, cmd.label, cmd._gRect.x + cmd._gRect.w / 2, cmd._gRect.y - 16, color);
+          }
+        }
+
+        else if (cmd.type === 'TRACE') {
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(cmd._traceRect.x - 6, cmd._traceRect.y - 6, cmd._traceRect.w + 12, cmd._traceRect.h + 12, 12);
+          ctx.clip();
+          ctx.translate(cmd._tDx || 0, cmd._tDy || 0);
+          renderTraceCommand(cmd, elapsed, color);
+          ctx.restore();
+          if (cmd.label && cmd._traceRect) {
+            drawLabelPill(cmd, cmd.label, cmd._traceRect.x + cmd._traceRect.w / 2, cmd._traceRect.y - 16, color);
+          }
+        }
+
+        else if (cmd.type === 'FIELD') {
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(cmd._fieldRect.x - 6, cmd._fieldRect.y - 6, cmd._fieldRect.w + 12, cmd._fieldRect.h + 12, 12);
+          ctx.clip();
+          ctx.translate(cmd._fDx || 0, cmd._fDy || 0);
+          renderFieldCommand(cmd, elapsed, color);
+          ctx.restore();
+          if (cmd.label && cmd._fieldRect) {
+            drawLabelPill(cmd, cmd.label, cmd._fieldRect.x + cmd._fieldRect.w / 2, cmd._fieldRect.y - 16, color);
+          }
+        }
+
+        else if (cmd.type === 'DJ') {
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(cmd._djRect.x - 6, cmd._djRect.y - 6, cmd._djRect.w + 12, cmd._djRect.h + 12, 12);
+          ctx.clip();
+          ctx.translate(cmd._djDx || 0, cmd._djDy || 0);
+          renderDjCommand(cmd, elapsed, color);
+          ctx.restore();
+          if (cmd.label && cmd._djRect) {
+            drawLabelPill(cmd, cmd.label, cmd._djRect.x + cmd._djRect.w / 2, cmd._djRect.y - 16, color);
+          }
+        }
+
+        else if (cmd.type === 'AIM_TRAINER') {
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(cmd._aimRect.x - 6, cmd._aimRect.y - 6, cmd._aimRect.w + 12, cmd._aimRect.h + 12, 12);
+          ctx.clip();
+          ctx.translate(cmd._aimDx || 0, cmd._aimDy || 0);
+          renderAimTrainerCommand(cmd, elapsed, color);
+          ctx.restore();
+          if (cmd.label && cmd._aimRect) {
+            drawLabelPill(cmd, cmd.label, cmd._aimRect.x + cmd._aimRect.w / 2, cmd._aimRect.y - 16, color);
+          }
+        }
+
+        else if (cmd.type === 'UIRECT') {
+          // Dashed glow frame that grows out of the scanned control's true
+          // screen rect during the 750ms draw-in, then freezes (no loop).
+          // No clipping: the control may legitimately sit under the notes zone.
+          const x = cmd.x, y = cmd.y, w = cmd.w, h = cmd.h;
+          const pad = 4;
+          const dw = Math.max(10, (w + pad * 2) * ease);
+          const dh = Math.max(8, (h + pad * 2) * ease);
+
+          ctx.save();
+          ctx.setLineDash([9, 6]);
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = color;
+          ctx.beginPath();
+          ctx.roundRect(x - pad, y - pad, dw, dh, 7);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.globalAlpha = 0.16 * ease;
+          ctx.fillStyle = color;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+          ctx.shadowBlur = 0;
+          ctx.restore();
+
+          if (cmd.label && progress > 0.35) {
+            drawLabelPill(cmd, cmd.label, x + w / 2, y - 14, color);
+          }
+        }
+
+        else if (cmd.type === 'ANATOMY') {
+          // Clip to the diagram zone so callouts can never paint over notes.
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(0, 0, Math.max(140, NOTES_MIN_X - 6), window.innerHeight);
+          ctx.clip();
+          renderAnatomyAndBiologyCommand(cmd, elapsed, ease);
+          ctx.restore();
+          if (cmd.label && cmd._anatRect) {
+            drawLabelPill(cmd, cmd.label, cmd._anatRect.x + cmd._anatRect.w / 2, cmd._anatRect.y - 16, color);
+          }
+        }
+
+        else if (cmd.type === 'SVG' && cmd.d) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(0, 0, Math.max(140, NOTES_MIN_X - 6), window.innerHeight);
+          ctx.clip();
+          try {
+            if (cmd._pathLen === undefined) {
+              const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+              pathEl.setAttribute('d', cmd.d);
+              cmd._pathLen = pathEl.getTotalLength() || 0;
+              // Sample the path to find its bounding box so any path data
+              // fits inside the claimed rect regardless of its raw units.
+              let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+              const samples = Math.max(2, Math.min(256, Math.ceil(cmd._pathLen / 4) || 2));
+              for (let i = 0; i <= samples; i++) {
+                const pt = pathEl.getPointAtLength((cmd._pathLen * i) / samples);
+                if (pt.x < minX) minX = pt.x;
+                if (pt.x > maxX) maxX = pt.x;
+                if (pt.y < minY) minY = pt.y;
+                if (pt.y > maxY) maxY = pt.y;
+              }
+              cmd._bbox = { cx: (minX + maxX) / 2, cy: (minY + maxY) / 2,
+                            w: Math.max(1, maxX - minX), h: Math.max(1, maxY - minY) };
+            }
+            const rect = cmd._anatRect || { x: cmd.cx - 150, y: cmd.cy - 120, w: 300, h: 240 };
+            const bbox = cmd._bbox;
+            const fit = bbox
+              ? Math.min(rect.w / bbox.w, rect.h / bbox.h)
+              : 1;
+            const sc = fit * (cmd.scale || 1);
+            ctx.translate(cmd.cx || 200, cmd.cy || 200);
+            ctx.scale(sc, sc);
+            if (bbox) ctx.translate(-bbox.cx, -bbox.cy);
+            if (cmd._pathLen > 0) {
+              // Progressive stroke reveal over the 750ms draw-in.
+              ctx.setLineDash([cmd._pathLen, cmd._pathLen]);
+              ctx.lineDashOffset = cmd._pathLen * (1 - ease);
+            }
+            ctx.stroke(new Path2D(cmd.d));
+            ctx.setLineDash([]);
+            ctx.lineDashOffset = 0;
+          } catch { /* invalid path data: skip this frame */ }
+          ctx.restore();
+          if (cmd.label && cmd._anatRect) {
+            drawLabelPill(cmd, cmd.label, cmd._anatRect.x + cmd._anatRect.w / 2, cmd._anatRect.y - 16, color);
+          }
+        }
+
+        else if (cmd.type === 'WRITE') {
+          const lines = cmd.wrappedLines || [cmd.label || ''];
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.78)';
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.38)';
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.roundRect(cmd.x, cmd.y, cmd.cardW, cmd.cardH, 9);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.roundRect(cmd.x, cmd.y, 4, cmd.cardH, 2);
+          ctx.fill();
+
+          ctx.shadowBlur = 0;
+          ctx.font = '600 15.5px "Segoe UI", sans-serif';
+          ctx.fillStyle = '#f8fafc';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'alphabetic';
+          lines.forEach((line, idx) => {
+            const chars = Math.max(1, Math.floor(line.length * ease));
+            ctx.fillText(line.slice(0, chars), cmd.x + 14, cmd.y + 22 + idx * 23);
+          });
+        }
+
+        else if (cmd.type === 'CURVE' || cmd.type === 'POLYGON') {
+          const pts = cmd.type === 'CURVE'
+            ? (cmd.smoothPoints || (cmd.smoothPoints = getSmoothSplinePoints(cmd.points, 16)))
+            : (cmd.points || []);
+          if (pts.length >= 2) {
+            const count = Math.max(2, Math.floor(pts.length * ease));
+            ctx.beginPath();
+            ctx.moveTo(pts[0].x, pts[0].y);
+            for (let i = 1; i < count; i++) ctx.lineTo(pts[i].x, pts[i].y);
+            if (cmd.type === 'POLYGON' && progress >= 0.98 && cmd.closed !== false) ctx.closePath();
+            ctx.stroke();
+            if (progress < 1) drawPenTip(pts[count - 1].x, pts[count - 1].y, color);
+            if (cmd.label && progress > 0.55) {
+              drawLabelPill(cmd, cmd.label, pts[0].x, pts[0].y - 22, color);
+            }
+          }
+        }
+
+        else if (cmd.type === 'ARROW') {
+          const curX = cmd.x1 + (cmd.x2 - cmd.x1) * ease;
+          const curY = cmd.y1 + (cmd.y2 - cmd.y1) * ease;
+          ctx.beginPath();
+          ctx.moveTo(cmd.x1, cmd.y1);
+          ctx.lineTo(curX, curY);
+          ctx.stroke();
+
+          const angle = Math.atan2(cmd.y2 - cmd.y1, cmd.x2 - cmd.x1);
+          const head = 13;
+          ctx.beginPath();
+          ctx.moveTo(curX, curY);
+          ctx.lineTo(curX - head * Math.cos(angle - Math.PI / 6), curY - head * Math.sin(angle - Math.PI / 6));
+          ctx.lineTo(curX - head * Math.cos(angle + Math.PI / 6), curY - head * Math.sin(angle + Math.PI / 6));
+          ctx.closePath();
+          ctx.fill();
+
+          if (progress < 1) drawPenTip(curX, curY, color);
+          if (cmd.label && progress > 0.45) {
+            drawLabelPill(cmd, cmd.label, cmd.x2 + Math.cos(angle) * 18, cmd.y2 + Math.sin(angle) * 18, color);
+          }
+        }
+
+        else if (cmd.type === 'BOX') {
+          ctx.strokeRect(cmd.x, cmd.y, cmd.w * ease, cmd.h * ease);
+          if (cmd.label && progress > 0.5) {
+            drawLabelPill(cmd, cmd.label, cmd.x + cmd.w / 2, cmd.y - 20, color);
+          }
+        }
+        else if (cmd.type === 'CIRCLE' || cmd.type === 'BEACON') {
+          ctx.beginPath();
+          ctx.arc(cmd.x, cmd.y, cmd.r || 36, 0, Math.PI * 2 * ease);
+          ctx.stroke();
+          if (cmd.label && progress > 0.5) {
+            drawLabelPill(cmd, cmd.label, cmd.x, cmd.y - (cmd.r || 36) - 20, color);
+          }
+        }
+
+        else if (cmd.type === 'PLOT') {
+          const { x, y, w, h, xMin, xMax, expr } = cmd;
+          if (!isValidMathExpression(expr)) { ctx.restore(); continue; }
+          if (!cmd.sampledPoints) {
+            const fn = compileMathExpression(expr);
+            const raw = [];
+            let yMin = Infinity, yMax = -Infinity;
+            for (let i = 0; i <= 180; i++) {
+              const xv = xMin + (i / 180) * (xMax - xMin);
+              const yv = fn(xv);
+              raw.push({ xv, yv });
+              if (Number.isFinite(yv) && Math.abs(yv) < 1e4) {
+                if (yv < yMin) yMin = yv;
+                if (yv > yMax) yMax = yv;
+              }
+            }
+            if (!Number.isFinite(yMin) || yMin === yMax) { yMin = -10; yMax = 10; }
+            else { const pad = (yMax - yMin) * 0.15 || 2; yMin -= pad; yMax += pad; }
+            cmd.yMin = yMin; cmd.yMax = yMax;
+            cmd.sampledPoints = raw.map(pt => {
+              if (!Number.isFinite(pt.yv)) return null;
+              return {
+                x: x + ((pt.xv - xMin) / (xMax - xMin)) * w,
+                y: y + h - ((pt.yv - yMin) / (yMax - yMin)) * h
+              };
+            });
+          }
+
+          ctx.strokeStyle = 'rgba(248, 250, 252, 0.55)';
+          ctx.lineWidth = 1.6;
+          const zeroX = x + ((0 - xMin) / (xMax - xMin)) * w;
+          const zeroY = y + h - ((0 - cmd.yMin) / (cmd.yMax - cmd.yMin)) * h;
+          if (zeroX >= x && zeroX <= x + w) { ctx.beginPath(); ctx.moveTo(zeroX, y); ctx.lineTo(zeroX, y + h); ctx.stroke(); }
+          if (zeroY >= y && zeroY <= y + h) { ctx.beginPath(); ctx.moveTo(x, zeroY); ctx.lineTo(x + w, zeroY); ctx.stroke(); }
+
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 3.4;
+          const maxIdx = Math.floor(cmd.sampledPoints.length * ease);
+          ctx.beginPath();
+          let penDown = false, lastPt = null;
+          for (let i = 0; i < maxIdx; i++) {
+            const pt = cmd.sampledPoints[i];
+            if (!pt || pt.y < y - 8 || pt.y > y + h + 8) { penDown = false; continue; }
+            if (!penDown) { ctx.moveTo(pt.x, pt.y); penDown = true; }
+            else ctx.lineTo(pt.x, pt.y);
+            lastPt = pt;
+          }
+          ctx.stroke();
+          if (progress < 1 && lastPt) drawPenTip(lastPt.x, lastPt.y, color);
+          if (progress > 0.4) drawLabelPill(cmd, `y = ${expr}`, x + w / 2, y - 18, color);
+        }
+
+        else if (cmd.type === 'SHAPE3D') {
+          if (!cmd.edges3D) cmd.edges3D = build3DShapeEdges(cmd.shapeType, cmd.cx, cmd.cy, cmd.size, cmd.pitch, cmd.yaw);
+          const count = Math.max(1, Math.floor(cmd.edges3D.length * ease));
+          for (let i = 0; i < count; i++) {
+            const e = cmd.edges3D[i];
+            ctx.save();
+            ctx.strokeStyle = e.color || color;
+            if (e.dashed) ctx.setLineDash([6, 6]);
+            ctx.beginPath();
+            ctx.moveTo(e.p1.x, e.p1.y);
+            ctx.lineTo(e.p2.x, e.p2.y);
+            ctx.stroke();
+            if (e.axisLabel && progress >= 1) drawLabelPill(cmd, e.axisLabel, e.p2.x, e.p2.y, e.color || color);
+            ctx.restore();
+          }
+          if (cmd.label && progress > 0.5) drawLabelPill(cmd, cmd.label, cmd.cx, cmd.cy - cmd.size - 22, color);
+        }
+
+        else if (cmd.type === 'POLY3D') {
+          if (!cmd.projectedPts && cmd.points3D) {
+            cmd.projectedPts = cmd.points3D.map(pt =>
+              project3DPoint(pt.x, pt.y, pt.z, cmd.cx || 280, cmd.cy || 300, cmd.scale || 90, 0.42, 0.65)
+            );
+          }
+          const pts = cmd.projectedPts || [];
+          if (pts.length >= 2) {
+            if (cmd.dashed) ctx.setLineDash([6, 6]);
+            const count = Math.max(2, Math.floor(pts.length * ease));
+            ctx.beginPath();
+            ctx.moveTo(pts[0].x, pts[0].y);
+            for (let i = 1; i < count; i++) ctx.lineTo(pts[i].x, pts[i].y);
+            ctx.stroke();
+            if (progress < 1) drawPenTip(pts[count - 1].x, pts[count - 1].y, color);
+            if (cmd.label && progress > 0.6) drawLabelPill(cmd, cmd.label, pts[0].x, pts[0].y - 18, color);
+          }
+        }
+
+        ctx.restore();
+      }
+
+      if (!activeCommands.some((c) => !c.skip && c.type === 'DJ')) DJAudio.stop();
+
+      if (stillAnimating) animationFrameId = requestAnimationFrame(renderFrame);
+      else animationFrameId = null;
+    }
+
+    function addOverlayCommands(newCommands, clearExisting = false) {
+      if (clearExisting) {
+        activeCommands = [];
+        resetLayoutState();
+      }
+      const now = performance.now();
+      const prepared = [];
+      (newCommands || []).forEach((rawCmd, idx) => {
+        const cmd = { ...rawCmd };
+        cmd.type = (cmd.type || '').toUpperCase();
+        prepared.push({ cmd, idx });
+      });
+
+      // Layout order: topic banner first, then the notes (they own the right
+      // column), then diagram shapes from BIGGEST to smallest so the rigid
+      // plot/3D shapes claim space first and small labels work around them.
+      // Animation order still follows the original command index.
+      const diagramArea = (c) => {
+        if (c.type === 'ACTOR') return 450 * 360;
+        if (c.type === 'ANATOMY') return 460 * 470;
+        if (c.type === 'SVG') return 300 * 240;
+        if (c.type === 'ANIMATE') return 470 * 380;
+        if (c.type === 'KEYFRAMES') return 460 * 380;
+        if (c.type === 'GRAPH') return 400 * 340;
+        if (c.type === 'TRACE') return 430 * 240;
+        if (c.type === 'FIELD') return 390 * 290;
+        if (c.type === 'DJ') return 420 * 320;
+        if (c.type === 'AIM_TRAINER') return 440 * 370;
+        if (c.type === 'PLOT') return (c.w || 400) * (c.h || 310);
+        if (c.type === 'SHAPE3D') return 4 * (c.size || 90) * (c.size || 90);
+        if (c.type === 'POLY3D') return 380 * 340;
+        if (c.type === 'BOX') return (c.w || 150) * (c.h || 100);
+        if (c.type === 'CIRCLE' || c.type === 'BEACON') return 4 * (c.r || 40) * (c.r || 40);
+        return 0;
+      };
+      const shapes = prepared
+        .filter(p => p.cmd.type !== 'BOARD' && !isNoteCommand(p.cmd))
+        .sort((a, b) => diagramArea(b.cmd) - diagramArea(a.cmd));
+      const layoutOrder = [
+        ...prepared.filter(p => p.cmd.type === 'BOARD'),
+        ...prepared.filter(p => isNoteCommand(p.cmd)),
+        ...shapes
+      ];
+      layoutOrder.forEach(p => layoutCommand(p.cmd));
+
+      prepared.forEach(({ cmd, idx }) => {
+        if (cmd.skip) return;
+        cmd.startTime = now + (cmd.delayMs !== undefined ? cmd.delayMs : idx * 220);
+        cmd.duration = cmd.duration || 750;
+        activeCommands.push(cmd);
+      });
+
+      if (activeCommands.length > MAX_COMMANDS) {
+        activeCommands = activeCommands.slice(activeCommands.length - MAX_COMMANDS);
+      }
+
+      if (activeCommands.length > 0) {
+        voidBackdrop.classList.add('active');
+      }
+
+      if (!animationFrameId) animationFrameId = requestAnimationFrame(renderFrame);
+    }
+
+    function clearOverlay() {
+      activeCommands = [];
+      resetLayoutState();
+      DJAudio.stop();
+      voidBackdrop.classList.remove('active');
+      if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; }
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      subtitleBanner.style.display = 'none';
+    }
+
+    window.ClickyOverlay = {
+      addCommands: addOverlayCommands,
+      clear: clearOverlay,
+      setSubtitle(text) {
+        if (!text) subtitleBanner.style.display = 'none';
+        else {
+          voidBackdrop.classList.add('active');
+          subtitleBanner.textContent = text;
+          subtitleBanner.style.display = 'block';
+        }
+      }
+    };
+
+    // =========================================================================
+    // 6. IPC (drawing channels + buddy/voice/TTS channels used by the main process)
+    // =========================================================================
+    ipcRenderer.on('overlay:draw', (_e, payload) => {
+      if (Array.isArray(payload)) addOverlayCommands(payload, false);
+      else if (payload && Array.isArray(payload.commands)) {
+        addOverlayCommands(payload.commands, !!payload.clear);
+        if (payload.subtitle !== undefined) window.ClickyOverlay.setSubtitle(payload.subtitle);
+      }
+    });
+    ipcRenderer.on('overlay:clear', () => clearOverlay());
+    ipcRenderer.on('clear-drawings', () => clearOverlay());
+    ipcRenderer.on('overlay:subtitle', (_e, text) => window.ClickyOverlay.setSubtitle(text));
+
+    // Interactive prompt bar (File 29): shown when the main process turns
+    // click-through off (Ctrl+Shift+Space). Submits through the same
+    // pipeline as voice transcripts, then returns to click-through mode.
+    const promptBar = document.getElementById('prompt-bar');
+    const promptInput = document.getElementById('prompt-input');
+    ipcRenderer.on('overlay:click-through-changed', (_e, isClickThrough) => {
+      if (isClickThrough) {
+        promptBar.classList.remove('interactive');
+        promptInput.value = '';
+      } else {
+        promptBar.classList.add('interactive');
+        promptInput.focus();
+      }
+    });
+    promptBar.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = promptInput.value.trim();
+      if (!text) return;
+      promptInput.value = '';
+      try {
+        await ipcRenderer.invoke('overlay:submit-prompt', text);
+      } catch {
+        /* submit is best-effort; still return to click-through */
+      }
+      ipcRenderer.send('overlay:set-click-through', true);
+    });
+
+    // =========================================================================
+    // 7. BUDDY CURSOR (triangle flight, waveform, spinner, speech bubble)
+    // =========================================================================
+    const buddyRoot = document.getElementById('buddy-root');
+    const triangle = document.getElementById('triangle');
+    const waveform = document.getElementById('waveform');
+    const waveBars = Array.from(document.querySelectorAll('.wave-bar'));
+    const spinner = document.getElementById('spinner');
+    const speechBubble = document.getElementById('speech-bubble');
+
+    const listeningBarProfile = [0.4, 0.7, 1.0, 0.7, 0.4];
+    const navigationPointerPhrases = ['right here!', 'this one!', 'over here!', 'click this!', 'here it is!'];
+
+    let buddyNavigationMode = 'followingCursor';
+    let isReturningToCursor = false;
+    let isCursorOnThisScreen = true;
+    let anotherScreenNavigating = false;
+
+    let cursorPosition = { x: 300, y: 300 };
+    let targetMousePosition = { x: 300, y: 300 };
+    let cursorPositionWhenNavigationStarted = { x: 0, y: 0 };
+
+    let triangleRotationDegrees = -35.0;
+    let buddyFlightScale = 1.0;
+    let currentAudioPowerLevel = 0;
+    let voiceState = 'idle';
+    let currentAudioElement = null;
+
+    function stopActiveAudio() {
+      speechSynthesis.cancel();
+      if (currentAudioElement) {
+        try { currentAudioElement.pause(); currentAudioElement.currentTime = 0; } catch (e) {}
+        currentAudioElement = null;
+      }
+    }
+    ipcRenderer.on('stop-tts-audio', stopActiveAudio);
+
+    ipcRenderer.on('trigger-welcome', () => {
+      streamTextInBubble("hey! i'm clicky", () => setTimeout(hideBubble, 2500));
+    });
+
+    ipcRenderer.on('cursor-tick', (_, payload) => {
+      isCursorOnThisScreen = payload.isCursorOnThisScreen;
+      anotherScreenNavigating = payload.anotherScreenNavigating;
+      if (isCursorOnThisScreen) {
+        targetMousePosition = { x: payload.localX + 35, y: payload.localY + 25 };
+      }
+      if (buddyNavigationMode === 'navigatingToTarget' && isReturningToCursor) {
+        const dist = Math.hypot(
+          payload.localX - cursorPositionWhenNavigationStarted.x,
+          payload.localY - cursorPositionWhenNavigationStarted.y
+        );
+        if (dist > 100) finishNavigationAndResumeFollowing();
+      }
+    });
+
+    function buddyLoop(now) {
+      const visible = buddyNavigationMode === 'followingCursor'
+        ? (!anotherScreenNavigating && isCursorOnThisScreen)
+        : true;
+      buddyRoot.style.opacity = visible ? '1' : '0';
+
+      if (buddyNavigationMode === 'followingCursor') {
+        cursorPosition.x += (targetMousePosition.x - cursorPosition.x) * 0.22;
+        cursorPosition.y += (targetMousePosition.y - cursorPosition.y) * 0.22;
+        triangleRotationDegrees = -35.0;
+        buddyFlightScale = 1.0;
+      }
+
+      buddyRoot.style.transform =
+        'translate3d(' + cursorPosition.x + 'px,' + cursorPosition.y + 'px,0) rotate(' +
+        triangleRotationDegrees + 'deg) scale(' + buddyFlightScale + ')';
+
+      if (speechBubble.style.opacity === '1') {
+        speechBubble.style.left = cursorPosition.x + 18 + 'px';
+        speechBubble.style.top = cursorPosition.y + 8 + 'px';
+      }
+
+      if (voiceState === 'listening') {
+        waveBars.forEach((bar, idx) => {
+          const phase = (now / 1000) * 3.6 + idx * 0.35;
+          const normPower = Math.max(currentAudioPowerLevel - 0.008, 0);
+          const easedPower = Math.pow(Math.min(normPower * 2.85, 1), 0.76);
+          const reactiveHeight = easedPower * 10 * listeningBarProfile[idx];
+          const idlePulse = ((Math.sin(phase) + 1) / 2) * 1.5;
+          bar.style.height = 3 + reactiveHeight + idlePulse + 'px';
+        });
+      }
+
+      requestAnimationFrame(buddyLoop);
+    }
+    requestAnimationFrame(buddyLoop);
+
+    function animateBezierFlightArc(destination, onComplete) {
+      const startPosition = { ...cursorPosition };
+      const endPosition = { ...destination };
+      const distance = Math.hypot(endPosition.x - startPosition.x, endPosition.y - startPosition.y);
+      const flightDurationMs = Math.min(Math.max(distance / 800.0, 0.6), 1.4) * 1000;
+      const startTime = performance.now();
+
+      const midPoint = {
+        x: (startPosition.x + endPosition.x) / 2.0,
+        y: (startPosition.y + endPosition.y) / 2.0
+      };
+      const arcHeight = Math.min(distance * 0.2, 80.0);
+      const controlPoint = { x: midPoint.x, y: midPoint.y - arcHeight };
+
+      function step(now) {
+        if (buddyNavigationMode !== 'navigatingToTarget') return;
+        const linearProgress = Math.min((now - startTime) / flightDurationMs, 1.0);
+        const t = linearProgress * linearProgress * (3.0 - 2.0 * linearProgress);
+        const u = 1.0 - t;
+
+        cursorPosition.x = u * u * startPosition.x + 2 * u * t * controlPoint.x + t * t * endPosition.x;
+        cursorPosition.y = u * u * startPosition.y + 2 * u * t * controlPoint.y + t * t * endPosition.y;
+
+        const tx = 2 * u * (controlPoint.x - startPosition.x) + 2 * t * (endPosition.x - controlPoint.x);
+        const ty = 2 * u * (controlPoint.y - startPosition.y) + 2 * t * (endPosition.y - controlPoint.y);
+        triangleRotationDegrees = Math.atan2(ty, tx) * (180.0 / Math.PI) + 90.0;
+        buddyFlightScale = 1.0 + Math.sin(linearProgress * Math.PI) * 0.3;
+
+        if (linearProgress < 1.0) requestAnimationFrame(step);
+        else { buddyFlightScale = 1.0; onComplete(); }
+      }
+      requestAnimationFrame(step);
+    }
+
+    ipcRenderer.on('navigate-to-element', (_, { localX, localY, bubbleText }) => {
+      buddyNavigationMode = 'navigatingToTarget';
+      isReturningToCursor = false;
+      cursorPositionWhenNavigationStarted = { x: targetMousePosition.x - 35, y: targetMousePosition.y - 25 };
+
+      const clampedTarget = {
+        x: Math.max(20, Math.min(localX + 8, window.innerWidth - 20)),
+        y: Math.max(20, Math.min(localY + 12, window.innerHeight - 20))
+      };
+
+      animateBezierFlightArc(clampedTarget, () => {
+        buddyNavigationMode = 'pointingAtTarget';
+        triangleRotationDegrees = -35.0;
+        const phrase = bubbleText ||
+          navigationPointerPhrases[Math.floor(Math.random() * navigationPointerPhrases.length)];
+        streamTextInBubble(phrase, () => {
+          setTimeout(() => {
+            if (buddyNavigationMode !== 'pointingAtTarget') return;
+            hideBubble();
+            setTimeout(() => {
+              if (buddyNavigationMode !== 'pointingAtTarget') return;
+              buddyNavigationMode = 'navigatingToTarget';
+              isReturningToCursor = true;
+              animateBezierFlightArc(targetMousePosition, finishNavigationAndResumeFollowing);
+            }, 450);
+          }, 4000);
+        });
+      });
+    });
+
+    function streamTextInBubble(phrase, onComplete) {
+      speechBubble.textContent = '';
+      speechBubble.style.opacity = '1';
+      speechBubble.style.transform = 'scale(1)';
+      let idx = 0;
+      function nextChar() {
+        if (idx < phrase.length) {
+          speechBubble.textContent += phrase[idx++];
+          setTimeout(nextChar, 30 + Math.random() * 25);
+        } else if (onComplete) onComplete();
+      }
+      nextChar();
+    }
+
+    function hideBubble() {
+      speechBubble.style.opacity = '0';
+      speechBubble.style.transform = 'scale(0.5)';
+    }
+
+    function finishNavigationAndResumeFollowing() {
+      buddyNavigationMode = 'followingCursor';
+      isReturningToCursor = false;
+      triangleRotationDegrees = -35.0;
+      buddyFlightScale = 1.0;
+      hideBubble();
+      ipcRenderer.send('navigation-completed');
+    }
+
+    ipcRenderer.on('voice-state', (_, newState) => {
+      voiceState = newState;
+      triangle.style.display = (newState === 'idle' || newState === 'responding') ? 'block' : 'none';
+      waveform.style.display = newState === 'listening' ? 'flex' : 'none';
+      spinner.style.display = newState === 'processing' ? 'block' : 'none';
+    });
+
+    // =========================================================================
+    // 8. DICTATION + TTS
+    // =========================================================================
+    let recognition = null;
+    let latestTranscript = '';
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+      recognition.onresult = (event) => {
+        let text = '';
+        for (let i = 0; i < event.results.length; i++) text += event.results[i][0].transcript;
+        latestTranscript = text.trim();
+      };
+    }
+
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+        const audioCtx = new AudioContext();
+        const source = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        const buffer = new Float32Array(analyser.fftSize);
+        function pollAudioPower() {
+          analyser.getFloatTimeDomainData(buffer);
+          let sum = 0;
+          for (let i = 0; i < buffer.length; i++) sum += buffer[i] * buffer[i];
+          const rms = Math.sqrt(sum / buffer.length);
+          currentAudioPowerLevel = Math.max(Math.min(Math.max(rms * 10.2, 0), 1), currentAudioPowerLevel * 0.72);
+          requestAnimationFrame(pollAudioPower);
+        }
+        pollAudioPower();
+      }).catch(() => {});
+    }
+
+    ipcRenderer.on('start-listening', () => {
+      latestTranscript = '';
+      stopActiveAudio();
+      try { recognition && recognition.start(); } catch (e) {}
+    });
+
+    ipcRenderer.on('stop-listening', () => {
+      try { recognition && recognition.stop(); } catch (e) {}
+      setTimeout(() => ipcRenderer.invoke('submit-transcript', latestTranscript), 350);
+    });
+
+    ipcRenderer.on('play-tts-audio', async (_, { audioBase64, spokenText }) => {
+      stopActiveAudio();
+      if (audioBase64) {
+        try {
+          const audio = new Audio('data:audio/mp3;base64,' + audioBase64);
+          currentAudioElement = audio;
+          audio.onended = () => { currentAudioElement = null; ipcRenderer.send('tts-playback-ended'); };
+          audio.onerror = () => { currentAudioElement = null; ipcRenderer.send('tts-playback-ended'); };
+          await audio.play();
+          return;
+        } catch (e) {}
+      }
+      const utterance = new SpeechSynthesisUtterance(spokenText);
+      utterance.onend = () => ipcRenderer.send('tts-playback-ended');
+      utterance.onerror = () => ipcRenderer.send('tts-playback-ended');
+      speechSynthesis.speak(utterance);
+    });
+
+    // =========================================================================
+    // 9. ADDITIONAL ENHANCEMENTS: Teaching Pulse Ring & Fake Cursor
+    //    These work alongside the existing Clicky system for visual teaching
+    // =========================================================================
+    
+    // Enhanced pulse ring for teaching mode
+    ipcRenderer.on('draw-pulse-ring-enhanced', (event, { x, y, label }) => {
+      // Don't clear existing drawings - add to them
+      const ring = document.createElement('div');
+      ring.className = 'pulse-ring-enhanced';
+      ring.style.left = (x - 30) + 'px';
+      ring.style.top = (y - 30) + 'px';
+      ring.style.width = '60px';
+      ring.style.height = '60px';
+      document.body.appendChild(ring);
+
+      if (label) {
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tooltip-enhanced';
+        tooltip.textContent = label;
+        tooltip.style.left = (x + 35) + 'px';
+        tooltip.style.top = (y - 10) + 'px';
+        document.body.appendChild(tooltip);
+        
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+          ring.remove();
+          tooltip.remove();
+        }, 3000);
+      } else {
+        setTimeout(() => ring.remove(), 3000);
+      }
+    });
+
+    // Enhanced fake cursor (Clicky-style) for teaching mode
+    ipcRenderer.on('draw-fake-cursor-enhanced', (event, { x, y, label }) => {
+      // Don't clear existing drawings - add to them
+      const cursor = document.createElement('div');
+      cursor.className = 'fake-cursor-enhanced';
+      cursor.style.left = (x - 12) + 'px';
+      cursor.style.top = (y - 12) + 'px';
+      document.body.appendChild(cursor);
+
+      const arrow = document.createElement('div');
+      arrow.className = 'cursor-arrow-enhanced';
+      arrow.style.left = (x - 6) + 'px';
+      arrow.style.top = (y - 18) + 'px';
+      document.body.appendChild(arrow);
+
+      if (label) {
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tooltip-enhanced';
+        tooltip.textContent = label;
+        tooltip.style.left = (x + 25) + 'px';
+        tooltip.style.top = (y - 10) + 'px';
+        document.body.appendChild(tooltip);
+        
+        setTimeout(() => {
+          cursor.remove();
+          arrow.remove();
+          tooltip.remove();
+        }, 2000);
+      } else {
+        setTimeout(() => {
+          cursor.remove();
+          arrow.remove();
+        }, 2000);
+      }
+    });
+
+    // Bezier animation for cursor movement
+    ipcRenderer.on('animate-cursor-enhanced', (event, { startX, startY, endX, endY, duration }) => {
+      const cursor = document.createElement('div');
+      cursor.className = 'fake-cursor-enhanced';
+      cursor.style.left = (startX - 12) + 'px';
+      cursor.style.top = (startY - 12) + 'px';
+      document.body.appendChild(cursor);
+
+      const arrow = document.createElement('div');
+      arrow.className = 'cursor-arrow-enhanced';
+      arrow.style.left = (startX - 6) + 'px';
+      arrow.style.top = (startY - 18) + 'px';
+      document.body.appendChild(arrow);
+
+      // Animate using Web Animations API with bezier easing
+      const animation = cursor.animate([
+        { left: (startX - 12) + 'px', top: (startY - 12) + 'px' },
+        { left: (endX - 12) + 'px', top: (endY - 12) + 'px' }
+      ], {
+        duration: duration,
+        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+      });
+
+      const arrowAnimation = arrow.animate([
+        { left: (startX - 6) + 'px', top: (startY - 18) + 'px' },
+        { left: (endX - 6) + 'px', top: (endY - 18) + 'px' }
+      ], {
+        duration: duration,
+        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+      });
+
+      animation.onfinish = () => {
+        cursor.style.left = (endX - 12) + 'px';
+        cursor.style.top = (endY - 12) + 'px';
+        arrow.style.left = (endX - 6) + 'px';
+        arrow.style.top = (endY - 18) + 'px';
+        
+        // Auto-remove after animation
+        setTimeout(() => {
+          cursor.remove();
+          arrow.remove();
+        }, 500);
+      };
+    });
+
+    // Clear enhanced drawings only (doesn't affect existing Clicky drawings)
+    ipcRenderer.on('clear-enhanced-drawings', () => {
+      document.querySelectorAll('.pulse-ring-enhanced, .fake-cursor-enhanced, .cursor-arrow-enhanced, .tooltip-enhanced').forEach(el => el.remove());
+    });
+
+    // =========================================================================
+    // VIRTUAL CURSOR - Independent operation with color changes
+    // =========================================================================
+    const virtualCursor = document.getElementById('virtual-cursor');
+    const cursorStatus = document.getElementById('cursor-status');
+
+    // Listen for cursor state updates from main process
+    ipcRenderer.on('cursor-state', (event, state) => {
+      if (!virtualCursor || !cursorStatus) return;
+
+      // Update position
+      virtualCursor.style.left = state.position.x + 'px';
+      virtualCursor.style.top = state.position.y + 'px';
+
+      // Update color and mode
+      if (state.isDetached) {
+        virtualCursor.classList.remove('attached');
+        virtualCursor.classList.add('detached');
+        cursorStatus.classList.remove('attached');
+        cursorStatus.classList.add('detached');
+        cursorStatus.classList.add('visible');
+        cursorStatus.textContent = state.mode === 'teaching' ? 'TEACHING - Independent' : 'EXECUTING - Independent';
+      } else {
+        virtualCursor.classList.remove('detached');
+        virtualCursor.classList.add('attached');
+        cursorStatus.classList.remove('detached');
+        cursorStatus.classList.add('attached');
+        cursorStatus.classList.remove('visible');
+        cursorStatus.textContent = 'IDLE - Following Mouse';
+      }
+    });
+
+    // Follow physical mouse when attached (idle mode)
+    document.addEventListener('mousemove', (e) => {
+      if (virtualCursor && virtualCursor.classList.contains('attached')) {
+        virtualCursor.style.left = e.clientX + 'px';
+        virtualCursor.style.top = e.clientY + 'px';
+      }
+    });
+  </script>
+</body>
+</html>

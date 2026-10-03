@@ -1,0 +1,125 @@
+Hojaiga System Intelligence Suite — 2026-10-03 16:14:42
+
+[PASS] B1 [BRAIN] B1: Brain compiler parses 10 differently-phrased natural tasks
+    evidence: 11/12 natural phrasings routed to the right agent family; deep LinkedIn flow: 5 checkpoints -> 15 granular tasks [OK]; intent vocabulary=5 distinct | misses: 'calculate the monthly totals in the spre' spec data_processing != desktop_automation (intent='perform the requested task')
+    duration: 987.5 ms  metrics: {'routing_accuracy': '11/12', 'linkedin_checkpoints': 5, 'linkedin_granular_tasks': 15}
+
+[PASS] B2 [BRAIN] B2: Organ-01 router classifies intent/nature/confidence on raw text (no LLM needed)
+    evidence: 7/7 total; design-covered natures (analytical/creative/unknown) 5/5 correct; operational verbs routed 2/2 ('open chrome'/'click send' -> OPERATIONAL); empty-task guard=ON
+    duration: 604.1 ms  metrics: {'nature_accuracy': '7/7', 'operational_routed': '2/2'}
+
+[PASS] B3 [BRAIN] B3: enhanced_brain_compiler specialty routing (the 'open excel'->web fix)
+    evidence: 6/6 specialty routes correct | 'open excel'->desktop_automationOK; 'open notepad and type hell'->desktop_automationOK; 'launch obs studio and reco'->desktop_automationOK; 'calculate the sum of this '->data_processingOK; 'open gmail and send an ema'->web_automationOK; 'browse a website for hotel'->web_automationOK
+    duration: 0.3 ms  metrics: {'specialty_accuracy': '6/6'}
+
+[PASS] P1 [POPUP] P1: Organ-29 enumerates live windows and classifies modal vs in-window popups
+    evidence: 7 visible windows enumerated, 0 classic modal HWNDs, 5 in-window modals found on foreground window ('Clicky Infinite Void Overlay')
+    duration: 6274.9 ms  metrics: {'windows_seen': 7, 'classic_modals': 0, 'in_window_modals': 5}
+
+[PASS] P2 [POPUP] P2: Organ-29 mitigation engine resolves synthetic + live popups (dry-run safe)
+    evidence: 3/3 popup types produced a mitigation decision; live mitigation=DRY-RUN | 'Save changes before closing?'->dismiss (1114.3ms) ; 'Microsoft Store Update'->dismiss (366.7ms) ; 'Allow notifications?'->accept (431.0ms)
+    duration: 1913.6 ms  metrics: {'decisions_made': 3, 'modes_tested': 3}
+
+[PASS] S1 [SCANNER] S1: Organ-30 deep scan — how deep and how much it learns (target-aware)
+    evidence: scanned 1 target(s); best='<foreground>': 364 nodes walked, depth 10/32, 124 actionable controls, 0 menu items, 82 elements learned in 5.78s
+    duration: 6318.4 ms  metrics: {'nodes_walked': 364, 'depth_seen': 10, 'depth_cap': 32, 'actionable_controls': 124, 'elements_learned': 82, 'scan_seconds': 5.78, 'targets_tried': 1}
+
+[PASS] S2 [SCANNER] S2: Organ-41 continuous scanner — real cycles, change detection, budget behaviour
+    evidence: 5 cycles (incl. real notepad spawn/kill mutation), avg 844 ms/cycle (min 674 max 1365), 4 change-detections (expected >=2), peak elements 50
+    duration: 7450.6 ms  metrics: {'avg_cycle_ms': 843.7, 'min_cycle_ms': 673.5, 'max_cycle_ms': 1364.6, 'change_detections': 4, 'peak_elements': 50}
+
+[ENV-BLOCKED] M1 [MOUSE] M1: Virtual mouse — real Win32 motion via DAP primitives + API-contract verify
+    evidence: ENVIRONMENT-BLOCKED (NOT a code defect) — OS refused SetCursorPos (ret=0) under a foreign-thread clip we cannot remove; our thread holds no clip (release confirmed); primitive wired to Win32 SetCursorPos=True and executes without error; passes 4/4 in isolation when the pointer is free; click injection=OK; unified_virtual_mouse facade executes real input: True (wired) | diag: want(100,100) got(995,585); want(960,540) got(995,585); want(1400,300) got(995,585); want(250,800) got(995,585)
+    duration: 3023.3 ms  metrics: {'moves_verified': 0, 'moves_total': 4, 'avg_move_ms': 314.385, 'primitive_wired_setcursorpos': True, 'raw_setcursorpos_return': 0, 'pointer_hard_locked_by_other_app': True, 'os_refused_setcursorpos': True, 'our_thread_clip_confined': False, 'facade_wired_to_win32': True}
+
+[PASS] L1 [LAUNCHER] L1: Dynamic app resolution on 12 NEW phrasings not in the original 23-case matrix
+    evidence: 12/12 new phrasings routed correctly @ 3.881 ms/task | 'calculate seventeen times nine'->calculatorOK; 'sketch a sunset with a brush'->paintOK; 'take a screenshot of this mess'->snipping toolOK; 'play my downloaded music'->windows media playerOK; 'set an alarm for six am'->google chromeOK; 'draw a diagram of the system'->paintOK; 'write text in notepad for later'->notepadOK; 'rename my files in downloads'->file explorerOK; 'browse hotel deals online'->google chromeOK; 'send an email to my brother'->mailOK; 'check my outlook inbox'->mailOK; 'cook me a three course dinner'->google chromeOK
+    duration: 53.5 ms  metrics: {'matrix_accuracy': '12/12', 'resolve_ms_per_task': 3.881}
+
+[PASS] L2 [LAUNCHER] L2: launcher action semantics on the 4 designer cases (dry-run, no OS input)
+    evidence: 5/5 launcher-semantic checks pass | (a) open gmail -> browser_web/type_bar=False | (b) open obs studio -> src=alias target='obs studio' action=launch_app | (c) 'record ...' -> src=alias target='obs studio' | (d) open blender -> src=named target='blender' action=not_found | (d2) open photoshop -> src=named target='photoshop'
+    duration: 4.7 ms  metrics: {'semantic_checks': '5/5'}
+
+[PASS] R1 [MEMORY] R1: Memory organ working store, fetch throughput, TTL expiry
+    evidence: 200/200 keys round-tripped; store 76 ms (0.378 ms/op), fetch 0 ms (0.002 ms/op); TTL alive=True, expired=True
+    duration: 1483.2 ms  metrics: {'store_ms_per_op': 0.3777, 'fetch_ms_per_op': 0.0025, 'keys_round_tripped': 200}
+
+[PASS] R2 [MEMORY] R2: Memory session rooms, conversational history, snapshot persistence
+    evidence: room 247b3e05: 3 messages replayed, snapshot id=1791024236_dc623
+    duration: 132.1 ms  metrics: {'messages_replayed': 3}
+
+[PASS] K1 [KNOWLEDGE] K1: Knowledge organ ingests prose documents and retrieves them by meaning
+    evidence: 3 chunks ingested in 8 ms; 2/2 paraphrased queries returned the SEMANTICALLY correct doc; capability 'launch_app' -> 0 provider(s) | 'how do we handle the sql server ' -> top='SSMS error dialogs' score=0.138675 RELEVANT; 'which app needs pixel coordinate' -> top='Paint canvas behaviour' score=0.13159 RELEVANT
+    duration: 118.3 ms  metrics: {'chunks_ingested': 3, 'semantic_queries_hit': '2/2'}
+
+[PASS] K2 [KNOWLEDGE] K2: How easily/fast the system parses knowledge — 50 ingest+search round trips
+    evidence: 50 ingest+search round trips: avg 3.71 ms, p50 3.37 ms, p95 6.56 ms
+    duration: 275.4 ms  metrics: {'kg_roundtrip_avg_ms': 3.708, 'kg_roundtrip_p95_ms': 6.558}
+
+[PASS] D1 [DATABASE] D1: DAP batch-store 200 element profiles, then read them back from the DB
+    evidence: 200/200 profiles written in 342 ms (1.71 ms/element); 200 read back
+    duration: 685.0 ms  metrics: {'written': 200, 'read_back': 200, 'ms_per_element': 1.711}
+
+[PASS] D2 [DATABASE] D2: Popup-resolution cache + session cookie persistence round-trip
+    evidence: modal resolution read-back=OK; cookies=OK
+    duration: 75.4 ms  metrics: {}
+
+[ENV-BLOCKED] G1 [GROUNDING] G1: desktop_grounding perceives a real app AND reports tiers honestly
+    evidence: notepad window never appeared (environment)
+    duration: 12242.4 ms  metrics: {}
+
+[PASS] V1 [VERIFY] V1: DesktopVerifier emits PASS / NO_CHANGE / WRONG_STATE on live + synthetic state
+    evidence: 7/7 verdict transitions correct: change->PASS ; same->NO_CHANGE ; expect-met->PASS ; wrong->WRONG_STATE ; title->PASS ; disappeared->PASS ; file_created->PASS
+    duration: 4.3 ms  metrics: {'verdict_checks': '7/7'}
+
+[PASS] P3 [POPUP] P3: organ_29 Tier-3 gatekeeper is hard-capped so a dead LLM can't stall the loop
+    evidence: Tier-3 cap=5.0s (must be <=5s): OK; unresolvable modal resolved in 4.83s -> action='dismiss'; no multi-30s stall: OK
+    duration: 4830.3 ms  metrics: {'tier3_cap_s': 5.0, 'resolve_s': 4.83, 'fell_through': True}
+
+[PASS] PL1 [POPUP] PL1: organ_29 Tier-2.5 lexical intent resolves known categories instantly,
+escalates elevation/destructive to human, and never clicks/blind-types in test
+    evidence: 8/8 lexical checks: uac->('key:escape', True) ; destructive->('key:escape', True) ; crash->('key:escape', False) ; msgbox->('key:enter', False) ; ambiguous->None ; cookie live-resolved in 0.17s via key:escape ; uac->need_human, pressed=0 (must be 0) ; repeat hit cache in 0.13s replay=['key:escape']
+    duration: 441.4 ms  metrics: {'checks': '8/8', 'first_resolve_s': 0.17}
+
+[PASS] SK1 [SKILL] SK1: loop distills verified steps into a reusable organ_04 skill recipe and recalls it
+    evidence: 2-PASS trace -> distill=True (recipe ingested to organ_04 (2 verified steps)); recall_hit=True; 1-PASS trace -> refused=True (not enough verified steps to distill)
+    duration: 132.4 ms  metrics: {'distilled': True, 'thin_refused': True, 'recall_hit': True}
+
+[PASS] CP1 [CHECKPOINT] CP1: loop persists a resumable checkpoint after each verified step and resumes
+    evidence: checkpoint round-trip: last-verdict-recovered=True, steps=1, unknown-session->None=True, resume_session=True
+    duration: 39.1 ms  metrics: {'recovered': True, 'unknown_absent': True, 'resumed': True}
+
+[PASS] TG1 [TASKGRAPH] TG1: 'I'm busy, model a 3D chair from scratch' compiles to skip-ReAct native graph
+    evidence: graph skip_react=True mode=native_runtime kind=chair save=chair.blend steps=5 reason='construct chair in blender model 3d chair from scratch save chair blend: native bpy first, UI loop fallback'; bpy_recipe=OK; calculator_kept_react=True
+    duration: 5703.0 ms  metrics: {'mode': 'native_runtime', 'steps': 5, 'vision_tier': 4}
+
+[PASS] W6 [HYGIENE] W6: _derive_web_url resolves brand destinations without the goto.com verb alias bug
+    evidence: 6/6 hygiene checks: go to gmail -> https://www.gmail.com; goto gmail -> https://www.gmail.com; open browser and check gmail -> https://www.gmail.com; browse hotel deals -> https://www.google.com; explicit -> https://news.ycombinator.com/item?id=1; is_site(goto)=False, is_site(gmail)=True
+    duration: 21433.3 ms  metrics: {'checks': '6/6'}
+
+[PASS] W8 [INTELLIGENCE] W8: organ_47 turns verified outcomes into pro shortcuts — and never trusts a guess
+    evidence: archetype-route=OK; guess-never-learned=OK; verified-ctrl+s-trusted=OK(conf 0.85); climbs-to-cap=OK(0.85->0.97); failure-erodes=OK(0.85->0.60)
+    duration: 340.8 ms  metrics: {'checks': '5/5', 'learned_confidence': 0.97}
+
+[PASS] H1 [HEALTH] H1: Every core organ module imports cleanly with its main symbol present
+    evidence: 22/22 organs import clean (445 ms cold-import sweep)
+    duration: 445.0 ms  metrics: {'organs_healthy': '22/22'}
+
+
+RANKINGS
+1. Desktop verification loop (W2): 1/1 tests, score 100.0, avg 4.3 ms
+2. App resolution (organ_40): 2/2 tests, score 99.9, avg 29.1 ms
+3. Checkpoint / resume (W5): 1/1 tests, score 99.9, avg 39.1 ms
+4. Recipe distillation (W5): 1/1 tests, score 99.6, avg 132.4 ms
+5. Knowledge organ (organ_04): 2/2 tests, score 99.4, avg 196.9 ms
+6. App-intelligence organ (organ_47): 1/1 tests, score 99.0, avg 340.8 ms
+7. Database (batch + caches): 2/2 tests, score 98.9, avg 380.2 ms
+8. System import health: 1/1 tests, score 98.7, avg 445.0 ms
+9. Brain (compile + route + nature): 3/3 tests, score 98.4, avg 530.6 ms
+10. Memory organ (organ_03): 2/2 tests, score 97.6, avg 807.6 ms
+11. Virtual mouse (env-only): 0/1 (+1B ENV) tests, score 90.9, avg 3023.3 ms
+12. Popup handler (organ_29): 4/4 tests, score 89.9, avg 3365.0 ms
+13. Task graph compiler (skip-ReAct): 1/1 tests, score 82.9, avg 5703.0 ms
+14. Scanning (deep + continuous): 2/2 tests, score 79.3, avg 6884.5 ms
+15. Desktop grounding ladder (W1) (env-only): 0/1 (+1B ENV) tests, score 70.0, avg 12242.4 ms
+16. Web URL hygiene (W6): 1/1 tests, score 70.0, avg 21433.3 ms

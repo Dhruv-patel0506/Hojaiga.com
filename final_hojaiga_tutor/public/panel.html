@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Clicky Control Panel</title>
+  <style>
+    :root {
+      --bg: #101211;
+      --surface2: #202221;
+      --surface3: #272A29;
+      --border-subtle: #373B39;
+      --text-primary: #ECEEED;
+      --text-secondary: #ADB5B2;
+      --text-tertiary: #6B736F;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --success: #34D399;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+    body {
+      width: 330px;
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      -webkit-app-region: drag;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 6px var(--success);
+    }
+    .status-label {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    .section {
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .hint {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    .icon-btn:hover {
+      background: var(--surface2);
+      color: var(--text-primary);
+    }
+
+    .queue-badge {
+      background: var(--accent);
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 10px;
+      min-width: 18px;
+      text-align: center;
+    }
+    .queue-badge.hidden {
+      display: none;
+    }
+
+    .drawer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      background: var(--surface2);
+    }
+    .drawer.open {
+      max-height: 200px;
+    }
+
+    .drawer-section {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .drawer-section h4 {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    select, input {
+      background: var(--surface2);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .prompt-box {
+      display: flex;
+      gap: 6px;
+    }
+    .prompt-box input { flex: 1; }
+
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+    .btn-secondary:hover { background: var(--surface3); color: var(--text-primary); }
+
+    .btn-row {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-row .btn { flex: 1; }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 11.5px;
+      color: var(--text-tertiary);
+    }
+    .footer span { cursor: pointer; }
+    .footer span:hover { color: var(--text-primary); }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="brand">
+      <div id="dot" class="status-dot"></div>
+      <span>Clicky</span>
+    </div>
+    <div class="header-controls">
+      <span id="queue-badge" class="queue-badge hidden">0</span>
+      <button id="toggle-drawer" class="icon-btn">⚙️</button>
+      <span id="status-text" class="status-label">Active</span>
+    </div>
+  </div>
+
+  <div class="drawer" id="settings-drawer">
+    <div class="drawer-section">
+      <h4>Settings</h4>
+      <div class="row">
+        <span>Vision Engine</span>
+        <select id="model-select">
+          <option value="qwen2.5vl:3b" selected>Ollama: qwen2.5vl:3b (local, $0)</option>
+          <option value="llava-llama3">Ollama: llava-llama3 (local, $0)</option>
+          <option value="free-cloud-vision">Free Cloud Vision (optional fallback, no key)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="hint">
+      Ask Clicky to plot math graphs, explain your screen, teach apps, write documents, or demonstrate multi-app workflows like Ultron/Jarvis.
+    </div>
+
+    <div class="prompt-box">
+      <input id="manual-input" type="text" placeholder="draw a graph of logx and sine curve" />
+      <button id="send-btn" class="btn">Send</button>
+    </div>
+
+    <div class="btn-row">
+      <button id="explain-app-btn" class="btn btn-secondary" style="background: var(--accent); color: white;">🤖 Explain App</button>
+      <button id="write-doc-btn" class="btn btn-secondary">📝 Write Doc</button>
+      <button id="multi-app-btn" class="btn btn-secondary">🔄 Multi-App</button>
+    </div>
+
+    <div class="btn-row">
+      <button id="graph-btn" class="btn btn-secondary">📈 log(x) + sin(x)</button>
+      <button id="demo-btn" class="btn btn-secondary">✨ Shapes</button>
+      <button id="clear-btn" class="btn btn-secondary">🧹 Clear</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span id="quit-btn">⏻ Quit Clicky</span>
+    <span id="welcome-btn">▶ Replay Welcome</span>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    const manualInput = document.getElementById('manual-input');
+    const sendBtn = document.getElementById('send-btn');
+    const modelSelect = document.getElementById('model-select');
+    const graphBtn = document.getElementById('graph-btn');
+    const demoBtn = document.getElementById('demo-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const explainAppBtn = document.getElementById('explain-app-btn');
+    const writeDocBtn = document.getElementById('write-doc-btn');
+    const multiAppBtn = document.getElementById('multi-app-btn');
+    const quitBtn = document.getElementById('quit-btn');
+    const welcomeBtn = document.getElementById('welcome-btn');
+    const statusText = document.getElementById('status-text');
+    const dot = document.getElementById('dot');
+    const toggleDrawerBtn = document.getElementById('toggle-drawer');
+    const settingsDrawer = document.getElementById('settings-drawer');
+    const queueBadge = document.getElementById('queue-badge');
+
+    function submitQuestion() {
+      const val = manualInput.value.trim();
+      if (!val) return;
+      manualInput.value = '';
+      ipcRenderer.invoke('submit-transcript', val);
+    }
+
+    sendBtn.addEventListener('click', submitQuestion);
+    manualInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitQuestion();
+    });
+
+    modelSelect.addEventListener('change', () => {
+      ipcRenderer.send('set-model', modelSelect.value);
+    });
+
+    graphBtn.addEventListener('click', () => {
+      ipcRenderer.invoke('submit-transcript', 'draw a graph of logx and sine curve');
+    });
+
+    demoBtn.addEventListener('click', () => {
+      ipcRenderer.invoke('submit-transcript', 'draw a circle and a decagon in it');
+    });
+
+    clearBtn.addEventListener('click', () => {
+      ipcRenderer.send('clear-all-drawings');
+    });
+
+    explainAppBtn.addEventListener('click', () => {
+      ipcRenderer.invoke('start-app-teaching');
+    });
+
+    writeDocBtn.addEventListener('click', () => {
+      const topic = prompt('What should I write about? (e.g., "Quarterly sales report", "Professional email to client")');
+      if (topic) {
+        const docType = prompt('Document type? (report/email/paragraph/resume)');
+        ipcRenderer.invoke('write-document', topic, docType || 'report');
+      }
+    });
+
+    multiAppBtn.addEventListener('click', () => {
+      ipcRenderer.invoke('teach-multiple-apps');
+    });
+
+    welcomeBtn.addEventListener('click', () => {
+      ipcRenderer.send('replay-welcome');
+    });
+
+    quitBtn.addEventListener('click', () => {
+      ipcRenderer.send('quit-app');
+    });
+
+    toggleDrawerBtn.addEventListener('click', () => {
+      settingsDrawer.classList.toggle('open');
+      ipcRenderer.send('toggle-drawer');
+    });
+
+    ipcRenderer.on('queue-count', (_, count) => {
+      if (count > 0) {
+        queueBadge.textContent = count > 9 ? '9+' : count;
+        queueBadge.classList.remove('hidden');
+      } else {
+        queueBadge.classList.add('hidden');
+      }
+    });
+
+    ipcRenderer.on('status-update', (_, state) => {
+      statusText.textContent = state.charAt(0).toUpperCase() + state.slice(1);
+      dot.style.background = state === 'idle' ? '#34D399' : '#60a5fa';
+    });
+  </script>
+</body>
+</html>

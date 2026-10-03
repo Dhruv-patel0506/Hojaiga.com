@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Clicky Control Panel</title>
+  <style>
+    :root {
+      --bg: #101211;
+      --surface2: #202221;
+      --surface3: #272A29;
+      --border-subtle: #373B39;
+      --text-primary: #ECEEED;
+      --text-secondary: #ADB5B2;
+      --text-tertiary: #6B736F;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --success: #34D399;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+    body {
+      width: 330px;
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      -webkit-app-region: drag;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 6px var(--success);
+    }
+    .status-label {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    .section {
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .hint {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    select, input {
+      background: var(--surface2);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .prompt-box {
+      display: flex;
+      gap: 6px;
+    }
+    .prompt-box input { flex: 1; }
+
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+    .btn-secondary:hover { background: var(--surface3); color: var(--text-primary); }
+
+    .btn-row {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-row .btn { flex: 1; }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 11.5px;
+      color: var(--text-tertiary);
+    }
+    .footer span { cursor: pointer; }
+    .footer span:hover { color: var(--text-primary); }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="brand">
+      <div id="dot" class="status-dot"></div>
+      <span>Clicky</span>
+    </div>
+    <span id="status-text" class="status-label">Active</span>
+  </div>
+
+  <div class="section">
+    <div class="hint">
+      Ask Clicky to plot math graphs (<i>"draw a graph of logx and sine curve"</i>), polygons, or explain your screen.
+    </div>
+
+    <div class="prompt-box">
+      <input id="manual-input" type="text" placeholder="draw a graph of logx and sine curve" />
+      <button id="send-btn" class="btn">Send</button>
+    </div>
+
+    <div class="row">
+      <span>Vision Engine</span>
+      <select id="model-select">
+        <option value="free-cloud-vision">Free Cloud Vision (Recommended)</option>
+        <option value="llama3.2-vision">Ollama: llama3.2-vision</option>
+        <option value="qwen2.5vl">Ollama: qwen2.5vl</option>
+      </select>
+    </div>
+
+    <div class="btn-row">
+      <button id="graph-btn" class="btn btn-secondary">📈 log(x) + sin(x)</button>
+      <button id="demo-btn" class="btn btn-secondary">✨ Shapes</button>
+      <button id="clear-btn" class="btn btn-secondary">🧹 Clear</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span id="quit-btn">⏻ Quit Clicky</span>
+    <span id="welcome-btn">▶ Replay Welcome</span>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    const manualInput = document.getElementById('manual-input');
+    const sendBtn = document.getElementById('send-btn');
+    const modelSelect = document.getElementById('model-select');
+    const graphBtn = document.getElementById('graph-btn');
+    const demoBtn = document.getElementById('demo-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const quitBtn = document.getElementById('quit-btn');
+    const welcomeBtn = document.getElementById('welcome-btn');
+    const statusText = document.getElementById('status-text');
+    const dot = document.getElementById('dot');
+
+    function submitQuestion() {
+      const val = manualInput.value.trim();
+      if (!val) return;
+      manualInput.value = '';
+      ipcRenderer.invoke('submit-transcript', val);
+    }
+
+    sendBtn.addEventListener('click', submitQuestion);
+    manualInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitQuestion();
+    });
+
+    modelSelect.addEventListener('change', () => {
+      ipcRenderer.send('set-model', modelSelect.value);
+    });
+
+    graphBtn.addEventListener('click', () => {
+      ipcRenderer.invoke('submit-transcript', 'draw a graph of logx and sine curve');
+    });
+
+    demoBtn.addEventListener('click', () => {
+      ipcRenderer.invoke('submit-transcript', 'draw a circle and a decagon in it');
+    });
+
+    clearBtn.addEventListener('click', () => {
+      ipcRenderer.send('clear-all-drawings');
+    });
+
+    welcomeBtn.addEventListener('click', () => {
+      ipcRenderer.send('replay-welcome');
+    });
+
+    quitBtn.addEventListener('click', () => {
+      ipcRenderer.send('quit-app');
+    });
+
+    ipcRenderer.on('status-update', (_, state) => {
+      statusText.textContent = state.charAt(0).toUpperCase() + state.slice(1);
+      dot.style.background = state === 'idle' ? '#34D399' : '#60a5fa';
+    });
+  </script>
+</body>
+</html>
