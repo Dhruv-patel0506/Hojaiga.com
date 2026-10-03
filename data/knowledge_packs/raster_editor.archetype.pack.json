@@ -1,0 +1,34 @@
+{
+  "schema": "hojaiga.pack/1",
+  "archetype": "raster_editor",
+  "scope": "archetype",
+  "trust": "archetype",
+  "version_hash": "*",
+  "note": "Generic raster-editor family. Unverified seeds; promoted only by passing postconditions.",
+  "templates": [
+    {
+      "name": "save the image as file",
+      "aliases": ["save the canvas as an image", "save drawing as png", "export the image", "save picture"],
+      "steps": [
+        {
+          "id": "open_save_as",
+          "goal": "open the Save As dialog",
+          "risk": "E1",
+          "unwind": "cancel the dialog",
+          "do": [{"verb": "key", "keys": "ctrl+s", "expect_popup": "save as"}],
+          "post": [{"kind": "window_opened"}],
+          "retries": 2
+        },
+        {
+          "id": "save_to_path",
+          "goal": "choose the file path and confirm",
+          "risk": "E1",
+          "unwind": "delete the created file",
+          "do": [{"verb": "file_dialog", "path": "{path}"}],
+          "post": [{"kind": "file_exists", "path": "{path}"}],
+          "retries": 1
+        }
+      ]
+    }
+  ]
+}
