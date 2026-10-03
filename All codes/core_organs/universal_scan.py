@@ -38,7 +38,7 @@ from typing import Any, Dict, List, Optional, Tuple
 logger = logging.getLogger("hojaiga.universal_scan")
 
 _u32 = ctypes.windll.user32 if os.name == "nt" else None
-_START_APPS: Optional[List[Tuple[str, str]]] = None
+_start_apps_cache: Optional[List[Tuple[str, str]]] = None
 
 
 # ------------------------------------------------------------------ target classification
@@ -77,18 +77,39 @@ def _top_windows() -> Dict[int, Tuple[int, str, str]]:
 
 
 def start_apps() -> List[Tuple[str, str]]:
-    """(display name, AppID) from the Start menu — packaged, Win32 and PWA apps alike. Cached."""
-    global _START_APPS
-    if _START_APPS is not None:
-        return _START_APPS
+    """(display name, AppID) from the Start menu — packaged, Win32 and PWA apps alike.
+    The Start menu changes rarely, but every scan runs in its own process, so the in-memory cache is
+    worthless there and the ~2 s `Get-StartApps` call was paid on EVERY launch. Persist it to disk with a
+    TTL so a fresh process resolves apps instantly and only the first scan (or one after the TTL) pays."""
+    global _start_apps_cache
+    if _start_apps_cache is not None:
+        return _start_apps_cache
+    cache = os.path.join(os.environ.get("HOJAIGA_VAR", r"D:\new_automation\var\hojaiga"), "start_apps_cache.json")
+    ttl = float(os.environ.get("HOJAIGA_STARTAPPS_TTL_S", str(6 * 3600)))
+    apps: List[Tuple[str, str]] = []
     try:
-        r = subprocess.run(["powershell", "-NoProfile", "-Command",
-                            "Get-StartApps | ForEach-Object { $_.Name + '|||' + $_.AppID }"],
-                           capture_output=True, text=True, timeout=40, creationflags=0x08000000)
-        _START_APPS = [tuple(l.split("|||", 1)) for l in r.stdout.splitlines() if "|||" in l]
+        if os.path.exists(cache) and (time.time() - os.path.getmtime(cache)) < ttl:
+            with open(cache, encoding="utf-8") as fh:
+                loaded = json.load(fh)
+            apps = [(str(x[0]), str(x[1])) for x in loaded if len(x) >= 2]
     except Exception:
-        _START_APPS = []
-    return _START_APPS
+        apps = []
+    if not apps:
+        try:
+            r = subprocess.run(["powershell", "-NoProfile", "-Command",
+                                "Get-StartApps | ForEach-Object { $_.Name + '|||' + $_.AppID }"],
+                               capture_output=True, text=True, timeout=40, creationflags=0x08000000)
+            apps = [(l.split("|||", 1)[0], l.split("|||", 1)[1]) for l in r.stdout.splitlines() if "|||" in l]
+            if apps:
+                os.makedirs(os.path.dirname(cache), exist_ok=True)
+                tmp = cache + f".{os.getpid()}.tmp"
+                with open(tmp, "w", encoding="utf-8") as fh:
+                    json.dump(apps, fh)
+                os.replace(tmp, cache)                  # atomic: concurrent scans never read a half file
+        except Exception:
+            apps = []
+    _start_apps_cache = apps
+    return apps
 
 
 def resolve_app(name: str) -> Optional[Tuple[str, str]]:
@@ -416,5 +437,5 @@ def scan(target: str, model=None, **kw) -> Dict[str, Any]:
     kind = classify_target(target)
     if kind == "web":
         from core_organs import organ_51_web_layout as wl
-        return wl.scan_url(target, model, **{k: v for k, v in kw.items() if k in ("deepen", "budget", "cookies_site", "privacy")})
+        return wl.scan_url(target, model, **{k: v for k, v in kw.items() if k in ("deepen", "budget", "cookies_site", "privacy", "force")})
     return scan_desktop(target, model, **kw)

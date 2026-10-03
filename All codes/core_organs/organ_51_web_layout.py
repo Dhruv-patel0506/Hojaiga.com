@@ -609,8 +609,23 @@ def _vault_cookies(site: str) -> List[Dict[str, Any]]:
         return []
 
 
+def _deepening_known(model, app_key: str, version_hash: str) -> int:
+    """How many controls a PREVIOUS scan already learned by deepening this exact site version
+    (tabs/disclosures/lazy-scroll). >0 means the reversible deepening has been done and persisted,
+    so a warm re-scan can reuse it instead of clicking through the page again."""
+    try:
+        from core_organs import organ_50_layout_map as lm
+        model._conn.executescript(lm.LAYOUT_SCHEMA)
+        row = model._conn.execute(
+            "SELECT COUNT(*) n FROM bm_layout WHERE app_key=? AND version_hash=? AND via<>'' AND via<>'static' AND instr(via,':')>0",
+            (app_key, version_hash)).fetchone()
+        return int(row["n"]) if row else 0
+    except Exception:
+        return 0
+
+
 def scan_url(url: str, model=None, *, deepen: bool = True, budget=None, cookies_site: str = "",
-             privacy: Optional[bool] = None) -> Dict[str, Any]:
+             privacy: Optional[bool] = None, force: bool = False) -> Dict[str, Any]:
     """Map + persist one website / web app. Same shape of result as the desktop pipeline.
     cookies_site='gmail' seeds the private browser with that saved session; authenticated scans run in
     PRIVACY mode by default (structure kept, data names redacted) with the strict probe policy."""
@@ -667,12 +682,22 @@ def scan_url(url: str, model=None, *, deepen: bool = True, budget=None, cookies_
                 mp.stats["skipped"].append(f"cross-origin-iframes:{len(data['iframesCross'])}:opaque-to-DOM")
             if data["hasCanvas"] and len(mp.controls) < 40:
                 mp.stats["skipped"].append("canvas-interior:needs-ocr-or-vision")
-            t = time.time()
-            if deepen and not (authed and rep.get("session", {}).get("state", "").startswith("login_required")):
-                _deepen(b, mp, budget, strict=privacy_on)
-            rep["phases"]["deepen_s"] = round(time.time() - t, 2)
+            # WARM START: the site version (script bundle hash) is stable -> a previous scan's reversible
+            # deepening is already persisted. Reusing it is what makes a re-scan faster, exactly like the
+            # desktop pipeline reusing cached menus/layout; the click-through is the slow part of a web scan.
             vh = bm.app_version_hash("", hashlib.md5("|".join(data["scripts"]).encode()).hexdigest())
             model.check_version(key, vh)
+            deep_known = 0 if force else _deepening_known(model, key, vh)
+            rep["warm"] = {"deepen_cached": deep_known > 0, "deepened_controls_before": deep_known,
+                           "known_commands_before": len(model.commands(key, limit=5000))}
+            t = time.time()
+            if deepen and deep_known == 0 and not (authed and rep.get("session", {}).get("state", "").startswith("login_required")):
+                _deepen(b, mp, budget, strict=privacy_on)
+                rep["phases"]["deepen_s"] = round(time.time() - t, 2)
+            else:
+                rep["phases"]["deepen_s"] = 0.0
+                if deep_known:
+                    mp.stats["deepen_reused"] = deep_known
             n_saved = lm.save_layout(model, key, mp, vh)
             link_after = True
             # commands: nav links, buttons, tabs — catalog trust, risk graded, never executed here
