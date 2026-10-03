@@ -72,6 +72,7 @@ Dependencies: Python 3.11+, sqlite3 (stdlib, must be built with FTS5),
 
 
 import asyncio
+import inspect
 import json
 import logging
 import math
@@ -132,9 +133,14 @@ except ImportError:  # pragma: no cover
 #         logger.setLevel(logging.INFO)
 #     return logger
 
-from core_runtime.logger import get_clean_logger
 def build_logger(name: str = "organ_04_knowledge") -> logging.Logger:
-    return get_clean_logger(name)
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        h = logging.StreamHandler()
+        h.setFormatter(logging.Formatter('{"timestamp":"%(asctime)s","logger":"%(name)s","level":"%(levelname)s","message":"%(message)s"}'))
+        logger.addHandler(h)
+        logger.setLevel(logging.INFO)
+    return logger
 
 
 LOGGER = build_logger()
@@ -1251,7 +1257,12 @@ class IPCServer:
         config = self.kernel.config
         if platform.system() == "Windows":
             log_event(logging.INFO, "ipc_named_pipe_mode_selected", pipe=config.pipe_name)
-            self._server = await self._start_windows_pipe(config.pipe_name)
+            # loop.start_serving_pipe() returns a LIST of server objects (one per
+            # pipe instance) on Windows; normalise to a single AbstractServer.
+            server = await self._start_windows_pipe(config.pipe_name)
+            if isinstance(server, (list, tuple)):
+                server = server[0] if server else None
+            self._server = server
         else:
             socket_path = config.unix_socket_path
             if os.path.exists(socket_path):
@@ -1312,8 +1323,17 @@ class IPCServer:
 
     async def stop(self) -> None:
         if self._server is not None:
-            self._server.close()
-            await self._server.wait_closed()
+            try:
+                self._server.close()
+            except Exception:  # noqa: BLE001 - pipe listeners may lack full AbstractServer API
+                pass
+            # wait_closed() is a coroutine on AbstractServer, a plain no-op on
+            # Windows pipe listeners, and absent on _PipeServer (start_serving_pipe).
+            waiter = getattr(self._server, "wait_closed", None)
+            if waiter is not None:
+                maybeAwaitable = waiter()
+                if inspect.isawaitable(maybeAwaitable):
+                    await maybeAwaitable
 
 
 class _PipeProtocolAdapter(asyncio.Protocol):

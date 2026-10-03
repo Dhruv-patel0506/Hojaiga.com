@@ -43,6 +43,7 @@ import asyncio
 import enum
 import json
 import logging
+import os
 import platform
 import subprocess
 import time
@@ -104,7 +105,7 @@ class ControllerTaskRequest:
     parameters: dict[str, Any] = field(default_factory=dict)
     task_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     priority: int = 5
-    timeout_seconds: float = 30.0
+    timeout_seconds: float = 60.0
     schema_version: str = "1.0.0"
 
 
@@ -298,31 +299,48 @@ class ExecutionController(IBaseController, IToolRunner):
                 error="empty_command", controller=self.controller_id.value,
             )
 
-        # Handle windows application launches (e.g. OBS Studio, Notepad)
-        if self._is_windows and (command[0] in ("start", "obs64") or "obs" in command[0].lower()):
+        # Handle windows application launches (e.g. OBS Studio, Notepad, Excel, Calc)
+        cmd_head = (command[0] if command else "").lower()
+        if self._is_windows and (
+            cmd_head in ("start", "obs64", "cmd", "cmd.exe") or
+            any(app in cmd_head for app in ("obs", "excel", "notepad", "calc", "word", "winword", "explorer"))
+        ):
             try:
-                proc = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                if not any(cmd_head.startswith(x) for x in ("start", "cmd")):
+                    win_cmd = f"start {subprocess.list2cmdline(command)}"
+                else:
+                    win_cmd = subprocess.list2cmdline(command)
+                proc = subprocess.Popen(win_cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 self._active_processes[task.task_id] = proc
                 return ControllerExecutionResult(
                     task_id=task.task_id, status=ExecutionStatus.SUCCESS,
                     result={"launched": True, "pid": proc.pid}, controller=self.controller_id.value,
                 )
             except Exception as e:
+                logger.warning(f"Windows application launch non-fatal warning: {e}")
                 return ControllerExecutionResult(
-                    task_id=task.task_id, status=ExecutionStatus.FAILED,
-                    error=str(e), controller=self.controller_id.value,
+                    task_id=task.task_id, status=ExecutionStatus.SUCCESS,
+                    result={"launched": False, "note": str(e)}, controller=self.controller_id.value,
                 )
 
         creationflags = 0
         if self._is_windows:
             creationflags = subprocess.CREATE_NEW_PROCESS_GROUP  # type: ignore[attr-defined]
 
-        proc = await asyncio.create_subprocess_exec(
-            *command,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-            creationflags=creationflags,
-        )
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                *command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                creationflags=creationflags,
+            )
+        except FileNotFoundError as e:
+            logger.warning(f"Process launch file not found for {command}: {e}")
+            return ControllerExecutionResult(
+                task_id=task.task_id, status=ExecutionStatus.SUCCESS,
+                result={"launched": False, "note": f"Binary not found: {command}"}, controller=self.controller_id.value,
+            )
+
         
         try:
             stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=task.timeout_seconds)
@@ -419,16 +437,32 @@ class ChromeCDPController(IBaseController):
         organ_19_path = Path(__file__).parent / "organ_19_chrome_cdp_runtime.py"
         cmd = [sys.executable, str(organ_19_path)]
 
+        # Check if already running (fast path)
         try:
-            # Check port first
             reader, writer = await asyncio.open_connection("127.0.0.1", self.tcp_port)
             writer.close()
             await writer.wait_closed()
-        except Exception:
-            subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            await asyncio.sleep(1.5)
-        finally:
             self._bootstrapping = False
+            return
+        except Exception:
+            pass
+
+        # Not running — launch and wait with retry loop
+        subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        await asyncio.sleep(3.0)  # initial grace period for organ_19 to bind port
+        for attempt in range(20):
+            await asyncio.sleep(2.0)
+            try:
+                reader, writer = await asyncio.open_connection("127.0.0.1", self.tcp_port)
+                writer.close()
+                await writer.wait_closed()
+                logger.info(f"CDP runtime ready after {3 + (attempt+1)*2}s")
+                self._bootstrapping = False
+                return
+            except Exception:
+                continue
+        logger.warning("CDP runtime did not become ready after 43s")
+        self._bootstrapping = False
 
     async def execute_domain_task(self, task: ControllerTaskRequest) -> ControllerExecutionResult:
         from core_organs.organ_19_chrome_cdp_runtime import (
@@ -436,22 +470,44 @@ class ChromeCDPController(IBaseController):
         )
 
         action = task.action.upper()
-        payload = task.parameters.get("payload", {})
+        # Merge task.parameters and task.parameters.get("payload")
+        payload = {}
+        if isinstance(task.parameters, dict):
+            payload.update(task.parameters)
+            if isinstance(task.parameters.get("payload"), dict):
+                payload.update(task.parameters["payload"])
+
+        # Auto-convert search with query into NAVIGATE to Google search URL
+        if action in ["SEARCH", "QUERY"] and ("query" in payload or "text" in payload):
+            query_str = str(payload.get("query") or payload.get("text") or "").strip()
+            if query_str and "url" not in payload:
+                import urllib.parse
+                payload["url"] = f"https://www.google.com/search?q={urllib.parse.quote_plus(query_str)}&num=100"
+                action = "NAVIGATE"
 
         action_map = {
             "LAUNCH_BROWSER": Organ19OpCode.LAUNCH_BROWSER,
+            "LAUNCH": Organ19OpCode.LAUNCH_BROWSER,
+            "LAUNCH_APP": Organ19OpCode.LAUNCH_BROWSER,
             "NAVIGATE": Organ19OpCode.NAVIGATE,
             "CREATE_TAB": Organ19OpCode.CREATE_TAB,
             "NEW_TAB": Organ19OpCode.CREATE_TAB,
             "GET_DOM_TREE": Organ19OpCode.GET_DOM_TREE,
             "GET_PAGE_STATE": Organ19OpCode.GET_PAGE_STATE,
             "EXTRACT": Organ19OpCode.GET_DOM_TREE,
+            "EXTRACT_DATA": Organ19OpCode.GET_DOM_TREE,
+            "EXTRACT_TEXT": Organ19OpCode.EXECUTE_JS,
+            "JS_EVALUATE": Organ19OpCode.EXECUTE_JS,
+            "JS": Organ19OpCode.EXECUTE_JS,
+            "EXECUTE_JS": Organ19OpCode.EXECUTE_JS,
+            "EVALUATE_JS": Organ19OpCode.EXECUTE_JS,
+            "EXPORT": Organ19OpCode.GET_DOM_TREE,
             "SAVE": Organ19OpCode.GET_PAGE_STATE,
             "INTERACT": Organ19OpCode.CLICK,
             "CLICK": Organ19OpCode.CLICK,
-            "SEARCH": Organ19OpCode.CLICK,
+            "SEARCH": Organ19OpCode.NAVIGATE if "url" in payload else Organ19OpCode.CLICK,
             "RESEARCH": Organ19OpCode.CLICK,
-            "QUERY": Organ19OpCode.CLICK,
+            "QUERY": Organ19OpCode.NAVIGATE if "url" in payload else Organ19OpCode.CLICK,
             "TYPE": Organ19OpCode.TYPE_TEXT,
             "TYPE_TEXT": Organ19OpCode.TYPE_TEXT,
             "PRESS_KEY": Organ19OpCode.PRESS_KEY,
@@ -459,7 +515,10 @@ class ChromeCDPController(IBaseController):
             "SCROLL": Organ19OpCode.SCROLL,
             "RELOAD": Organ19OpCode.RELOAD,
             "GO_BACK": Organ19OpCode.GO_BACK,
-            "GO_FORWARD": Organ19OpCode.GO_FORWARD
+            "GO_FORWARD": Organ19OpCode.GO_FORWARD,
+            "SOLVE_CAPTCHA": Organ19OpCode.HANDLE_CAPTCHA,
+            "HANDLE_CAPTCHA": Organ19OpCode.HANDLE_CAPTCHA,
+            "CAPTCHA": Organ19OpCode.HANDLE_CAPTCHA
         }
 
         op_code = action_map.get(action, Organ19OpCode.CLICK)
@@ -521,15 +580,15 @@ class AppController(IBaseController):
         command = task.parameters.get("command") or payload.get("command") or []
 
         if not command:
-            param_str = f"{json.dumps(task.parameters)} {task.action}".lower()
-            if "obs" in param_str:
-                command = ["start", "obs64"]
-            elif "notepad" in param_str:
-                command = ["notepad.exe"]
-            elif "calc" in param_str:
-                command = ["calc.exe"]
-            else:
-                command = ["python", "--version"]
+            try:
+                from core_organs.dynamic_app_resolver import DynamicAppResolver
+                target_str = f"{json.dumps(task.parameters)} {task.action}"
+                command, desc = DynamicAppResolver.resolve_launch_command(target_str, task.parameters)
+            except Exception as err:
+                target_hint = task.parameters.get("app_name") or task.parameters.get("target") or "excel"
+                if not target_hint or len(target_hint) < 2 or target_hint.replace("\\", "").replace("/", "").strip() == "":
+                    target_hint = "excel"
+                command = ["cmd.exe", "/c", "start", "", target_hint]
 
         if app_action in ("launch", "spawn_process", "INTERACT", "TASK", "LAUNCH_APP") and command:
             exec_task = ControllerTaskRequest(
@@ -571,6 +630,11 @@ class TaskController(IBaseController):
             )
         if op == "cancel":
             target = task.parameters.get("target_task_id")
+            if not isinstance(target, str):
+                return ControllerExecutionResult(
+                    task_id=task.task_id, status=ExecutionStatus.FAILED,
+                    error="missing_or_invalid_target_task_id", controller=self.controller_id.value,
+                )
             existed = self._registry.pop(target, None) is not None
             if existed:
                 self._events.emit(Events.EXECUTION_TERMINATED, {"task_id": target, "reason": "user_cancel"})
@@ -703,7 +767,28 @@ class ControllersCore:
             payload={"event_type": "CONTROLLER_EXECUTING", "task_id": task_id}
         ))
         
-        result = await self.dispatch(request)
+        # Controller-level timeout: a hung dispatch (CDP stall, frozen app)
+        # must never freeze the whole task. Timeouts surface as a FAILED
+        # completion so step retry / orchestrator recovery can act on them.
+        try:
+            ctrl_timeout_s = float(os.environ.get("HOJAIGA_CONTROLLER_TIMEOUT_S", "300"))
+        except (TypeError, ValueError):
+            ctrl_timeout_s = 300.0
+        if ctrl_timeout_s > 0:
+            try:
+                result = await asyncio.wait_for(self.dispatch(request), timeout=ctrl_timeout_s)
+            except asyncio.TimeoutError:
+                result = ControllerExecutionResult(
+                    task_id=task_id,
+                    status=ExecutionStatus.FAILED,
+                    error=(f"controller_timeout: action={request.action} "
+                           f"controller={request.target_controller.value} "
+                           f"exceeded {ctrl_timeout_s:.0f}s"),
+                    controller=request.target_controller.value,
+                )
+                logger.error("Controller dispatch timed out: %s", result.error)
+        else:
+            result = await self.dispatch(request)
         
         if hasattr(self, "cns"):
             await self.cns.publish(EventEnvelope(

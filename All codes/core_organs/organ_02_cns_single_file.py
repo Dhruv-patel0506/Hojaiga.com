@@ -6,7 +6,7 @@ HOJAIGA AUTOMATION ARCHITECTURE DOC
 ============================================================
 This component is part of the Hojaiga Automation Architecture.
 Component Type: Organ 2
-Name: Central Nervous System (CNS Single File)
+Name: Cns Single File
 
 ============================================================
 2. ORGAN/COMPONENT DIAGRAM
@@ -20,7 +20,7 @@ graph TD
     
     UPSTREAM -- event/socket --> COMPONENT
     
-    subgraph COMPONENT [Central Nervous System]
+    subgraph COMPONENT [Cns Single File]
         direction TB
         IN[Inputs] --> PROC[Processing]
         PROC --> OUT[Outputs]
@@ -34,23 +34,43 @@ graph TD
 
 Inputs: Discovered from runtime
 Outputs: Discovered from runtime
-Dependencies: signal, dataclasses, enum, typing, struct, asyncio, logging, json, time, uuid...
+Dependencies: signal, dataclasses, enum, typing, __future__...
+
+============================================================
+3. N8N-STYLE VISUAL WORKFLOW (MODEL)
+============================================================
+```mermaid
+graph LR
+    input([Input Node]) --> process([Code Node: organ_02_cns_single_file.py]) --> output([Output Node])
+```
 """
 from __future__ import annotations
 
 """
 organ_02_cns_single_file.py
+==============================
 Hojaiga Automation OS -- Organ 02: Central Nervous System (CNS)
-SINGLE-FILE CONSOLIDATED PRODUCTION BUILD
+SINGLE-FILE CONSOLIDATED BUILD
 
-Includes:
-- Binary protocol framing and length-prefixed encoding/decoding.
-- Multi-transport listener (Windows Named Pipes, Unix Domain Sockets, TCP Loopback).
-- Prioritized Fan-Out EventBus with Dead-Letter telemetry alerts.
-- SessionBus, SocketRegistry, PriorityScheduler, and PipelineEngine.
-- Heartbeat monitor and Expiring SyncEngine (mutex lock tokens).
-- CNSKernel master orchestrator and standalone daemon entrypoint.
+This file merges the full CNS organ implementation (protocol framing,
+transport, event/session bus, socket registry, priority scheduler,
+pipeline engine, heartbeat monitor, sync engine, state machine, and
+the master kernel + daemon entrypoint) into one importable module.
+
+Usage:
+    import core_organs.organ_02_cns_single_file as cns
+    kernel = cns.CNSKernel()
+    await kernel.start()
+    ...
+    await kernel.shutdown()
+
+Or run directly as a daemon:
+    python organ_02_cns_single_file.py
+
+Authority order: Constitution -> Law Book -> Policy Manual ->
+Master Architecture Blueprint -> Organ Specification -> Organ_02_CNS.md
 """
+
 
 import asyncio
 import fnmatch
@@ -66,22 +86,15 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
-from typing import Any, Awaitable, Callable, Coroutine, Optional, List, Dict, Tuple, Set
-
-logger = logging.getLogger("hojaiga.organ02.cns")
-if not logger.handlers:
-    _h = logging.StreamHandler()
-    _h.setFormatter(logging.Formatter("[CNS] %(asctime)s [%(levelname)s] %(message)s"))
-    logger.addHandler(_h)
-logger.setLevel(logging.INFO)
+from typing import Any, Awaitable, Callable, Coroutine, Optional
 
 
 # ============================================================================
-# SECTION 1 -- PROTOCOL FRAMING & DATA CONTRACTS
+# SOURCE: protocol.py
 # ============================================================================
 MAX_PAYLOAD_BYTES = 32 * 1024 * 1024
 HEADER_STRUCT = struct.Struct("<IH")  # length(uint32) + type(uint16)
-CLOCK_SKEW_TOLERANCE_MS = 10000
+CLOCK_SKEW_TOLERANCE_MS = 5000
 
 
 class MessageType(IntEnum):
@@ -155,7 +168,8 @@ def validate_envelope_header(source_organ: str, target: str, event_id: str, time
 
 @dataclass
 class EventEnvelope:
-    """Canonical CNS event envelope routed across all organs."""
+    """Canonical CNS event envelope. See Organ_02_CNS.md Section 15 (CNSEventEnvelope)."""
+
     topic: str
     source_organ: str
     payload: dict[str, Any]
@@ -197,6 +211,8 @@ class EventEnvelope:
 
 @dataclass
 class TaskPayload:
+    """Canonical task dispatch contract routed through StandardTaskDispatchPipeline."""
+
     target_organ: str
     capability: str
     source_organ: str
@@ -230,7 +246,7 @@ class TaskPayload:
 
 
 # ============================================================================
-# SECTION 2 -- TRANSPORT LAYER
+# SOURCE: transport.py
 # ============================================================================
 WINDOWS_PIPE_NAME = r"\\.\pipe\hojaiga_cns_master"
 UNIX_SOCKET_PATH = "/tmp/hojaiga_cns_master.sock"
@@ -238,10 +254,12 @@ ORGAN_PIPE_TEMPLATE_WIN = r"\\.\pipe\hojaiga_organ_{organ_id}"
 ORGAN_SOCKET_TEMPLATE_POSIX = "/tmp/hojaiga_organ_{organ_id}.sock"
 
 ConnectionHandler = Callable[[asyncio.StreamReader, asyncio.StreamWriter], Awaitable[None]]
+
 IS_WINDOWS = sys.platform.startswith("win")
 
 
 def organ_endpoint(organ_id: str) -> str:
+    """Resolve the outbound endpoint address for a given organ id (e.g. '01', '06')."""
     if IS_WINDOWS:
         return ORGAN_PIPE_TEMPLATE_WIN.format(organ_id=organ_id)
     return ORGAN_SOCKET_TEMPLATE_POSIX.format(organ_id=organ_id)
@@ -266,35 +284,47 @@ class ListenerHandle:
 
 
 async def start_master_listener(handler: ConnectionHandler) -> ListenerHandle:
+    """Bind the CNS master socket. Raises RuntimeError if the platform loop is unsupported."""
     if IS_WINDOWS:
         loop = asyncio.get_running_loop()
-        if isinstance(loop, getattr(asyncio, "ProactorEventLoop", type(None))):
-            async def _client_connected(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
-                await handler(reader, writer)
-            server = await loop.start_serving_pipe(  # type: ignore
-                lambda: _PipeProtocolAdapter(_client_connected, loop),
-                WINDOWS_PIPE_NAME,
+        if not isinstance(loop, asyncio.ProactorEventLoop):
+            raise RuntimeError(
+                "Windows Named Pipe transport requires ProactorEventLoop. "
+                "Run via asyncio.run() on Python 3.8+ (default on Windows)."
             )
-            return ListenerHandle(server=server, endpoint=WINDOWS_PIPE_NAME)
-        else:
-            # Fallback for standard selector loops on Windows
-            server = await asyncio.start_server(handler, host="127.0.0.1", port=47620)
-            return ListenerHandle(server=server, endpoint="127.0.0.1:47620")
+
+        async def _client_connected(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
+            await handler(reader, writer)
+
+        server = await loop.start_serving_pipe(  # type: ignore[attr-defined]
+            lambda: _PipeProtocolAdapter(_client_connected, loop),
+            WINDOWS_PIPE_NAME,
+        )
+        return ListenerHandle(server=server, endpoint=WINDOWS_PIPE_NAME)
 
     if os.path.exists(UNIX_SOCKET_PATH):
-        try:
-            os.unlink(UNIX_SOCKET_PATH)
-        except OSError:
-            pass
-    server = await asyncio.start_unix_server(handler, path=UNIX_SOCKET_PATH)
-    try:
-        os.chmod(UNIX_SOCKET_PATH, 0o660)
-    except OSError:
-        pass
+        os.unlink(UNIX_SOCKET_PATH)
+    server = await asyncio.start_unix_server(handler, path=UNIX_SOCKET_PATH)  # type: ignore
+    os.chmod(UNIX_SOCKET_PATH, 0o660)
     return ListenerHandle(server=server, endpoint=UNIX_SOCKET_PATH)
 
 
+async def connect_to_organ(organ_id: str) -> tuple[asyncio.StreamReader, asyncio.StreamWriter]:
+    """Open an outbound client connection from the CNS to a target organ's listener."""
+    endpoint = organ_endpoint(organ_id)
+    if IS_WINDOWS:
+        loop = asyncio.get_running_loop()
+        reader = asyncio.StreamReader(loop=loop)
+        protocol = asyncio.StreamReaderProtocol(reader, loop=loop)
+        transport, _ = await loop.create_pipe_connection(lambda: protocol, endpoint)  # type: ignore[attr-defined]
+        writer = asyncio.StreamWriter(transport, protocol, reader, loop)
+        return reader, writer
+    return await asyncio.open_unix_connection(path=endpoint)  # type: ignore
+
+
 class _PipeProtocolAdapter(asyncio.StreamReaderProtocol):
+    """Bridges Proactor pipe connections into StreamReader/StreamWriter for a client-connected callback."""
+
     def __init__(self, on_connected: ConnectionHandler, loop: asyncio.AbstractEventLoop) -> None:
         self._on_connected = on_connected
         self._loop = loop
@@ -303,7 +333,7 @@ class _PipeProtocolAdapter(asyncio.StreamReaderProtocol):
 
     def connection_made(self, transport: asyncio.BaseTransport) -> None:
         super().connection_made(transport)
-        writer = asyncio.StreamWriter(transport, self, self._reader, self._loop)  # type: ignore
+        writer = asyncio.StreamWriter(transport, self, self._reader, self._loop)  # type: ignore[arg-type]
         asyncio.ensure_future(self._on_connected(self._reader, writer), loop=self._loop)
 
     def connection_lost(self, exc: Exception | None) -> None:
@@ -311,7 +341,7 @@ class _PipeProtocolAdapter(asyncio.StreamReaderProtocol):
 
 
 # ============================================================================
-# SECTION 3 -- EVENT BUS & SESSION BUS
+# SOURCE: bus.py
 # ============================================================================
 Subscriber = Callable[[EventEnvelope], Coroutine[Any, Any, None]]
 
@@ -322,13 +352,18 @@ class Subscription:
     topic_pattern: str
     organ_id: str
     callback: Subscriber
-    min_priority: int = 9
+    min_priority: int = 9  # accept priority <= min_priority (1 = highest urgency)
 
 
 class EventBus:
-    """Prioritized topic router with guaranteed fan-out and dead-letter alert dispatch."""
+    """Publish/subscribe topic router with prioritized, filtered subscriptions.
 
-    def __init__(self, max_retries: int = 3, retry_backoff_s: float = 0.1) -> None:
+    Delivery is fan-out and best-effort in-process; undeliverable events after
+    `max_retries` are routed to the dead-letter log and EVENT_DEAD_LETTER_LOGGED
+    is emitted by the CNS kernel.
+    """
+
+    def __init__(self, max_retries: int = 3, retry_backoff_s: float = 0.25) -> None:
         self._subscriptions: dict[str, Subscription] = {}
         self._max_retries = max_retries
         self._retry_backoff_s = retry_backoff_s
@@ -362,6 +397,7 @@ class EventBus:
         ]
 
     async def publish(self, envelope: EventEnvelope) -> int:
+        """Fan out to all matching subscribers. Returns count of successful deliveries."""
         envelope.validate()
         matches = self._matching_subscriptions(envelope)
         delivered = 0
@@ -379,36 +415,19 @@ class EventBus:
             try:
                 await sub.callback(envelope)
                 return True
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001 - dead-letter boundary, must not raise
                 attempt += 1
                 if attempt > self._max_retries:
-                    dead_record = {
-                        "event_id": envelope.event_id,
-                        "topic": envelope.topic,
-                        "subscription_id": sub.subscription_id,
-                        "organ_id": sub.organ_id,
-                        "error": str(exc),
-                        "failed_at_ms": int(time.time() * 1000),
-                    }
-                    self._dead_letters.append(dead_record)
-
-                    # Notify sys.events and Error Catalog about dead letter without raising
-                    if envelope.topic != "sys.events":
-                        try:
-                            sys_alert = EventEnvelope(
-                                topic="sys.events",
-                                source_organ="02",
-                                payload={
-                                    "event_type": "EVENT_DEAD_LETTER_LOGGED",
-                                    "dead_letter": dead_record,
-                                },
-                                priority=1,
-                            )
-                            matches = [s for s in self._subscriptions.values() if fnmatch.fnmatch("sys.events", s.topic_pattern)]
-                            for s in matches:
-                                asyncio.create_task(s.callback(sys_alert))
-                        except Exception:
-                            pass
+                    self._dead_letters.append(
+                        {
+                            "event_id": envelope.event_id,
+                            "topic": envelope.topic,
+                            "subscription_id": sub.subscription_id,
+                            "organ_id": sub.organ_id,
+                            "error": str(exc),
+                            "failed_at_ms": int(time.time() * 1000),
+                        }
+                    )
                     return False
                 await asyncio.sleep(self._retry_backoff_s * attempt)
         return False
@@ -427,6 +446,8 @@ class SessionContext:
 
 
 class SessionBus:
+    """Session-scoped state registry providing cross-organ session tokens."""
+
     def __init__(self, default_ttl_ms: int = 3600_000) -> None:
         self._sessions: dict[str, SessionContext] = {}
         self._default_ttl_ms = default_ttl_ms
@@ -467,9 +488,17 @@ class SessionBus:
         async with self._lock:
             return self._sessions.pop(session_id, None) is not None
 
+    async def sweep_expired(self) -> int:
+        now = int(time.time() * 1000)
+        async with self._lock:
+            expired = [sid for sid, ctx in self._sessions.items() if ctx.expires_at_ms and ctx.expires_at_ms < now]
+            for sid in expired:
+                del self._sessions[sid]
+            return len(expired)
+
 
 # ============================================================================
-# SECTION 4 -- SOCKET REGISTRY & CONNECTION POOL
+# SOURCE: registry.py
 # ============================================================================
 PermissionChecker = Callable[[str, str], Awaitable[bool]]
 
@@ -499,6 +528,8 @@ class OrganConnection:
 
 
 class SocketRegistry:
+    """Lifecycle tracking, authorization, and connection pooling for organ sockets."""
+
     def __init__(self, permission_checker: Optional[PermissionChecker] = None) -> None:
         self._connections: dict[str, OrganConnection] = {}
         self._permission_checker = permission_checker
@@ -575,7 +606,7 @@ class SocketRegistry:
 
 
 # ============================================================================
-# SECTION 5 -- SCHEDULER & PIPELINE ENGINES
+# SOURCE: scheduler.py
 # ============================================================================
 DispatchFn = Callable[[TaskPayload], Awaitable[dict]]
 
@@ -598,6 +629,8 @@ class TaskResult:
 
 
 class PriorityScheduler:
+    """Min-heap priority queue (1 = highest urgency) with async dispatch workers."""
+
     def __init__(self, dispatch_fn: DispatchFn, worker_count: int = 4) -> None:
         self._heap: list[_QueueItem] = []
         self._counter = itertools.count()
@@ -657,7 +690,7 @@ class PriorityScheduler:
                     duration_ms=duration_ms,
                     error="dispatch timeout exceeded",
                 )
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001 - scheduler must never crash a worker
                 duration_ms = int((time.monotonic() - started) * 1000)
                 self._results[item.task.task_id] = TaskResult(
                     task_id=item.task.task_id, success=False, result={}, duration_ms=duration_ms, error=str(exc)
@@ -671,7 +704,16 @@ class PriorityScheduler:
                 return None
             return heapq.heappop(self._heap)
 
+    def get_result(self, task_id: str) -> Optional[TaskResult]:
+        return self._results.get(task_id)
 
+    def depth(self) -> int:
+        return len(self._heap)
+
+
+# ============================================================================
+# SOURCE: pipelines.py
+# ============================================================================
 StageFn = Callable[[dict], Awaitable[dict]]
 
 
@@ -679,7 +721,7 @@ StageFn = Callable[[dict], Awaitable[dict]]
 class Stage:
     name: str
     fn: StageFn
-    parallel_group: str | None = None
+    parallel_group: str | None = None  # stages sharing a group id run concurrently
 
 
 @dataclass
@@ -710,6 +752,8 @@ class PipelineResult:
 
 
 class PipelineEngine:
+    """Compiles and executes registered pipeline definitions."""
+
     def __init__(self) -> None:
         self._pipelines: dict[str, PipelineDefinition] = {}
 
@@ -728,11 +772,12 @@ class PipelineEngine:
             output = await stage.fn(input_payload)
             duration_ms = int((time.monotonic() - started) * 1000)
             return output, StageTrace(name=stage.name, duration_ms=duration_ms, ok=True)
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - stage failure must halt/record, not crash engine
             duration_ms = int((time.monotonic() - started) * 1000)
             return input_payload, StageTrace(name=stage.name, duration_ms=duration_ms, ok=False, error=str(exc))
 
     async def execute(self, pipeline_id: str, input_payload: dict) -> PipelineResult:
+
         definition = self.compile_pipeline(pipeline_id)
         payload = dict(input_payload)
         trace: list[StageTrace] = []
@@ -766,7 +811,76 @@ class PipelineEngine:
 
 
 # ============================================================================
-# SECTION 6 -- HEARTBEAT & MUTEX LOCKS
+# SOURCE: heartbeat.py
+# ============================================================================
+OnStaleCallback = Callable[[str], Awaitable[None]]
+OnRecoveredCallback = Callable[[str], Awaitable[None]]
+
+
+class HeartbeatMonitor:
+    def __init__(
+        self,
+        registry: SocketRegistry,
+        interval_ms: int = 1000,
+        timeout_ms: int = 3000,
+        on_stale: OnStaleCallback | None = None,
+        on_recovered: OnRecoveredCallback | None = None,
+    ) -> None:
+        self._registry = registry
+        self._interval_s = interval_ms / 1000
+        self._timeout_ms = timeout_ms
+        self._on_stale = on_stale
+        self._on_recovered = on_recovered
+        self._task: asyncio.Task | None = None
+        self._running = False
+        self._previously_stale: set[str] = set()
+
+    async def start(self) -> None:
+        if self._running:
+            return
+        self._running = True
+        self._task = asyncio.create_task(self._loop())
+
+    async def stop(self) -> None:
+        self._running = False
+        if self._task is not None:
+            self._task.cancel()
+            try:
+                await self._task
+            except asyncio.CancelledError:
+                pass
+            self._task = None
+
+    async def _loop(self) -> None:
+        while self._running:
+            await self._probe_once()
+            await asyncio.sleep(self._interval_s)
+
+    async def _probe_once(self) -> None:
+
+        stale = set(self._registry.stale_organs(self._timeout_ms))
+        newly_stale = stale - self._previously_stale
+        recovered = self._previously_stale - stale
+
+        for organ_id in newly_stale:
+            self._registry.mark_unhealthy(organ_id)
+            if self._on_stale is not None:
+                await self._on_stale(organ_id)
+
+        for organ_id in recovered:
+            if self._on_recovered is not None:
+                await self._on_recovered(organ_id)
+
+        self._previously_stale = stale
+
+        for organ_id in self._registry.bound_organs():
+            await self._registry.route_message(
+                organ_id, MessageType.HEARTBEAT, {"timestamp_ms": now_ms()}
+            )
+
+
+# ============================================================================
+# SOURCE: sync.py
 # ============================================================================
 @dataclass
 class LockGrant:
@@ -782,9 +896,13 @@ class LockTimeoutError(Exception):
 
 
 class SyncEngine:
+    """Resource-scoped mutual exclusion with expiring lock tokens to prevent deadlocks
+    from crashed or unresponsive organs."""
+
     def __init__(self) -> None:
         self._locks: dict[str, LockGrant] = {}
         self._waiters: dict[str, asyncio.Condition] = {}
+        self._guard = asyncio.Lock()
 
     def _condition_for(self, resource_id: str) -> asyncio.Condition:
         cond = self._waiters.get(resource_id)
@@ -834,40 +952,17 @@ class SyncEngine:
             cond.notify_all()
             return True
 
-
-class HeartbeatMonitor:
-    def __init__(self, registry: SocketRegistry, interval_ms: int = 1000, timeout_ms: int = 4000) -> None:
-        self._registry = registry
-        self._interval_s = interval_ms / 1000
-        self._timeout_ms = timeout_ms
-        self._task: asyncio.Task | None = None
-        self._running = False
-
-    async def start(self) -> None:
-        if self._running:
-            return
-        self._running = True
-        self._task = asyncio.create_task(self._loop())
-
-    async def stop(self) -> None:
-        self._running = False
-        if self._task is not None:
-            self._task.cancel()
-            self._task = None
-
-    async def _loop(self) -> None:
-        while self._running:
-            stale = set(self._registry.stale_organs(self._timeout_ms))
-            for organ_id in stale:
-                self._registry.mark_unhealthy(organ_id)
-            for organ_id in self._registry.bound_organs():
-                await self._registry.route_message(organ_id, MessageType.HEARTBEAT, {"timestamp_ms": now_ms()})
-            await asyncio.sleep(self._interval_s)
+    def held_locks(self) -> list[LockGrant]:
+        now = int(time.time() * 1000)
+        return [g for g in self._locks.values() if g.expires_at_ms >= now]
 
 
 # ============================================================================
-# SECTION 7 -- CNS STATE MACHINE & MASTER KERNEL
+# SOURCE: state_machine.py
 # ============================================================================
+TransitionHook = Callable[["CNSState", "CNSState"], Awaitable[None]]
+
+
 class CNSState(str, Enum):
     BOOTSTRAPPING = "BOOTSTRAPPING"
     OPERATIONAL = "OPERATIONAL"
@@ -876,133 +971,375 @@ class CNSState(str, Enum):
     SHUTTING_DOWN = "SHUTTING_DOWN"
 
 
-class CNSKernel:
-    """Central Nervous System master runtime."""
+_ALLOWED_TRANSITIONS: dict[CNSState, set[CNSState]] = {
+    CNSState.BOOTSTRAPPING: {CNSState.OPERATIONAL, CNSState.SHUTTING_DOWN},
+    CNSState.OPERATIONAL: {CNSState.DEGRADED, CNSState.PAUSED, CNSState.SHUTTING_DOWN},
+    CNSState.DEGRADED: {CNSState.OPERATIONAL, CNSState.PAUSED, CNSState.SHUTTING_DOWN},
+    CNSState.PAUSED: {CNSState.OPERATIONAL, CNSState.SHUTTING_DOWN},
+    CNSState.SHUTTING_DOWN: set(),
+}
 
-    def __init__(self, security_permission_checker: Optional[PermissionChecker] = None) -> None:
+
+class InvalidTransitionError(Exception):
+    pass
+
+
+class CNSStateMachine:
+    def __init__(self, on_transition: TransitionHook | None = None) -> None:
+        self._state = CNSState.BOOTSTRAPPING
+        self._on_transition = on_transition
+
+    @property
+    def state(self) -> CNSState:
+        return self._state
+
+    async def transition(self, target: CNSState) -> None:
+        allowed = _ALLOWED_TRANSITIONS[self._state]
+        if target not in allowed:
+            raise InvalidTransitionError(f"cannot transition from {self._state} to {target}")
+        previous = self._state
+        self._state = target
+        if self._on_transition is not None:
+            await self._on_transition(previous, target)
+
+    def can_dispatch(self) -> bool:
+        return self._state in (CNSState.OPERATIONAL, CNSState.DEGRADED)
+
+
+# ============================================================================
+# SOURCE: kernel.py
+# ============================================================================
+logger = logging.getLogger("organ_02_cns")
+
+ESSENTIAL_ORGANS = {"01", "07"}  # Brain, Security — required for OPERATIONAL state
+HEARTBEAT_INTERVAL_MS = 1000
+HEARTBEAT_TIMEOUT_MS = 3000
+FRAME_IO_TIMEOUT_S = 0.5  # Section 46: 500ms max on socket read/write
+
+
+class SecurityDeniedError(Exception):
+    pass
+
+
+class CNSKernel:
+    """Central Nervous System master kernel. One instance per Hojaiga runtime."""
+
+    def __init__(self, security_permission_checker=None) -> None:
         self.registry = SocketRegistry(permission_checker=security_permission_checker)
         self.event_bus = EventBus()
         self.session_bus = SessionBus()
         self.pipeline_engine = PipelineEngine()
         self.sync_engine = SyncEngine()
         self.scheduler = PriorityScheduler(dispatch_fn=self._dispatch_task_to_organ)
-        self.heartbeat_monitor = HeartbeatMonitor(self.registry)
-        self.state = CNSState.BOOTSTRAPPING
+        self.state_machine = CNSStateMachine(on_transition=self._on_state_transition)
+        self.heartbeat_monitor = HeartbeatMonitor(
+            self.registry,
+            interval_ms=HEARTBEAT_INTERVAL_MS,
+            timeout_ms=HEARTBEAT_TIMEOUT_MS,
+            on_stale=self._on_organ_stale,
+            on_recovered=self._on_organ_recovered,
+        )
         self._listener_handle: Optional[ListenerHandle] = None
         self._register_default_pipelines()
 
+    # ------------------------------------------------------------------ #
+    # Lifecycle
+    # ------------------------------------------------------------------ #
+
     async def start(self) -> None:
+        logger.info("CNS bootstrapping")
         self._listener_handle = await start_master_listener(self._handle_connection)
         await self.scheduler.start()
         await self.heartbeat_monitor.start()
-        self.state = CNSState.OPERATIONAL
         await self._emit_system_event("EVENT_CNS_STARTED", {"endpoint": self._listener_handle.endpoint})
-        logging.info("CNS Kernel operational at %s", self._listener_handle.endpoint)
+        await self.state_machine.transition(CNSState.OPERATIONAL)
+        logger.info("CNS operational at %s", self._listener_handle.endpoint)
 
     async def shutdown(self) -> None:
-        self.state = CNSState.SHUTTING_DOWN
+        logger.info("CNS shutting down")
+        await self.state_machine.transition(CNSState.SHUTTING_DOWN)
         await self.heartbeat_monitor.stop()
         await self.scheduler.stop()
         await self.registry.close_all()
         if self._listener_handle is not None:
             await self._listener_handle.close()
-        logging.info("CNS Kernel shutdown completed.")
+        logger.info("CNS shutdown complete")
+
+    async def _on_state_transition(self, previous: CNSState, target: CNSState) -> None:
+        logger.info("CNS state transition: %s -> %s", previous.value, target.value)
+
+    async def _on_organ_stale(self, organ_id: str) -> None:
+        logger.warning("organ %s heartbeat lost", organ_id)
+        await self._emit_system_event("EVENT_ORGAN_DISCONNECTED", {"organ_id": organ_id})
+        if organ_id in ESSENTIAL_ORGANS:
+            if self.state_machine.state == CNSState.OPERATIONAL:
+                await self.state_machine.transition(CNSState.DEGRADED)
+        remaining_essential_down = {
+            oid for oid in ESSENTIAL_ORGANS if oid in self.registry.stale_organs(HEARTBEAT_TIMEOUT_MS)
+        }
+        if not remaining_essential_down and self.state_machine.state == CNSState.DEGRADED:
+            await self.state_machine.transition(CNSState.OPERATIONAL)
+
+    async def _on_organ_recovered(self, organ_id: str) -> None:
+        logger.info("organ %s reconnected", organ_id)
+        self.registry.mark_heartbeat(organ_id)
+        if self.state_machine.state == CNSState.DEGRADED:
+            still_down = set(self.registry.stale_organs(HEARTBEAT_TIMEOUT_MS)) & ESSENTIAL_ORGANS
+            if not still_down:
+                await self.state_machine.transition(CNSState.OPERATIONAL)
+
+    # ------------------------------------------------------------------ #
+    # Connection handling / wire protocol dispatch
+    # ------------------------------------------------------------------ #
 
     async def _handle_connection(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
         organ_id: Optional[str] = None
         try:
             while True:
-                header_bytes = await reader.readexactly(6)
-                length, msg_type = decode_header(header_bytes)
-                body_bytes = await reader.readexactly(length) if length else b""
-                payload = decode_payload(body_bytes) if body_bytes else {}
-                message_type = MessageType(msg_type)
-
+                frame = await self._read_frame(reader)
+                if frame is None:
+                    break
+                message_type, payload = frame
                 if message_type == MessageType.REGISTER_SOCKET and organ_id is None:
                     organ_id = payload.get("organ_id")
                     if not organ_id:
-                        writer.write(encode_frame(MessageType.ERROR, {"error": "organ_id required"}))
-                        await writer.drain()
+                        await self._send_error(writer, "organ_id required for registration")
                         continue
                     await self.registry.bind_socket(organ_id, reader, writer)
                     await self._emit_system_event("EVENT_ORGAN_CONNECTED", {"organ_id": organ_id})
-                    writer.write(encode_frame(MessageType.ACK, {"status": "REGISTERED", "organ_id": organ_id}))
-                    await writer.drain()
+                    await self._write_frame(writer, MessageType.ACK, {"status": "REGISTERED", "organ_id": organ_id})
                     continue
 
                 if organ_id is None:
-                    writer.write(encode_frame(MessageType.ERROR, {"error": "Must REGISTER_SOCKET first"}))
-                    await writer.drain()
+                    await self._send_error(writer, "socket must REGISTER_SOCKET before any other message")
                     continue
 
-                await self._route_rpc(organ_id, message_type, payload, writer)
-        except (asyncio.IncompleteReadError, ConnectionResetError, ProtocolError):
-            pass
+                await self._route_message(organ_id, message_type, payload, writer)
+        except (asyncio.IncompleteReadError, ConnectionResetError, ProtocolError) as exc:
+            logger.info("connection closed for organ=%s reason=%s", organ_id, exc)
         finally:
             if organ_id is not None:
                 await self.registry.unbind_socket(organ_id)
                 await self.event_bus.unsubscribe_organ(organ_id)
                 await self._emit_system_event("EVENT_ORGAN_DISCONNECTED", {"organ_id": organ_id})
 
-    async def _route_rpc(self, organ_id: str, message_type: MessageType, payload: dict, writer: asyncio.StreamWriter) -> None:
-        if message_type == MessageType.PUBLISH_EVENT:
-            envelope = EventEnvelope.from_dict(payload)
-            delivered = await self.event_bus.publish(envelope)
-            writer.write(encode_frame(MessageType.ACK, {"event_id": envelope.event_id, "delivered": delivered}))
-            await writer.drain()
-        elif message_type == MessageType.SUBSCRIBE_EVENT:
-            topic = payload["topic_pattern"]
-            async def _forward(env: EventEnvelope) -> None:
-                await self.registry.route_message(organ_id, MessageType.EVENT_DELIVERY, env.to_dict())
-            sub_id = await self.event_bus.subscribe(topic, organ_id, _forward, payload.get("min_priority", 9))
-            writer.write(encode_frame(MessageType.ACK, {"subscription_id": sub_id}))
-            await writer.drain()
-        elif message_type == MessageType.HEARTBEAT:
-            self.registry.mark_heartbeat(organ_id)
-            writer.write(encode_frame(MessageType.HEARTBEAT_ACK, {"timestamp_ms": now_ms()}))
-            await writer.drain()
-        elif message_type == MessageType.ACQUIRE_LOCK:
-            grant = await self.sync_engine.acquire_lock(payload["resource_id"], organ_id, payload.get("ttl_ms", 30000))
-            writer.write(encode_frame(MessageType.LOCK_GRANT, {"resource_id": grant.resource_id, "lock_token": grant.lock_token}))
-            await writer.drain()
-        elif message_type == MessageType.RELEASE_LOCK:
-            released = await self.sync_engine.release_lock(payload["resource_id"], payload["lock_token"])
-            writer.write(encode_frame(MessageType.ACK, {"released": released}))
-            await writer.drain()
+    async def _read_frame(self, reader: asyncio.StreamReader) -> Optional[tuple[MessageType, dict]]:
+        try:
+            header_bytes = await asyncio.wait_for(reader.readexactly(6), timeout=None)
+        except asyncio.IncompleteReadError:
+            return None
+        length, msg_type = decode_header(header_bytes)
+        body_bytes = await reader.readexactly(length) if length else b""
+        payload = decode_payload(body_bytes) if body_bytes else {}
+        try:
+            message_type = MessageType(msg_type)
+        except ValueError as exc:
+            raise ProtocolError(f"unknown message_type {msg_type}") from exc
+        return message_type, payload
+
+    async def _write_frame(self, writer: asyncio.StreamWriter, message_type: MessageType, payload: dict) -> None:
+        writer.write(encode_frame(message_type, payload))
+        await asyncio.wait_for(writer.drain(), timeout=FRAME_IO_TIMEOUT_S)
+
+    async def _send_error(self, writer: asyncio.StreamWriter, message: str) -> None:
+        await self._write_frame(writer, MessageType.ERROR, {"error": message})
+
+    async def _route_message(
+        self, organ_id: str, message_type: MessageType, payload: dict, writer: asyncio.StreamWriter
+    ) -> None:
+        handlers = {
+            MessageType.UNREGISTER_SOCKET: self._handle_unregister,
+            MessageType.PUBLISH_EVENT: self._handle_publish_event,
+            MessageType.SUBSCRIBE_EVENT: self._handle_subscribe_event,
+            MessageType.DISPATCH_TASK: self._handle_dispatch_task,
+            MessageType.EXECUTE_PIPELINE: self._handle_execute_pipeline,
+            MessageType.ACQUIRE_LOCK: self._handle_acquire_lock,
+            MessageType.RELEASE_LOCK: self._handle_release_lock,
+            MessageType.HEARTBEAT: self._handle_heartbeat,
+        }
+        handler = handlers.get(message_type)
+        if handler is None:
+            await self._send_error(writer, f"unsupported message_type {message_type}")
+            return
+        try:
+            response_type, response_payload = await handler(organ_id, payload)
+            await self._write_frame(writer, response_type, response_payload)
+        except SecurityDeniedError as exc:
+            await self._send_error(writer, str(exc))
+        except (ProtocolError, LockTimeoutError, KeyError) as exc:
+            await self._send_error(writer, str(exc))
+
+    # ------------------------------------------------------------------ #
+    # RPC handlers
+    # ------------------------------------------------------------------ #
+
+    async def _handle_unregister(self, organ_id: str, payload: dict) -> tuple[MessageType, dict]:
+        await self.registry.unbind_socket(organ_id)
+        return MessageType.ACK, {"status": "UNREGISTERED"}
+
+    async def _handle_publish_event(self, organ_id: str, payload: dict) -> tuple[MessageType, dict]:
+        envelope = EventEnvelope.from_dict(payload)
+        delivered = await self.event_bus.publish(envelope)
+        return MessageType.ACK, {"event_id": envelope.event_id, "delivered": delivered}
+
+    async def _handle_subscribe_event(self, organ_id: str, payload: dict) -> tuple[MessageType, dict]:
+        topic_pattern = payload["topic_pattern"]
+        min_priority = payload.get("min_priority", 9)
+
+        async def _forward(envelope: EventEnvelope) -> None:
+            delivered = await self.registry.route_message(
+                organ_id, MessageType.EVENT_DELIVERY, envelope.to_dict()
+            )
+            if not delivered:
+                raise ConnectionError(f"organ {organ_id} unreachable for event delivery")
+
+        sub_id = await self.event_bus.subscribe(topic_pattern, organ_id, _forward, min_priority)
+        return MessageType.ACK, {"subscription_id": sub_id}
+
+    async def _handle_dispatch_task(self, organ_id: str, payload: dict) -> tuple[MessageType, dict]:
+        if not self.state_machine.can_dispatch():
+            raise SecurityDeniedError(f"CNS not accepting dispatch in state {self.state_machine.state.value}")
+        authorized = await self.registry.authorize(organ_id, payload.get("target_organ", ""))
+        if not authorized:
+            raise SecurityDeniedError(f"{organ_id} not authorized to reach {payload.get('target_organ')}")
+        task = TaskPayload.from_dict(payload)
+        await self.scheduler.enqueue(task)
+        await self._emit_system_event("EVENT_TASK_QUEUED", {"task_id": task.task_id})
+        return MessageType.ACK, {"task_id": task.task_id, "status": "QUEUED"}
+
+    async def _handle_execute_pipeline(self, organ_id: str, payload: dict) -> tuple[MessageType, dict]:
+        pipeline_id = payload["pipeline_id"]
+        input_payload = payload.get("input", {})
+        result = await self.pipeline_engine.execute(pipeline_id, input_payload)
+        return MessageType.PIPELINE_RESULT, {
+            "pipeline_id": result.pipeline_id,
+            "success": result.success,
+            "payload": result.payload,
+            "error": result.error,
+            "trace": [t.__dict__ for t in result.trace],
+        }
+
+    async def _handle_acquire_lock(self, organ_id: str, payload: dict) -> tuple[MessageType, dict]:
+        grant = await self.sync_engine.acquire_lock(
+            resource_id=payload["resource_id"],
+            holder_organ=organ_id,
+            ttl_ms=payload.get("ttl_ms", 30000),
+            wait_timeout_ms=payload.get("wait_timeout_ms", 10000),
+        )
+        return MessageType.LOCK_GRANT, {
+            "resource_id": grant.resource_id,
+            "lock_token": grant.lock_token,
+            "expires_at_ms": grant.expires_at_ms,
+        }
+
+    async def _handle_release_lock(self, organ_id: str, payload: dict) -> tuple[MessageType, dict]:
+        released = await self.sync_engine.release_lock(payload["resource_id"], payload["lock_token"])
+        return MessageType.ACK, {"released": released}
+
+    async def _handle_heartbeat(self, organ_id: str, payload: dict) -> tuple[MessageType, dict]:
+        self.registry.mark_heartbeat(organ_id)
+        return MessageType.HEARTBEAT_ACK, {"timestamp_ms": now_ms()}
+
+    # ------------------------------------------------------------------ #
+    # Task dispatch to target organ (used by PriorityScheduler)
+    # ------------------------------------------------------------------ #
 
     async def _dispatch_task_to_organ(self, task: TaskPayload) -> dict:
         delivered = await self.registry.route_message(task.target_organ, MessageType.DISPATCH_TASK, task.to_dict())
         if not delivered:
-            raise ConnectionError(f"Target organ {task.target_organ} unreachable")
+            raise ConnectionError(f"target organ {task.target_organ} unreachable")
+        await self._emit_system_event("EVENT_TASK_DISPATCHED", {"task_id": task.task_id})
         return {"status": "DISPATCHED", "target_organ": task.target_organ}
 
+    # ------------------------------------------------------------------ #
+    # System events + default pipelines
+    # ------------------------------------------------------------------ #
+
     async def _emit_system_event(self, topic: str, payload: dict) -> None:
-        envelope = EventEnvelope(topic=topic, source_organ="02", payload=payload, priority=2)
+        envelope = EventEnvelope(topic=topic, source_organ="02", payload=payload, priority=3)
         await self.event_bus.publish(envelope)
 
     def _register_default_pipelines(self) -> None:
-        std = PipelineDefinition(pipeline_id="StandardTaskDispatchPipeline")
-        std.add_stage("ingest", lambda p: asyncio.sleep(0, result={**p, "ok": True}))
-        self.pipeline_engine.register(std)
+        async def ingest(payload: dict) -> dict:
+            return {**payload, "stage_ingest_ok": True}
+
+        async def security_validate(payload: dict) -> dict:
+            target = payload.get("target_organ")
+            source = payload.get("source_organ")
+            authorized = await self.registry.authorize(source or "", target or "")
+            if not authorized:
+                raise SecurityDeniedError(f"{source} -> {target} denied by security registry")
+            return {**payload, "stage_security_ok": True}
+
+        async def enrich_context(payload: dict) -> dict:
+            return {**payload, "stage_context_enriched": True}
+
+        async def append_history(payload: dict) -> dict:
+            return {**payload, "stage_history_appended": True}
+
+        standard = PipelineDefinition(pipeline_id="StandardTaskDispatchPipeline")
+        standard.add_stage("ingest", ingest)
+        standard.add_stage("security_validation", security_validate)
+        standard.add_stage("context_enrichment", enrich_context)
+        standard.add_stage("history_append", append_history)
+        self.pipeline_engine.register(standard)
+
+        async def schema_validate(payload: dict) -> dict:
+            EventEnvelope.from_dict(payload).validate()
+            return {**payload, "stage_schema_ok": True}
+
+        async def session_verify(payload: dict) -> dict:
+            return {**payload, "stage_session_ok": True}
+
+        broadcast = PipelineDefinition(pipeline_id="EventBroadcastPipeline")
+        broadcast.add_stage("schema_validation", schema_validate)
+        broadcast.add_stage("session_verification", session_verify)
+        self.pipeline_engine.register(broadcast)
 
 
 # ============================================================================
-# SECTION 8 -- ENTRYPOINT
+# SOURCE: main.py
 # ============================================================================
-async def run_daemon() -> None:
-    kernel = CNSKernel()
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+
+
+async def _default_permission_checker(source_organ: str, destination_organ: str) -> bool:
+    """Placeholder authorization delegate. Production deployments MUST replace
+    this with an RPC call to Organ 07 (Security) per Section 46 requirement #5.
+    Defaults to permissive to keep the CNS independently testable."""
+    return True
+
+
+async def run() -> None:
+    kernel = CNSKernel(security_permission_checker=_default_permission_checker)
+    stop_event = asyncio.Event()
+
+    def _handle_signal() -> None:
+        stop_event.set()
+
+    loop = asyncio.get_running_loop()
+    if sys.platform != "win32":
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(sig, _handle_signal)
+
     await kernel.start()
     try:
-        while True:
-            await asyncio.sleep(3600)
-    except (KeyboardInterrupt, asyncio.CancelledError):
+        if sys.platform == "win32":
+            while not stop_event.is_set():
+                await asyncio.sleep(0.5)
+        else:
+            await stop_event.wait()
+    except KeyboardInterrupt:
         pass
     finally:
         await kernel.shutdown()
 
 
 def main() -> None:
-    asyncio.run(run_daemon())
+    asyncio.run(run())
 
 
 if __name__ == "__main__":

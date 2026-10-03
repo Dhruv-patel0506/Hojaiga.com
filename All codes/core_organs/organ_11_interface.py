@@ -138,9 +138,14 @@ from typing import Any, Callable, Optional
 #         logger.propagate = False
 #     return logger
 
-from core_runtime.logger import get_clean_logger
 def _build_logger(name: str = "organ_11_interface") -> logging.Logger:
-    return get_clean_logger(name)
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        h = logging.StreamHandler()
+        h.setFormatter(logging.Formatter('{"timestamp":"%(asctime)s","logger":"%(name)s","level":"%(levelname)s","message":"%(message)s"}'))
+        logger.addHandler(h)
+        logger.setLevel(logging.INFO)
+    return logger
 
 
 LOGGER = _build_logger()

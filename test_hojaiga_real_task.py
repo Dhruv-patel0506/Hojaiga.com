@@ -8,13 +8,36 @@ import os
 from pathlib import Path
 import logging
 
-# Suppress all noisy third-party libraries and warnings
+try:
+    sys.stdout.reconfigure(line_buffering=True)
+    sys.stderr.reconfigure(line_buffering=True)
+except Exception:
+    pass
+
+try:
+    import ctypes
+    ctypes.windll.user32.DisableProcessWindowsGhosting()
+except Exception:
+    pass
+
+os.environ["HOJAIGA_QUIET_LOGS"] = "1"
+
+# Suppress all noisy third-party libraries, warnings, and raw JSON organ logging
 logging.basicConfig(level=logging.ERROR)
-for noisy_logger in [
+NOISY_LOGGERS = [
     "speechbrain", "faster_whisper", "huggingface_hub", "httpx", "websockets",
-    "urllib3", "torch", "haos.interface_layer", "haos.local_stt"
-]:
-    logging.getLogger(noisy_logger).setLevel(logging.ERROR)
+    "urllib3", "torch", "haos.interface_layer", "haos.local_stt",
+    "organ_36_workflow_compiler", "organ_10_agents", "organ_10_agents.core",
+    "hojaiga.organ05.controllers", "hojaiga.brain", "hojaiga.decision_engine",
+    "organ_04_knowledge", "organ_30_app_scanner", "organ_32_state_catalog",
+    "organ_03_memory", "hojaiga.lead_extractor", "lead_extractor",
+    "hojaiga.organ19.runtime", "haos.audit", "haos.state_catalog", "haos.agents",
+    "haos.controllers"
+]
+for noisy_logger in NOISY_LOGGERS:
+    _l = logging.getLogger(noisy_logger)
+    _l.setLevel(logging.ERROR)
+    _l.propagate = False
 
 # Add core path
 sys.path.append(str(Path(__file__).parent / "All codes"))
@@ -34,8 +57,46 @@ from core_organs.organ_30_app_scanner import AppScannerOrgan
 from core_organs.organ_31_visual_perception import VisualPerceptionOrgan
 from core_organs.organ_05_controllers import ControllersCore
 from core_organs.organ_29_popup_handler import DesktopInteractionManager
+from core_organs.organ_37_llm_gateway import LLMGateway
+from core_organs.organ_24_dap import DesktopAutomationProtocol
+from core_organs.organ_40_app_launcher import AppLauncher
+from organ_ml import OrganML
+from core_organs.virtual_mouse_service import VirtualMouseService
 from chrome_launcher import launch_chrome_for_trial
 from observability.organ_99_visual_adapter import VisualAdapterServer, EventBusWrapper
+
+# Clean any handlers attached during module import so they do not spew raw JSON
+for noisy_logger in NOISY_LOGGERS:
+    _l = logging.getLogger(noisy_logger)
+    _l.setLevel(logging.ERROR)
+    _l.propagate = False
+    for h in list(_l.handlers):
+        _l.removeHandler(h)
+
+
+class SupportOrganCNSBridge:
+    """Sync -> async CNS publisher facade for support organs (41/42).
+
+    Organs 41 (Scanner) and 42 (Popup) run monitor loops in background
+    threads and call `publisher.publish(envelope)` synchronously. The CNS
+    EventBus exposes only `async def publish(envelope)`, so this facade
+    hops the call back onto the main event loop in a thread-safe,
+    fire-and-forget way.
+    """
+
+    def __init__(self, cns, loop):
+        self._cns = cns
+        self._loop = loop
+
+    def publish(self, envelope, *args, **kwargs):
+        try:
+            fut = asyncio.run_coroutine_threadsafe(self._cns.publish(envelope), self._loop)
+            fut.add_done_callback(lambda f: None if f.cancelled() else f.exception())
+            return fut
+        except Exception as exc:
+            print(f"[SUPPORT-ORG] CNS bridge publish skipped: {exc}")
+            return None
+
 
 async def run_real_task_test(enable_visualizer: bool, inject_failure: bool = False, test_name: str = "Standard Run"):
     print(f"\n{'='*50}\nStarting Real Task Validation: {test_name}\nVisualizer Enabled: {enable_visualizer}\n{'='*50}")
@@ -45,9 +106,8 @@ async def run_real_task_test(enable_visualizer: bool, inject_failure: bool = Fal
     security = SecurityKernel(Path("."))
     
     # Set up environment routing BEFORE instantiating organs
-    os.environ["HOJAIGA_CDP_PORT"] = "47619"
-    # Route through Hojaiga Brain Gatekeeper (port 11435) protecting Ollama (port 11434)
-    os.environ["HOJAIGA_BRAIN_URL"] = "http://127.0.0.1:11435/api/chat"
+    # Route directly to local Ollama (port 11434) for fast, reliable local inference
+    os.environ["HOJAIGA_BRAIN_URL"] = "http://127.0.0.1:11434/api/chat"
     
     orchestrator = TaskOrchestrator(cns, audit, security)
     brain = BrainOrgan()
@@ -61,31 +121,76 @@ async def run_real_task_test(enable_visualizer: bool, inject_failure: bool = Fal
     visual_perception = VisualPerceptionOrgan()
     controllers = ControllersCore()
     popup_handler = DesktopInteractionManager()
+    
+    # === NEW: Additional organs for full system coverage ===
+    print("[BOOT] Initializing LLM Gateway (organ_37) with bootstrap...")
+    llm_gateway = LLMGateway()
+    llm_gateway.bootstrap()
+    
+    print("[BOOT] Initializing DAP Bridge (organ_24)...")
+    dap_bridge = DesktopAutomationProtocol()
+    
+    print("[BOOT] Initializing App Launcher (organ_40)...")
+    from core_organs.organ_40_app_launcher import AppCatalog
+    app_catalog = AppCatalog()
+    app_launcher = AppLauncher(app_catalog)
+    
+    # === NEW: Support organs (41/42/46/52/55/58/59/60) wired into the pipeline ===
+    print("[BOOT] Initializing Support Organs (41/42/46/52/55/58/59/60)...")
+    from core_organs.organ_41_scanner import ScannerOrgan
+    from core_organs.organ_42_navigation_popup import NavigationPopupOrgan
+    from core_organs.organ_46_task_understanding import UniversalTaskParser
+    from core_organs.organ_52_report_generator import ReportGenerator
+    from core_organs.organ_55_warning_system import WarningSystem
+    from core_organs.organ_58_api_integration import APIIntegrationHub
+    from core_organs.organ_59_hybrid_bridge import HybridCloudDesktopBridge
+    from core_organs.organ_60_ai_optimizer import AIWorkflowOptimizer
+    cns_sync_publisher = SupportOrganCNSBridge(cns, asyncio.get_running_loop())
+    scanner_organ_41 = ScannerOrgan(cns_publisher=cns_sync_publisher)
+    popup_organ_42 = NavigationPopupOrgan(cns_publisher=cns_sync_publisher, scanner_organ=scanner_organ_41)
+    task_parser_46 = UniversalTaskParser()
+    report_generator_52 = ReportGenerator()
+    warning_system_55 = WarningSystem()
+    api_hub_58 = APIIntegrationHub()
+    hybrid_bridge_59 = HybridCloudDesktopBridge()
+    ai_optimizer_60 = AIWorkflowOptimizer()
+    print("[BOOT] Support organs ready: 41 Scanner, 42 Popup, 46 TaskParser, 52 Reports, 55 Warnings, 58 API Hub, 59 Hybrid Bridge, 60 AI Optimizer")
+    
+    print("[BOOT] Initializing ML Organ...")
+    ml_organ = OrganML()
+    
+    print("[BOOT] Initializing Virtual Mouse (Always-Active Living Cursor)...")
+    try:
+        from core_organs.visual_cursor import get_cursor
+        vc = get_cursor()
+        vc.show()
+        vc.set_state("ACTIVE")
+    except Exception as vc_boot_err:
+        print(f"[BOOT] Notice starting visual cursor: {vc_boot_err}")
+    virtual_mouse = VirtualMouseService()
+    try:
+        virtual_mouse.start()
+    except Exception:
+        pass
 
-    # chrome_mode = os.environ.get("HOJAIGA_CHROME_MODE", "safe").strip().lower()
-    # chrome_profile = os.environ.get("HOJAIGA_CHROME_PROFILE", "Profile 1")
-    # chrome_user_data = os.environ.get("HOJAIGA_CHROME_USER_DATA_BASE")
-    # launch_chrome_for_trial(
-    #     mode=chrome_mode,
-    #     port=9222,
-    #     ip="127.0.0.1",
-    #     profile_name=chrome_profile,
-    #     user_data_base=chrome_user_data,
-    # )
-    # await asyncio.sleep(2.5)
+    try:
+        from chrome_launcher import is_port_open, launch_safe_chrome
+        if not is_port_open("127.0.0.1", 9222):
+            print("[BOOT] Launching visible Chrome automation instance on port 9222...")
+            launch_safe_chrome(port=9222)
+            await asyncio.sleep(2.0)
+        else:
+            print("[BOOT] Chrome is already open on port 9222.")
+    except Exception as e:
+        print(f"[BOOT] Chrome launcher notice: {e}")
 
-    # Launch Organ 19 (Chrome CDP Runtime) translator daemon in background (clean up stale processes first)
+    # Clean up stale organ_19 processes; organ_05's _ensure_cdp_runtime will launch it on demand
     import subprocess
     if os.name == 'nt':
         try:
-            # Kill any stale python process holding port 47619
             subprocess.run(["powershell", "-Command", "Get-NetTCPConnection -LocalPort 47619 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5)
         except Exception:
             pass
-            
-    organ_19_path = Path(__file__).parent / "All codes" / "core_organs" / "organ_19_chrome_cdp_runtime.py"
-    subprocess.Popen([sys.executable, str(organ_19_path)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    await asyncio.sleep(1.5)
     
     
     await orchestrator.start()
@@ -98,11 +203,36 @@ async def run_real_task_test(enable_visualizer: bool, inject_failure: bool = Fal
     await knowledge.start_cns(cns)
     await agents.start()
     await agents.start_cns(cns)
-    await app_scanner.start_cns(cns)
-    await visual_perception.start_cns(cns)
+    await app_scanner.start_cns(cns) if hasattr(app_scanner, 'start_cns') else None
+    await visual_perception.start_cns(cns) if hasattr(visual_perception, 'start_cns') else None
     await controllers.start_cns(cns)
     await state_catalog.start_cns(cns)
-    await popup_handler.start_cns(cns)
+    if hasattr(popup_handler, 'start_cns'):
+        await popup_handler.start_cns(cns)
+    
+    # === NEW: Start additional organs on CNS ===
+    try:
+        await dap_bridge.start_cns(cns)
+    except Exception:
+        pass
+    try:
+        await app_launcher.start_cns(cns)
+    except Exception:
+        pass
+    
+    # === NEW: Start support organs (41/42 run monitor loops via CNS bridge; 59 opens hybrid bridge) ===
+    try:
+        scanner_organ_41.start()
+    except Exception as e:
+        print(f"[BOOT] Scanner organ (41) notice: {e}")
+    try:
+        popup_organ_42.start()
+    except Exception as e:
+        print(f"[BOOT] Popup organ (42) notice: {e}")
+    try:
+        await hybrid_bridge_59.start_bridge()
+    except Exception as e:
+        print(f"[BOOT] Hybrid bridge organ (59) notice: {e}")
     
     visualizer = None
     if enable_visualizer:
@@ -118,6 +248,19 @@ async def run_real_task_test(enable_visualizer: bool, inject_failure: bool = Fal
         if event_type and event_type != "SCREEN_STATE_CHANGED":
             trace.append(event_type)
             print(f"[TRACE] {event_type} emitted by {env.source_organ}")
+            # Feed every event into ML for self-learning
+            try:
+                ml_organ.feed_action(
+                    env.source_organ or "unknown",
+                    event_type,
+                    "cns_event",
+                    True,
+                    visual_hint=payload.get("detail", "")[:60],
+                    tab=event_type,
+                    group_location="TraceMonitor"
+                )
+            except Exception:
+                pass
             # Update the UI status box dynamically if it exists
             if 'sys_status_update' in globals():
                 try:
@@ -129,6 +272,8 @@ async def run_real_task_test(enable_visualizer: bool, inject_failure: bool = Fal
     await cns.subscribe("sys.events", "trace_monitor", trace_monitor)
     await cns.subscribe("REPLANNING_REQUESTED", "trace_monitor_rep", trace_monitor)
     await cns.subscribe("TASK_FAILED", "trace_monitor_fail", trace_monitor)
+    await cns.subscribe("TASK_PERMANENTLY_FAILED", "trace_monitor_perm_fail", trace_monitor)
+    await cns.subscribe("CREWAI_FAILURE_DETECTED", "trace_monitor_crew_fail", trace_monitor)
     await cns.subscribe("TASK_COMPLETED", "trace_monitor_comp", trace_monitor)
     await cns.subscribe("STATE_TRANSITION_FAILED", "trace_monitor_state_fail", trace_monitor)
     
@@ -519,26 +664,63 @@ async def run_real_task_test(enable_visualizer: bool, inject_failure: bool = Fal
         timeout_count = 0
         timeout_count = 0
         # Wait for execution to settle (success or permanent failure)
+        # Wait for VERIFICATION_COMPLETED (auditor finished) OR TASK_PERMANENTLY_FAILED
         while timeout_count < 300: # 5 minutes timeout to allow LLM to think and agents to execute
-            if "TASK_COMPLETED" in trace or "TASK_PERMANENTLY_FAILED" in trace:
+            if "VERIFICATION_COMPLETED" in trace or "TASK_PERMANENTLY_FAILED" in trace or "CREWAI_FAILURE_DETECTED" in trace:
                 break
             await asyncio.sleep(1)
             timeout_count += 1
             
         print("[SYSTEM] Task execution loop completed for current task.")
-        if "TASK_COMPLETED" in trace:
+        # Check if auditor reported FAILURE or any failure event occurred
+        failed_events = {"TASK_PERMANENTLY_FAILED", "TASK_FAILED", "CREWAI_FAILURE_DETECTED", "STATE_TRANSITION_FAILED"}
+        has_failure_event = any(ev in trace for ev in failed_events)
+        crew_had_failure = any("FAILURE" in str(t) for t in trace if isinstance(t, str)) if trace else False
+        crewai_hallucination = "CREWAI_FAILURE_DETECTED" in trace
+
+        if has_failure_event or crew_had_failure or crewai_hallucination:
+            print("[TEST RESULT] FAILED: Task failed (permanent failure or auditor rejection).")
+            try:
+                ml_organ.feed_action("Orchestrator", command[:30], "task_failed", False,
+                                     visual_hint=f"Error trace: {trace[-3:]}", tab="Failure", group_location="Pipeline")
+            except Exception:
+                pass
+        elif "TASK_COMPLETED" in trace:
             print("[TEST RESULT] SUCCESS: Task completed successfully!")
-        elif "TASK_PERMANENTLY_FAILED" in trace:
-            print("[TEST RESULT] FAILED: Task permanently failed.")
+            try:
+                ml_organ.feed_action("Orchestrator", command[:30], "task_completed", True,
+                                     visual_hint=f"Steps: {len(trace)}", tab="Success", group_location="Pipeline")
+            except Exception:
+                pass
+        else:
+            print("[TEST RESULT] FAILED: Task did not reach completed state.")
+        sys.stdout.flush()
+        sys.stderr.flush()
         trace.clear() # clear trace for next task in queue
         
         # If running in single-task/CLI mode, exit cleanly
         if cli_command:
             break
-            
+
     if visualizer:
         await visualizer.stop()
-        
+
+    # Best-effort stop for support organs (41/42 monitor threads, 59 bridge)
+    for _stop in (popup_organ_42.stop, scanner_organ_41.stop):
+        try:
+            _stop()
+        except Exception:
+            pass
+    try:
+        hybrid_bridge_59.stop_bridge()
+    except Exception:
+        pass
+
+    print("[SYSTEM] All organs cleanly finished task. Exiting test.")
+    sys.stdout.flush()
+    sys.stderr.flush()
+    # Immediate clean exit to avoid dangling background asyncio/threading loops
+    os._exit(0)
     return trace, "DONE"
 
 async def main():
@@ -546,7 +728,18 @@ async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--test", choices=["standard_off", "standard_on", "fail", "checkpoint"], default="standard_off")
     parser.add_argument("--command", type=str, default="", help="Direct task command string to bypass manual UI entry")
+    env_engine = os.environ.get("HOJAIGA_ENGINE", "crewai").strip().lower()
+    if env_engine not in ["default", "crewai"]:
+        env_engine = "crewai"
+    parser.add_argument("--engine", choices=["default", "crewai"], default=env_engine, help="Select orchestration engine (default or crewai)")
     args = parser.parse_args()
+
+    if args.engine == "crewai":
+        os.environ["HOJAIGA_ENGINE"] = "crewai"
+        print("[ENGINE] Selected Orchestration Engine: CrewAI (Multi-Agent ReAct)")
+    else:
+        os.environ["HOJAIGA_ENGINE"] = "default"
+        print("[ENGINE] Selected Orchestration Engine: Default (Hojaiga ReAct Compiler)")
 
     global cli_command
     cli_command = args.command

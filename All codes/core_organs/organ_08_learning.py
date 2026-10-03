@@ -749,11 +749,7 @@ class LearningIPCServer:
                 log.exception("named pipe unavailable, falling back to TCP loopback")
         else:
             Path(UNIX_SOCK).unlink(missing_ok=True)
-            start_unix = getattr(asyncio, "start_unix_server", None)
-            if start_unix is not None:
-                self._server = await start_unix(self._handle, path=UNIX_SOCK)
-            else:
-                self._server = await asyncio.start_server(self._handle, "127.0.0.1", 47080)
+            self._server = await asyncio.start_unix_server(self._handle, path=UNIX_SOCK)
             log.info("Learning IPC listening on %s", UNIX_SOCK)
 
     async def serve_forever(self) -> None:

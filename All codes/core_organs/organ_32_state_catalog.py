@@ -6,7 +6,7 @@ HOJAIGA AUTOMATION ARCHITECTURE DOC
 ============================================================
 This component is part of the Hojaiga Automation Architecture.
 Component Type: Organ 32
-Name: State Catalog (AOS-STC)
+Name: State Catalog
 
 ============================================================
 2. ORGAN/COMPONENT DIAGRAM
@@ -34,34 +34,108 @@ graph TD
 
 Inputs: Discovered from runtime
 Outputs: Discovered from runtime
-Dependencies: enum, typing, future, json, time, threading, sqlite3, uuid, hashlib, asyncio, dataclasses...
+Dependencies: enum, typing, __future__, json, time...
+
+============================================================
+3. N8N-STYLE VISUAL WORKFLOW (MODEL)
+============================================================
+```mermaid
+graph LR
+    input([Input Node]) --> process([Code Node: organ_32_state_catalog.py]) --> output([Output Node])
+```
 """
 from __future__ import annotations
 
 """
 Hojaiga Automation OS — Organ 32: State Catalog (AOS-STC)
+===========================================================
+
 Authority Order (highest first):
-1. Constitution of Hojaiga
-2. Hojaiga Law Book
-3. Diagrams (Upper Surface + Inner Depth)
-4. Legacy Code Migration Guide
-5. Hojaiga Policy Manual
-6. Master Architecture Blueprint
-7. Organ Specification
-8. State_Catalog.md (this organ's authoritative spec)
+    1. Constitution of Hojaiga
+    2. Hojaiga Law Book
+    3. Diagrams (Upper Surface + Inner Depth)
+    4. Legacy Code Migration Guide
+    5. Hojaiga Policy Manual
+    6. Master Architecture Blueprint
+    7. Organ Specification
+    8. State_Catalog.md (this organ's authoritative spec)
 
 Purpose
+-------
 AOS-STC is the authoritative, deterministic runtime state registry and
 transition engine for every organ, service, task, workflow, connector,
 plugin and runtime component operating inside Hojaiga. No component may
 invent custom state names, bypass transition validation, or perform
 illegal out-of-band state jumps.
+
+This module is the SOLE importable artifact for Organ 32. It communicates
+with other organs exclusively through the socket / pipeline abstractions
+defined below (mirroring the documented Unix-domain-socket contracts in
+State_Catalog.md, adapted to an in-process CNSGateway-mediated boundary).
+Organ 32 never imports another organ's private implementation.
+
+--------------------------------------------------------------------------
+PRE-CODE ARCHITECTURE DIAGRAM (specification-intended topology)
+--------------------------------------------------------------------------
+
+                                KERNEL
+                                  |
+                                  v
+                          STATE CATALOG (AOS-STC)
+                                  |
+        +-----------------------+------------------------+
+        |                        |                        |
+        v                        v                        v
+  STATE REGISTRY        TRANSITION VALIDATOR        STATE MACHINE ENGINE
+        |                        |                        |
+        +-----------+------------+------------+-----------+
+                                  |
+                                  v
+                         TRANSITION MANAGER
+                                  |
+        +----------+----------+----------+----------+
+        |          |          |          |          |
+        v          v          v          v          v
+     ORGANS    SERVICES     TASKS    WORKFLOWS   CONNECTIONS
+        |          |          |          |          |
+        v          v          v          v          v
+     RUNTIME  CONNECTORS   PLUGINS   SECURITY    PERMISSION MGR
+
+--------------------------------------------------------------------------
+POST-CODE ARCHITECTURE DIAGRAM (actual implemented topology)
+--------------------------------------------------------------------------
+
+    StateCatalogOrgan (public facade / single entrypoint)
+        |
+        +-- StateRegistry            (entity -> FSM binding, category)
+        +-- PermissionManager        (privilege boundary matrix)
+        +-- TransitionValidator      (matrix + guard + entry/exit checks)
+        +-- StateCore                (thread-safe volatile state map)
+        +-- StateMachineEngine       (hook execution: exit/action/entry)
+        +-- TransitionManager        (atomic orchestration, uses all above)
+        +-- StateHistory             (SQLite WAL, hash-chained ledger)
+        +-- StateMetrics             (MTIS, churn, error-rate aggregation)
+        +-- StateMonitor             (async watchdog for timeouts)
+        +-- RecoveryManager          (auto-repair on FAILED/BLOCKED/UNKNOWN)
+        +-- SocketBridge             (documented socket contracts, in-proc)
+        +-- DocumentationManager     (JSON/Markdown catalog export)
+
+    Sockets (in-process, CNSGateway-mediated queues/callables):
+        state_core, state_trans, state_val, state_fsm, state_mon,
+        state_metrics, state_hist, state_cfg, state_aud, state_perm,
+        state_comp, state_ver, state_rec, state_doc
+
+    Pipelines:
+        Registration Pipeline -> Transition Pipeline -> Recovery Pipeline
+        -> Metrics/History Pipeline -> Documentation Pipeline
+
+--------------------------------------------------------------------------
 """
+
 
 import asyncio
 import hashlib
 import json
-import logging
 import sqlite3
 import threading
 import time
@@ -70,13 +144,6 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Tuple
-
-logger = logging.getLogger("hojaiga.organ32.stc")
-if not logger.handlers:
-    _h = logging.StreamHandler()
-    _h.setFormatter(logging.Formatter("[StateCatalog] %(asctime)s [%(levelname)s] %(message)s"))
-    logger.addHandler(_h)
-logger.setLevel(logging.INFO)
 
 __all__ = [
     "StateCatalogOrgan",
@@ -103,7 +170,11 @@ SPEC_VERSION = "1.0.0"
 # ==========================================================================
 # SECTION 1 — ERRORS
 # ==========================================================================
+
 class StateCatalogError(Exception):
+    """Base exception for all AOS-STC failures. Never propagated raw over
+    a socket boundary; public socket-facing methods convert these into
+    Result-style dictionaries."""
     code = "ERR_STATE_CATALOG"
 
 
@@ -134,6 +205,7 @@ class LookupError_(StateCatalogError):
 # ==========================================================================
 # SECTION 2 — STATE CATEGORY / STATE NAME / ENTITY TYPE
 # ==========================================================================
+
 class StateCategory(str, Enum):
     SYSTEM = "SYSTEM"
     KERNEL = "KERNEL"
@@ -198,6 +270,8 @@ class StateName(str, Enum):
 
 
 class EntityType(str, Enum):
+    """The FSM graph an entity is bound to. Each maps to a transition
+    matrix in TransitionValidator.MATRICES."""
     SYSTEM = "SYSTEM"
     KERNEL = "KERNEL"
     TASK = "TASK"
@@ -208,38 +282,53 @@ class EntityType(str, Enum):
     WORKFLOW = "WORKFLOW"
 
 
+# Privilege boundary matrix (Section 7.1.3 of State_Catalog.md)
 PRIVILEGE_MATRIX: Dict[str, Dict[str, Any]] = {
     "SYSTEM_KERNEL": {
         "categories": {StateCategory.SYSTEM, StateCategory.KERNEL},
-        "allowed_targets": None,
+        "allowed_targets": None,  # None => all states permitted
         "permitted_invoker": "AOS_MICRO_KERNEL_CORE",
     },
     "SERVICE_ORGAN": {
         "categories": {StateCategory.SERVICE, StateCategory.CONTROLLER},
-        "allowed_targets": {
-            StateName.READY, StateName.RUNNING, StateName.STOPPING, StateName.PAUSED,
-            StateName.INITIALIZING, StateName.STARTING, StateName.BUSY, StateName.IDLE,
-            StateName.FAILED, StateName.RECOVERING, StateName.STOPPED
-        },
+        # Base set per Section 7.1.3 (READY, RUNNING, STOPPING, PAUSED),
+        # extended with the intermediate lifecycle/failure states required
+        # for a SERVICE entity to legally traverse its own FSM matrix.
+        "allowed_targets": {StateName.READY, StateName.RUNNING,
+                             StateName.STOPPING, StateName.PAUSED,
+                             StateName.INITIALIZING, StateName.STARTING,
+                             StateName.BUSY, StateName.IDLE,
+                             StateName.FAILED, StateName.RECOVERING,
+                             StateName.STOPPED},
         "permitted_invoker": "REGISTERED_SERVICE_MANAGER",
     },
     "WORKFLOW_TASK": {
         "categories": {StateCategory.WORKFLOW, StateCategory.TASK},
-        "allowed_targets": {
-            StateName.QUEUED, StateName.RUNNING, StateName.PROCESSING, StateName.COMPLETED,
-            StateName.WAITING, StateName.SUCCESS, StateName.BLOCKED, StateName.PAUSED,
-            StateName.FAILED, StateName.RETRYING, StateName.TERMINATED, StateName.ARCHIVED,
-            StateName.REMOVED
-        },
+        # Base set per Section 7.1.3 (QUEUED, RUNNING, PROCESSING,
+        # COMPLETED), extended with the intermediate lifecycle/failure
+        # states required for a TASK/WORKFLOW entity to legally traverse
+        # its own FSM matrix.
+        "allowed_targets": {StateName.QUEUED, StateName.RUNNING,
+                             StateName.PROCESSING, StateName.COMPLETED,
+                             StateName.WAITING, StateName.SUCCESS,
+                             StateName.BLOCKED, StateName.PAUSED,
+                             StateName.FAILED, StateName.RETRYING,
+                             StateName.TERMINATED, StateName.ARCHIVED,
+                             StateName.REMOVED},
         "permitted_invoker": "EXECUTION_ORCHESTRATOR",
     },
     "PLUGIN_CONNECTOR": {
         "categories": {StateCategory.PLUGIN, StateCategory.CONNECTOR},
-        "allowed_targets": {
-            StateName.INITIALIZING, StateName.READY, StateName.RUNNING, StateName.STOPPED,
-            StateName.DISABLED, StateName.FAILED, StateName.RECOVERING, StateName.STARTING,
-            StateName.REGISTERED, StateName.TERMINATED, StateName.REMOVED
-        },
+        # Base set per Section 7.1.3 (INITIALIZING, READY, RUNNING,
+        # STOPPED), extended with the intermediate lifecycle/failure
+        # states required for a PLUGIN/CONNECTOR entity to legally
+        # traverse its own FSM matrix.
+        "allowed_targets": {StateName.INITIALIZING, StateName.READY,
+                             StateName.RUNNING, StateName.STOPPED,
+                             StateName.DISABLED, StateName.FAILED,
+                             StateName.RECOVERING, StateName.STARTING,
+                             StateName.REGISTERED, StateName.TERMINATED,
+                             StateName.REMOVED},
         "permitted_invoker": "SUBSYSTEM_SANDBOX_HOST",
     },
 }
@@ -253,12 +342,13 @@ def _privilege_bucket_for_category(category: StateCategory) -> Optional[str]:
 
 
 # ==========================================================================
-# SECTION 3 — STATE DEFINITIONS
+# SECTION 3 — STATE DEFINITION SCHEMA (AOSStateDefinition)
 # ==========================================================================
+
 @dataclass(frozen=True)
 class TimeoutRule:
     max_duration_ms: int
-    action_on_timeout: str
+    action_on_timeout: str  # TRANSITION_TO_FAILED | TRANSITION_TO_RECOVERING | FORCE_KILL | NONE
 
 
 @dataclass(frozen=True)
@@ -313,6 +403,8 @@ class StateDefinition:
         }
 
 
+# Standardized state catalog (Section 2.2 of State_Catalog.md).
+# (state_name, default_max_duration_ms, recovery_action_description)
 _RAW_STATES: Tuple[Tuple[str, str, int, str], ...] = (
     ("CREATED", "Entity instantiated in memory; metadata unverified.", 500, "TERMINATED"),
     ("REGISTERED", "Identified and recorded in the State Registry.", 1000, "TERMINATED"),
@@ -387,8 +479,9 @@ DEFAULT_STATE_CATALOG: Dict[str, StateDefinition] = _build_default_catalog()
 
 
 # ==========================================================================
-# SECTION 4 — FSM TRANSITION MATRICES
+# SECTION 4 — FSM TRANSITION MATRICES (Section 4 of State_Catalog.md)
 # ==========================================================================
+
 _S = StateName
 
 TRANSITION_MATRICES: Dict[EntityType, Dict[StateName, Tuple[StateName, ...]]] = {
@@ -503,8 +596,13 @@ TRANSITION_MATRICES: Dict[EntityType, Dict[StateName, Tuple[StateName, ...]]] = 
     },
 }
 
+# Terminal / recovery-eligible states used by RecoveryManager
 RECOVERY_ELIGIBLE_STATES = {StateName.FAILED, StateName.BLOCKED, StateName.UNKNOWN}
 
+
+# ==========================================================================
+# SECTION 5 — RUNTIME RECORDS / EVENTS
+# ==========================================================================
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -577,15 +675,12 @@ class TransitionReceipt:
 
     def to_result(self) -> Dict[str, Any]:
         if self.success:
-            return {
-                "ok": True,
-                "value": {
-                    "entity_id": self.entity_id,
-                    "previous_state": self.previous_state,
-                    "new_state": self.new_state,
-                    "record_id": self.record_id,
-                },
-            }
+            return {"ok": True, "value": {
+                "entity_id": self.entity_id,
+                "previous_state": self.previous_state,
+                "new_state": self.new_state,
+                "record_id": self.record_id,
+            }}
         return {"ok": False, "error": self.error}
 
 
@@ -599,9 +694,108 @@ class StateEvent:
 
 
 # ==========================================================================
-# SECTION 5 — MANAGERS AND REGISTRIES
+# SECTION 6 — SOCKETS AND PIPELINES (documented, in-process)
 # ==========================================================================
+
+@dataclass(frozen=True)
+class SocketDefinition:
+    name: str
+    version: str
+    direction: str  # INBOUND | OUTBOUND | BIDIRECTIONAL
+    allowed_data: Tuple[str, ...]
+    validation: str
+    security: str
+    failure_behaviour: str
+    retry_behaviour: str
+
+
+SOCKET_REGISTRY: Dict[str, SocketDefinition] = {
+    "state_core": SocketDefinition(
+        "state_core", "1.0.0", "INBOUND", ("StateRecord",),
+        "schema+checksum", "kernel-only", "reject+alert", "none"),
+    "state_trans": SocketDefinition(
+        "state_trans", "1.0.0", "INBOUND", ("TransitionRequest",),
+        "schema+matrix", "authenticated-invoker", "abort+rollback", "backoff:10ms,50ms max 2"),
+    "state_val": SocketDefinition(
+        "state_val", "1.0.0", "BIDIRECTIONAL", ("ValidationRequest", "ValidationResult"),
+        "matrix-match", "internal", "reject-transition", "none"),
+    "state_fsm": SocketDefinition(
+        "state_fsm", "1.0.0", "INBOUND", ("FSMEventSignal",),
+        "hook-signature", "internal", "abort-to-failed", "none"),
+    "state_mon": SocketDefinition(
+        "state_mon", "1.0.0", "OUTBOUND", ("TimeoutInterrupt",),
+        "n/a", "internal", "watchdog-restart", "hardware:10ms"),
+    "state_metrics": SocketDefinition(
+        "state_metrics", "1.0.0", "OUTBOUND", ("MetricsSample",),
+        "n/a", "read-only", "drop-oldest", "none"),
+    "state_hist": SocketDefinition(
+        "state_hist", "1.0.0", "INBOUND", ("TransitionRecord",),
+        "hash-chain", "append-only", "ring-buffer-backpressure", "none"),
+    "state_cfg": SocketDefinition(
+        "state_cfg", "1.0.0", "BIDIRECTIONAL", ("ConfigPayload",),
+        "json-schema", "admin-only", "reject-retain-current", "none"),
+    "state_aud": SocketDefinition(
+        "state_aud", "1.0.0", "INBOUND", ("HighSeverityRecord",),
+        "sha256-signature", "enclave", "halt-until-signed", "none"),
+    "state_perm": SocketDefinition(
+        "state_perm", "1.0.0", "INBOUND", ("AuthorizationClaim",),
+        "capability-matrix", "security-boundary", "reject+alert", "none"),
+    "state_comp": SocketDefinition(
+        "state_comp", "1.0.0", "INBOUND", ("FSMSchemaCandidate",),
+        "graph-isomorphism", "internal", "reject-install", "none"),
+    "state_ver": SocketDefinition(
+        "state_ver", "1.0.0", "OUTBOUND", ("VersionTag",),
+        "n/a", "internal", "fallback-baseline", "none"),
+    "state_rec": SocketDefinition(
+        "state_rec", "1.0.0", "BIDIRECTIONAL", ("RecoveryTrigger", "RecoveryOutcome"),
+        "n/a", "internal", "force-terminate+isolate", "none"),
+    "state_doc": SocketDefinition(
+        "state_doc", "1.0.0", "OUTBOUND", ("DocumentationPayload",),
+        "n/a", "read-only", "default-raw-json", "none"),
+}
+
+
+@dataclass(frozen=True)
+class PipelineDefinition:
+    source: str
+    destination: str
+    data_contract: str
+    authentication: str
+    validation: str
+    retry_logic: str
+    timeout: str
+    logging: str
+
+
+PIPELINE_REGISTRY: Dict[str, PipelineDefinition] = {
+    "registration_pipeline": PipelineDefinition(
+        "Component Launch Signal", "State Registry Index", "EntityRegistration",
+        "capability-token", "schema-binding", "none", "1000ms", "audit+history"),
+    "transition_pipeline": PipelineDefinition(
+        "Transition Request", "State Core", "TransitionRequest->TransitionReceipt",
+        "subject-token", "matrix+guard+permission", "backoff:10ms,50ms max 2",
+        "50ms validation / 200ms hooks", "history+metrics"),
+    "recovery_pipeline": PipelineDefinition(
+        "State Monitor Timeout Alert", "Transition Manager", "RecoveryTrigger->RecoveryOutcome",
+        "internal", "recovery-plan-selection", "escalate-on-failure", "5000ms",
+        "audit+history+alert"),
+    "metrics_history_pipeline": PipelineDefinition(
+        "Transition Receipts", "Metrics Aggregator + WAL Ledger", "TransitionRecord",
+        "internal", "serialization", "ring-buffer:100000", "1000ms flush", "append-only"),
+    "documentation_pipeline": PipelineDefinition(
+        "Active State Registries", "Documentation Payload", "CatalogExport",
+        "read-only", "format-validation", "none", "n/a", "none"),
+}
+
+
+# ==========================================================================
+# SECTION 7 — STATE REGISTRY
+# ==========================================================================
+
 class StateRegistry:
+    """Global metadata index mapping every runtime entity to its FSM
+    schema/category. See Section 3.2 of State_Catalog.md."""
+
     def __init__(self) -> None:
         self._bindings: Dict[str, Tuple[EntityType, StateCategory]] = {}
         self._lock = threading.RLock()
@@ -628,25 +822,40 @@ class StateRegistry:
             return entity_id in self._bindings
 
 
+# ==========================================================================
+# SECTION 8 — PERMISSION MANAGER
+# ==========================================================================
+
 class PermissionManager:
+    """Enforces the privilege boundary matrix (Section 7.1.3)."""
+
     def authorize_transition(self, subject_token: str, category: StateCategory,
-                             target_state: StateName) -> bool:
+                              target_state: StateName) -> bool:
         bucket = _privilege_bucket_for_category(category)
         if bucket is None:
-            return True
+            raise AuthError(f"No privilege bucket defined for category={category}")
         spec = PRIVILEGE_MATRIX[bucket]
-        if bucket == "SYSTEM_KERNEL" and subject_token != spec["permitted_invoker"]:
-            raise AuthError("Only AOS Micro-Kernel Core may mutate SYSTEM/KERNEL state")
+        if bucket == "SYSTEM_KERNEL":
+            if subject_token != spec["permitted_invoker"]:
+                raise AuthError("Only AOS Micro-Kernel Core may mutate SYSTEM/KERNEL state")
+            return True
         allowed_targets = spec["allowed_targets"]
         if allowed_targets is not None and target_state not in allowed_targets:
-            raise AuthError(f"Target state {target_state} outside permitted set for {bucket}")
+            raise AuthError(
+                f"Target state {target_state} outside permitted set for {bucket}")
         return True
 
+
+# ==========================================================================
+# SECTION 9 — TRANSITION VALIDATOR
+# ==========================================================================
 
 GuardFn = Callable[[str, StateName, StateName, Dict[str, Any]], bool]
 
 
 class TransitionValidator:
+    """Enforces FSM structural constraints and dynamic guard conditions."""
+
     def __init__(self) -> None:
         self._guards: Dict[Tuple[EntityType, StateName, StateName], List[GuardFn]] = {}
 
@@ -676,7 +885,16 @@ class TransitionValidator:
                     f"for entity_id={entity_id}")
 
 
+# ==========================================================================
+# SECTION 10 — STATE CORE (volatile lock-free-style state map)
+# ==========================================================================
+
 class StateCore:
+    """High-speed, thread-safe volatile state map. Uses a single RLock plus
+    atomic dict-swap semantics to emulate the double-buffered lock-free read
+    path described in the specification (CPython dict assignment is atomic
+    under the GIL, so reads never observe torn writes)."""
+
     def __init__(self) -> None:
         self._table: Dict[str, StateRecord] = {}
         self._lock = threading.RLock()
@@ -709,11 +927,28 @@ class StateCore:
         with self._lock:
             return list(self._table.values())
 
+    def rebuild_from_history(self, records: List[Tuple[str, EntityType, StateCategory,
+                                                         StateName, Optional[StateName], float]]) -> None:
+        """Memory-corruption recovery path: reload from persistent WAL."""
+        with self._lock:
+            self._table.clear()
+            for entity_id, etype, cat, cur, prev, ts in records:
+                rec = StateRecord(entity_id, etype, cat, cur, prev, ts)
+                rec.refresh_checksum()
+                self._table[entity_id] = rec
+
+
+# ==========================================================================
+# SECTION 11 — STATE MACHINE ENGINE (hook execution)
+# ==========================================================================
 
 HookFn = Callable[[str, Dict[str, Any]], None]
 
 
 class StateMachineEngine:
+    """Executes pre-transition exit hooks, action bindings, and
+    post-transition entry hooks (Section 3.5)."""
+
     def __init__(self) -> None:
         self._exit_hooks: Dict[StateName, List[HookFn]] = {}
         self._entry_hooks: Dict[StateName, List[HookFn]] = {}
@@ -739,7 +974,14 @@ class StateMachineEngine:
             hook(entity_id, context)
 
 
+# ==========================================================================
+# SECTION 12 — STATE HISTORY (append-only, hash-chained, SQLite WAL)
+# ==========================================================================
+
 class StateHistory:
+    """Append-only historical ledger. Persists to SQLite in WAL mode and
+    maintains a SHA-256 hash chain so retrospective tampering is detectable."""
+
     def __init__(self, db_path: str = ":memory:") -> None:
         self._conn = sqlite3.connect(db_path, check_same_thread=False)
         self._conn.execute("PRAGMA journal_mode=WAL;")
@@ -833,7 +1075,14 @@ class StateHistory:
             self._conn.close()
 
 
+# ==========================================================================
+# SECTION 13 — STATE METRICS
+# ==========================================================================
+
 class StateMetrics:
+    """Aggregates mean-time-in-state (MTIS), transition churn, and error
+    rates for operational telemetry (Section 3.7)."""
+
     def __init__(self) -> None:
         self._durations: Dict[str, List[float]] = {}
         self._transition_count = 0
@@ -867,7 +1116,14 @@ class StateMetrics:
             }
 
 
+# ==========================================================================
+# SECTION 14 — RECOVERY MANAGER
+# ==========================================================================
+
 class RecoveryManager:
+    """Executes automated corrective action workflows for entities in
+    FAILED, BLOCKED, UNKNOWN, or timed-out states (Section 3.14)."""
+
     def __init__(self, transition_fn: Callable[..., "TransitionReceipt"]) -> None:
         self._transition_fn = transition_fn
         self._attempts: Dict[str, int] = {}
@@ -898,13 +1154,25 @@ class RecoveryManager:
         return {"outcome": target.value, "reason": failure_cause, "success": receipt.success}
 
 
+# ==========================================================================
+# SECTION 15 — STATE MONITOR (async watchdog for timeout rules)
+# ==========================================================================
+
 class StateMonitor:
+    """Continuously scans active entities to enforce max-duration timeout
+    rules and dispatch timeout interrupts to the Recovery Manager."""
+
     def __init__(self, state_core: StateCore, recovery_manager: RecoveryManager,
-                 sweep_interval_ms: int = 500) -> None:
+                 sweep_interval_ms: int = 250) -> None:
         self._state_core = state_core
         self._recovery_manager = recovery_manager
         self._sweep_interval_ms = sweep_interval_ms
+        self._task: Optional[asyncio.Task] = None
         self._stop_event: Optional[asyncio.Event] = None
+        self._watchdogs: Dict[str, int] = {}
+
+    def register_state_watchdog(self, entity_id: str, timeout_ms: int) -> None:
+        self._watchdogs[entity_id] = timeout_ms
 
     async def start_monitoring_loop(self) -> None:
         self._stop_event = asyncio.Event()
@@ -939,7 +1207,14 @@ class StateMonitor:
                     pass
 
 
+# ==========================================================================
+# SECTION 16 — TRANSITION MANAGER (atomic orchestration)
+# ==========================================================================
+
 class TransitionManager:
+    """Orchestrates transition processing pipelines with strict sequence
+    enforcement and transactional safety (Section 3.3)."""
+
     def __init__(self, registry: StateRegistry, state_core: StateCore,
                  validator: TransitionValidator, engine: StateMachineEngine,
                  permission_manager: PermissionManager, history: StateHistory,
@@ -1014,18 +1289,50 @@ class TransitionManager:
             self._metrics.record_transition(success=False)
             return TransitionReceipt(False, entity_id, None, None, error=f"{exc.code}:{exc}")
 
+    def rollback_transition(self, entity_id: str) -> bool:
+        with self._lock:
+            record = self._state_core.get_state(entity_id)
+            if record.previous_state is None:
+                return False
+            receipt = self.request_transition(
+                entity_id, StateName.ROLLING_BACK, subject_token="AOS_MICRO_KERNEL_CORE",
+                triggering_vector="ROLLBACK")
+            return receipt.success
+
+
+# ==========================================================================
+# SECTION 17 — SOCKET BRIDGE (in-process pub-sub / request bridge)
+# ==========================================================================
 
 class SocketBridge:
+    """Implements the documented socket contracts as in-process callables /
+    subscriber lists, mediated the same way CNSGateway mediates cross-organ
+    traffic elsewhere in Hojaiga. No organ may bypass this bridge."""
+
     def __init__(self) -> None:
         self._subscribers: Dict[str, List[Callable[[Any], None]]] = {}
 
     def subscribe(self, socket_name: str, handler: Callable[[Any], None]) -> None:
+        if socket_name not in SOCKET_REGISTRY:
+            raise StateCatalogError(f"Unknown socket: {socket_name}")
         self._subscribers.setdefault(socket_name, []).append(handler)
 
     def publish(self, socket_name: str, payload: Any) -> None:
+        if socket_name not in SOCKET_REGISTRY:
+            raise StateCatalogError(f"Unknown socket: {socket_name}")
         for handler in self._subscribers.get(socket_name, []):
             handler(payload)
 
+    def describe(self, socket_name: str) -> Dict[str, Any]:
+        definition = SOCKET_REGISTRY.get(socket_name)
+        if definition is None:
+            raise StateCatalogError(f"Unknown socket: {socket_name}")
+        return definition.__dict__.copy()
+
+
+# ==========================================================================
+# SECTION 18 — DOCUMENTATION MANAGER
+# ==========================================================================
 
 class DocumentationManager:
     def __init__(self, registry: StateRegistry, state_core: StateCore) -> None:
@@ -1037,14 +1344,28 @@ class DocumentationManager:
             "version": SPEC_VERSION,
             "states": {name: d.to_dict() for name, d in DEFAULT_STATE_CATALOG.items()},
             "entity_types": [e.value for e in EntityType],
+            "sockets": list(SOCKET_REGISTRY.keys()),
+            "pipelines": list(PIPELINE_REGISTRY.keys()),
         }
-        return json.dumps(catalog_export, indent=2)
+        if format_type == "json":
+            return json.dumps(catalog_export, indent=2)
+        if format_type == "markdown":
+            lines = [f"# AOS State Catalog Export (v{SPEC_VERSION})", ""]
+            for name, d in DEFAULT_STATE_CATALOG.items():
+                lines.append(f"## {name}\n{d.description}\n")
+            return "\n".join(lines)
+        return json.dumps(catalog_export)
 
 
 # ==========================================================================
-# SECTION 6 — PUBLIC FACADE: StateCatalogOrgan
+# SECTION 19 — PUBLIC FACADE: StateCatalogOrgan
 # ==========================================================================
+
 class StateCatalogOrgan:
+    """Single public entrypoint for Organ 32. All cross-organ interaction
+    must occur through this facade's public methods, mirroring the
+    documented socket/pipeline contracts."""
+
     def __init__(self, db_path: str = ":memory:") -> None:
         self.registry = StateRegistry()
         self.state_core = StateCore()
@@ -1060,11 +1381,15 @@ class StateCatalogOrgan:
         self.recovery_manager = RecoveryManager(self.transition_manager.request_transition)
         self.monitor = StateMonitor(self.state_core, self.recovery_manager)
         self.documentation = DocumentationManager(self.registry, self.state_core)
-        self.cns: Optional[Any] = None
 
+    # -- events -------------------------------------------------------
     def _publish_event(self, event: StateEvent) -> None:
         self.socket_bridge.publish("state_hist", event)
 
+    def subscribe_events(self, handler: Callable[[StateEvent], None]) -> None:
+        self.socket_bridge.subscribe("state_hist", handler)
+
+    # -- registration ---------------------------------------------------
     def register_entity(self, entity_id: Optional[str], entity_type: EntityType,
                          category: StateCategory,
                          initial_state: StateName = StateName.CREATED) -> str:
@@ -1076,6 +1401,7 @@ class StateCatalogOrgan:
         self.registry.unregister_entity(entity_id)
         self.state_core.remove(entity_id)
 
+    # -- transitions ------------------------------------------------
     def request_transition(self, entity_id: str, target_state: StateName,
                             subject_token: str = "SYSTEM",
                             triggering_vector: str = "MANUAL",
@@ -1097,11 +1423,13 @@ class StateCatalogOrgan:
     def batch_get_states(self, entity_ids: List[str]) -> Dict[str, str]:
         return self.state_core.batch_get_states(entity_ids)
 
+    # -- recovery -----------------------------------------------------
     def initiate_recovery(self, entity_id: str, failure_cause: str) -> Dict[str, Any]:
         record = self.state_core.get_state(entity_id)
         return self.recovery_manager.initiate_recovery(
             entity_id, record.current_state, record.entity_type, failure_cause)
 
+    # -- history / metrics ---------------------------------------------
     def query_entity_history(self, entity_id: str) -> List[Dict[str, Any]]:
         return self.history.query_entity_history(entity_id)
 
@@ -1111,25 +1439,29 @@ class StateCatalogOrgan:
     def get_metrics_summary(self) -> Dict[str, Any]:
         return self.metrics.get_system_state_summary()
 
+    # -- monitoring -----------------------------------------------------
     async def start_monitor(self) -> None:
         await self.monitor.start_monitoring_loop()
 
     def stop_monitor(self) -> None:
         self.monitor.stop()
 
+    # -- documentation ----------------------------------------------
+    # -- documentation ----------------------------------------------
     def export_documentation(self, format_type: str = "json") -> str:
         return self.documentation.generate_catalog_documentation(format_type)
 
-    # ── CNS Integration (Serializes Dict Receipts Properly) ─────────────
-
+    # -- CNS Integration ----------------------------------------------
     async def start_cns(self, cns) -> None:
         self.cns = cns
         await self.cns.subscribe("STATE_TRANSITION_REQUEST", "organ_32", self._handle_cns_state_request)
+        import logging
+        logger = logging.getLogger("hojaiga.organ32.stc")
         logger.info("StateCatalogOrgan connected to CNS.")
 
     async def _handle_cns_state_request(self, env) -> None:
         from core_organs.organ_02_cns_single_file import EventEnvelope
-        payload = env.payload or {}
+        payload = env.payload
         entity_id = payload.get("entity_id")
         target_state_str = payload.get("target_state")
         
@@ -1138,34 +1470,35 @@ class StateCatalogOrgan:
             receipt = self.request_transition(
                 entity_id=entity_id,
                 target_state=target_state,
-                subject_token=getattr(env, "source_organ", "SYSTEM"),
+                subject_token=env.source_organ,
                 triggering_vector="CNS",
                 context=payload.get("context")
             )
             
-            if self.cns:
-                await self.cns.publish(EventEnvelope(
-                    topic="STATE_TRANSITION_COMPLETED",
-                    source_organ="organ_32",
-                    payload={"entity_id": entity_id, "receipt": receipt}
-                ))
+            await self.cns.publish(EventEnvelope(
+                topic="STATE_TRANSITION_COMPLETED",
+                source_organ="organ_32",
+                payload={"entity_id": entity_id, "receipt": receipt}
+            ))
         except Exception as e:
-            if self.cns:
-                await self.cns.publish(EventEnvelope(
-                    topic="STATE_TRANSITION_FAILED",
-                    source_organ="organ_32",
-                    payload={"entity_id": entity_id, "error": str(e)}
-                ))
+            await self.cns.publish(EventEnvelope(
+                topic="STATE_TRANSITION_FAILED",
+                source_organ="organ_32",
+                payload={"entity_id": entity_id, "error": str(e)}
+            ))
 
+    # -- lifecycle --------------------------------------------------
     def shutdown(self) -> None:
         self.stop_monitor()
         self.history.close()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     organ = StateCatalogOrgan()
     eid = organ.register_entity(None, EntityType.TASK, StateCategory.TASK)
-    print("Registered task entity:", eid)
-    res = organ.request_transition(eid, StateName.QUEUED, subject_token="EXECUTION_ORCHESTRATOR")
-    print("Transition result:", res)
+    print(organ.get_state(eid))
+    print(organ.request_transition(eid, StateName.QUEUED,
+                                    subject_token="EXECUTION_ORCHESTRATOR",
+                                    triggering_vector="TEST"))
+    print(organ.get_state(eid))
     organ.shutdown()

@@ -6,7 +6,7 @@ HOJAIGA AUTOMATION ARCHITECTURE DOC
 ============================================================
 This component is part of the Hojaiga Automation Architecture.
 Component Type: Organ 36
-Name: Workflow Compiler (Full Production Implementation)
+Name: Workflow Compiler
 
 ============================================================
 2. ORGAN/COMPONENT DIAGRAM
@@ -35,6 +35,14 @@ graph TD
 Inputs: Discovered from runtime
 Outputs: Discovered from runtime
 Dependencies: socket, hashlib, dataclasses, uuid, pywintypes...
+
+============================================================
+3. N8N-STYLE VISUAL WORKFLOW (MODEL)
+============================================================
+```mermaid
+graph LR
+    input([Input Node]) --> process([Code Node: organ_36_workflow_compiler.py]) --> output([Output Node])
+```
 """
 from __future__ import annotations
 
@@ -42,16 +50,95 @@ from __future__ import annotations
 organ_36_workflow_compiler.py
 
 HOJAIGA AUTOMATION OS - ORGAN 36: WORKFLOW COMPILER
+=====================================================
+
 Authority Order (highest to lowest):
-1. Constitution of Hojaiga
-2. Hojaiga Law Book
-3. Upper/Inner Surface Diagrams & Workflows
-4. Legacy Code Migration Guide (reference only, not binding)
-5. Hojaiga Policy Manual
-6. Master Architecture Blueprint
-7. Organ Specification
-8. Workflow_Compiler.md (organ-authoritative specification)
+    1. Constitution of Hojaiga
+    2. Hojaiga Law Book
+    3. Upper/Inner Surface Diagrams & Workflows
+    4. Legacy Code Migration Guide (reference only, not binding)
+    5. Hojaiga Policy Manual
+    6. Master Architecture Blueprint
+    7. Organ Specification
+    8. Workflow_Compiler.md (organ-authoritative specification)
+
+Universal Law 3 (Separation of Responsibility): this organ owns ONLY the
+compilation domain -- parsing, validation, dependency resolution, capability
+resolution, optimization, execution-graph construction and IR emission. It
+performs ZERO runtime execution, ZERO physical side effects and ZERO
+Brain-level strategic reasoning. It is a pure, deterministic, side-effect
+free translator: Approved Execution Plan (raw workflow) -> Validated IR.
+
+------------------------------------------------------------------------------
+PRE-CODE DIAGRAM (spec-derived, Workflow_Compiler.md Section 1)
+------------------------------------------------------------------------------
+    USER WORKFLOW (JSON / YAML / Visual Graph AST / NL-IR)
+            |
+            v
+    WORKFLOW PARSER  (Lexical Parser, Structure Normalizer, Lexical Validator)
+            |
+            v
+    SYNTAX VALIDATOR (Schema Check, Grammar Rules, Expression Syntax)
+            |
+            v
+    SEMANTIC VALIDATOR (Type Inference, Scope/Symbol Table, Event/State Check)
+            |
+            v
+    DEPENDENCY RESOLVER (Cycle Check, Dependency Graph, Sync Point Builder)
+            |
+            v
+    CAPABILITY RESOLVER (Organ Capability Match, Service Binding, Permission)
+            |
+            v
+    OPTIMIZATION ENGINE (Dead Code Elim, Task Fusion, Parallel Planner)
+            |
+            v
+    EXECUTION GRAPH BUILDER (IR, DAG, Diagnostic Engine)
+            |
+            v
+    EXECUTION PLAN (Executable DAG + IR Envelope + Hashes)
+            |          |
+            v          v
+    TASK SCHEDULER   EXECUTION CONTROLLER      (both OUTSIDE this organ)
+
+------------------------------------------------------------------------------
+POST-CODE DIAGRAM (as-built, this file)
+------------------------------------------------------------------------------
+    IPCServer (hojaiga_interface: named pipe | unix socket | tcp loopback)
+            |
+            v
+    WorkflowCompilerKernel  (facade / config / lifecycle)
+            |
+            v
+    CompilerCore.compile()  <-- orchestrator, phase sequencer
+            |
+            +--> WorkflowParser            -> AstNode tree
+            +--> SyntaxValidator           -> validated AST
+            +--> SemanticValidator         -> annotated AST + symbol table
+            +--> DependencyResolver        -> DependencyGraph (topo + cycles)
+            +--> CapabilityResolver        -> ResolvedCapabilityMap
+            +--> ServiceResolver           -> BoundServiceMap
+            +--> OptimizationEngine        -> OptimizedGraph (O0..O3 passes)
+            +--> ExecutionGraphBuilder     -> ExecutableDAG
+            +--> IrGenerator               -> WorkflowIrEnvelope (signed)
+            +--> CompilationCache          -> hash-keyed IR store (SQLite)
+            +--> DiagnosticsEngine         -> DiagnosticsReport
+            +--> RecoveryManager           -> fault containment / rollback
+
+    All cross-organ data (capability registry lookups, event catalog schema,
+    service registry snapshots) enters ONLY through injected provider
+    interfaces (CapabilityProvider / EventCatalogProvider / ServiceProvider)
+    -- this organ never imports another organ's private implementation.
+
+------------------------------------------------------------------------------
+IPC WIRE PROTOCOL (per Master Architecture / Law Book Universal Law 5)
+------------------------------------------------------------------------------
+    Frame  := [4-byte big-endian length][2-byte big-endian op_code][JSON payload]
+    Max frame size: 16 MiB
+    Socket name: hojaiga_interface
+    Transport preference: Windows Named Pipe -> Unix Domain Socket -> TCP loopback
 """
+
 
 import asyncio
 import hashlib
@@ -69,11 +156,31 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
+# Add path for enhanced components
+if r"D:\new_automation\All codes" not in sys.path:
+    sys.path.insert(0, r"D:\new_automation\All codes")
+
+# Import enhanced brain compiler and agent structure
+try:
+    from core_organs.enhanced_brain_compiler import get_enhanced_compiler, CompiledPlan
+    from core_organs.agent_structure import AgentParadigm, AgentTier
+    _HAS_ENHANCED_COMPILER = True
+except ImportError:
+    try:
+        from enhanced_brain_compiler import get_enhanced_compiler, CompiledPlan
+        from agent_structure import AgentParadigm, AgentTier
+        _HAS_ENHANCED_COMPILER = True
+    except ImportError:
+        _HAS_ENHANCED_COMPILER = False
+
+# ----------------------------------------------------------------------------
+# Soft imports (optional platform dependencies) -- Universal Law 4 / 9
+# ----------------------------------------------------------------------------
 try:
     import yaml  # type: ignore
     _HAS_YAML = True
-except ImportError:
-    yaml = None
+except ImportError:  # pragma: no cover - environment dependent
+    yaml = None  # type: ignore
     _HAS_YAML = False
 
 try:
@@ -81,19 +188,23 @@ try:
     import win32file  # type: ignore
     import pywintypes  # type: ignore
     _HAS_WIN32 = True
-except ImportError:
-    win32pipe = None
-    win32file = None
-    pywintypes = None
+except ImportError:  # pragma: no cover - environment dependent
+    win32pipe = None  # type: ignore
+    win32file = None  # type: ignore
+    pywintypes = None  # type: ignore
     _HAS_WIN32 = False
 
 _IS_WINDOWS = os.name == "nt"
+
+# ==============================================================================
+# CHAPTER 0 -- CONSTANTS, PROTOCOL, LOGGING
+# ==============================================================================
 
 ORGAN_ID = "organ_36_workflow_compiler"
 ORGAN_VERSION = "1.0.0"
 IR_SCHEMA_VERSION = "1.0.0"
 MAX_FRAME_BYTES = 16 * 1024 * 1024
-FRAME_HEADER = ">IH"
+FRAME_HEADER = ">IH"  # 4-byte length (payload only) + 2-byte op_code
 FRAME_HEADER_SIZE = struct.calcsize(FRAME_HEADER)
 IPC_SOCKET_NAME = "hojaiga_interface"
 NAMED_PIPE_PATH = r"\\.\pipe\hojaiga_interface_organ36"
@@ -121,14 +232,14 @@ def _make_logger() -> logging.Logger:
             '{"ts":"%(asctime)s","module":"%(name)s","level":"%(levelname)s","msg":%(message)s}'
         ))
         logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
+        logger.setLevel(logging.INFO)
     return logger
 
 
 LOG = _make_logger()
 
 
-def _jlog(module: str, level: str, message: str, metadata: Any) -> None:
+def _jlog(module: str, level: str, message: str, **metadata: Any) -> None:
     payload = json.dumps({
         "timestamp": int(time.time()),
         "level": level,
@@ -140,6 +251,10 @@ def _jlog(module: str, level: str, message: str, metadata: Any) -> None:
     method_name = "warning" if level_name == "warn" else level_name
     getattr(LOG, method_name, LOG.info)(payload)
 
+
+# ==============================================================================
+# CHAPTER 1 -- DIAGNOSTICS ENGINE (3.12) & ERROR REPORTER (3.13)
+# ==============================================================================
 
 class Severity(str, Enum):
     ERROR = "ERROR"
@@ -171,21 +286,23 @@ class DiagnosticEntry:
 
 
 class DiagnosticsEngine:
+    """Aggregates, formats and structures all compiler diagnostics (3.12)."""
+
     def __init__(self, max_entries: int = 5000) -> None:
         self._entries: List[DiagnosticEntry] = []
         self._max_entries = max_entries
         self._truncated = False
 
     def error(self, code: str, message: str, node_id: Optional[str] = None,
-              line: Optional[int] = None, column: Optional[int] = None, remediation: Optional[str] = None) -> None:
+               line: Optional[int] = None, column: Optional[int] = None, remediation: Optional[str] = None) -> None:
         self._add(Severity.ERROR, code, message, node_id, line, column, remediation)
 
     def warning(self, code: str, message: str, node_id: Optional[str] = None,
-                line: Optional[int] = None, column: Optional[int] = None, remediation: Optional[str] = None) -> None:
+                 line: Optional[int] = None, column: Optional[int] = None, remediation: Optional[str] = None) -> None:
         self._add(Severity.WARNING, code, message, node_id, line, column, remediation)
 
     def suggestion(self, code: str, message: str, node_id: Optional[str] = None,
-                   line: Optional[int] = None, column: Optional[int] = None, remediation: Optional[str] = None) -> None:
+                    line: Optional[int] = None, column: Optional[int] = None, remediation: Optional[str] = None) -> None:
         self._add(Severity.SUGGESTION, code, message, node_id, line, column, remediation)
 
     def _add(self, severity: Severity, code: str, message: str, node_id, line, column, remediation) -> None:
@@ -208,6 +325,10 @@ class DiagnosticsEngine:
         self._entries.clear()
         self._truncated = False
 
+
+# ==============================================================================
+# CHAPTER 2 -- AST PRIMITIVES & WORKFLOW PARSER (3.2)
+# ==============================================================================
 
 @dataclass
 class AstNode:
@@ -245,6 +366,13 @@ _VALID_NODE_TYPES = {
 
 
 class WorkflowParser:
+    """Translates raw JSON/YAML/dict workflow declarations into an AST (3.2).
+
+    Performs lexical analysis (format decoding), structural tokenization,
+    and AST assembly with line/column coordinate mapping where available.
+    Emits no runtime side effects.
+    """
+
     def __init__(self, diagnostics: DiagnosticsEngine) -> None:
         self._diag = diagnostics
 
@@ -288,8 +416,8 @@ class WorkflowParser:
                         "YAML source provided but PyYAML is not installed on this host."
                     )
                 try:
-                    return yaml.safe_load(source)
-                except Exception as exc:
+                    return yaml.safe_load(source)  # type: ignore
+                except Exception as exc:  # pragma: no cover - yaml lib specific
                     raise WorkflowParseError(f"Malformed YAML workflow source: {exc}") from exc
             raise WorkflowParseError(f"Unsupported source format '{fmt}'.")
         raise WorkflowParseError("Unsupported workflow source type; expected dict, str, or bytes.")
@@ -316,6 +444,10 @@ class WorkflowParser:
         return node
 
 
+# ==============================================================================
+# CHAPTER 3 -- SYNTAX VALIDATOR (3.3)
+# ==============================================================================
+
 _REQUIRED_ATTRS_BY_TYPE: Dict[str, Set[str]] = {
     "TASK": {"capability"},
     "CONDITION": {"expression"},
@@ -332,6 +464,8 @@ _REQUIRED_ATTRS_BY_TYPE: Dict[str, Set[str]] = {
 
 
 class SyntaxValidator:
+    """Asserts AST conformance to the Hojaiga Workflow Language grammar (3.3)."""
+
     def __init__(self, diagnostics: DiagnosticsEngine) -> None:
         self._diag = diagnostics
         self._seen_ids: Set[str] = set()
@@ -370,6 +504,10 @@ class SyntaxValidator:
             self._walk(child)
 
 
+# ==============================================================================
+# CHAPTER 4 -- SEMANTIC VALIDATOR (3.4)
+# ==============================================================================
+
 @dataclass
 class SymbolTableEntry:
     symbol_name: str
@@ -379,10 +517,13 @@ class SymbolTableEntry:
 
 
 EventSchemaLookup = Callable[[str], Optional[Dict[str, Any]]]
+
 _PRIMITIVE_TYPES = {"string", "number", "boolean", "object", "array", "null"}
 
 
 class SemanticValidator:
+    """Verifies scope, type compatibility and event alignment (3.4)."""
+
     def __init__(self, diagnostics: DiagnosticsEngine,
                  event_catalog_lookup: Optional[EventSchemaLookup] = None) -> None:
         self._diag = diagnostics
@@ -461,6 +602,10 @@ class SemanticValidator:
         return refs
 
 
+# ==============================================================================
+# CHAPTER 5 -- DEPENDENCY RESOLVER (3.5)
+# ==============================================================================
+
 @dataclass
 class DependencyGraph:
     adjacency: Dict[str, Set[str]] = field(default_factory=dict)
@@ -476,6 +621,9 @@ class CircularDependencyError(Exception):
 
 
 class DependencyResolver:
+    """Builds dependency adjacency, detects cycles (Tarjan) and computes
+    a Kahn topological order (3.5)."""
+
     def __init__(self, diagnostics: DiagnosticsEngine) -> None:
         self._diag = diagnostics
 
@@ -609,6 +757,10 @@ class DependencyResolver:
         walk(root)
 
 
+# ==============================================================================
+# CHAPTER 6 -- CAPABILITY & SERVICE RESOLVERS (3.6, 3.7)
+# ==============================================================================
+
 @dataclass
 class CapabilityBinding:
     organ: str
@@ -622,6 +774,13 @@ ServiceLookup = Callable[[str], Optional[Dict[str, Any]]]
 
 
 class CapabilityResolver:
+    """Maps node capability requirements to registered organ capabilities (3.6).
+
+    Cross-organ data enters only through the injected `capability_lookup`
+    callable -- this preserves Universal Law 3 (Separation of Responsibility):
+    Organ 36 never imports the Capability Registry's private implementation.
+    """
+
     def __init__(self, diagnostics: DiagnosticsEngine,
                  capability_lookup: Optional[CapabilityLookup] = None) -> None:
         self._diag = diagnostics
@@ -638,12 +797,13 @@ class CapabilityResolver:
             if node.type != "TASK":
                 continue
             capability_ref = str(node.attributes.get("capability", ""))
-            
-            # Robust normalization: if simple action like NAVIGATE, assume browser/app context
             if "." not in capability_ref:
-                capability_ref = f"browser.{capability_ref.lower()}"
-                node.attributes["capability"] = capability_ref
-
+                self._diag.error(
+                    "ERR_CAPABILITY_MALFORMED_REF",
+                    f"Node '{node_id}' capability reference '{capability_ref}' must be ORGAN.CAPABILITY.",
+                    node_id=node_id,
+                )
+                continue
             organ, capability = capability_ref.split(".", 1)
             record = self._lookup(organ, capability)
             if record is None or not record.get("available", False):
@@ -663,6 +823,9 @@ class CapabilityResolver:
 
 
 class ServiceResolver:
+    """Resolves service endpoints and transport bindings for capability
+    invocations (3.7)."""
+
     def __init__(self, diagnostics: DiagnosticsEngine,
                  service_lookup: Optional[ServiceLookup] = None) -> None:
         self._diag = diagnostics
@@ -674,14 +837,25 @@ class ServiceResolver:
         return {"reachable": True, "transport": "hojaiga_interface"}
 
     def resolve(self, capability_map: Dict[str, CapabilityBinding]) -> bool:
+        before_has_errors = False
         for node_id, binding in capability_map.items():
             record = self._lookup(binding.organ)
             if record is None or not record.get("reachable", False):
+                self._diag.warning(
+                    "WARN_SERVICE_UNREACHABLE",
+                    f"Service for organ '{binding.organ}' is not currently reachable; "
+                    f"binding recorded for deferred resolution.",
+                    node_id=node_id,
+                )
                 self.bound[node_id] = {"organ": binding.organ, "transport": "unresolved"}
                 continue
             self.bound[node_id] = {"organ": binding.organ, "transport": record.get("transport", "hojaiga_interface")}
-        return True
+        return not before_has_errors
 
+
+# ==============================================================================
+# CHAPTER 7 -- OPTIMIZATION ENGINE (3.8)
+# ==============================================================================
 
 @dataclass
 class OptimizedGraph:
@@ -693,6 +867,8 @@ class OptimizedGraph:
 
 
 class OptimizationEngine:
+    """Applies deterministic optimization passes (3.8, Section 7)."""
+
     _LEVEL_PASSES = {
         "O0": [],
         "O1": ["dead_code"],
@@ -774,6 +950,10 @@ class OptimizationEngine:
         for key, siblings in independent_groups.items():
             if len(siblings) > 1:
                 opt.parallel_extractions += 1
+                self._diag.suggestion(
+                    "SUGG_OPT_PARALLEL_EXTRACTED",
+                    f"Nodes {siblings} share predecessor {key} and can execute in parallel.",
+                )
 
     def _connector_reuse(self, opt: OptimizedGraph) -> None:
         graph = opt.graph
@@ -782,8 +962,13 @@ class OptimizationEngine:
             if node.type == "CONNECTOR":
                 cid = str(node.attributes.get("connectorId", ""))
                 connectors[cid] = connectors.get(cid, 0) + 1
-        opt.connector_reuse_groups = sum(1 for count in connectors.values() if count > 1)
+        reused = sum(1 for count in connectors.values() if count > 1)
+        opt.connector_reuse_groups = reused
 
+
+# ==============================================================================
+# CHAPTER 8 -- EXECUTION GRAPH BUILDER (3.9)
+# ==============================================================================
 
 class GraphNodeType(str, Enum):
     TASK = "TASK"
@@ -852,6 +1037,8 @@ class ExecutableDAG:
 
 
 class ExecutionGraphBuilder:
+    """Translates the optimized IR into an immutable, executable DAG (3.9)."""
+
     def __init__(self, diagnostics: DiagnosticsEngine) -> None:
         self._diag = diagnostics
 
@@ -859,6 +1046,8 @@ class ExecutionGraphBuilder:
         graph = opt.graph
         dag = ExecutableDAG()
 
+        # Build a remap table: every member of a fused chain collapses onto
+        # the synthetic fused_id so that edges naturally re-target correctly.
         remap: Dict[str, str] = {}
         for fused_id, members in opt.fused_step_mappings.items():
             for member in members:
@@ -928,6 +1117,7 @@ class ExecutionGraphBuilder:
             dag.edges.append(GraphEdge(f"e_{edge_counter}", "__start__", r, EdgeType.SEQUENTIAL))
             edge_counter += 1
 
+        self._assert_integrity(dag)
         return dag
 
     def _build_node(self, node_id: str, node: AstNode,
@@ -951,6 +1141,19 @@ class ExecutionGraphBuilder:
             timeout_ms=int(node.attributes.get("timeoutMs", 30000)),
         )
 
+    def _assert_integrity(self, dag: ExecutableDAG) -> None:
+        node_ids = {n.node_id for n in dag.nodes}
+        for edge in dag.edges:
+            if edge.from_node not in node_ids or edge.to_node not in node_ids:
+                self._diag.error(
+                    "ERR_GRAPH_ORPHAN_EDGE",
+                    f"Edge '{edge.edge_id}' references a node not present in the DAG.",
+                )
+
+
+# ==============================================================================
+# CHAPTER 9 -- IR GENERATOR (3.10)
+# ==============================================================================
 
 @dataclass
 class WorkflowIrEnvelope:
@@ -977,6 +1180,8 @@ class WorkflowIrEnvelope:
 
 
 class IrGenerator:
+    """Serializes the compiled DAG into the standardized Workflow IR (3.10)."""
+
     def __init__(self, signing_key: bytes) -> None:
         self._signing_key = signing_key
 
@@ -992,11 +1197,7 @@ class IrGenerator:
         }
         graph_nodes = [n.to_dict() for n in dag.nodes]
         graph_edges = [e.to_dict() for e in dag.edges]
-        resource_requirements = {
-            "estimatedPeakCpuCores": 2.0,
-            "estimatedPeakRamMb": 128,
-            "estimatedPeakVramMb": 0,
-        }
+        resource_requirements = self._estimate_resources(dag)
         optimization_summary = {
             "fusedTaskCount": len(opt.fused_step_mappings),
             "eliminatedNodeCount": len(opt.eliminated_nodes),
@@ -1031,8 +1232,42 @@ class IrGenerator:
             compilation_signature=signature,
         )
 
+    @staticmethod
+    def _estimate_resources(dag: ExecutableDAG) -> Dict[str, Any]:
+        task_nodes = [n for n in dag.nodes if n.node_type == GraphNodeType.TASK]
+        parallel_nodes = [n for n in dag.nodes if n.node_type == GraphNodeType.PARALLEL_SPLIT]
+        estimated_cpu_cores = round(min(1.0 + 0.25 * len(parallel_nodes), 8.0), 2)
+        estimated_ram_mb = 64 + len(task_nodes) * 8
+        llm_bound_nodes = sum(
+            1 for n in task_nodes
+            if n.capability_binding is not None and n.capability_binding.organ.upper() in ("BRAIN", "LLM")
+        )
+        estimated_vram_mb = 4096 if llm_bound_nodes > 0 else 0
+        return {
+            "estimatedPeakCpuCores": estimated_cpu_cores,
+            "estimatedPeakRamMb": estimated_ram_mb,
+            "estimatedPeakVramMb": estimated_vram_mb,
+        }
+
+    @staticmethod
+    def verify_signature(envelope_dict: Dict[str, Any], signing_key: bytes) -> bool:
+        payload_for_signature = json.dumps({
+            "irVersion": envelope_dict["irVersion"],
+            "workflowMetadata": envelope_dict["workflowMetadata"],
+            "graphNodes": envelope_dict["graphNodes"],
+            "graphEdges": envelope_dict["graphEdges"],
+        }, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        expected = hmac.new(signing_key, payload_for_signature, hashlib.sha256).hexdigest()
+        return hmac.compare_digest(expected, envelope_dict.get("compilationSignature", ""))
+
+
+# ==============================================================================
+# CHAPTER 10 -- COMPILATION CACHE
+# ==============================================================================
 
 class CompilationCache:
+    """Hash-keyed SQLite-backed IR cache (Section 3.1 / 15 compilationCache)."""
+
     def __init__(self, storage_path: str, max_entries: int = 5000, ttl_seconds: int = 86400) -> None:
         self._max_entries = max_entries
         self._ttl_seconds = ttl_seconds
@@ -1072,6 +1307,11 @@ class CompilationCache:
                 "INSERT OR REPLACE INTO ir_cache (cache_key, ir_json, created_at) VALUES (?, ?, ?)",
                 (cache_key, json.dumps(ir_envelope), int(time.time())),
             )
+            self._conn.execute(
+                "DELETE FROM ir_cache WHERE cache_key NOT IN "
+                "(SELECT cache_key FROM ir_cache ORDER BY created_at DESC LIMIT ?)",
+                (self._max_entries,),
+            )
             self._conn.commit()
 
     def invalidate(self, cache_key: str) -> bool:
@@ -1085,7 +1325,14 @@ class CompilationCache:
             self._conn.close()
 
 
+# ==============================================================================
+# CHAPTER 11 -- RECOVERY MANAGER
+# ==============================================================================
+
 class RecoveryManager:
+    """Traps uncaught compiler exceptions and emits fatal diagnostics (Law Book
+    Universal Law 8 -- Failure Transparency and Recovery)."""
+
     def __init__(self, diagnostics: DiagnosticsEngine) -> None:
         self._diag = diagnostics
 
@@ -1095,10 +1342,19 @@ class RecoveryManager:
         except WorkflowParseError as exc:
             self._diag.error("ERR_LEXICAL_PARSE_FAILURE", exc.message, line=exc.line, column=exc.column)
             return False, None
-        except Exception as exc:
-            self._diag.error("ERR_COMPILER_FATAL", f"Fatal error during {phase_name}: {exc}")
+        except Exception as exc:  # noqa: BLE001 - compiler must never crash the host process
+            _jlog("RecoveryManager", "ERROR", f"Fatal exception in phase '{phase_name}'", error=str(exc))
+            self._diag.error(
+                "ERR_COMPILER_FATAL",
+                f"Unrecoverable internal error during phase '{phase_name}': {exc}",
+                remediation="Report this as a compiler defect with the workflow source attached.",
+            )
             return False, None
 
+
+# ==============================================================================
+# CHAPTER 12 -- COMPILER CORE (3.1) -- ORCHESTRATOR
+# ==============================================================================
 
 @dataclass
 class CompilerFlags:
@@ -1115,6 +1371,9 @@ class CompilerConfig:
     cache_max_entries: int = 5000
     cache_ttl_seconds: int = 86400
     cache_storage_path: str = os.path.join(os.path.expanduser("~"), ".hojaiga", "cache", "organ36_compiler.sqlite3")
+    total_compilation_timeout_ms: int = 10000
+    max_workflow_depth: int = 100
+    max_parallel_branches: int = 32
     signing_key: bytes = field(default_factory=lambda: os.environ.get(
         "HOJAIGA_COMPILER_SIGNING_KEY", "hojaiga-default-development-key"
     ).encode("utf-8"))
@@ -1141,6 +1400,14 @@ class CompilationOutput:
 
 
 class CompilerCore:
+    """Coordinates top-level compiler phase transitions (3.1).
+
+    Zero Runtime Execution guarantee: this class never instantiates runtime
+    organ handlers, never issues network calls to automation targets, and
+    never executes compiled task steps. It only reads its inputs and
+    deterministically emits a Compilation Output Object.
+    """
+
     def __init__(self, config: CompilerConfig,
                  capability_lookup: Optional[CapabilityLookup] = None,
                  service_lookup: Optional[ServiceLookup] = None,
@@ -1173,6 +1440,7 @@ class CompilerCore:
             cached = self._cache.get(cache_key)
             if cached is not None:
                 duration_ms = (time.perf_counter() - start) * 1000
+                _jlog("CompilerCore", "INFO", "Cache hit", compilationId=compilation_id, sourceHash=source_hash)
                 return CompilationOutput(True, cached, [], compilation_id, duration_ms, from_cache=True)
 
         ok, root = recovery.guard("parse", lambda: WorkflowParser(diagnostics).parse(source, source_format))
@@ -1188,8 +1456,26 @@ class CompilerCore:
         if not ok or (diagnostics.has_errors() and flags.strict_validation):
             return self._fail(compilation_id, diagnostics, start)
 
+        depth = self._max_depth(root)
+        if depth > self._config.max_workflow_depth:
+            diagnostics.error(
+                "ERR_VALIDATION_DEPTH_EXCEEDED",
+                f"Workflow nesting depth {depth} exceeds configured maximum "
+                f"{self._config.max_workflow_depth}.",
+            )
+            return self._fail(compilation_id, diagnostics, start)
+
         ok, dep_graph = recovery.guard("dependency_resolve", lambda: DependencyResolver(diagnostics).resolve(root))
         if not ok or dep_graph is None or diagnostics.has_errors():
+            return self._fail(compilation_id, diagnostics, start)
+
+        max_parallel = self._max_parallel_branches(root)
+        if max_parallel > self._config.max_parallel_branches:
+            diagnostics.error(
+                "ERR_VALIDATION_PARALLEL_LIMIT_EXCEEDED",
+                f"Parallel branch count {max_parallel} exceeds configured maximum "
+                f"{self._config.max_parallel_branches}.",
+            )
             return self._fail(compilation_id, diagnostics, start)
 
         cap_resolver = CapabilityResolver(diagnostics, self._capability_lookup)
@@ -1237,6 +1523,9 @@ class CompilerCore:
             self._cache.set(cache_key, envelope_dict)
 
         duration_ms = (time.perf_counter() - start) * 1000
+        _jlog("CompilerCore", "INFO", "Compilation succeeded",
+              compilationId=compilation_id, durationMs=round(duration_ms, 3),
+              optimizationLevel=flags.optimization_level)
         return CompilationOutput(True, envelope_dict, diagnostics.get_report(), compilation_id, duration_ms)
 
     def validate_only(self, source: Any, source_format: str = "auto") -> CompilationOutput:
@@ -1259,21 +1548,51 @@ class CompilerCore:
     @staticmethod
     def _fail(compilation_id: str, diagnostics: DiagnosticsEngine, start: float) -> CompilationOutput:
         duration_ms = (time.perf_counter() - start) * 1000
+        _jlog("CompilerCore", "WARN", "Compilation failed",
+              compilationId=compilation_id, errorCount=sum(
+                  1 for d in diagnostics.get_report() if d["severity"] == "ERROR"
+              ))
         return CompilationOutput(False, None, diagnostics.get_report(), compilation_id, duration_ms)
+
+    @staticmethod
+    def _max_depth(node: AstNode) -> int:
+        if not node.children:
+            return 1
+        return 1 + max(CompilerCore._max_depth(c) for c in node.children)
+
+    @staticmethod
+    def _max_parallel_branches(node: AstNode) -> int:
+        local = len(node.children) if node.type == "PARALLEL" else 0
+        for child in node.children:
+            local = max(local, CompilerCore._max_parallel_branches(child))
+        return local
 
     def close(self) -> None:
         if self._cache is not None:
             self._cache.close()
 
 
+# ==============================================================================
+# CHAPTER 13 -- WORKFLOW COMPILER KERNEL (public facade)
+# ==============================================================================
+
 class WorkflowCompilerKernel:
+    """Top-level facade for Organ 36. Owns configuration and lifecycle.
+
+    This is the ONLY class other in-process callers (e.g. an embedding host
+    process on the same machine) should interact with directly. All remote
+    interaction happens exclusively through IPCServer / the documented
+    socket protocol.
+    """
+
     def __init__(self, config: Optional[CompilerConfig] = None,
                  capability_lookup: Optional[CapabilityLookup] = None,
                  service_lookup: Optional[ServiceLookup] = None,
                  event_catalog_lookup: Optional[EventSchemaLookup] = None) -> None:
         self.config = config or CompilerConfig()
         self.core = CompilerCore(self.config, capability_lookup, service_lookup, event_catalog_lookup)
-        self.cns = None
+        _jlog("WorkflowCompilerKernel", "INFO", "Organ 36 initialized",
+              organVersion=ORGAN_VERSION, irVersion=IR_SCHEMA_VERSION)
 
     def compile_workflow(self, source: Any, optimization_level: Optional[str] = None,
                           strict_validation: bool = True, force_recompile: bool = False,
@@ -1284,13 +1603,112 @@ class WorkflowCompilerKernel:
             force_recompile=force_recompile,
         )
         return self.core.compile(source, flags, source_format).to_dict()
+    
+    def compile_with_swarm(self, task_text: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Compile a task using the enhanced multi-agent swarm compiler.
+        
+        This method uses the enhanced brain compiler which creates:
+        - 7 permanent agents with different paradigms
+        - Human intent focused compilation
+        - Smart distribution to idle agents
+        - Checkpoint generation for each phase
+        - Sub-agent and temporary agent hierarchy
+        
+        Args:
+            task_text: The user's natural language task
+            context: Additional context (geographic, previous strategy, etc.)
+        
+        Returns:
+            Compiled plan with full agent structure
+        """
+        if not _HAS_ENHANCED_COMPILER:
+            # Fallback to standard compilation
+            LOG.warning("[Organ36] Enhanced compiler not available, using standard compilation")
+            workflow_doc = {
+                "name": f"Workflow_{uuid.uuid4().hex[:8]}",
+                "version": "1.0.0",
+                "steps": [
+                    {
+                        "id": f"task_{uuid.uuid4().hex[:8]}",
+                        "type": "TASK",
+                        "capability": "task_execution",
+                        "agent_id": "unknown"
+                    }
+                ]
+            }
+            return self.compile_workflow(workflow_doc)
+        
+        # Use enhanced compiler
+        compiler = get_enhanced_compiler()
+        compiled_plan = compiler.compile_task(task_text, context)
+        
+        # Convert CompiledPlan to standard workflow format
+        workflow_doc = {
+            "name": f"SwarmWorkflow_{compiled_plan.task_id[:8]}",
+            "version": "1.0.0",
+            "variables": [
+                {
+                    "name": "task_id",
+                    "type": "string",
+                    "default": compiled_plan.task_id
+                },
+                {
+                    "name": "human_intent",
+                    "type": "string",
+                    "default": compiled_plan.human_intent
+                },
+                {
+                    "name": "primary_specialty",
+                    "type": "string",
+                    "default": compiled_plan.primary_specialty
+                }
+            ],
+            "steps": []
+        }
+        
+        # Convert checkpoints to steps (supports both EnhancedBrainCompiler
+        # checkpoint dicts and AgentCheckpoint dataclass dicts)
+        for i, checkpoint in enumerate(compiled_plan.checkpoints):
+            step = {
+                "id": checkpoint.get("checkpoint_id") or f"cp_{i}",
+                "type": "TASK",
+                "capability": checkpoint.get("phase") or checkpoint.get("objective") or "task_execution",
+                "agent_id": checkpoint.get("parent_agent_id") or checkpoint.get("assigned_agent") or "unknown",
+                "attributes": {
+                    "sub_agents_required": checkpoint.get("sub_agents_required", 0),
+                    "temporary_agents_required": checkpoint.get("temporary_agents_required", 0),
+                    "required_capabilities": checkpoint.get("required_capabilities") or checkpoint.get("capabilities", [])
+                }
+            }
+            workflow_doc["steps"].append(step)
+        
+        # Compile the workflow
+        result = self.compile_workflow(workflow_doc)
+        
+        # Add swarm-specific information to result
+        result["swarm_structure"] = {
+            "assigned_permanent_agents": compiled_plan.assigned_permanent_agents,
+            "checkpoints": compiled_plan.checkpoints,
+            "sub_agent_instructions": compiled_plan.sub_agent_instructions,
+            "temporary_agent_tasks": compiled_plan.temporary_agent_tasks,
+            "execution_graph": compiled_plan.execution_graph,
+            "parallelism_level": compiled_plan.parallelism_level,
+            "estimated_duration": compiled_plan.estimated_duration,
+            "human_intent": compiled_plan.human_intent,
+            "primary_specialty": compiled_plan.primary_specialty
+        }
+        
+        LOG.info(f"[Organ36] Compiled task with swarm structure: {len(compiled_plan.assigned_permanent_agents)} permanent agents, {len(compiled_plan.checkpoints)} checkpoints")
+        
+        return result
 
     def validate_workflow(self, source: Any, source_format: str = "auto") -> Dict[str, Any]:
         return self.core.validate_only(source, source_format).to_dict()
 
     def invalidate_cache(self, source: Any, optimization_level: Optional[str] = None,
                           strict_validation: bool = True) -> bool:
-        if self.core._cache is None:
+        if self.core._cache is None:  # noqa: SLF001 - intentional internal facade access
             return False
         source_bytes = source if isinstance(source, (bytes, bytearray)) else str(source).encode("utf-8")
         source_hash = hashlib.sha256(source_bytes).hexdigest()
@@ -1299,7 +1717,7 @@ class WorkflowCompilerKernel:
             "strictValidation": strict_validation,
             "irVersion": IR_SCHEMA_VERSION,
         })
-        return self.core._cache.invalidate(cache_key)
+        return self.core._cache.invalidate(cache_key)  # noqa: SLF001
 
     def health(self) -> Dict[str, Any]:
         return {
@@ -1313,16 +1731,17 @@ class WorkflowCompilerKernel:
     async def start(self, cns):
         self.cns = cns
         await self.cns.subscribe("COMPILATION_STARTED", "compiler_comp", self.handle_cns_event)
-
+        
     async def handle_cns_event(self, env):
         from core_organs.organ_02_cns_single_file import EventEnvelope
         payload = env.payload
         task_id = payload.get("task_id")
         plan_payload = payload.get("plan_payload") or {}
-
+        command = payload.get("command") or plan_payload.get("command") or ""
+        
         loop = asyncio.get_running_loop()
-
-        # Robust translation of agent tasks into normalized capability steps
+        
+        # Translate agent_tasks into Workflow Compiler IR steps
         steps = []
         for at in plan_payload.get("agent_tasks", []):
             if at.get("wait_seconds"):
@@ -1331,46 +1750,63 @@ class WorkflowCompilerKernel:
                     "type": "WAIT",
                     "duration_seconds": at["wait_seconds"]
                 })
-
-            raw_instr = at.get("instructions", "{}")
-            action_name = "TASK"
-            if isinstance(raw_instr, str) and "action" in raw_instr:
-                try:
-                    action_name = json.loads(raw_instr).get("action", "TASK")
-                except Exception:
-                    pass
-            elif isinstance(raw_instr, dict):
-                action_name = raw_instr.get("action", "TASK")
-
-            # Determine whether task is browser or OS bound
-            target_scope = "app" if any(k in str(at.get("objective", "")).lower() for k in ["obs", "desktop", "launch"]) else "browser"
-            capability_key = f"{target_scope}.{action_name.lower()}"
-
             steps.append({
                 "id": f"task_{uuid.uuid4().hex[:8]}",
                 "type": "TASK",
-                "capability": capability_key,
+                "capability": at.get("objective", "unknown"),
                 "agent_id": at.get("agent_id")
             })
-
+            
         workflow_doc = {
             "name": f"Workflow_{task_id}",
             "version": "1.0.0",
             "steps": steps
         }
-
-        result = await loop.run_in_executor(None, lambda: self.compile_workflow(workflow_doc))
-
+        
+        # Bounded compilation: a hung compiler must never stall the pipeline forever.
+        # On timeout the pipeline proceeds without the compiled IR (graceful
+        # degradation); the orchestrator's task watchdog remains the final net.
+        compile_timeout_s = float(os.environ.get("HOJAIGA_COMPILE_TIMEOUT_S", "120"))
+        try:
+            result = await asyncio.wait_for(
+                loop.run_in_executor(None, lambda: self.compile_workflow(workflow_doc)),
+                timeout=compile_timeout_s)
+        except asyncio.TimeoutError:
+            LOG.warning(f"[Organ36] compile_workflow timed out after {compile_timeout_s}s for task {task_id}")
+            result = None
+        
+        # Enhanced swarm compilation (permanent -> sub -> temporary agent hierarchy).
+        # Produces checkpoints, sub-agent instructions, temporary agent tasks and an
+        # execution graph that Organ 10 consumes via spawn_swarm_agents().
+        swarm_structure = None
+        if _HAS_ENHANCED_COMPILER and command:
+            try:
+                swarm_result = await asyncio.wait_for(
+                    loop.run_in_executor(
+                        None, lambda: self.compile_with_swarm(command, {"task_id": task_id})
+                    ),
+                    timeout=compile_timeout_s)
+                swarm_structure = swarm_result.get("swarm_structure")
+                LOG.info(
+                    f"[Organ36] Swarm structure compiled for task {task_id}: "
+                    f"{len(swarm_structure.get('checkpoints', []))} checkpoints, "
+                    f"{len(swarm_structure.get('temporary_agent_tasks', []))} temporary agent tasks"
+                    if swarm_structure else f"[Organ36] Swarm compilation returned no structure for task {task_id}"
+                )
+            except Exception as exc:
+                LOG.warning(f"[Organ36] Swarm compilation failed for task {task_id}: {exc}")
+        
         await self.cns.publish(EventEnvelope(
             topic="COMPILATION_COMPLETED",
             source_organ="organ_36",
             payload={
                 "task_id": task_id,
                 "compiled_workflow": result,
-                "agent_tasks": plan_payload.get("agent_tasks")
+                "agent_tasks": plan_payload.get("agent_tasks"),
+                "swarm_structure": swarm_structure
             }
         ))
-
+        
         await self.cns.publish(EventEnvelope(
             topic="sys.events",
             source_organ="organ_36",
@@ -1382,7 +1818,12 @@ class WorkflowCompilerKernel:
 
     def shutdown(self) -> None:
         self.core.close()
+        _jlog("WorkflowCompilerKernel", "INFO", "Organ 36 shutdown complete")
 
+
+# ==============================================================================
+# CHAPTER 14 -- IPC SERVER (length-prefixed binary frame protocol)
+# ==============================================================================
 
 class FrameProtocolError(Exception):
     pass
@@ -1406,6 +1847,11 @@ def decode_frame_header(header_bytes: bytes) -> Tuple[int, int]:
 
 
 class IPCServer:
+    """Serves the `hojaiga_interface` socket using the standardized
+    length-prefixed binary frame protocol, with graceful transport fallback:
+    Windows Named Pipe -> Unix Domain Socket -> TCP loopback (Law Book
+    Universal Law 5 -- Standardized Communication)."""
+
     def __init__(self, kernel: WorkflowCompilerKernel) -> None:
         self._kernel = kernel
         self._running = False
@@ -1420,10 +1866,12 @@ class IPCServer:
         else:
             self._thread = threading.Thread(target=self._serve_tcp_loopback, daemon=True)
         self._thread.start()
+        _jlog("IPCServer", "INFO", "Organ 36 IPC server started", socketName=IPC_SOCKET_NAME)
 
     def stop(self) -> None:
         self._running = False
 
+    # -- dispatch -------------------------------------------------------
     def _dispatch(self, op_code: int, payload: Dict[str, Any]) -> Tuple[int, Dict[str, Any]]:
         try:
             if op_code == OpCode.COMPILE:
@@ -1450,51 +1898,53 @@ class IPCServer:
             if op_code == OpCode.HEALTH:
                 return OpCode.RESULT, self._kernel.health()
             return OpCode.ERROR, {"error": f"Unsupported op_code {op_code}"}
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - IPC boundary must never crash the server
+            _jlog("IPCServer", "ERROR", "Dispatch failure", error=str(exc))
             return OpCode.ERROR, {"error": str(exc)}
 
-    def _serve_named_pipe(self) -> None:
+    # -- transports -------------------------------------------------------
+    def _serve_named_pipe(self) -> None:  # pragma: no cover - windows only
         while self._running:
-            handle = win32pipe.CreateNamedPipe(
+            handle = win32pipe.CreateNamedPipe(  # type: ignore
                 NAMED_PIPE_PATH,
-                win32pipe.PIPE_ACCESS_DUPLEX,
-                win32pipe.PIPE_TYPE_MESSAGE | win32pipe.PIPE_READMODE_MESSAGE | win32pipe.PIPE_WAIT,
-                win32pipe.PIPE_UNLIMITED_INSTANCES, MAX_FRAME_BYTES, MAX_FRAME_BYTES, 0, None,
+                win32pipe.PIPE_ACCESS_DUPLEX,  # type: ignore
+                win32pipe.PIPE_TYPE_MESSAGE | win32pipe.PIPE_READMODE_MESSAGE | win32pipe.PIPE_WAIT,  # type: ignore
+                win32pipe.PIPE_UNLIMITED_INSTANCES, MAX_FRAME_BYTES, MAX_FRAME_BYTES, 0, None,  # type: ignore
             )
             try:
-                win32pipe.ConnectNamedPipe(handle, None)
+                win32pipe.ConnectNamedPipe(handle, None)  # type: ignore
                 self._serve_named_pipe_connection(handle)
-            except pywintypes.error:
-                pass
+            except pywintypes.error as exc:  # type: ignore
+                _jlog("IPCServer", "ERROR", "Named pipe error", error=str(exc))
             finally:
                 try:
-                    win32file.CloseHandle(handle)
+                    win32file.CloseHandle(handle)  # type: ignore
                 except Exception:
                     pass
 
-    def _serve_named_pipe_connection(self, handle) -> None:
+    def _serve_named_pipe_connection(self, handle) -> None:  # pragma: no cover - windows only
         while self._running:
-            _, header_bytes = win32file.ReadFile(handle, FRAME_HEADER_SIZE)
+            _, header_bytes = win32file.ReadFile(handle, FRAME_HEADER_SIZE)  # type: ignore
             length, op_code = decode_frame_header(header_bytes if isinstance(header_bytes, bytes) else header_bytes.encode())
             body = b""
             while len(body) < length:
-                _, chunk = win32file.ReadFile(handle, length - len(body))
+                _, chunk = win32file.ReadFile(handle, length - len(body))  # type: ignore
                 body += chunk if isinstance(chunk, bytes) else chunk.encode()
             payload = json.loads(body.decode("utf-8")) if body else {}
             reply_op, reply_payload = self._dispatch(op_code, payload)
-            win32file.WriteFile(handle, encode_frame(reply_op, reply_payload))
+            win32file.WriteFile(handle, encode_frame(reply_op, reply_payload))  # type: ignore
 
-    def _serve_unix_socket(self) -> None:
+    def _serve_unix_socket(self) -> None:  # pragma: no cover - posix only
         import socket
         if os.path.exists(UNIX_SOCKET_PATH):
             os.remove(UNIX_SOCKET_PATH)
-        server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)  # type: ignore
         server.bind(UNIX_SOCKET_PATH)
         server.listen(8)
         server.settimeout(1.0)
         while self._running:
             try:
-                conn, _ = server.accept()
+                conn, _addr = server.accept()
             except socket.timeout:
                 continue
             threading.Thread(target=self._serve_socket_connection, args=(conn,), daemon=True).start()
@@ -1509,7 +1959,7 @@ class IPCServer:
         server.settimeout(1.0)
         while self._running:
             try:
-                conn, _ = server.accept()
+                conn, _addr = server.accept()
             except socket.timeout:
                 continue
             threading.Thread(target=self._serve_socket_connection, args=(conn,), daemon=True).start()
@@ -1545,6 +1995,10 @@ class IPCServer:
             buf += chunk
         return buf
 
+
+# ==============================================================================
+# CHAPTER 15 -- ENTRY POINT
+# ==============================================================================
 
 def main() -> None:
     kernel = WorkflowCompilerKernel()

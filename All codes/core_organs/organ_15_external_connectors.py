@@ -813,6 +813,23 @@ class DesktopConnector(IConnector):
             if action == "focus_window":
                 await asyncio.to_thread(self._focus_window, payload["title"])
                 return _make_response(request.request_id, ResponseStatus.OK, 200, started, {"focused": True})
+            if action == "click":
+                x = payload.get("x")
+                y = payload.get("y")
+                await asyncio.to_thread(self._click, x, y)
+                return _make_response(request.request_id, ResponseStatus.OK, 200, started, {"clicked": True, "x": x, "y": y})
+            if action == "type":
+                text = payload.get("text", "")
+                await asyncio.to_thread(self._type, text)
+                return _make_response(request.request_id, ResponseStatus.OK, 200, started, {"typed": True, "len": len(text)})
+            if action == "hotkey":
+                keys = payload.get("keys", [])
+                await asyncio.to_thread(self._hotkey, keys)
+                return _make_response(request.request_id, ResponseStatus.OK, 200, started, {"hotkey": keys})
+            if action == "press":
+                key = payload.get("key", "")
+                await asyncio.to_thread(self._press, key)
+                return _make_response(request.request_id, ResponseStatus.OK, 200, started, {"pressed": key})
             if action == "gui_search_launch":
                 success = await asyncio.to_thread(self._gui_search_launch, payload["app_name"])
                 if success:
@@ -822,6 +839,25 @@ class DesktopConnector(IConnector):
             raise ConnectorExecutionError(f"Unknown desktop action '{action}'")
         except Exception as exc:  # noqa: BLE001
             return _make_response(request.request_id, ResponseStatus.ERROR, 500, started, None, str(exc))
+
+    def _click(self, x: Optional[int], y: Optional[int]) -> None:
+        import pyautogui
+        if x is not None and y is not None:
+            pyautogui.click(x=x, y=y)
+        else:
+            pyautogui.click()
+
+    def _type(self, text: str) -> None:
+        import pyautogui
+        pyautogui.write(text, interval=0.02)
+
+    def _hotkey(self, keys: list[str]) -> None:
+        import pyautogui
+        pyautogui.hotkey(*keys)
+
+    def _press(self, key: str) -> None:
+        import pyautogui
+        pyautogui.press(key)
 
     def _gui_search_launch(self, app_name: str) -> bool:
         try:

@@ -146,7 +146,7 @@ import threading
 import time
 import uuid
 from collections import deque
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field, asdict, replace
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
@@ -262,6 +262,7 @@ class RecoveryStrategyType(str, Enum):
     MANUAL_APPROVAL = "MANUAL_APPROVAL"
     ABORT = "ABORT"
     EMERGENCY_SHUTDOWN = "EMERGENCY_SHUTDOWN"
+    BRAIN_RESOLVE = "BRAIN_RESOLVE"
 
 
 class RetryAlgorithm(str, Enum):
@@ -1018,6 +1019,8 @@ class RecoveryManager(IRecoveryManager):
                 if bridge is not None:
                     bridge.trigger_emergency_shutdown(definition.error_code)
                 outcome = "SUCCESS"
+            elif strategy == RecoveryStrategyType.BRAIN_RESOLVE:
+                outcome = self._brain_resolve(definition, execution_context)
             elif strategy == RecoveryStrategyType.ABORT:
                 outcome = "ABORTED"
             else:
@@ -1045,6 +1048,175 @@ class RecoveryManager(IRecoveryManager):
             if target():
                 return "SUCCESS"
         return "ESCALATED"
+
+    def _brain_resolve(
+        self, definition: AOSErrorDefinition, execution_context: Dict[str, Any]
+    ) -> str:
+        """Brain-driven recovery: read the FULL error, ask the LLM to choose a
+        resume/fix path, detect self-describing fixes, and auto pause/resume the
+        workflow around the analysis. Pauses automatically before reasoning and
+        resumes after a decision; falls back to ESCALATED if the brain is
+        unavailable so existing escalation still fires."""
+        bridge = execution_context.get("kernel_bridge")
+        pause_fn = (
+            getattr(bridge, "pause", None)
+            or execution_context.get("pause_workflow")
+        )
+        resume_fn = (
+            getattr(bridge, "resume", None)
+            or execution_context.get("resume_workflow")
+        )
+
+        def _safe_pause() -> None:
+            try:
+                if callable(pause_fn):
+                    pause_fn()
+            except Exception:  # noqa: BLE001 - best-effort pause
+                pass
+
+        def _safe_resume() -> None:
+            try:
+                if callable(resume_fn):
+                    resume_fn()
+            except Exception:  # noqa: BLE001 - best-effort resume
+                pass
+
+        _safe_pause()
+        try:
+            full_error = self._build_error_brief(definition, execution_context)
+            decision = self._query_brain_for_recovery(full_error)
+        finally:
+            _safe_resume()
+
+        action = (decision.get("action") or "ESCALATE").upper()
+        fix_instructions = decision.get("fix_instructions") or ""
+        is_self_describing = bool(decision.get("self_describing_fix")) or self._looks_self_describing(
+            definition
+        )
+
+        if is_self_describing and fix_instructions:
+            fix_target = execution_context.get("fix_target")
+            if callable(fix_target):
+                try:
+                    if fix_target(fix_instructions):
+                        return "SUCCESS"
+                except Exception:  # noqa: BLE001 - fix callback may raise
+                    self._logging.log(
+                        "WARNING", "recovery.log",
+                        f"BRAIN_RESOLVE fix_target failed for {definition.error_code}",
+                    )
+
+        if action in ("RESUME", "RETRY", "FALLBACK", "FIX"):
+            retry_target = execution_context.get("retry_target")
+            fallback_target = execution_context.get("fallback_target")
+            if action == "RETRY" and callable(retry_target) and retry_target():
+                return "SUCCESS"
+            if action == "FALLBACK" and callable(fallback_target) and fallback_target():
+                return "SUCCESS"
+            if action in ("RESUME", "FIX"):
+                return "SUCCESS"
+            return "ESCALATED"
+        if action == "ABORT":
+            return "ABORTED"
+        return "ESCALATED"
+
+    @staticmethod
+    def _looks_self_describing(definition: AOSErrorDefinition) -> bool:
+        """Heuristic: many app errors embed the exact remediation in their text."""
+        haystack = " ".join(
+            [definition.developer_message, definition.recommended_action, definition.description]
+        ).lower()
+        markers = (
+            "run ", "execute ", "install ", "set ", "configure ", "restart ",
+            "use ", "try ", "please ", "you must", "you need", "to fix",
+            "to resolve", "command", "npm ", "pip ", "apt ",
+        )
+        return any(m in haystack for m in markers)
+
+    @staticmethod
+    def _build_error_brief(
+        definition: AOSErrorDefinition, execution_context: Dict[str, Any]
+    ) -> str:
+        diagnostic = execution_context.get("diagnostic_data") or {}
+        context = execution_context.get("context") or {}
+        diagnostic_str = json.dumps(diagnostic, default=str)
+        context_str = json.dumps(context, default=str)
+        return (
+            f"ERROR CODE: {definition.error_code}\n"
+            f"NAME: {definition.name}\n"
+            f"DESCRIPTION: {definition.description}\n"
+            f"DEVELOPER MESSAGE: {definition.developer_message}\n"
+            f"POSSIBLE CAUSES: {'; '.join(definition.possible_causes)}\n"
+            f"RECOMMENDED ACTION: {definition.recommended_action}\n"
+            f"DIAGNOSTIC DATA: {diagnostic_str}\n"
+            f"CONTEXT: {context_str}\n"
+        )
+
+    def _query_brain_for_recovery(self, full_error: str) -> Dict[str, Any]:
+        """Ask the LLM Gateway to pick a recovery path. Returns a dict with at
+        least an 'action' key. Robust to malformed / fenced JSON and to gateway
+        failure (returns ESCALATE in that case)."""
+        system = (
+            "You are the Hojaiga error-recovery brain. Given a full error report, "
+            "decide how the automation OS should recover. Respond ONLY with JSON of "
+            "the form: "
+            '{"action": "RESUME"|"RETRY"|"FALLBACK"|"FIX"|"ABORT"|"ESCALATE", '
+            '"self_describing_fix": true|false, '
+            '"fix_instructions": "exact command/steps to fix, or empty", '
+            '"reason": "short explanation"}. '
+            "A 'self_describing_fix' is true ONLY when the error text itself states "
+            "the exact remediation (e.g. 'run npm install X'). Prefer RESUME when the "
+            "task can continue, RETRY when a transient failure, FALLBACK when an "
+            "alternate path exists, FIX when a concrete remediation was found, "
+            "ABORT only if continuing is unsafe, ESCALATE if unsure."
+        )
+        prompt = (
+            f"{full_error}\n\nReturn the JSON decision now (no prose, no markdown fences)."
+        )
+        try:
+            from core_organs.organ_37_llm_gateway import LLMGateway
+
+            gateway = LLMGateway()
+            raw = gateway.execute_inference(system, prompt, timeout=120.0)
+        except Exception as exc:  # noqa: BLE001 - brain unavailable -> escalate
+            self._logging.log(
+                "WARNING", "recovery.log",
+                f"BRAIN_RESOLVE gateway unavailable: {exc}",
+            )
+            return {"action": "ESCALATE", "self_describing_fix": False, "fix_instructions": "", "reason": "brain unavailable"}
+
+        parsed = self._parse_brain_json(raw)
+        if parsed is None:
+            return {"action": "ESCALATE", "self_describing_fix": False, "fix_instructions": "", "reason": "unparseable brain output"}
+        return parsed
+
+    @staticmethod
+    def _parse_brain_json(raw: str) -> Optional[Dict[str, Any]]:
+        if not raw:
+            return None
+        text = raw.strip()
+        if text.startswith("```"):
+            text = text.split("```", 2)[1]
+            if text.lower().startswith("json"):
+                text = text[4:]
+            text = text.strip()
+        try:
+            data = json.loads(text)
+        except json.JSONDecodeError:
+            start, end = text.find("{"), text.rfind("}")
+            if start != -1 and end != -1 and end > start:
+                try:
+                    data = json.loads(text[start : end + 1])
+                except json.JSONDecodeError:
+                    return None
+            else:
+                return None
+        if not isinstance(data, dict) or "action" not in data:
+            return None
+        data.setdefault("self_describing_fix", False)
+        data.setdefault("fix_instructions", "")
+        data.setdefault("reason", "")
+        return data
 
 
 # =================================================================
@@ -1495,6 +1667,7 @@ class ErrorCatalogOrgan:
         trace_id: Optional[str] = None,
         execution_context: Optional[Dict[str, Any]] = None,
         auto_recover: bool = True,
+        brain_fallback: bool = True,
     ) -> AOSErrorInstance:
         """
         Full lifecycle entry point: Detected -> Validated -> Logged ->
@@ -1595,15 +1768,64 @@ class ErrorCatalogOrgan:
                     else ErrorLifecycleState.SAFE_MODE
                 )
                 instance.transition(target_state)
+                instance.transition(ErrorLifecycleState.ARCHIVED)
             else:
+                # Brain-driven "find another path" recovery before giving up.
+                if brain_fallback:
+                    try:
+                        brain_report = self.attempt_brain_recovery(
+                            error_code,
+                            execution_context=execution_context,
+                            diagnostic_data=instance.diagnostic_data,
+                            context=instance.context,
+                        )
+                        if brain_report.get("outcome") == "SUCCESS":
+                            instance.transition(ErrorLifecycleState.RESOLVED)
+                            instance.transition(ErrorLifecycleState.VERIFIED)
+                            instance.transition(ErrorLifecycleState.ARCHIVED)
+                            self.history_pipeline.run(instance, evaluated_severity)
+                            return instance
+                    except Exception as exc:  # noqa: BLE001 - brain is best-effort
+                        self.logging_system.log(
+                            "WARNING", "recovery.log",
+                            f"brain_fallback recovery failed for {error_code}: {exc}",
+                        )
                 instance.transition(ErrorLifecycleState.SAFE_MODE)
-            instance.transition(ErrorLifecycleState.ARCHIVED)
+                instance.transition(ErrorLifecycleState.ARCHIVED)
         else:
             instance.transition(ErrorLifecycleState.ABORTED)
             instance.transition(ErrorLifecycleState.ARCHIVED)
 
         self.history_pipeline.run(instance, evaluated_severity)
         return instance
+
+    def attempt_brain_recovery(
+        self,
+        error_code: str,
+        execution_context: Optional[Dict[str, Any]] = None,
+        diagnostic_data: Optional[Dict[str, Any]] = None,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Force a brain-driven recovery pass for a known error code. Builds a
+        transient copy of the definition with the BRAIN_RESOLVE strategy and runs
+        it through the RecoveryManager. Returns a small report dict.
+
+        The brain reads the FULL error, optionally pauses/resumes the workflow via
+        an optional `kernel_bridge`/`pause_workflow`/`resume_workflow` in
+        execution_context, detects self-describing fixes, and either resumes,
+        retries, falls back, or applies a fix before escalating.
+        """
+        self.registry.require_definition(error_code)
+        definition = self.registry.get_definition(error_code)
+        assert definition is not None
+        brain_def = replace(
+            definition, recovery_strategy=RecoveryStrategyType.BRAIN_RESOLVE
+        )
+        ctx: Dict[str, Any] = dict(execution_context or {})
+        ctx.setdefault("diagnostic_data", diagnostic_data or {})
+        ctx.setdefault("context", context or {})
+        outcome = self.recovery_manager.execute_recovery(brain_def, ctx)
+        return {"error_code": error_code, "outcome": outcome}
 
     def get_definition(self, error_code: str) -> Optional[AOSErrorDefinition]:
         return self.registry.get_definition(error_code)
