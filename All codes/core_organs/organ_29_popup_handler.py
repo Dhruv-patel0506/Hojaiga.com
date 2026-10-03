@@ -677,6 +677,28 @@ class DesktopInteractionManager:
 
         return None
 
+    def _cancel_only(self, node: WindowNode, default_x: int, default_y: int) -> Tuple[bool, int, int, str]:
+        """Probe-time dismissal: Escape -> IDCANCEL -> WM_CLOSE, verified gone. Never accepts a
+        change, never queries the LLM, never writes the pathway cache (a cached 'escape' for
+        this title would later cancel the very dialog a real task needs)."""
+        import ctypes as _ct
+        h = node.handle
+        if not h:
+            return False, default_x, default_y, "cancel_only_no_handle"
+        steps = (lambda: self._execute_key_intent("key:escape", h),
+                 lambda: _ct.windll.user32.PostMessageW(h, 0x0111, 2, 0),    # WM_COMMAND IDCANCEL
+                 lambda: _ct.windll.user32.PostMessageW(h, 0x0010, 0, 0))    # WM_CLOSE
+        for i, fire in enumerate(steps):
+            try:
+                fire()
+            except Exception:
+                continue
+            time.sleep(0.12)
+            if not hin.is_alive(h) or not _ct.windll.user32.IsWindowVisible(h):
+                logger.info("[HOST AGENT] probe-mode cancel-only closed '%s' (rung %d)", node.title, i + 1)
+                return True, default_x, default_y, "cancel_only"
+        return False, default_x, default_y, "cancel_only_failed"
+
     def resolve_and_mitigate(self, node: WindowNode) -> Tuple[bool, int, int, str]:
         """
         Universal resolution pipeline:
@@ -692,6 +714,20 @@ class DesktopInteractionManager:
         b = node.bounds
         default_x = (b.left + b.right) // 2 if b else 0
         default_y = (b.top + b.bottom) // 2 if b else 0
+
+        # ------------------------------------------------------------------ #
+        # Rulebook gate (popup_mode): a dialog the task WANTS is left alone; a dialog our own
+        # scan probe opened is CANCEL-ONLY (no accept, no LLM tier, nothing cached).
+        # ------------------------------------------------------------------ #
+        try:
+            from core_organs import popup_mode as _pm
+            if _pm.is_expected(node.title):
+                logger.info("[HOST AGENT] '%s' is an EXPECTED popup for the running step; leaving it.", node.title)
+                return True, default_x, default_y, "expected_keep"
+            if _pm.current_policy() == "probe":
+                return self._cancel_only(node, default_x, default_y)
+        except Exception as _pm_err:
+            logger.debug("popup_mode unavailable: %s", _pm_err)
 
         # ------------------------------------------------------------------ #
         # Tier 1: Fast Semantic Button Extraction
