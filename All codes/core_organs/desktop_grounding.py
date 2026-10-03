@@ -730,11 +730,24 @@ class DesktopGrounding:
 # W2 — DesktopVerifier: outcome assertions (the trust core)
 # ---------------------------------------------------------------------------
 
+# Pixel-delta tolerance. The window is reduced to a small grayscale thumbnail quantized into
+# REGION_LEVEL_BANDS brightness bands, and a change only counts when at least
+# REGION_MIN_CHANGED_FRACTION of the cells moved. Two reasons, both measured on real windows:
+# an exact-byte hash of a screen grab let a blinking caret / ticking clock read as "the app
+# reacted", and it hashed whatever window was ON TOP of the target. The measured fraction always
+# goes into the evidence string, so a suppressed small change stays visible to a human.
+REGION_THUMB_SIZE = (48, 48)
+REGION_LEVEL_BANDS = 16
+REGION_MIN_CHANGED_FRACTION = 0.02
+
+
 @dataclass
 class Snapshot:
     title: str
     element_ids: List[str]
     region_hash: str = ""
+    region_thumb: bytes = b""
+    region_source: str = ""
 
     def signature(self) -> str:
         return hashlib.md5(("|".join(sorted(self.element_ids)) + self.title).encode("utf-8")).hexdigest()
@@ -743,31 +756,86 @@ class Snapshot:
 class DesktopVerifier:
     def snapshot(self, hwnd: int, elements: List[GroundedElement]) -> Snapshot:
         snap = Snapshot(title=_quick_title(hwnd), element_ids=[e.id for e in elements])
-        snap.region_hash = self._region_hash(hwnd)
+        snap.region_hash, snap.region_thumb, snap.region_source = self._region_capture(hwnd)
         return snap
 
-    def _region_hash(self, hwnd: int) -> str:
+    def _region_capture(self, hwnd: int) -> Tuple[str, bytes, str]:
+        """(hash, quantized thumbnail, capture source) of the window's OWN pixels.
+
+        PrintWindow is tried first because a screen grab of the window rect hashes whatever is on
+        top, so an occluded app could fake both a change and a no-change. A screen grab is still
+        used as a fallback (some GPU windows return no PrintWindow content) but the source tag
+        says so — the fallback is never silent. Minimized windows are not rendered by Windows, so
+        no fallback happens there: grabbing their parked 1x1 rect would be meaningless noise.
+        """
         if not (HAS_PIL and _IS_WINDOWS and hwnd):
-            return ""
+            return "", b"", "unavailable"
+        img, why = None, "no-capture"
+        try:
+            img, why = hin.capture_window(hwnd)
+        except Exception as exc:
+            img, why = None, f"error({type(exc).__name__})"
+        if img is not None:
+            return self._thumb_pair(img, "printwindow")
+        if why == "window-minimized":
+            return "", b"", "window-minimized"
         try:
             from PIL import ImageGrab
             import ctypes.wintypes as wt
             rr = wt.RECT()
             ctypes.windll.user32.GetWindowRect(hwnd, ctypes.byref(rr))
+            if rr.right - rr.left < 8 or rr.bottom - rr.top < 8:
+                return "", b"", f"no-usable-rect({why})"
             img = ImageGrab.grab(bbox=(rr.left, rr.top, rr.right, rr.bottom))
-            img = img.resize((64, 64))
-            return hashlib.md5(img.tobytes()).hexdigest()
-        except Exception:
-            return ""
+        except Exception as exc:
+            return "", b"", f"capture-failed({why}/{type(exc).__name__})"
+        if img is None:
+            return "", b"", f"capture-failed({why})"
+        return self._thumb_pair(img, "screen-grab-fallback")
+
+    @staticmethod
+    def _thumb_pair(img, source: str) -> Tuple[str, bytes, str]:
+        try:
+            thumb = DesktopVerifier._region_thumb(img)
+        except Exception as exc:
+            return "", b"", f"thumb-error({type(exc).__name__})"
+        return hashlib.md5(thumb).hexdigest(), thumb, source
+
+    @staticmethod
+    def _region_thumb(img) -> bytes:
+        """Grayscale, fixed 48x48, quantized into REGION_LEVEL_BANDS bands."""
+        gray = img.convert("L").resize(REGION_THUMB_SIZE)
+        band = 256 // REGION_LEVEL_BANDS
+        return bytes(min(REGION_LEVEL_BANDS - 1, px // band) for px in gray.getdata())
+
+    def _region_hash(self, hwnd: int) -> str:
+        """Kept as the hash-only entry point (organ_48 uses it)."""
+        return self._region_capture(hwnd)[0]
+
+    @staticmethod
+    def pixels_changed(before: Snapshot, after: Snapshot) -> Tuple[bool, str]:
+        """Tolerance-based pixel delta -> (changed, evidence carrying the measured fraction)."""
+        if not (before.region_hash and after.region_hash):
+            return False, "region pixel-delta unavailable(" + (before.region_source or "no-capture") + ")"
+        b, a = before.region_thumb, after.region_thumb
+        if b and a and len(b) == len(a):
+            moved = sum(1 for x, y in zip(b, a) if x != y)
+            fraction = moved / float(len(b))
+            ok = fraction >= REGION_MIN_CHANGED_FRACTION
+            return ok, (f"region pixel-delta {fraction:.3f} of cells via "
+                        f"{after.region_source or before.region_source} "
+                        + ("detected" if ok else "below tolerance"))
+        ok = before.region_hash != after.region_hash
+        return ok, "region pixel-delta " + ("detected" if ok else "none")
 
     def check_expect(self, expect: Dict[str, Any], before: Snapshot,
                      after: Snapshot, elements_now: List[GroundedElement]) -> Tuple[bool, str]:
         """Evaluate a postcondition dict. Returns (ok, evidence)."""
         if not expect:
             # Default postcondition: something about the UI changed.
-            changed = before.signature() != after.signature() or (
-                before.region_hash and after.region_hash and before.region_hash != after.region_hash)
-            return changed, ("ui-changed" if changed else "ui-unchanged")
+            pixel_changed, pixel_evidence = self.pixels_changed(before, after)
+            changed = before.signature() != after.signature() or pixel_changed
+            return changed, f"ui-{'changed' if changed else 'unchanged'}; {pixel_evidence}"
 
         checks: List[Tuple[bool, str]] = []
         if "title_contains" in expect:
@@ -791,8 +859,7 @@ class DesktopVerifier:
                 ok = os.path.exists(p)
             checks.append((ok, f"file {os.path.basename(p)} {'exists' if ok else 'MISSING'}"))
         if "region_changed" in expect and bool(expect["region_changed"]):
-            ok = bool(before.region_hash and after.region_hash and before.region_hash != after.region_hash)
-            checks.append((ok, "region pixel-delta " + ("detected" if ok else "none")))
+            checks.append(self.pixels_changed(before, after))
         return all(c[0] for c in checks), "; ".join(c[1] for c in checks) or "no-expect"
 
     def verdict(self, expect: Dict[str, Any], before: Snapshot, after: Snapshot,
@@ -801,8 +868,8 @@ class DesktopVerifier:
         ok, evidence = self.check_expect(expect, before, after, elements_now)
         if ok:
             return "PASS", evidence
-        structurally_dead = (before.signature() == after.signature()
-                             and (not before.region_hash or before.region_hash == after.region_hash))
+        pixel_moved, _ = self.pixels_changed(before, after)
+        structurally_dead = before.signature() == after.signature() and not pixel_moved
         if expect and structurally_dead:
             return "NO_CHANGE", evidence
         if structurally_dead:
