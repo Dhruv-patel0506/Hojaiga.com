@@ -1457,6 +1457,7 @@ def run_ty1(TestOutcome):
         charlie = EditorWindow("HJ-TY1-Charlie", kind="refusing", minimized=True).start()
         delta = EditorWindow("HJ-TY1-Delta", kind="swallow", minimized=True).start()
         windows += [alpha, bravo, charlie, delta]
+        visible_fixtures = [alpha]        # fixtures that are VISIBLE by design (excluded from the minimized/parked gate)
         call_windows: List[Tuple[float, float, str]] = []
 
         def timed(name, fn, *a, **k):
@@ -1605,11 +1606,61 @@ def run_ty1(TestOutcome):
                            o1._last_launched_app.get("hwnd") == alpha.hwnd and a1 == a0 and not spy.refused,
                            f"tracked={o1._last_launched_app.get('hwnd') == alpha.hwnd} state {a0['rect']}->{a1['rect']} raise-attempts={spy.refused}"))
 
+            # 15. a window that merely LOOKS like the target is the user's: hygiene must not blank, reset or close it
+            look = EditorWindow("HJ-Hyg untitled", x=330, y=230).start()
+            windows.append(look)
+            visible_fixtures.append(look)
+            spy.watched.add(look.hwnd)
+            seed = ctypes.create_unicode_buffer("user text")
+            look._sup.user32.SendMessageW(look.edit, 0x000C, 0, ctypes.addressof(seed))   # WM_SETTEXT on OUR fixture
+            time.sleep(0.2)
+            timed("hygiene", o1._clean_slate_app_hygiene, "hj-hyg")
+            alive15 = bool(_u32.IsWindow(look.hwnd))
+            checks.append(("hygiene-leaves-a-look-alike-window-it-did-not-launch-alone",
+                           alive15 and look.read_text() == "user text" and not spy.refused,
+                           f"alive={alive15} text={look.read_text() if alive15 else None!r} (a window titled 'untitled' for an unlaunched app used to be WM_CLOSEd)"))
+
+            # 16. popup ownership: only the driven app's popups / windows we launched may ever be dismissed
+            ours_before = o1._popup_is_ours(look.hwnd)
+            bw.mark_ours(look.hwnd)
+            ours_after = o1._popup_is_ours(look.hwnd)
+            checks.append(("popup-dismisser-only-touches-popups-it-owns", (not ours_before) and ours_after,
+                           f"look-alike window owned before={ours_before} after we launched it={ours_after}"))
+
+            # 17. the 'focus' helper names the window and does not raise it
+            o1._last_launched_app["hwnd"] = alpha.hwnd
+            a0 = alpha.state()
+            r_before = len(spy.refused)
+            named = timed("focus-helper", o1._focus_most_recent_app_window)
+            checks.append(("focus-helper-names-the-window-without-raising-it",
+                           named == "HJ-TY1-Alpha" and alpha.state() == a0 and not spy.refused[r_before:],
+                           f"returned {named!r}; raise-attempts={spy.refused[r_before:]}"))
+
+            # 18. source-level guard: no physical key API, no show/restore/maximize, no image-name taskkill of a user app in organ_01
+            import ast as _ast
+            with open(o1.__file__, encoding="utf-8") as fh:
+                tree = _ast.parse(fh.read())
+            bad: List[Tuple[Any, int]] = []
+            for node in _ast.walk(tree):
+                if isinstance(node, _ast.Attribute) and node.attr in ("keybd_event", "SetForegroundWindow", "SwitchToThisWindow"):
+                    bad.append((node.attr, node.lineno))
+                if isinstance(node, _ast.Call) and isinstance(node.func, _ast.Attribute) and node.func.attr == "ShowWindow" and len(node.args) >= 2:
+                    a = node.args[1]
+                    v = a.value if isinstance(a, _ast.Constant) else (a.attr if isinstance(a, _ast.Attribute) else None)
+                    if v in (1, 3, 4, 5, 8, 9, 10, "SW_RESTORE", "SW_MAXIMIZE", "SW_SHOW", "SW_SHOWNORMAL", "SW_SHOWNOACTIVATE"):
+                        bad.append(("ShowWindow", node.lineno))
+                if isinstance(node, _ast.Call) and node.args and isinstance(node.args[0], _ast.List):
+                    items = [e.value for e in node.args[0].elts if isinstance(e, _ast.Constant)]
+                    if "taskkill" in items and "ollama.exe" not in items:
+                        bad.append(("taskkill", node.lineno))
+            checks.append(("organ_01-source-has-no-key-injection-raise-restore-or-user-app-taskkill", not bad,
+                           f"offending call sites: {bad if bad else 'none'} (the only taskkill left restarts ollama.exe, a service)"))
+
             sampler.stop()
             exposure = {w.title[7:]: (round(sampler.exposed_s.get(w.hwnd, 0) * 1000), sampler.fg_hits.get(w.hwnd)) for w in windows}
-            parked_ok = all(sampler.exposed_s.get(w.hwnd, 0) <= 0.12 for w in windows if w is not alpha)
+            parked_ok = all(sampler.exposed_s.get(w.hwnd, 0) <= 0.12 for w in windows if w not in visible_fixtures)
             checks.append(("parked-windows-never-shown-and-nothing-became-foreground",
-                           parked_ok and all(v == 0 for v in sampler.fg_hits.values()) and all(w.state()["iconic"] for w in windows if w is not alpha)
+                           parked_ok and all(v == 0 for v in sampler.fg_hits.values()) and all(w.state()["iconic"] for w in windows if w not in visible_fixtures)
                            and not any(bw.is_parked(w.hwnd) for w in windows),
                            f"{sampler.samples} samples; (ms a non-minimized window overlapped a monitor by >1 px, samples as foreground) per window = {exposure}; "
                            f"gate <= 120 ms per window (the documented park floor is ~40-110 ms); all minimized again, none left parked"))
