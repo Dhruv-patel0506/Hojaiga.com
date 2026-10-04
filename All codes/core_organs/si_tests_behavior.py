@@ -990,7 +990,12 @@ def run_min1(TestOutcome):
                 probe = bm.probe_e1(m, app, la.hwnd, cand) if cand else {"skipped": "no page-setup in this app"}
                 # OCR/vision precondition: PrintWindow only works on a non-minimized window
                 with bw.BackgroundSession(la.hwnd):
+                    # a window restored a moment ago has not repainted yet: poll (bounded) like the product's rung does
+                    t_cap = time.time()
                     img, why = hin.capture_window(la.hwnd)
+                    while img is None and time.time() - t_cap < 3.0:
+                        time.sleep(0.2)
+                        img, why = hin.capture_window(la.hwnd)
                 tpl = {}
                 if app == "notepad":
                     m.load_pack_dir()

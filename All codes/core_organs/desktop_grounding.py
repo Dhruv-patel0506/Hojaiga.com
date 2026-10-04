@@ -536,16 +536,23 @@ class DesktopGrounding:
             return 0, 0
 
     def _walk_ocr(self, hwnd: int) -> List[GroundedElement]:
+        """OCR of the window's own pixels. ``self._ocr_ran`` says whether OCR really ran (a capture that came back blank,
+        unpainted or minimized is NOT an OCR pass that found nothing); ``self._ocr_skip`` carries the reason."""
+        self._ocr_ran = False
+        self._ocr_skip = ""
         if not (HAS_PYTESSERACT and HAS_PIL):
+            self._ocr_skip = "ocr:engine-missing"
             return []
         path = self._window_png(hwnd)
         if not path:
+            self._ocr_skip = f"ocr:capture({str(getattr(self, '_capture_note', '') or 'no-capture')[:80]})"
             return []
         try:
             import pytesseract
             from PIL import Image
             img = Image.open(path)
             data = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT)
+            self._ocr_ran = True
             ox, oy = self._window_origin(hwnd)
             out: List[GroundedElement] = []
             for i, text in enumerate(data["text"]):
@@ -680,6 +687,8 @@ class DesktopGrounding:
             return []
         path = self._window_png(hwnd)
         if not path:
+            report.setdefault("tiers_skipped", []).append(
+                f"vision:capture({str(getattr(self, '_capture_note', '') or 'no-capture')[:80]})")
             return []
         try:
             key = (hwnd, self._png_signature(path))
@@ -690,6 +699,7 @@ class DesktopGrounding:
                 return list(hit[1])
             parser = self._get_vision_parser()
             if parser is None:
+                report.setdefault("tiers_skipped", []).append("vision:no-parser")
                 return []
             self._vision_calls += 1
             self._vision_ran = True
@@ -798,16 +808,21 @@ class DesktopGrounding:
                         _t = time.perf_counter()
                         ocr_els = self._walk_ocr(hwnd)
                         report["tier_ms"]["ocr"] = round((time.perf_counter() - _t) * 1000, 1)
-                        if str(getattr(self, "_capture_note", "")).startswith("unpainted"):
-                            rep["content_painted"] = False
-                            rep["escalate_to_human"] = True
-                            report["tiers_skipped"] += ["ocr:offscreen-capture(content not painted: composited only while visible)",
-                                                        "vision:offscreen-capture(content not painted)"]
-                            max_tier = min(max_tier, 3)             # do not spend a 46 s vision parse on an empty frame
-                        else:
+                        note = str(getattr(self, "_capture_note", ""))
+                        if getattr(self, "_ocr_ran", False):
                             out = out + ocr_els
                             report["tiers_ran"].append("ocr")
                             via.append("ocr:offscreen-capture")
+                        else:
+                            # The window did not render into PrintWindow even after the paint wait (an unpainted GPU/
+                            # XAML surface, or a WinUI window that stops composing while off-screen): there is nothing
+                            # for OCR or vision to read, and saying either "ran" would be a fabricated tier.
+                            rep["content_painted"] = False
+                            rep["escalate_to_human"] = True
+                            rep["capture_note"] = note[:120]
+                            report["tiers_skipped"] += [str(getattr(self, "_ocr_skip", "") or "ocr:offscreen-capture(no capture)"),
+                                                        f"vision:offscreen-capture(no painted capture: {note[:60]})"]
+                            max_tier = min(max_tier, 3)             # do not spend a 46 s vision parse on an empty frame
                     else:
                         report["tiers_skipped"].append("ocr:engine-missing")
                     if rep.get("content_painted") is False:
@@ -901,7 +916,10 @@ class DesktopGrounding:
                 _t = time.perf_counter()
                 ocr = self._walk_ocr(hwnd)
                 report["tier_ms"]["ocr"] = round((time.perf_counter() - _t) * 1000, 1)
-                report["tiers_ran"].append("ocr")
+                if getattr(self, "_ocr_ran", False):
+                    report["tiers_ran"].append("ocr")
+                else:
+                    report["tiers_skipped"].append(getattr(self, "_ocr_skip", "") or "ocr:no-capture")
                 elements.extend(ocr)
             elif max_tier >= 3:
                 report["tiers_skipped"].append("ocr:engine-missing")

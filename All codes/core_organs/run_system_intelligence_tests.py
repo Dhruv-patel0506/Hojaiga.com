@@ -1960,7 +1960,8 @@ def test_e2e2_canvas_app_vision() -> TestOutcome:
         passed=bool(r.get("completed")) and "vision" in tiers and vision_els > 0,
         evidence=(f"{subst}app={app}; completed={r.get('completed')} steps={r.get('steps')} {r.get('elapsed_s')}s "
                   f"awaiting_human={r.get('awaiting_human')}; trace={verdicts}; vision-tier grounding: "
-                  f"tiers_ran={tiers}, vision_elements={vision_els}, tier_ms={rep.get('tier_ms')}"),
+                  f"tiers_ran={tiers}, tiers_skipped={rep.get('tiers_skipped')}, vision_elements={vision_els}, "
+                  f"tier_ms={rep.get('tier_ms')}"),
         metrics={"app": app, "vision_elements": vision_els, "tier_ms": str(rep.get("tier_ms"))},
     )
 
