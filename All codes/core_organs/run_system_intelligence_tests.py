@@ -16,6 +16,8 @@ Extends run_realtime_tests.py with the deep, real-behaviour checks:
 
 Flags:
   --e2e   also run the live unattended E2E-1 (Notepad) / E2E-2 (canvas app) proofs
+  --only A,B     run just these test ids (writes system_intelligence_results_partial.txt, never the full log)
+  --vision-bench also run VB1: real cold-start head-to-head of the vision warmup thread (minutes)
 
 Each test reports: PASS/FAIL, latency, and a measured evidence string.
 At the end a RECONCILED RANKING table scores every subsystem 0-100.
@@ -48,6 +50,39 @@ class TestOutcome:
     evidence: str
     metrics: Dict[str, Any] = field(default_factory=dict)
     env_blocked: bool = False  # correct+verified but OS/environment prevented the action
+
+
+def _windows_of_class(*class_names: str) -> set:
+    """Visible-or-minimized top-level windows of the given classes (case-insensitive)."""
+    import ctypes.wintypes as _wt
+    u = ctypes.windll.user32
+    want = {c.lower() for c in class_names}
+    found = set()
+
+    @ctypes.WINFUNCTYPE(ctypes.c_bool, _wt.HWND, _wt.LPARAM)
+    def _cb(h, _l):
+        if u.IsWindowVisible(h) or u.IsIconic(h):
+            b = ctypes.create_unicode_buffer(128)
+            u.GetClassNameW(h, b, 128)
+            if b.value.lower() in want:
+                found.add(int(h))
+        return True
+    u.EnumWindows(_cb, 0)
+    return found
+
+
+def _close_new_windows_of(before: set, *class_names: str) -> int:
+    """Close ONLY windows of these classes that did not exist when `before` was taken - i.e. ones THIS TEST started.
+    The old teardown was `taskkill /f /im notepad.exe`, which also killed whatever the user had open."""
+    from core_organs import universal_scan as us
+    n = 0
+    for h in sorted(_windows_of_class(*class_names) - before):
+        try:
+            if us.close_window(h, timeout_s=5.0, discard_unsaved=True):
+                n += 1
+        except Exception:
+            pass
+    return n
 
 
 def run_test(test_id: str, group: str, func: Callable[[], TestOutcome]) -> None:
@@ -427,6 +462,7 @@ def test_s2_continuous_scanner_cycles() -> TestOutcome:
     # Real mutation: spawn a throwaway app owned by this test, detect the UI
     # change, then clean it up again.
     import subprocess
+    notepads_before = _windows_of_class("Notepad")
     proc = subprocess.Popen(["notepad.exe"])
     try:
         time.sleep(1.2)  # let the window appear
@@ -439,8 +475,7 @@ def test_s2_continuous_scanner_cycles() -> TestOutcome:
             proc.wait(timeout=3)
         except Exception:
             pass
-        subprocess.run(["taskkill", "/f", "/im", "notepad.exe"],
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        _close_new_windows_of(notepads_before, "Notepad")      # only the window THIS test opened
     time.sleep(0.6)
     changed, n = one_cycle()  # window gone -> should change again
     diffs += changed
@@ -908,6 +943,13 @@ ORGAN_IMPORTS = [
     ("core_organs.background_window", "BackgroundSession"),
     ("core_organs.unified_virtual_mouse", "UnifiedVirtualMouse"),
     ("core_organs.enhanced_brain_compiler", "EnhancedBrainCompiler"),
+    # the A-G fix brief's modules: the product router, the one popup engine, the headless drag, the drawing cursor
+    ("core_organs.loop_first", "run_loop_first"),
+    ("core_organs.organ_01_crewai_engine", "CrewAIEngine"),
+    ("core_organs.popup_policy", "resolve_view"),
+    ("core_organs.headless_input", "post_drag"),
+    ("core_organs.visual_cursor", "VisualCursor"),
+    ("core_organs.organ_15_external_connectors", "DesktopConnector"),
 ]
 
 
@@ -1018,18 +1060,19 @@ def test_g1_grounding_ladder_honesty() -> TestOutcome:
         DesktopGrounding, HAS_UIA, HAS_TORCH, HAS_PYTESSERACT,
     )
 
-    subprocess.run(["taskkill", "/f", "/im", "notepad.exe"],
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    time.sleep(0.3)
+    notepads_before = _windows_of_class("Notepad")           # the user's own Notepad is never touched
     proc = subprocess.Popen(["notepad.exe"])
     try:
-        DesktopGrounding.wait_vision_ready(600)   # warmup happens off the goal path; tests wait for it
+        _ready, _blocked = _vision_ready_or_blocked(300.0)   # warmup happens off the goal path; tests wait for it
+        if not _ready:
+            return _blocked
         g = DesktopGrounding()
         hwnd = None
         deadline = time.perf_counter() + 10
         while time.perf_counter() < deadline:
-            hwnd = g.find_window("notepad")
-            if hwnd:
+            new_np = _windows_of_class("Notepad") - notepads_before
+            if new_np:
+                hwnd = g.find_window("notepad")
                 break
             time.sleep(0.3)
         if not hwnd:
@@ -1072,8 +1115,7 @@ def test_g1_grounding_ladder_honesty() -> TestOutcome:
             proc.wait(timeout=3)
         except Exception:
             pass
-        subprocess.run(["taskkill", "/f", "/im", "notepad.exe"],
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        _close_new_windows_of(notepads_before, "Notepad")
 
 
 def test_v1_verifier_verdict_logic() -> TestOutcome:
@@ -1437,75 +1479,91 @@ def test_w8_app_intelligence_pro_learning() -> TestOutcome:
 # OUTSTANDING-ISSUES FIX PLAN: vision budget/cache, blank parse, PL2, W9, E2E
 # ═══════════════════════════════════════════════════════════════════════
 
+def _vision_ready_or_blocked(timeout_s: float = 300.0):
+    """(ready, ENV-BLOCKED outcome | None). A warmup that fails or times out is an ENVIRONMENT result that must be
+    SAID - never a silent skip that lets a vision test pass without vision."""
+    from core_organs import desktop_grounding as dg
+    ready = dg.DesktopGrounding.wait_vision_ready(timeout_s)
+    if ready:
+        return True, None
+    warm = dict(dg.DesktopGrounding._warm)
+    return False, TestOutcome(
+        passed=False, env_blocked=True,
+        evidence=f"ENV-BLOCKED: vision warmup did not become ready within {timeout_s:.0f} s "
+                 f"(state={warm.get('state')}, result={warm.get('result')}); the vision tier cannot be measured on this host right now")
+
+
 def test_g2_vision_budget_cache_timing() -> TestOutcome:
-    """G2: vision tier is budgeted per goal, cached per window signature, and per-tier ms is reported"""
-    import types
+    """G2: vision tier is budgeted per goal, cached per window signature, and per-tier ms is reported - with the REAL OmniParser, instrumented"""
     from core_organs import si_test_support as sup
     from core_organs import desktop_grounding as dg
-
-    calls = {"n": 0}
-
-    class _FakeParser:
-        _available = True
-
-        def parse_screenshot(self, path):
-            calls["n"] += 1
-            time.sleep(0.05)
-            return [types.SimpleNamespace(bounds=(10, 10, 60, 40), text="fake-vision-el",
-                                          role="vision_element", confidence=0.35)]
 
     if not (dg.HAS_TORCH and dg.HAS_PIL and os.path.isdir(dg.OMNI_LOCAL_REPO)):
         return TestOutcome(passed=False, env_blocked=True,
                            evidence="vision prerequisites missing (torch/PIL/OmniParser repo)")
+    t_w = time.perf_counter()
+    ready, blocked = _vision_ready_or_blocked(300.0)
+    if not ready:
+        return blocked
+    warm_wait_ms = (time.perf_counter() - t_w) * 1000
 
+    parser = dg.DesktopGrounding._get_vision_parser()
+    if parser is None:
+        return TestOutcome(passed=False, env_blocked=True, evidence="OmniParser reported itself unavailable after warmup")
+    calls: List[Dict[str, Any]] = []
+    real_parse = parser.parse_screenshot
+
+    def instrumented(path):
+        t0 = time.perf_counter()
+        els = real_parse(path)
+        calls.append({"ms": round((time.perf_counter() - t0) * 1000, 1), "elements": len(els or [])})
+        return els
+    parser.parse_screenshot = instrumented
     win = sup.NativeButtonWindow(title="HJ-G2-VisionProbe").start()
-    saved = (dg.DesktopGrounding._vision_parser, dg.DesktopGrounding._vision_parser_init_tried)
-    saved_warm = dict(dg.DesktopGrounding._warm)
-    dg.DesktopGrounding._vision_parser = _FakeParser()
-    dg.DesktopGrounding._vision_parser_init_tried = True
-    dg.DesktopGrounding._warm.update(state="ready")
     try:
         g = dg.DesktopGrounding()
         absent = "zz_absent_widget_zz"
-        # 1st ground: vision runs (cache miss)
+        # 1st ground: vision runs (cache miss) - the REAL parser
         _h, _e, r1 = g.ground(win.title, target_text=absent, max_tier=4)
-        n_after_first = calls["n"]
-        # 2nd ground, identical pixels, inside TTL: cache hit, parser NOT called again
+        n_after_first = len(calls)
+        cold_parse_ms = calls[0]["ms"] if calls else None
+        # 2nd ground, identical pixels, inside the TTL: cache hit, parser NOT called again
         _h, _e, r2 = g.ground(win.title, target_text=absent, max_tier=4)
-        cache_hit = bool(r2.get("vision_cache_hit")) and calls["n"] == n_after_first
+        cache_hit = bool(r2.get("vision_cache_hit")) and len(calls) == n_after_first
         t_cached = r2["tier_ms"].get("vision", 9e9)
-        # Budget: force misses by clearing cache; calls beyond VISION_MAX_CALLS are refused
+        # Budget: force misses by clearing the cache; calls beyond VISION_MAX_CALLS are refused
         g.reset_vision_budget()
-        n0 = calls["n"]
+        n0 = len(calls)
         reports = []
         for _ in range(dg.VISION_MAX_CALLS + 1):
             g._vision_cache.clear()
             reports.append(g.ground(win.title, target_text=absent, max_tier=4)[2])
-        ran = calls["n"] - n0
+        ran = len(calls) - n0
         budget_enforced = ran == dg.VISION_MAX_CALLS and any(
             "vision:budget-exhausted" in rp.get("tiers_skipped", []) for rp in reports)
         # New goal => budget refilled
         g.reset_vision_budget()
         g._vision_cache.clear()
-        n1 = calls["n"]
+        n1 = len(calls)
         g.ground(win.title, target_text=absent, max_tier=4)
-        refilled = calls["n"] == n1 + 1
+        refilled = len(calls) == n1 + 1
         tier_ms_ok = all(k in r1["tier_ms"] for k in ("uia", "vision")) and "ocr" in r1["tier_ms"]
+        parse_ms = [c["ms"] for c in calls]
         passed = (n_after_first == 1 and cache_hit and budget_enforced and refilled and tier_ms_ok)
+        speedup = (cold_parse_ms / t_cached) if (cold_parse_ms and t_cached and t_cached > 0) else None
         return TestOutcome(
             passed=passed,
-            evidence=(f"first ground ran vision {n_after_first}x; 2nd identical window cache_hit={cache_hit} "
-                      f"({t_cached} ms vs {r1['tier_ms'].get('vision')} ms cold); budget "
-                      f"{dg.VISION_MAX_CALLS}/goal enforced={budget_enforced} (ran {ran} of "
-                      f"{dg.VISION_MAX_CALLS + 1} attempts); refill-on-new-goal={refilled}; "
-                      f"measured per-tier ms={r1['tier_ms']}"),
-            metrics={"cache_hit": cache_hit, "budget_enforced": budget_enforced,
-                     "refilled": refilled, "tier_ms": str(r1["tier_ms"])},
+            evidence=(f"REAL OmniParser (warm, waited {warm_wait_ms:.0f} ms for the warmup thread): first ground ran vision "
+                      f"{n_after_first}x, parse {cold_parse_ms} ms; 2nd identical window cache_hit={cache_hit} "
+                      f"({t_cached} ms vs {r1['tier_ms'].get('vision')} ms miss{f', x{speedup:.0f}' if speedup else ''}); budget "
+                      f"{dg.VISION_MAX_CALLS}/goal enforced={budget_enforced} (ran {ran} of {dg.VISION_MAX_CALLS + 1} attempts); "
+                      f"refill-on-new-goal={refilled}; all {len(calls)} real parses (ms)={parse_ms}; "
+                      f"measured per-tier ms (miss)={r1['tier_ms']}"),
+            metrics={"cache_hit": cache_hit, "budget_enforced": budget_enforced, "refilled": refilled,
+                     "real_parse_ms": parse_ms, "tier_ms_miss": str(r1["tier_ms"]), "tier_ms_hit": t_cached},
         )
     finally:
-        dg.DesktopGrounding._vision_parser, dg.DesktopGrounding._vision_parser_init_tried = saved
-        dg.DesktopGrounding._warm.clear()
-        dg.DesktopGrounding._warm.update(saved_warm)
+        parser.parse_screenshot = real_parse
         win.stop()
 
 
@@ -1676,6 +1734,86 @@ def test_pp1_popup_policy_real_dialogs() -> TestOutcome:
     return si_tests_extra.run_pp1(TestOutcome)
 
 
+def test_lf1_loop_first_routing() -> TestOutcome:
+    """LF1: the product routes detected desktop apps through the verified loop IN ORDER, stops at a human gate, and is switchable"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_lf1(TestOutcome)
+
+
+def test_lf2_loop_first_two_apps_live() -> TestOutcome:
+    """LF2: a REAL two-app task (Notepad then Calculator) runs both apps through the verified loop with the physical pointer untouched"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_lf2(TestOutcome)
+
+
+def test_off1_offscreen_capture_rung() -> TestOutcome:
+    """OFF1: a real MINIMIZED Notepad is read by OCR through the off-screen capture rung, ends minimized again, and a structurally-grounded app never pays for it"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_off1(TestOutcome)
+
+
+def test_dr1_headless_drag() -> TestOutcome:
+    """DR1: headless drag - ordered, time-sliced WM_MOUSEMOVE/LBUTTONDOWN/UP draws a circle on a real canvas; physical pointer untouched; an app that ignores posted mouse input is reported INEFFECTIVE, not success"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_dr1(TestOutcome)
+
+
+def test_cn1_desktop_connector_headless() -> TestOutcome:
+    """CN1: organ_15's desktop connector delivers click/type/hotkey/press as posted messages to a resolved window, and REFUSES (never pyautogui) when no window resolves"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_cn1(TestOutcome)
+
+
+def test_ty1_headless_launch_switch_type() -> TestOutcome:
+    """TY1: the launch / switch / type tools never touch the physical keyboard or mouse and never raise, restore or maximize a window (a minimized target is parked off-screen for the call); a delivery the target did not accept is never reported - or recorded - as typed"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_ty1(TestOutcome)
+
+
+def test_any1_any_app_discovery() -> TestOutcome:
+    """ANY1: any-app discovery - scan walks are bounded by TIME with a visible depth rail, readiness follows a splash chain instead of a flat 10 s, an unnamed DataGrid is grounded by role, XAML hosts are recognised"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_any1(TestOutcome)
+
+
+def test_up1_unified_popup_engine() -> TestOutcome:
+    """UP1: ONE popup engine - organ_29 only detects; escalation presses zero buttons; benign prompts are dismissed not escalated; the cold LLM tier is capped AND a breaker stops later popups paying it again (measured)"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_up1(TestOutcome)
+
+
+def test_vb1_warmup_head_to_head() -> TestOutcome:
+    """VB1: REAL cold starts, head to head - does the warmup thread buy anything? (A = warmup at t0, B = lazy), same workload, alternating order, real OmniParser"""
+    import json as _json
+    import subprocess
+    from core_organs import desktop_grounding as dg
+    if not (dg.HAS_TORCH and dg.HAS_PIL and os.path.isdir(dg.OMNI_LOCAL_REPO)):
+        return TestOutcome(passed=False, env_blocked=True, evidence="vision prerequisites missing (torch/PIL/OmniParser repo)")
+    bench = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vision_bench.py")
+    t0 = time.perf_counter()
+    p = subprocess.run([sys.executable, "-X", "utf8", bench, "h2h", "--work-s", "8", "--rounds", "2"],
+                       capture_output=True, text=True, timeout=2400,
+                       env=dict(os.environ, PYTHONPATH="D:\\new_automation;D:\\new_automation\\All codes"))
+    line = next((l for l in reversed((p.stdout or "").splitlines()) if l.startswith("H2H_JSON ") or "H2H_JSON " in l), "")
+    if "H2H_JSON " not in line:
+        return TestOutcome(passed=False, env_blocked=True, evidence=f"bench produced no result (rc={p.returncode}): {(p.stderr or '')[-300:]}")
+    data = _json.loads(line.split("H2H_JSON ", 1)[1])
+    runs = data.get("runs", [])
+    missing = [r.get("mode") for r in runs if not r.get("vision_ran")]
+    if missing or "warmup_thread_saved_ms" not in data:
+        return TestOutcome(passed=False, env_blocked=True,
+                           evidence=f"vision never became available in {len(missing)} cold run(s) {missing}: {[r.get('error') or r.get('tiers_skipped_last') for r in runs]}")
+    per = "; ".join(f"{r['mode']}: vision@{r['vision_result_at_ms']} ms (goal waited {r['goal_waited_for_vision_ms']} ms; "
+                    f"warmup load {r.get('warmup_result_ms')} ms; tier_ms {r.get('ground_report_tier_ms')})" for r in runs)
+    return TestOutcome(
+        passed=True,
+        evidence=(f"{len(runs)} fresh-process cold starts in {time.perf_counter() - t0:.0f} s (alternating A/B order, 8 s of UIA goal-path "
+                  f"work before the first pixel need): mean time the goal WAITED for vision A(warmup thread)={data['mean_goal_wait_A_ms']} ms vs "
+                  f"B(lazy)={data['mean_goal_wait_B_ms']} ms; vision available at A={data['mean_vision_ready_A_ms']} ms vs B={data['mean_vision_ready_B_ms']} ms "
+                  f"=> the warmup thread saved {data['warmup_thread_saved_ms']} ms. {per}"),
+        metrics={k: data[k] for k in data if k.startswith("mean_") or k == "warmup_thread_saved_ms"})
+
+
 def test_j1_judge_shortlist_ranking() -> TestOutcome:
     """J1: judge shortlist is goal-aware (text area / 'Save as' reach the 8-slot window, indices map back)"""
     from core_organs.desktop_grounding import ConstrainedJudge, GroundedElement, MAX_JUDGE_ELEMENTS
@@ -1801,16 +1939,22 @@ def test_e2e2_canvas_app_vision() -> TestOutcome:
          if os.path.isdir(p)), None)
     app = "blender" if blender else "mspaint"
     subst = "" if blender else "Blender not installed -> substituted Paint (honest substitution). "
-    subprocess.run(["taskkill", "/f", "/im", "mspaint.exe"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    time.sleep(0.5)
+    paint_before = _windows_of_class("MSPaintApp")
+    if app == "mspaint" and paint_before:
+        return TestOutcome(passed=False, env_blocked=True,
+                           evidence=f"Paint is already open ({len(paint_before)} window(s)) and is the USER'S: E2E-2 will not drive or "
+                                    "close it (the old teardown was taskkill /im mspaint.exe). Close it and re-run.")
     goals = ["select the pencil or brush tool", "draw a short line on the canvas"]
-    DesktopGrounding.wait_vision_ready(600)
+    _ready, _blocked = _vision_ready_or_blocked(300.0)
+    if not _ready:
+        return _blocked
     r = operate_app(app, goals, max_steps_per_goal=5)
     g = get_loop().grounding
     hwnd, els, rep = g.ground(app, target_text="zz_absent_canvas_widget_zz", max_tier=4)
     tiers = rep.get("tiers_ran", [])
     vision_els = sum(1 for e in els if e.tier == "vision")
-    subprocess.run(["taskkill", "/f", "/im", "mspaint.exe"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if app == "mspaint":
+        _close_new_windows_of(paint_before, "MSPaintApp")        # only the window this test started
     verdicts = [(st["verb"], st["element"][:20], st["verdict"]) for st in r.get("trace", [])]
     return TestOutcome(
         passed=bool(r.get("completed")) and "vision" in tiers and vision_els > 0,
@@ -1847,6 +1991,11 @@ GROUP_LABELS = {
     "SCANKNOW": "Knowledge-assisted scanning (organ_49/50)",
     "AUTONOMY": "Unattended task runs (templates + day report)",
     "BACKGROUND": "Background operation (minimized, never shown/focused)",
+    "ROUTING": "Product routing (verified loop first)",
+    "HEADLESS": "Headless input (drag / off-screen capture)",
+    "ANYAPP": "Any-app discovery (time-budget scan, window find)",
+    "POPUPENG": "Unified popup engine (popup_policy)",
+    "VISIONBUDGET": "Vision budget (real parser, honest timings)",
     "E2E": "End-to-end unattended runs",
 }
 
@@ -1916,6 +2065,14 @@ def main() -> int:
         ("W9", "HYGIENE", test_w9_compiled_nav_step_url),
         ("J1", "GROUNDING", test_j1_judge_shortlist_ranking),
         ("PP1", "POPUP", test_pp1_popup_policy_real_dialogs),
+        ("LF1", "ROUTING", test_lf1_loop_first_routing),
+        ("LF2", "ROUTING", test_lf2_loop_first_two_apps_live),
+        ("OFF1", "HEADLESS", test_off1_offscreen_capture_rung),
+        ("DR1", "HEADLESS", test_dr1_headless_drag),
+        ("CN1", "HEADLESS", test_cn1_desktop_connector_headless),
+        ("TY1", "HEADLESS", test_ty1_headless_launch_switch_type),
+        ("ANY1", "ANYAPP", test_any1_any_app_discovery),
+        ("UP1", "POPUPENG", test_up1_unified_popup_engine),
         ("BM1", "BEHAVIOR", test_bm1_behavior),
         ("BM2", "BEHAVIOR", test_bm2_behavior),
         ("BM3", "BEHAVIOR", test_bm3_behavior),
@@ -1932,6 +2089,11 @@ def main() -> int:
     if "--e2e" in sys.argv:
         plan += [("E2E-1", "E2E", test_e2e1_notepad_haiku_save),
                  ("E2E-2", "E2E", test_e2e2_canvas_app_vision)]
+    if "--vision-bench" in sys.argv:     # 4 REAL cold starts (several minutes): opt-in, results also land in data/vision_bench_results.json
+        plan += [("VB1", "VISIONBUDGET", test_vb1_warmup_head_to_head)]
+    if "--only" in sys.argv:          # iterate on a few tests: --only LM1,SC1  (a partial run never overwrites the full log)
+        wanted = {t.strip().upper() for t in sys.argv[sys.argv.index("--only") + 1].split(",") if t.strip()}
+        plan = [p for p in plan if p[0].upper() in wanted]
     for test_id, group, func in plan:
         run_test(test_id, group, func)
 
@@ -1954,7 +2116,8 @@ def main() -> int:
     for i, row in enumerate(rankings, 1):
         print(f"{i:>2}  {row['group']:<38} {row['tests']:>13} {row['score']:>6.1f} {row['avg_ms']:>9.1f}")
 
-    out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "system_intelligence_results.txt")
+    out_name = "system_intelligence_results_partial.txt" if "--only" in sys.argv else "system_intelligence_results.txt"
+    out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), out_name)
     with open(out_path, "a" if "--e2e" in sys.argv else "w", encoding="utf-8") as f:
         f.write(f"Hojaiga System Intelligence Suite — {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n")
         for r in RESULTS:

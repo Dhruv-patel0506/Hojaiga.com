@@ -66,9 +66,8 @@ def _top_windows() -> Dict[int, Tuple[int, str, str]]:
                 _u32.GetWindowThreadProcessId(h, ctypes.byref(p))
                 c = ctypes.create_unicode_buffer(128)
                 _u32.GetClassNameW(h, c, 128)
-                t = ctypes.create_unicode_buffer(200)
-                _u32.GetWindowTextW(h, t, 200)
-                out[int(h)] = (int(p.value), c.value, t.value)
+                from core_organs import headless_input as _hin      # deadlock-safe title read (see safe_window_text)
+                out[int(h)] = (int(p.value), c.value, _hin.safe_window_text(int(h), 200)[:200])
         except Exception:
             pass
         return True
@@ -124,26 +123,33 @@ def resolve_app(name: str) -> Optional[Tuple[str, str]]:
 
 
 def wake_accessibility(hwnd: int) -> str:
-    """Chromium/Electron apps build their UIA tree only once a client asks. Ask (WM_GETOBJECT on the
-    render-host child) — a read-only query, nothing is clicked or focused."""
-    cls = ctypes.create_unicode_buffer(128)
-    _u32.GetClassNameW(hwnd, cls, 128)
-    woke = 0
-    if cls.value.startswith("Chrome_WidgetWin") or cls.value in ("Chrome_RenderWidgetHostHWND",):
-        @ctypes.WINFUNCTYPE(ctypes.c_bool, wt.HWND, wt.LPARAM)
-        def cb(h, _):
-            nonlocal woke
-            c = ctypes.create_unicode_buffer(128)
-            _u32.GetClassNameW(h, c, 128)
-            if "Chrome_RenderWidgetHostHWND" in c.value:
-                res = ctypes.c_size_t()
-                for obj in (-4, -25):                        # OBJID_CLIENT, UiaRootObjectId
-                    _u32.SendMessageTimeoutW(h, 0x3D, 0, obj, 0x2, 500, ctypes.byref(res))
-                woke += 1
-            return True
-        _u32.EnumChildWindows(hwnd, cb, 0)
-        return f"chromium-render-hosts-queried={woke}"
-    return "not-chromium"
+    """Chromium-family UIs (Chrome, Electron, CEF clients such as Steam / Spotify) build their UIA tree only once a
+    client asks. Ask (WM_GETOBJECT on every Chromium window inside the frame) - a read-only query, nothing is
+    clicked or focused. The frame itself may be any class (SDL_app, Qt, a custom host): what matters is whether it
+    CONTAINS Chromium windows, so look at the descendants, not at the top-level class."""
+    def cls_of(h) -> str:
+        b = ctypes.create_unicode_buffer(128)
+        _u32.GetClassNameW(h, b, 128)
+        return b.value
+
+    targets: List[int] = []
+    if cls_of(hwnd).startswith("Chrome_"):
+        targets.append(int(hwnd))
+
+    @ctypes.WINFUNCTYPE(ctypes.c_bool, wt.HWND, wt.LPARAM)
+    def cb(h, _):
+        c = cls_of(h)
+        if c.startswith("Chrome_") or c == "CefBrowserWindow":
+            targets.append(int(h))
+        return True
+    _u32.EnumChildWindows(hwnd, cb, 0)
+    if not targets:
+        return "not-chromium"
+    res = ctypes.c_size_t()
+    for h in targets:
+        for obj in (-4, -25):                            # OBJID_CLIENT, UiaRootObjectId
+            _u32.SendMessageTimeoutW(h, 0x3D, 0, obj, 0x2, 500, ctypes.byref(res))
+    return f"chromium-windows-queried={len(targets)}"
 
 
 def launch_hidden(name: str, timeout_s: float = 45.0) -> Dict[str, Any]:
@@ -224,6 +230,7 @@ def launch_hidden(name: str, timeout_s: float = 45.0) -> Dict[str, Any]:
         info["notes"].append(bw.stabilize_minimized(hwnd, fg_before, 5.0) or "stable")
         info["launched"] = True
         info["hwnd"] = hwnd
+        bw.mark_ours(hwnd)                       # we created it: only then may the harness close/park it freely
         info["title"] = now.get(hwnd, (0, "", ""))[2]
     else:
         if dialog_seen:

@@ -102,7 +102,7 @@ sequenceDiagram
     participant L as Loop
     participant V as Verifier
     participant App as Target app
-    L->>V: snapshot BEFORE (title, md5(sorted ids), 64x64 hash of window rect)
+    L->>V: snapshot BEFORE (title, md5(sorted ids), 48x48 quantized thumb of the window's OWN pixels)
     L->>App: act (Invoke / PostMessage / SendInput)
     L->>L: _settle(): re-walk until tree stable (<=1.6s)
     L->>V: snapshot AFTER
@@ -111,6 +111,8 @@ sequenceDiagram
 ```
 
 Why two signatures: the UIA tree does not change when you extrude a face in Blender — **only pixels do**. Structure catches dialogs/menus; the pixel hash catches canvases.
+
+Pixel delta is tolerance-based, not exact-byte (`REGION_MIN_CHANGED_FRACTION = 0.02`): the window is captured with PrintWindow (so an occluding window cannot be hashed by mistake), reduced to 48x48 grayscale, quantized into 16 brightness bands, and a change counts only when >= 2% of cells moved. Measured on a controlled Tk canvas (`benchmarks/region_hash_hardening.py` -> `grounding_reports/region_hash_hardening.json`): idle 0.000, caret-sized flicker 0.001 (ignored), canvas recolor 0.140 (detected, structure signature identical), fully-occluded window 0.000 while the old screen-grab path on the same moment reported 0.969. The measured fraction always appears in the evidence string, so a suppressed small change stays visible — the trade-off is that a genuinely tiny canvas edit reads as NO_CHANGE and walks the ladder instead of falsely passing.
 
 | Verdict | Meaning | Reaction |
 |---|---|---|
@@ -256,11 +258,11 @@ Learned knowledge only ever **nudges** the judge or sends a shortcut that is sti
 
 ✅ In code: UIA + Win32 tiers, popup-window grounding, OCR + vision gating with honest `tiers_skipped`, verifier with structural + pixel signatures, constrained judge with 3-strike HITL, destructive guard, native file dialog rung, shortcut/pro path, NO_CHANGE ladder (re-invoke → PostMessage → post_click), WRONG_STATE popup triage, crash relaunch, `_settle`, checkpoint + `resume_session`, `distill_recipe`/`recall_recipe`.
 
-🟡 Installed but unmeasured: `pytesseract`, `torch`, `easyocr`, `uiautomation`, `comtypes` are present in the environment — so tiers 3/4 can run, but **no latency or accuracy has been measured here**. Treat any ms figures in tables as expectations until `tier_ms` is read from real `ground()` reports.
+🟡 Installed and now measured (see section 10): `pytesseract`, `torch`, `easyocr`, `uiautomation`, `comtypes` are present in `hojaiga_env` — note the interpreter matters: `.venv` has no PIL, `hojaiga_env\Scripts\python.exe` does. Accuracy of OCR/vision element boxes is still unmeasured; only latency and counts are.
 
 ⬜ Not yet: vision-click recovery rung; end-to-end unattended completion of a long task (e.g. the Blender chair) — this remains the real definition of done; recipe retrieval quality on multi-step traces is unmeasured.
 
-**Next honest step:** run `ground()` on 5 real apps (Settings, Notepad, Chrome, Blender, a Qt/Electron app), save the `ladder_report` JSON for each, and replace expectations in section 3 with measured numbers.
+**Next honest step (done 2026-10-04, see section 10):** run `ground()` on 5 real apps (Settings, Notepad, Chrome, Blender, a Qt/Electron app), save the `ladder_report` JSON for each, and replace expectations in section 3 with measured numbers.
 
 
 ---
@@ -291,9 +293,13 @@ What this changes:
 - **Blender is not installed** on this machine (no `blender.exe` found on C: or D: to depth 5). The Blender-specific checks are NOT done.
 - Stand-in 1, Paint (`canvas_hash_pretest.json`): posted clicks never drew, the pixel hash did not change. **Inconclusive**: shows PostMessage input does not reach Paint's XAML canvas, not that the hash fails.
 - Stand-in 2, controlled Tk canvas (`canvas_hash_controlled.json`): recoloring one canvas rectangle changed the pixel hash while the structure signature stayed identical; with no change, neither moved. **The verifier mechanism works for canvas-only changes.**
-- Caveats found in code: `_region_hash` uses `ImageGrab` (screen capture, not PrintWindow), so a window covered by another window hashes the occluder; it hashes the exact bytes of a 64x64 image, so any one-pixel flicker (blinking caret, clock) reads as a change.
+- Caveats found in code — **now fixed and tested**: `_region_hash` used `ImageGrab` (screen capture, not PrintWindow), so a window covered by another window hashed the occluder; and it hashed the exact bytes of a 64x64 image, so any one-pixel flicker (blinking caret, clock) read as a change. The verifier now captures via `headless_input.capture_window` (PrintWindow), compares a 48x48 banded thumbnail with a 2%-of-cells tolerance, tags the capture source in every Snapshot, and puts the measured fraction into the evidence. Regression evidence: `benchmarks/region_hash_hardening.py` (4 cases, all as expected) and `test_v1_verifier_verdict_logic` still 7/7. Screen grab remains only as a tagged fallback when PrintWindow yields nothing; minimized windows report `window-minimized` instead of hashing noise.
+
+### Decisions taken with this data
+- **Blender is deferred, not failed.** Skipping the Blender install was an explicit choice: the mechanism question (does the pixel verifier see canvas-only change?) was already answered on a controlled canvas, and a canvas-category gap remains honestly open until a real GL app is grounded.
+- **Vision-click recovery rung stays unbuilt** until an unattended run actually needs it.
 
 ### Still open
-- Install Blender (or point the benchmark at a portable build) and repeat the pre-test there.
 - Fix scenario 19 (VS Code groundability) before using it as the Electron case.
-- Medium multi-step unattended run, with its full ground -> act -> verdict trace, comes after these.
+- Medium multi-step unattended run, with its full ground -> act -> verdict trace.
+- Canvas-category grounding on a real GL/canvas app (Blender or another installed canvas app) — evidence so far is a Tk stand-in only.

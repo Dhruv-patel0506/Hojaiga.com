@@ -159,11 +159,26 @@ def _safe_walk_control(root_ctrl, includeTop=False, maxDepth=14):
 
 
 def _deep_scan_max_depth() -> int:
-    """Max UIA tree depth for deep scans (env-overridable, default 32)."""
+    """SECONDARY safety rail only (pathological / recursive trees): the primary limit is the time budget below.
+    Default 64 (was 32). Whether it was reached is always reported as ``depth_hit_cap``."""
     try:
-        return max(1, int(os.environ.get("HOJAIGA_DEEP_SCAN_MAX_DEPTH", "32")))
+        return max(1, int(os.environ.get("HOJAIGA_DEEP_SCAN_MAX_DEPTH", "64")))
     except ValueError:
-        return 32
+        return 64
+
+
+# Time budget for one deep UIA walk (the same approach app_scan.py uses): a tiny app finishes in milliseconds and a
+# huge one is cut by TIME, never by a depth guess. A floor of MIN_NODES is always walked so a slow first touch
+# (UWP / Electron roots can take >1 s cold) never yields an empty scan; HARD_EXTRA_S is the absolute cap past the budget.
+DEEP_SCAN_MIN_NODES = 120
+DEEP_SCAN_HARD_EXTRA_S = 4.0
+
+
+def _deep_scan_budget_ms() -> int:
+    try:
+        return max(1, int(os.environ.get("HOJAIGA_DEEP_SCAN_BUDGET_MS", "6000")))
+    except ValueError:
+        return 6000
 
 
 # --------------------------------------------------------------------------- #
@@ -457,6 +472,8 @@ class EyeAndBrainOrchestrator:
         menu_headers = set()
         nodes_walked = 0      # total nodes yielded by the walker (pre-filter)
         max_depth_seen = 0    # deepest level actually reached
+        time_budget_hit = False
+        walk_t0 = time.perf_counter()
         try:
             if auto:
                 if not quiet or is_uwp:
@@ -482,10 +499,17 @@ class EyeAndBrainOrchestrator:
                     current_tab = ""
                     current_group = ""
 
+                    walk_t0 = time.perf_counter()
+                    budget_s = _deep_scan_budget_ms() / 1000.0
                     for ctrl, depth in walker:
                         nodes_walked += 1
                         if depth > max_depth_seen:
                             max_depth_seen = depth
+                        _elapsed = time.perf_counter() - walk_t0
+                        if (_elapsed > budget_s and nodes_walked >= DEEP_SCAN_MIN_NODES) \
+                                or _elapsed > budget_s + DEEP_SCAN_HARD_EXTRA_S:
+                            time_budget_hit = True
+                            break
                         try:
                             box = safe_bounding_rect(ctrl)
                             if not box:
@@ -834,6 +858,12 @@ class EyeAndBrainOrchestrator:
                 "actionable_controls": len(all_controls),
                 "max_depth_seen": max_depth_seen,
                 "walk_max_depth": _deep_scan_max_depth(),
+                # truncation is VISIBLE, never silent: which limit (if any) cut the walk
+                "depth_hit_cap": bool(max_depth_seen >= _deep_scan_max_depth()),
+                "time_budget_ms": _deep_scan_budget_ms(),
+                "time_budget_hit": bool(time_budget_hit),
+                "walk_ms": int((time.perf_counter() - walk_t0) * 1000),
+                "truncated": bool(time_budget_hit or max_depth_seen >= _deep_scan_max_depth()),
             },
             "status": "success" if ui_elements else "partial",
             "scan_timestamp": time.time(),

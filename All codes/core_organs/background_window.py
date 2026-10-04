@@ -179,6 +179,25 @@ def mark_automation_pid(pid: int) -> None:
     _automation_pids.add(pid)
 
 
+# Windows WE launched (launch_hidden / operate_app / prepare_app). Everything else - a window that merely
+# looks like our target - belongs to the user until proven otherwise: off-screen capture of a window the user
+# can currently SEE is refused, and only windows in this set are ever closed by the harness.
+_ours: set = set()
+
+
+def mark_ours(hwnd: int) -> None:
+    if hwnd:
+        _ours.add(int(hwnd))
+
+
+def is_ours(hwnd: int) -> bool:
+    h = int(hwnd or 0)
+    if h in _ours and _IS_WINDOWS and _u32.IsWindow(h):
+        return True
+    _ours.discard(h)
+    return False
+
+
 def last_user_window() -> int:
     return _last_user_fg
 
@@ -198,7 +217,7 @@ def next_user_window(exclude_pid: int) -> int:
                 ex = _u32.GetWindowLongW(h, -20)
                 if ex & 0x80 or ex & 0x08000000:                 # tool window / no-activate
                     return True
-                n = _u32.GetWindowTextLengthW(h)
+                n = len(_safe_text(h))
                 r = _rect(h)
                 if n > 0 and (r[2] - r[0]) > 100 and (r[3] - r[1]) > 60 and _on_real_screen(r):
                     found = int(h)
@@ -262,6 +281,18 @@ def holds_app_focus(fg: int, target: int, pid: int = 0) -> bool:
     if is_target_popup(fg, target, pid):
         return True
     return _cls(fg) in INPUT_SITE_CLASSES and _pid(fg) == (pid or _pid(target)) and _tid(fg) == _tid(target)
+
+
+def _safe_text(h: int) -> str:
+    """Window title via a bounded SendMessageTimeout (GetWindowText can deadlock against a same-process window whose
+    thread never pumps messages)."""
+    buf = ctypes.create_unicode_buffer(300)
+    res = ctypes.c_size_t(0)
+    try:
+        ok = ctypes.windll.user32.SendMessageTimeoutW(h, 0x000D, 300, ctypes.addressof(buf), 0x0002, 150, ctypes.byref(res))
+    except Exception:
+        return ""
+    return buf.value if ok else ""
 
 
 def _cls(h: int) -> str:
@@ -572,6 +603,13 @@ def enter(hwnd: int) -> Dict[str, Any]:
         new.rcNormalPosition = wt.RECT(-w + 1, -h + 1, 1, 1)
         new.showCmd = SW_SHOWNOACTIVATE
         _u32.SetWindowPlacement(hwnd, ctypes.byref(new))
+        # A packaged / UWP frame leaves the minimized state ASYNCHRONOUSLY (measured: its rect still read
+        # (-32000,-32000) and IsIconic stayed true past the old fixed 150 ms, so it was declared unparkable
+        # about one run in three). A SetWindowPos on a still-iconic window moves nothing, so wait - bounded -
+        # for the restore to land, then move it off every monitor.
+        end = time.time() + 1.5
+        while time.time() < end and is_minimized(hwnd):
+            time.sleep(0.03)
         _u32.SetWindowPos(hwnd, 0, PARK_X, PARK_Y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE)
         time.sleep(0.15)
         rect = _rect(hwnd)

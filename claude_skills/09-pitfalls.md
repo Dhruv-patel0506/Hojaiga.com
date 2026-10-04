@@ -118,3 +118,47 @@ Each entry: **Bug class → Root cause → Fix pattern → Boundary.**
   7B Brain fight for the same 6 GB and spill to CPU.
 - **Rule:** use the VLM only for targeted `locate(one control)` (~40 tokens); OmniParser (warmed in a daemon thread at
   startup, never in a goal's path) stays the bulk vision tier.
+
+## P-20  Win11 Paint ignores posted mouse messages (WinUI canvas)
+- **Measured:** `post_drag` of a circle to Paint's 6 windows (frame, MSPaintView, DesktopChildSiteBridge, InputSite...)
+  changed 0 pixels, while a UIA invoke on the same parked window changed 597 - so the capture is live and the drag was ignored.
+- **Rule:** XAML/WinUI hosts take pointer/keyboard through their own input pipeline, not window messages. `post_drag` is proven
+  on a real Win32 canvas (DR1: 2124 px, bbox 223x223 for r=110); on a XAML canvas the draw tools report
+  `delivered but INEFFECTIVE`, never success. `headless_input.is_xaml_host()` recognises the stack; the loop annotates a
+  failed posted key with it.
+
+## P-21  `find_window` must skip the UWP CoreWindow
+- **Symptom:** Calculator grounded, but parking/closing it failed ("window-not-parkable"); the judge saw 4 elements.
+- **Root cause:** `Windows.UI.Core.CoreWindow` (process `CalculatorApp`) out-scored the `ApplicationFrameWindow` by process name,
+  and a CoreWindow cannot be parked or closed on its own.
+- **Fix:** skip that class in `find_window`; UIA on the frame already contains the content.
+
+## P-22  A parked UWP window reports empty rectangles
+- A window parked at -24000 lays out only sometimes; `IsOffscreen`/empty rects dropped every control. `_walk_uia` treats a
+  parked window like a minimized one (patterns work, rectangles do not). Never use the minimized sentinel -32000 as the park origin.
+
+## P-23  Connecting to a CLOSED local port takes ~2 s on Windows
+- **Measured:** `urlopen`/`connect` to 127.0.0.1:11435 with nothing listening: 2.04-2.10 s before "refused" (popup Tier-3 paid
+  that for every unseen popup). **Fix:** `_gatekeeper_listening()` probes with a 150 ms connect; down => skip T3 (breaker) => 166 ms.
+
+## P-24  A distilled hint can say verb "type" for a Calculator key
+- organ_47 returned `element '2', verb type, conf 0.3, source distilled` for `press Six`; the 7B echoed it and burned the 3-strike
+  HITL. **Fix:** exact-name goals ("press Six") are decided by lookup, a hint never advertises `type` when the goal has no typing
+  words, and a `type` on a non-editable control with no typing intent is coerced to `click` (the verifier still judges it).
+
+## P-25  `resolve_and_launch` maps nonsense onto a real app
+- `gui_search_launch("zzq no such application zzq")` launched Excel (semantic alias fallback). Tests must stub the launcher for
+  "nothing" cases; production callers only pass names the compiler already resolved.
+
+## P-26  Drawing was dead for three independent reasons
+- (1) every stroke used `mouse_event`/`SendInput`, which the physical-input guard refuses; (2) `CursorShape` had no
+  `set_shape/get_shape`, so `drag_to`/`draw_shape` raised AttributeError before delivering a point; (3) the tools claimed
+  SUCCESS without measuring anything. Now: posted messages, measured pixel change, honest INEFFECTIVE/UNVERIFIED.
+
+## P-27  Escape is not always an answer, and an unverified answer must not be cached
+- Inside the long suite process the UIA read of a plain message box returned NO buttons for the whole 4.5 s re-read window
+  (PP1 case 1: decision took 5466 ms, then T4 Escape); standalone the same read takes 541-683 ms and returns them, and 40 busy
+  processes on 20 CPUs did not change that - the in-suite cause was not isolated. T4 sent Escape to a Yes/No box, which has no
+  Cancel, so nothing happened, and then CACHED that dead `key:escape`, which poisoned the next case. Fix: read classic dialogs
+  natively (`hin.native_dialog_parts`, 2-6 ms) and press with a posted `BM_CLICK`; cache a key answer only after the window is
+  verified gone. Rule: never cache an unverified answer.

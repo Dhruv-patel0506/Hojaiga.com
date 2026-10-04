@@ -813,85 +813,124 @@ class DesktopConnector(IConnector):
             if action == "focus_window":
                 await asyncio.to_thread(self._focus_window, payload["title"])
                 return _make_response(request.request_id, ResponseStatus.OK, 200, started, {"focused": True})
-            if action == "click":
-                x = payload.get("x")
-                y = payload.get("y")
-                await asyncio.to_thread(self._click, x, y)
-                return _make_response(request.request_id, ResponseStatus.OK, 200, started, {"clicked": True, "x": x, "y": y})
-            if action == "type":
-                text = payload.get("text", "")
-                await asyncio.to_thread(self._type, text)
-                return _make_response(request.request_id, ResponseStatus.OK, 200, started, {"typed": True, "len": len(text)})
-            if action == "hotkey":
-                keys = payload.get("keys", [])
-                await asyncio.to_thread(self._hotkey, keys)
-                return _make_response(request.request_id, ResponseStatus.OK, 200, started, {"hotkey": keys})
-            if action == "press":
-                key = payload.get("key", "")
-                await asyncio.to_thread(self._press, key)
-                return _make_response(request.request_id, ResponseStatus.OK, 200, started, {"pressed": key})
-            if action == "gui_search_launch":
-                success = await asyncio.to_thread(self._gui_search_launch, payload["app_name"])
-                if success:
-                    return _make_response(request.request_id, ResponseStatus.OK, 200, started, {"launched": True})
+            if action in ("click", "type", "hotkey", "press"):
+                # Headless only: every one of these is delivered as posted window messages to a SPECIFIC window
+                # (headless_input). With no resolvable window there is nothing safe to address, and falling back to
+                # pyautogui (the physical pointer / keyboard) is forbidden - so the action is refused.
+                hwnd, how = await asyncio.to_thread(self._resolve_target, payload)
+                if not hwnd:
+                    return _make_response(request.request_id, ResponseStatus.ERROR, 403, started, None,
+                                          f"REFUSED: {action} needs a target window in the payload "
+                                          f"(hwnd | window_title | app); {how}. Physical input is not available.")
+                if action == "click":
+                    ok, note = await asyncio.to_thread(self._click, hwnd, payload.get("x"), payload.get("y"))
+                    data = {"clicked": ok, "x": payload.get("x"), "y": payload.get("y"), "hwnd": hwnd, "note": note}
+                elif action == "type":
+                    text = payload.get("text", "")
+                    ok, note = await asyncio.to_thread(self._type, hwnd, text, int(payload.get("control_hwnd") or 0))
+                    data = {"typed": ok, "len": len(text), "hwnd": hwnd, "note": note}
+                elif action == "hotkey":
+                    keys = payload.get("keys", [])
+                    ok, note = await asyncio.to_thread(self._hotkey, hwnd, keys)
+                    data = {"hotkey": keys, "delivered": ok, "hwnd": hwnd, "note": note}
                 else:
-                    return _make_response(request.request_id, ResponseStatus.ERROR, 404, started, None, "App did not launch via GUI search")
+                    key = payload.get("key", "")
+                    ok, note = await asyncio.to_thread(self._press, hwnd, key)
+                    data = {"pressed": key, "delivered": ok, "hwnd": hwnd, "note": note}
+                if not ok:
+                    return _make_response(request.request_id, ResponseStatus.ERROR, 422, started, data, note)
+                return _make_response(request.request_id, ResponseStatus.OK, 200, started, data)
+            if action == "gui_search_launch":
+                success, note = await asyncio.to_thread(self._gui_search_launch, payload["app_name"],
+                                                         float(payload.get("wait_s") or 12.0))
+                if success:
+                    return _make_response(request.request_id, ResponseStatus.OK, 200, started, {"launched": True, "note": note})
+                else:
+                    return _make_response(request.request_id, ResponseStatus.ERROR, 404, started, None,
+                                          f"App did not launch: {note}")
             raise ConnectorExecutionError(f"Unknown desktop action '{action}'")
         except Exception as exc:  # noqa: BLE001
             return _make_response(request.request_id, ResponseStatus.ERROR, 500, started, None, str(exc))
 
-    def _click(self, x: Optional[int], y: Optional[int]) -> None:
-        import pyautogui
-        if x is not None and y is not None:
-            pyautogui.click(x=x, y=y)
-        else:
-            pyautogui.click()
+    # --- headless delivery (headless_input): no pyautogui, no SendInput, no pointer / keyboard ---------------------
 
-    def _type(self, text: str) -> None:
-        import pyautogui
-        pyautogui.write(text, interval=0.02)
-
-    def _hotkey(self, keys: list[str]) -> None:
-        import pyautogui
-        pyautogui.hotkey(*keys)
-
-    def _press(self, key: str) -> None:
-        import pyautogui
-        pyautogui.press(key)
-
-    def _gui_search_launch(self, app_name: str) -> bool:
+    def _resolve_target(self, payload: dict) -> tuple[int, str]:
+        """(hwnd, how). The window an action addresses: payload['hwnd'] | payload['window_title'] (or 'title')
+        | payload['app'] / 'app_name'. (0, reason) when none resolves - the caller then refuses."""
         try:
-            import pyautogui # type: ignore
-            import psutil # type: ignore
-            import pygetwindow as gw # type: ignore
-        except ImportError:
-            raise ConnectorExecutionError("pyautogui, psutil, or pygetwindow not installed")
-            
-        initial_windows = {w for w in gw.getAllTitles() if w.strip()}
-        
-        pyautogui.press("win")
-        time.sleep(1.0)
-        pyautogui.write(app_name, interval=0.05)
-        time.sleep(1.5) # Wait for search results
-        pyautogui.press("enter")
-        
-        # Wait up to 5 seconds for a new window
-        for _ in range(10):
-            time.sleep(0.5)
-            current_windows = {w for w in gw.getAllTitles() if w.strip()}
-            new_windows = current_windows - initial_windows
-            for title in new_windows:
-                if title.lower() not in ["search", "start", "cortana"]:
-                    return True
-        
-        # Fallback to psutil if no window detected (e.g. background app)
-        return True # Optimistic fallback since GUI search is hard to reliably verify
+            from core_organs import headless_input as hin
+            h = int(payload.get("hwnd") or 0)
+            if h:
+                return (h, "hwnd") if hin.is_alive(h) else (0, f"hwnd {h} is not a live window")
+            title = (payload.get("window_title") or payload.get("title") or "").strip()
+            if title:
+                # (not pygetwindow: it reads titles with GetWindowText, which deadlocks against a window owned by a
+                #  thread of this process that never pumps messages - measured as a hang with the cursor overlay up)
+                want = title.lower()
+                titled = hin.top_level_titles()
+                exact = [h for h, t in titled if t.lower() == want]
+                part = [h for h, t in titled if want in t.lower()]
+                pick = (exact or part or [0])[0]
+                if pick:
+                    return int(pick), f"title '{title}'"
+                return 0, f"no window titled '{title}'"
+            app = (payload.get("app") or payload.get("app_name") or "").strip()
+            if app:
+                from core_organs.desktop_grounding import DesktopGrounding
+                h = DesktopGrounding().find_window(app) or 0
+                return (int(h), f"app '{app}'") if h else (0, f"no window found for app '{app}'")
+            return 0, "none of hwnd / window_title / app was given"
+        except Exception as exc:  # noqa: BLE001
+            return 0, f"target resolution failed: {type(exc).__name__}: {exc}"
+
+    def _click(self, hwnd: int, x: Optional[int], y: Optional[int]) -> tuple[bool, str]:
+        from core_organs import headless_input as hin
+        if x is None or y is None:
+            return False, "click needs x and y (screen coordinates): there is no pointer to click 'where it is'"
+        return hin.post_click(hwnd, int(x), int(y))
+
+    def _type(self, hwnd: int, text: str, control_hwnd: int = 0) -> tuple[bool, str]:
+        """Characters go to the control that HAS FOCUS inside the window (or an explicit control_hwnd)."""
+        from core_organs import headless_input as hin
+        return hin.post_text(control_hwnd or hin.focused_control(hwnd), text)
+
+    def _hotkey(self, hwnd: int, keys: list[str]) -> tuple[bool, str]:
+        from core_organs import headless_input as hin
+        return hin.post_key_combo(hwnd, "+".join(str(k) for k in keys))
+
+    def _press(self, hwnd: int, key: str) -> tuple[bool, str]:
+        from core_organs import headless_input as hin
+        return hin.post_key_combo(hwnd, str(key))
+
+    def _gui_search_launch(self, app_name: str, wait_s: float = 12.0) -> tuple[bool, str]:
+        """Launch through the OS (Start-menu entry / catalog), NOT by typing into the Windows search box with the
+        keyboard. Success means a window for the app really exists afterwards (polled, bounded) - the old
+        'optimistic' True when nothing showed up is gone."""
+        try:
+            from core_organs.organ_40_app_launcher import resolve_and_launch
+            from core_organs.desktop_grounding import DesktopGrounding
+        except Exception as exc:  # noqa: BLE001
+            return False, f"launcher unavailable: {exc}"
+        g = DesktopGrounding()
+        if g.find_window(app_name):
+            return True, "already running"
+        info = resolve_and_launch(app_name)
+        if not info.get("launched"):
+            return False, str(info.get("note") or "launcher declined")
+        end = time.time() + wait_s
+        delay = 0.3
+        while time.time() < end:
+            if g.find_window(app_name):
+                return True, f"window appeared ({info.get('method')})"
+            time.sleep(delay)
+            delay = min(delay * 1.5, 1.5)
+        return False, f"started, but no window appeared within {wait_s:g} s (tray-only, sign-in gated, or slow)"
 
     def _list_windows(self) -> list[str]:
         try:
-            import pygetwindow as gw  # type: ignore
-            return [w.title for w in gw.getAllWindows() if w.title]
-        except ImportError:
+            from core_organs import headless_input as hin
+            return [t for _h, t in hin.top_level_titles()]
+        except Exception:
             return []
 
     def _focus_window(self, title: str) -> None:

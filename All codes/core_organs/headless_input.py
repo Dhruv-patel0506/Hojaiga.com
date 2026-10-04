@@ -50,6 +50,10 @@ if _IS_WINDOWS:
     _u32.IsIconic.argtypes = [_H]
     _u32.IsWindow.argtypes = [_H]
     _u32.IsWindowVisible.argtypes = [_H]
+    _u32.IsWindowEnabled.argtypes = [_H]
+    _u32.GetDlgCtrlID.argtypes = [_H]
+    _u32.GetWindowLongW.argtypes = [_H, ctypes.c_int]
+    _u32.GetWindowLongW.restype = ctypes.c_long
     _u32.GetClassNameW.argtypes = [_H, wt.LPWSTR, ctypes.c_int]
     _u32.GetWindowTextW.argtypes = [_H, wt.LPWSTR, ctypes.c_int]
     _u32.GetWindowTextLengthW.argtypes = [_H]
@@ -163,6 +167,41 @@ def window_state(hwnd: int) -> Dict[str, object]:
             "state": "minimized" if mini else "normal"}
 
 
+# Window classes that mark a XAML / WinUI host. These UI stacks take keyboard and pointer input through their own
+# input pipeline (InputSite / CoreWindow), NOT through the window messages post_key_combo / post_drag send, so a posted
+# key or drag is simply ignored. Detecting the host lets the caller REPORT that instead of failing silently, and
+# route the action through UIA Invoke / ValuePattern (which XAML does honour).
+_XAML_CLASSES = frozenset({
+    "applicationframewindow", "windows.ui.core.corewindow", "winuidesktopwin32windowclass",
+    "microsoft.ui.content.desktopchildsitebridge", "microsoft.ui.content.popupwindowsitebridge",
+    "windows.ui.input.inputsite.windowclass", "inputsitewindowclass", "xaml_windowedpopupclass",
+})
+
+
+def is_xaml_host(hwnd: int) -> bool:
+    """True when ``hwnd`` (or any window inside it) is a XAML / WinUI host window."""
+    if not is_alive(hwnd):
+        return False
+    if _class_name(hwnd).lower() in _XAML_CLASSES:
+        return True
+    found = []
+
+    @ctypes.WINFUNCTYPE(wt.BOOL, ctypes.c_void_p, wt.LPARAM)
+    def _cb(h, _l):
+        try:
+            if _class_name(h).lower() in _XAML_CLASSES:
+                found.append(int(h))
+                return False
+        except Exception:
+            pass
+        return True
+    try:
+        _u32.EnumChildWindows(hwnd, _cb, 0)
+    except Exception:
+        pass
+    return bool(found)
+
+
 def process_windows(hwnd: int, include_hidden: bool = True) -> List[int]:
     """All top-level windows owned by the same process as ``hwnd`` (the app frame PLUS its
     popup hosts / menus / dialogs, which live in separate top-level windows and are invisible
@@ -213,6 +252,119 @@ def child_at(top_hwnd: int, sx: int, sy: int) -> int:
     return cur
 
 
+def safe_window_text(hwnd: int, timeout_ms: int = 150) -> str:
+    """A window's title WITHOUT the deadlock GetWindowText can cause. For a window owned by THIS process,
+    GetWindowText sends WM_GETTEXT to the thread that created it; a thread that never pumps messages (an overlay window
+    created from a worker, or a test's main thread parked in an asyncio loop) never answers, so an EnumWindows+
+    GetWindowText sweep from another thread hangs forever. This asks with a bounded SendMessageTimeout instead and
+    returns '' when the owner does not answer in ``timeout_ms``."""
+    if not (_IS_WINDOWS and hwnd):
+        return ""
+    buf = ctypes.create_unicode_buffer(512)
+    res = ctypes.c_size_t(0)
+    try:
+        ok = _u32.SendMessageTimeoutW(hwnd, 0x000D, 512, ctypes.addressof(buf), SMTO_ABORTIFHUNG, timeout_ms,
+                                      ctypes.byref(res))      # WM_GETTEXT
+    except Exception:
+        return ""
+    return buf.value if ok else ""
+
+
+def top_level_titles(visible_only: bool = True) -> List[Tuple[int, str]]:
+    """[(hwnd, title)] for the top-level windows, read with safe_window_text (see there)."""
+    out: List[Tuple[int, str]] = []
+
+    @ctypes.WINFUNCTYPE(wt.BOOL, ctypes.c_void_p, wt.LPARAM)
+    def _cb(h, _l):
+        try:
+            if (not visible_only) or _u32.IsWindowVisible(h) or _u32.IsIconic(h):
+                t = safe_window_text(int(h))
+                if t:
+                    out.append((int(h), t))
+        except Exception:
+            pass
+        return True
+    _u32.EnumWindows(_cb, 0)
+    return out
+
+
+BM_CLICK = 0x00F5
+GWL_STYLE = -16
+# BS_PUSHBUTTON, BS_DEFPUSHBUTTON, BS_COMMANDLINK, BS_DEFCOMMANDLINK: the button kinds that ANSWER a dialog (check
+# boxes, radio buttons and group boxes share the "Button" class but only change a setting).
+_BS_PUSH_KINDS = frozenset({0x0, 0x1, 0xE, 0xF})
+
+
+def native_dialog_parts(top_hwnd: int) -> Tuple[List[Tuple[int, str, int]], List[str]]:
+    """Read a classic Win32 dialog (a message box / #32770) WITHOUT UI Automation: ([(button_hwnd, caption, control_id)],
+    [static text lines]). Plain GetClassName / WM_GETTEXT / GetDlgCtrlID queries - a few milliseconds and independent of
+    how loaded the machine is, where a UIA walk of the same dialog was measured taking seconds while a model held the
+    CPUs. Only visible, enabled push buttons are returned (the ids are the standard IDOK=1 / IDCANCEL=2 / IDYES=6 /
+    IDNO=7 ..., so a caller can rank them by role rather than by caption)."""
+    buttons: List[Tuple[int, str, int]] = []
+    texts: List[str] = []
+    if not is_alive(top_hwnd):
+        return buttons, texts
+
+    @ctypes.WINFUNCTYPE(wt.BOOL, ctypes.c_void_p, wt.LPARAM)
+    def _cb(h, _l):
+        try:
+            h = int(h)
+            cls = _class_name(h).lower()
+            if cls == "button":
+                style = int(_u32.GetWindowLongW(h, GWL_STYLE)) & 0xFFFFFFFF
+                if ((style & 0xF) in _BS_PUSH_KINDS and _u32.IsWindowVisible(h) and _u32.IsWindowEnabled(h)):
+                    cap = safe_window_text(h)
+                    if cap:
+                        buttons.append((h, cap, int(_u32.GetDlgCtrlID(h))))
+            elif cls == "static":
+                t = safe_window_text(h)
+                if t.strip():
+                    texts.append(t.strip())
+        except Exception:
+            pass
+        return True
+    try:
+        _u32.EnumChildWindows(top_hwnd, _cb, 0)
+    except Exception:
+        pass
+    return buttons, texts
+
+
+def post_button_click(button_hwnd: int) -> Tuple[bool, str]:
+    """Press a native push button by POSTING BM_CLICK to its own window - the button then does what a click on it does
+    (WM_COMMAND to its dialog). No pointer, no keyboard, no focus change."""
+    if not is_alive(button_hwnd):
+        return False, f"{UNDELIVERABLE}: button window gone"
+    if not _u32.PostMessageW(button_hwnd, BM_CLICK, 0, 0):
+        return False, f"{UNDELIVERABLE}: PostMessage refused for BM_CLICK"
+    return True, "bm-click"
+
+
+def focused_control(top_hwnd: int) -> int:
+    """The control that has keyboard focus INSIDE ``top_hwnd``'s UI thread (GetGUIThreadInfo - a read-only query),
+    else ``top_hwnd`` itself. Posted characters belong to the focused control, not to the frame."""
+    if not is_alive(top_hwnd):
+        return top_hwnd
+
+    class GUITHREADINFO(ctypes.Structure):
+        _fields_ = [("cbSize", wt.DWORD), ("flags", wt.DWORD), ("hwndActive", _H), ("hwndFocus", _H),
+                    ("hwndCapture", _H), ("hwndMenuOwner", _H), ("hwndMoveSize", _H), ("hwndCaret", _H),
+                    ("rcCaret", wt.RECT)]
+    try:
+        tid = _u32.GetWindowThreadProcessId(top_hwnd, None)
+        info = GUITHREADINFO()
+        info.cbSize = ctypes.sizeof(GUITHREADINFO)
+        _u32.GetGUIThreadInfo.argtypes = [wt.DWORD, ctypes.POINTER(GUITHREADINFO)]
+        if _u32.GetGUIThreadInfo(tid, ctypes.byref(info)) and info.hwndFocus:
+            f = int(info.hwndFocus)
+            if f == top_hwnd or _u32.GetAncestor(f, 2) == top_hwnd:
+                return f
+    except Exception:
+        pass
+    return top_hwnd
+
+
 def _lparam_xy(x: int, y: int) -> int:
     return ((int(y) & 0xFFFF) << 16) | (int(x) & 0xFFFF)
 
@@ -246,6 +398,120 @@ def post_click(hwnd: int, sx: int, sy: int, *, right: bool = False,
         _u32.PostMessageW(target, up, 0, lp)
     note = f"postmessage-{'rclick' if right else 'click'}->{_class_name(target)}@({pt.x},{pt.y})"
     return bool(ok), note if ok else f"{UNDELIVERABLE}: PostMessage refused ({note})"
+
+
+WM_MBUTTONDOWN, WM_MBUTTONUP, MK_MBUTTON = 0x0207, 0x0208, 0x0010
+_DRAG_MESSAGES = {"left": (WM_LBUTTONDOWN, WM_LBUTTONUP, MK_LBUTTON),
+                  "right": (WM_RBUTTONDOWN, WM_RBUTTONUP, MK_RBUTTON),
+                  "middle": (WM_MBUTTONDOWN, WM_MBUTTONUP, MK_MBUTTON)}
+
+
+def ellipse_points(cx: float, cy: float, rx: float, ry: float, n: int = 48,
+                   start_deg: float = -90.0) -> List[Tuple[int, int]]:
+    """Parametric ellipse sampled at ``n`` points (closed: the last point repeats the first). A circle is
+    rx == ry. The result feeds post_drag(path=...) - there is no separate 'draw circle' code path."""
+    import math
+    n = max(8, int(n))
+    a0 = math.radians(start_deg)
+    pts = [(int(round(cx + rx * math.cos(a0 + 2 * math.pi * i / n))),
+            int(round(cy + ry * math.sin(a0 + 2 * math.pi * i / n)))) for i in range(n)]
+    pts.append(pts[0])
+    return pts
+
+
+def post_drag(hwnd: int, x0: int, y0: int, x1: int, y1: int, *, steps: int = 24, button: str = "left",
+              duration_s: float = 0.4, path: Optional[List[Tuple[int, int]]] = None,
+              on_point=None) -> Tuple[bool, str]:
+    """Drag with the left (or right/middle) button WITHOUT touching the physical pointer:
+
+        WM_MOUSEMOVE -> WM_xBUTTONDOWN -> N x WM_MOUSEMOVE (button flag held) -> WM_xBUTTONUP
+
+    posted to the child control under the start point (``child_at``), with client-relative coordinates
+    (the same convention post_click uses). Coordinates are SCREEN pixels, like post_click.
+
+    ``path`` replaces the straight line with a sampled point list (circle/oval/any stroke): the same
+    messages, the same ordering, the first point is where the button goes down and the last is where it
+    comes up. The moves are TIME-SLICED over ``duration_s`` (a canvas needs ordered move events, not a
+    burst that arrives in one scheduler quantum).
+
+    Returns (delivered, note). ``delivered`` means every message was accepted by the target's queue; whether
+    a stroke actually landed is decided by the caller's postcondition (pixel diff), never assumed here.
+
+    ``on_point(x, y)`` (optional) is called as each point is posted, so an overlay (the visible blue-arrow
+    sprite) can follow the stroke in step with the real messages."""
+    if not _IS_WINDOWS:
+        return False, f"{UNDELIVERABLE}: non-windows"
+    if not is_alive(hwnd):
+        return False, f"{UNDELIVERABLE}: window gone"
+    if is_minimized(hwnd):
+        return False, (f"{UNDELIVERABLE}: window minimized - screen coordinates are meaningless; "
+                       "park it (background_window) or address the control through UIA")
+    if button not in _DRAG_MESSAGES:
+        return False, f"{UNDELIVERABLE}: unknown button '{button}'"
+    down, up, mk = _DRAG_MESSAGES[button]
+    if path and len(path) >= 2:
+        pts = [(int(x), int(y)) for x, y in path]
+    else:
+        n = max(2, int(steps))
+        pts = [(int(round(x0 + (x1 - x0) * i / n)), int(round(y0 + (y1 - y0) * i / n))) for i in range(n + 1)]
+    target = child_at(hwnd, pts[0][0], pts[0][1])
+
+    def lp(sx: int, sy: int) -> int:
+        pt = wt.POINT(int(sx), int(sy))
+        _u32.ScreenToClient(target, ctypes.byref(pt))
+        return _lparam_xy(pt.x, pt.y)
+
+    ok = _u32.PostMessageW(target, WM_MOUSEMOVE, 0, lp(*pts[0]))
+    time.sleep(0.02)
+    ok = _u32.PostMessageW(target, down, mk, lp(*pts[0])) and ok
+    if on_point:
+        on_point(*pts[0])
+    slice_s = max(0.0, float(duration_s)) / max(1, len(pts) - 1)
+    t_next = time.perf_counter()
+    for sx, sy in pts[1:]:
+        t_next += slice_s
+        ok = _u32.PostMessageW(target, WM_MOUSEMOVE, mk, lp(sx, sy)) and ok
+        if on_point:
+            on_point(sx, sy)
+        wait = t_next - time.perf_counter()
+        if wait > 0:
+            time.sleep(wait)
+    time.sleep(0.02)
+    ok = _u32.PostMessageW(target, up, 0, lp(*pts[-1])) and ok
+    note = (f"postmessage-drag-{button}->{_class_name(target)} {len(pts)} points "
+            f"({pts[0][0]},{pts[0][1]})->({pts[-1][0]},{pts[-1][1]}) over {duration_s:.2f}s")
+    return bool(ok), note if ok else f"{UNDELIVERABLE}: PostMessage refused ({note})"
+
+
+def changed_pixels(before, after, threshold: int = 24) -> Tuple[int, Optional[Tuple[int, int, int, int]]]:
+    """(# pixels whose grayscale moved by more than ``threshold``, bounding box of the change) between two
+    same-size PIL images; (-1, None) when they cannot be compared. The independent evidence a stroke landed."""
+    try:
+        from PIL import ImageChops
+        if before is None or after is None or before.size != after.size:
+            return -1, None
+        diff = ImageChops.difference(before.convert("RGB"), after.convert("RGB")).convert("L")
+        mask = diff.point(lambda v: 255 if v > threshold else 0)
+        return int(sum(1 for v in mask.getdata() if v)), mask.getbbox()
+    except Exception:
+        return -1, None
+
+
+def post_drag_verified(hwnd: int, x0: int, y0: int, x1: int, y1: int, **kw) -> Dict[str, object]:
+    """post_drag + a before/after capture of the window's OWN pixels. ``effective`` is None when the window
+    cannot be captured, False when messages were delivered but NOTHING changed (the target ignores posted
+    mouse input - XAML / WinUI canvases do), True only when pixels moved. Never reports success for a
+    delivery alone."""
+    before, why_b = capture_window(hwnd)
+    ok, note = post_drag(hwnd, x0, y0, x1, y1, **kw)
+    time.sleep(0.35)
+    after, why_a = capture_window(hwnd)
+    n, bbox = changed_pixels(before, after)
+    effective = None if n < 0 else (n > 0)
+    verdict = ("delivered but INEFFECTIVE: the window did not react to posted mouse input (no pixel changed)"
+               if ok and effective is False else note)
+    return {"delivered": ok, "effective": effective, "changed_pixels": n, "bbox": bbox, "note": verdict,
+            "capture": f"{why_b}/{why_a}"}
 
 
 def post_scroll(hwnd: int, sx: int, sy: int, clicks: int) -> Tuple[bool, str]:

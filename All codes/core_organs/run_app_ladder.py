@@ -11,10 +11,19 @@ judge to "click the '<name>' control" (decisive shortcut OFF), and checks it cho
 Vision test grades Qwen-VL boxes against the same UIA ground truth (centre-in-box + label overlap).
 Nothing is clicked. Apps we launched are closed again (WM_CLOSE); apps already open are left alone.
 
+Desktop apps are started MINIMIZED and unfocused (universal_scan.launch_hidden), read while parked off-screen
+(background_window), and - this is the part that used to say "no window appeared" - waited for with the loop's
+progress-aware readiness (a splash -> login -> main-frame chain such as Steam's is followed instead of abandoned after a
+flat 25 s). Each row reports the per-tier ms of the grounding ladder (uia / win32 / uia@offscreen / ocr / vision) and an
+element count that is non-empty for a UIA-sparse app too, because the off-screen capture rung reads its pixels. Only
+instances THIS run started are closed (a tray-resident app such as WhatsApp or Steam is shut down by its own process
+family, never by name); an instance the user already had open is read passively and left alone.
+
 Usage:
   python run_app_ladder.py                       # easy,medium,hard,web
   python run_app_ladder.py --tiers easy,medium
   python run_app_ladder.py --apps calculator,discord --no-vision
+  python run_app_ladder.py --apps excel,whatsapp,steam --no-vision
 """
 
 import argparse
@@ -26,6 +35,7 @@ import time
 sys.path.insert(0, r"D:\new_automation\All codes")
 from core_organs import headless_input as hin
 from core_organs import app_scan, popup_policy as pp, qwen_vl_scanner as qv
+from core_organs import background_window as bw, universal_scan as us
 from core_organs.desktop_grounding import (ConstrainedJudge, DesktopGrounding, GroundedElement,
                                            JUDGE_MODEL, get_loop)
 from core_organs.organ_40_app_launcher import resolve_and_launch
@@ -107,35 +117,131 @@ def vision_probe(scan, hwnd, g, n=2, backend="llamacpp"):
     return {"n": len(targets), "hits": hits, "ms": int(sum(ms) / max(1, len(ms))), "error": err}
 
 
+def _family_pids(main_pid):
+    """PIDs of the process family a window belongs to: the owning process and everything descended from it."""
+    try:
+        import psutil
+        root = psutil.Process(main_pid)
+        return {main_pid} | {c.pid for c in root.children(recursive=True)}
+    except Exception:
+        return {main_pid}
+
+
+def _stop_instance(hwnd, pre_pids):
+    """Close an instance THIS run started and VERIFY it is gone. Polite first (WM_CLOSE, discard-unsaved prompt), then - for
+    a tray-resident app that hides instead of closing - its own process family (processes that did not exist before the
+    launch and descend from, or share the install folder of, the window's process). Never by image name."""
+    pid = hin.window_pid(hwnd) if hwnd else 0
+    closed = us.close_window(hwnd, timeout_s=4.0, discard_unsaved=True) if hwnd else True
+    if closed and not pid:
+        return "closed"
+    try:
+        import psutil
+        main = psutil.Process(pid)
+        install = os.path.dirname(main.exe()).lower()
+        fam = {p for p in psutil.process_iter(["pid", "exe"])
+               if p.pid not in pre_pids and (p.info.get("exe") or "").lower().startswith(install)}
+        fam |= {psutil.Process(x) for x in _family_pids(pid) if x not in pre_pids and psutil.pid_exists(x)}
+        killed = 0
+        for p in fam:
+            try:
+                p.terminate()
+                killed += 1
+            except Exception:
+                pass
+        gone, alive = psutil.wait_procs(list(fam), timeout=5)
+        for p in alive:
+            try:
+                p.kill()
+            except Exception:
+                pass
+        # A tray-resident packaged app may be RESTARTED by its own supervisor right after we stop it (measured: WhatsApp.Root
+        # came back ~20 s later). Look again for a bounded moment and stop whatever our run caused to exist.
+        respawned = 0
+        for _ in range(2):
+            time.sleep(2.5)
+            late = [p for p in psutil.process_iter(["pid", "exe"])
+                    if p.pid not in pre_pids and (p.info.get("exe") or "").lower().startswith(install)]
+            for p in late:
+                try:
+                    p.terminate()
+                    respawned += 1
+                except Exception:
+                    pass
+            if late:
+                psutil.wait_procs(late, timeout=4)
+            else:
+                break
+        return (f"window {'closed' if closed else 'hid-to-tray'}; stopped {killed} process(es) of its own family"
+                + (f" + {respawned} respawned by the app's supervisor" if respawned else ""))
+    except Exception as exc:  # noqa: BLE001
+        return f"window {'closed' if closed else 'still open'} ({type(exc).__name__})"
+
+
 def run_desktop(app, do_vision, g):
     row = {"app": app}
-    pre = g.find_window(app) is not None
-    t0 = time.perf_counter()
-    if not pre:
-        try:
-            resolve_and_launch(app)
-        except Exception as exc:  # noqa: BLE001
-            row["error"] = f"launch: {exc}"
-            return row
-    hwnd = wait_window(g, app)
-    row["launch_s"] = round(time.perf_counter() - t0, 1)
-    row["launched_by_us"] = not pre
-    if not hwnd:
-        row["error"] = "no window appeared (tray-only / sign-in gated / not installed)"
-        return row
     try:
-        pp.clear_blockers(hwnd, mode="preflight")
+        import psutil
+        pre_pids = {p.pid for p in psutil.process_iter()}
     except Exception:
-        pass
-    time.sleep(1.0 if not pre else 0.0)
-    scan = app_scan.scan_desktop(hwnd)
-    row["scan"] = scan.stats
-    if scan.elements:
-        row["brain"] = brain_probe(scan, hwnd)
-    if do_vision and qv.available():
-        row["vision"] = vision_probe(scan, hwnd, g)
+        pre_pids = set()
+    pre_hwnd = g.find_window(app)
+    pre = pre_hwnd is not None
+    t0 = time.perf_counter()
+    hwnd, launch_note = pre_hwnd, ""
     if not pre:
-        hin._u32.PostMessageW(hwnd, 0x0010, 0, 0)
+        info = us.launch_hidden(app, timeout_s=90.0)
+        launch_note = "; ".join(info.get("notes", []))[:120]
+        hwnd = info.get("hwnd") or None
+        row["launched_hidden"] = bool(hwnd)
+    loop = get_loop()
+    loop._launched_apps.add(app.lower()) if not pre else None
+    # progress-aware readiness (follows a splash chain) + keeps a minimized window parked for the whole measurement
+    loop._run_depth += 1
+    try:
+        hwnd2, elements, rep = loop._wait_for_ready(app)
+        hwnd = hwnd2 or hwnd
+        row["launch_s"] = round(time.perf_counter() - t0, 1)
+        row["launched_by_us"] = not pre
+        row["launch_note"] = launch_note
+        row["ready_wait_s"] = rep.get("ready_wait_s")
+        if rep.get("ready_deadline_extended_s"):
+            row["ready_deadline_extended_s"] = rep["ready_deadline_extended_s"]
+        if not hwnd:
+            row["error"] = "no window appeared (tray-only / sign-in gated / not installed)"
+            return row
+        try:
+            pp.clear_blockers(hwnd, mode="preflight")
+        except Exception:
+            pass
+        # the ladder, with per-tier ms: UIA first; a UIA-sparse app escalates through the off-screen capture (OCR)
+        g_rep_tiers = {}
+        tg = time.perf_counter()
+        h1, els1, rep1 = g.ground(app, max_tier=2)
+        g_rep_tiers.update(rep1.get("tier_ms", {}))
+        ladder_els = els1
+        sparse = len([e for e in els1 if e.role != "pane"]) < 8
+        if sparse:
+            h2, els2, rep2 = g.ground(app, target_text="zz_absent_widget_zz", max_tier=4 if do_vision else 3)
+            g_rep_tiers.update(rep2.get("tier_ms", {}))
+            ladder_els = els2 or els1
+            row["escalated"] = {"offscreen": rep2.get("offscreen"), "tiers_ran": rep2.get("tiers_ran"),
+                                "tiers_skipped": rep2.get("tiers_skipped")}
+        row["ladder"] = {"elements": len(ladder_els), "uia_elements": len(els1), "tier_ms": g_rep_tiers,
+                         "by_tier": {t: sum(1 for e in ladder_els if e.tier == t) for t in {e.tier for e in ladder_els}},
+                         "ladder_s": round(time.perf_counter() - tg, 1)}
+        scan = app_scan.scan_desktop(hwnd)
+        row["scan"] = scan.stats
+        if scan.elements:
+            row["brain"] = brain_probe(scan, hwnd)
+        if do_vision and qv.available() and scan.elements:
+            row["vision"] = vision_probe(scan, hwnd, g)
+    finally:
+        loop._run_depth -= 1
+        if loop._run_depth == 0:
+            loop._release_held()
+        if not pre and hwnd:
+            row["stopped"] = _stop_instance(hwnd, pre_pids)
     return row
 
 
@@ -177,6 +283,18 @@ def fmt(row):
     line = (f"  {row['app'][:28]:<28} {s.get('difficulty','?'):<6} score={s.get('difficulty_score')} "
             f"nodes={s.get('nodes')} act={s.get('actionable')} depth={s.get('max_depth')} "
             f"scan={s.get('ms')}ms vision_needed={s.get('needs_vision')} trunc={s.get('truncated')}")
+    lad = row.get("ladder")
+    if lad:
+        line += (f"\n      ladder: {lad['elements']} elements (uia {lad['uia_elements']}; by tier {lad['by_tier']}) "
+                 f"per-tier ms {lad['tier_ms']} in {lad['ladder_s']}s; ready after {row.get('ready_wait_s')}s"
+                 + (f" (deadline extended {row['ready_deadline_extended_s']}s: window chain followed)" if row.get('ready_deadline_extended_s') else ""))
+        esc = row.get("escalated")
+        if esc and esc.get("offscreen"):
+            o = esc["offscreen"]
+            line += (f"\n      off-screen capture: used={o.get('used')} resolved_by={o.get('resolved_by')} round_trip={o.get('round_trip_ms')}ms "
+                     f"ended_minimized={o.get('ended_minimized')} via {o.get('tiers_via')} skipped={esc.get('tiers_skipped')}")
+    if row.get("stopped"):
+        line += f"\n      cleanup: {row['stopped']}"
     b, v = row.get("brain"), row.get("vision")
     if b:
         line += f"\n      brain[{JUDGE_MODEL}]: valid={b['valid']*100:.0f}% correct={b['correct']*100:.0f}% {b['ms']}ms/decision (n={b['n']})"

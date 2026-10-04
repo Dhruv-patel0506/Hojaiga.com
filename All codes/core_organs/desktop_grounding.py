@@ -76,7 +76,14 @@ ACTIONABLE_ROLES = {
     "button", "edit", "combobox", "dropdownbutton", "splitbutton", "menuitem",
     "checkbox", "radiobutton", "tabitem", "listitem", "treeitem", "hyperlink",
     "slider", "spinner", "group", "pane", "document", "thumb",
+    "datagrid", "table", "dataitem",
 }
+# Roles accepted even with an EMPTY Name. A spreadsheet's document grid is a custom UIA control whose Name is empty
+# (or a generic 'Grid'); it is recognised by what it IS (DataGrid / Table), not by what it is called.
+UNNAMED_OK_ROLES = ("edit", "pane", "datagrid", "table")
+# A grid exposes every cell as a DataItem (Excel: ~500 on the first screen). They are sampled, not enumerated, so
+# they cannot crowd the real controls out of the judge's shortlist; the totals are reported (never silently cut).
+GRID_CELL_CAP = int(os.environ.get("HOJAIGA_GRID_CELL_CAP", "120"))
 
 # Verbs the constrained judge is allowed to choose. Keeping this tiny is what
 # stops the 7B model from hallucinating tool calls (the old flailing failure).
@@ -103,6 +110,13 @@ CHECKPOINT_DIR = os.path.join(os.environ.get("TEMP", "."), "hojaiga_desktop_chec
 READY_TIMEOUT_S = float(os.environ.get("HOJAIGA_READY_TIMEOUT_S", "10"))
 READY_BACKOFF_S = float(os.environ.get("HOJAIGA_READY_BACKOFF_S", "0.35"))
 READY_BACKOFF_MAX_S = float(os.environ.get("HOJAIGA_READY_BACKOFF_MAX_S", "1.5"))
+# The 10 s above is the deadline for an app that shows NO sign of starting. While the app visibly IS starting
+# (its window set changes - splash -> login -> main frame - or its processes keep burning CPU) the deadline is
+# pushed out by READY_GRACE_S at a time, never past READY_HARD_CAP_S. Measured on this host: Steam shows a 199x34
+# update splash for ~39 s, then a login window from a DIFFERENT process 12 s later; a flat 10 s gave up on it.
+READY_GRACE_S = float(os.environ.get("HOJAIGA_READY_GRACE_S", "12"))
+READY_HARD_CAP_S = float(os.environ.get("HOJAIGA_READY_HARD_CAP_S", "90"))
+READY_RICH_ELEMENTS = 8        # a window with this many controls is a real UI, not a splash: no stability poll needed
 
 
 # ---------------------------------------------------------------------------
@@ -131,6 +145,20 @@ class GroundedElement:
                 "bbox": list(self.bbox), "tier": self.tier,
                 "confidence": round(self.confidence, 3),
                 "center": list(self.center)}
+
+
+def _is_parked_offscreen(hwnd: int) -> bool:
+    """True for a window that background_window has moved fully off every monitor (its parked rectangle sits at
+    the park origin, far outside any real screen)."""
+    if not (_IS_WINDOWS and hwnd):
+        return False
+    try:
+        import ctypes.wintypes as wt
+        r = wt.RECT()
+        ctypes.windll.user32.GetWindowRect(hwnd, ctypes.byref(r))
+        return r.right <= -10000 and r.bottom <= -10000
+    except Exception:
+        return False
 
 
 def _element_id(hwnd: int, role: str, name: str, bbox: Tuple[int, int, int, int]) -> str:
@@ -177,6 +205,7 @@ class DesktopGrounding:
 
     def __init__(self):
         self.last_report: Dict[str, Any] = {}
+        self.last_walk: Dict[str, Any] = {}
         self._dap = None
         self._vision_calls = 0
         # (hwnd, window-signature) -> (monotonic ts, elements)
@@ -221,7 +250,7 @@ class DesktopGrounding:
             pass
         return ""
 
-    def find_window(self, app_hint: str) -> Optional[int]:
+    def find_window(self, app_hint: str, all_candidates: bool = False):
         """Locate the target app window. Ranked, NOT first-substring-wins:
 
           5  owning process image name matches the hint   (notepad.exe for 'notepad')
@@ -235,7 +264,7 @@ class DesktopGrounding:
         """
         user32 = ctypes.windll.user32
         if not _IS_WINDOWS:
-            return None
+            return [] if all_candidates else None
         hint = (app_hint or "").lower().strip()
         token = hint.split()[0] if hint else ""
         hint_is_browser = any(b in hint for b in self._BROWSER_PROCS) or "browser" in hint
@@ -245,18 +274,19 @@ class DesktopGrounding:
         def _cb(hwnd, _lparam):
             if not user32.IsWindowVisible(hwnd):
                 return True
-            length = user32.GetWindowTextLengthW(hwnd)
-            title = ""
-            if length > 0:
-                buf = ctypes.create_unicode_buffer(length + 1)
-                user32.GetWindowTextW(hwnd, buf, length + 1)
-                title = buf.value.lower()
+            title = hin.safe_window_text(int(hwnd)).lower()      # never blocks on a window whose thread does not pump messages
             cls_buf = ctypes.create_unicode_buffer(256)
             user32.GetClassNameW(hwnd, cls_buf, 256)
             cname = cls_buf.value.lower()
             # Skip infrastructure windows, same spirit as organ_01 filters.
             if cname in ("shell_traywnd", "progman", "workerw", "mintaskswnd",
                          "shell_dock", "topmosttoplevelwindowclass"):
+                return True
+            # A UWP app's CoreWindow is its content host, not an app window: it cannot be minimized, parked or
+            # closed on its own (its ApplicationFrameWindow is the real top level, and UIA on the frame already
+            # contains the content). Matching it by PROCESS NAME (CalculatorApp.exe) used to beat the frame, so
+            # the loop grounded and tried to park a window that cannot be parked.
+            if cname == "windows.ui.core.corewindow":
                 return True
             if any(bad in title for bad in ("visual studio", "antigravity", " - editor")):
                 return True
@@ -297,11 +327,32 @@ class DesktopGrounding:
             user32.EnumWindows(_cb, 0)
         except Exception as exc:
             logger.debug("[grounding] EnumWindows failed: %s", exc)
-            return None
+            return [] if all_candidates else None
         if not found:
-            return None
+            return [] if all_candidates else None
         found.sort(key=lambda t: -t[0])  # stable: Z-order preserved among equal scores
+        if all_candidates:
+            return [h for _s, h in found]
         return found[0][1]
+
+    def family_activity(self, app_hint: str) -> Tuple[frozenset, float]:
+        """(window-set signature, CPU seconds) of everything that looks like this app. A change in the window
+        set (a splash replaced by a login window, a main frame appearing) or CPU still being spent means the
+        app is still STARTING; both flat means it is either ready or not starting at all."""
+        sig = frozenset((h, self.window_title(h)) for h in self.find_window(app_hint, all_candidates=True))
+        cpu = 0.0
+        token = (app_hint or "").lower().split()[0] if (app_hint or "").strip() else ""
+        if token:
+            try:
+                import psutil
+                for pr in psutil.process_iter(["name", "cpu_times"]):
+                    nm = (pr.info.get("name") or "").lower()
+                    ct = pr.info.get("cpu_times")
+                    if token in nm and ct:
+                        cpu += float(ct.user + ct.system)
+            except Exception:
+                pass
+        return sig, cpu
 
     def _process_stem_cached(self, hwnd: int) -> str:
         cache = getattr(self, "_proc_cache", None)
@@ -314,11 +365,7 @@ class DesktopGrounding:
     def window_title(self, hwnd: int) -> str:
         if not (_IS_WINDOWS and hwnd):
             return ""
-        user32 = ctypes.windll.user32
-        length = user32.GetWindowTextLengthW(hwnd)
-        buf = ctypes.create_unicode_buffer(length + 1)
-        user32.GetWindowTextW(hwnd, buf, length + 1)
-        return buf.value
+        return hin.safe_window_text(int(hwnd))
 
     # ---- Tier 1: UIA ----
     def _walk_uia(self, root_hwnd: int, max_depth: int = 12, max_nodes: int = 900) -> List[GroundedElement]:
@@ -333,12 +380,16 @@ class DesktopGrounding:
         if ctrl is None:
             return []
         count = 0
+        cells_seen = cells_kept = 0
         # A minimized window reports every control as off-screen with bogus (-32000) rects, but
         # its UIA patterns still work. Keep them (addressable by pattern, not by coordinates).
-        mini = hin.is_minimized(root_hwnd)
+        # A window PARKED off-screen (background_window) behaves the same for UWP/WinUI apps: they do not lay out
+        # content that is entirely off every monitor, so their controls report IsOffscreen / empty rectangles
+        # while Invoke / Value / Toggle patterns work. Treat it like minimized.
+        mini = hin.is_minimized(root_hwnd) or _is_parked_offscreen(root_hwnd)
 
         def _visit(c, depth: int):
-            nonlocal count
+            nonlocal count, cells_seen, cells_kept
             if depth > max_depth or count > max_nodes:
                 return
             try:
@@ -348,19 +399,28 @@ class DesktopGrounding:
                 bbox = (rect.left, rect.top, rect.right, rect.bottom)
                 enabled = bool(getattr(c, "IsEnabled", True))
                 visible = mini or bool(getattr(c, "IsOffscreen", False)) is False
-                if (role in ACTIONABLE_ROLES and (name or role in ("edit", "pane"))
+                if role == "dataitem":
+                    cells_seen += 1
+                    if cells_kept >= GRID_CELL_CAP:
+                        return                       # sampled: counted above, not surfaced
+                if (role in ACTIONABLE_ROLES and (name or role in UNNAMED_OK_ROLES)
                         and visible and enabled
                         and (mini or (bbox[2] > bbox[0] and bbox[3] > bbox[1]))):
                     value = ""
-                    try:
-                        vp = c.GetValuePattern()
-                        if vp:
-                            value = (vp.Value or "")[:80]
-                    except Exception:
-                        pass
+                    if role != "dataitem" or cells_kept < 40:      # a value read is one COM round trip per cell
+                        try:
+                            vp = c.GetValuePattern()
+                            if vp:
+                                value = (vp.Value or "")[:80]
+                        except Exception:
+                            pass
+                    if role == "dataitem":
+                        cells_kept += 1
+                    label = name or (str(getattr(c, "AutomationId", "") or "").strip()
+                                     if role in ("datagrid", "table") else "") or role
                     elements.append(GroundedElement(
-                        id=_element_id(root_hwnd, role, name, bbox),
-                        name=name or role, role=role, bbox=bbox, tier="uia",
+                        id=_element_id(root_hwnd, role, name or label, bbox),
+                        name=label, role=role, bbox=bbox, tier="uia",
                         confidence=0.9 if name else 0.55,
                         hwnd=root_hwnd, value=value))
                     count += 1
@@ -370,6 +430,8 @@ class DesktopGrounding:
                 return
 
         _visit(ctrl, 0)
+        self.last_walk = {"grid_cells_seen": cells_seen, "grid_cells_surfaced": cells_kept,
+                          "grid_cells_sampled_out": max(0, cells_seen - cells_kept)}
         return elements
 
     # ---- Tier 2: Win32 children ----
@@ -436,6 +498,13 @@ class DesktopGrounding:
         if img is None:
             logger.debug("[grounding] window capture unavailable: %s", why)
             return None
+        if self._unpainted(img):
+            # GPU / DirectComposition UIs (CEF clients such as Steam, many Electron shells) are composited only while
+            # the window is actually visible: PrintWindow of a hidden one returns just the native frame. OCR and a
+            # 46 s vision parse of that would read nothing - say so instead of pretending a tier ran.
+            self._capture_note = "unpainted (the window's content was not painted into the capture; it is composited only while visible)"
+            logger.debug("[grounding] %s", self._capture_note)
+            return None
         try:
             path = os.path.join(os.environ.get("TEMP", "."), f"hj_ground_{hwnd}_{int(time.time()*1000)}.png")
             img.save(path, format="PNG")
@@ -443,6 +512,19 @@ class DesktopGrounding:
         except Exception as exc:
             self._capture_note = f"save-error: {exc}"
             return None
+
+    @staticmethod
+    def _unpainted(img) -> bool:
+        """True for a capture that carries no content: near-zero contrast and only a few brightness bands. Measured on
+        this host: the unpainted Steam login window = stddev 3.9 / 4 bands; Paint 109 / 27; the plain Win32 test window
+        71 / 20."""
+        try:
+            from PIL import ImageStat
+            g = img.convert("L")
+            bands = len({v // 8 for v in g.resize((48, 48)).getdata()})
+            return ImageStat.Stat(g).stddev[0] < 8.0 and bands <= 6
+        except Exception:
+            return False
 
     def _window_origin(self, hwnd: int) -> Tuple[int, int]:
         try:
@@ -644,6 +726,113 @@ class DesktopGrounding:
             except Exception:
                 pass
 
+    # ---- capture-restore-capture rung for MINIMIZED windows ----
+    def _await_paint(self, hwnd: int, timeout_s: float = 3.0) -> float:
+        """A window that was just un-minimized off-screen needs a moment before PrintWindow returns real
+        pixels (XAML / Chromium repaint lazily). Poll with a small growing delay, bounded; returns seconds."""
+        t0 = time.perf_counter()
+        delay = 0.15
+        while time.perf_counter() - t0 < timeout_s:
+            img, _why = hin.capture_window(hwnd)
+            if img is not None:
+                break
+            time.sleep(delay)
+            delay = min(delay * 1.5, 0.5)
+        return time.perf_counter() - t0
+
+    def _ground_offscreen(self, hwnd: int, report: Dict[str, Any], max_tier: int,
+                          target_text: str = "") -> Tuple[List[GroundedElement], bool]:
+        """Perception for a MINIMIZED window whose structure missed the target. The window is PARKED off-screen
+        (background_window: restored, never on a monitor, never activated), read, then re-minimized exactly as it
+        was. Never a visible restore.
+
+          1. UIA again, now that the window is laid out (a parked tree is far richer than a minimized one:
+             measured 22 -> 56+ controls for the same Notepad). If the target is there, stop - no pixels needed.
+          2. otherwise OCR, then vision, over the window's OWN pixels (PrintWindow).
+
+        Guards: a window the user can currently SEE that we did not launch is not touched - the rung refuses and
+        the report says to escalate. Everything measured goes into report['offscreen'].
+        Returns (elements, replace_structural)."""
+        from core_organs import background_window as bw
+        rep: Dict[str, Any] = {"used": False}
+        report["offscreen"] = rep
+        out: List[GroundedElement] = []
+        t_all = time.perf_counter()
+        if not bw.ENABLED:
+            rep["refused"] = "parking-disabled(HOJAIGA_PARK_MINIMIZED=0)"
+            report["tiers_skipped"] += ["ocr:offscreen-disabled", "vision:offscreen-disabled"]
+            return out, False
+        rep["ours"] = bw.is_ours(hwnd)
+        if not rep["ours"] and bw.user_can_see(hwnd):
+            rep.update(refused="user-can-see", escalate_to_human=True)
+            report["tiers_skipped"] += ["ocr:offscreen-refused(user-can-see)", "vision:offscreen-refused(user-can-see)"]
+            return out, False
+        replace = False
+        with bw.BackgroundSession(hwnd) as sess:
+            rep["mode"] = sess.mode
+            rep["park_ms"] = round((time.perf_counter() - t_all) * 1000, 1)
+            if sess.mode != "parked":
+                rep["refused"] = f"could not park ({sess.mode})"
+                report["tiers_skipped"] += [f"ocr:offscreen-{sess.mode}", f"vision:offscreen-{sess.mode}"]
+            else:
+                rep["used"] = True
+                rep["paint_wait_ms"] = round(self._await_paint(hwnd) * 1000, 1)
+                via: List[str] = []
+                resolved = False
+                if HAS_UIA:
+                    _t = time.perf_counter()
+                    parked = self._walk_uia(hwnd)
+                    for w in hin.popup_windows(hwnd)[:10]:
+                        parked.extend(self._walk_uia(w, max_depth=8, max_nodes=300))
+                    report["tier_ms"]["uia@offscreen"] = round((time.perf_counter() - _t) * 1000, 1)
+                    report["tiers_ran"].append("uia@offscreen")
+                    rep["uia_parked_elements"] = len(parked)
+                    if parked:
+                        out, replace = parked, True
+                    resolved = bool(target_text) and any(target_text.lower() in e.name.lower() for e in parked)
+                    if resolved:
+                        rep["resolved_by"] = "uia-parked"
+                        via.append("uia:offscreen-capture")
+                if not resolved:
+                    if HAS_PYTESSERACT and HAS_PIL:
+                        _t = time.perf_counter()
+                        ocr_els = self._walk_ocr(hwnd)
+                        report["tier_ms"]["ocr"] = round((time.perf_counter() - _t) * 1000, 1)
+                        if str(getattr(self, "_capture_note", "")).startswith("unpainted"):
+                            rep["content_painted"] = False
+                            rep["escalate_to_human"] = True
+                            report["tiers_skipped"] += ["ocr:offscreen-capture(content not painted: composited only while visible)",
+                                                        "vision:offscreen-capture(content not painted)"]
+                            max_tier = min(max_tier, 3)             # do not spend a 46 s vision parse on an empty frame
+                        else:
+                            out = out + ocr_els
+                            report["tiers_ran"].append("ocr")
+                            via.append("ocr:offscreen-capture")
+                    else:
+                        report["tiers_skipped"].append("ocr:engine-missing")
+                    if rep.get("content_painted") is False:
+                        pass                                        # already reported above
+                    elif max_tier >= 4 and HAS_TORCH:
+                        _t = time.perf_counter()
+                        vis = self._walk_vision(hwnd, report)
+                        report["tier_ms"]["vision"] = round((time.perf_counter() - _t) * 1000, 1)
+                        if getattr(self, "_vision_ran", False):
+                            report["tiers_ran"].append("vision")
+                            via.append("vision:offscreen-capture")
+                        else:
+                            report["tiers_skipped"].append("vision:offscreen-capture(not run: see vision:* reason)")
+                        out = out + vis
+                    elif max_tier >= 4:
+                        report["tiers_skipped"].append("vision:torch-missing")
+                    else:
+                        report["tiers_skipped"].append("vision:offscreen-capture(cap)")
+                rep["tiers_via"] = via
+        rep["round_trip_ms"] = round((time.perf_counter() - t_all) * 1000, 1)     # includes the verified re-minimize
+        rep["ended_minimized"] = hin.is_minimized(hwnd)
+        if rep["used"] and not rep["ended_minimized"]:
+            report["tiers_skipped"].append("offscreen:NOT-reminimized")           # loud: the window is somewhere it should not be
+        return out, replace
+
     # ---- public API ----
     def ground(self, app_hint: str, target_text: str = "",
                max_tier: int = 2) -> Tuple[Optional[int], List[GroundedElement], Dict[str, Any]]:
@@ -679,6 +868,9 @@ class DesktopGrounding:
             if extra:
                 report["popup_windows"] = len(extra)
         report["window_state"] = hin.window_state(hwnd).get("state")
+        lw = getattr(self, "last_walk", None)
+        if lw and lw.get("grid_cells_seen"):
+            report["grid"] = dict(lw)          # honest: how many grid cells exist vs how many were surfaced
 
         if not elements and max_tier >= 2:
             _t = time.perf_counter()
@@ -690,9 +882,19 @@ class DesktopGrounding:
         structural_miss = not any(target_text.lower() in e.name.lower() for e in elements)
 
         if need_target and structural_miss and report["window_state"] == "minimized":
-            # Windows does not render minimized windows: pixel tiers are impossible, say so.
+            # Windows does not render a minimized window, so a pixel tier cannot read it AS IT IS. It can read it
+            # off-screen: park it (restored, never on a monitor, never activated), capture, re-minimize exactly as
+            # it was. Only reached when UIA/Win32 already missed the target - an app grounded structurally never
+            # pays this round trip.
             report["escalated"] = True
-            report["tiers_skipped"] += ["ocr:window-minimized", "vision:window-minimized"]
+            if max_tier >= 3:
+                extra, replace = self._ground_offscreen(hwnd, report, max_tier, target_text)
+                if replace:
+                    elements = extra          # the parked window's own UIA tree supersedes the degraded minimized one
+                else:
+                    elements.extend(extra)
+            else:
+                report["tiers_skipped"] += ["ocr:window-minimized", "vision:window-minimized"]
         elif need_target and structural_miss:
             report["escalated"] = True
             if HAS_PYTESSERACT and HAS_PIL and max_tier >= 3:
@@ -748,14 +950,16 @@ class Snapshot:
     region_hash: str = ""
     region_thumb: bytes = b""
     region_source: str = ""
+    text: str = ""
+    names: List[str] = field(default_factory=list)   # EVERY UIA name (text/labels too); filled only when a postcondition asks
 
     def signature(self) -> str:
         return hashlib.md5(("|".join(sorted(self.element_ids)) + self.title).encode("utf-8")).hexdigest()
 
 
 class DesktopVerifier:
-    def snapshot(self, hwnd: int, elements: List[GroundedElement]) -> Snapshot:
-        snap = Snapshot(title=_quick_title(hwnd), element_ids=[e.id for e in elements])
+    def snapshot(self, hwnd: int, elements: List[GroundedElement], text: str = "") -> Snapshot:
+        snap = Snapshot(title=_quick_title(hwnd), element_ids=[e.id for e in elements], text=text)
         snap.region_hash, snap.region_thumb, snap.region_source = self._region_capture(hwnd)
         return snap
 
@@ -816,7 +1020,11 @@ class DesktopVerifier:
     def pixels_changed(before: Snapshot, after: Snapshot) -> Tuple[bool, str]:
         """Tolerance-based pixel delta -> (changed, evidence carrying the measured fraction)."""
         if not (before.region_hash and after.region_hash):
-            return False, "region pixel-delta unavailable(" + (before.region_source or "no-capture") + ")"
+            # Name the side that failed and why, so 'no pixel evidence' is never mistaken for
+            # 'pixels proved nothing changed' (a minimized window is not rendered by Windows).
+            missing = before if not before.region_hash else after
+            which = "before" if missing is before else "after"
+            return False, f"region pixel-delta unavailable({which}:{missing.region_source or 'no-capture'})"
         b, a = before.region_thumb, after.region_thumb
         if b and a and len(b) == len(a):
             moved = sum(1 for x, y in zip(b, a) if x != y)
@@ -832,10 +1040,16 @@ class DesktopVerifier:
                      after: Snapshot, elements_now: List[GroundedElement]) -> Tuple[bool, str]:
         """Evaluate a postcondition dict. Returns (ok, evidence)."""
         if not expect:
-            # Default postcondition: something about the UI changed.
+            # Default postcondition: something about the UI changed. Three independent signals: the structure of
+            # the actionable controls, the window's own pixels (tolerance-based), and the set of EVERY UIA name
+            # (read-outs and labels included - pressing an operator key on a keypad changes a text label and
+            # almost no pixels, which the first two cannot see). Still "something changed", still reported weak.
             pixel_changed, pixel_evidence = self.pixels_changed(before, after)
-            changed = before.signature() != after.signature() or pixel_changed
-            return changed, f"ui-{'changed' if changed else 'unchanged'}; {pixel_evidence}"
+            nb, na = set(before.names or ()), set(after.names or ())
+            names_changed = bool(nb and na and nb != na)
+            changed = before.signature() != after.signature() or pixel_changed or names_changed
+            name_note = f"; names +{len(na - nb)}/-{len(nb - na)}" if names_changed else ""
+            return changed, f"ui-{'changed' if changed else 'unchanged'}; {pixel_evidence}{name_note}"
 
         checks: List[Tuple[bool, str]] = []
         if "title_contains" in expect:
@@ -849,6 +1063,25 @@ class DesktopVerifier:
             want = str(expect["element_disappeared"]).lower()
             ok = not any(want in (e.name or "").lower() for e in elements_now)
             checks.append((ok, f"element '{want}' {'gone' if ok else 'still-present'}"))
+        if "text_contains" in expect:
+            want = str(expect["text_contains"])
+            hay = after.text or ""
+            # Compare WORDS, not line-break bytes: Notepad's RichEdit stores a typed "\n" as "\r" (and other editors as
+            # "\r\n"), so a multi-line haiku was reported MISSING right after it had been typed in, and the retry then
+            # typed it again (the document filled with duplicates).
+            _flat = lambda t: re.sub(r"\s+", " ", t).strip().lower()
+            ok = bool(want) and _flat(want) in _flat(hay)
+            checks.append((ok, f"text {'has' if ok else 'MISSING'} '{want[:24]}'"
+                          + ("" if hay else " (control text unreadable)")
+                          + f" [read {len(hay)} chars]"))
+        if "name_visible" in expect:
+            # Some control on screen (labels and read-outs included, not just actionable ones) carries this text.
+            # A number must match as a whole number: '56' is not satisfied by 'Display is 156'.
+            want = str(expect["name_visible"]).strip().lower()
+            pat = (re.compile(r"(?<![\d.,])" + re.escape(want) + r"(?![\d]|[.,]\d)")
+                   if re.fullmatch(r"-?[\d.,]+", want or "") else None)
+            ok = bool(want) and any((pat.search(n) if pat else want in n) for n in (after.names or []))
+            checks.append((ok, f"name '{want[:24]}' {'visible' if ok else 'NOT visible'} among {len(after.names or [])} UIA names"))
         if "file_created" in expect or "file_saved" in expect:
             target_path = expect.get("file_created") or expect.get("file_saved")
             p = os.path.abspath(str(target_path))
@@ -886,10 +1119,7 @@ def _quick_title(hwnd: int) -> str:
         return ""
     try:
         import ctypes.wintypes as wt
-        length = ctypes.windll.user32.GetWindowTextLengthW(hwnd)
-        buf = ctypes.create_unicode_buffer(length + 1)
-        ctypes.windll.user32.GetWindowTextW(hwnd, buf, length + 1)
-        return buf.value
+        return hin.safe_window_text(int(hwnd))
     except Exception:
         return ""
 
@@ -966,6 +1196,37 @@ class ConstrainedJudge:
     _DECISIVE_TEXT_MARGIN = 2.5
     _DECISIVE_PATH_MARGIN = 4.0
 
+    @classmethod
+    def _wants_text(cls, goal: str) -> bool:
+        return bool(re.search(r"\b(" + "|".join(cls._TYPE_WORDS) + r")\b", (goal or "").lower()))
+
+    _CLICK_ROLES = ("button", "menuitem", "tabitem", "listitem", "hyperlink", "checkbox", "radiobutton",
+                    "splitbutton", "dropdownbutton", "treeitem")
+    _PRESS_RE = re.compile(r"^(?:please\s+)?(?:press|click|tap|hit|select|choose|push|invoke|toggle|activate)"
+                           r"\s+(?:on\s+)?(?:the\s+)?[\"'“]?(.+?)[\"'”]?(?:\s+(?:button|key|control|tab|item))?\s*$", re.I)
+
+    @classmethod
+    def _norm_label(cls, s: str) -> str:
+        return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]", " ", (s or "").lower())).strip()
+
+    @classmethod
+    def _exact_named_target(cls, goal: str, scored: List[Tuple[float, int, "GroundedElement"]]):
+        """(score, index, element) of the clickable control whose whole name equals the object of a 'press X'
+        style goal, else None. Digits match their word form ('6' == 'Six'), the way Calculator-style UIs label keys."""
+        m = cls._PRESS_RE.match((goal or "").strip())
+        if not m:
+            return None
+        obj = cls._norm_label(m.group(1))
+        if not obj or len(obj.split()) > 4:
+            return None
+        try:
+            from core_organs.task_runner import _DIGIT_WORDS
+            obj = _DIGIT_WORDS.get(obj, obj)
+        except Exception:
+            pass
+        hits = [c for c in scored if c[2].role in cls._CLICK_ROLES and cls._norm_label(c[2].name) == obj]
+        return hits[0] if hits else None
+
     def _compose_text(self, goal: str) -> str:
         """Small LLM call used ONLY to author the text for a typing goal (the element was chosen
         deterministically). A quoted string in the goal wins without any LLM call."""
@@ -1000,6 +1261,13 @@ class ConstrainedJudge:
         if not scored:
             return None
         top = scored[0]
+        # The goal NAMES one control exactly ("press Six", "click 'Save'", "select the Settings tab") and exactly
+        # such a clickable control is on screen: that is a lookup, not a judgement. Skipping the 7B here removed
+        # every invalid-choice strike a correct, unambiguous goal could earn (it said "type Six" on a button).
+        exact = self._exact_named_target(goal, scored)
+        if exact is not None:
+            return {"choice": exact[1], "verb": "click", "text": "", "why": "decisive: goal names this control exactly",
+                    "element_index": exact[1], "element": exact[2].as_dict(), "decisive": True}
         # the same control is often exposed twice (hidden + popup copy): measure the margin against
         # the best candidate with a DIFFERENT name
         rival = next((c[0] for c in scored[1:] if (c[2].name or "").strip().lower()
@@ -1047,6 +1315,8 @@ class ConstrainedJudge:
             if pro_hint.get("kind") == "element":
                 label = pro_hint.get("menu_path") or pro_hint.get("element_name") or ""
                 hv = pro_hint.get("verb", "click")
+                if hv == "type" and not self._wants_text(goal):
+                    hv = "click"      # a hint must not tell the model to type when the goal never asked for text
                 hv = "key" if hv == "shortcut" else hv  # 'shortcut' is not a legal verb; 'key' is
                 key_note = ""  # posted keys do not reach every UI framework; never advertise them
                 hv = "click" if hv == "key" else hv
@@ -1092,7 +1362,14 @@ class ConstrainedJudge:
             idx = int(decision.get("choice", -1))
             verb = str(decision.get("verb", "")).lower().strip()
             if 0 <= idx < len(picks) and verb == "type" and picks[idx].role not in self._TEXT_ROLES:
-                return {"invalid": True, "raw": decision, "why": "type on a non-editable control"}
+                if self._wants_text(goal):
+                    return {"invalid": True, "raw": decision, "why": "type on a non-editable control"}
+                # The goal never asked for typing and the element is a plain control: the model picked the right
+                # control and the wrong verb (a low-trust 'distilled' hint said "type" and it echoed it). That is
+                # not a hallucinated choice and must not count toward the 3-strike human escalation; click it.
+                # The postcondition verifier still decides whether the click achieved anything.
+                decision["verb"] = verb = "click"
+                decision["coerced"] = "type->click: goal has no typing intent and the target is not editable"
             if idx < 0 or idx >= len(picks) or verb not in LEGAL_VERBS:
                 return {"invalid": True, "raw": decision}
             # element_index always refers to the ORIGINAL grounded list (callers index into it)
@@ -1117,6 +1394,23 @@ def _uia_act(elem: GroundedElement, verb: str, text: str):
             target = _find_control_by_identity(uroot, elem)
             if target is not None:
                 native = int(getattr(target, "NativeWindowHandle", 0) or 0)
+                if verb == "locate":
+                    # Resolution only: the caller posts characters to the real control hwnd, which
+                    # appends at the caret instead of replacing the value like SetValue does.
+                    return None, native
+                if verb == "read":
+                    # What the control actually holds right now. The structure hash and the coarse
+                    # pixel hash both miss typing: a short line into a document changes no element id
+                    # and can move well under 2% of the pixels.
+                    for getter, extractor in (("GetValuePattern", lambda p: p.Value),
+                                              ("GetTextPattern", lambda p: p.DocumentRange.GetText(-1))):
+                        try:
+                            pat = getattr(target, getter)()
+                            if pat:
+                                return True, str(extractor(pat) or "")
+                        except Exception:
+                            continue
+                    return None, native
                 if verb == "type":
                     for getter, setter in (("GetValuePattern", "SetValue"),
                                            ("GetLegacyIAccessiblePattern", "SetValue")):
@@ -1196,9 +1490,10 @@ def _root_of(hwnd: int) -> int:
 
 def _act_on_element(elem: GroundedElement, verb: str, text: str = "") -> Tuple[bool, str]:
     """Deliver one action to ``elem`` WITHOUT touching the physical pointer or keyboard and
-    without changing which window is in front. Ladder: UIA pattern -> window messages posted to
-    the exact HWND. When neither can deliver, returns (False, 'UNDELIVERABLE: <why>') - there is
-    deliberately no physical-input rung (product law)."""
+    without changing which window is in front. Ladder: window messages to the exact HWND for
+    typing (append at the caret), UIA pattern otherwise, then the other rung. When nothing can
+    deliver, returns (False, 'UNDELIVERABLE: <why>') - there is deliberately no physical-input
+    rung (product law)."""
     if verb == "wait":
         time.sleep(min(2.0, 0.8))
         return True, "waited"
@@ -1217,6 +1512,22 @@ def _act_on_element(elem: GroundedElement, verb: str, text: str = "") -> Tuple[b
     if verb == "invoke":
         verb = "click"  # invoke is the UIA-safe synonym handled by the click ladder
 
+    if verb == "type" and text:
+        # Typing is the one verb where the UIA pattern is wrong by default: ValuePattern.SetValue
+        # REPLACES the control's content, so the second 'type' goal of a multi-part entry silently
+        # deletes the first (a real unattended Notepad run wrote line 2 over line 1 and line 3 over
+        # line 2, each still 'verified' because the UI did change). Posting characters to the
+        # control's own hwnd appends at the caret instead, so it goes first; SetValue stays as the
+        # fallback for controls that ignore posted characters. Neither is trusted - the verifier
+        # judges the postcondition either way.
+        native = 0
+        if elem.tier == "uia" and HAS_UIA:
+            out = _uia_dispatch(elem, "locate", "")
+            native = out[1] if out else 0
+        ok, note = hin.post_text(native or elem.hwnd, text)
+        if ok:
+            return True, f"append:{note}"
+
     res, native = (None, 0)
     if elem.tier == "uia" and HAS_UIA:
         out = _uia_dispatch(elem, verb, text)
@@ -1227,6 +1538,17 @@ def _act_on_element(elem: GroundedElement, verb: str, text: str = "") -> Tuple[b
     # Window messages to the exact HWND (works while covered / partly off-screen).
     if verb == "click" and root:
         cx, cy = elem.center
+        if elem.tier in ("ocr", "vision") and hin.is_minimized(root):
+            # A pixel-found element has screen coordinates, which only mean something while the window is laid
+            # out. Deliver the click while it is parked off-screen (same rect the capture used), let the app
+            # handle the message, then it is re-minimized as it was. Never a visible restore.
+            from core_organs import background_window as bw
+            with bw.BackgroundSession(root) as sess:
+                if sess.mode == "parked":
+                    ok, note = hin.post_click(root, cx, cy)
+                    time.sleep(0.4)
+                    return ok, note + " [delivered while parked off-screen]"
+            return False, f"{hin.UNDELIVERABLE}: pixel-found element in a minimized window and it could not be parked ({sess.mode})"
         return hin.post_click(root, cx, cy)
     if verb == "type" and (native or elem.hwnd):
         ok, note = hin.post_text(native or elem.hwnd, text)
@@ -1360,6 +1682,11 @@ class DesktopAutonomyLoop:
         self._goal_fails: Dict[str, int] = {}
         self._shortcut_tried: set = set()
         self._dap = None
+        # Windows kept parked off-screen for the current run (hwnd -> BackgroundSession), apps WE started, run nesting
+        self._held: Dict[int, Any] = {}
+        self._launched_apps: set = set()
+        self._run_depth = 0
+        self._last_window_mode = "not-needed"
         # W8 app-intelligence organ (None => run on perception alone)
         self.intel = _get_intel()
 
@@ -1449,28 +1776,36 @@ class DesktopAutonomyLoop:
 
     # ---- native Open/Save dialog driver (organ_24 NativeFilePicker + UIA) ----
     def handle_native_file_dialog(self, path: str, confirm_words: Tuple[str, ...] =
-                                  ("save", "open", "ok")) -> Tuple[bool, str]:
-        """Runs on the dedicated, initialised UIA thread (same as every other UIA action)."""
+                                  ("save", "open", "ok"),
+                                  owner_hwnd: int = 0) -> Tuple[bool, str]:
+        """Runs on the dedicated, initialised UIA thread (same as every other UIA action).
+
+        ``owner_hwnd`` scopes the rung to the app being driven: a Save/Open picker belonging to
+        some other still-open app must never be filled in and confirmed."""
         global _UIA_EXEC
         if _UIA_EXEC is None:
             from concurrent.futures import ThreadPoolExecutor
             _UIA_EXEC = ThreadPoolExecutor(max_workers=1, thread_name_prefix="uia-act", initializer=_uia_thread_init)
         try:
-            return _UIA_EXEC.submit(self._handle_native_file_dialog_impl, path, confirm_words).result(timeout=25)
+            return _UIA_EXEC.submit(self._handle_native_file_dialog_impl, path, confirm_words,
+                                    owner_hwnd).result(timeout=25)
         except Exception as exc:
             return False, f"file-dialog worker failed: {type(exc).__name__}: {exc}"
 
     def _handle_native_file_dialog_impl(self, path: str, confirm_words: Tuple[str, ...] =
-                                  ("save", "open", "ok")) -> Tuple[bool, str]:
+                                  ("save", "open", "ok"), owner_hwnd: int = 0) -> Tuple[bool, str]:
         if not _IS_WINDOWS:
             return False, "non-windows"
+        want_proc = self.grounding._process_stem_cached(owner_hwnd) if owner_hwnd else ""
 
         # Try organ_24 NativeFilePicker when available
         try:
             dap = self.dap_core
             if dap and hasattr(dap, "file_picker") and dap.file_picker:
                 dlg = dap.file_picker.locate_dialog()
-                if dlg:
+                dlg_proc = (self.grounding._process_stem_cached(int(getattr(dlg, "hwnd", 0) or 0))
+                            if dlg is not None and want_proc else "")
+                if dlg and not (want_proc and dlg_proc != want_proc):
                     dap.file_picker.select_path(dlg, path)
                     dap.file_picker.confirm(dlg)
                     return True, f"organ_24 file-picker selected '{path}'"
@@ -1479,6 +1814,7 @@ class DesktopAutonomyLoop:
 
         user32 = ctypes.windll.user32
         target = None
+        foreign: List[str] = []
 
         @ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
         def _cb(hwnd, _l):
@@ -1488,11 +1824,20 @@ class DesktopAutonomyLoop:
             if cls_buf.value == "#32770" and user32.IsWindowVisible(hwnd):
                 t = _quick_title(hwnd).lower()
                 if any(w in t for w in ("save", "open", "export", "browse")):
+                    if want_proc:
+                        proc = self.grounding._process_stem_cached(hwnd)
+                        if proc != want_proc:
+                            # Somebody else's picker: never type a path into it, never click Save.
+                            foreign.append(f"'{_quick_title(hwnd)}'({proc or 'unknown-proc'})")
+                            return True
                     target = hwnd
             return True
 
         user32.EnumWindows(_cb, 0)
         if not target:
+            if foreign:
+                return False, (f"file-dialog belongs to another app, not the target "
+                               f"({', '.join(foreign[:3])}) -> not touched")
             return False, "no-file-dialog-visible"
         if HAS_UIA:
             import uiautomation as auto
@@ -1658,6 +2003,17 @@ class DesktopAutonomyLoop:
     def step(self, goal: str, app_hint: str, expect: Optional[Dict[str, Any]] = None,
              allow_destructive: bool = False, max_tier: int = 2) -> Dict[str, Any]:
         expect = expect or {}
+        self._run_depth += 1                       # a bare step() (no run()) releases what it parked when it returns
+        try:
+            return self._step_impl(goal, app_hint, expect, allow_destructive, max_tier)
+        finally:
+            self._run_depth -= 1
+            if self._run_depth == 0:
+                self._release_held()
+
+    def _step_impl(self, goal: str, app_hint: str, expect: Dict[str, Any],
+                   allow_destructive: bool, max_tier: int) -> Dict[str, Any]:
+        self._hold_hidden(app_hint)
         self._triage_popups(app_hint)
 
         hwnd, elements, ladder = self.grounding.ground(app_hint,
@@ -1684,18 +2040,20 @@ class DesktopAutonomyLoop:
             return self._step_result(entry, elements=[])
 
         before = self.verifier.snapshot(hwnd, elements)
+        if not expect:
+            before.names = self._all_names(hwnd)      # the default postcondition also compares every UIA name
 
         # ---- Native file dialog rung: a goal naming an absolute path + a visible
         # Save/Open dialog is resolved deterministically (type path, confirm), not by the LLM.
         path_m = re.search(r"[A-Za-z]:[\\/][^\s'<>|?*]+", goal or "")
         if path_m:
-            fd_ok, fd_note = self.handle_native_file_dialog(path_m.group(0))
+            fd_ok, fd_note = self.handle_native_file_dialog(path_m.group(0), owner_hwnd=hwnd)
             logger.info("[autonomy] file-dialog rung: ok=%s note=%s", fd_ok, fd_note)
             if fd_ok:
                 time.sleep(0.6)
                 after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
                 verdict, evidence = self.verifier.verdict(
-                    expect, before, self.verifier.snapshot(hwnd, after_elements), after_elements)
+                    expect, before, self._snap(hwnd, after_elements, expect), after_elements)
                 self._history.append(f"file-dialog {path_m.group(0)} -> {verdict}")
                 entry = StepTrace(goal, "file-dialog", "file-dialog", verdict, "native-file-dialog",
                                   f"{fd_note}; {evidence}", ladder["tiers_ran"])
@@ -1728,7 +2086,10 @@ class DesktopAutonomyLoop:
             time.sleep(0.8)  # let a dialog/menu open before verifying
             after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
             verdict, evidence = self.verifier.verdict(
-                expect, before, self.verifier.snapshot(hwnd, after_elements), after_elements)
+                expect, before, self._snap(hwnd, after_elements, expect), after_elements)
+            if verdict != "PASS" and hin.is_xaml_host(_root_of(hwnd)):
+                evidence += " [XAML/WinUI host: posted keys are not delivered to XAML input - the shortcut cannot work headless; use the element route]"
+                method += "+xaml-ignores-posted-keys"
             self._reinforce(app_hint, goal, pro, verdict)
             self._goal_fails[goal] = 0 if verdict == "PASS" else self._goal_fails.get(goal, 0) + 1
             self._history.append(f"shortcut {pro['shortcut']} -> {verdict}")
@@ -1759,6 +2120,13 @@ class DesktopAutonomyLoop:
         elem = elements[decision["element_index"]]
         verb = decision["verb"]
         text = str(decision.get("text", ""))
+        if verb == "type" and text and "text_contains" not in expect:
+            # A typed payload is verified by CONTENT, not by a hash: the text the judge actually
+            # delivered becomes the postcondition, so a keystroke that landed cannot be called
+            # NO_CHANGE (which used to make the ladder type it again) and text that went into the
+            # wrong control cannot be called PASS (a path once went into 'Save as type:' and still
+            # 'verified' because the dialog's pixels moved).
+            expect = dict(expect, text_contains=text)
 
         if verb == "done":
             entry = StepTrace(goal, elem.name, "done", "PASS", "judge", "declared-done",
@@ -1786,13 +2154,28 @@ class DesktopAutonomyLoop:
                 pass
 
         ok, method = _act_on_element(elem, verb, text)
+        if not ok:
+            # Delivery itself failed, so nothing that the UI does afterwards may be read as success.
+            # A real run once "PASSed" a type whose window had already gone (UNDELIVERABLE), because
+            # an unrelated structure change satisfied the default postcondition. Force NO_CHANGE and
+            # re-ground on the next attempt; the retry ladder below is skipped on purpose, since
+            # re-delivering into a control that refused the first time is how text got duplicated.
+            self._goal_fails[goal] = self._goal_fails.get(goal, 0) + 1
+            self._history.append(f"{verb} '{elem.name}' undeliverable")
+            entry = StepTrace(goal, elem.name, verb, "NO_CHANGE", method,
+                              "action not delivered -> never a PASS regardless of UI diff",
+                              ladder["tiers_ran"])
+            self.trace.append(entry)
+            self._write_checkpoint(entry)
+            self.capsule_cb("working", f"[{app_hint}] not delivered: {method[:44]}")
+            return self._step_result(entry, elements=elements)
         if ok and verb in ("click", "invoke", "key", "shortcut"):
             self._settle(hwnd)
 
         # Verification step
         after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
         verdict, evidence = self.verifier.verdict(expect, before,
-                                                  self.verifier.snapshot(hwnd, after_elements),
+                                                  self._snap(hwnd, after_elements, expect),
                                                   after_elements)
 
         # NO_CHANGE retry ladder through organ_24 RecoveryEngine sequence:
@@ -1802,7 +2185,7 @@ class DesktopAutonomyLoop:
             time.sleep(0.3)
             _act_on_element(elem, "invoke" if verb == "click" else verb, text)
             after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
-            after_re = self.verifier.snapshot(hwnd, after_elements)
+            after_re = self._snap(hwnd, after_elements, expect)
             verdict, evidence = self.verifier.verdict(expect, before, after_re, after_elements)
             method += "+retry-invoke"
 
@@ -1811,7 +2194,7 @@ class DesktopAutonomyLoop:
                 _postmessage_action(elem, verb, text)
                 time.sleep(0.2)
                 after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
-                after_pm = self.verifier.snapshot(hwnd, after_elements)
+                after_pm = self._snap(hwnd, after_elements, expect)
                 verdict, evidence = self.verifier.verdict(expect, before, after_pm, after_elements)
                 method += "+retry-postmessage"
 
@@ -1821,9 +2204,16 @@ class DesktopAutonomyLoop:
                 hin.post_click(_root_of(elem.hwnd or hwnd), cx, cy)
                 time.sleep(0.25)
                 after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
-                after2 = self.verifier.snapshot(hwnd, after_elements)
+                after2 = self._snap(hwnd, after_elements, expect)
                 verdict, evidence = self.verifier.verdict(expect, before, after2, after_elements)
                 method += "+retry-postclick"
+
+        # A posted KEY into a XAML/WinUI host is not delivered by that UI stack: say so (and keep the verdict honest)
+        # instead of letting it look like an unexplained NO_CHANGE.
+        if verb in ("key", "shortcut") and verdict != "PASS" and hin.is_xaml_host(_root_of(hwnd)):
+            evidence += " [XAML/WinUI host: posted keys are not delivered to XAML input - use a UIA-invokable element instead]"
+            method += "+xaml-ignores-posted-keys"
+            self._history.append(f"{verb} ignored by a XAML host")
 
         # On WRONG_STATE, triage popups first to dismiss unexpected roadblocks, then re-check
         if verdict == "WRONG_STATE":
@@ -1832,7 +2222,7 @@ class DesktopAutonomyLoop:
                 evidence += " | cleared: " + "; ".join(popup_notes)
                 time.sleep(0.2)
                 after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
-                after_pop = self.verifier.snapshot(hwnd, after_elements)
+                after_pop = self._snap(hwnd, after_elements, expect)
                 verdict, evidence = self.verifier.verdict(expect, before, after_pop, after_elements)
 
         if verdict == "PASS":
@@ -1854,6 +2244,46 @@ class DesktopAutonomyLoop:
         self.trace.append(entry)
         self._write_checkpoint(entry)
         return self._step_result(entry, elements=after_elements)
+
+    def _control_text(self, elements: List[GroundedElement]) -> str:
+        """Longest readable text among the editable controls (UIA value/text pattern)."""
+        best = ""
+        checked = 0
+        for e in elements:
+            if (e.role or "").lower() not in ("edit", "document", "text", "richedit", "combobox"):
+                continue
+            if e.tier != "uia" or checked >= 6:
+                continue
+            checked += 1
+            out = _uia_dispatch(e, "read", "")
+            got = out[1] if out and out[0] is True else ""
+            if isinstance(got, str) and len(got) > len(best):
+                best = got
+            if len(best) >= 4000:
+                break
+        return best[:8000]
+
+    def _snap(self, hwnd: int, elements: List[GroundedElement],
+              expect: Optional[Dict[str, Any]] = None) -> Snapshot:
+        """Snapshot, reading control text only when a postcondition actually asks for it (the UIA
+        value read costs a round trip per editable control)."""
+        want_text = bool((expect or {}).get("text_contains"))
+        snap = self.verifier.snapshot(hwnd, elements,
+                                      text=self._control_text(elements) if want_text else "")
+        if (expect or {}).get("name_visible") or not expect:
+            snap.names = self._all_names(hwnd)
+        return snap
+
+    def _all_names(self, hwnd: int) -> List[str]:
+        """Lower-cased name of EVERY UIA node of the window and its popups (one bulk CacheRequest snapshot)."""
+        names: List[str] = []
+        try:
+            from core_organs import fast_uia
+            for w in [hwnd] + hin.popup_windows(hwnd)[:6]:
+                names += [(n.name or "").lower() for n in (fast_uia.snapshot(w, timeout_ms=3000) or []) if n.name]
+        except Exception as exc:
+            logger.debug("[verify] name read failed: %s", exc)
+        return names
 
     def _settle(self, hwnd: int, timeout_s: float = 1.6, interval_s: float = 0.22) -> int:
         """Wait (bounded) until the app's element tree - popups/menus/dialogs included - stops
@@ -1902,31 +2332,123 @@ class DesktopAutonomyLoop:
             self._wait_for_ready(app_hint)
         return cp
 
+    def _hold_hidden(self, app_hint: str) -> Optional[int]:
+        """Find the app's window and, when it is MINIMIZED, keep it parked off-screen (laid out, never on a monitor,
+        focus untouched) until this run ends. A window of an app WE started that has just appeared on the user's
+        screen (the splash -> main-frame handoff) is minimized first. A window the user is looking at, and any
+        window of an app we did not start, is left exactly where it is."""
+        hwnd = self.grounding.find_window(app_hint)
+        if not hwnd:
+            return None
+        if hwnd in self._held:
+            return hwnd
+        from core_organs import background_window as bw
+        ours = bw.is_ours(hwnd) or (app_hint or "").lower() in self._launched_apps
+        if ours:
+            bw.mark_ours(hwnd)
+            if not hin.is_minimized(hwnd) and hin.is_alive(hwnd) and bw.user_can_see(hwnd):
+                ctypes.windll.user32.ShowWindow(hwnd, 7)            # SW_SHOWMINNOACTIVE: put it away, take no focus
+                time.sleep(0.12)
+        if hin.is_minimized(hwnd):
+            sess = bw.BackgroundSession(hwnd)
+            sess.__enter__()
+            self._last_window_mode = sess.mode or "failed"
+            if sess.mode == "parked":
+                self._held[hwnd] = sess
+                logger.info("[autonomy] %s hwnd=%s held parked off-screen", app_hint, hwnd)
+            else:
+                sess.__exit__(None, None, None)
+        return hwnd
+
+    def _release_held(self) -> None:
+        for hwnd, sess in list(self._held.items()):
+            try:
+                sess.__exit__(None, None, None)
+            except Exception:
+                pass
+        self._held.clear()
+        # "apps we started" is PER-RUN state: the loop is a process-wide singleton, and a window the USER opens later
+        # under the same app name must never be treated as ours (minimized / parked). Windows we created stay known
+        # precisely, by handle, through background_window.is_ours().
+        self._launched_apps.clear()
+
+    def _tame_family(self, app_hint: str) -> None:
+        """Cheap sweep during an extended startup wait: any visible window of an app WE started goes straight back
+        to minimized (a splash chain keeps creating new top-levels)."""
+        if (app_hint or "").lower() not in self._launched_apps:
+            return
+        try:
+            from core_organs import background_window as bw
+            for h in self.grounding.find_window(app_hint, all_candidates=True):
+                if hin.is_alive(h) and not hin.is_minimized(h) and h not in self._held and bw.user_can_see(h):
+                    ctypes.windll.user32.ShowWindow(h, 7)
+                    bw.mark_ours(h)
+        except Exception:
+            pass
+
     def _wait_for_ready(self, app_hint: str, target_text: str = "",
                         max_tier: int = 2) -> Tuple[Optional[int], List[GroundedElement], Dict[str, Any]]:
-        """Readiness backoff poll: bring up the target and wait (bounded, growing
-        waits) until it exposes a live control tree. Prevents 'still booting' from
-        being misread as an empty/wrong state on heavy apps."""
-        deadline = time.time() + READY_TIMEOUT_S
+        """Readiness poll: bring up the target and wait (bounded, growing waits) until it exposes a live control
+        tree. Prevents 'still booting' from being misread as an empty/wrong state on heavy apps.
+
+        The deadline is READY_TIMEOUT_S for an app that shows no sign of starting; while its window set changes or
+        its processes keep working the deadline slides out by READY_GRACE_S, never beyond READY_HARD_CAP_S. A tiny
+        window is not 'ready' until it has stayed the same for a poll (a splash vanishes; a real UI does not)."""
+        t0 = time.time()
+        deadline = t0 + READY_TIMEOUT_S
+        hard = t0 + READY_HARD_CAP_S
         delay = READY_BACKOFF_S
         hwnd, elements, report = None, [], {}
+        last_sig, last_cpu, stable, extended = None, 0.0, 0, 0.0
         while True:
+            self._hold_hidden(app_hint)
             hwnd, elements, report = self.grounding.ground(
                 app_hint, target_text=target_text, max_tier=max_tier)
-            if hwnd and elements:
+            if hwnd and len(elements) >= READY_RICH_ELEMENTS:
+                break                                  # a real UI is up: skip the (slower) startup-activity probe
+            sig, cpu = self.grounding.family_activity(app_hint)
+            progressing = (last_sig is not None and sig != last_sig) or (last_sig is not None and cpu - last_cpu > 0.15)
+            if progressing and time.time() < hard:
+                new_deadline = min(hard, time.time() + READY_GRACE_S)
+                if new_deadline > deadline:
+                    extended += new_deadline - deadline
+                    deadline = new_deadline
+            stable = 0 if (last_sig is not None and sig != last_sig) else stable + 1
+            last_sig, last_cpu = sig, cpu
+            if hwnd and elements and stable >= 1:
                 break
             if time.time() >= deadline:
                 break
             self.capsule_cb("working", f"Waiting for {app_hint} to be ready")
-            time.sleep(delay)
+            end = time.time() + delay
+            while time.time() < end:                 # sleep in slices so a new splash-chain window is put away fast
+                time.sleep(0.1)
+                self._tame_family(app_hint)
             delay = min(delay * 1.6, READY_BACKOFF_MAX_S)
+        report = dict(report or {})
+        report["ready_wait_s"] = round(time.time() - t0, 2)
+        if extended:
+            report["ready_deadline_extended_s"] = round(extended, 1)
         return hwnd, elements, report
 
     def run(self, goals: List[str], app_hint: str, max_steps_per_goal: int = 4,
             allow_destructive: bool = False,
-            expect_map: Optional[Dict[int, Dict[str, Any]]] = None) -> Dict[str, Any]:
+            expect_map: Optional[Dict[int, Dict[str, Any]]] = None,
+            max_tier: int = 2) -> Dict[str, Any]:
         """Execute ordered micro-goals. Each goal gets up to max_steps_per_goal
-        closed-loop attempts; a PASS or declared-done advances to the next goal."""
+        closed-loop attempts; a PASS or declared-done advances to the next goal. A minimized target is held parked
+        off-screen for the whole run and put back as it was when the run ends."""
+        self._run_depth += 1
+        try:
+            return self._run_impl(goals, app_hint, max_steps_per_goal, allow_destructive, expect_map, max_tier)
+        finally:
+            self._run_depth -= 1
+            if self._run_depth == 0:
+                self._release_held()
+
+    def _run_impl(self, goals: List[str], app_hint: str, max_steps_per_goal: int,
+                  allow_destructive: bool,
+                  expect_map: Optional[Dict[int, Dict[str, Any]]], max_tier: int) -> Dict[str, Any]:
         expect_map = expect_map or {}
         # The loop object is a process-wide singleton: per-RUN state must not leak from the previous run
         # (stale 'already tried' history made the judge avoid exactly the steps that had worked).
@@ -1964,7 +2486,7 @@ class DesktopAutonomyLoop:
             self.grounding.reset_vision_budget()
             for _ in range(max_steps_per_goal):
                 res = self.step(goal, app_hint, expect=expect_map.get(gi),
-                                allow_destructive=allow_destructive)
+                                allow_destructive=allow_destructive, max_tier=max_tier)
                 results.append(res)
                 if res["verdict"] == "PASS" or self.awaiting_human:
                     advanced = True
@@ -2093,19 +2615,17 @@ def operate_app(app_name: str, goals, allow_destructive: bool = False,
     loop = get_loop(capsule_cb=capsule_cb, cursor_cb=cursor_cb)
     loop.trace = []  # one trace per operate_app call (the loop is a shared singleton)
     loop.awaiting_human = False
-    launched = False
-    try:
-        if not loop.grounding.find_window(app_name):
-            if capsule_cb:
-                capsule_cb("working", f"Launching {app_name}")
-            from core_organs.organ_40_app_launcher import resolve_and_launch
-            resolve_and_launch(app_name)
-            launched = True
-            time.sleep(1.5)
-    except Exception as exc:
-        logger.debug("[operate_app] auto-launch note: %s", exc)
+    launched = _launch_if_missing(loop, app_name, capsule_cb)
+    if launched:
+        loop._launched_apps.add((app_name or "").lower())
+    # No fixed sleep after the launch: run() starts with _wait_for_ready (bounded, growing waits, polling the live
+    # control tree), which is what a slow starter (Steam's splash chain, Office, packaged apps) actually needs.
+    # A minimized window is held parked off-screen by the loop for the whole run (laid out, never on a monitor,
+    # focus untouched) and put back exactly as it was; a window the user can see is left exactly where it is.
+    loop._last_window_mode = "not-needed"
     result = loop.run(goal_list, app_name, max_steps_per_goal=max_steps_per_goal,
                       allow_destructive=allow_destructive, expect_map=expect_map)
+    result["window_mode"] = loop._last_window_mode
     try:
         if result.get("completed"):
             ok, note = loop.distill_recipe(" / ".join(goal_list), app_name)
@@ -2113,9 +2633,79 @@ def operate_app(app_name: str, goals, allow_destructive: bool = False,
             result["recipe_ingested"] = bool(ok)
     except Exception:
         pass
-    result.update(goals=goal_list, launched=launched,
+    hwnd = loop.grounding.find_window(app_name) or 0
+    if launched and hwnd:
+        _mark_ours(hwnd)
+    result.update(goals=goal_list, launched=launched, hwnd=hwnd,
+                  window_title=loop.grounding.window_title(hwnd) if hwnd else "",
                   elapsed_s=round(time.perf_counter() - t0, 2))
     return result
+
+
+def _mark_ours(hwnd: int) -> None:
+    try:
+        from core_organs import background_window as bw
+        bw.mark_ours(hwnd)
+    except Exception:
+        pass
+
+
+def _launch_if_missing(loop: "DesktopAutonomyLoop", app_name: str, capsule_cb=None) -> bool:
+    """Start the app only when no window for it exists (single instance, never a second copy).
+
+    Launched MINIMIZED and unfocused (universal_scan.launch_hidden: every new window is minimized the instant it
+    appears) so a task never pops a window onto the user's screen. Only an app the Start menu does not know falls
+    back to the organ_40 resolver (aliases / catalog / crawl)."""
+    try:
+        if loop.grounding.find_window(app_name):
+            return False
+        if capsule_cb:
+            capsule_cb("working", f"Launching {app_name}")
+        try:
+            from core_organs import universal_scan as us
+            info = us.launch_hidden(app_name, timeout_s=30.0)
+            if info.get("hwnd"):
+                return True
+            if not any("not in the Start menu" in n for n in info.get("notes", [])):
+                return True          # it was started but showed no window yet: poll for it, never start a second copy
+        except Exception as exc:
+            logger.debug("[operate_app] hidden launch unavailable: %s", exc)
+        from core_organs.organ_40_app_launcher import resolve_and_launch
+        resolve_and_launch(app_name)
+        return True
+    except Exception as exc:
+        logger.debug("[operate_app] auto-launch note: %s", exc)
+        return False
+
+
+def prepare_app(app_name: str, capsule_cb=None, cursor_cb=None) -> Dict[str, Any]:
+    """Bring an app to a usable state WITHOUT choosing or performing any UI action: launch if missing, clear stale
+    dialogs, then wait (bounded, backoff) for a live control tree. Used for a command that only says 'open X'."""
+    t0 = time.perf_counter()
+    loop = get_loop(capsule_cb=capsule_cb, cursor_cb=cursor_cb)
+    loop.awaiting_human = False
+    launched = _launch_if_missing(loop, app_name, capsule_cb)
+    if launched:
+        loop._launched_apps.add((app_name or "").lower())
+    loop._run_depth += 1
+    try:
+        try:
+            loop._triage_popups(app_name, mode="preflight")
+        except Exception as exc:
+            logger.debug("[prepare_app] preflight note: %s", exc)
+        hwnd, elements, report = loop._wait_for_ready(app_name)
+    finally:
+        loop._run_depth -= 1
+        if loop._run_depth == 0:
+            loop._release_held()
+    if launched and hwnd:
+        _mark_ours(hwnd)
+    ready = bool(hwnd and elements) and not loop.awaiting_human
+    return {"ready": ready, "hwnd": hwnd or 0, "launched": launched, "elements": len(elements or []),
+            "window_title": loop.grounding.window_title(hwnd) if hwnd else "",
+            "awaiting_human": loop.awaiting_human,
+            "ready_reason": "" if ready else (report or {}).get("reason", "no-controls-within-ready-window"),
+            "elapsed_s": round(time.perf_counter() - t0, 2)}
 
 
 def get_loop(capsule_cb=None, cursor_cb=None) -> DesktopAutonomyLoop:
