@@ -9,7 +9,7 @@ sys.path.insert(0, r"D:\new_automation\All codes")
 sys.path.insert(0, r"D:\new_automation")
 
 
-def verify(truth: dict, app: str) -> tuple:
+def verify(truth: dict, app: str, hwnd0=None) -> tuple:
     if "file_has" in truth:
         path, text = truth["file_has"]
         end = time.time() + 4
@@ -29,7 +29,7 @@ def verify(truth: dict, app: str) -> tuple:
     # UI-state truths: read the live window (parked so nothing is shown or focused)
     from core_organs import universal_scan as us, fast_uia, background_window as bw
     from core_organs import desktop_grounding as dg
-    hwnd = dg.DesktopGrounding().find_window(app) or 0
+    hwnd = hwnd0 or dg.DesktopGrounding().find_window(app) or 0
     if not hwnd:
         return False, "app window not found"
     with bw.BackgroundSession(hwnd):
@@ -51,7 +51,15 @@ def main():
     t0 = time.time()
     out = {"entry": entry}
     try:
-        if "|" in task:                                    # "template task|path|text": the template runner path
+        if entry == "run_task" and "|" not in task:        # the new honest runner
+            from core_organs.task_runner import run_task
+            file_truth = "file_has" in truth or "png" in truth
+            r = run_task(task, app, close_when_done=file_truth)    # UI-state truths need the window alive to be checked
+            out.update(hwnd=r.get("hwnd"), claimed_done=(r["status"] == "DONE"), status=r["status"], steps=len(r.get("steps", [])),
+                       window=r.get("window"), window_mode=r.get("window_mode"), closed=r.get("closed"),
+                       blocked_at=r.get("blocked_at"), reason=r.get("reason"), seconds_run=r.get("elapsed_s"),
+                       step_detail=[(x["step"][:24], x["verdict"], x["attempts"], x["latency_s"], x["evidence"][:60]) for x in r.get("steps", [])])
+        elif "|" in task:                                  # "template task|path|text": the template runner path
             from core_organs import organ_48_app_behavior_model as bm
             ttask, path, text = task.split("|")
             m = bm.get_model()
@@ -69,7 +77,13 @@ def main():
     except Exception as exc:
         import traceback
         out.update(error=f"{type(exc).__name__}: {str(exc)[:160]}", trace=traceback.format_exc()[-500:], claimed_done=False)
-    ok, why = verify(truth, app)
+    ok, why = verify(truth, app, out.get("hwnd"))
+    if out.get("hwnd") and not ("file_has" in truth or "png" in truth):
+        try:
+            from core_organs import universal_scan as _us
+            out["closed"] = _us.close_window(out["hwnd"], discard_unsaved=True)
+        except Exception:
+            pass
     out.update(truth_ok=ok, truth_detail=why, total_s=round(time.time() - t0, 1))
     print("TASK_JSON " + json.dumps(out, default=str))
 

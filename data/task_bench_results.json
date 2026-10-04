@@ -1,108 +1,225 @@
 [
  {
-  "entry": "auto",
+  "entry": "run_task",
+  "hwnd": 13961324,
   "claimed_done": true,
+  "status": "DONE",
   "steps": 3,
-  "launched": true,
-  "awaiting_human": false,
-  "blocked_at_goal": null,
-  "seconds_run": 55.3,
-  "trace_tail": [
-   [
-    "type hello world",
-    "NO_CHANGE",
-    "-"
-   ],
+  "window": "fresh hidden instance",
+  "window_mode": "parked",
+  "closed": true,
+  "blocked_at": null,
+  "reason": null,
+  "seconds_run": 23.19,
+  "step_detail": [
    [
     "type hello world",
     "PASS",
-    "Text editor"
+    1,
+    2.48,
+    "OK value-text 'hello world' found in 1 control value(s)"
    ],
    [
-    "save the file as C:\\Users\\dhru",
+    "open the save dialog",
     "PASS",
-    "File"
+    1,
+    4.26,
+    "OK new window(s): ['save as']"
+   ],
+   [
+    "save as C:\\Users\\dhruv\\A",
+    "PASS",
+    1,
+    7.37,
+    "OK file hj_task_4e27f4.txt exists"
+   ]
+  ],
+  "truth_ok": true,
+  "truth_detail": "file exists, 11 chars",
+  "total_s": 23.9,
+  "name": "notepad-write-save",
+  "app": "Notepad",
+  "task": "type hello world; save the file as C:\\Users\\dhruv\\AppData\\Local\\Temp\\hj_task_4e27f4.txt",
+  "wall_s": 24.4
+ },
+ {
+  "entry": "run_task",
+  "hwnd": 14550596,
+  "claimed_done": true,
+  "status": "DONE",
+  "steps": 6,
+  "window": "fresh hidden instance",
+  "window_mode": "parked",
+  "closed": true,
+  "blocked_at": null,
+  "reason": null,
+  "seconds_run": 14.92,
+  "step_detail": [
+   [
+    "press 2",
+    "PASS",
+    1,
+    1.62,
+    "OK UIA tree/title/windows changed"
+   ],
+   [
+    "press 5",
+    "PASS",
+    1,
+    1.56,
+    "OK UIA tree/title/windows changed"
+   ],
+   [
+    "press multiply",
+    "PASS",
+    1,
+    1.58,
+    "OK UIA tree/title/windows changed"
+   ],
+   [
+    "press 4",
+    "PASS",
+    1,
+    1.56,
+    "OK UIA tree/title/windows changed"
+   ],
+   [
+    "press equals",
+    "PASS",
+    1,
+    1.58,
+    "OK UIA tree/title/windows changed"
+   ],
+   [
+    "expect Display is 100",
+    "PASS",
+    1,
+    0.63,
+    "OK element '100' present"
+   ]
+  ],
+  "truth_ok": true,
+  "truth_detail": "display reads ['Display is 100']",
+  "total_s": 17.7,
+  "name": "calculator-25x4",
+  "app": "Calculator",
+  "task": "press 2; press 5; press multiply; press 4; press equals; expect Display is 100",
+  "wall_s": 18.0
+ },
+ {
+  "entry": "run_task",
+  "hwnd": 10421992,
+  "claimed_done": true,
+  "status": "DONE",
+  "steps": 2,
+  "window": "fresh hidden instance",
+  "window_mode": "parked",
+  "closed": true,
+  "blocked_at": null,
+  "reason": null,
+  "seconds_run": 38.86,
+  "step_detail": [
+   [
+    "open the save dialog",
+    "PASS",
+    1,
+    16.45,
+    "OK new window(s): ['save as']"
+   ],
+   [
+    "save as C:\\Users\\dhruv\\A",
+    "PASS",
+    1,
+    14.47,
+    "OK file hj_task_face10.png exists"
+   ]
+  ],
+  "truth_ok": true,
+  "truth_detail": "png header ok",
+  "total_s": 39.5,
+  "name": "paint-save-png",
+  "app": "Paint",
+  "task": "save the image as C:\\Users\\dhruv\\AppData\\Local\\Temp\\hj_task_face10.png",
+  "wall_s": 39.9
+ },
+ {
+  "entry": "run_task",
+  "hwnd": 13634444,
+  "claimed_done": true,
+  "status": "DONE",
+  "steps": 2,
+  "window": "fresh hidden instance",
+  "window_mode": "parked",
+  "closed": true,
+  "blocked_at": null,
+  "reason": null,
+  "seconds_run": 11.52,
+  "step_detail": [
+   [
+    "open the Bluetooth & dev",
+    "PASS",
+    1,
+    3.3,
+    "OK UIA tree/title/windows changed"
+   ],
+   [
+    "expect Add device",
+    "PASS",
+    1,
+    1.03,
+    "OK element 'add device' present"
+   ]
+  ],
+  "truth_ok": true,
+  "truth_detail": "69 names read; match=True",
+  "total_s": 14.4,
+  "name": "settings-bluetooth",
+  "app": "Settings",
+  "task": "open the Bluetooth & devices page; expect Add device",
+  "wall_s": 14.7
+ },
+ {
+  "entry": "run_task",
+  "claimed_done": false,
+  "steps": 4,
+  "matched": true,
+  "blocked_at": "verify_content",
+  "seconds_run": 51.66,
+  "truth_ok": false,
+  "truth_detail": "file exists, 179 chars",
+  "total_s": 53.7,
+  "name": "notepad-template",
+  "app": "Notepad",
+  "task": "write text and save as file|C:\\Users\\dhruv\\AppData\\Local\\Temp\\hj_task_6b8fa7.txt|templated text",
+  "wall_s": 54.2
+ },
+ {
+  "entry": "run_task",
+  "hwnd": 6490406,
+  "claimed_done": true,
+  "status": "DONE",
+  "steps": 1,
+  "window": "fresh hidden instance",
+  "window_mode": "parked",
+  "closed": false,
+  "blocked_at": null,
+  "reason": null,
+  "seconds_run": 14.57,
+  "step_detail": [
+   [
+    "type just a note",
+    "PASS",
+    1,
+    1.84,
+    "OK value-text 'just a note' found in 1 control value(s)"
    ]
   ],
   "truth_ok": false,
   "truth_detail": "file missing (FileNotFoundError)",
-  "total_s": 60.4,
-  "name": "notepad-write-save",
+  "total_s": 19.5,
+  "name": "notepad-unverifiable",
   "app": "Notepad",
-  "task": "type hello world; save the file as C:\\Users\\dhruv\\AppData\\Local\\Temp\\hj_task_626995.txt",
-  "wall_s": 63.0
- },
- {
-  "entry": "auto",
-  "claimed_done": false,
-  "steps": 3,
-  "launched": true,
-  "awaiting_human": true,
-  "blocked_at_goal": null,
-  "seconds_run": 18.97,
-  "trace_tail": [
-   [
-    "press 2",
-    "NO_CHANGE",
-    "-"
-   ],
-   [
-    "press 2",
-    "NO_CHANGE",
-    "-"
-   ],
-   [
-    "press 2",
-    "HITL",
-    "-"
-   ]
-  ],
-  "truth_ok": false,
-  "truth_detail": "display reads ['Display is 0']",
-  "total_s": 21.6,
-  "name": "calculator-25x4",
-  "app": "Calculator",
-  "task": "press 2; press 5; press multiply; press 4; press equals",
-  "wall_s": 24.3
- },
- {
-  "entry": "auto",
-  "claimed_done": true,
-  "steps": 1,
-  "launched": true,
-  "awaiting_human": false,
-  "blocked_at_goal": null,
-  "seconds_run": 39.63,
-  "trace_tail": [
-   [
-    "save the image as C:\\Users\\dhr",
-    "PASS",
-    "File"
-   ]
-  ],
-  "truth_ok": false,
-  "truth_detail": "png missing (FileNotFoundError)",
-  "total_s": 40.8,
-  "name": "paint-save-png",
-  "app": "Paint",
-  "task": "save the image as C:\\Users\\dhruv\\AppData\\Local\\Temp\\hj_task_7f7bef.png",
-  "wall_s": 43.4
- },
- {
-  "entry": "auto",
-  "claimed_done": false,
-  "steps": 0,
-  "launched": true,
-  "awaiting_human": true,
-  "blocked_at_goal": 0,
-  "seconds_run": 15.34,
-  "trace_tail": [],
-  "truth_ok": false,
-  "truth_detail": "app window not found",
-  "total_s": 16.1,
-  "name": "settings-bluetooth",
-  "app": "Settings",
-  "task": "open the Bluetooth & devices page",
-  "wall_s": 18.4
+  "task": "type just a note",
+  "wall_s": 19.9
  }
 ]

@@ -175,6 +175,7 @@ def launch_hidden(name: str, timeout_s: float = 45.0) -> Dict[str, Any]:
     hwnd, now = 0, {}
     first_seen: Dict[int, float] = {}
     chosen_since, chosen = 0.0, 0
+    dialog_seen: List[str] = []
     from core_organs import desktop_grounding as dg
     g = dg.DesktopGrounding()
     while time.time() - t0 < timeout_s:
@@ -187,8 +188,16 @@ def launch_hidden(name: str, timeout_s: float = 45.0) -> Dict[str, Any]:
         # Candidates must have PROVEN stable: still alive, titled, real size, and older than 1.5 s.
         # Splash screens (Office, Visual Studio, Electron) appear for a moment and are destroyed; locking
         # onto one made every later UIA call throw COMError.
+        # A single-instance app already running (e.g. OBS) pops an "already running" MESSAGE BOX when we
+        # launch it. Scanning that dialog returned a nonsense "8 controls" map of a popup, so reject any
+        # window whose title says it is an error/second-instance notice — we must not measure it as the app.
         def _ok(h: int) -> bool:
             if not (_u32.IsWindow(h) and now.get(h, (0, "", ""))[2]):
+                return False
+            title = now[h][2]
+            if _SECOND_INSTANCE_RE.search(title):
+                if title not in dialog_seen:
+                    dialog_seen.append(title)
                 return False
             r = wt.RECT()
             _u32.GetWindowRect(h, ctypes.byref(r))
@@ -217,14 +226,53 @@ def launch_hidden(name: str, timeout_s: float = 45.0) -> Dict[str, Any]:
         info["hwnd"] = hwnd
         info["title"] = now.get(hwnd, (0, "", ""))[2]
     else:
-        info["notes"].append("no window appeared")
+        if dialog_seen:
+            info["already_running_dialog"] = dialog_seen[0]
+            info["notes"].append(f"app is already running (single instance); refused to scan its '{dialog_seen[0]}' dialog")
+        else:
+            info["notes"].append("no window appeared")
     info["launch_s"] = round(time.time() - t0, 2)
     info.pop("_tick", None)
     info["trace"] = (info.get("trace") or [])[-6:]
     return info
 
 
-def close_window(hwnd: int, timeout_s: float = 6.0) -> bool:
+def wait_tree_ready(hwnd: int, timeout_s: float = 15.0, min_nodes: int = 3) -> int:
+    """Block (bounded) until the window's UI tree has STOPPED GROWING. Apps resume and populate for a second or
+    two after being un-minimized (UWP/WinUI/Office); acting at the first moment something exists means acting
+    on an empty UI. Returns the settled node count."""
+    from core_organs import fast_uia
+    last, steady, end = -1, 0, time.time() + timeout_s
+    while time.time() < end and steady < 2:
+        snap = fast_uia.snapshot(hwnd, timeout_ms=6000)
+        cnt = len(snap) if snap else 0
+        steady = steady + 1 if (cnt == last and cnt >= min_nodes) else 0
+        last = cnt
+        time.sleep(0.35)
+    return max(last, 0)
+
+
+_DISCARD_RE = re.compile(r"^(don'?t save|do not save|discard( changes)?|no)$", re.I)
+
+
+def _discard_unsaved(hwnd: int) -> bool:
+    """A window WE launched is asking to save changes: answer with the non-saving button. Only ever called for
+    instances this run created, so no user document is involved."""
+    from core_organs import fast_uia
+    from core_organs import organ_48_app_behavior_model as bm
+    snaps = list(fast_uia.snapshot(hwnd, timeout_ms=4000) or [])
+    for w in bm._popups(hwnd)[:4]:
+        snaps += fast_uia.snapshot(w, timeout_ms=3000) or []
+    asks = any("save changes" in (n.name or "").lower() or "want to save" in (n.name or "").lower() for n in snaps)
+    if not asks:
+        return False
+    for n in snaps:
+        if _DISCARD_RE.match((n.name or "").strip()) and "invoke" in n.pats and n.enabled:
+            return bm.invoke_node_safely(n)[0]
+    return False
+
+
+def close_window(hwnd: int, timeout_s: float = 6.0, discard_unsaved: bool = False) -> bool:
     """Close a window WE launched and VERIFY it is gone: WM_CLOSE, then SC_CLOSE, then a second WM_CLOSE.
     Never kills a process. Returns False honestly when the app refuses (e.g. a save prompt or a dialog)."""
     if not (hwnd and _u32.IsWindow(hwnd)):
@@ -235,14 +283,26 @@ def close_window(hwnd: int, timeout_s: float = 6.0) -> bool:
         except Exception:
             pass
         end = time.time() + timeout_s / 3
+        tried = False
         while time.time() < end:
             if not _u32.IsWindow(hwnd):
                 return True
+            if discard_unsaved and not tried and time.time() > end - timeout_s / 3 + 0.8:
+                tried = True
+                try:
+                    _discard_unsaved(hwnd)
+                except Exception:
+                    pass
             time.sleep(0.1)
     return not _u32.IsWindow(hwnd)
 
 
 # ------------------------------------------------------------------ start screens
+
+# A single-instance app that is already running shows a modal notice when launched again (OBS: "OBS is
+# already running"). Such a window is a message box, NOT the app — scanning it produced a bogus tiny map.
+_SECOND_INSTANCE_RE = re.compile(r"already (running|open|launched)|another instance|instance already|"
+                                 r"is (currently )?running|cannot (start|launch|open)" , re.I)
 
 # Names (not apps) of the "give me an empty document" tile that start/backstage screens offer.
 START_TILE_RE = re.compile(r"^(blank( (document|workbook|presentation|notebook|page|canvas|project|file))?|"
@@ -300,7 +360,10 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
         hwnd = g.find_window(name) or 0
     rep["pre_existing_window"] = bool(hwnd) and not launched
     if not hwnd:
-        rep["error"] = "no window (not running and could not be launched)"
+        dlg = (rep.get("launch") or {}).get("already_running_dialog")
+        rep["error"] = (f"already running (single instance): its '{dlg}' dialog was refused and the existing "
+                        "window was not touched for safety" if dlg
+                        else "no window (not running and could not be launched)")
         rep["elapsed_s"] = round(time.time() - t_all, 2)
         return rep
     if on_window:

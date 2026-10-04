@@ -22,15 +22,16 @@ def _tmp(ext):
     return os.path.join(TMP, "hj_task_" + uuid.uuid4().hex[:6] + ext)
 
 
-TXT, TXT2, PNG = _tmp(".txt"), _tmp(".txt"), _tmp(".png")
+TXT, TXT2, TXT3, PNG = _tmp(".txt"), _tmp(".txt"), _tmp(".txt"), _tmp(".png")
 
 # name, app, natural-language task, truth spec
 TASKS = [
     ("notepad-write-save", "Notepad", f"type hello world; save the file as {TXT}", {"file_has": (TXT, "hello world")}),
-    ("calculator-25x4", "Calculator", "press 2; press 5; press multiply; press 4; press equals", {"calc_display": "100"}),
+    ("calculator-25x4", "Calculator", "press 2; press 5; press multiply; press 4; press equals; expect Display is 100", {"calc_display": "100"}),
     ("paint-save-png", "Paint", f"save the image as {PNG}", {"png": PNG}),
-    ("settings-bluetooth", "Settings", "open the Bluetooth & devices page", {"window_text": "bluetooth"}),
+    ("settings-bluetooth", "Settings", "open the Bluetooth & devices page; expect Add device", {"window_text": "bluetooth"}),
     ("notepad-template", "Notepad", f"write text and save as file|{TXT2}|templated text", {"file_has": (TXT2, "templated text")}),
+    ("notepad-unverifiable", "Notepad", "type just a note", {"window_text": "just a note"}),   # typed text is verifiable in the control, so DONE is legitimate
 ]
 
 

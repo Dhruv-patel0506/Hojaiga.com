@@ -503,6 +503,11 @@ class LayoutMapper:
     # ------------------------------------------------------------------ orchestration
     def map(self, deepen: bool = True) -> Dict[str, Any]:
         t0 = time.time()
+        try:
+            from core_organs import fast_uia as _fu
+            _fu.wait_ready(self.hwnd, timeout_s=10.0)         # never map a tree that is still populating
+        except Exception:
+            pass
         root = self.auto.ControlFromHandle(self.hwnd)
         if root is None:
             return {"error": "cannot attach to window"}

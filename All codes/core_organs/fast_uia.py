@@ -208,3 +208,18 @@ def descendants_of(nodes: List[Node], idx: int) -> List[Node]:
         out.append(nodes[i])
         stack.extend(nodes[i].children)
     return out
+
+
+def wait_ready(hwnd: int, timeout_s: float = 15.0, min_nodes: int = 3) -> int:
+    """Block (bounded) until the window's UI tree has STOPPED GROWING; returns the settled node count. Apps
+    populate for a second or two after being restored/parked (UWP/WinUI/Office); mapping or acting before that
+    maps an empty UI (6 controls instead of 70)."""
+    import time as _t
+    last, steady, end = -1, 0, _t.time() + timeout_s
+    while _t.time() < end and steady < 2:
+        snap = snapshot(hwnd, timeout_ms=6000)
+        cnt = len(snap) if snap else 0
+        steady = steady + 1 if (cnt == last and cnt >= min_nodes) else 0
+        last = cnt
+        _t.sleep(0.3)
+    return max(last, 0)

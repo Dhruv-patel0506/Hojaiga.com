@@ -188,7 +188,23 @@ def observe(hwnd: int, *, grounding=None, want_ocr: bool = False,
                 continue
     except Exception:
         pass
-    st.names = [(e.name or "").lower() for e in elements if (e.name or "").lower() != "pop-uphost"]
+    names = [(e.name or "").lower() for e in elements if (e.name or "").lower() != "pop-uphost"]
+    # The old walk drops controls with empty rectangles, which is EVERYTHING in a hidden UWP app (Calculator's
+    # display, Settings' pages). A bulk snapshot needs no geometry, so union its names in: otherwise a step that
+    # really changed the UI looks like "nothing happened" and gets wrongly failed.
+    try:
+        from core_organs import fast_uia
+        snap = fast_uia.snapshot(hwnd, timeout_ms=6000)
+        if snap:
+            seen = set(names)
+            for n in snap:
+                nm = (n.name or "").lower().strip()
+                if nm and nm != "pop-uphost" and nm not in seen:
+                    names.append(nm)
+                    seen.add(nm)
+    except Exception:
+        pass
+    st.names = names
     st.values = [(e.value or "").lower() for e in elements if getattr(e, "value", "")]
     st.windows = sorted({(_win_title(w) or _win_class(w)).lower() for w in others})
     if want_ocr:
@@ -1547,6 +1563,11 @@ def crawl_menus_uia_e0(hwnd: int, *, budget: Optional[DiscoveryBudget] = None,
       * a verified clean slate between top-level menus (Escape first, pattern Collapse as fallback)
       * Expand retried once; a menu that still yields nothing gets a bounded second pass
       * every menu that could not be opened is listed in `skipped` — never dropped silently"""
+    try:
+        from core_organs import fast_uia as _fu
+        _fu.wait_ready(hwnd, timeout_s=10.0)                 # never crawl a tree that is still populating
+    except Exception:
+        pass
     from core_organs import fast_uia
     if fast_uia.snapshot(hwnd, max_nodes=50) is None:
         return _crawl_menus_uia_e0_slow(hwnd, budget=budget, max_items=max_items, max_depth=max_depth)
@@ -2179,7 +2200,7 @@ class EffectorLadder:
     WM_COMMAND (Win32 menu id) -> key chord. Records which one worked — that IS the
     knowledge ('this app is keyboard-driven', 'that one exposes UIA invoke')."""
 
-    DEFAULTS = {"invoke": ["uia", "wm_command", "postmessage", "layout_click", "key"],
+    DEFAULTS = {"invoke": ["snapshot_invoke", "uia", "wm_command", "postmessage", "layout_click", "key"],
                 "type": ["uia", "postmessage"],
                 "key": ["key", "menu_command"],
                 "menu": ["menu_command", "wm_command", "key"]}
@@ -2213,17 +2234,33 @@ class EffectorLadder:
         if verb == "file_dialog":
             if self.loop is None:
                 return False, "file_dialog", "no loop available"
+            from core_organs import fast_uia
+            end = time.time() + 8.0                            # wait (bounded) until the dialog really has its filename box
+            while time.time() < end:
+                ready = False
+                for w in _popups(hwnd)[:4]:
+                    if _win_class(w) == "#32770":
+                        kids = win32_window_controls(w)
+                        ready = any(k["class"] in ("Edit", "ComboBox", "ComboBoxEx32") for k in kids)
+                        if not ready:
+                            snap = fast_uia.snapshot(w, timeout_ms=3000) or []
+                            ready = any(n.ctype == "EditControl" for n in snap)
+                    if ready:
+                        break
+                if ready:
+                    break
+                time.sleep(0.3)
             ok, note = self.loop.handle_native_file_dialog(str(action.get("path", "")))
             return bool(ok), "file_dialog", note
         order = [e for e in self.model.effector_order(app_key, verb, self.DEFAULTS.get(verb, ["key"]))
                  if e not in avoid] or list(self.DEFAULTS.get(verb, ["key"]))
-        last = "no-effector-applicable"
+        trail: List[str] = []
         for eff in order:
             ok, note = self._try(eff, verb, action, hwnd, dg, hin)
             if ok:
                 return True, eff, note
-            last = f"{eff}: {note}"
-        return False, "none", last
+            trail.append(f"{eff}: {note}")
+        return False, "none", " | ".join(trail) or "no-effector-applicable"     # the WHOLE trail, not just the last miss
 
     def _command_for_chord(self, app_key: str, hwnd: int, chord: str) -> Optional[Dict[str, Any]]:
         """Knowledge lookup: which known menu command is bound to this chord? If nothing is known
@@ -2246,6 +2283,30 @@ class EffectorLadder:
 
     def _try(self, eff: str, verb: str, a: Dict[str, Any], hwnd: int, dg, hin) -> Tuple[bool, str]:
         try:
+            if eff == "snapshot_invoke":
+                # label -> control, from ONE bulk snapshot of the live tree. Needs no geometry, so it works on
+                # hidden/parked apps whose controls report empty rectangles (UWP), and it understands that a
+                # person's "2" or "*" is the control named "Two" / "Multiply by".
+                from core_organs import fast_uia
+                from core_organs import task_runner as _tr
+                label = a.get("label") or a.get("name") or (a.get("path", "").split(">")[-1].strip())
+                if not label:
+                    return False, "no label"
+                node, cands = None, []
+                for attempt in range(4):                           # a just-restored / just-changed UI may still be empty:
+                    snap = fast_uia.snapshot(hwnd, timeout_ms=8000) or []      # look again a few times before giving up
+                    for w in _popups(hwnd)[:6]:                    # open flyouts/menus are part of the live UI too
+                        snap += fast_uia.snapshot(w, timeout_ms=3000) or []
+                    cands = [(n, n.name) for n in snap if n.name and n.enabled
+                             and (set(n.pats) & {"invoke", "select", "toggle", "expand"})]
+                    node = _tr.match_label(label, cands)
+                    if node is not None or len(cands) >= 12:      # found it, or the UI is populated and it is not there
+                        break
+                    time.sleep(0.6)
+                if node is None:
+                    return False, f"no control matches '{label}' ({len(cands)} operable controls seen)"
+                ok, how = invoke_node_safely(node)
+                return ok, f"{how} -> '{node.name}'"
             if eff == "layout_click":
                 from core_organs import organ_50_layout_map as lm
                 name = a.get("name") or (a.get("path", "").split(">")[-1].strip())
@@ -2590,8 +2651,9 @@ class TemplateRunner:
                 ok, eff, note = self.ladder.perform(key, hwnd, act, avoid=avoid)
                 did.append(f"{act.get('verb')}:{eff}")
                 if not ok:
+                    # A delivery failure says nothing about WHAT THE APP ACCEPTS (it is usually timing: the UI
+                    # was not ready). Recording it taught the ladder to distrust the one effector that works.
                     res.evidence = f"delivery failed ({note})"
-                    self.model.record_effector(key, act.get("verb", ""), eff, False)
                     break
                 self._settle(hwnd)
             else:
