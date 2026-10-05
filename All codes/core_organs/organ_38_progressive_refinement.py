@@ -325,9 +325,9 @@ Respond ONLY with valid JSON."""
             # Mark failed step for retry
             if "steps" in refined_plan:
                 for step in refined_plan["steps"]:
-                    if step.get("id") == refinement.new_step_ids[0] if refinement.new_step_ids else "":
-                step["status"] = "pending"
-                step["retry_count"] = step.get("retry_count", 0) + 1
+                    if refinement.new_step_ids and step.get("id") == refinement.new_step_ids[0]:
+                        step["status"] = "pending"
+                        step["retry_count"] = step.get("retry_count", 0) + 1
         
         logger.info(f"[Refinement Engine] Applied refinement to plan")
         

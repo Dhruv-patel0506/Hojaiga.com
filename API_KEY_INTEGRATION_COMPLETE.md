@@ -21,7 +21,7 @@ Your API keys have been successfully integrated into Hojaiga with **SHA-256 hash
 - **Cost:** FREE (50 requests/second)
 
 ### ✅ GitHub API Key
-- **Key:** `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`
+- **Key:** `ghp_REDAVED__REVOKE_AND_LOAD_FROM_ENV`
 - **Length:** 40 characters
 - **Status:** ✅ Integrated securely
 - **Cost:** FREE (5000 requests/hour)

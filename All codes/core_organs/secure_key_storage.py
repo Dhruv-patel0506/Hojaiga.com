@@ -56,10 +56,11 @@ class SecureKeyStorage:
         # Provided keys from user
         keys = {
             "discord": "d5f83a3fc8c7e8544413018207f685157615d18af84ac06da9976271c49978a0",
-            "github": "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",
+            "github": os.environ.get("GITHUB_TOKEN", ""),
             "telegram": "8716987781:AAHAfIgCrlehFtn3UItUqhcVIt2PETzHJ0M"
         }
         
+        keys = {service: key for service, key in keys.items() if key}
         for service, key in keys.items():
             self.store_key(service, key, encrypted=True)
         
@@ -225,7 +226,7 @@ if __name__ == "__main__":
     # Provided keys (same as in initialize_with_provided_keys)
     keys = {
         "discord": "d5f83a3fc8c7e8544413018207f685157615d18af84ac06da9976271c49978a0",
-        "github": "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",
+        "github": os.environ.get("GITHUB_TOKEN", ""),
         "telegram": "8716987781:AAHAfIgCrlehFtn3UItUqhcVIt2PETzHJ0M"
     }
     

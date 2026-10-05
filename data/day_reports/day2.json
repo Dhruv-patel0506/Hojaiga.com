@@ -1,0 +1,109 @@
+{
+ "run_id": "day2",
+ "done": [
+  {
+   "idx": 0,
+   "id": "a",
+   "task": "write the weekly report",
+   "app": "",
+   "reason": "verified",
+   "evidence": "scripted DONE for a (execution #1) | independent check passed",
+   "attempts": 1,
+   "seconds": 0.0,
+   "status": "DONE"
+  },
+  {
+   "idx": 1,
+   "id": "b",
+   "task": "open the spreadsheet and add a column",
+   "app": "",
+   "reason": "verified",
+   "evidence": "scripted DONE for b (execution #2) | independent check passed",
+   "attempts": 2,
+   "seconds": 0.0,
+   "status": "DONE"
+  },
+  {
+   "idx": 7,
+   "id": "h",
+   "task": "rename the heading",
+   "app": "",
+   "reason": "verified",
+   "evidence": "scripted DONE for h (execution #1) | independent check passed",
+   "attempts": 1,
+   "seconds": 0.0,
+   "status": "DONE"
+  }
+ ],
+ "failed": [
+  {
+   "idx": 2,
+   "id": "c",
+   "task": "press the totals button",
+   "app": "",
+   "reason": "executor raised RuntimeError: scripted failure",
+   "evidence": "",
+   "attempts": 1,
+   "seconds": 0.0,
+   "status": "FAILED"
+  },
+  {
+   "idx": 4,
+   "id": "e",
+   "task": "summarize the notes",
+   "app": "",
+   "reason": "watchdog: no result within 3s; the queue moved on",
+   "evidence": "",
+   "attempts": 1,
+   "seconds": 3.0,
+   "status": "TIMEOUT"
+  },
+  {
+   "idx": 6,
+   "id": "g",
+   "task": "export the chart",
+   "app": "",
+   "reason": "executor claimed DONE but the independent check failed: the output file is not on disk",
+   "evidence": "scripted DONE for g (execution #1) | the output file is not on disk",
+   "attempts": 1,
+   "seconds": 0.0,
+   "status": "FAILED"
+  }
+ ],
+ "waiting_for_you": [
+  {
+   "idx": 3,
+   "id": "d",
+   "task": "delete all files in the downloads folder",
+   "app": "",
+   "reason": "destructive/irreversible class (E2): queued for a human, not executed",
+   "evidence": "",
+   "attempts": 0,
+   "seconds": null,
+   "status": "ESCALATED"
+  },
+  {
+   "idx": 5,
+   "id": "f",
+   "task": "send the invoice to the customer",
+   "app": "",
+   "reason": "destructive/irreversible class (E2): queued for a human, not executed",
+   "evidence": "",
+   "attempts": 0,
+   "seconds": null,
+   "status": "ESCALATED"
+  }
+ ],
+ "pending": [],
+ "running": [],
+ "counts": {
+  "done": 3,
+  "failed": 3,
+  "waiting_for_you": 2,
+  "pending": 0,
+  "running": 0
+ },
+ "capsule": "3 done / 3 failed / 2 waiting for you",
+ "total": 8,
+ "complete": true
+}
