@@ -252,9 +252,39 @@ def _fingerprint(element_name: str, element_role: str, menu_path: str = "") -> s
     return hashlib.md5(raw.encode("utf-8")).hexdigest()[:12]
 
 
+_EV_ARCH_CACHE: Dict[str, Tuple[float, str]] = {}
+
+
+def _evidence_archetype(app_name: str) -> str:
+    """The family the app's OWN evidence says it is (file types it opens + the vocabulary of its commands + dialogs, see
+    static_knowledge.infer_profile), stored by a scan/mastery run. '' when nothing was learned or the evidence is thin.
+    Cached 60 s: classify_archetype runs on every step."""
+    key = _app_key(app_name)
+    now = time.time()
+    hit = _EV_ARCH_CACHE.get(key)
+    if hit and now - hit[0] < 60.0:
+        return hit[1]
+    arch = ""
+    try:
+        from core_organs import organ_48_app_behavior_model as bm
+        from core_organs import knowledge_store as ks
+        prof = ks.get_fact(bm.get_model(), bm._app_key(app_name), "profile", None) or {}
+        cand = prof.get("archetype", "")
+        if cand and cand != "unclassified":
+            arch = cand
+    except Exception:
+        arch = ""
+    _EV_ARCH_CACHE[key] = (now, arch)
+    return arch
+
+
 def classify_archetype(app_name: str, exe_path: str = "") -> str:
-    """Map an app to a generic UI family by name/exe tokens. Data-driven; adding
-    a new app family means adding tokens, never new control-flow code."""
+    """Map an app to a generic UI family. EVIDENCE first (what the app was observed to open / offer: learned at runtime,
+    no app names), then the name/exe tokens below as a prior for an app nothing has been learned about yet. Data-driven:
+    adding a family means adding tokens or an evidence rule, never control-flow code."""
+    ev = _evidence_archetype(app_name)
+    if ev:
+        return ev
     hay = _norm(app_name) + " " + os.path.basename(exe_path or "").lower()
     for family, spec in ARCHETYPES.items():
         if family == "generic_win32":
@@ -283,6 +313,7 @@ class StepHint:
     hits: int = 0
     source: str = "learned"
     destructive: bool = False
+    successes: int = 0              # verified PASSes (hits also counts failures)
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -319,6 +350,13 @@ class AppIntelligence:
         self._conn = sqlite3.connect(self.db_path, timeout=15, check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
         self._conn.executescript(SCHEMA)
+        # 6.4: `hits` counts EVERY recorded outcome (a FAIL bumps it too), so it can never gate muscle memory. `successes`
+        # counts verified PASSes only. Migrated rows: a row whose last outcome was PASS keeps min(hits, 1) - one trace
+        # is exactly what must not be trusted blind - and earns the rest by passing again.
+        cols = {r["name"] for r in self._conn.execute("PRAGMA table_info(steps)")}
+        if "successes" not in cols:
+            self._conn.execute("ALTER TABLE steps ADD COLUMN successes INTEGER DEFAULT 0")
+            self._conn.execute("UPDATE steps SET successes = CASE WHEN outcome='PASS' THEN MIN(hits, 1) ELSE 0 END")
         self._conn.commit()
         # in-session memo so a long task does not re-query per step
         self._memo: Dict[str, AppIntel] = {}
@@ -395,17 +433,19 @@ class AppIntelligence:
             hits = int(row["hits"]) + 1
             conf = confidence if confidence is not None else _reinforce(
                 float(row["confidence"]), outcome, row["source"] or source)
+            prev_ok = int(row["successes"] or 0) if "successes" in row.keys() else 0
+            succ = prev_ok + 1 if outcome == "PASS" else max(0, prev_ok - 1)       # a failure takes one verification away
             self._conn.execute(
-                "UPDATE steps SET confidence=?, hits=?, outcome=?, source=?, ts=? WHERE step_id=?",
-                (conf, hits, outcome, row["source"] or source, time.time(), step_id))
+                "UPDATE steps SET confidence=?, hits=?, outcome=?, source=?, ts=?, successes=? WHERE step_id=?",
+                (conf, hits, outcome, row["source"] or source, time.time(), succ, step_id))
         else:
             conf = confidence if confidence is not None else _initial_confidence(outcome, source)
             self._conn.execute(
                 "INSERT INTO steps(step_id, app_key, goal, verb, element_name, element_role,"
-                " shortcut, menu_path, fingerprint, outcome, source, confidence, hits, ts)"
-                " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                " shortcut, menu_path, fingerprint, outcome, source, confidence, hits, ts, successes)"
+                " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (step_id, key, _norm(goal), verb, element_name, element_role, shortcut,
-                 menu_path, fp, outcome, source, conf, 1, time.time()))
+                 menu_path, fp, outcome, source, conf, 1, time.time(), 1 if outcome == "PASS" else 0))
         # roll the app-level reliability up as well
         if outcome == "PASS":
             self._conn.execute("UPDATE apps SET successes=successes+1, confidence=?,"
@@ -441,6 +481,7 @@ class AppIntelligence:
                 element_name=row["element_name"] or "", element_role=row["element_role"] or "",
                 shortcut=row["shortcut"] or "", menu_path=row["menu_path"] or "",
                 confidence=float(row["confidence"]), hits=int(row["hits"] or 0),
+                successes=int(row["successes"] or 0) if "successes" in row.keys() else 0,
                 source=row["source"] or "learned",
                 destructive=_is_destructive(row["verb"], row["element_name"],
                                             row["menu_path"], row["outcome"])))
@@ -703,8 +744,9 @@ def record_outcome(app_name: str, goal: str, verb: str, *, element_name: str = "
         if row:
             source = row["source"] or source
             new_conf = _reinforce(float(row["confidence"]), outcome, source)
-            conn.execute("UPDATE steps SET confidence=?, outcome=?, hits=hits+1, ts=? "
-                         "WHERE step_id=?", (new_conf, outcome, time.time(), step_id))
+            conn.execute("UPDATE steps SET confidence=?, outcome=?, hits=hits+1, ts=?, "
+                         "successes=CASE WHEN ?='PASS' THEN successes+1 ELSE MAX(0, successes-1) END "
+                         "WHERE step_id=?", (new_conf, outcome, time.time(), outcome, step_id))
             conn.execute("UPDATE apps SET successes=successes+?, failures=failures+? "
                          "WHERE app_key=?",
                          (1 if outcome == "PASS" else 0,

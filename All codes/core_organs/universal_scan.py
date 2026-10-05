@@ -183,6 +183,23 @@ def launch_hidden(name: str, timeout_s: float = 45.0) -> Dict[str, Any]:
     info: Dict[str, Any] = {"launched": False, "hwnd": 0, "notes": []}
     app = resolve_app(name)
     if not app:
+        # Not a Start-menu entry: any INSTALLED program still resolves by path / PATH / App Paths (an exe path is accepted
+        # as is). A program whose manifest asks for elevation is never launched here: the UAC prompt is a human step.
+        try:
+            from core_organs import static_knowledge as sk
+            from core_organs import pe_resources as pr
+            exe = sk.exe_for(name)
+            if exe and os.path.isfile(exe) and not sk.package_root(exe):
+                level = (pr.read_resources(exe).get("manifest") or {}).get("execution_level", "")
+                if level in ("requireAdministrator", "highestAvailable"):
+                    info["notes"].append(f"not in the Start menu; {os.path.basename(exe)} requests elevation ({level}): a UAC prompt is a human step, not launched")
+                    info["requires_elevation"] = True
+                    return info
+                app = (os.path.splitext(os.path.basename(exe))[0], exe)
+                info["notes"].append("resolved by program path (not a Start-menu entry)")
+        except Exception as exc:
+            info["notes"].append(f"program-path resolution unavailable ({type(exc).__name__})")
+    if not app:
         info["notes"].append("not in the Start menu")
         return info
     disp, appid = app

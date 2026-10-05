@@ -754,97 +754,54 @@ def _get_calculator_display_value(hwnd: int = 0) -> str:
         logger.debug(f"[CALC_DISP] Error reading display: {e}")
         return ""
 
-def _clean_slate_app_hygiene(app_name: str):
-    """Dynamic session hygiene: cleans up stale / leftover test windows
-    before launching a fresh instance, ensuring the task starts with a clean slate.
-    """
+
+def _fallback_exe(name: str, default: str) -> str:
+    """The program an app NAME refers to, by evidence on this machine (PATH / App Paths / Store package): `default` when none."""
     try:
-        _ensure_interactive_desktop()
-        import win32gui
-        import win32con
-        app_clean = app_name.strip().lower()
+        from core_organs import static_knowledge as _sk
+        return _sk.exe_for(name) or default
+    except Exception:
+        return default
 
-        stale_hwnds = []
-        def _enum_stale(h, _):
-            if win32gui.IsWindowVisible(h):
-                t = (win32gui.GetWindowText(h) or "").lower()
-                c = (win32gui.GetClassName(h) or "").lower()
-                if any(bad in t for bad in ["antigravity", "visual studio", "code -", "chrome", "edge", "terminal", "powershell"]):
-                    return True
-                if app_clean == "notepad" or "notepad" in app_clean:
-                    if c == "notepad" or t.endswith(" - notepad") or t == "notepad":
-                        stale_hwnds.append((h, t, "notepad"))
-                elif app_clean in ("calc", "calculator") or "calc" in app_clean:
-                    if "calculator" in t or "calc" in t or (c == "applicationframewindow" and "calc" in t):
-                        stale_hwnds.append((h, t, "calculator"))
-                elif app_clean in ("paint", "mspaint"):
-                    if "paint" in t or c in ("mspaintapp", "paintapp"):
-                        stale_hwnds.append((h, t, "paint"))
-                elif app_clean in t or app_clean in c:
-                    stale_hwnds.append((h, t, app_clean))
+
+def _is_infra_window(hwnd, allow_browser: bool = False) -> bool:
+    """True for a window that is never an automation TARGET: a window of the agent's own host (the IDE / terminal / desktop app this
+    process runs inside: found by process ANCESTRY, not by title text), a console host, and - unless the caller is looking for a
+    browser - a browser window (a tab titled 'Windows Notepad - Search' must never be mistaken for Notepad). Replaces 17 copies of a
+    hard-coded list of editor / browser / terminal names (backlog 2.3)."""
+    try:
+        from core_organs import desktop_grounding as _dg
+        from core_organs import headless_input as _hin
+        h = int(hwnd)
+        if _hin.window_pid(h) in _dg._agent_host_pids():
             return True
+        if _hin._class_name(h) in ("ConsoleWindowClass", "CASCADIA_HOSTING_WINDOW_CLASS"):
+            return True
+        if not allow_browser and _dg.DesktopGrounding._process_stem(h) in _dg.DesktopGrounding._BROWSER_PROCS:
+            return True
+    except Exception:
+        pass
+    return False
 
-        try:
-            win32gui.EnumWindows(_enum_stale, None)
-        except Exception:
-            pass
-
-        # Only windows WE launched are ever reset or closed. A window that merely looks like the target belongs to the
-        # user until proven otherwise (their Notepad text must never be blanked, nor their Notepad closed).
-        try:
-            from core_organs import background_window as _bw_h
-            stale_hwnds = [x for x in stale_hwnds if _bw_h.is_ours(x[0])]
-        except Exception:
-            stale_hwnds = []
-
-        for h, title, app_type in stale_hwnds:
-            if app_type == "notepad":
-                logger.info(f"[HYGIENE] Resetting/Closing stale leftover Notepad processes/windows for clean session.")
-                try:
-                    import uiautomation as auto
-                    ctrl = auto.ControlFromHandle(h)
-                    if ctrl:
-                        for c, _ in auto.WalkControl(ctrl, maxDepth=10):
-                            if any(k in (c.ControlTypeName or "") for k in ["Document", "Edit"]):
-                                vp = c.GetValuePattern()
-                                if vp:
-                                    vp.SetValue("")
-                                break
-                except Exception:
-                    pass
-                try:
-                    win32gui.PostMessage(h, win32con.WM_CLOSE, 0, 0)
-                except Exception:
-                    pass
-                break
-            elif app_type == "calculator":
-                logger.info(f"[HYGIENE] Resetting Calculator window hwnd={h} to 0 for clean session.")
-                try:
-                    import uiautomation as auto
-                    ctrl = auto.ControlFromHandle(h)
-                    if ctrl:
-                        for c, _ in auto.WalkControl(ctrl, maxDepth=14):
-                            if c.ControlTypeName == "ButtonControl" and c.Name == "Clear":
-                                ip = c.GetInvokePattern()
-                                if ip:
-                                    ip.Invoke()
-                                    time.sleep(0.1)
-                                break
-                except Exception:
-                    pass
-            elif app_type in ("paint", "mspaint"):
-                # Paint default title is 'Untitled - Paint' — do not kill it during clean slate
+def _clean_slate_app_hygiene(app_name: str):
+    """Session hygiene: a leftover window of the target that WE launched earlier (a test, a previous task) is closed before a fresh
+    instance starts. Generic: the window is found by the one resolver and touched only if the harness marked it ours - a window that
+    merely looks like the target belongs to the user (their Notepad text must never be blanked, nor their Notepad closed). How an app
+    is 'reset' is not special-cased per app: a closed leftover is a clean slate, and a fresh instance starts from the app's own default."""
+    try:
+        from core_organs import desktop_grounding as _dgh
+        from core_organs import background_window as _bw_h
+        from core_organs import universal_scan as _ush
+        stale = [h for h in (_dgh.DesktopGrounding().find_window(app_name, all_candidates=True) or []) if _bw_h.is_ours(h)]
+        for h in stale:
+            logger.info(f"[HYGIENE] closing stale leftover window hwnd={h} of '{app_name}' (launched by this harness) for a clean session")
+            try:
+                _ush.close_window(h, discard_unsaved=True, timeout_s=4)
+            except Exception:
                 pass
-            else:
-                if ("untitled" in title or "test" in title) and "paint" not in title and "paint" not in app_type:
-                    logger.info(f"[HYGIENE] Closing stale leftover window hwnd={h} ('{title}') for clean session.")
-                    try:
-                        win32gui.PostMessage(h, win32con.WM_CLOSE, 0, 0)
-                    except Exception:
-                        pass
-        if stale_hwnds:
-            import time
-            time.sleep(0.5)
+        if stale:
+            import time as _t
+            _t.sleep(0.5)
     except Exception as e:
         logger.debug(f"[HYGIENE] Error during pre-task cleanup: {e}")
 
@@ -1170,9 +1127,13 @@ def _loop_first_preamble(command: str, compilation: Dict[str, Any]):
     except Exception as exc:
         logger.warning("[LOOP-FIRST] risk gate unavailable (%s): irreversible goals would not be gated", exc)
     try:
-        result = _lf.run_loop_first(command, spans, capsule_cb=_capsule, cursor_cb=_cursor,
-                                    notify=notify_crewai_activity, record_action=_record_session_action,
-                                    plan_filter=plan_filter)
+        result = None
+        if chain is not None:                                  # 3.1: a learned/seeded template covering the whole ticket runs first
+            result = _tl.try_template_first(command, spans, _model, _run_id, chain, allow_destructive=False)
+        if result is None:
+            result = _lf.run_loop_first(command, spans, capsule_cb=_capsule, cursor_cb=_cursor,
+                                        notify=notify_crewai_activity, record_action=_record_session_action,
+                                        plan_filter=plan_filter)
     except Exception as exc:
         logger.exception("[LOOP-FIRST] pass crashed")
         return None, f"DETERMINISTIC DESKTOP PASS crashed ({type(exc).__name__}: {exc}); plan every step yourself."
@@ -1621,37 +1582,16 @@ def _track_launched_app(app_name: str):
             time.sleep(0.8 + attempt * 0.4)  # 0.8, 1.2, 1.6, 2.0, 2.4s
 
             candidates = []
-            def _enum(h, _):
-                if not win32gui.IsWindowVisible(h):
-                    return True
-                title = win32gui.GetWindowText(h) or ""
-                cls = win32gui.GetClassName(h) or ""
-                if cls in ("Shell_TrayWnd", "Progman", "WorkerW"):
-                    return True
-                tl = title.lower()
-                if any(bad in tl for bad in ["antigravity", "visual studio", "code -", "chrome", "edge", "terminal", "powershell"]):
-                    return True
-                if is_calc:
-                    if "calculator" in tl or "calc" in tl or (cls == "ApplicationFrameWindow" and "calc" in tl):
-                        candidates.append((h, title or "Calculator"))
-                elif "notepad" in app_lower:
-                    if cls == "Notepad" or tl.endswith(" - notepad") or tl == "notepad":
-                        candidates.append((h, title or "Notepad"))
-                elif app_lower in ("paint", "mspaint"):
-                    if "paint" in tl or cls in ("MSPaintApp", "PaintApp"):
-                        candidates.append((h, title or "Paint"))
-                else:
-                    if title and (app_lower in tl or app_lower in cls.lower()):
-                        candidates.append((h, title))
-                return True
-            try:
-                win32gui.EnumWindows(_enum, None)
+            try:      # the ONE window resolver (process stem / class / title scoring, UWP + cloaked + agent-host + browser rules)
+                from core_organs import desktop_grounding as _dgt
+                for _h in _dgt.DesktopGrounding().find_window(app_name, all_candidates=True) or []:
+                    candidates.append((_h, win32gui.GetWindowText(_h) or app_name))
             except Exception:
                 pass
 
             if candidates:
-                hwnd = candidates[-1][0]
-                title = candidates[-1][1]
+                hwnd = candidates[0][0]            # best-scored first (the old code took the LAST window enumerated)
+                title = candidates[0][1]
                 _last_launched_app["hwnd"] = hwnd
                 _last_launched_app["title"] = title
                 _last_launched_app["app_name"] = app_name
@@ -1833,24 +1773,11 @@ if _HAS_CREWAI:
             import win32gui
             _already_hwnd = 0
             _app_lower = resolved_app.lower()
-            def _find_existing(h, _):
-                nonlocal _already_hwnd
-                if not win32gui.IsWindowVisible(h):
-                    return True
-                t = (win32gui.GetWindowText(h) or "").lower()
-                c = (win32gui.GetClassName(h) or "").lower()
-                if any(bad in t for bad in ["antigravity", "visual studio", "code -", "chrome", "edge", "terminal", "powershell"]):
-                    return True
-                if _app_lower in ("paint", "mspaint"):
-                    if "paint" in t or c in ("mspaintapp", "paintapp"):
-                        _already_hwnd = h
-                elif _app_lower in t or _app_lower in c:
-                    _already_hwnd = h
-                return True
             try:
-                win32gui.EnumWindows(_find_existing, None)
+                from core_organs import desktop_grounding as _dgl
+                _already_hwnd = int(_dgl.DesktopGrounding().find_window(resolved_app) or 0)
             except Exception:
-                pass
+                _already_hwnd = 0
             if _already_hwnd:
                 # App already open — track it, don't launch new instance
                 import ctypes
@@ -1951,16 +1878,10 @@ if _HAS_CREWAI:
             except Exception as resolver_err:
                 logger.warning(f"[LAUNCH] DynamicAppResolver failed for '{resolved_app}': {resolver_err}")
 
-            # Fallback: common Windows UWP apps that DynamicAppResolver can't find
-            _UWP_APP_MAP = {
-                "calculator": "calc.exe",
-                "calc": "calc.exe",
-                "notepad": "notepad.exe",
-                "paint": "mspaint.exe",
-                "snipping tool": "snippingtool.exe",
-            }
-            if exe_path == resolved_app or resolved_app.lower() in _UWP_APP_MAP:
-                exe_path = _UWP_APP_MAP.get(resolved_app.lower(), exe_path)
+            # Fallback when the resolver found no executable: whatever installed program answers to the name (PATH, App Paths,
+            # Store package) - no hard-coded name -> exe table (backlog 2.3)
+            if exe_path == resolved_app:
+                exe_path = _fallback_exe(resolved_app, exe_path)
 
             import ctypes
             import time
@@ -2045,7 +1966,7 @@ if _HAS_CREWAI:
             try:
                 t = (win32gui.GetWindowText(h) or "").lower()
                 c = (win32gui.GetClassName(h) or "").lower()
-                if any(bad in t for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell", "cmd.exe"]):
+                if _is_infra_window(h, allow_browser=True):
                     return True
                 if c in ("chrome_widgetwin_1", "consolewindowclass", "windowsterminal"):
                     return True
@@ -2087,7 +2008,7 @@ if _HAS_CREWAI:
                     tl = title.lower()
                     cl = cn.lower()
                     # Filter out IDE, editor, and terminal windows
-                    if any(bad in tl for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell", "cmd.exe"]):
+                    if _is_infra_window(hwnd, allow_browser=True):
                         return True
                     if cl in ("chrome_widgetwin_1", "consolewindowclass", "windowsterminal"):
                         return True
@@ -2179,7 +2100,7 @@ if _HAS_CREWAI:
                         return True
                     t = (win32gui.GetWindowText(h) or "").lower()
                     c = (win32gui.GetClassName(h) or "").lower()
-                    if any(bad in t for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell", "cmd.exe"]):
+                    if _is_infra_window(h, allow_browser=True):
                         return True
                     if c in ("chrome_widgetwin_1", "consolewindowclass", "windowsterminal"):
                         return True
@@ -2253,7 +2174,7 @@ if _HAS_CREWAI:
                     c = (win32gui.GetClassName(h) or "")
                     if not t or c in ("Shell_TrayWnd", "Progman", "WorkerW", "MSTaskSwWClass"):
                         return True
-                    if any(bad in t.lower() for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell", "cmd.exe"]):
+                    if _is_infra_window(h, allow_browser=True):
                         return True
                     if c.lower() in ("chrome_widgetwin_1", "consolewindowclass", "windowsterminal"):
                         return True
@@ -2864,7 +2785,7 @@ if _HAS_CREWAI:
                             return True
                         t = (win32gui.GetWindowText(h) or "").lower()
                         c = (win32gui.GetClassName(h) or "").lower()
-                        if any(bad in t for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell", "cmd.exe"]):
+                        if _is_infra_window(h, allow_browser=True):
                             return True
                         if c in ("chrome_widgetwin_1", "consolewindowclass", "windowsterminal"):
                             return True
@@ -2899,7 +2820,7 @@ if _HAS_CREWAI:
                                 return True
                             t = (win32gui.GetWindowText(h) or "").lower()
                             c = (win32gui.GetClassName(h) or "").lower()
-                            if any(bad in t for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell", "cmd.exe"]):
+                            if _is_infra_window(h, allow_browser=True):
                                 return True
                             if c in ("chrome_widgetwin_1", "consolewindowclass", "windowsterminal"):
                                 return True
@@ -3091,7 +3012,7 @@ if _HAS_CREWAI:
                     if win32gui.IsWindowVisible(h):
                         t = (win32gui.GetWindowText(h) or "").lower()
                         c = (win32gui.GetClassName(h) or "").lower()
-                        if any(bad in t for bad in ["antigravity", "visual studio", "code -", "chrome", "edge", "terminal", "powershell"]):
+                        if _is_infra_window(h):
                             return True
                         if "paint" in t or c in ("mspaintapp", "paintapp") or "draw" in t:
                             target_hwnd = h
@@ -3520,7 +3441,7 @@ if _HAS_CREWAI:
                     import win32gui
                     t = (win32gui.GetWindowText(h) or "").lower()
                     c = (win32gui.GetClassName(h) or "").lower()
-                    if any(bad in t for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell", "cmd.exe"]):
+                    if _is_infra_window(h, allow_browser=True):
                         return True
                     if c in ("chrome_widgetwin_1", "consolewindowclass", "windowsterminal"):
                         return True
@@ -3542,7 +3463,7 @@ if _HAS_CREWAI:
                         return True
                     t = (win32gui.GetWindowText(h) or "").lower()
                     c = (win32gui.GetClassName(h) or "").lower()
-                    if any(bad in t for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell", "cmd.exe"]):
+                    if _is_infra_window(h, allow_browser=True):
                         return True
                     if c in ("chrome_widgetwin_1", "consolewindowclass", "windowsterminal"):
                         return True
@@ -3839,7 +3760,7 @@ if _HAS_CREWAI:
 
             is_calc = "calc" in resolved_name.lower()
             is_paint = any(k in resolved_name.lower() for k in ["paint", "mspaint", "draw"])
-            is_ide = any(bad in actual_title for bad in ["antigravity", "visual studio", "code -", "terminal", "powershell"])
+            is_ide = _is_infra_window(target_hwnd, allow_browser=True)
             matches_target = (
                 target_hwnd
                 and win32gui.IsWindow(target_hwnd)
@@ -3864,7 +3785,7 @@ if _HAS_CREWAI:
                         return True
                     t = (win32gui.GetWindowText(h) or "").lower()
                     c = (win32gui.GetClassName(h) or "").lower()
-                    if any(bad in t for bad in ["antigravity", "visual studio", "code -", "chrome", "edge", "terminal", "powershell"]):
+                    if _is_infra_window(h):
                         return True
                     if is_calc:
                         if "calculator" in t or "calc" in t or (c == "applicationframewindow" and "calc" in t):
@@ -3910,12 +3831,7 @@ if _HAS_CREWAI:
                         except Exception:
                             subprocess.Popen(['explorer.exe', r'shell:AppsFolder\Microsoft.Paint_8wekyb3d8bbwe!App'])
                     else:
-                        exe_map = {
-                            "calculator": "calc.exe", "calc": "calc.exe",
-                            "notepad": "notepad.exe", "paint": "mspaint.exe",
-                            "wordpad": "wordpad.exe",
-                        }
-                        exe = exe_map.get(app_lower, f"{app_lower}.exe")
+                        exe = _fallback_exe(app_lower, f"{app_lower}.exe")
                         try:
                             import ctypes
                             logger.info(f"[SCAN] ShellExecuteW opening '{exe}' for '{resolved_name}'")
@@ -3932,7 +3848,7 @@ if _HAS_CREWAI:
                             return True
                         t = (win32gui.GetWindowText(h) or "").lower()
                         c = (win32gui.GetClassName(h) or "").lower()
-                        if any(bad in t for bad in ["antigravity", "visual studio", "code -", "chrome", "edge", "terminal", "powershell"]):
+                        if _is_infra_window(h):
                             return True
                         if is_calc:
                             if "calculator" in t or "calc" in t or (c == "applicationframewindow" and "calc" in t):
@@ -5191,7 +5107,7 @@ class CrewAIEngine:
                         if win32gui.IsWindowVisible(h):
                             t = (win32gui.GetWindowText(h) or "").lower()
                             c = (win32gui.GetClassName(h) or "").lower()
-                            if any(bad in t for bad in ["antigravity", "visual studio", "code -", "chrome", "edge", "terminal", "powershell"]):
+                            if _is_infra_window(h):
                                 return True
                             if c in ("mspaintapp", "paintapp") or "paint" in t:
                                 p_hwnd = h

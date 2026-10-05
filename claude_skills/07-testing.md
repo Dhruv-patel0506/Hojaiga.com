@@ -65,3 +65,12 @@ pointer). Do not mark it PASS, do not mark it FAIL — mark it blocked and expla
 Popup group 92.1 (4/4). G1 now grounds notepad to 312 elements via `['uia','ocr','vision']`
 with `skipped=[]` — but CPU vision is slow (~2 min in-test); that's real, not faked.
 **Nothing has completed a fully unattended end-to-end task yet** — that remains the goal.
+
+## Sync step after a green suite (backlog 5.6)
+Repo never more than one session behind: after a suite-green run, `powershell -File D:\new_automation\build_hojaiga_repo.ps1` mirrors the product to
+`D:\Hojaiga` (it OVERWRITES that repo's `.gitignore`: run `git checkout -- .gitignore` there), stage selectively (never the sqlite/db files), commit,
+`git push origin main`. Identity is already `Dhruv-patel0506` (global config); new commits show it.
+
+## App-knowledge tests (2026-10-05)
+Offline: `--only KP1,KP2,KS1,KB1,INF1,B2N,PURE1,KM2,TF1,DAY2,ORG1`. Live (a fresh window each, ENV-BLOCKED when the user has that app open):
+`--only KM1,KC1,KT1`; the 8-ticket unattended day is opt-in: `--day-live` (DAY3). Benchmark: `python mastery_bench.py --apps calculator,notepad,paint --runs 3`.

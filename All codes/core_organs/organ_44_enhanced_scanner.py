@@ -376,8 +376,73 @@ class OmniParserScanner:
         except Exception as e:
             logger.error(f"[OmniParserScanner] Failed to initialize: {e}")
 
-    def parse_screenshot(self, image_path: str) -> List[UIElementEnhanced]:
+    # ---- the split vision tier (backlog 2.1) -------------------------------------------------------------------
+    CAPTION_MAX_ICONS = int(os.environ.get("HOJAIGA_OMNI_CAPTION_MAX_ICONS", "60"))
+
+    def _parse_fast(self, image) -> List[Dict[str, Any]]:
+        """Detector + OCR only (use_local_semantics=False): text boxes with their OCR text, icon boxes with content None.
+        Returns the upstream's own element dicts: {'type','bbox'(ratio xyxy),'interactivity','content'}."""
+        from util.utils import get_som_labeled_img, check_ocr_box
+        ratio = max(image.size) / 3200
+        draw_cfg = {"text_scale": 0.8 * ratio, "text_thickness": max(int(2 * ratio), 1), "text_padding": max(int(3 * ratio), 1),
+                    "thickness": max(int(3 * ratio), 1)}
+        (text, ocr_bbox), _ = check_ocr_box(image, display_img=False, output_bb_format="xyxy",
+                                            easyocr_args={"text_threshold": 0.8}, use_paddleocr=False)
+        _img, _coords, elems = get_som_labeled_img(
+            image, self._model.som_model, BOX_TRESHOLD=self._resolve_config()["BOX_TRESHOLD"], output_coord_in_ratio=True,
+            ocr_bbox=ocr_bbox, draw_bbox_config=draw_cfg, caption_model_processor=None, ocr_text=text,
+            use_local_semantics=False, iou_threshold=0.7, scale_img=False, batch_size=128)
+        return list(elems or [])
+
+    def _start_caption_job(self, image, items: List[Tuple[UIElementEnhanced, Dict[str, Any]]]) -> None:
+        """Caption the icon boxes on ONE background worker and write the captions into the element objects the caller already holds.
+        `caption_future` resolves to the number of icons named; callers may add a done-callback (the grounding cache does)."""
+        from concurrent.futures import ThreadPoolExecutor
+        icons = [(el, it) for el, it in items if it.get("content") is None]
+        icons.sort(key=lambda p: -((p[1]["bbox"][2] - p[1]["bbox"][0]) * (p[1]["bbox"][3] - p[1]["bbox"][1])))
+        icons = icons[: self.CAPTION_MAX_ICONS]
+        self.caption_future = None
+        if not icons or getattr(self._model, "caption_model_processor", None) is None:
+            return
+        if not hasattr(self, "_cap_pool"):
+            self._cap_pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="omni-caption")
+        gen = getattr(self, "_cap_gen", 0)            # the job belongs to THIS window state; a newer parse invalidates it
+
+        def _job() -> int:
+            import numpy as np
+            import torch
+            from util.utils import get_parsed_content_icon
+            t0 = time.time()
+            boxes = torch.tensor([it["bbox"] for _el, it in icons])
+            src = np.asarray(image.convert("RGB"))
+            prev = torch.get_num_threads()
+            caps: List[str] = []
+            try:
+                torch.set_num_threads(max(1, (os.cpu_count() or 4) // 4))        # leave most cores to the foreground
+                for i in range(0, len(icons), 12):
+                    if getattr(self, "_cap_gen", 0) != gen:                      # a newer parse started: stop, do not compete with it
+                        break
+                    caps += get_parsed_content_icon(boxes[i:i + 12], 0, src, self._model.caption_model_processor, batch_size=12)
+            finally:
+                torch.set_num_threads(prev)
+            named = 0
+            for (el, it), cap in zip(icons, caps):
+                cap = (cap or "").strip()
+                if cap:
+                    el.text = cap
+                    el.semantic_action = cap
+                    it["content"] = cap
+                    named += 1
+            logger.info("[OmniParserScanner] captioned %d/%d icons in %.1fs (background)", named, len(icons), time.time() - t0)
+            return named
+        self.caption_future = self._cap_pool.submit(_job)
+
+    def parse_screenshot(self, image_path: str, captions: Optional[str] = None) -> List[UIElementEnhanced]:
         """Parse a screenshot using the local OmniParser for semantic UI understanding.
+
+        captions: 'lazy' (default; env HOJAIGA_OMNI_CAPTIONS) = detector + OCR now, icon captions in the background;
+                  'sync' = the upstream blocking behaviour (detector + OCR + a caption for every icon, minutes on CPU);
+                  'off'  = never caption.
 
         The model's parse() takes a base64 PNG and returns (annotated_img, list)
         where each item has a normalized [0,1] bbox, caption/content and an
@@ -388,6 +453,7 @@ class OmniParserScanner:
             self._init_model()
         if not self._available:
             return []
+        self._cap_gen = getattr(self, "_cap_gen", 0) + 1          # cancels any caption job of an OLDER window state
 
         try:
             import base64 as _b64
@@ -396,8 +462,13 @@ class OmniParserScanner:
             w, h = img.size
             with open(image_path, "rb") as fh:
                 b64 = _b64.b64encode(fh.read()).decode("ascii")
+            mode = (captions or os.environ.get("HOJAIGA_OMNI_CAPTIONS", "lazy")).lower()
+            self.caption_future = None
             try:
-                parsed = self._model.parse(b64)
+                if mode == "sync":
+                    parsed = self._model.parse(b64)
+                else:
+                    parsed = (None, self._parse_fast(img))
             except (TypeError, ValueError) as pe:
                 # Upstream OmniParser has no guard for "nothing detected" (blank / icon-free
                 # window): depending on the stage it raises "'NoneType' object is not
@@ -413,6 +484,7 @@ class OmniParserScanner:
                 logger.info("[OmniParserScanner] PARSE returned 0 elements (no detections)")
                 return []
             _labeled, parsed_content_list = parsed
+            pairs: List[Tuple[UIElementEnhanced, Dict[str, Any]]] = []
 
             elements: List[UIElementEnhanced] = []
             for i, item in enumerate(parsed_content_list or []):
@@ -442,6 +514,9 @@ class OmniParserScanner:
                     attributes={"omniparser_raw": item},
                 )
                 elements.append(element)
+                pairs.append((element, item))
+            if mode == "lazy":
+                self._start_caption_job(img, pairs)
 
             logger.info(f"[OmniParserScanner] Parsed {len(elements)} elements")
             return elements

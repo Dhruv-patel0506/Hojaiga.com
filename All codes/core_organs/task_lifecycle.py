@@ -174,6 +174,38 @@ def _template_first(ticket, spans, plans, model, run_id, allow_destructive, chai
         return None
 
 
+def try_template_first(command: str, spans, model, run_id: str, chain: "Chain", allow_destructive: bool = False):
+    """3.1: the SAME template-first lookup the lifecycle does, for the free-form `execute_task` path. Called by the
+    loop-first preamble BEFORE any goal segmentation / planning. Returns a LoopFirstResult that stands for the
+    template run (status COMPLETED or NEEDS_HUMAN), or None when no template covers the ticket (the verified loop then
+    plans as before). The chain carries the A3.template checkpoint either way, so a trace shows which path ran."""
+    desk = [(a, p) for a, p in (spans or []) if not lf.is_browser_app(a)]
+    if model is None or len(desk) != 1:
+        return None
+    try:
+        plans = lf.plan_app_goals(command, desk)
+        r = _template_first(command, desk, plans, model, run_id, allow_destructive, chain)
+    except Exception as exc:
+        chain.mark("A3.template", "template-first lookup", "FAIL", f"{type(exc).__name__}: {exc}")
+        return None
+    if r is None or not plans:
+        return None
+    plan = plans[0]
+    run = lf.AppRun(app=desk[0][0], plan=plan, hwnd=lf.handle_for(desk[0][0]))
+    run.result = {"steps": 0, "completed": r["status"] == "DONE", "via": "template", "template": r.get("template", ""),
+                  "recipe": f"template '{r.get('template', '')}'", "evidence": r.get("evidence", "")}
+    out = lf.LoopFirstResult(ran=True, reason="template-first", runs=[run])
+    if r["status"] == "DONE":
+        run.status = "COMPLETED"
+        run.goal_verdicts = ["PASS"] * len(plan.goals)
+    else:                                                   # a leaf was queued for a human: stop, never improvise
+        run.status = "NEEDS_HUMAN"
+        run.goal_verdicts = ["NOT RUN"] * len(plan.goals)
+        out.halted_for_human = True
+        out.capsule = r.get("evidence", "a template step needs a human")
+    return out
+
+
 def _checkpoints_from_run(run: lf.AppRun, chain: Chain, *, intel_note: str = "") -> None:
     """Derive the B-H checkpoint verdicts from what this app's run actually measured."""
     r = run.result or {}

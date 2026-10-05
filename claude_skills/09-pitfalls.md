@@ -162,3 +162,17 @@ Each entry: **Bug class → Root cause → Fix pattern → Boundary.**
   Cancel, so nothing happened, and then CACHED that dead `key:escape`, which poisoned the next case. Fix: read classic dialogs
   natively (`hin.native_dialog_parts`, 2-6 ms) and press with a posted `BM_CLICK`; cache a key answer only after the window is
   verified gone. Rule: never cache an unverified answer.
+
+## P-28  `pip check` reports one conflict - decided: leave it pinned, it is cosmetic (I-5, 2026-10-05)
+- `crewai-cli 1.15.1 requires pydantic-settings~=2.10.1, but pydantic-settings 2.15.0 is installed`. Five packages need pydantic-settings
+  (crewai, crewai-cli, langchain-community, litellm, mcp); litellm and mcp want the newer line, crewai-cli's `~=2.10.1` pin is stricter than
+  its code needs. Verified: `crewai`, `litellm` and `pydantic_settings` all import (suite H1 stays green). Do NOT downgrade pydantic-settings to
+  satisfy crewai-cli (it breaks litellm/mcp); if crewai-cli is ever upgraded, re-run `pip check`.
+
+## P-29  App-knowledge engine pitfalls (details in 16-app-mastery.md)
+- Caches keyed by `id(object)` are wrong after garbage collection (a new sqlite connection reused an id: tables "already existed").
+- Two sources describing the same command (same name/path/shortcut) upsert to ONE row; keep provenance in `bm_cmd_sources` or corroboration is lost.
+- Window chrome is not app UI: pressing Minimize / Maximize / Keep-on-top as a probe destroys the scan (frontier skips title-bar controls).
+- A posted Escape is not delivered to XAML popups (`WM_CLOSE` on the popup window closes them); UIA `ShowContextMenu` / Shift+F10 do nothing there;
+  a posted `WM_CONTEXTMENU` to the CHILD window under the point works.
+- A single keyword is not evidence of what an app is ("Volume" in a converter list), and shared file verbs are not a kind.

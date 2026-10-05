@@ -663,6 +663,14 @@ def exit(hwnd: int) -> bool:                            # noqa: A001 - mirrors e
         except Exception:
             return False
     try:
+        if _u32.IsWindow(hwnd) and _u32.IsHungAppWindow(hwnd):
+            # ShowWindow / SetWindowPlacement are SYNCHRONOUS calls into the window's thread: on a window that has stopped answering
+            # they block this process for ever (measured: a colour dialog wedged Paint and the run hung in here). Nothing can be
+            # restored on a frozen window; the caller reports it.
+            if p.guard is not None:
+                p.guard.halt()
+                p.guard.join(timeout=1.0)
+            return False
         if _u32.IsWindow(hwnd):
             # order matters (measured): SetWindowPlacement with the ORIGINAL rect while the window is
             # still restored flashes the whole window at its old position. So minimize IN PLACE

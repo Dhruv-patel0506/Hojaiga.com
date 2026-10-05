@@ -137,8 +137,6 @@ if _HAS_CTYPES:
         ctypes.windll.user32.PostMessageW.restype = wintypes.BOOL
         ctypes.windll.user32.ScreenToClient.argtypes = [wintypes.HWND, ctypes.c_void_p]
         ctypes.windll.user32.ScreenToClient.restype = wintypes.BOOL
-        ctypes.windll.user32.SetCursorPos.argtypes = [ctypes.c_int, ctypes.c_int]
-        ctypes.windll.user32.SetCursorPos.restype = wintypes.BOOL
         ctypes.windll.user32.GetCursorPos.argtypes = [ctypes.c_void_p]
         ctypes.windll.user32.GetCursorPos.restype = wintypes.BOOL
 

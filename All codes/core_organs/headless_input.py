@@ -111,7 +111,11 @@ _VK: Dict[str, int] = {
     "up": 0x26, "down": 0x28, "left": 0x25, "right": 0x27,
     "home": 0x24, "end": 0x23, "pageup": 0x21, "pagedown": 0x22,
     **{f"f{i}": 0x6F + i for i in range(1, 13)},
+    # punctuation (US layout virtual keys): accelerators such as Ctrl+, / Ctrl+= / Ctrl+- are common
+    "comma": 0xBC, "period": 0xBE, "minus": 0xBD, "equals": 0xBB, "plus": 0xBB, "slash": 0xBF, "semicolon": 0xBA,
+    "quote": 0xDE, "lbracket": 0xDB, "rbracket": 0xDD, "backslash": 0xDC, "backtick": 0xC0,
 }
+_PUNCT_CHARS = {",": 0xBC, ".": 0xBE, "-": 0xBD, "=": 0xBB, "/": 0xBF, ";": 0xBA, "'": 0xDE, "[": 0xDB, "]": 0xDD, "`": 0xC0}
 _MODS = {0x11, 0x10, 0x12, 0x5B}
 _EXTENDED = {0x25, 0x26, 0x27, 0x28, 0x21, 0x22, 0x23, 0x24, 0x2D, 0x2E}
 
@@ -122,6 +126,8 @@ def token_to_vk(tok: str) -> Optional[int]:
         return _VK[t]
     if len(t) == 1 and t.isalnum():
         return ord(t.upper())
+    if t in _PUNCT_CHARS:
+        return _PUNCT_CHARS[t]
     return None
 
 
@@ -697,10 +703,10 @@ def capture_window(hwnd: int):
 # ---------------------------------------------------------------------------
 # Physical-input guard (product law: the user's pointer/keyboard are never touched)
 # ---------------------------------------------------------------------------
-# Legacy code paths (older crew tools, scanners) still call the Win32/pyautogui injection APIs.
-# Rather than trusting every call site, those APIs are replaced process-wide with a guard that
-# REFUSES the call, records who tried (VIOLATIONS), and returns a failure value. Opt-out for
-# deliberate legacy debugging only: HOJAIGA_ALLOW_PHYSICAL_INPUT=1.
+# No first-party code calls the Win32/pyautogui injection APIs any more (1.1: the code paths were DELETED, and
+# si_tests_knowledge PURE1 fails the suite if one comes back - it reads the AST of every source file). The guard below stays
+# as defence in depth against THIRD-PARTY libraries: those APIs are replaced process-wide with a guard that REFUSES the call,
+# records who tried (VIOLATIONS) and returns a failure value. There is no opt-out.
 
 VIOLATIONS: List[Dict[str, str]] = []
 _GUARDED_USER32 = ("SetCursorPos", "mouse_event", "keybd_event", "SendInput")
@@ -713,9 +719,7 @@ _guard_installed = False
 
 
 def physical_input_blocked(what: str) -> bool:
-    """True (and recorded) when a physical-input attempt must be refused."""
-    if os.environ.get("HOJAIGA_ALLOW_PHYSICAL_INPUT") == "1":
-        return False
+    """True (and recorded) when a physical-input attempt must be refused. Always refuses: there is no opt-out."""
     import traceback
     frames = traceback.extract_stack(limit=5)[:-1]
     where = " <- ".join(f"{os.path.basename(f.filename)}:{f.lineno}" for f in reversed(frames))

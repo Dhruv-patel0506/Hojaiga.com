@@ -92,6 +92,9 @@ LEGAL_VERBS = ("click", "type", "key", "invoke", "scroll", "wait", "done")
 # A learned shortcut this confident is executed directly, skipping the LLM
 # judge entirely — this is the "pro muscle memory" path (Ctrl+S to save, etc.).
 PRO_SHORTCUT_CONF = float(os.environ.get("HOJAIGA_PRO_SHORTCUT_CONF", "0.70"))
+# 6.4: direct control (executing a remembered shortcut without the judge) needs this many VERIFIED successes - one lucky
+# trace once poisoned a step (a weak 'the UI changed' PASS on Ctrl+N turned into 'Ctrl+N does whatever the goal says')
+DIRECT_MIN_SUCCESSES = int(os.environ.get("HOJAIGA_DIRECT_MIN_SUCCESSES", "2"))
 
 # Destructive patterns are generic word cues, not per-app hardcodes.
 MAX_RELAUNCHES = int(os.environ.get("HOJAIGA_MAX_RELAUNCHES", "1"))     # G2: one relaunch per run, then fail with evidence
@@ -166,6 +169,15 @@ def _is_parked_offscreen(hwnd: int) -> bool:
 def _element_id(hwnd: int, role: str, name: str, bbox: Tuple[int, int, int, int]) -> str:
     raw = f"{hwnd}|{role}|{name.strip().lower()}|{bbox}"
     return "el_" + hashlib.md5(raw.encode("utf-8")).hexdigest()[:10]
+
+
+def _get_bridge():
+    """The knowledge bridge (unified command knowledge from scans + explorations). None when unavailable or disabled."""
+    try:
+        from core_organs import knowledge_bridge as _kb
+        return _kb.get_bridge() if _kb.ENABLED else None
+    except Exception:
+        return None
 
 
 def _get_intel():
@@ -314,7 +326,8 @@ class DesktopGrounding:
             cname = cls_buf.value.lower()
             # Skip infrastructure windows, same spirit as organ_01 filters.
             if cname in ("shell_traywnd", "progman", "workerw", "mintaskswnd",
-                         "shell_dock", "topmosttoplevelwindowclass"):
+                         "shell_dock", "topmosttoplevelwindowclass",
+                         "#32768"):           # a classic MENU window (the popup of a menu bar) is never the app's window; it was picked once after a menu crawl
                 return True
             # A UWP app's CoreWindow is its content host, not an app window: it cannot be minimized, parked or
             # closed on its own (its ApplicationFrameWindow is the real top level, and UIA on the frame already
@@ -330,9 +343,15 @@ class DesktopGrounding:
             hit = next((t for t in hint_tokens if t in proc), None) or next((t for t in hint_tokens if t in cname), None)                 or next((t for t in hint_tokens if t in title), None)
             if not hint_tokens or hit is None:
                 return True
+            if len(hint_tokens) > 1 and not any(t in proc for t in hint_tokens) and not all(t in (cname + " " + title) for t in hint_tokens):
+                return True      # a multi-word name that only SOME of its words reach through the class / title is another window ('HJ-TY1-Nothing' is not 'HJ-TY1-Alpha')
             if proc in self._BROWSER_PROCS and not hint_is_browser:
                 return True
-            if any(t in proc for t in hint_tokens):
+            blob = proc + " " + cname + " " + title
+            matched = sum(1 for t in hint_tokens if t in blob)            # a window that carries MORE of the hint's words is the better match
+            if title == hint:
+                score = 6                                                 # the window is literally titled what was asked for
+            elif any(t in proc for t in hint_tokens):
                 score = 5
             elif any(t in cname for t in hint_tokens):
                 score = 4
@@ -356,7 +375,7 @@ class DesktopGrounding:
                 w = h = 1000
             if not hin.is_minimized(hwnd) and (w < 120 or h < 80):
                 return True  # (minimized windows report a tiny parked rect; they are still real)
-            found.append((score * 10_000_000 + w * h, hwnd))
+            found.append((score * 1_000_000_000 + matched * 100_000_000 + w * h, hwnd))
             return True
 
         self._proc_cache = {}
@@ -768,14 +787,17 @@ class DesktopGrounding:
             if hit and key[1] and (time.monotonic() - hit[0]) <= VISION_CACHE_TTL_S:
                 report["vision_cache_hit"] = True
                 self._vision_ran = True
-                return list(hit[1])
+                return list(hit[1])           # same element objects: any captions the background job finished are already in them
             parser = self._get_vision_parser()
             if parser is None:
                 report.setdefault("tiers_skipped", []).append("vision:no-parser")
                 return []
             self._vision_calls += 1
             self._vision_ran = True
+            t_parse = time.time()
             elements = parser.parse_screenshot(path)
+            report["vision_parse_ms"] = int((time.time() - t_parse) * 1000)
+            report["vision_captions"] = "background" if getattr(parser, "caption_future", None) is not None else "none/sync"
             # parse_screenshot returns image-pixel bounds; the window PNG is a grab
             # of the window rect, so add the window origin to get SCREEN coords.
             ox = oy = 0
@@ -787,15 +809,29 @@ class DesktopGrounding:
             except Exception:
                 pass
             out: List[GroundedElement] = []
+            src_of: List[Tuple[GroundedElement, Any]] = []
             for e in elements:
                 b = e.bounds
                 screen_bbox = (b[0] + ox, b[1] + oy, b[2] + ox, b[3] + oy)
-                out.append(GroundedElement(
+                ge = GroundedElement(
                     id=_element_id(hwnd, e.role, e.text, screen_bbox),
-                    name=e.text or "vision", role=e.role, bbox=screen_bbox,
-                    tier="vision", confidence=float(e.confidence or 0.35), hwnd=hwnd))
+                    name=e.text or ("icon" if e.role != "text" else "vision"), role=e.role, bbox=screen_bbox,
+                    tier="vision", confidence=float(e.confidence or 0.35), hwnd=hwnd)
+                out.append(ge)
+                src_of.append((ge, e))
+            fut = getattr(parser, "caption_future", None)
+            if fut is not None:
+                def _fill(_f, _pairs=src_of):
+                    """Background captions finished: write the names into the SAME GroundedElement objects the cache holds."""
+                    try:
+                        for ge_, e_ in _pairs:
+                            if e_.text and ge_.name in ("icon", "vision"):
+                                ge_.name = e_.text
+                    except Exception:
+                        pass
+                fut.add_done_callback(_fill)
             if key[1]:
-                self._vision_cache[key] = (time.monotonic(), list(out))
+                self._vision_cache[key] = (time.monotonic(), out)           # the cache holds the live objects: captions land in them
                 if len(self._vision_cache) > 8:
                     self._vision_cache.pop(next(iter(self._vision_cache)))
             return out
@@ -1866,6 +1902,8 @@ class DesktopAutonomyLoop:
         self._last_window_mode = "not-needed"
         # W8 app-intelligence organ (None => run on perception alone)
         self.intel = _get_intel()
+        # behavior-model knowledge (unified commands, routes, transitions); None => the loop runs without it
+        self.bridge = _get_bridge()
 
     @property
     def dap_core(self):
@@ -2130,7 +2168,8 @@ class DesktopAutonomyLoop:
         # Only a genuinely-verified shortcut may skip the judge. An unverified
         # archetype guess must never take direct control of the machine.
         if (top.shortcut and top.source == "learned"
-                and top.confidence >= PRO_SHORTCUT_CONF and not top.destructive):
+                and top.confidence >= PRO_SHORTCUT_CONF and not top.destructive
+                and getattr(top, "successes", DIRECT_MIN_SUCCESSES) >= DIRECT_MIN_SUCCESSES):
             return {"kind": "shortcut", "shortcut": top.shortcut,
                     "confidence": top.confidence, "source": top.source,
                     "step_id": top.step_id, "goal": goal, "kb_route": kb_route}
@@ -2220,6 +2259,17 @@ class DesktopAutonomyLoop:
 
         # Crash / "Not Responding" detection: relaunch via organ_40 and resume
         if hwnd and self.is_app_crashed_or_hung(hwnd):
+            try:                                                           # B2: one stat before any relaunch
+                from core_organs import organ_48_app_behavior_model as _bm2
+                _exe = _bm2._exe_of_hwnd(hwnd)
+            except Exception:
+                _exe = ""
+            if _exe and not os.path.isfile(_exe):
+                self._launch_note = f"executable missing ({_exe}); not relaunching"
+                logger.warning("[autonomy] %s", self._launch_note)
+                entry = StepTrace(goal, "-", "-", "WRONG_STATE", "relaunch", self._launch_note, ladder["tiers_ran"])
+                self.trace.append(entry)
+                return self._step_result(entry, elements=[])
             logger.warning("[autonomy] App %s (hwnd=%s) is hung/crashed. Relaunching...", app_hint, hwnd)
             self.capsule_cb("working", f"Relaunching {app_hint} (not responding)")
             try:
@@ -2240,6 +2290,9 @@ class DesktopAutonomyLoop:
         before = self.verifier.snapshot(hwnd, elements)
         if not expect:
             before.names = self._all_names(hwnd)      # the default postcondition also compares every UIA name
+            before.modes = list(getattr(self, "_last_modes", []))
+        elif self.bridge is not None:                 # 3.2/3.3: the state a transition starts from (names + mode indicators)
+            before.names = self._all_names(hwnd)
             before.modes = list(getattr(self, "_last_modes", []))
 
         # ---- Native file dialog rung: a goal naming an absolute path + a visible
@@ -2275,6 +2328,25 @@ class DesktopAutonomyLoop:
         # not reachable (menus often live in a popup host the UIA tree cannot see), so try the
         # expert hint's keyboard route ONCE. Non-destructive only, focus proven, and the result
         # is still judged by the postcondition (an unverified guess never counts as success).
+        # ---- K: unified command knowledge learned by scans/explorations (statically from the program file, live from
+        # menus, explored surfaces, tested conventions). A VERIFIED command (>= 2 successes, postcondition, not E2) runs
+        # directly; anything less only ranks the judge's shortlist.
+        kb = None
+        if self.bridge is not None:
+            kb = self.bridge.consult(app_hint, goal, wants_text=self.judge._wants_text(goal))
+            if kb is not None:
+                direct, why = self.bridge.direct_ok(kb, goal)
+                logger.info("[knowledge] goal=%r -> %r score=%.1f sources=%s direct=%s (%s)", goal[:40], kb["name"], kb["score"],
+                            kb["sources"], direct, why)
+                if direct and (pro is None or pro.get("kind") != "shortcut"):
+                    return self._run_kb_route(kb, goal, app_hint, hwnd, before, expect, elements, ladder)
+                acc, acc_why = self.bridge.accelerator_ok(kb, goal)
+                if acc and (pro is None or pro.get("kind") != "shortcut") and self._goal_fails.get(goal, 0) < 2:
+                    logger.info("[knowledge] declared accelerator attempt: %s", acc_why)
+                    return self._run_kb_route(kb, goal, app_hint, hwnd, before, expect, elements, ladder, only="key",
+                                              tag="knowledge:accelerator")
+                if pro is None or pro.get("source") not in ("learned",):
+                    pro = self.bridge.as_hint(kb)
         kb_key = (pro.get("shortcut") or pro.get("kb_route") or "") if pro is not None else ""
         kb_recovery = (pro is not None and pro["kind"] == "element" and bool(kb_key)
                        and self._goal_fails.get(goal, 0) >= 4
@@ -2294,6 +2366,8 @@ class DesktopAutonomyLoop:
                 evidence += " [XAML/WinUI host: posted keys are not delivered to XAML input - the shortcut cannot work headless; use the element route]"
                 method += "+xaml-ignores-posted-keys"
             self._reinforce(app_hint, goal, pro, verdict)
+            self._record_knowledge(app_hint, goal, kb=None, verb="key", target=pro.get("shortcut", ""), effector="key", verdict=verdict,
+                                   before=before, expect=expect, hwnd=hwnd, evidence=evidence)
             self._goal_fails[goal] = 0 if verdict == "PASS" else self._goal_fails.get(goal, 0) + 1
             self._history.append(f"shortcut {pro['shortcut']} -> {verdict}")
             entry = StepTrace(goal, f"shortcut:{pro['shortcut']}", "shortcut", verdict,
@@ -2376,6 +2450,17 @@ class DesktopAutonomyLoop:
             except Exception:
                 pass
 
+        if self.bridge is not None and verb in ("click", "invoke", "key", "shortcut"):
+            gate = self.bridge.precheck(app_hint, elem.name, hwnd, self.grounding)
+            if gate is not None and not gate["ok"]:             # 3.2: never fire a command whose mode precondition is unmet
+                self._history.append(f"{verb} '{elem.name}' refused: {gate['why'][:60]}")
+                entry = StepTrace(goal, elem.name, verb, "WRONG_STATE", "precondition", gate["why"], ladder["tiers_ran"])
+                self.trace.append(entry)
+                self._write_checkpoint(entry)
+                self.capsule_cb("working", f"[{app_hint}] '{elem.name[:24]}' needs another mode first")
+                return self._step_result(entry, elements=elements)
+            if gate is not None and gate["repaired"]:
+                self._history.append(f"mode repaired via {gate['repaired']} before '{elem.name}'")
         ok, method = _act_on_element(elem, verb, text)
         if not ok:
             # Delivery itself failed, so nothing that the UI does afterwards may be read as success.
@@ -2460,6 +2545,8 @@ class DesktopAutonomyLoop:
         # outcome, so the next run against this app gets a stronger honest prior.
         self._reinforce(app_hint, goal, {"kind": "element", "verb": verb,
                         "element_name": elem.name, "element_role": elem.role}, verdict)
+        self._record_knowledge(app_hint, goal, kb=kb, verb=verb, target=elem.name, effector=method, verdict=verdict,
+                               before=before, expect=expect, hwnd=hwnd, evidence=evidence)
 
         self._goal_fails[goal] = 0 if verdict == "PASS" else self._goal_fails.get(goal, 0) + 1
         if verdict == "WRONG_STATE" and verb in ("click", "invoke"):
@@ -2475,6 +2562,55 @@ class DesktopAutonomyLoop:
         self.trace.append(entry)
         self._write_checkpoint(entry)
         return self._step_result(entry, elements=after_elements)
+
+    def _run_kb_route(self, kb: Dict[str, Any], goal: str, app_hint: str, hwnd: int, before: "Snapshot",
+                      expect: Dict[str, Any], elements: List[GroundedElement], ladder: Dict[str, Any],
+                      only: str = "", tag: str = "knowledge:direct") -> Dict[str, Any]:
+        """Execute a VERIFIED unified command through its best route, then let the postcondition verifier judge it.
+        A failure erodes the command (it stops qualifying for direct control) and the next step falls back to the judge."""
+        self.capsule_cb("working", f"[{app_hint}] {kb['name']} (verified x{kb['successes']})")
+        gate = self.bridge.precheck(app_hint, kb["name"], hwnd, self.grounding)
+        if gate is not None and not gate["ok"]:
+            entry = StepTrace(goal, kb["name"], "kb-route", "WRONG_STATE", "precondition", gate["why"] + f" [{tag} blocked]", ladder["tiers_ran"])
+            self.trace.append(entry)
+            self._write_checkpoint(entry)
+            return self._step_result(entry, elements=elements)
+        ok, eff, note = self.bridge.execute(kb, hwnd, self.grounding, only=only)
+        if ok:
+            self._settle(hwnd)
+        after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
+        if ok:
+            verdict, evidence = self.verifier.verdict(expect, before, self._snap(hwnd, after_elements, expect), after_elements)
+        else:
+            verdict, evidence = "NO_CHANGE", f"route not delivered ({note})"
+        self._record_knowledge(app_hint, goal, kb=kb, verb="invoke", target=kb["name"], effector=eff, verdict=verdict,
+                               before=before, expect=expect, hwnd=hwnd, evidence=evidence)
+        self._goal_fails[goal] = 0 if verdict == "PASS" else self._goal_fails.get(goal, 0) + 1
+        self._history.append(f"knowledge {kb['name']} via {eff} -> {verdict}")
+        entry = StepTrace(goal, kb["name"], "kb-route", verdict, eff, evidence + f" [{tag}]", ladder["tiers_ran"])
+        self.trace.append(entry)
+        self._write_checkpoint(entry)
+        return self._step_result(entry, elements=after_elements)
+
+    def _record_knowledge(self, app_hint: str, goal: str, *, kb: Optional[Dict[str, Any]], verb: str, target: str,
+                          effector: str, verdict: str, before: "Snapshot", expect: Dict[str, Any], hwnd: int,
+                          evidence: str) -> None:
+        """3.3: every verified step becomes behavior knowledge: the command is reinforced/eroded, the effector outcome is
+        recorded and the (state, action, effector) -> (state', evidence) transition is written. Never raises."""
+        if self.bridge is None:
+            return
+        try:
+            if kb is not None:
+                from core_organs import command_registry as _cr
+                if _cr.canon(target) not in {_cr.canon(n) for n in kb["names"]}:
+                    kb = None                          # the judge chose something else: do not credit the hinted command
+            after_names = self._all_names(hwnd) if verdict == "PASS" else []
+            b = self.bridge.observe_light(hwnd, before.title, list(before.names or []), list(before.modes or []))
+            a = self.bridge.observe_light(hwnd, _quick_title(hwnd), after_names, list(getattr(self, "_last_modes", []))) if verdict == "PASS" else None
+            self.bridge.record(app_hint, goal, verb=verb, target=target, effector=effector, verdict=verdict,
+                               before_state=b, after_state=a, evidence=evidence, kb=kb, strong=bool(expect))
+        except Exception as exc:
+            logger.debug("[knowledge] record failed: %s", exc)
 
     def _control_text(self, elements: List[GroundedElement]) -> str:
         """Longest readable text among the editable controls (UIA value/text pattern)."""
@@ -2528,6 +2664,8 @@ class DesktopAutonomyLoop:
                         modes.append(f"{nm}|selected")
                     if n.expand_state == 1:
                         modes.append(f"{nm}|expanded")
+                    if getattr(n, "toggle_state", -1) == 1:
+                        modes.append(f"{nm}|checked")
         except Exception as exc:
             logger.debug("[verify] name read failed: %s", exc)
         self._last_modes = modes
@@ -3106,12 +3244,43 @@ def _launch_if_missing(loop: "DesktopAutonomyLoop", app_name: str, capsule_cb=No
                 return True          # it was started but showed no window yet: poll for it, never start a second copy
         except Exception as exc:
             logger.debug("[operate_app] hidden launch unavailable: %s", exc)
+        # B2: the fuzzy resolver maps a nonsense name onto a REAL app (it once launched Excel for an invented name). Only a
+        # resolution that actually names what was asked may launch; otherwise report it and stop - no retry, no guess.
+        ok_res, why = _fallback_resolution_ok(app_name)
+        if not ok_res:
+            loop._launch_note = (getattr(loop, "_launch_note", "") + f" | no installed app resolves to '{app_name}': {why}; nothing launched").strip(" |")
+            logger.warning("[operate_app] %s", loop._launch_note)
+            return False
         from core_organs.organ_40_app_launcher import resolve_and_launch
         resolve_and_launch(app_name)
         return True
     except Exception as exc:
         logger.debug("[operate_app] auto-launch note: %s", exc)
         return False
+
+
+def _fallback_resolution_ok(app_name: str) -> Tuple[bool, str]:
+    """True when SOME installed program faithfully answers to `app_name`: a program/package/App-Paths resolution
+    (static_knowledge.exe_for) or the organ_40 catalog's pick sharing a distinctive word with the request."""
+    try:
+        from core_organs import static_knowledge as sk
+        if sk.exe_for(app_name):
+            return True, "resolved to an installed program"
+    except Exception:
+        pass
+    try:
+        from core_organs.organ_40_app_launcher import AppCatalog, VerbAliasEngine, plan_task_app
+        catalog = AppCatalog()
+        catalog.ensure_scanned()
+        plan = plan_task_app(app_name, catalog=catalog, engine=VerbAliasEngine(catalog, None))
+        target = (plan.get("target_app") or "") if plan.get("action") == "launch_app" else ""
+        want = {w for w in re.findall(r"[a-z0-9]+", (app_name or "").lower()) if len(w) > 2}
+        got = {w for w in re.findall(r"[a-z0-9]+", target.lower()) if len(w) > 2}
+        if want & got:
+            return True, f"catalog resolved to '{target}'"
+        return False, f"the catalog's pick '{target or 'nothing'}' shares no word with the request"
+    except Exception as exc:
+        return False, f"resolver unavailable ({type(exc).__name__})"
 
 
 def prepare_app(app_name: str, capsule_cb=None, cursor_cb=None) -> Dict[str, Any]:

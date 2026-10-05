@@ -577,11 +577,16 @@ def save_layout(model, app_key: str, mapper: LayoutMapper, version_hash: str = "
     now = time.time()
     rname = {r["region_id"]: r for r in mapper.regions.values()}
     sig = mapper.structure_signature()
+    try:
+        from core_organs.knowledge_store import redact as _redact
+    except Exception:
+        _redact = lambda t: t
     for c in mapper.controls:
         rg = rname.get(c["region_id"], {})
+        c = dict(c, name=_redact(c["name"]), path=" > ".join(_redact(x.strip()) for x in (c["path"] or "").split(">")) if c.get("path") else c.get("path", ""))
         model._conn.execute(
             "INSERT OR REPLACE INTO bm_layout VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            (c["ctrl_id"], app_key, c["region_id"], rg.get("kind", ""), rg.get("name", ""), c["role"], c["name"],
+            (c["ctrl_id"], app_key, c["region_id"], rg.get("kind", ""), _redact(rg.get("name", "")), c["role"], c["name"],
              c["automation_id"], c["cls"], *c["bbox"], *c["rel"], int(c["enabled"]), int(c["offscreen"]),
              ",".join(c["patterns"]), c["path"], c["via"], version_hash, now))
     for r in mapper.regions.values():

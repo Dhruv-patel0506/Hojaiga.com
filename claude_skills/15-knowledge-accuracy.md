@@ -71,3 +71,33 @@ Local judge `qwen2.5:7b` (ladder): valid decisions 100% on Notepad/Paint/Excel a
   was not isolated (CPU spin-wait after a vision parse was measured and ruled out: 0-4% idle).
 * **Window-matching** (`find_window`) now skips only the agent's ancestor processes; excluding the agent's own process broke every test
   that creates its own fixture window.
+
+## App-mastery engine (organ_63 + static harvest; `mastery_bench.py`, measured 2026-10-05)
+Method: a brand-new empty database per app, then N cumulative `master()` runs, graded afterwards against INDEPENDENT readings of the live
+window (a plain `uiautomation` walk; the live Win32 HMENU for classic menu bars). Hosts: msinfo32 (Win32), Notepad and Paint (WinUI), Calculator (UWP).
+
+| App | runs (s) | commands | transitions | recall of resting controls | menu-path precision | explored frontier |
+|---|---|---|---|---|---|---|
+| msinfo32 | 53 / 21 / 18 | 108 -> 108 -> 108 | 0 | 1.00 (60 controls) | 0.92 (14 paths, HMENU grader) | 3/8 |
+| Calculator | 52 / 22 / 16 | 40 -> 40 -> 40 | 16 | 0.83 (46) | no menu paths | 19/19 |
+| Notepad | 38 / 43 / 20 | 84 -> 92 -> 92 | 0 -> 5 -> 5 | 0.65 (17) | 0.33 (36 paths, UIA-expand grader) | 13/13 |
+| Paint (2 runs) | 85 / 40 | 206 -> 207 | 9 -> 10 | 0.90 (10) | 0.92 (41) | 14/55 |
+
+What the numbers do NOT say (read before quoting them):
+* **Run-to-run variance is real.** Calculator persists its mode: one session reached 72 -> 115 -> 124 commands (Programmer mode on screen), the
+  next three sessions 40 commands (Standard). Knowledge is measured per UI state, so the same app can yield different totals.
+* **Notepad's menu-path precision is a GRADER limit, not necessarily a knowledge error**: its menus are XAML flyouts that the UIA-expand grader
+  opens unreliably headless (0.67 in one session, 0.33 in the next, same code). msinfo32 and Paint grade exactly (HMENU) or near it.
+* **Replay (probe a surface again, same effect?)** is mostly not comparable: 0 comparable for msinfo32/Calculator/Paint, 1 for Notepad,
+  because the controls a replay needs are absent in the state the app is in after the first pass. No replay rate is claimed.
+* Paint explored 14 of 55 explorable surfaces in two runs: the frontier is large and each run is time-boxed.
+* **Paint's `Edit colours` dialog freezes Paint** (not responding, ~100% CPU, reproduced 3 times, found only by a stack dump). The
+  explorer now has a per-probe deadline, a post-probe responsiveness check, marks the control `unsafe` ("froze the app, not pressed
+  again"), and terminates only a process THIS run launched (by pid). A third Paint run in a fresh database still reaches that control once
+  and loses the app, so Paint is graded on 2 runs.
+
+## Known limits found by the exploration work (kept so nobody re-discovers them)
+* WinUI Paint ignores posted mouse input: no context menu and no drawing headless. Posted keys never reach XAML hosts.
+* Exclusive tool toggles (Pencil, Fill, Text, Eraser) cannot be switched off; the previously active tool is not exposed as a toggle,
+  so their unwind is reported FAILED (honestly) and `left_as_found` is False for Paint.
+* "What's new" opens a popup host that does not count as restored; reported as an unwind failure.

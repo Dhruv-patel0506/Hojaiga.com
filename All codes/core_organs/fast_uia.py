@@ -44,6 +44,7 @@ P_PAT = {"invoke": 30031, "toggle": 30041, "expand": 30028, "select": 30036, "va
 P_EXPAND_STATE = 30070          # ExpandCollapseExpandCollapseState
 P_SELECTED = 30079              # SelectionItemIsSelected
 P_ACCESSKEY = 30007
+P_TOGGLE_STATE = 30086          # ToggleToggleState: 0 off, 1 on, 2 indeterminate
 
 _cache_request = None
 _DEFAULT_TIMEOUT_MS = int(__import__("os").environ.get("HOJAIGA_UIA_TIMEOUT_MS", "12000"))
@@ -73,7 +74,7 @@ def _request():
         iua, core, _ = _client()
         cr = iua.CreateCacheRequest()
         for pid in (P_RECT, P_CTYPE, P_NAME, P_ACCEL, P_AID, P_CLASS, P_HELP, P_ENABLED, P_OFFSCREEN, P_ACCESSKEY,
-                    P_EXPAND_STATE, P_SELECTED, *P_PAT.values()):
+                    P_EXPAND_STATE, P_SELECTED, P_TOGGLE_STATE, *P_PAT.values()):
             try:
                 cr.AddProperty(pid)
             except Exception:
@@ -86,7 +87,7 @@ def _request():
 
 class Node:
     __slots__ = ("idx", "parent", "depth", "ctype", "name", "aid", "cls", "rect", "enabled", "offscreen",
-                 "help", "accel", "pats", "expand_state", "selected", "el", "_ctrl", "children")
+                 "help", "accel", "pats", "expand_state", "selected", "toggle_state", "el", "_ctrl", "children")
 
     def __init__(self):
         self.children: List[int] = []
@@ -146,6 +147,10 @@ def _read(el, idx: int, parent: int, depth: int) -> Node:
         n.selected = bool(el.GetCachedPropertyValue(P_SELECTED)) if "select" in pats else None
     except Exception:
         n.selected = None
+    try:
+        n.toggle_state = int(el.GetCachedPropertyValue(P_TOGGLE_STATE)) if "toggle" in pats else -1
+    except Exception:
+        n.toggle_state = -1
     return n
 
 

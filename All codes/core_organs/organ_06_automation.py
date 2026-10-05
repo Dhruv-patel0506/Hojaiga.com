@@ -422,42 +422,26 @@ class MultiTouch_3D_Physics_Engine:
     def __init__(self):
         self._user32 = ctypes.windll.user32 if os.name == 'nt' else None
 
+    # The hardware-event implementations (mouse_event / keybd_event) were DELETED (backlog 1.1): they moved the user's real
+    # pointer and keyboard. A viewport gesture needs a TARGET window and posted messages (headless_input.post_scroll /
+    # post_drag); without one there is nothing safe to do, so the honest answer is a refusal, never a guess.
+    _REFUSED = {"error": "physical input removed (product law); use headless_input.post_scroll/post_drag with a target window",
+                "delivered": False}
+
     async def scroll(self, amount: int) -> Dict[str, Any]:
-        """Basic 2D scrolling."""
-        if not self._user32:
-            return {"error": "unsupported OS"}
-        # MOUSEEVENTF_WHEEL = 0x0800
-        self._user32.mouse_event(0x0800, 0, 0, amount, 0)
-        return {"action": "scroll", "amount": amount}
+        """Basic 2D scrolling: refused (no target window to post to)."""
+        return dict(self._REFUSED, action="scroll", amount=amount)
 
     async def zoom(self, factor: float) -> Dict[str, Any]:
-        """Basic Zoom (Ctrl+Scroll)."""
-        if not self._user32:
-            return {"error": "unsupported OS"}
-        # VK_CONTROL = 0x11, KEYEVENTF_KEYUP = 0x0002
-        self._user32.keybd_event(0x11, 0, 0, 0) # Ctrl down
-        self._user32.mouse_event(0x0800, 0, 0, int(factor * 100), 0)
-        self._user32.keybd_event(0x11, 0, 0x0002, 0) # Ctrl up
-        return {"action": "zoom", "factor": factor}
+        """Basic Zoom (Ctrl+Scroll): refused (no target window to post to)."""
+        return dict(self._REFUSED, action="zoom", factor=factor)
 
     async def rotate_3d_object(self, yaw: float, pitch: float, roll: float) -> Dict[str, Any]:
-        """Maps 3D rotation vectors to coordinated drag sequences for CAD viewing."""
-        if not self._user32:
-            return {"error": "unsupported OS"}
-        
-        # MOUSEEVENTF_LEFTDOWN = 0x0002, MOUSEEVENTF_LEFTUP = 0x0004, MOUSEEVENTF_MOVE = 0x0001
-        self._user32.mouse_event(0x0002, 0, 0, 0, 0) # Mouse Down
-        
-        # Calculate drag offsets based on yaw and pitch
+        """Maps 3D rotation vectors to drag offsets. Refused here; the offsets are still reported so a caller with a window
+        can deliver them through headless_input.post_drag."""
         dx = int(math.sin(yaw) * 100)
         dy = int(math.sin(pitch) * 100)
-        
-        # Simulate drag
-        self._user32.mouse_event(0x0001, dx, dy, 0, 0)
-        await asyncio.sleep(0.1) # Simulate hold time
-        
-        self._user32.mouse_event(0x0004, 0, 0, 0, 0) # Mouse Up
-        return {"action": "3d_rotate", "dx": dx, "dy": dy}
+        return dict(self._REFUSED, action="3d_rotate", dx=dx, dy=dy)
 
 
 # ───────────────────────────── Task Engine (Orchestrator) ─────────────────────────────

@@ -1192,16 +1192,10 @@ def bring_to_foreground(hwnd: int, retries: int = 3) -> bool:
             win32gui.SetForegroundWindow(hwnd)
             return True
         except Exception as e:
+            # (the old fallback pulsed the Alt key with keybd_event to defeat the foreground lock: hardware input and
+            # focus theft in one. Deleted - a window that will not come forward is reported, not forced.)
             logger.debug("SetForegroundWindow attempt %d failed: %s", attempt + 1, e)
-            try:
-                if win32api:
-                    win32api.keybd_event(VK_MENU, 0, 0, 0)
-                    win32api.keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0)
-                time.sleep(0.1)
-                win32gui.SetForegroundWindow(hwnd)
-                return True
-            except Exception:
-                time.sleep(0.15)
+            time.sleep(0.15)
     return False
 
 
@@ -1210,9 +1204,10 @@ def _probe_input_capability() -> bool:
     return True
 
 
-# Keyboard injection enabled (keybd_event). Mouse is ALWAYS virtual (PostMessage — never moved).
+# Input is ALWAYS virtual: UIA patterns and posted window messages (headless_input). Nothing here moves the pointer or
+# injects hardware keyboard events.
 CAN_INJECT_INPUT = True
-logger.info("Input mode: KEYBOARD via keybd_event + MOUSE via PostMessage (cursor never moves)")
+logger.info("Input mode: posted messages + UIA patterns (no hardware input)")
 
 
 def uia_activate(ctrl, fallback_coords: Optional[Tuple[int, int]] = None, target_hwnd: int = 0) -> bool:

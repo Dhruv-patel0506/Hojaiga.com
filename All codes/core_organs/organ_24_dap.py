@@ -564,22 +564,16 @@ class Win32Primitives:
         self.press_button(button)
         self.release_button(button)
 
+    # Physical injection was DELETED (backlog 1.1): these keep their signatures so old callers do not crash, record the
+    # attempt, and do nothing. Input to an app goes through headless_input (posted messages) or a UIA pattern.
     def scroll(self, amount: int, horizontal: bool = False) -> None:
-        """Wheel scroll; positive amount scrolls up (vertical) / right (horizontal)."""
-        if not IS_WINDOWS or hin.physical_input_blocked("organ_24.WIN32.scroll"):
-            return
-        flag = 0x01000 if horizontal else 0x0800  # MOUSEEVENTF_HWHEEL / MOUSEEVENTF_WHEEL
-        user32.mouse_event(flag, 0, 0, int(amount), 0)  # type: ignore
+        hin.physical_input_blocked("organ_24.WIN32.scroll")
 
     def _move_cursor(self, x: int, y: int) -> None:
-        if hin.physical_input_blocked("organ_24.WIN32._move_cursor"):
-            return
-        user32.SetCursorPos(int(x), int(y))  # type: ignore
+        hin.physical_input_blocked("organ_24.WIN32._move_cursor")
 
     def _send_mouse_event(self, flag: int) -> None:
-        if hin.physical_input_blocked("organ_24.WIN32._send_mouse_event"):
-            return
-        user32.mouse_event(flag, 0, 0, 0, 0)  # type: ignore
+        hin.physical_input_blocked("organ_24.WIN32._send_mouse_event")
 
     def send_unicode_text(self, text: str) -> None:
         if not IS_WINDOWS:
@@ -588,40 +582,10 @@ class Win32Primitives:
             self._send_unicode_char(ch)
 
     def _send_unicode_char(self, ch: str) -> None:
-        if hin.physical_input_blocked("organ_24.WIN32._send_unicode_char"):
-            return
-        KEYEVENTF_UNICODE = 0x0004
-        KEYEVENTF_KEYUP = 0x0002
-        user32.keybd_event(0, ord(ch) if False else 0, 0, 0)  # placeholder no-op guard  # type: ignore
-        # Proper unicode key injection via SendInput structures:
-        self._send_input_unicode(ch, KEYEVENTF_UNICODE)
-        self._send_input_unicode(ch, KEYEVENTF_UNICODE | KEYEVENTF_KEYUP)
-
-    def _send_input_unicode(self, ch: str, flags: int) -> None:
-        class KEYBDINPUT(ctypes.Structure):
-            _fields_ = [
-                ("wVk", ctypes.c_ushort), ("wScan", ctypes.c_ushort),
-                ("dwFlags", ctypes.c_uint32), ("time", ctypes.c_uint32),
-                ("dwExtraInfo", ctypes.POINTER(ctypes.c_ulong)),
-            ]
-
-        class _INPUTUNION(ctypes.Union):
-            _fields_ = [("ki", KEYBDINPUT)]
-
-        class INPUT(ctypes.Structure):
-            _fields_ = [("type", ctypes.c_uint32), ("union", _INPUTUNION)]
-
-        INPUT_KEYBOARD = 1
-        extra = ctypes.c_ulong(0)
-        ki = KEYBDINPUT(0, ord(ch), flags, 0, ctypes.pointer(extra))
-        inp = INPUT(INPUT_KEYBOARD, _INPUTUNION(ki=ki))
-        user32.SendInput(1, ctypes.byref(inp), ctypes.sizeof(inp))  # type: ignore
+        hin.physical_input_blocked("organ_24.WIN32._send_unicode_char")
 
     def send_vk(self, vk: int, keyup: bool = False) -> None:
-        if not IS_WINDOWS or hin.physical_input_blocked("organ_24.WIN32.send_vk"):
-            return
-        KEYEVENTF_KEYUP = 0x0002
-        user32.keybd_event(vk, 0, KEYEVENTF_KEYUP if keyup else 0, 0)  # type: ignore
+        hin.physical_input_blocked("organ_24.WIN32.send_vk")
 
     # ---- Capture ------------------------------------------------------------
     def capture_window_bitmap_bytes(self, hwnd: int) -> Tuple[int, int, bytes]:
@@ -1088,14 +1052,7 @@ class InputInjector:
         WIN32._send_mouse_event(0x0004)  # left up
 
     def scroll(self, delta_x: int, delta_y: int) -> None:
-        if not IS_WINDOWS or hin.physical_input_blocked("organ_24.InputInjector.scroll"):
-            return
-        MOUSEEVENTF_WHEEL = 0x0800
-        MOUSEEVENTF_HWHEEL = 0x01000
-        if delta_y:
-            user32.mouse_event(MOUSEEVENTF_WHEEL, 0, 0, int(delta_y), 0)  # type: ignore
-        if delta_x:
-            user32.mouse_event(MOUSEEVENTF_HWHEEL, 0, 0, int(delta_x), 0)  # type: ignore
+        hin.physical_input_blocked("organ_24.InputInjector.scroll")
 
     def type_text(self, text: str) -> None:
         WIN32.send_unicode_text(text)

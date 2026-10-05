@@ -932,6 +932,7 @@ ORGAN_IMPORTS = [
     ("core_organs.organ_36_workflow_compiler", None),
     ("core_organs.organ_37_llm_gateway", None),
     ("core_organs.organ_38_task_orchestrator", None),
+    ("core_organs.organ_38_progressive_refinement", "ProgressiveRefinementEngine"),
     ("core_organs.organ_40_app_launcher", "VerbAliasEngine"),
     ("core_organs.organ_41_scanner", "ScannerOrgan"),
     ("core_organs.desktop_grounding", "DesktopAutonomyLoop"),
@@ -950,6 +951,13 @@ ORGAN_IMPORTS = [
     ("core_organs.headless_input", "post_drag"),
     ("core_organs.visual_cursor", "VisualCursor"),
     ("core_organs.organ_15_external_connectors", "DesktopConnector"),
+    # the app-knowledge engine
+    ("core_organs.pe_resources", "read_resources"),
+    ("core_organs.static_knowledge", "harvest"),
+    ("core_organs.knowledge_store", "ensure"),
+    ("core_organs.command_registry", "dossier"),
+    ("core_organs.knowledge_bridge", "KnowledgeBridge"),
+    ("core_organs.organ_63_app_mastery", "master"),
 ]
 
 
@@ -1019,6 +1027,34 @@ def test_day1_behavior() -> TestOutcome:
     from core_organs import si_tests_behavior
     return si_tests_behavior.run_day1(TestOutcome)
 
+
+
+def _kn(name: str, doc: str):
+    """Wrapper factory for si_tests_knowledge (the app-knowledge engine tests): same TestOutcome, doc = the test's name."""
+    def _t() -> TestOutcome:
+        from core_organs import si_tests_knowledge
+        return getattr(si_tests_knowledge, name)(TestOutcome)
+    _t.__doc__ = doc
+    _t.__name__ = "test_" + name
+    return _t
+
+
+test_kp1_behavior = _kn("run_kp1", "KP1: the PE resource reader agrees with Windows' own menu loader; static knowledge of a real classic program is complete and honest")
+test_kp2_behavior = _kn("run_kp2", "KP2: shipped data sources (toolkit files, asar package.json, keymaps, manifests, settings) are found by SHAPE and ingested at catalog trust")
+test_ks1_behavior = _kn("run_ks1", "KS1: one command map per app: sources merge + corroborate, E2 stays out, routes follow how the app takes input, frontier persists")
+test_kb1_behavior = _kn("run_kb1", "KB1: direct control needs >= 2 verified successes (6.4); the bridge and organ_47 obey the same gate")
+test_inf1_behavior = _kn("run_inf1", "INF1: what an app IS is inferred from evidence, not its name; thin evidence stays unclassified")
+test_b2n_behavior = _kn("run_b2n", "B2N: an invented app name fails at launch with a reason and launches nothing else")
+test_pure1_behavior = _kn("run_pure1", "PURE1: no first-party source reaches for a physical-input API (AST scan); the guard still refuses a physical call")
+test_km1_behavior = _kn("run_km1", "KM1: mastery learns an app across runs, invisibly; the knowledge is true against an independent UIA walk")
+test_kc1_behavior = _kn("run_kc1", "KC1: a context menu is discovered headless, read, closed again; a dropdown is expanded and collapsed; the app is left as found")
+test_km2_behavior = _kn("run_km2", "KM2: a command that needs a mode is never fired in the wrong one: mode repaired via the learned graph or refused")
+test_day2_behavior = _kn("run_day2", "DAY2: the unattended day survives a KILLED process: no redo of finished tickets, one retry of the cut-off one, E2 waits for a human, a hang times out, a false DONE is caught")
+test_org1_behavior = _kn("run_org1", "ORG1: per-app hard-coding in organ_01 only shrinks (ratchet) and the refactor stays in place")
+test_day3_behavior = _kn("run_day3", "DAY3 (live, --day-live): 8 real tickets across 4 apps with no human: E2 waits, an invented app does not stall, nothing is reported DONE that is not there")
+test_priv1_behavior = _kn("run_priv1", "PRIV1: a UI label that names a person is stored without the person in every sink and is never pressed")
+test_tf1_behavior = _kn("run_tf1", "TF1: the free-form path tries a learned template before any goal planning")
+test_kt1_behavior = _kn("run_kt1", "KT1: the loop uses verified knowledge as a direct route and records the verified step as a transition")
 
 
 def test_min1_behavior() -> TestOutcome:
@@ -2161,7 +2197,24 @@ def main() -> int:
         ("SCK1", "SCANKNOW", test_sck1_behavior),
         ("TPL1", "AUTONOMY", test_tpl1_behavior),
         ("DAY1", "AUTONOMY", test_day1_behavior),
+        ("KP1", "APPKNOW", test_kp1_behavior),
+        ("KP2", "APPKNOW", test_kp2_behavior),
+        ("KS1", "APPKNOW", test_ks1_behavior),
+        ("KB1", "APPKNOW", test_kb1_behavior),
+        ("INF1", "APPKNOW", test_inf1_behavior),
+        ("B2N", "APPKNOW", test_b2n_behavior),
+        ("PURE1", "APPKNOW", test_pure1_behavior),
+        ("KM1", "APPKNOW", test_km1_behavior),
+        ("KC1", "APPKNOW", test_kc1_behavior),
+        ("KT1", "APPKNOW", test_kt1_behavior),
+        ("KM2", "APPKNOW", test_km2_behavior),
+        ("TF1", "APPKNOW", test_tf1_behavior),
+        ("PRIV1", "APPKNOW", test_priv1_behavior),
+        ("ORG1", "APPKNOW", test_org1_behavior),
+        ("DAY2", "AUTONOMY", test_day2_behavior),
     ]
+    if "--day-live" in sys.argv:         # the 8-ticket unattended day (several minutes, drives Notepad / Calculator / Paint / Excel)
+        plan += [("DAY3", "AUTONOMY", test_day3_behavior)]
     if "--e2e" in sys.argv:
         plan += [("E2E-1", "E2E", test_e2e1_notepad_haiku_save),
                  ("E2E-2", "E2E", test_e2e2_canvas_app_vision)]

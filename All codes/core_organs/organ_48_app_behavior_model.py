@@ -85,6 +85,8 @@ CREATE TABLE IF NOT EXISTS bm_templates (
     source TEXT, confidence REAL, hits INTEGER DEFAULT 0, failures INTEGER DEFAULT 0,
     stale INTEGER DEFAULT 0, seed_note TEXT, ts REAL);
 CREATE INDEX IF NOT EXISTS bm_tpl_app ON bm_templates(app_key);
+CREATE TABLE IF NOT EXISTS bm_cmd_sources (
+    cmd_id TEXT, origin_class TEXT, origin TEXT, ts REAL, PRIMARY KEY (cmd_id, origin_class));
 CREATE TABLE IF NOT EXISTS bm_stats (
     key TEXT PRIMARY KEY, successes INTEGER DEFAULT 0, failures INTEGER DEFAULT 0,
     consecutive_fail INTEGER DEFAULT 0, confidence REAL DEFAULT 0.3, last_outcome TEXT, ts REAL);
@@ -774,14 +776,21 @@ class BehaviorModel:
     def upsert_command(self, app_key: str, cmd: Dict[str, Any], *, source: str,
                        origin: str = "", evidence: str = "") -> str:
         assert source in TRUST_RANK
+        try:
+            from core_organs.knowledge_store import redact
+            cmd = dict(cmd, name=redact(cmd.get("name", "")), goal=redact(cmd.get("goal", "") or ""),
+                       menu_path=" > ".join(redact(seg.strip()) for seg in (cmd.get("menu_path", "") or "").split(">")) if cmd.get("menu_path") else "")
+        except Exception:
+            pass
         name = cmd.get("name", "")
         ident = f"{app_key}|{_norm(name)}|{_norm(cmd.get('menu_path', ''))}|{_norm(cmd.get('shortcut', ''))}"
         cmd_id = "cmd_" + hashlib.md5(ident.encode()).hexdigest()[:12]
         risk = cmd.get("risk") or classify_risk(name, cmd.get("menu_path", ""))
         post = cmd.get("post") or []
         opaque = 1 if cmd.get("opaque") or not post else 0
-        row = self._conn.execute("SELECT source, confidence FROM bm_commands WHERE cmd_id=?",
+        row = self._conn.execute("SELECT source, confidence, evidence FROM bm_commands WHERE cmd_id=?",
                                  (cmd_id,)).fetchone()
+        evidence = evidence or cmd.get("evidence", "") or (row["evidence"] if row and row["evidence"] else "")   # a later source never wipes earlier help/mnemonic evidence
         if row:
             # never let a weaker source overwrite a stronger one
             if TRUST_RANK.get(row["source"], 0) >= TRUST_RANK[source]:
@@ -800,7 +809,15 @@ class BehaviorModel:
              cmd.get("shortcut", ""), cmd.get("menu_path", ""), cmd.get("automation_id", ""),
              cmd.get("menu_id"), risk, json.dumps(cmd.get("pre") or []), json.dumps(post),
              cmd.get("unwind", ""), opaque, source, conf, cmd_id, cmd_id, origin,
-             evidence or cmd.get("evidence", ""), time.time()))
+             evidence, time.time()))
+        # PROVENANCE: two sources that describe the SAME command (same name/path/shortcut) land on one row, so the row's own `origin`
+        # keeps only the last writer. Every source is recorded here so cross-source corroboration is never lost.
+        try:
+            from core_organs.knowledge_store import origin_class
+            self._conn.execute("INSERT OR REPLACE INTO bm_cmd_sources(cmd_id, origin_class, origin, ts) VALUES (?,?,?,?)",
+                               (cmd_id, origin_class(origin), origin, time.time()))
+        except Exception:
+            pass
         self._conn.commit()
         return cmd_id
 
@@ -853,8 +870,13 @@ class BehaviorModel:
     def record_region(self, app_key: str, title: str, elements: List[Dict[str, Any]], via: str = "") -> str:
         """Persist the FULL tree of a UI region a probe revealed (dialog / settings pane / palette),
         so what a child window contains is knowledge, not something re-discovered every scan."""
-        slim = [{"name": e.get("name", ""), "type": e.get("type", e.get("role", "")),
-                 "parent": e.get("parent_tab") or e.get("parent_menu") or ""} for e in elements][:400]
+        try:
+            from core_organs.knowledge_store import redact as _red
+        except Exception:
+            _red = lambda t: t
+        title = _red(title)
+        slim = [{"name": _red(e.get("name", "")), "type": e.get("type", e.get("role", "")),
+                 "parent": _red(e.get("parent_tab") or e.get("parent_menu") or "")} for e in elements][:400]
         rid = hashlib.md5(f"{app_key}|{_norm(title)}|{sorted(x['name'] for x in slim)[:40]}".encode()).hexdigest()[:14]
         self._conn.execute(
             "INSERT OR REPLACE INTO bm_ui_regions(region_id, app_key, title, via, elements_json, n_elements, ts)"

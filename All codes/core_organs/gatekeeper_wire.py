@@ -250,9 +250,9 @@ class WireBox:
             return ""
 
     def pyautogui_click(self, x: int, y: int):
-        if _HAS_PYAUTOGUI:
-            import pyautogui as pg
-            pg.click(x, y)
+        """Removed (backlog 1.1): a pyautogui click moves the user's real pointer. Click through headless_input.post_click
+        (a posted message to a target window) or a UIA pattern. Kept so an old caller gets an honest False, not a crash."""
+        return False
 
     # --- Tool 2: BeautifulSoup ---
     def parse_html(self, html: str, selector: str = "") -> Any:

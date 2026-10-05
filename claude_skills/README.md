@@ -1,6 +1,6 @@
 ---
 name: hojaiga-skill-set-index
-description: Index of the Hojaiga Claude skill set - the 14 fragmented skill files, what each covers, and the recommended load order starting from the 8 laws in CLAUDE.md.
+description: Index of the Hojaiga Claude skill set - the 17 skill files, what each covers, and the recommended load order starting from the 8 laws in CLAUDE.md.
 ---
 
 # Hojaiga Automation — Claude Skill Set (Index)
@@ -24,6 +24,12 @@ description: Index of the Hojaiga Claude skill set - the 14 fragmented skill fil
 | `08-safety-hitl.md` | Destructive-action guardrails, human-in-the-loop law | Anything that clicks/types/confirms |
 | `09-pitfalls.md` | Catalogue of every bug class we've actually hit | Before fixing anything UI/vision related |
 | `10-performance.md` | Latency budgets, caching rules, CPU-vision discipline | Any perf work or slow-test triage |
+| `11-web-automation.md` | Web / CDP automation, session cookies, URL guards | Browser or web-app tasks |
+| `12-app-knowledge.md` | organ_47 pro knowledge: trust order, confidence climb/erode, the direct-control gate | Touching learned shortcuts / hints |
+| `13-scenario-playbook.md` | Situation -> execution path map | Planning how a task should run |
+| `14-lifecycle-checkpoints.md` | A-H lifecycle checkpoint chain, risk gate, template-first | Task intake / lifecycle work |
+| `15-knowledge-accuracy.md` | MEASURED accuracy + timings of first-contact knowledge, tasks, vision | Quoting or improving any number |
+| `16-app-mastery.md` | The app-knowledge engine: static harvest, frontier exploration, conventions, unified registry, knowledge bridge | Any "how does this app work" question / `organ_63`, `static_knowledge`, `command_registry` |
 
 ## One-paragraph project summary
 

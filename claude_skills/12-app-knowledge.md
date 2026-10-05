@@ -51,3 +51,16 @@ records. This is what makes unattended runs safe from random destructive clicks.
 3. New app-classes get an *archetype* (generic affordances), not a per-app script.
 4. Prove learning works with a W8-style test: temp DB, archetype route, guess-never-learned,
    verified-shortcut-trusted, climb-to-cap, failure-erodes.
+
+## Direct control needs TWO verified successes (backlog 6.4, 2026-10-05)
+`steps.hits` counts EVERY recorded outcome (a FAIL bumps it too) and a first PASS starts at confidence 0.85, so a single lucky
+trace used to cross `PRO_SHORTCUT_CONF` and take direct control (a weak "the UI changed" PASS on Ctrl+N once poisoned a step).
+Now `steps.successes` counts verified PASSes only (a failure takes one away) and `_consult_intel` hands a learned shortcut to
+direct control only at `successes >= HOJAIGA_DIRECT_MIN_SUCCESSES` (default 2). Same rule in `knowledge_bridge.direct_ok`.
+Tests: KB1 (single pass stays a hint, second pass allows it, failure revokes, old databases migrate to one verification).
+
+## Where scan knowledge enters the loop
+organ_47 is the loop's own step memory. Everything a scan or an exploration learns (menu IDs, accelerators, dialog schemas, how
+the app takes input) lives in organ_48 + `knowledge_store` and reaches the loop through `knowledge_bridge` (hint / direct route /
+declared-accelerator attempt / precondition + mode repair / transition recording). See `16-app-mastery.md`.
+`classify_archetype` asks the EVIDENCE profile first (`static_knowledge.infer_profile`) and name tokens only for an unknown app.
