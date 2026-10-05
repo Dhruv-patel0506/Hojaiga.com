@@ -26,7 +26,8 @@ $excludeFiles = @(
     '*.exp','*.iobj','*.ipdb','*.res','*.exe','*.snap','build_hojaiga_repo.ps1',
     '*.zip','*.7z','*.tar','*.gz','*.rar',
     '*.pt','*.pth','*.ckpt','*.onnx','*.engine','*.safetensors','*.pkl','*.joblib','*.xz','*.msi','*.bin','*.log',
-    '*.mp4','*.avi','*.mkv','*.mov','*.webm','*.wmv','*.flv','*.wav','*.mp3'
+    '*.mp4','*.avi','*.mkv','*.mov','*.webm','*.wmv','*.flv','*.wav','*.mp3',
+    'secure_keys.json','.api_keys_encrypted'
 )
 
 $rcArgs = @($src, $dst, '/MIR', '/MAX:95000000', '/NFL', '/NDL', '/NJH', '/NP',
