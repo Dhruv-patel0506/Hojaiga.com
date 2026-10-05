@@ -18,17 +18,18 @@ $excludeDirs = @(
     'var', 'tmpdir', 'tmp', 'tmp2', 'checkpoints', '.test_harness_videos',
     'pixel-animation-video', '_stale_top_level_backup_*', 'node_modules',
     '.ipynb_checkpoints', 'xvfb', '.cache', 'Clicky (2) (1)_file',
-    'videos', 'screenshots', 'observation', 'observations'
+    'videos', 'screenshots', 'observation', 'observations',
+    '.tmp_video_frames', 'kokoro_models', 'ffmeg', 'snapshots'
 )
 $excludeFiles = @(
     '*.dll','*.lib','*.pdb','*.tlog','*.ilk','*.obj','*.o','*.bcf','*.sbr',
-    '*.exp','*.iobj','*.ipdb','*.res','*.exe',
+    '*.exp','*.iobj','*.ipdb','*.res','*.exe','*.snap','build_hojaiga_repo.ps1',
     '*.zip','*.7z','*.tar','*.gz','*.rar',
-    '*.pt','*.pth','*.ckpt','*.onnx','*.engine','*.safetensors','*.pkl','*.joblib',
+    '*.pt','*.pth','*.ckpt','*.onnx','*.engine','*.safetensors','*.pkl','*.joblib','*.xz','*.msi','*.bin','*.log',
     '*.mp4','*.avi','*.mkv','*.mov','*.webm','*.wmv','*.flv','*.wav','*.mp3'
 )
 
-$rcArgs = @($src, $dst, '/E', '/MAX:95000000', '/NFL', '/NDL', '/NJH', '/NP',
+$rcArgs = @($src, $dst, '/MIR', '/MAX:95000000', '/NFL', '/NDL', '/NJH', '/NP',
             '/XD') + $excludeDirs + @('/XF') + $excludeFiles
 & robocopy @rcArgs | Out-Null
 Write-Host "ROBOCOPY_EXIT=$LASTEXITCODE (0-7 = success)"
