@@ -589,7 +589,9 @@ def enter(hwnd: int) -> Dict[str, Any]:
         orig = _placement(hwnd)
         rc = orig.rcNormalPosition
         w, h = rc.right - rc.left, rc.bottom - rc.top
-        if w < 300 or h < 200:
+        if w < 640 or h < 420:
+            # A parked window is laid out at ITS OWN size; a small remembered one (Notepad persisted 415x253) collapses toolbars
+            # into menus and halves what a scan can see. Only the PARKED size changes: exit() puts the original placement back.
             w, h = 1100, 760
         # Measured on this host, each variant on its own fresh minimized window:
         #   * SetWindowPos on a minimized/hidden window does NOT move its restore rectangle, so the

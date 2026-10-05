@@ -1501,6 +1501,7 @@ def test_g2_vision_budget_cache_timing() -> TestOutcome:
     if not (dg.HAS_TORCH and dg.HAS_PIL and os.path.isdir(dg.OMNI_LOCAL_REPO)):
         return TestOutcome(passed=False, env_blocked=True,
                            evidence="vision prerequisites missing (torch/PIL/OmniParser repo)")
+    os.environ["HOJAIGA_QWEN_VL"] = "0"        # G2 measures the budget/cache of the FULL OmniParser parse; the targeted Qwen locator is tested by VQ1
     t_w = time.perf_counter()
     ready, blocked = _vision_ready_or_blocked(300.0)
     if not ready:
@@ -1788,6 +1789,42 @@ def test_lc2_lifecycle_live() -> TestOutcome:
     return si_tests_lifecycle.run_lc2(TestOutcome)
 
 
+def test_es1_escalation_screenshot() -> TestOutcome:
+    """ES1 (C2): a dialog that needs a human is saved as a real PNG screenshot for the human and left open, no button pressed"""
+    from core_organs import si_tests_checkpoints
+    return si_tests_checkpoints.run_es1(TestOutcome)
+
+
+def test_b2x_missing_exe_not_retried() -> TestOutcome:
+    """B2X (B2): a launch target whose executable is gone is reported as MISSING and never retried or replaced by another app"""
+    from core_organs import si_tests_checkpoints
+    return si_tests_checkpoints.run_b2x(TestOutcome)
+
+
+def test_c3x_mode_indicators() -> TestOutcome:
+    """C3X (C3): mode indicators (selected tab / open menu) are read with the snapshot and a mode-only change is noticed"""
+    from core_organs import si_tests_checkpoints
+    return si_tests_checkpoints.run_c3x(TestOutcome)
+
+
+def test_a3x_template_first() -> TestOutcome:
+    """A3X (A3): a ticket a stored template covers runs template-first (no LLM planning) and the chain says so"""
+    from core_organs import si_tests_checkpoints
+    return si_tests_checkpoints.run_a3x(TestOutcome)
+
+
+def test_g2l_crash_relaunch_live() -> TestOutcome:
+    """G2L (G2): the app's window vanishes mid-run on a real Notepad - relaunched once and the run completes; a second loss fails with evidence"""
+    from core_organs import si_tests_checkpoints
+    return si_tests_checkpoints.run_g2l(TestOutcome)
+
+
+def test_vq1_qwen_locate() -> TestOutcome:
+    """VQ1: the targeted vision tier (Qwen2.5-VL locate on the llama.cpp server) finds real controls of a parked window, graded against UIA"""
+    from core_organs import si_tests_checkpoints
+    return si_tests_checkpoints.run_vq1(TestOutcome)
+
+
 def test_any1_any_app_discovery() -> TestOutcome:
     """ANY1: any-app discovery - scan walks are bounded by TIME with a visible depth rail, readiness follows a splash chain instead of a flat 10 s, an unnamed DataGrid is grounded by role, XAML hosts are recognised"""
     from core_organs import si_tests_fixes
@@ -1968,7 +2005,15 @@ def test_e2e2_canvas_app_vision() -> TestOutcome:
         return _blocked
     r = operate_app(app, goals, max_steps_per_goal=5)
     g = get_loop().grounding
-    hwnd, els, rep = g.ground(app, target_text="zz_absent_canvas_widget_zz", max_tier=4)
+    _prev_qv = os.environ.get("HOJAIGA_QWEN_VL")
+    os.environ["HOJAIGA_QWEN_VL"] = "0"        # this test is about the FULL OmniParser parse; the targeted Qwen locator would 'find' an absent widget
+    try:
+        hwnd, els, rep = g.ground(app, target_text="zz_absent_canvas_widget_zz", max_tier=4)
+    finally:
+        if _prev_qv is None:
+            os.environ.pop("HOJAIGA_QWEN_VL", None)
+        else:
+            os.environ["HOJAIGA_QWEN_VL"] = _prev_qv
     tiers = rep.get("tiers_ran", [])
     vision_els = sum(1 for e in els if e.tier == "vision")
     if app == "mspaint":
@@ -2016,6 +2061,7 @@ GROUP_LABELS = {
     "POPUPENG": "Unified popup engine (popup_policy)",
     "GOALCHECK": "Goal postconditions (honest DONE)",
     "LIFECYCLE": "Task lifecycle (A intake -> H report)",
+    "CHECKPOINTS": "Lifecycle checkpoints (escalation, launch, modes, template, crash)",
     "VISIONBUDGET": "Vision budget (real parser, honest timings)",
     "E2E": "End-to-end unattended runs",
 }
@@ -2097,6 +2143,12 @@ def main() -> int:
         ("DE1", "GOALCHECK", test_de1_goal_postconditions),
         ("LC1", "LIFECYCLE", test_lc1_lifecycle_offline),
         ("LC2", "LIFECYCLE", test_lc2_lifecycle_live),
+        ("ES1", "CHECKPOINTS", test_es1_escalation_screenshot),
+        ("B2X", "CHECKPOINTS", test_b2x_missing_exe_not_retried),
+        ("C3X", "CHECKPOINTS", test_c3x_mode_indicators),
+        ("A3X", "CHECKPOINTS", test_a3x_template_first),
+        ("G2L", "CHECKPOINTS", test_g2l_crash_relaunch_live),
+        ("VQ1", "CHECKPOINTS", test_vq1_qwen_locate),
         ("BM1", "BEHAVIOR", test_bm1_behavior),
         ("BM2", "BEHAVIOR", test_bm2_behavior),
         ("BM3", "BEHAVIOR", test_bm3_behavior),

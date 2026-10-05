@@ -94,6 +94,7 @@ LEGAL_VERBS = ("click", "type", "key", "invoke", "scroll", "wait", "done")
 PRO_SHORTCUT_CONF = float(os.environ.get("HOJAIGA_PRO_SHORTCUT_CONF", "0.70"))
 
 # Destructive patterns are generic word cues, not per-app hardcodes.
+MAX_RELAUNCHES = int(os.environ.get("HOJAIGA_MAX_RELAUNCHES", "1"))     # G2: one relaunch per run, then fail with evidence
 DESTRUCTIVE_CUES = ("delete", "remove", "format", "overwrite", "discard", "erase", "don't save", "don’t save",
                     "do not save", "dont save")
 
@@ -192,6 +193,35 @@ def get_dap_core():
 # W1 — DesktopGrounding: tiered perception ladder
 # ---------------------------------------------------------------------------
 
+_HOST_PIDS_CACHE: Dict[str, Any] = {"t": 0.0, "pids": frozenset()}
+
+
+def _agent_host_pids() -> frozenset:
+    """PIDs of the processes THIS agent runs inside: its ancestors (the IDE / terminal / desktop app that
+    launched it). Their windows are the agent's own host, never an automation target. Data-driven - it replaces a
+    hardcoded list of editor titles that also made a user's real VS Code ungroundable. A window of the same app that
+    the user (or the launcher) started separately has a different process and is unaffected. Cached for 30 s."""
+    now = time.monotonic()
+    if now - _HOST_PIDS_CACHE["t"] < 30.0 and _HOST_PIDS_CACHE["pids"]:
+        return _HOST_PIDS_CACHE["pids"]
+    pids: set = set()          # ANCESTORS only: this process's own windows (test fixtures, overlays) are legitimate targets
+    try:
+        import psutil
+        proc = psutil.Process(os.getpid())
+        for _ in range(10):
+            proc = proc.parent()
+            if proc is None:
+                break
+            name = (proc.name() or "").lower()
+            if name in ("explorer.exe", "services.exe", "wininit.exe", "winlogon.exe", "svchost.exe", "system"):
+                break                       # the desktop shell / system: not an app host
+            pids.add(proc.pid)
+    except Exception:
+        pass
+    _HOST_PIDS_CACHE.update(t=now, pids=frozenset(pids))
+    return _HOST_PIDS_CACHE["pids"]
+
+
 class DesktopGrounding:
     """Grounds one app window into a unified list of actionable elements.
 
@@ -269,6 +299,9 @@ class DesktopGrounding:
         hint = (app_hint or "").lower().strip()
         token = hint.split()[0] if hint else ""
         hint_is_browser = any(b in hint for b in self._BROWSER_PROCS) or "browser" in hint
+        host_pids = _agent_host_pids()
+        _generic = {"microsoft", "windows", "app", "the", "for", "and", "of", "new"}
+        hint_tokens = [w for w in re.findall(r"[a-z0-9\+\.#]+", hint) if w not in _generic and len(w) > 1] or ([token] if token else [])
         found: List[Tuple[int, int]] = []
 
         @ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
@@ -289,16 +322,19 @@ class DesktopGrounding:
             # the loop grounded and tried to park a window that cannot be parked.
             if cname == "windows.ui.core.corewindow":
                 return True
-            if any(bad in title for bad in ("visual studio", "antigravity", " - editor")):
-                return True
-            if not token or not (token in title or token in cname or token in self._process_stem_cached(hwnd)):
-                return True
+            if hin.window_pid(int(hwnd)) in host_pids:
+                return True          # the agent's own host (the IDE / terminal / app this process runs inside): never a target
             proc = self._process_stem_cached(hwnd)
+            # every distinctive word of the hint may name the app: 'visual studio code' is process 'code', title 'x - Visual
+            # Studio Code' or nothing at all; matching only the FIRST word made a perfectly good window unfindable
+            hit = next((t for t in hint_tokens if t in proc), None) or next((t for t in hint_tokens if t in cname), None)                 or next((t for t in hint_tokens if t in title), None)
+            if not hint_tokens or hit is None:
+                return True
             if proc in self._BROWSER_PROCS and not hint_is_browser:
                 return True
-            if token in proc:
+            if any(t in proc for t in hint_tokens):
                 score = 5
-            elif token in cname:
+            elif any(t in cname for t in hint_tokens):
                 score = 4
             elif title == hint or title.endswith(" - " + hint) or title.startswith(hint + " "):
                 score = 3
@@ -670,8 +706,43 @@ class DesktopGrounding:
             except Exception:
                 pass
 
-    def _walk_vision(self, hwnd: int, report: Optional[Dict[str, Any]] = None) -> List[GroundedElement]:
+    def _qwen_locate(self, hwnd: int, target_text: str, report: Dict[str, Any]) -> List[GroundedElement]:
+        """Targeted vision: ask the local Qwen2.5-VL server (llama.cpp :8081, booted by start_hojaiga.bat) WHERE one named
+        control is. Measured on this machine against UIA ground truth: ~4.5 s per control and 90% hits on a plain Win32
+        window (Notepad) but only 20% on a dense icon toolbar (Paint), versus 80-260 s for a full OmniParser parse on CPU.
+        The postcondition verifier still judges whatever gets clicked, so a wrong box costs time, never a false PASS."""
+        if os.environ.get("HOJAIGA_QWEN_VL", "1") == "0" or not (target_text or "").strip():
+            return []
+        try:
+            from core_organs import qwen_vl_scanner as qv
+            if not qv.available():
+                report.setdefault("tiers_skipped", []).append("vision:qwen-locate(server :8081 not reachable)")
+                return []
+            img, why = hin.capture_window(hwnd)
+            if img is None or self._unpainted(img):
+                report.setdefault("tiers_skipped", []).append(f"vision:qwen-locate(no painted capture: {why})")
+                return []
+            box, meta = qv.locate(img, target_text, backend="llamacpp", timeout_s=40)
+            report["vision_engine"] = "qwen-locate"
+            report["vision_locate_ms"] = meta.get("ms")
+            if not box:
+                report.setdefault("tiers_skipped", []).append(f"vision:qwen-locate(no box for '{target_text[:24]}'{': ' + meta['error'][:40] if meta.get('error') else ''})")
+                return []
+            ox, oy = self._window_origin(hwnd)
+            bbox = (int(box[0]) + ox, int(box[1]) + oy, int(box[2]) + ox, int(box[3]) + oy)
+            self._vision_ran = True
+            return [GroundedElement(id=_element_id(hwnd, "vision", target_text, bbox), name=target_text, role="unknown",
+                                    bbox=bbox, tier="vision", confidence=0.5, hwnd=hwnd)]
+        except Exception as exc:
+            logger.debug("[grounding] qwen locate unavailable: %s", exc)
+            return []
+
+    def _walk_vision(self, hwnd: int, report: Optional[Dict[str, Any]] = None, target_text: str = "") -> List[GroundedElement]:
         report = report if report is not None else {}
+        self._vision_ran = False
+        located = self._qwen_locate(hwnd, target_text, report)
+        if located:
+            return located
         if not (HAS_TORCH and os.path.isdir(OMNI_LOCAL_REPO) and HAS_PIL):
             return []
         self._vision_ran = False
@@ -840,7 +911,7 @@ class DesktopGrounding:
                         pass                                        # already reported above
                     elif max_tier >= 4 and HAS_TORCH:
                         _t = time.perf_counter()
-                        vis = self._walk_vision(hwnd, report)
+                        vis = self._walk_vision(hwnd, report, target_text)
                         report["tier_ms"]["vision"] = round((time.perf_counter() - _t) * 1000, 1)
                         if getattr(self, "_vision_ran", False):
                             report["tiers_ran"].append("vision")
@@ -938,7 +1009,7 @@ class DesktopGrounding:
                     report["tiers_skipped"].append("ocr:cap")
             if HAS_TORCH and max_tier >= 4:
                 _t = time.perf_counter()
-                vis = self._walk_vision(hwnd, report)
+                vis = self._walk_vision(hwnd, report, target_text)
                 report["tier_ms"]["vision"] = round((time.perf_counter() - _t) * 1000, 1)
                 if getattr(self, "_vision_ran", False):
                     report["tiers_ran"].append("vision")
@@ -981,6 +1052,9 @@ class Snapshot:
     region_source: str = ""
     text: str = ""
     names: List[str] = field(default_factory=list)   # EVERY UIA name (text/labels too); filled only when a postcondition asks
+    # MODE indicators read from the same pass: 'name|selected' (tab / list item / radio / tool that is on) and
+    # 'name|expanded' (an open menu / combo / tree node). An app's mode is state the structure hash cannot see.
+    modes: List[str] = field(default_factory=list)
 
     def signature(self) -> str:
         return hashlib.md5(("|".join(sorted(self.element_ids)) + self.title).encode("utf-8")).hexdigest()
@@ -1076,8 +1150,12 @@ class DesktopVerifier:
             pixel_changed, pixel_evidence = self.pixels_changed(before, after)
             nb, na = set(before.names or ()), set(after.names or ())
             names_changed = bool(nb and na and nb != na)
-            changed = before.signature() != after.signature() or pixel_changed or names_changed
+            mb, ma = set(before.modes or ()), set(after.modes or ())
+            modes_changed = bool(mb or ma) and mb != ma
+            changed = before.signature() != after.signature() or pixel_changed or names_changed or modes_changed
             name_note = f"; names +{len(na - nb)}/-{len(nb - na)}" if names_changed else ""
+            if modes_changed:
+                name_note += f"; modes +{sorted(ma - mb)[:3]}/-{sorted(mb - ma)[:3]}"
             return changed, f"ui-{'changed' if changed else 'unchanged'}; {pixel_evidence}{name_note}"
 
         checks: List[Tuple[bool, str]] = []
@@ -1111,6 +1189,11 @@ class DesktopVerifier:
                    if re.fullmatch(r"-?[\d.,]+", want or "") else None)
             ok = bool(want) and any((pat.search(n) if pat else want in n) for n in (after.names or []))
             checks.append((ok, f"name '{want[:24]}' {'visible' if ok else 'NOT visible'} among {len(after.names or [])} UIA names"))
+        if "mode_on" in expect:
+            # the named control is SELECTED / EXPANDED now (active tool, open tab, checked radio, open menu)
+            want = str(expect["mode_on"]).strip().lower()
+            ok = any(m.split("|", 1)[0] == want or want in m.split("|", 1)[0] for m in (after.modes or []))
+            checks.append((ok, f"mode '{want}' {'on' if ok else 'NOT on'} among {len(after.modes or [])} mode indicator(s)"))
         if "file_created" in expect or "file_saved" in expect:
             target_path = expect.get("file_created") or expect.get("file_saved")
             p = os.path.abspath(str(target_path))
@@ -1774,6 +1857,7 @@ class DesktopAutonomyLoop:
         # or submenu that is now open. Pressing the same control again cannot advance the goal; its children can.
         self._opened_not_done: Dict[str, set] = {}
         self.escalation_shots: List[Dict[str, str]] = []
+        self._relaunches = 0
         self._dap = None
         # Windows kept parked off-screen for the current run (hwnd -> BackgroundSession), apps WE started, run nesting
         self._held: Dict[int, Any] = {}
@@ -2156,6 +2240,7 @@ class DesktopAutonomyLoop:
         before = self.verifier.snapshot(hwnd, elements)
         if not expect:
             before.names = self._all_names(hwnd)      # the default postcondition also compares every UIA name
+            before.modes = list(getattr(self, "_last_modes", []))
 
         # ---- Native file dialog rung: a goal naming an absolute path + a visible
         # Save/Open dialog is resolved deterministically (type path, confirm), not by the LLM.
@@ -2422,19 +2507,30 @@ class DesktopAutonomyLoop:
         want_text = bool((expect or {}).get("text_contains"))
         snap = self.verifier.snapshot(hwnd, elements,
                                       text=self._control_text(elements) if want_text else "")
-        if (expect or {}).get("name_visible") or not expect:
+        if (expect or {}).get("name_visible") or (expect or {}).get("mode_on") or not expect:
             snap.names = self._all_names(hwnd)
+            snap.modes = list(getattr(self, "_last_modes", []))
         return snap
 
     def _all_names(self, hwnd: int) -> List[str]:
         """Lower-cased name of EVERY UIA node of the window and its popups (one bulk CacheRequest snapshot)."""
         names: List[str] = []
+        modes: List[str] = []
         try:
             from core_organs import fast_uia
             for w in [hwnd] + hin.popup_windows(hwnd)[:6]:
-                names += [(n.name or "").lower() for n in (fast_uia.snapshot(w, timeout_ms=3000) or []) if n.name]
+                for n in (fast_uia.snapshot(w, timeout_ms=3000) or []):
+                    if not n.name:
+                        continue
+                    nm = (n.name or "").lower()
+                    names.append(nm)
+                    if n.selected:
+                        modes.append(f"{nm}|selected")
+                    if n.expand_state == 1:
+                        modes.append(f"{nm}|expanded")
         except Exception as exc:
             logger.debug("[verify] name read failed: %s", exc)
+        self._last_modes = modes
         return names
 
     def _settle(self, hwnd: int, timeout_s: float = 1.6, interval_s: float = 0.22) -> int:
@@ -2609,6 +2705,7 @@ class DesktopAutonomyLoop:
         self._shortcut_tried = set()
         self._opened_not_done = {}
         self.escalation_shots = []
+        self._relaunches = 0
         self.invalid_streak = 0
         self.awaiting_human = False
         self._task_paths = tuple(m.group(0) for g_ in goals
@@ -2635,6 +2732,14 @@ class DesktopAutonomyLoop:
                     "awaiting_human": True, "ready_reason": reason,
                     "trace": [t.as_dict() for t in self.trace]}
         results = []
+        fresh_note = ""
+        if (app_hint or "").lower() in self._launched_apps and any(re.match(r"^\s*(?:type|write|enter|input)\b", g or "", re.I) for g in goals):
+            try:
+                fresh_note = self._ensure_blank_document(app_hint)
+            except Exception as exc:
+                fresh_note = f"blank-document check failed ({type(exc).__name__})"
+            if fresh_note:
+                self.trace.append(StepTrace("(prepare) blank document", "-", "check", "PASS", "hygiene", fresh_note, []))
         for gi, goal in enumerate(goals):
             advanced = False
             self.grounding.reset_vision_budget()
@@ -2653,12 +2758,33 @@ class DesktopAutonomyLoop:
                 if res["verdict"] == "PASS" or self.awaiting_human:
                     advanced = True
                     break
+                # G2: the app's window is GONE mid-run (it crashed / was closed under us). Relaunch it ONCE, wait for it
+                # to be groundable and carry on with the SAME goal (earlier goals stay done); a second loss is a failure
+                # with evidence, never a loop of relaunches.
+                if res["verdict"] == "WRONG_STATE" and "window-not-found" in str(res.get("evidence", "")):
+                    if self._relaunches < MAX_RELAUNCHES:
+                        self._relaunches += 1
+                        try:
+                            launched = _launch_if_missing(self, app_hint, self.capsule_cb)
+                            if launched:
+                                self._launched_apps.add((app_hint or "").lower())
+                            self._wait_for_ready(app_hint)
+                            note = f"app window vanished: relaunched once (launched={launched}); resuming goal {gi + 1}/{len(goals)}"
+                        except Exception as exc:
+                            note = f"app window vanished: relaunch failed ({type(exc).__name__}: {exc})"
+                        self.trace.append(StepTrace(goal, "-", "relaunch", "NO_CHANGE", "crash-recovery", note, []))
+                        self._history.append("window vanished -> relaunched once")
+                        continue
+                    self.trace.append(StepTrace(goal, "-", "relaunch", "WRONG_STATE", "crash-recovery",
+                                                f"the window vanished again after {MAX_RELAUNCHES} relaunch(es): failing with evidence", []))
+                    return {"completed": False, "blocked_at_goal": gi, "steps": len(results), "crashed": True,
+                            "relaunches": self._relaunches, "trace": [t.as_dict() for t in self.trace]}
             if self.awaiting_human:
                 break
             if not advanced:
                 return {"completed": False, "blocked_at_goal": gi, "steps": len(results),
-                        "trace": [t.as_dict() for t in self.trace]}
-        return {"completed": not self.awaiting_human, "steps": len(results),
+                        "relaunches": self._relaunches, "trace": [t.as_dict() for t in self.trace]}
+        return {"completed": not self.awaiting_human, "steps": len(results), "relaunches": self._relaunches,
                 "trace": [t.as_dict() for t in self.trace],
                 "awaiting_human": self.awaiting_human, "escalation_shots": list(self.escalation_shots)}
 
@@ -2742,6 +2868,32 @@ class DesktopAutonomyLoop:
         except Exception as exc:
             logger.debug("[learn] recall unavailable: %s", exc)
             return ""
+
+    _NEW_DOC_RE = re.compile(r"^(?:add )?new (?:tab|document|file)$|^new tab$", re.I)
+
+    def _ensure_blank_document(self, app_hint: str) -> str:
+        """An instance WE just launched may reopen the previous session's unsaved document (Notepad restores tabs), and a
+        'type X ... save as Y' task would then save the old text with X. When the editor already holds text and the app
+        offers a 'New tab / New document' button, open a blank one first (non-destructive: the old tab stays). Never
+        clears anything. Returns a note ('' when there was nothing to do)."""
+        self._hold_hidden(app_hint)          # the window is held parked for the whole run, like every other step
+        hwnd, els, _rep = self.grounding.ground(app_hint, max_tier=2)
+        if not hwnd or not els:
+            return ""
+        before = self._control_text(els)
+        if not before.strip():
+            return ""
+        new = next((e for e in els if e.role in ("button", "splitbutton") and self._NEW_DOC_RE.match((e.name or "").strip())), None)
+        if new is None:
+            return (f"the launched instance restored a document with {len(before)} chars and offers no 'new tab' control: "
+                    "typed text will be APPENDED to it")
+        ok, how = _act_on_element(new, "click", "")
+        time.sleep(0.8)
+        self._settle(hwnd)
+        hwnd2, els2, _r2 = self.grounding.ground(app_hint, max_tier=2)
+        after = self._control_text(els2 or [])
+        return (f"restored document ({len(before)} chars) kept in its tab; opened a new blank one via '{new.name}' "
+                f"({how}); the editor now holds {len(after)} chars")
 
     def _assert_step(self, goal: str, app_hint: str, text: str, max_tier: int) -> Dict[str, Any]:
         """A pure assertion goal: PASS only when some control's name (labels and read-outs included) or the editor's text
@@ -2889,6 +3041,7 @@ def operate_app(app_name: str, goals, allow_destructive: bool = False,
     loop = get_loop(capsule_cb=capsule_cb, cursor_cb=cursor_cb)
     loop.trace = []  # one trace per operate_app call (the loop is a shared singleton)
     loop.awaiting_human = False
+    loop._launch_note = ""
     launched = _launch_if_missing(loop, app_name, capsule_cb)
     if launched:
         loop._launched_apps.add((app_name or "").lower())
@@ -2910,7 +3063,7 @@ def operate_app(app_name: str, goals, allow_destructive: bool = False,
     hwnd = loop.grounding.find_window(app_name) or 0
     if launched and hwnd:
         _mark_ours(hwnd)
-    result.update(goals=goal_list, launched=launched, hwnd=hwnd,
+    result.update(goals=goal_list, launched=launched, hwnd=hwnd, launch_note=getattr(loop, "_launch_note", ""),
                   window_title=loop.grounding.window_title(hwnd) if hwnd else "",
                   elapsed_s=round(time.perf_counter() - t0, 2))
     return result
@@ -2937,6 +3090,15 @@ def _launch_if_missing(loop: "DesktopAutonomyLoop", app_name: str, capsule_cb=No
             capsule_cb("working", f"Launching {app_name}")
         try:
             from core_organs import universal_scan as us
+            # B2: verify the launch TARGET exists before trying (and before any retry): a missing exe is reported as such,
+            # not retried through a search or an alias resolver that would launch something else
+            tgt = us.launch_target_status(app_name)
+            loop._launch_note = (f"target {tgt['kind']} '{str(tgt['app_id'])[:60]}': exists={tgt['exists']}" if tgt["found"]
+                                 else "not in the Start menu catalog")
+            if tgt["found"] and tgt["exists"] is False:
+                loop._launch_note += " - the executable is MISSING; not launching (no retry could succeed)"
+                logger.warning("[operate_app] %s", loop._launch_note)
+                return False
             info = us.launch_hidden(app_name, timeout_s=30.0)
             if info.get("hwnd"):
                 return True
@@ -2958,6 +3120,7 @@ def prepare_app(app_name: str, capsule_cb=None, cursor_cb=None) -> Dict[str, Any
     t0 = time.perf_counter()
     loop = get_loop(capsule_cb=capsule_cb, cursor_cb=cursor_cb)
     loop.awaiting_human = False
+    loop._launch_note = ""
     launched = _launch_if_missing(loop, app_name, capsule_cb)
     if launched:
         loop._launched_apps.add((app_name or "").lower())

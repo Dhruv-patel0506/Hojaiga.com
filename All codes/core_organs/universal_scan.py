@@ -75,6 +75,31 @@ def _top_windows() -> Dict[int, Tuple[int, str, str]]:
     return out
 
 
+def launch_target_status(app_name: str) -> Dict[str, Any]:
+    """Does what the Start menu would launch for ``app_name`` actually exist? {found, app_id, kind: path|aumid|other,
+    exists: True|False|None}. A path-style entry (a classic exe) is checked on disk; a packaged / ProgID entry cannot be
+    checked cheaply and says exists=None (unknown, not 'yes'). Used to tell 'the exe is gone' from 'it is just slow'."""
+    want = (app_name or "").strip().lower()
+    hit = None
+    for name, app_id in start_apps():
+        if name.strip().lower() == want:
+            hit = (name, app_id)
+            break
+    if hit is None:
+        for name, app_id in start_apps():
+            if want and want in name.strip().lower():
+                hit = (name, app_id)
+                break
+    if hit is None:
+        return {"found": False, "app_id": "", "kind": "none", "exists": None}
+    app_id = hit[1]
+    if re.match(r"^[A-Za-z]:[\\/]", app_id) or app_id.lower().endswith(".exe"):
+        return {"found": True, "app_id": app_id, "kind": "path", "exists": os.path.exists(app_id)}
+    if "!" in app_id:
+        return {"found": True, "app_id": app_id, "kind": "aumid", "exists": None}
+    return {"found": True, "app_id": app_id, "kind": "other", "exists": None}
+
+
 def start_apps() -> List[Tuple[str, str]]:
     """(display name, AppID) from the Start menu — packaged, Win32 and PWA apps alike.
     The Start menu changes rarely, but every scan runs in its own process, so the in-memory cache is
