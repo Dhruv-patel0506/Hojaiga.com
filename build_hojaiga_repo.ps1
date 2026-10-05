@@ -19,7 +19,7 @@ $excludeDirs = @(
     'pixel-animation-video', '_stale_top_level_backup_*', 'node_modules',
     '.ipynb_checkpoints', 'xvfb', '.cache', 'Clicky (2) (1)_file',
     'videos', 'screenshots', 'observation', 'observations',
-    '.tmp_video_frames', 'kokoro_models', 'ffmeg', 'snapshots'
+    '.tmp_video_frames', 'kokoro_models', 'ffmeg', 'snapshots', '.claude'
 )
 $excludeFiles = @(
     '*.dll','*.lib','*.pdb','*.tlog','*.ilk','*.obj','*.o','*.bcf','*.sbr',
@@ -37,6 +37,11 @@ Write-Host "ROBOCOPY_EXIT=$LASTEXITCODE (0-7 = success)"
 # fresh git repo
 Set-Location $dst
 if (-not (Test-Path (Join-Path $dst '.git'))) { git init -b main | Out-Null; Write-Host 'GIT_INIT=ok' }
+# /MIR deletes dest-only files: restore the repo-only README/.gitignore from git
+if (Test-Path (Join-Path $dst '.git')) {
+    git -C $dst checkout -- README.md .gitignore 2>$null
+    git -C $dst rm -r --cached -q '.claude' 2>$null
+}
 
 $size = (Get-ChildItem $dst -Recurse -File | Measure-Object Length -Sum).Sum
 $count = (Get-ChildItem $dst -Recurse -File | Measure-Object).Count
