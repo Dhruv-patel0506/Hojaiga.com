@@ -1,0 +1,25 @@
+{
+  "name": "clicky-windows",
+  "version": "1.0.0",
+  "description": "Clicky AI Companion for Windows (100% Free Port)",
+  "main": "dist/src/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "npx electron dist/src/main.js",
+    "start-local": "electron dist/src/main.js",
+    "start-ts-node": "npx ts-node src/main.ts",
+    "check-node": "node --version"
+  },
+  "dependencies": {
+    "axios": "^1.20.0",
+    "msedge-tts": "^2.0.4",
+    "tesseract.js": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "electron": "^30.5.1",
+    "electron-builder": "^26.15.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}

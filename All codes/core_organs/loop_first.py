@@ -46,6 +46,9 @@ _ACTION_VERBS = (
     "subtract", "sum", "draw", "sketch", "paint", "rename", "create", "make", "play", "pause", "record", "stop",
     "export", "import", "print", "scroll", "zoom", "toggle", "turn", "check", "uncheck", "expand", "collapse",
     "navigate", "go", "read", "show", "hide", "undo", "redo", "format", "bold", "underline", "italicize",
+    # irreversible verbs MUST be goals of their own so the risk gate (task_lifecycle D3) can see and queue them
+    "delete", "remove", "erase", "send", "submit", "publish", "post", "pay", "buy", "purchase", "uninstall",
+    "overwrite", "clear", "reset", "quit", "exit",
 )
 _VERB_ALT = "|".join(sorted(_ACTION_VERBS, key=len, reverse=True))
 
@@ -394,7 +397,8 @@ def run_loop_first(command: str, app_spans: List[Tuple[str, int]], *,
                    cursor_cb: Optional[Callable[[float, float], None]] = None,
                    notify: Optional[Callable[[str, str], None]] = None,
                    record_action: Optional[Callable[[str, str, str], None]] = None,
-                   allow_destructive: bool = False, max_steps_per_goal: int = 5) -> LoopFirstResult:
+                   allow_destructive: bool = False, max_steps_per_goal: int = 5,
+                   plan_filter: Optional[Callable[[List[AppPlan]], List[AppPlan]]] = None) -> LoopFirstResult:
     """Run operate_app for every detected desktop app, in the compiler's order. See the module docstring."""
     out = LoopFirstResult()
     if not loop_first_enabled():
@@ -407,6 +411,8 @@ def run_loop_first(command: str, app_spans: List[Tuple[str, int]], *,
         logger.exception("[loop-first] planning failed")
         out.reason = f"planning failed: {type(exc).__name__}: {exc}"
         return out
+    if plan_filter is not None:                               # e.g. the lifecycle's risk gate removes goals it queued for a human
+        plans = plan_filter(plans)
     if not plans:
         out.reason = "no desktop app detected"
         return out

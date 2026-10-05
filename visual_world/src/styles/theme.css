@@ -1,0 +1,207 @@
+:root {
+  --bg-void: #05070c;
+  --panel: #0b0f17;
+  --panel-border: #1c2433;
+  --floor-dim: #10141d;
+  --floor-lit-base: #151b28;
+  --wall: #1a2030;
+  --grid-line: #1a2130;
+  --text-primary: #e7ecf6;
+  --text-dim: #6b7488;
+  --text-faint: #444d5f;
+  --accent-error: #f87171;
+  --accent-security: #f97316;
+  --accent-ok: #34d399;
+  --accent-info: #38bdf8;
+
+  --font-mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+  --font-sans: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.facility-app {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  grid-template-rows: auto 1fr;
+  gap: 12px;
+  height: 100vh;
+  padding: 14px;
+}
+
+.facility-header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.facility-title {
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  font-size: 13px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.facility-title strong {
+  color: var(--text-primary);
+  font-size: 15px;
+  letter-spacing: 0.04em;
+}
+
+.status-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--panel-border);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-faint);
+}
+
+.status-pill[data-status="open"] .status-dot {
+  background: var(--accent-ok);
+  box-shadow: 0 0 6px var(--accent-ok);
+}
+.status-pill[data-status="connecting"] .status-dot,
+.status-pill[data-status="reconnecting"] .status-dot {
+  background: var(--accent-security);
+  box-shadow: 0 0 6px var(--accent-security);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+.status-pill[data-status="closed"] .status-dot {
+  background: var(--accent-error);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.canvas-panel {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.canvas-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.015) 0px,
+    rgba(255, 255, 255, 0.015) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+}
+
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.panel-card {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  min-height: 0;
+}
+
+.panel-card h2 {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  margin: 0 0 8px 0;
+}
+
+.registry-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 3px 0;
+  color: var(--text-primary);
+}
+
+.registry-row .organ-id {
+  color: var(--text-dim);
+}
+
+.event-log {
+  flex: 1;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+
+.event-log li {
+  list-style: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  padding: 3px 0;
+}
+
+.event-log li:first-child {
+  color: var(--text-primary);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-dim);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend-swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}

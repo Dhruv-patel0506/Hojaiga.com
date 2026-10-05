@@ -1770,6 +1770,24 @@ def test_ty1_headless_launch_switch_type() -> TestOutcome:
     return si_tests_fixes.run_ty1(TestOutcome)
 
 
+def test_de1_goal_postconditions() -> TestOutcome:
+    """DE1: a goal carries its own machine-checkable postcondition - 'save as <path>' needs that file (and its real format), 'expect X' needs X on screen, the requested format outranks 'Save as project'"""
+    from core_organs import si_tests_derive
+    return si_tests_derive.run_de1(TestOutcome)
+
+
+def test_lc1_lifecycle_offline() -> TestOutcome:
+    """LC1: intake (secrets, tickets, domain, impossible, one question) + the D3 risk gate + the per-checkpoint record, with a stubbed operator"""
+    from core_organs import si_tests_lifecycle
+    return si_tests_lifecycle.run_lc1(TestOutcome)
+
+
+def test_lc2_lifecycle_live() -> TestOutcome:
+    """LC2: the checkpoint chain on REAL apps - Notepad types and saves, Calculator computes, an irreversible delete is queued - against independent ground truth"""
+    from core_organs import si_tests_lifecycle
+    return si_tests_lifecycle.run_lc2(TestOutcome)
+
+
 def test_any1_any_app_discovery() -> TestOutcome:
     """ANY1: any-app discovery - scan walks are bounded by TIME with a visible depth rail, readiness follows a splash chain instead of a flat 10 s, an unnamed DataGrid is grounded by role, XAML hosts are recognised"""
     from core_organs import si_tests_fixes
@@ -1996,6 +2014,8 @@ GROUP_LABELS = {
     "HEADLESS": "Headless input (drag / off-screen capture)",
     "ANYAPP": "Any-app discovery (time-budget scan, window find)",
     "POPUPENG": "Unified popup engine (popup_policy)",
+    "GOALCHECK": "Goal postconditions (honest DONE)",
+    "LIFECYCLE": "Task lifecycle (A intake -> H report)",
     "VISIONBUDGET": "Vision budget (real parser, honest timings)",
     "E2E": "End-to-end unattended runs",
 }
@@ -2074,6 +2094,9 @@ def main() -> int:
         ("TY1", "HEADLESS", test_ty1_headless_launch_switch_type),
         ("ANY1", "ANYAPP", test_any1_any_app_discovery),
         ("UP1", "POPUPENG", test_up1_unified_popup_engine),
+        ("DE1", "GOALCHECK", test_de1_goal_postconditions),
+        ("LC1", "LIFECYCLE", test_lc1_lifecycle_offline),
+        ("LC2", "LIFECYCLE", test_lc2_lifecycle_live),
         ("BM1", "BEHAVIOR", test_bm1_behavior),
         ("BM2", "BEHAVIOR", test_bm2_behavior),
         ("BM3", "BEHAVIOR", test_bm3_behavior),

@@ -1,0 +1,172 @@
+[
+  {
+    "execution_id": "exec_interface_2a449c",
+    "node_name": "Interface",
+    "status": "SUCCESS",
+    "predecessor": null,
+    "successor": "cns",
+    "start_time": 1786548834.1167047,
+    "end_time": 1786548834.1167047,
+    "input_received": {
+      "command": "final-certification task on http://127.0.0.1:9998/test/start"
+    },
+    "output_produced": "Submitted to CNS",
+    "reason": "User requested task"
+  },
+  {
+    "execution_id": "exec_cns_144e64",
+    "node_name": "CNS",
+    "status": "SUCCESS",
+    "predecessor": "interface",
+    "successor": "brain",
+    "start_time": 1786548834.1167047,
+    "end_time": 1786548834.1167047,
+    "input_received": null,
+    "output_produced": null,
+    "reason": null
+  },
+  {
+    "execution_id": "exec_brain_473295",
+    "node_name": "Brain",
+    "status": "SUCCESS",
+    "predecessor": "cns",
+    "successor": "memory",
+    "start_time": 1786548842.737365,
+    "end_time": 1786548842.736738,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "Processed raw user intent"
+  },
+  {
+    "execution_id": "exec_memory_8e0088",
+    "node_name": "Memory/Knowledge",
+    "status": "SKIPPED",
+    "predecessor": "brain",
+    "successor": "compiler",
+    "start_time": null,
+    "end_time": null,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "Unreached or skipped"
+  },
+  {
+    "execution_id": "exec_compiler_fe005c",
+    "node_name": "Workflow Compiler",
+    "status": "SUCCESS",
+    "predecessor": "memory",
+    "successor": "decision",
+    "start_time": 1786548842.7230291,
+    "end_time": 1786548842.7225204,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "Compiled execution plan"
+  },
+  {
+    "execution_id": "exec_decision_8f1104",
+    "node_name": "Decision Engine",
+    "status": "SKIPPED",
+    "predecessor": "compiler",
+    "successor": "security",
+    "start_time": 1786548842.7168455,
+    "end_time": 1786548842.7168455,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "No complex UI resolution required"
+  },
+  {
+    "execution_id": "exec_security_2d1084",
+    "node_name": "Security/Governance",
+    "status": "SKIPPED",
+    "predecessor": "decision",
+    "successor": "orchestrator",
+    "start_time": 1786548842.7168455,
+    "end_time": 1786548842.7168455,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "Not required for local synthetic task"
+  },
+  {
+    "execution_id": "exec_orchestrator_685c89",
+    "node_name": "Task Orchestrator",
+    "status": "SUCCESS",
+    "predecessor": "security",
+    "successor": "agent",
+    "start_time": 1786548836.6714952,
+    "end_time": 1786548836.6714952,
+    "input_received": null,
+    "output_produced": null,
+    "reason": null
+  },
+  {
+    "execution_id": "exec_agent_96bdbd",
+    "node_name": "Agent",
+    "status": "SUCCESS",
+    "predecessor": "orchestrator",
+    "successor": "controller",
+    "start_time": 1786548836.6714952,
+    "end_time": 1786548842.692103,
+    "input_received": null,
+    "output_produced": null,
+    "reason": null
+  },
+  {
+    "execution_id": "exec_controller_68c1c6",
+    "node_name": "Controller",
+    "status": "FAILED",
+    "predecessor": "agent",
+    "successor": "recovery",
+    "start_time": null,
+    "end_time": 1786548839.7001789,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "Agent step failed"
+  },
+  {
+    "execution_id": "exec_recovery_e7dec3",
+    "node_name": "Recovery",
+    "status": "SUCCESS",
+    "predecessor": "controller",
+    "successor": "verification",
+    "start_time": 1786548839.7088077,
+    "end_time": 1786548839.7098246,
+    "input_received": "RECOVERY_STARTED",
+    "output_produced": "ALTERNATIVE",
+    "reason": "Brain calculated alternative route"
+  },
+  {
+    "execution_id": "exec_verification_985158",
+    "node_name": "Verification",
+    "status": "SUCCESS",
+    "predecessor": "recovery",
+    "successor": "audit",
+    "start_time": 1786548842.681878,
+    "end_time": 1786548842.6810803,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "Verified final page DOM"
+  },
+  {
+    "execution_id": "exec_audit_0f7b66",
+    "node_name": "Audit",
+    "status": "SUCCESS",
+    "predecessor": "verification",
+    "successor": "completion",
+    "start_time": 1786548846.204282,
+    "end_time": 1786548846.204287,
+    "input_received": null,
+    "output_produced": null,
+    "reason": "Continuous trace logging via V2"
+  },
+  {
+    "execution_id": "exec_completion_958d31",
+    "node_name": "Completion",
+    "status": "SUCCESS",
+    "predecessor": "audit",
+    "successor": null,
+    "start_time": 1786548842.673715,
+    "end_time": 1786548842.673715,
+    "input_received": null,
+    "output_produced": null,
+    "reason": null
+  }
+]

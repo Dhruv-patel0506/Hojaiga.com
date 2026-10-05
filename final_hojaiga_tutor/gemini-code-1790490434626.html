@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Clicky Overlay</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; overflow: hidden; }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.001);
+      user-select: none;
+      pointer-events: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    #buddy-root {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 20px;
+      height: 20px;
+      transform-origin: center center;
+      pointer-events: none;
+      will-change: transform, opacity;
+      transition: opacity 0.25s ease;
+    }
+
+    /* Equilateral Triangle from OverlayWindow.swift + DS.Colors.overlayCursorBlue (#3380FF) */
+    #triangle {
+      width: 16px;
+      height: 16px;
+      background: #3380FF;
+      clip-path: polygon(50% 6.7%, 0% 93.3%, 100% 93.3%);
+      filter: drop-shadow(0 0 8px #3380FF);
+    }
+
+    /* BlueCursorWaveformView (5 bars, [0.4, 0.7, 1.0, 0.7, 0.4]) */
+    #waveform {
+      display: none;
+      align-items: center;
+      gap: 2px;
+      height: 18px;
+      filter: drop-shadow(0 0 6px rgba(51, 128, 255, 0.6));
+    }
+    .wave-bar {
+      width: 2px;
+      height: 3px;
+      border-radius: 1.5px;
+      background: #3380FF;
+    }
+
+    /* BlueCursorSpinnerView */
+    #spinner {
+      display: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2.5px solid rgba(51, 128, 255, 0.15);
+      border-top-color: #3380FF;
+      filter: drop-shadow(0 0 6px rgba(51, 128, 255, 0.6));
+      animation: clicky-spin 0.8s linear infinite;
+    }
+    @keyframes clicky-spin { to { transform: rotate(360deg); } }
+
+    /* Speech Bubble (welcome / onboarding / navigation pointer bubble) */
+    #speech-bubble {
+      position: absolute;
+      background: #3380FF;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 6px;
+      box-shadow: 0 0 12px rgba(51, 128, 255, 0.6);
+      white-space: nowrap;
+      opacity: 0;
+      transform: scale(0.5);
+      transform-origin: left center;
+      transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="buddy-root">
+    <div id="triangle"></div>
+    <div id="waveform">
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+    </div>
+    <div id="spinner"></div>
+  </div>
+
+  <div id="speech-bubble"></div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    const buddyRoot = document.getElementById('buddy-root');
+    const triangle = document.getElementById('triangle');
+    const waveform = document.getElementById('waveform');
+    const waveBars = Array.from(document.querySelectorAll('.wave-bar'));
+    const spinner = document.getElementById('spinner');
+    const speechBubble = document.getElementById('speech-bubble');
+
+    const listeningBarProfile = [0.4, 0.7, 1.0, 0.7, 0.4];
+    const navigationPointerPhrases = [
+      "right here!",
+      "this one!",
+      "over here!",
+      "click this!",
+      "here it is!",
+      "found it!"
+    ];
+
+    let buddyNavigationMode = 'followingCursor'; // 'followingCursor' | 'navigatingToTarget' | 'pointingAtTarget'
+    let isReturningToCursor = false;
+    let isCursorOnThisScreen = true;
+    let anotherScreenNavigating = false;
+
+    let cursorPosition = { x: 200, y: 200 };
+    let targetMousePosition = { x: 200, y: 200 };
+    let cursorPositionWhenNavigationStarted = { x: 0, y: 0 };
+
+    let triangleRotationDegrees = -35.0;
+    let buddyFlightScale = 1.0;
+    let currentAudioPowerLevel = 0;
+    let voiceState = 'idle';
+
+    // Welcome message on first appearance
+    let hasPlayedWelcome = false;
+    function playWelcomeAnimation() {
+      if (hasPlayedWelcome) return;
+      hasPlayedWelcome = true;
+      const welcomeMsg = "hey! i'm clicky";
+      streamTextInBubble(welcomeMsg, () => {
+        setTimeout(() => {
+          hideBubble();
+        }, 2000);
+      });
+    }
+
+    ipcRenderer.on('trigger-welcome', () => {
+      hasPlayedWelcome = false;
+      playWelcomeAnimation();
+    });
+
+    // Cursor tracking updates from Main Process (60 FPS)
+    ipcRenderer.on('cursor-tick', (_, payload) => {
+      isCursorOnThisScreen = payload.isCursorOnThisScreen;
+      anotherScreenNavigating = payload.anotherScreenNavigating;
+
+      if (isCursorOnThisScreen) {
+        targetMousePosition = {
+          x: payload.localX + 35,
+          y: payload.localY + 25
+        };
+      }
+
+      // Cancel return flight if user moves cursor > 100px
+      if (buddyNavigationMode === 'navigatingToTarget' && isReturningToCursor) {
+        const dist = Math.hypot(
+          payload.localX - cursorPositionWhenNavigationStarted.x,
+          payload.localY - cursorPositionWhenNavigationStarted.y
+        );
+        if (dist > 100) {
+          finishNavigationAndResumeFollowing();
+        }
+      }
+    });
+
+    // Main 60 FPS render loop
+    function renderLoop(now) {
+      // Visibility check across multiple monitors
+      let visible = false;
+      if (buddyNavigationMode === 'followingCursor') {
+        visible = !anotherScreenNavigating && isCursorOnThisScreen;
+      } else {
+        visible = true;
+      }
+      buddyRoot.style.opacity = visible ? '1' : '0';
+
+      if (buddyNavigationMode === 'followingCursor') {
+        cursorPosition.x += (targetMousePosition.x - cursorPosition.x) * 0.22;
+        cursorPosition.y += (targetMousePosition.y - cursorPosition.y) * 0.22;
+        triangleRotationDegrees = -35.0;
+        buddyFlightScale = 1.0;
+      }
+
+      buddyRoot.style.transform = `translate3d(${cursorPosition.x}px, ${cursorPosition.y}px, 0) rotate(${triangleRotationDegrees}deg) scale(${buddyFlightScale})`;
+
+      // Keep bubble anchored next to buddy
+      if (speechBubble.style.opacity === '1') {
+        speechBubble.style.left = `${cursorPosition.x + 16}px`;
+        speechBubble.style.top = `${cursorPosition.y + 8}px`;
+      }
+
+      // Update 5-bar waveform heights when listening
+      if (voiceState === 'listening') {
+        waveBars.forEach((bar, idx) => {
+          const phase = (now / 1000) * 3.6 + idx * 0.35;
+          const normPower = Math.max(currentAudioPowerLevel - 0.008, 0);
+          const easedPower = Math.pow(Math.min(normPower * 2.85, 1), 0.76);
+          const reactiveHeight = easedPower * 10 * listeningBarProfile[idx];
+          const idlePulse = ((Math.sin(phase) + 1) / 2) * 1.5;
+          bar.style.height = `${3 + reactiveHeight + idlePulse}px`;
+        });
+      }
+
+      requestAnimationFrame(renderLoop);
+    }
+    requestAnimationFrame(renderLoop);
+
+    // Quadratic Bezier Arc Flight from OverlayWindow.swift
+    function animateBezierFlightArc(destination, onComplete) {
+      const startPosition = { ...cursorPosition };
+      const endPosition = { ...destination };
+
+      const deltaX = endPosition.x - startPosition.x;
+      const deltaY = endPosition.y - startPosition.y;
+      const distance = Math.hypot(deltaX, deltaY);
+
+      const flightDurationMs = Math.min(Math.max(distance / 800.0, 0.6), 1.4) * 1000;
+      const startTime = performance.now();
+
+      const midPoint = {
+        x: (startPosition.x + endPosition.x) / 2.0,
+        y: (startPosition.y + endPosition.y) / 2.0
+      };
+      const arcHeight = Math.min(distance * 0.2, 80.0);
+      const controlPoint = { x: midPoint.x, y: midPoint.y - arcHeight };
+
+      function step(now) {
+        if (buddyNavigationMode !== 'navigatingToTarget') return;
+
+        const linearProgress = Math.min((now - startTime) / flightDurationMs, 1.0);
+        // Smoothstep easeInOut: 3t^2 - 2t^3
+        const t = linearProgress * linearProgress * (3.0 - 2.0 * linearProgress);
+        const oneMinusT = 1.0 - t;
+
+        cursorPosition.x =
+          oneMinusT * oneMinusT * startPosition.x +
+          2.0 * oneMinusT * t * controlPoint.x +
+          t * t * endPosition.x;
+        cursorPosition.y =
+          oneMinusT * oneMinusT * startPosition.y +
+          2.0 * oneMinusT * t * controlPoint.y +
+          t * t * endPosition.y;
+
+        const tangentX =
+          2.0 * oneMinusT * (controlPoint.x - startPosition.x) +
+          2.0 * t * (endPosition.x - controlPoint.x);
+        const tangentY =
+          2.0 * oneMinusT * (controlPoint.y - startPosition.y) +
+          2.0 * t * (endPosition.y - controlPoint.y);
+
+        triangleRotationDegrees = Math.atan2(tangentY, tangentX) * (180.0 / Math.PI) + 90.0;
+        buddyFlightScale = 1.0 + Math.sin(linearProgress * Math.PI) * 0.3;
+
+        if (linearProgress < 1.0) {
+          requestAnimationFrame(step);
+        } else {
+          buddyFlightScale = 1.0;
+          onComplete();
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    ipcRenderer.on('navigate-to-element', (_, { localX, localY, bubbleText }) => {
+      buddyNavigationMode = 'navigatingToTarget';
+      isReturningToCursor = false;
+      cursorPositionWhenNavigationStarted = {
+        x: targetMousePosition.x - 35,
+        y: targetMousePosition.y - 25
+      };
+
+      const clampedTarget = {
+        x: Math.max(20, Math.min(localX + 8, window.innerWidth - 20)),
+        y: Math.max(20, Math.min(localY + 12, window.innerHeight - 20))
+      };
+
+      animateBezierFlightArc(clampedTarget, () => {
+        buddyNavigationMode = 'pointingAtTarget';
+        triangleRotationDegrees = -35.0;
+
+        const phrase =
+          bubbleText ||
+          navigationPointerPhrases[Math.floor(Math.random() * navigationPointerPhrases.length)];
+
+        streamTextInBubble(phrase, () => {
+          setTimeout(() => {
+            if (buddyNavigationMode !== 'pointingAtTarget') return;
+            hideBubble();
+            setTimeout(() => {
+              if (buddyNavigationMode !== 'pointingAtTarget') return;
+              buddyNavigationMode = 'navigatingToTarget';
+              isReturningToCursor = true;
+              animateBezierFlightArc(targetMousePosition, finishNavigationAndResumeFollowing);
+            }, 450);
+          }, 3000);
+        });
+      });
+    });
+
+    function streamTextInBubble(phrase, onComplete) {
+      speechBubble.textContent = '';
+      speechBubble.style.opacity = '1';
+      speechBubble.style.transform = 'scale(1)';
+
+      let idx = 0;
+      function nextChar() {
+        if (idx < phrase.length) {
+          speechBubble.textContent += phrase[idx++];
+          setTimeout(nextChar, 30 + Math.random() * 30);
+        } else if (onComplete) {
+          onComplete();
+        }
+      }
+      nextChar();
+    }
+
+    function hideBubble() {
+      speechBubble.style.opacity = '0';
+      speechBubble.style.transform = 'scale(0.5)';
+    }
+
+    function finishNavigationAndResumeFollowing() {
+      buddyNavigationMode = 'followingCursor';
+      isReturningToCursor = false;
+      triangleRotationDegrees = -35.0;
+      buddyFlightScale = 1.0;
+      hideBubble();
+      ipcRenderer.send('navigation-completed');
+    }
+
+    ipcRenderer.on('voice-state', (_, newState) => {
+      voiceState = newState;
+      triangle.style.display = (newState === 'idle' || newState === 'responding') ? 'block' : 'none';
+      waveform.style.display = newState === 'listening' ? 'flex' : 'none';
+      spinner.style.display = newState === 'processing' ? 'block' : 'none';
+    });
+
+    // Free Microphone RMS Power Meter + Web Speech API Dictation
+    let recognition = null;
+    let latestTranscript = '';
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = (event) => {
+        let text = '';
+        for (let i = 0; i < event.results.length; i++) {
+          text += event.results[i][0].transcript;
+        }
+        latestTranscript = text.trim();
+      };
+    }
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      const audioCtx = new AudioContext();
+      const source = audioCtx.createMediaStreamSource(stream);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      const buffer = new Float32Array(analyser.fftSize);
+
+      function pollAudioPower() {
+        analyser.getFloatTimeDomainData(buffer);
+        let sumSquares = 0;
+        for (let i = 0; i < buffer.length; i++) {
+          sumSquares += buffer[i] * buffer[i];
+        }
+        const rms = Math.sqrt(sumSquares / buffer.length);
+        const boosted = Math.min(Math.max(rms * 10.2, 0), 1);
+        currentAudioPowerLevel = Math.max(boosted, currentAudioPowerLevel * 0.72);
+        requestAnimationFrame(pollAudioPower);
+      }
+      pollAudioPower();
+    }).catch(() => {});
+
+    ipcRenderer.on('start-listening', () => {
+      latestTranscript = '';
+      speechSynthesis.cancel();
+      try { recognition && recognition.start(); } catch (e) {}
+    });
+
+    ipcRenderer.on('stop-listening', () => {
+      try { recognition && recognition.stop(); } catch (e) {}
+      setTimeout(() => {
+        ipcRenderer.invoke('submit-transcript', latestTranscript);
+      }, 350);
+    });
+
+    ipcRenderer.on('play-tts-audio', async (_, { audioBase64, spokenText }) => {
+      speechSynthesis.cancel();
+      if (audioBase64) {
+        try {
+          const audio = new Audio(`data:audio/mp3;base64,${audioBase64}`);
+          audio.onended = () => ipcRenderer.send('tts-playback-ended');
+          audio.onerror = () => ipcRenderer.send('tts-playback-ended');
+          await audio.play();
+          return;
+        } catch (e) {}
+      }
+      const utterance = new SpeechSynthesisUtterance(spokenText);
+      utterance.onend = () => ipcRenderer.send('tts-playback-ended');
+      utterance.onerror = () => ipcRenderer.send('tts-playback-ended');
+      speechSynthesis.speak(utterance);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Void - Ollama Powered</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/roughjs@4.5.1/bundled/rough.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Caveat+Brush&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #000;
+            font-family: 'Patrick Hand', cursive;
+            overflow: hidden;
+        }
+        #root { width: 100vw; height: 100vh; }
+        .canvas-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            cursor: grab;
+        }
+        .canvas-container:active { cursor: grabbing; }
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+        .ui-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            z-index: 1000;
+            min-width: 300px;
+        }
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .status-dot.connected { background: #00ff00; box-shadow: 0 0 10px #00ff00; }
+        .status-dot.disconnected { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 16px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #00ffff;
+        }
+        button {
+            background: linear-gradient(135deg, #00ffff, #0088ff);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            color: #000;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .hint {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        function InfiniteVoid() {
+            const [connected, setConnected] = useState(false);
+            const [topic, setTopic] = useState('');
+            const [generating, setGenerating] = useState(false);
+            const wsRef = useRef(null);
+            const svgRef = useRef(null);
+            const elementsRef = useRef([]);
+            const cameraRef = useRef({ x: 0, y: 0, zoom: 1 });
+            const isDraggingRef = useRef(false);
+            const lastPosRef = useRef({ x: 0, y: 0 });
+
+            // Color mapping
+            const colorMap = {
+                white: '#ffffff',
+                cyan: '#00ffff',
+                magenta: '#ff00ff',
+                green: '#00ff00',
+                yellow: '#ffff00',
+                orange: '#ff8800'
+            };
+
+            // Initialize Rough.js
+            const roughCanvas = useRef(null);
+
+            useEffect(() => {
+                if (svgRef.current) {
+                    roughCanvas.current = rough.svg(svgRef.current);
+                }
+            }, []);
+
+            // WebSocket connection
+            useEffect(() => {
+                const ws = new WebSocket('ws://localhost:8765');
+                wsRef.current = ws;
+
+                ws.onopen = () => {
+                    console.log('[WebSocket] Connected');
+                    setConnected(true);
+                };
+
+                ws.onclose = () => {
+                    console.log('[WebSocket] Disconnected');
+                    setConnected(false);
+                };
+
+                ws.onerror = (error) => {
+                    console.error('[WebSocket] Error:', error);
+                };
+
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    handleCommand(data);
+                };
+
+                return () => {
+                    ws.close();
+                };
+            }, []);
+
+            // Handle drawing commands
+            const handleCommand = (command) => {
+                if (command.action === 'move_camera') {
+                    cameraRef.current = { x: command.x, y: command.y, zoom: 1 };
+                    render();
+                    return;
+                }
+
+                if (command.type === 'lesson_complete') {
+                    setGenerating(false);
+                    return;
+                }
+
+                // Add element
+                const element = { ...command, id: Date.now() };
+                elementsRef.current.push(element);
+                render();
+            };
+
+            // Render elements using Rough.js
+            const render = () => {
+                if (!svgRef.current || !roughCanvas.current) return;
+
+                const svg = svgRef.current;
+                svg.innerHTML = '';
+
+                const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.setAttribute('transform', `translate(${cameraRef.current.x}, ${cameraRef.current.y}) scale(${cameraRef.current.zoom})`);
+
+                let yOffset = 0;
+
+                elementsRef.current.forEach((element, index) => {
+                    const color = colorMap[element.color] || element.color || '#ffffff';
+                    const options = {
+                        stroke: color,
+                        strokeWidth: 2,
+                        roughness: 1.5,
+                        bowing: 1
+                    };
+
+                    const y = yOffset;
+                    yOffset += element.type === 'text' || element.type === 'math' ? 60 : 100;
+
+                    if (element.type === 'text') {
+                        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                        text.setAttribute('x', 50);
+                        text.setAttribute('y', y);
+                        text.setAttribute('fill', color);
+                        text.setAttribute('font-size', '18');
+                        text.setAttribute('font-family', 'Patrick Hand, cursive');
+                        text.textContent = element.content;
+                        group.appendChild(text);
+                    } else if (element.type === 'math') {
+                        const text = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+                        text.setAttribute('x', 50);
+                        text.setAttribute('y', y - 20);
+                        text.setAttribute('width', 400);
+                        text.setAttribute('height', 50);
+                        const div = document.createElement('div');
+                        div.style.color = color;
+                        div.style.fontSize = '20px';
+                        div.style.fontFamily = 'Patrick Hand, cursive';
+                        text.appendChild(div);
+                        group.appendChild(text);
+                        katex.render(element.content, div, { throwOnError: false });
+                    } else if (element.type === 'image') {
+                        // Render base64 image
+                        const img = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                        img.setAttribute('x', 50);
+                        img.setAttribute('y', y);
+                        img.setAttribute('width', element.width || 400);
+                        img.setAttribute('height', element.height || 300);
+                        img.setAttribute('href', `data:image/png;base64,${element.content}`);
+                        group.appendChild(img);
+                        yOffset += element.height || 300;
+                    } else if (element.type === 'shape') {
+                        if (element.shape === 'circle') {
+                            const circle = roughCanvas.current.circle(200, y + 40, element.w || 80, options);
+                            group.appendChild(circle);
+                        } else if (element.shape === 'rect') {
+                            const rect = roughCanvas.current.rectangle(150, y, element.w || 100, element.h || 50, options);
+                            group.appendChild(rect);
+                        }
+                    } else if (element.type === 'path') {
+                        const path = roughCanvas.current.path(element.svgPath, options);
+                        path.setAttribute('transform', `translate(100, ${y})`);
+                        group.appendChild(path);
+                    }
+                });
+
+                svg.appendChild(group);
+            };
+
+            // Pan/zoom handlers
+            const handleMouseDown = (e) => {
+                isDraggingRef.current = true;
+                lastPosRef.current = { x: e.clientX, y: e.clientY };
+            };
+
+            const handleMouseMove = (e) => {
+                if (!isDraggingRef.current) return;
+                const dx = e.clientX - lastPosRef.current.x;
+                const dy = e.clientY - lastPosRef.current.y;
+                cameraRef.current.x += dx;
+                cameraRef.current.y += dy;
+                lastPosRef.current = { x: e.clientX, y: e.clientY };
+                render();
+            };
+
+            const handleMouseUp = () => {
+                isDraggingRef.current = false;
+            };
+
+            // Start lesson
+            const startLesson = () => {
+                if (!topic.trim() || !connected || generating) return;
+
+                setGenerating(true);
+                elementsRef.current = [];
+                cameraRef.current = { x: 0, y: 0, zoom: 1 };
+
+                wsRef.current.send(JSON.stringify({
+                    type: 'start_lesson',
+                    topic: topic
+                }));
+            };
+
+            // Keyboard handler
+            const handleKeyPress = (e) => {
+                if (e.key === 'Enter') {
+                    startLesson();
+                }
+            };
+
+            return (
+                <div className="canvas-container"
+                     onMouseDown={handleMouseDown}
+                     onMouseMove={handleMouseMove}
+                     onMouseUp={handleMouseUp}
+                     onMouseLeave={handleMouseUp}>
+                    <svg ref={svgRef} />
+
+                    <div className="ui-panel">
+                        <div className="connection-status">
+                            <div className={`status-dot ${connected ? 'connected' : 'disconnected'}`} />
+                            <span>{connected ? 'Connected to Ollama' : 'Disconnected'}</span>
+                        </div>
+
+                        <div className="input-group">
+                            <input
+                                type="text"
+                                placeholder="Enter a topic..."
+                                value={topic}
+                                onChange={(e) => setTopic(e.target.value)}
+                                onKeyPress={handleKeyPress}
+                                disabled={!connected || generating}
+                            />
+                            <button
+                                onClick={startLesson}
+                                disabled={!connected || generating}
+                            >
+                                {generating ? 'Teaching...' : 'Teach Me'}
+                            </button>
+                        </div>
+
+                        <div className="hint">
+                            Powered by Llama 3.1 via Ollama (100% offline, free)
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<InfiniteVoid />, document.getElementById('root'));
+    </script>
+</body>
+</html>

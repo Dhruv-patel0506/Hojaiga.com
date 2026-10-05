@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOJAIGA // WORLD 03: Execution Engine</title>
+  <link rel="icon" href="data:," />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- MediaPipe Hands & Camera Utils CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=JetBrains+Mono:wght@300;400;600&display=swap');
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #0b0602;
+      font-family: 'JetBrains Mono', monospace;
+      user-select: none;
+    }
+
+    .font-display {
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .hud-overlay {
+      background:
+        radial-gradient(circle at center, transparent 50%, rgba(11, 6, 2, 0.9) 100%),
+        repeating-linear-gradient(0deg, rgba(245, 158, 11, 0.03) 0px, rgba(245, 158, 11, 0.03) 1px, transparent 1px, transparent 3px);
+      pointer-events: none;
+    }
+
+    .glass-panel {
+      background: rgba(28, 14, 4, 0.74);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      box-shadow: 0 0 30px rgba(245, 158, 11, 0.15), inset 0 0 15px rgba(245, 158, 11, 0.08);
+    }
+
+    /* Transform-only label compositing, no backdrop blur (60+ FPS lesson) */
+    .node-label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translate(-50%, -145%);
+      pointer-events: none;
+      white-space: nowrap;
+      padding: 6px 12px;
+      border-radius: 8px;
+      text-align: center;
+      background: rgba(28, 14, 4, 0.78);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      will-change: transform;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .node-label.targeted {
+      border-color: #10b981 !important;
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.7) !important;
+      z-index: 5;
+    }
+
+    #hand-cursor {
+      position: fixed;
+      width: 38px;
+      height: 38px;
+      margin-left: -19px;
+      margin-top: -19px;
+      border: 2px solid #fbbf24;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 40;
+      transition: transform 0.12s ease, border-color 0.15s ease;
+      box-shadow: 0 0 18px rgba(251, 191, 36, 0.85);
+      display: none;
+    }
+
+    #hand-cursor.pinching {
+      transform: scale(0.62);
+      border-color: #10b981;
+      background-color: rgba(16, 185, 129, 0.35);
+      box-shadow: 0 0 25px rgba(16, 185, 129, 1);
+    }
+
+    #warp-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle, #fbbf24 0%, #0b0602 70%);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+  </style>
+</head>
+<body class="text-amber-100">
+
+  <div id="warp-overlay"></div>
+  <div id="canvas-container" class="fixed inset-0 z-0"></div>
+  <div id="hud-overlay" class="fixed inset-0 z-10 hud-overlay"></div>
+
+  <div id="hand-cursor">
+    <div class="w-1.5 h-1.5 bg-amber-300 rounded-full m-auto mt-3.5"></div>
+  </div>
+
+  <!-- Live desktop OS cursor marker driven by CNS telemetry -->
+  <div id="desk-cursor" style="display:none; position:fixed; z-index:35; width:26px; height:26px; margin-left:-13px; margin-top:-13px; border:2px solid #10b981; border-radius:50%; pointer-events:none; box-shadow:0 0 16px rgba(16,185,129,0.9); transition:left 0.45s cubic-bezier(.2,.9,.3,1), top 0.45s cubic-bezier(.2,.9,.3,1), opacity 0.3s ease;">
+    <div style="width:6px; height:6px; background:#10b981; border-radius:50%; margin:8px;"></div>
+  </div>
+
+  <div id="labels-container" class="fixed inset-0 z-20 pointer-events-none overflow-hidden"></div>
+
+  <!-- TOP HUD BAR (Ability #27: Omni-Portal Cross-World Nav) -->
+  <header class="fixed top-4 left-4 right-4 z-30 flex flex-wrap items-center justify-between gap-4 pointer-events-none">
+    <div class="glass-panel px-5 py-3 rounded-xl pointer-events-auto flex items-center gap-4">
+      <button onclick="warpTo('index.html')" class="px-3 py-1.5 rounded-lg bg-amber-500/25 border border-amber-400 text-amber-200 text-xs font-display tracking-wider hover:bg-amber-500/40 transition">
+        &larr; HUB
+      </button>
+      <div>
+        <h1 class="font-display text-sm md:text-base font-extrabold tracking-widest text-amber-300">
+          SECTOR 03 // EXECUTION ENGINE &amp; CNS ACTUATION
+        </h1>
+        <p class="text-[11px] text-amber-200/70 tracking-wider">
+          OS ACTUATION WORLD &bull; <span id="fps-counter" class="text-emerald-400 font-semibold">60 FPS</span>
+          &bull; MACROS DISPATCHED: <span id="macro-counter" class="text-emerald-300 font-bold">1,084</span>
+          &bull; <span id="gesture-readout" class="text-amber-300 font-semibold">STANDBY</span>
+          &bull; <span id="cns-status" class="text-rose-400 font-semibold">CNS LINKING&hellip;</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="glass-panel px-3 py-2 rounded-xl pointer-events-auto flex flex-wrap items-center gap-2">
+      <button onclick="warpTo('scanner-world.html')" class="px-2.5 py-1.5 rounded-lg text-xs bg-slate-900/70 border border-emerald-400/40 text-emerald-300 hover:bg-emerald-500/20 transition">
+        Sector 01: Scanner
+      </button>
+      <button onclick="warpTo('llm-world.html')" class="px-2.5 py-1.5 rounded-lg text-xs bg-slate-900/70 border border-purple-400/40 text-purple-300 hover:bg-purple-500/20 transition">
+        Sector 02: LLM Bridge
+      </button>
+      <button onclick="triggerActuationStrike()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/25 border border-emerald-400 text-emerald-200 hover:bg-emerald-500/40 transition">
+        &#128433;&#65039; Dispatch Macro (Space / Swipe)
+      </button>
+    </div>
+  </header>
+
+  <!-- LEFT LIVE OS EXECUTION LOG -->
+  <aside class="fixed bottom-4 left-4 z-30 glass-panel p-4 rounded-xl w-84 pointer-events-auto hidden md:block">
+    <div class="text-xs font-display font-bold tracking-widest text-amber-300 uppercase mb-2 flex items-center justify-between">
+      <span>&#9881;&#65039; Live OS Actuation Queue</span>
+      <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-400/40 text-emerald-300">SANDBOX ARMED</span>
+    </div>
+    <div id="exec-log" class="space-y-1.5 text-[11px] font-mono text-amber-200/85 max-h-36 overflow-hidden">
+      <div class="text-emerald-300">[PYAUTOGUI] Bezier moveTo(642, 410, dur=0.18s)</div>
+      <div>[HOST_AGENT] Worker Thread #04 lock acquired</div>
+      <div class="text-amber-300">[CNS_BRIDGE] ACK packet sent to Main Orchestrator</div>
+      <div>[FAILSAFE] Corner-screen abort watchdog: CLEAR</div>
+    </div>
+  </aside>
+
+  <!-- SUB-PROCESS DETAIL MODAL -->
+  <div id="node-modal" class="fixed inset-0 z-40 flex items-center justify-center p-4 pointer-events-none opacity-0 transition-opacity duration-300">
+    <div id="node-modal-card" class="glass-panel rounded-2xl max-w-lg w-full p-6 border border-amber-400/50 transform scale-95 transition-transform duration-300 pointer-events-auto">
+      <div class="flex items-start justify-between gap-4 border-b border-amber-500/30 pb-4">
+        <div>
+          <span id="modal-badge" class="text-[10px] font-display uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400 text-amber-300">
+            ACTUATION SUB-PROCESS
+          </span>
+          <h2 id="modal-title" class="font-display text-xl font-bold text-white mt-2">Node Name</h2>
+          <p id="modal-subtitle" class="text-xs text-amber-200/70 mt-0.5">Hardware Input Telemetry</p>
+        </div>
+        <button onclick="closeNodeModal()" class="px-3 py-1 rounded-lg bg-rose-500/20 border border-rose-400/50 text-rose-200 text-xs hover:bg-rose-500/40 transition">
+          &#10005; ESC
+        </button>
+      </div>
+      <div id="modal-metrics" class="mt-4 space-y-2.5"></div>
+      <div class="mt-4 bg-slate-950/90 border border-amber-500/30 rounded-xl p-3 font-mono text-xs text-amber-300 whitespace-pre-wrap" id="modal-code"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM-RIGHT WEBCAM PREVIEW -->
+  <div class="fixed bottom-4 right-4 z-30 glass-panel rounded-xl overflow-hidden w-56 sm:w-64 border border-amber-400/40 pointer-events-auto">
+    <div class="px-3 py-1.5 bg-slate-950/80 border-b border-amber-500/30 flex items-center justify-between">
+      <span class="text-[10px] font-display tracking-wider uppercase text-amber-300 flex items-center gap-1.5">
+        <span id="cam-indicator" class="w-2 h-2 rounded-full bg-amber-400"></span>
+        Kinetic Hand Cam
+      </span>
+      <button onclick="initCameraTracking(true)" class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 border border-amber-400/50 text-amber-200">
+        Sync
+      </button>
+    </div>
+    <div class="relative aspect-video bg-slate-950 flex items-center justify-center">
+      <video id="webcam-video" class="hidden" playsinline></video>
+      <canvas id="webcam-canvas" class="w-full h-full object-cover transform -scale-x-100"></canvas>
+      <div id="cam-overlay-msg" class="absolute inset-0 flex flex-col items-center justify-center text-center p-3 bg-slate-950/80 text-[11px] text-amber-200/80">
+        <span>Syncing Hand Telemetry...</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function warpTo(url) {
+      document.getElementById('warp-overlay').style.opacity = '1';
+      setTimeout(() => { window.location.href = url; }, 420);
+    }
+
+    // ============================================================================
+    // 1. BRANCH 3 EXECUTION STATIONS DATA (Abilities #24 - #26)
+    // ============================================================================
+    const EXEC_STATIONS = [
+      {
+        id: 'cns-bridge',
+        role: 'SECTOR HUB // NERVOUS SYSTEM',
+        name: 'CNS Bridge Layer Core',
+        position: new THREE.Vector3(0, 0, 0),
+        color: 0xf59e0b,
+        radius: 2.2,
+        type: 'cns',
+        description: 'Central Nervous System zero-copy message bus synchronizing Scanner coordinates, LLM decisions, and OS actuation threads.',
+        metrics: [
+          { label: 'IPC Ring-Buffer Throughput', val: '142,000 msg/sec', state: 'SYNCED' },
+          { label: 'Round-Trip Bus Latency', val: '0.42 ms', state: 'REALTIME' },
+          { label: 'State Lock Contention', val: '0.00%', state: 'LOCK-FREE' }
+        ],
+        code: "// CNS Bridge Pub/Sub Dispatch\ncnsBus.subscribe('LLM_ACTION_PLAN', async (plan) => {\n  await hostAgent.verifySafetyBounds(plan);\n  await pyAutoGui.executeBezierClick(plan.x, plan.y);\n});"
+      },
+      {
+        id: 'pyautogui-engine',
+        role: 'SUB-PROCESS 01',
+        name: 'PyAutoGUI Scripting Engine',
+        position: new THREE.Vector3(-7.0, 2.2, 1.5),
+        color: 0x10b981,
+        radius: 1.4,
+        type: 'pyautogui',
+        description: 'Synthesizes human-like cubic-bezier mouse curves, sub-millisecond clicks, and deterministic keyboard macros.',
+        metrics: [
+          { label: 'Trajectory Interpolation', val: 'Cubic Bezier + Jitter', state: 'HUMANIZED' },
+          { label: 'Click Dispatch Precision', val: '100% Pixel-Exact', state: 'VERIFIED' },
+          { label: 'Fail-Safe Corner Trigger', val: '(0,0) Instant Abort', state: 'ARMED' }
+        ],
+        code: "# PyAutoGUI Humanized Bezier Curve\nfor px, py in cubic_bezier(start, target, steps=24):\n    pyautogui.moveTo(px, py, _pause=False)\npyautogui.click(button='left')"
+      },
+      {
+        id: 'host-agent',
+        role: 'SUB-PROCESS 02',
+        name: 'HostAgent Core',
+        position: new THREE.Vector3(7.0, 2.2, 1.5),
+        color: 0x38bdf8,
+        radius: 1.4,
+        type: 'hostagent',
+        description: 'OS-level daemon managing privileged worker threads, process sandboxing, and window focus orchestration.',
+        metrics: [
+          { label: 'Worker Thread Pool', val: '8 / 8 Active Threads', state: 'ONLINE' },
+          { label: 'Privilege Sandbox Level', val: 'Ring-3 Isolated', state: 'SECURE' },
+          { label: 'Process Recovery Watchdog', val: 'Auto-Restart < 5ms', state: 'GUARDING' }
+        ],
+        code: '// HostAgent Thread Supervisor\nconst worker = hostPool.acquireThread();\nworker.execSandboxed(actionPayload, { timeoutMs: 500 });'
+      },
+      {
+        id: 'macro-sequencer',
+        role: 'SUB-PROCESS 03',
+        name: 'Kinetic Macro Sequencer',
+        position: new THREE.Vector3(0, -5.5, 2.0),
+        color: 0xf43f5e,
+        radius: 1.35,
+        type: 'sequencer',
+        description: 'Chains multi-step hotkey chords, clipboard injections, and UI verification waits into atomic transactions.',
+        metrics: [
+          { label: 'Atomic Rollback Support', val: 'Enabled on UI Desync', state: 'PROTECTED' },
+          { label: 'Hotkey Chord Speed', val: '2.1 ms interval', state: 'TURBO' },
+          { label: 'Completed Macro Chains', val: '1,084 Chains', state: 'NOMINAL' }
+        ],
+        code: "// Atomic Multi-Step Macro\nawait sequence([\n  hotkey('ctrl', 'l'),\n  pasteClipboard(targetUrl),\n  pressKey('enter')\n]);"
+      },
+      {
+        id: 'warp-hub',
+        role: 'DIMENSIONAL PORTAL',
+        name: '<< Warp to Main Orchestrator',
+        position: new THREE.Vector3(0, 5.6, -2.5),
+        color: 0x00f0ff,
+        radius: 1.2,
+        type: 'portal'
+      }
+    ];
+
+    // ============================================================================
+    // 2. THREE.JS SCENE & 3D BEZIER CURSOR TRAJECTORY SIMULATOR
+    // ============================================================================
+    const container = document.getElementById('canvas-container');
+    const labelsContainer = document.getElementById('labels-container');
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x0b0602, 0.024);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 200);
+    const defaultCamPos = new THREE.Vector3(0, 1.2, 17.5);
+    camera.position.copy(defaultCamPos);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    const worldGroup = new THREE.Group();
+    scene.add(worldGroup);
+
+    scene.add(new THREE.AmbientLight(0x4a3208, 1.5));
+
+    const grid = new THREE.GridHelper(48, 48, 0xf59e0b, 0x3d2204);
+    grid.position.y = -8.5;
+    grid.material.transparent = true;
+    grid.material.opacity = 0.4;
+    worldGroup.add(grid);
+
+    const interactiveMeshes = [];
+    const stationObjects = {};
+
+    EXEC_STATIONS.forEach((st) => {
+      const hitMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(st.radius * 1.45, 16, 16),
+        new THREE.MeshBasicMaterial({ visible: false })
+      );
+      hitMesh.position.copy(st.position);
+      hitMesh.userData = { stationData: st };
+      worldGroup.add(hitMesh);
+      interactiveMeshes.push(hitMesh);
+
+      const group = new THREE.Group();
+      group.position.copy(st.position);
+
+      if (st.type === 'cns') {
+        // Ability #26: Double Counter-Rotating Synaptic Ring Bus + Core
+        const r1 = new THREE.Mesh(
+          new THREE.TorusGeometry(2.0, 0.08, 16, 64),
+          new THREE.MeshBasicMaterial({ color: 0xf59e0b, wireframe: true })
+        );
+        const r2 = new THREE.Mesh(
+          new THREE.TorusGeometry(1.45, 0.08, 16, 64),
+          new THREE.MeshBasicMaterial({ color: 0x10b981, wireframe: true })
+        );
+        r2.rotation.x = Math.PI / 2;
+        const core = new THREE.Mesh(
+          new THREE.OctahedronGeometry(0.9, 1),
+          new THREE.MeshBasicMaterial({ color: 0xfbbf24, wireframe: true })
+        );
+        group.add(r1, r2, core);
+      } else if (st.type === 'pyautogui') {
+        // Ability #24: 3D Vector Cursor Cone + Target Reticle Ring
+        const cursorCone = new THREE.Mesh(
+          new THREE.ConeGeometry(0.75, 1.8, 4),
+          new THREE.MeshBasicMaterial({ color: st.color, wireframe: true })
+        );
+        cursorCone.rotation.z = -Math.PI / 4;
+        const reticle = new THREE.Mesh(
+          new THREE.RingGeometry(1.1, 1.35, 32),
+          new THREE.MeshBasicMaterial({ color: st.color, side: THREE.DoubleSide, wireframe: true })
+        );
+        group.add(cursorCone, reticle);
+      } else if (st.type === 'hostagent') {
+        // Ability #25: Hexagonal Sandbox Containment Pillar
+        const hex = new THREE.LineSegments(
+          new THREE.EdgesGeometry(new THREE.CylinderGeometry(1.2, 1.2, 2.2, 6)),
+          new THREE.LineBasicMaterial({ color: st.color })
+        );
+        group.add(hex);
+      } else if (st.type === 'sequencer') {
+        const dodec = new THREE.LineSegments(
+          new THREE.EdgesGeometry(new THREE.DodecahedronGeometry(1.3, 0)),
+          new THREE.LineBasicMaterial({ color: st.color })
+        );
+        group.add(dodec);
+      } else if (st.type === 'portal') {
+        const portal = new THREE.Mesh(
+          new THREE.TorusGeometry(1.1, 0.12, 16, 48),
+          new THREE.MeshBasicMaterial({ color: st.color, wireframe: true })
+        );
+        group.add(portal);
+      }
+
+      if (st.type !== 'cns') {
+        const lineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), st.position]);
+        const lineMat = new THREE.LineBasicMaterial({ color: st.color, transparent: true, opacity: 0.45 });
+        worldGroup.add(new THREE.Line(lineGeo, lineMat));
+      }
+
+      worldGroup.add(group);
+
+      const labelEl = document.createElement('div');
+      labelEl.className = 'node-label';
+      labelEl.innerHTML =
+        '<div class="text-[9px] font-display tracking-widest text-amber-300 uppercase">' + st.role + '</div>' +
+        '<div class="text-xs font-bold text-white">' + st.name + '</div>';
+      labelsContainer.appendChild(labelEl);
+
+      stationObjects[st.id] = { data: st, hitMesh: hitMesh, group: group, labelEl: labelEl };
+    });
+
+    // Ability #24: Live 3D Cubic Bezier PyAutoGUI Cursor Curve Simulator
+    const bezierCurve = new THREE.CubicBezierCurve3(
+      new THREE.Vector3(-7.0, 2.2, 1.5),
+      new THREE.Vector3(-2.5, 5.5, 4.0),
+      new THREE.Vector3(3.0, -3.5, 3.0),
+      new THREE.Vector3(7.0, 2.2, 1.5)
+    );
+    const bezierGeo = new THREE.BufferGeometry().setFromPoints(bezierCurve.getPoints(60));
+    const bezierLine = new THREE.Line(
+      bezierGeo,
+      new THREE.LineBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.8 })
+    );
+    worldGroup.add(bezierLine);
+
+    // Click impact ripple at the end of the trajectory
+    const impactRipple = new THREE.Mesh(
+      new THREE.RingGeometry(0.3, 0.45, 32),
+      new THREE.MeshBasicMaterial({ color: 0x10b981, side: THREE.DoubleSide, transparent: true, opacity: 0, depthWrite: false })
+    );
+    impactRipple.position.copy(bezierCurve.getPointAt(1));
+    worldGroup.add(impactRipple);
+
+    const cursorRunner = new THREE.Mesh(
+      new THREE.SphereGeometry(0.24, 16, 16),
+      new THREE.MeshBasicMaterial({ color: 0x10b981 })
+    );
+    worldGroup.add(cursorRunner);
+
+    let macroCount = 1084;
+    let strikePulse = 1.0;
+    let rippleT = 0;
+    function triggerActuationStrike() {
+      macroCount += 1;
+      strikePulse = 3.5;
+      rippleT = 1.0;
+      document.getElementById('macro-counter').textContent = macroCount.toLocaleString();
+      const log = document.getElementById('exec-log');
+      const row = document.createElement('div');
+      row.className = 'text-emerald-300 font-semibold';
+      row.textContent = '[CLICK_DISPATCH] Executed Bezier macro #' + macroCount + ' in 3.9ms';
+      log.prepend(row);
+      while (log.children.length > 6) log.removeChild(log.lastElementChild);
+    }
+    window.triggerActuationStrike = triggerActuationStrike;
+
+    // ============================================================================
+    // 3. MODAL, RAYCASTER & MEDIAPIPE HAND TRACKING
+    // ============================================================================
+    const raycaster = new THREE.Raycaster();
+    const targetHandNDC = new THREE.Vector2(0, 0);
+    const smoothedHandNDC = new THREE.Vector2(0, 0);
+    const camTargetPos = new THREE.Vector3().copy(defaultCamPos);
+    const camLookAtTarget = new THREE.Vector3(0, 0, 0);
+    const currentLookAt = new THREE.Vector3(0, 0, 0);
+
+    let hoveredStationId = null;
+    let activeModalId = null;
+    let isHandTracked = false;
+
+    function activateStation(st) {
+      if (st.type === 'portal') {
+        warpTo('index.html');
+        return;
+      }
+      activeModalId = st.id;
+      const worldPos = new THREE.Vector3();
+      stationObjects[st.id].hitMesh.getWorldPosition(worldPos);
+      camLookAtTarget.copy(worldPos);
+      camTargetPos.copy(worldPos).add(new THREE.Vector3(0, 0.6, 5.8));
+
+      document.getElementById('modal-badge').textContent = st.role;
+      document.getElementById('modal-title').textContent = st.name;
+      document.getElementById('modal-subtitle').textContent = st.description;
+      document.getElementById('modal-metrics').innerHTML = st.metrics.map(function (m) {
+        return '<div class="p-3 rounded-xl bg-slate-900/80 border border-amber-500/30 flex items-center justify-between">' +
+          '<div><div class="text-xs font-bold text-white">' + m.label + '</div>' +
+          '<div class="text-[11px] text-amber-300">' + m.val + '</div></div>' +
+          '<span class="text-[10px] font-display px-2.5 py-1 rounded bg-emerald-500/20 border border-emerald-400/50 text-emerald-300">' +
+          '&#9679; ' + m.state + '</span></div>';
+      }).join('');
+      document.getElementById('modal-code').textContent = st.code;
+
+      const modal = document.getElementById('node-modal');
+      const card = document.getElementById('node-modal-card');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-95');
+      card.classList.add('scale-100');
+    }
+
+    function closeNodeModal() {
+      if (!activeModalId) return;
+      activeModalId = null;
+      camLookAtTarget.set(0, 0, 0);
+      camTargetPos.copy(defaultCamPos);
+      const modal = document.getElementById('node-modal');
+      const card = document.getElementById('node-modal-card');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-100');
+      card.classList.add('scale-95');
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      if (isHandTracked) return;
+      if (e.target.closest('header, aside, #node-modal-card, .fixed.bottom-4.right-4')) return;
+      targetHandNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
+      targetHandNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target.closest('header, aside, #node-modal-card, .fixed.bottom-4.right-4')) return;
+      if (hoveredStationId) activateStation(stationObjects[hoveredStationId].data);
+      else if (activeModalId) closeNodeModal();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Escape') closeNodeModal();
+      if (e.code === 'Space') { e.preventDefault(); triggerActuationStrike(); }
+    });
+
+    // MediaPipe Hands
+    const videoElement = document.getElementById('webcam-video');
+    const canvasElement = document.getElementById('webcam-canvas');
+    const canvasCtx = canvasElement.getContext('2d');
+    const handCursor = document.getElementById('hand-cursor');
+    const gestureReadout = document.getElementById('gesture-readout');
+    let prevPalmPos = null;
+    let pinchFrames = 0;
+    let openFrames = 0;
+    let camRunning = false;
+    let mpCamera = null;
+
+    function onHandResults(results) {
+      canvasElement.width = results.image.width;
+      canvasElement.height = results.image.height;
+      canvasCtx.save();
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        isHandTracked = true;
+        const lm = results.multiHandLandmarks[0];
+        drawConnectors(canvasCtx, lm, HAND_CONNECTIONS, { color: '#fbbf24', lineWidth: 2 });
+        drawLandmarks(canvasCtx, lm, { color: '#10b981', lineWidth: 1, radius: 2.5 });
+
+        const mirroredX = 1.0 - lm[9].x;
+        const normY = lm[9].y;
+        targetHandNDC.x = mirroredX * 2 - 1;
+        targetHandNDC.y = -(normY * 2 - 1);
+
+        const isPinch = Math.hypot(lm[8].x - lm[4].x, lm[8].y - lm[4].y) < 0.055;
+        if (prevPalmPos && Math.hypot(mirroredX - prevPalmPos.x, normY - prevPalmPos.y) > 0.16) {
+          triggerActuationStrike();
+        }
+        prevPalmPos = { x: mirroredX, y: normY };
+
+        if (isPinch) {
+          pinchFrames++;
+          openFrames = 0;
+          handCursor.classList.add('pinching');
+          gestureReadout.textContent = activeModalId ? '\u{1F590}\uFE0F HOLD OPEN HAND TO EXIT' : '\u{1F92F} PINCH LOCK';
+          if (activeModalId) {
+            if (openFrames > 45) closeNodeModal();
+          } else if (pinchFrames === 6 && hoveredStationId) {
+            activateStation(stationObjects[hoveredStationId].data);
+          }
+        } else {
+          pinchFrames = 0;
+          openFrames++;
+          handCursor.classList.remove('pinching');
+          if (activeModalId) {
+            gestureReadout.textContent = openFrames > 50 ? '\u{1F590}\uFE0F HOLDING... EXITING' : '\u{1F590}\uFE0F HOLD OPEN HAND ~1.5s TO EXIT';
+            if (openFrames > 50) closeNodeModal();
+          } else {
+            gestureReadout.textContent = '\u{1F590}\uFE0F HAND ORBIT';
+          }
+        }
+      } else {
+        isHandTracked = false;
+        prevPalmPos = null;
+        pinchFrames = 0;
+        openFrames = 0;
+      }
+      canvasCtx.restore();
+    }
+
+    async function initCameraTracking(retry) {
+      if (camRunning && !retry) return;
+      if (camRunning && mpCamera && mpCamera.stop) { try { mpCamera.stop(); } catch (e) {} camRunning = false; }
+      const overlay = document.getElementById('cam-overlay-msg');
+      overlay.style.display = 'flex';
+      try {
+        const hands = new Hands({ locateFile: (f) => 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/' + f });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.65, minTrackingConfidence: 0.65 });
+        hands.onResults(onHandResults);
+        mpCamera = new Camera(videoElement, {
+          onFrame: async () => { await hands.send({ image: videoElement }); },
+          width: 320, height: 180
+        });
+        await mpCamera.start();
+        camRunning = true;
+        overlay.style.display = 'none';
+        document.getElementById('cam-indicator').className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+      } catch (e) {
+        camRunning = false;
+        overlay.innerHTML = '<span class="text-amber-300">Mouse Fallback Active</span>';
+        document.getElementById('cam-indicator').className = 'w-2 h-2 rounded-full bg-rose-500';
+      }
+    }
+    window.initCameraTracking = initCameraTracking;
+
+    if (!window.location.search.includes('nocam')) {
+      initCameraTracking(false);
+    } else {
+      document.getElementById('cam-overlay-msg').innerHTML = '<span class="text-amber-300">Camera skipped (?nocam=1)</span>';
+      document.getElementById('cam-indicator').className = 'w-2 h-2 rounded-full bg-emerald-400';
+    }
+
+    // ============================================================================
+    // 4. 60+ FPS RENDER LOOP
+    // ============================================================================
+    const clock = new THREE.Clock();
+    let curveT = 0;
+    let frameCount = 0;
+    let lastFpsUpdate = performance.now();
+    const fpsEl = document.getElementById('fps-counter');
+    const tmpVec = new THREE.Vector3();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsed = clock.getElapsedTime();
+      const now = performance.now();
+
+      frameCount++;
+      if (now - lastFpsUpdate >= 500) {
+        fpsEl.textContent = Math.round((frameCount * 1000) / (now - lastFpsUpdate)) + ' FPS';
+        frameCount = 0;
+        lastFpsUpdate = now;
+      }
+
+      smoothedHandNDC.lerp(targetHandNDC, 0.08);
+      strikePulse = THREE.MathUtils.lerp(strikePulse, 1.0, 0.05);
+
+      if (isHandTracked) {
+        handCursor.style.display = 'block';
+        handCursor.style.left = (((smoothedHandNDC.x + 1) / 2) * window.innerWidth) + 'px';
+        handCursor.style.top = (((-smoothedHandNDC.y + 1) / 2) * window.innerHeight) + 'px';
+      } else {
+        handCursor.style.display = 'none';
+      }
+
+      if (!activeModalId) {
+        camTargetPos.x = smoothedHandNDC.x * 7.2;
+        camTargetPos.y = 1.2 + smoothedHandNDC.y * 4.5;
+        camTargetPos.z = 17.5;
+        worldGroup.rotation.y = elapsed * 0.08;
+      }
+      camera.position.lerp(camTargetPos, 0.06);
+      currentLookAt.lerp(camLookAtTarget, 0.08);
+      camera.lookAt(currentLookAt);
+
+      // Ability #24: animate cursor runner along 3D trajectory + impact ripple
+      curveT = (curveT + 0.007 * strikePulse) % 1.0;
+      cursorRunner.position.copy(bezierCurve.getPointAt(curveT));
+      if (rippleT > 0.01) {
+        rippleT *= 0.94;
+        impactRipple.scale.setScalar(1 + (1 - rippleT) * 4);
+        impactRipple.material.opacity = rippleT * 0.9;
+        impactRipple.lookAt(camera.position);
+      } else {
+        impactRipple.material.opacity = 0;
+      }
+
+      raycaster.setFromCamera(smoothedHandNDC, camera);
+      const hits = raycaster.intersectObjects(interactiveMeshes, false);
+      hoveredStationId = hits.length > 0 ? hits[0].object.userData.stationData.id : null;
+
+      Object.keys(stationObjects).forEach(function (key) {
+        const obj = stationObjects[key];
+        const isTargeted = hoveredStationId === obj.data.id;
+        obj.group.rotation.y = elapsed * 0.6 * strikePulse;
+        const s = isTargeted ? 1.24 : 1.0;
+        const cs = obj.group.scale.x + (s - obj.group.scale.x) * 0.12;
+        obj.group.scale.setScalar(cs);
+
+        const worldPos = new THREE.Vector3();
+        obj.hitMesh.getWorldPosition(worldPos);
+        worldPos.y += obj.data.radius + 0.6;
+        worldPos.project(camera);
+        obj.labelEl.style.transform = 'translate(-50%,-145%) translate(' +
+          ((worldPos.x * 0.5 + 0.5) * window.innerWidth).toFixed(1) + 'px,' +
+          ((-(worldPos.y * 0.5) + 0.5) * window.innerHeight).toFixed(1) + 'px)';
+        obj.labelEl.style.visibility = worldPos.z > 1 ? 'hidden' : 'visible';
+        obj.labelEl.classList.toggle('targeted', isTargeted);
+      });
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    window.__EXEC_READY = true;
+    window.__EXEC = {
+      stations: stationObjects,
+      activate: activateStation,
+      close: closeNodeModal,
+      strike: triggerActuationStrike
+    };
+  </script>
+
+  <!-- Ability #38: Real-Time CNS Telemetry Streamer (live from server.py) -->
+  <script>
+    (function () {
+      var statusEl = document.getElementById('cns-status');
+      var sseStarted = false;
+      function setStatus(txt, live) {
+        if (!statusEl) return;
+        statusEl.textContent = txt;
+        statusEl.className = live ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold';
+      }
+      function handle(ev) {
+        window.__CNS_COUNT = (window.__CNS_COUNT || 0) + 1;
+        window.__CNS_LAST = ev;
+        setStatus('CNS \u25CF ' + (ev.log_line || ev.event_type || '').slice(0, 52), true);
+        try { if (window.handleCNS) window.handleCNS(ev); } catch (e) {}
+      }
+      function startSSE() {
+        if (sseStarted) return;
+        if (!window.EventSource) { setStatus('CNS \u2716 OFFLINE', false); return; }
+        sseStarted = true;
+        var es = new EventSource('/api/stream');
+        es.onopen = function () { setStatus('CNS \u25CF LINK LIVE (SSE)', true); };
+        es.onmessage = function (e) { try { handle(JSON.parse(e.data)); } catch (err) {} };
+        es.onerror = function () { setStatus('CNS \u25D0 RETRY', false); };
+      }
+      function startWS() {
+        var ws, opened = false;
+        try { ws = new WebSocket('ws://' + (location.hostname || 'localhost') + ':8765'); }
+        catch (e) { return startSSE(); }
+        ws.onopen = function () { opened = true; setStatus('CNS \u25CF LINK LIVE', true); };
+        ws.onmessage = function (e) { try { handle(JSON.parse(e.data)); } catch (err) {} };
+        ws.onerror = function () { try { ws.close(); } catch (e) {} };
+        ws.onclose = function () {
+          if (!opened) { startSSE(); }
+          else { setStatus('CNS \u25D0 RETRY', false); setTimeout(startWS, 3000); }
+        };
+      }
+      setStatus('CNS \u25C6 LINKING\u2026', false);
+      startWS();
+    })();
+
+    // Execution world: live OS cursor marker + macro dispatch feed
+    window.handleCNS = function (ev) {
+      if (ev.sector !== 'execution' && ev.sector !== 'hub') return;
+      var log = document.getElementById('exec-log');
+      if (log && ev.log_line) {
+        var d = document.createElement('div');
+        d.className = ev.event_type === 'PYAUTOGUI_MOVE' ? 'text-emerald-300 font-semibold' : 'text-amber-300';
+        d.textContent = ev.log_line;
+        log.prepend(d);
+        while (log.children.length > 6) log.removeChild(log.lastElementChild);
+      }
+      if (ev.event_type === 'PYAUTOGUI_MOVE') {
+        macroCount = macroCount + 1;
+        document.getElementById('macro-counter').textContent = macroCount.toLocaleString();
+        strikePulse = 2.6;
+        rippleT = 1.0;
+        if (ev.coordinates) {
+          var c = document.getElementById('desk-cursor');
+          c.style.display = 'block';
+          c.style.opacity = '1';
+          c.style.left = Math.min(Math.max((ev.coordinates.x / 1920) * window.innerWidth, 14), window.innerWidth - 14) + 'px';
+          c.style.top = Math.min(Math.max((ev.coordinates.y / 1080) * window.innerHeight, 14), window.innerHeight - 14) + 'px';
+        }
+      }
+    };
+  </script>
+</body>
+</html>

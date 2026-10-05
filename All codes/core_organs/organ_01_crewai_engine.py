@@ -11,6 +11,7 @@ Zero mock data, 100% closed-loop execution.
 import os
 import sys
 import json
+import uuid
 import logging
 import re
 from typing import Dict, Any, Optional
@@ -1154,14 +1155,41 @@ def _loop_first_preamble(command: str, compilation: Dict[str, Any]):
         except Exception:
             pass
 
+    chain = None
+    plan_filter = None
+    try:
+        from core_organs import task_lifecycle as _tl
+        from core_organs import organ_48_app_behavior_model as _bm
+        chain = _tl.Chain()
+        _model = _bm.get_model()
+        _run_id = "run_" + uuid.uuid4().hex[:8]
+
+        def plan_filter(plans, _c=chain, _m=_model, _r=_run_id):       # D3: irreversible goals are queued, not executed
+            return _tl.gate_plans(plans, model=_m, run_id=_r, task=command, allow_destructive=False,
+                                  unattended=True, chain=_c)
+    except Exception as exc:
+        logger.warning("[LOOP-FIRST] risk gate unavailable (%s): irreversible goals would not be gated", exc)
     try:
         result = _lf.run_loop_first(command, spans, capsule_cb=_capsule, cursor_cb=_cursor,
-                                    notify=notify_crewai_activity, record_action=_record_session_action)
+                                    notify=notify_crewai_activity, record_action=_record_session_action,
+                                    plan_filter=plan_filter)
     except Exception as exc:
         logger.exception("[LOOP-FIRST] pass crashed")
         return None, f"DETERMINISTIC DESKTOP PASS crashed ({type(exc).__name__}: {exc}); plan every step yourself."
     logger.info("[LOOP-FIRST] %s", json.dumps(result.as_dict(), default=str)[:1500])
-    return result, result.evidence_text()
+    evidence = result.evidence_text()
+    if chain is not None:
+        try:
+            for _run in result.runs:
+                _tl._checkpoints_from_run(_run, chain)
+            evidence += "\nCHECKPOINT CHAIN (what each lifecycle stage measured):\n" + chain.text()
+            queued = [i for i in chain.items if i["id"] == "D3.gate" and i["status"] == "ESCALATED"]
+            if queued:
+                evidence += ("\n  IRREVERSIBLE STEPS WERE QUEUED FOR A HUMAN and were NOT performed; do not perform them yourself "
+                             "(delete/send/pay/close-without-saving).")
+        except Exception as exc:
+            logger.debug("[LOOP-FIRST] checkpoint chain failed: %s", exc)
+    return result, evidence
 
 
 def _register_with_organ10(task_id: str, command: str, is_multi_app: bool = False, is_lead: bool = False) -> str:
@@ -4266,6 +4294,43 @@ class CrewAIEngine:
         if not self.is_available():
             raise RuntimeError("CrewAI is not available or could not initialize local LLM.")
 
+        # ---- Phase A intake: sanitize credentials, declare the impossible, ask ONE question when nothing is actionable,
+        #      split a list of tasks into independent tickets (a failing ticket never stalls the others)
+        try:
+            from core_organs import task_intake as _ti
+            _intake = _ti.analyse(command)
+        except Exception as _ie:
+            logger.warning("[CrewAI][INTAKE] unavailable (%s): task runs unsanitized", _ie)
+            _intake = None
+        if _intake is not None:
+            if _intake.secrets_found:
+                logger.warning("[CrewAI][INTAKE] redacted %s from the task text", sorted(set(_intake.secrets_found)))
+            command = _intake.clean_text
+            _chain_txt = "\n".join(f"  [{c['status']}] {c['id']}: {c['evidence']}" for c in _intake.checkpoints)
+            if _intake.refused:
+                logger.warning("[CrewAI][INTAKE] declared impossible at intake: %s", _intake.impossible)
+                return {"task_id": task_id, "status": "IMPOSSIBLE", "attempts": 0, "failure_history": None,
+                        "session_actions": [], "engine": "crewai",
+                        "crew_output": "DECLARED IMPOSSIBLE AT INTAKE (nothing was attempted): " + "; ".join(_intake.impossible)
+                                       + "\n" + _chain_txt}
+            if _intake.question:
+                notify_crewai_activity("input_needed", _intake.question)
+                return {"task_id": task_id, "status": "NEEDS_INPUT", "attempts": 0, "failure_history": None,
+                        "session_actions": [], "engine": "crewai", "question": _intake.question,
+                        "crew_output": "CLARIFICATION NEEDED: " + _intake.question + "\n" + _chain_txt}
+            if len(_intake.tickets) > 1:
+                outs, worst = [], "COMPLETED"
+                for _i, _t in enumerate(_intake.tickets, 1):
+                    try:
+                        _r = self.execute_task(_t, f"{task_id}.{_i}")
+                    except Exception as _te:                    # one failing ticket never stalls the queue
+                        _r = {"status": "FAILED", "crew_output": f"{type(_te).__name__}: {_te}"}
+                    outs.append(f"TICKET {_i}/{len(_intake.tickets)} '{_t[:60]}': {_r.get('status')}\n{str(_r.get('crew_output', ''))[:1500]}")
+                    if str(_r.get("status", "")) not in ("COMPLETED", "SUCCESS", "DONE"):
+                        worst = "PARTIAL"
+                return {"task_id": task_id, "status": worst, "attempts": 1, "failure_history": None,
+                        "session_actions": list(_current_session_actions), "engine": "crewai",
+                        "crew_output": "\n\n".join(outs) + "\n" + _chain_txt}
         logger.info(f"[CrewAI] Spinning up autonomous multi-agent crew for task {task_id}: '{command}'")
         notify_crewai_activity("running", command)
 

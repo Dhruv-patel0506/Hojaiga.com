@@ -127,3 +127,42 @@ App ladder run 2026-10-04 19:00:18  judge=qwen2.5:7b  qwen-vl=up
 
 total 55s; physical-input guard violations=0
 
+App ladder run 2026-10-04 23:55:51  judge=qwen2.5:7b  qwen-vl=up
+
+== tier: easy
+  calculator                   easy   score=15.2 nodes=80 act=33 depth=6 scan=206ms vision_needed=False trunc=False
+      ladder: 36 elements (uia 36; by tier {'uia': 36}) per-tier ms {'uia': 256.9} in 0.3s; ready after 0.76s
+      cleanup: window closed; stopped 2 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 3238ms/decision (n=3)
+  notepad                      easy   score=20.2 nodes=68 act=26 depth=7 scan=198ms vision_needed=False trunc=False
+      ladder: 31 elements (uia 31; by tier {'uia': 31}) per-tier ms {'uia': 205.2} in 0.2s; ready after 0.47s
+      cleanup: window closed; stopped 1 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=67% 1467ms/decision (n=3)
+== tier: medium
+  word                         easy   score=17.3 nodes=61 act=41 depth=7 scan=196ms vision_needed=False trunc=False
+      ladder: 49 elements (uia 49; by tier {'uia': 49}) per-tier ms {'uia': 187.9} in 0.2s; ready after 0.42s
+      cleanup: window closed; stopped 2 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1442ms/decision (n=3)
+  excel                        easy   score=19.6 nodes=67 act=43 depth=7 scan=248ms vision_needed=False trunc=False
+      ladder: 55 elements (uia 55; by tier {'uia': 55}) per-tier ms {'uia': 194.5} in 0.2s; ready after 0.57s
+      cleanup: window closed; stopped 1 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1453ms/decision (n=3)
+  whatsapp                     hard   score=74.7 nodes=561 act=99 depth=26 scan=1209ms vision_needed=False trunc=True
+      ladder: 37 elements (uia 37; by tier {'uia': 37}) per-tier ms {'uia': 803.0} in 0.8s; ready after 1.23s
+      cleanup: window hid-to-tray; stopped 8 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1443ms/decision (n=3)
+== tier: hard
+  discord                      hard   score=73.6 nodes=555 act=118 depth=24 scan=1209ms vision_needed=False trunc=True
+      ladder: 7 elements (uia 7; by tier {'uia': 7}) per-tier ms {'uia': 82.0, 'ocr': 76.9} in 0.3s; ready after 4.03s
+      cleanup: window hid-to-tray; stopped 0 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1448ms/decision (n=3)
+  obs studio                   medium score=36.9 nodes=137 act=52 depth=9 scan=372ms vision_needed=False trunc=False
+      ladder: 49 elements (uia 49; by tier {'uia': 49}) per-tier ms {'uia': 449.8} in 0.5s; ready after 0.64s
+      cleanup: window closed; stopped 1 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1462ms/decision (n=3)
+  steam                        hard   score=60.4 nodes=5 act=0 depth=3 scan=67ms vision_needed=True trunc=False
+      ladder: 37 elements (uia 1; by tier {'uia': 1, 'ocr': 36}) per-tier ms {'uia': 63.4, 'ocr': 2400.0} in 2.6s; ready after 4.33s
+      cleanup: window closed; stopped 5 process(es) of its own family
+
+total 186s; physical-input guard violations=0
+

@@ -1,0 +1,158 @@
+# Hojaiga Master Tutorial: Pythagoras theorem right-angle triangle a^2+b^2=c^2 geometric proof
+
+### TIER 1: MULTIMODAL PERCEPTION & DIAGRAM DECONSTRUCTION
+
+**Visual Elements:**
+- **Right-Angle Triangle:** A triangle with one angle equal to 90 degrees.
+- **Axes:** Two perpendicular lines forming the right angle.
+- **Symbols:** 
+  - \(a\), \(b\), and \(c\) represent the lengths of the sides of the triangle.
+  - \(a^2\), \(b^2\), and \(c^2\) represent the squares of these lengths.
+- **Vector Arrows:** Arrows indicating the direction of the sides.
+- **Circuits:** The triangle is often depicted as a circuit diagram with the right angle at the center.
+
+**Geometric Proof:**
+- **Diagram:** A right-angle triangle with sides labeled \(a\), \(b\), and \(c\), where \(c\) is the hypotenuse.
+
+### TIER 2: FIRST-PRINCIPLES INTUITION & MENTAL MODELS
+
+**Real-World Analogies:**
+- **Pythagorean Theorem as a Square:** Imagine a square with side length \(c\). The area of this square is \(c^2\).
+- **Right-Angle Triangle as a Rectangle:** Consider a rectangle with sides \(a\) and \(b\). The area of this rectangle is \(a \times b\).
+- **Pythagorean Theorem as a Sum of Squares:** The area of the square on the hypotenuse \(c\) is the sum of the areas of the squares on the other two sides \(a\) and \(b\).
+
+**Intuitive Physical Intuition:**
+- **Visualizing the Triangle:** Imagine a right-angle triangle being cut into two smaller right-angle triangles. The area of the original triangle is the sum of the areas of the two smaller triangles.
+- **Area Comparison:** The area of the original triangle is \( \frac{1}{2}ab \). The area of the two smaller triangles is \( \frac{1}{2}ac \) and \( \frac{1}{2}bc \). The sum of these areas is \( \frac{1}{2}ab + \frac{1}{2}ac + \frac{1}{2}bc \).
+
+### TIER 3: FORMAL STEP-BY-STEP DERIVATION & PROOF
+
+**Mathematical Derivation:**
+1. **Area of the Original Triangle:**
+   \[
+   \text{Area} = \frac{1}{2}ab
+   \]
+
+2. **Area of the Two Smaller Triangles:**
+   \[
+   \text{Area of } \triangle AOC = \frac{1}{2}ac
+   \]
+   \[
+   \text{Area of } \triangle BOC = \frac{1}{2}bc
+   \]
+
+3. **Total Area of the Smaller Triangles:**
+   \[
+   \text{Total Area} = \frac{1}{2}ac + \frac{1}{2}bc
+   \]
+
+4. **Equating the Areas:**
+   \[
+   \frac{1}{2}ab = \frac{1}{2}ac + \frac{1}{2}bc
+   \]
+
+5. **Simplifying:**
+   \[
+   ab = ac + bc
+   \]
+
+6. **Rearranging:**
+   \[
+   ab = c(a + b)
+   \]
+
+7. **Dividing by \(c\):**
+   \[
+   \frac{ab}{c} = a + b
+   \]
+
+8. **Squaring Both Sides:**
+   \[
+   \left(\frac{ab}{c}\right)^2 = (a + b)^2
+   \]
+
+9. **Expanding the Right Side:**
+   \[
+   \left(\frac{ab}{c}\right)^2 = a^2 + 2ab + b^2
+   \]
+
+10. **Substituting \(ab = c(a + b)\):**
+    \[
+    \left(\frac{c(a + b)}{c}\right)^2 = a^2 + 2c(a + b) + b^2
+    \]
+
+11. **Simplifying:**
+    \[
+    (a + b)^2 = a^2 + b^2 + 2c(a + b)
+    \]
+
+12. **Rearranging:**
+    \[
+    a^2 + b^2 = c^2
+    \]
+
+### TIER 4: COGNITIVE HURDLE DIAGNOSTIC
+
+**Common Misunderstandings:**
+- **Confusion with the Right-Angle Triangle:** Some learners might confuse the right-angle triangle with a general triangle.
+- **Area Comparison:** Some might incorrectly compare the areas of the smaller triangles without considering the hypotenuse.
+- **Incorrect Squaring:** Some might incorrectly square the sides without considering the hypotenuse.
+
+**Strategies to Avoid Misunderstandings:**
+- **Visualize the Triangle:** Use visual aids to ensure the triangle is a right-angle triangle.
+- **Compare Areas Correctly:** Ensure the areas are compared correctly by considering the hypotenuse.
+- **Square the Sides Properly:** Square the sides correctly by considering the hypotenuse.
+
+### TIER 5: SOCRATIC PRACTICE DRILLS & WORKED SOLUTIONS
+
+**Beginner Problem:**
+- **Question:** What is the area of a right-angle triangle with sides \(a = 3\) and \(b = 4\)?
+- **Answer:** 
+  \[
+  \text{Area} = \frac{1}{2}ab = \frac{1}{2} \times 3 \times 4 = 6
+  \]
+
+**Intermediate Problem:**
+- **Question:** If the sides of a right-angle triangle are \(a = 5\) and \(b = 12\), find the length of the hypotenuse \(c\).
+- **Answer:**
+  \[
+  c^2 = a^2 + b^2 = 5^2 + 12^2 = 25 + 144 = 169
+  \]
+  \[
+  c = \sqrt{169} = 13
+  \]
+
+**Master Problem:**
+- **Question:** A right-angle triangle has sides \(a = 7\), \(b = 24\), and \(c = 25\). Verify if it satisfies the Pythagorean Theorem.
+- **Answer:**
+  \[
+  c^2 = a^2 + b^2
+  \]
+  \[
+  25^2 = 7^2 + 24^2
+  \]
+  \[
+  625 = 49 + 576
+  \]
+  \[
+  625 = 625
+  \]
+
+### TIER 6: EXECUTIVE SUMMARY & FLASHCARD CHEAT-SHEET
+
+**Summary Formula:**
+\[
+a^2 + b^2 = c^2
+\]
+
+**Definition:**
+The Pythagorean Theorem states that in a right-angle triangle, the square of the length of the hypotenuse (the side opposite the right angle) is equal to the sum of the squares of the lengths of the other two sides.
+
+**Flashcard Cues:**
+- **Right-Angle Triangle:** Triangle with one angle equal to 90 degrees.
+- **Hypotenuse:** The side opposite the right angle.
+- **Sides:** \(a\), \(b\), and \(c\).
+- **Pythagorean Theorem:** \(a^2 + b^2 = c^2\).
+- **Proof Steps:** Area comparison, squaring, rearranging, and simplifying.
+
+By following this structured approach, learners can master the Pythagorean Theorem and its geometric proof.

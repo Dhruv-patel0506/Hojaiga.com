@@ -1,0 +1,13 @@
+2026-10-03 21:17:14
+Model benchmark on 'notepad' (desktop:Autumn leaves falling.txt -  nodes=68 actionable=26 depth=7 385ms diff=easy(20.2) vision=False trunc=False)
+
+BRAIN (judge picks the named control; decisive shortcut OFF)
+  qwen2.5:7b             valid 100%  correct 100%     1897 ms/decision
+  qwen2.5:3b             valid 100%  correct  80%     1837 ms/decision
+  llama3.1               valid  60%  correct  60%     7514 ms/decision
+
+VISION (locate one named control; hit = IoU>0.3 or centre inside the real box)
+  llamacpp                   hit 1/2 (50%)      8449 ms/locate  errors=0
+  ollama:qwen2.5vl:3b        hit 0/2 (0%)      5968 ms/locate  errors=0
+  ollama:minicpm-v           hit 0/2 (0%)      9520 ms/locate  errors=0
+

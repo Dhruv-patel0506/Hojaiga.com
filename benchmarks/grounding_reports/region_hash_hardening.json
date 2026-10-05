@@ -1,0 +1,39 @@
+{
+  "capture_source": "printwindow",
+  "hash_present": true,
+  "A_idle": {
+    "changed": false,
+    "expect": false,
+    "evidence": "region pixel-delta 0.000 of cells via printwindow below tolerance",
+    "structure_changed": false
+  },
+  "B_caret_flicker": {
+    "changed": false,
+    "expect": false,
+    "evidence": "region pixel-delta 0.001 of cells via printwindow below tolerance"
+  },
+  "C_canvas_recolor": {
+    "changed": true,
+    "expect": true,
+    "evidence": "region pixel-delta 0.140 of cells via printwindow detected",
+    "structure_changed": false
+  },
+  "D_occluded": {
+    "changed": false,
+    "expect": false,
+    "evidence": "region pixel-delta 0.000 of cells via printwindow below tolerance",
+    "source_after": "printwindow",
+    "control": {
+      "would_have_reported_change": true,
+      "evidence": "region pixel-delta 0.945 of cells via screen-grab-fallback detected"
+    }
+  },
+  "all_as_expected": true,
+  "per_case_pass": {
+    "A_idle": true,
+    "B_caret_flicker": true,
+    "C_canvas_recolor": true,
+    "D_occluded": true
+  },
+  "tolerance": 0.02
+}

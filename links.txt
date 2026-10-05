@@ -1,0 +1,147 @@
+http://localhost:8080/n8n_visualizer.html
+
+$env:PYTHONPATH='D:\new_automation\All codes'
+$env:HOJAIGA_CHROME_MODE='select'
+$env:HOJAIGA_CHROME_USER_DATA_BASE="$env:LOCALAPPDATA\Google\Chrome\User Data"
+python "D:\new_automation\test_hojaiga_real_task.py" --test standard_off
+
+#python organ_test_runner.py --task "open Chrome, search for Wikipedia, find the page about artificial intelligence, and show me the result"
+
+
+python "d:\new_automation\All codes\organ_13_interface_layer.py"
+
+Use these commands for the practical test run:
+$env:PYTHONPATH='D:\new_automation\All codes'
+$env:HOJAIGA_CHROME_MODE='select'
+$env:HOJAIGA_CHROME_USER_DATA_BASE="$env:LOCALAPPDATA\Google\Chrome\User Data"
+python "D:\new_automation\test_hojaiga_real_task.py" --test standard_off
+
+
+If you want the visualizer too:
+
+$env:PYTHONPATH='D:\new_automation\All codes'
+$env:HOJAIGA_CHROME_MODE='select'
+$env:HOJAIGA_CHROME_USER_DATA_BASE="$env:LOCALAPPDATA\Google\Chrome\User Data"
+python "D:\new_automation\test_hojaiga_real_task.py" --test standard_on
+
+
+for installation :
+pip install ....
+
+
+python "d:\new_automation\All codes\live_visualization_ui.py"
+python "d:\new_automation\All codes\organ_13_interface_layer.py"
+
+
+You will need to open two separate PowerShell terminals in D:\new_automation:
+
+Terminal 1 (The Live Graph):
+
+powershell
+python "d:\new_automation\All codes\live_visualization_ui.py"
+Terminal 2 (The Main System + Terminal Logger):
+
+powershell
+python "d:\new_automation\All codes\system_boot.py"
+
+
+
+Found them. Both files exist but in subdirectories, not directly in All codes\. Here are the correct paths:
+
+✅ Correct File Locations
+File	Correct Path
+system_boot.py	d:\new_automation\All codes\core_runtime\system_boot.py
+live_visualization_ui.py	d:\new_automation\All codes\user_io\live_visualization_ui.py
+Correct commands to run:
+
+powershell
+python "d:\new_automation\All codes\core_runtime\system_boot.py"
+powershell
+python "d:\new_automation\All codes\user_io\live_visualization_ui.py"
+✅ HTML Visualizer Files
+These 3 HTML files are in d:\new_automation\ (root, not All codes\). They are self-contained HTML files — to open them you simply launch them in a browser. There are no localhost server commands needed for them:
+
+File	How to Open
+
+
+hojaiga_visualizer_v3.html
+start d:\new_automation\hojaiga_visualizer_v3.html
+
+
+hojaiga_nodemation.html
+start d:\new_automation\hojaiga_nodemation.html
+
+
+hojaiga_nodemation_v2.html
+start d:\new_automation\hojaiga_nodemation_v2.html
+However, the live_visualization_ui.py does spin up a localhost server on port 8080 (HTTP) + 9998 (WebSocket) + 9999 (UDP). Once you run that script it will auto-open http://localhost:8080 in your browser.
+
+
+_________________________________________________________
+_________________________________________________________
+_________________________________________________________
+
+Use these existing entry points from the repo to run the runtime, visualizer, and workflow views.
+
+Core run commands
+
+$env:PYTHONPATH = "D:\new_automation\All codes"
+python D:\new_automation\test_hojaiga_real_task.py --test standard_on
+python D:\new_automation\test_hojaiga_real_task.py --test standard_off
+python D:\new_automation\test_hojaiga_real_task.py --test fail
+python D:\new_automation\test_hojaiga_real_task.py --test checkpoint
+
+
+V2 certification / workflow validation
+
+$env:PYTHONPATH = "D:\new_automation\All codes"
+python D:\new_automation\test_v2_master_certification.py
+python D:\new_automation\test_v2_final_validation.py
+python D:\new_automation\test_v2_final_certification.py
+python D:\new_automation\test_v2_recovery.py
+python D:\new_automation\test_v2_branching.py
+python D:\new_automation\test_v2_validation.py
+
+
+Visualizer / observability
+
+$env:PYTHONPATH = "D:\new_automation\All codes"
+python D:\new_automation\test_hojaiga_visualizer.py
+python D:\new_automation\hojaiga_visualizer_server.py
+
+
+Workflow / pipeline helpers
+
+python D:\new_automation\run_pipelines.py
+python D:\new_automation\generate_pipelines.py
+python D:\new_automation\generate_diagram_mds.py
+python D:\new_automation\generate_hand_drawn_diagrams.py
+python D:\new_automation\generate_hojaiga_nodemation.py
+
+
+HTML views you can open directly
+[hojaiga_nodemation.html](/D:/new_automation/hojaiga_nodemation.html)
+[hojaiga_nodemation_v2.html](/D:/new_automation/hojaiga_nodemation_v2.html)
+[hojaiga_visualizer_v3.html](/D:/new_automation/hojaiga_visualizer_v3.html)
+[n8n_visualizer.html](/D:/new_automation/n8n_visualizer.html)
+[All codes/V2_PRACTICAL_WORKFLOW_GRAPH.md](/D:/new_automation/All codes/V2_PRACTICAL_WORKFLOW_GRAPH.md)
+
+
+Live log tails
+Get-Content D:\new_automation\real_task_results.txt -Wait
+Get-Content D:\new_automation\audit_log.json -Wait
+Get-Content D:\new_automation\cns_trace.json -Wait
+Get-Content D:\new_automation\All codes\data_persistence\brain\logs\brain_execution.log -Wait
+
+_________________________________________________________
+_________________________________________________________
+_________________________________________________________
+
+The UI was initiated with this command:
+$env:PYTHONPATH='D:\new_automation\All codes'; python "D:\new_automation\All codes\core_runtime\system_boot.py"
+Your error happens because system_boot.py imports core_organs, and Python can’t find that package unless D:\new_automation\All codes is on PYTHONPATH.
+Use exactly this in the terminal instead of the plain python ...system_boot.py command:
+$env:PYTHONPATH='D:\new_automation\All codes'; python "D:\new_automation\All codes\core_runtime\system_boot.py"
+If you want the UI to stay open in a separate window, use:
+$env:PYTHONPATH='D:\new_automation\All codes'; Start-Process -FilePath 'python' -ArgumentList '"D:\new_automation\All codes\core_runtime\system_boot.py"' -WorkingDirectory 'D:\new_automation' -WindowStyle Normal
+If you want, I can now help you with the exact next command sequence after the UI appears.

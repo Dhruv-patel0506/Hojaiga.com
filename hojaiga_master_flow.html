@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hojaiga — Master Flow Diagram (Corrected)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --bg2: #0f1520;
+      --bg3: #141b2d;
+      --border: #1e2d4a;
+      --accent: #4a9eff;
+      --accent2: #6c63ff;
+      --green: #00e676;
+      --red: #ff4444;
+      --yellow: #ffd740;
+      --purple: #ce93d8;
+      --teal: #4dd0e1;
+      --orange: #ffab40;
+      --text: #e2e8f0;
+      --text2: #8899aa;
+      --success-bg: #0d2b1a;
+      --recovery-bg: #2b0d0d;
+      --panel-w: 320px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .logo-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+    .logo h1 { font-size: 16px; font-weight: 700; color: var(--accent); }
+    .logo span { font-size: 12px; color: var(--text2); margin-left: 4px; }
+    .header-badges { display: flex; gap: 8px; }
+    .badge {
+      font-size: 11px; font-weight: 600; padding: 3px 10px;
+      border-radius: 20px; border: 1px solid; cursor: pointer;
+      transition: all .2s;
+    }
+    .badge-green  { border-color: var(--green);  color: var(--green);  background: rgba(0,230,118,.08); }
+    .badge-red    { border-color: var(--red);    color: var(--red);    background: rgba(255,68,68,.08); }
+    .badge-blue   { border-color: var(--accent); color: var(--accent); background: rgba(74,158,255,.08); }
+    .badge-purple { border-color: var(--purple); color: var(--purple); background: rgba(206,147,216,.08); }
+    .badge:hover  { filter: brightness(1.3); transform: translateY(-1px); }
+    .badge.active { filter: brightness(1.5); box-shadow: 0 0 12px currentColor; }
+
+    /* ── MAIN LAYOUT ── */
+    .main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── SIDE PANEL ── */
+    .side-panel {
+      width: var(--panel-w);
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .tab-bar {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .tab {
+      flex: 1; padding: 9px 6px; font-size: 11px; font-weight: 600;
+      text-align: center; cursor: pointer; color: var(--text2);
+      border-bottom: 2px solid transparent; transition: all .2s;
+    }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab:hover  { color: var(--text); }
+    .panel-content {
+      flex: 1; overflow-y: auto; padding: 12px;
+    }
+    .panel-content::-webkit-scrollbar { width: 4px; }
+    .panel-content::-webkit-scrollbar-track { background: transparent; }
+    .panel-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── INFO BOX ── */
+    .info-box {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;
+      cursor: pointer; transition: all .2s;
+    }
+    .info-box:hover { border-color: var(--accent); background: rgba(74,158,255,.05); }
+    .info-box .label {
+      font-size: 10px; font-weight: 600; color: var(--text2);
+      text-transform: uppercase; letter-spacing: .6px;
+      margin-bottom: 4px;
+    }
+    .info-box .title { font-size: 13px; font-weight: 600; color: var(--text); }
+    .info-box .sub   { font-size: 11px; color: var(--text2); margin-top: 3px; }
+    .info-box .events {
+      margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px;
+    }
+    .ev-chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px; padding: 2px 6px; border-radius: 4px;
+      background: rgba(74,158,255,.15); color: var(--accent);
+      border: 1px solid rgba(74,158,255,.3);
+    }
+    .ev-chip.red    { background: rgba(255,68,68,.15);   color: var(--red);    border-color: rgba(255,68,68,.3); }
+    .ev-chip.green  { background: rgba(0,230,118,.15);   color: var(--green);  border-color: rgba(0,230,118,.3); }
+    .ev-chip.yellow { background: rgba(255,215,64,.15);  color: var(--yellow); border-color: rgba(255,215,64,.3); }
+    .ev-chip.purple { background: rgba(206,147,216,.15); color: var(--purple); border-color: rgba(206,147,216,.3); }
+
+    /* ── PIPELINE LIST ── */
+    .pipe-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 8px; border-radius: 6px; cursor: pointer;
+      transition: all .15s; border: 1px solid transparent;
+      margin-bottom: 3px;
+    }
+    .pipe-item:hover { background: rgba(74,158,255,.07); border-color: var(--border); }
+    .pipe-num {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      color: var(--accent); min-width: 28px; font-weight: 600;
+    }
+    .pipe-route { font-size: 11px; color: var(--text); flex: 1; }
+    .pipe-status {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--text2); flex-shrink: 0;
+    }
+    .pipe-status.ok  { background: var(--green); box-shadow: 0 0 5px var(--green); }
+    .pipe-cmd {
+      font-family: 'JetBrains Mono', monospace; font-size: 9px;
+      color: var(--text2); display: none; padding: 4px 6px;
+      background: var(--bg); border-radius: 4px; margin-top: 4px;
+      word-break: break-all;
+    }
+    .pipe-item.expanded .pipe-cmd { display: block; }
+
+    /* ── GRAPH AREA ── */
+    .graph-wrap {
+      flex: 1; position: relative; overflow: hidden;
+    }
+    #cy { width: 100%; height: 100%; }
+
+    /* ── LEGEND ── */
+    .legend {
+      position: absolute; bottom: 16px; right: 16px;
+      background: rgba(10,14,26,.9); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 16px; backdrop-filter: blur(8px);
+      font-size: 11px;
+    }
+    .legend-title { font-weight: 700; color: var(--text2); margin-bottom: 8px; font-size: 10px; text-transform: uppercase; letter-spacing: .6px; }
+    .legend-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+    /* ── NODE DETAIL POPUP ── */
+    .node-popup {
+      position: absolute; top: 16px; right: 16px;
+      background: var(--bg2); border: 1px solid var(--accent);
+      border-radius: 12px; padding: 16px; width: 280px;
+      box-shadow: 0 8px 32px rgba(74,158,255,.2);
+      display: none; z-index: 50;
+      animation: fadeIn .2s ease;
+    }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+    .node-popup.visible { display: block; }
+    .popup-close {
+      position: absolute; top: 10px; right: 12px;
+      cursor: pointer; color: var(--text2); font-size: 16px;
+    }
+    .popup-close:hover { color: var(--text); }
+    .popup-title { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+    .popup-file  { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text2); margin-bottom: 10px; }
+    .popup-desc  { font-size: 12px; color: var(--text); line-height: 1.6; margin-bottom: 10px; }
+    .popup-events-title { font-size: 10px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 5px; }
+
+    /* ── CONTROLS ── */
+    .controls {
+      position: absolute; top: 16px; left: 16px;
+      display: flex; flex-direction: column; gap: 6px; z-index: 50;
+    }
+    .ctrl-btn {
+      background: var(--bg2); border: 1px solid var(--border);
+      color: var(--text2); font-size: 16px; width: 34px; height: 34px;
+      border-radius: 8px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; transition: all .2s;
+    }
+    .ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── TRACE BAR ── */
+    .trace-bar {
+      position: absolute; bottom: 16px; left: 16px;
+      background: rgba(10,14,26,.9); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 14px; backdrop-filter: blur(8px);
+      max-width: 440px; font-size: 11px;
+      display: none;
+    }
+    .trace-bar.visible { display: block; }
+    .trace-title { font-size: 10px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
+    #trace-events { display: flex; flex-wrap: wrap; gap: 4px; }
+
+    /* tab panels */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    <h1>Hojaiga Master Flow</h1>
+    <span>v3 — All Organs + 39 Pipelines + 9 Logic Engines</span>
+  </div>
+  <div class="header-badges">
+    <div class="badge badge-blue"   id="btn-all"      onclick="filterView('all')">All Organs</div>
+    <div class="badge badge-green active" id="btn-success"  onclick="filterView('success')">✅ Success Flow</div>
+    <div class="badge badge-red"    id="btn-recovery" onclick="filterView('recovery')">🔴 Recovery Flow</div>
+    <div class="badge badge-purple" id="btn-animate"  onclick="animateFlow()">▶ Animate</div>
+    <div class="badge badge-orange" id="btn-present"  onclick="togglePresentMode()" style="border-color:var(--orange);color:var(--orange);background:rgba(255,171,64,.08);">🎤 Present</div>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- ══ SIDE PANEL ══ -->
+  <div class="side-panel">
+    <div class="tab-bar">
+      <div class="tab active" onclick="showTab('organs')">Organs</div>
+      <div class="tab" onclick="showTab('events')">Events</div>
+      <div class="tab" onclick="showTab('pipelines')">Pipelines</div>
+      <div class="tab" onclick="showTab('commands')">Run</div>
+    </div>
+
+    <!-- ORGANS TAB -->
+    <div class="panel-content tab-panel active" id="tab-organs">
+      <div class="info-box" onclick="focusNode('interface')">
+        <div class="label">Input Layer</div>
+        <div class="title">11 Interface / UI</div>
+        <div class="sub">organ_13_interface_layer.py</div>
+        <div class="events"><span class="ev-chip">sock.cns.inbound</span></div>
+        <div class="sub" style="margin-top:4px;color:var(--green)">🔊 + AudioNotificationEngine</div>
+      </div>
+      <div class="info-box" onclick="focusNode('cns')">
+        <div class="label">Central Router</div>
+        <div class="title">02 CNS — EventBus</div>
+        <div class="sub">organ_02_cns_single_file.py</div>
+        <div class="events"><span class="ev-chip">TASK_CREATED</span></div>
+      </div>
+      <div class="info-box" onclick="focusNode('brain')">
+        <div class="label">Cognition</div>
+        <div class="title">01 Brain</div>
+        <div class="sub">organ_01_brain.py</div>
+        <div class="events">
+          <span class="ev-chip">INTENT_NORMALIZATION_STARTED</span>
+          <span class="ev-chip">INTENT_NORMALIZATION_COMPLETED</span>
+        </div>
+      </div>
+      <div class="info-box" onclick="focusNode('llm')">
+        <div class="label">Reasoning ⚠️ Previously Missing</div>
+        <div class="title">37 LLM Gateway</div>
+        <div class="sub">organ_37_llm_gateway.py</div>
+        <div class="events"><span class="ev-chip yellow">LLM_REASONING_STARTED</span></div>
+        <div class="sub" style="margin-top:4px;color:var(--green)">🌐 + Free_Tier_LLM_Router (Ollama→Omnirouter→OpenRouter→NIM→Groq)</div>
+      </div>
+      <div class="info-box" onclick="focusNode('memory')">
+        <div class="label">Context — Parallel Branch</div>
+        <div class="title">03 Memory</div>
+        <div class="sub">organ_03_memory.py</div>
+        <div class="events">
+          <span class="ev-chip">MEMORY_STARTED</span>
+          <span class="ev-chip">MEMORY_COMPLETED</span>
+        </div>
+        <div class="sub" style="margin-top:4px;color:var(--green)">📁 + UIFunctionalityArchiver (Web/Desktop History)</div>
+      </div>
+      <div class="info-box" onclick="focusNode('knowledge')">
+        <div class="label">Knowledge — Parallel Branch</div>
+        <div class="title">04 Knowledge</div>
+        <div class="sub">organ_04_knowledge.py</div>
+        <div class="events">
+          <span class="ev-chip">KNOWLEDGE_STARTED</span>
+          <span class="ev-chip">KNOWLEDGE_COMPLETED</span>
+        </div>
+        <div class="sub" style="margin-top:4px;color:var(--green)">📊 + ParadigmAnalyticsEngine (7-paradigm telemetry)</div>
+      </div>
+      <div class="info-box" onclick="focusNode('decision')">
+        <div class="label">Planning</div>
+        <div class="title">22 Decision Engine</div>
+        <div class="sub">organ_22_decision_engine.py</div>
+        <div class="events">
+          <span class="ev-chip">DECISION_EVALUATION_STARTED</span>
+          <span class="ev-chip">DECISION_EVALUATION_COMPLETED</span>
+        </div>
+      </div>
+      <div class="info-box" onclick="focusNode('compiler')">
+        <div class="label">DAG Builder</div>
+        <div class="title">36 Workflow Compiler</div>
+        <div class="sub">organ_36_workflow_compiler.py</div>
+        <div class="events">
+          <span class="ev-chip yellow">TASK_COMPILE_REQUESTED</span>
+          <span class="ev-chip yellow">WORKFLOW_COMPILED</span>
+        </div>
+      </div>
+      <div class="info-box" onclick="focusNode('security')">
+        <div class="label">Gate ⚠️ Placement Fixed</div>
+        <div class="title">07 Security / Gov</div>
+        <div class="sub">organ_07_security.py (post-compile)</div>
+        <div class="events"><span class="ev-chip red">SECURITY_CHECK</span></div>
+      </div>
+      <div class="info-box" onclick="focusNode('registry')">
+        <div class="label">Gate ⚠️ Placement Fixed</div>
+        <div class="title">18 Capability Registry</div>
+        <div class="sub">organ_18_capability_registry.py (post-compile)</div>
+        <div class="events"><span class="ev-chip red">CAPABILITY_CHECK</span></div>
+      </div>
+      <div class="info-box" onclick="focusNode('orchestrator')">
+        <div class="label">Scheduler</div>
+        <div class="title">38 Task Orchestrator</div>
+        <div class="sub">organ_38_task_orchestrator.py</div>
+        <div class="events">
+          <span class="ev-chip yellow">ORCHESTRATION_STARTED</span>
+          <span class="ev-chip yellow">AGENTS_ASSIGNED</span>
+        </div>
+        <div class="sub" style="margin-top:4px;color:var(--green)">🔒 + DistributedAgentLockingLedger (URL collision prevention)</div>
+      </div>
+      <div class="info-box" onclick="focusNode('agents')">
+        <div class="label">Execution</div>
+        <div class="title">10 Agents (Agent A)</div>
+        <div class="sub">organ_10_agents.py</div>
+        <div class="events">
+          <span class="ev-chip yellow">PERCEPTION_REQUESTED</span>
+          <span class="ev-chip yellow">ACTION_REQUESTED</span>
+          <span class="ev-chip yellow">CHECKPOINT_CREATED</span>
+        </div>
+        <div class="sub" style="margin-top:4px;color:var(--green)">🧠 + ParadigmKnowledgeBase + ParadigmSwitchController</div>
+      </div>
+      <div class="info-box" onclick="focusNode('perception')">
+        <div class="label">Sight</div>
+        <div class="title">31 Visual Perception</div>
+        <div class="sub">organ_31_visual_perception.py</div>
+        <div class="sub" style="margin-top:4px;color:var(--green)">👁️ + ContinuousVisionEngine + Window_Handle_Isolation_Engine</div>
+      </div>
+      <div class="info-box" onclick="focusNode('controllers')">
+        <div class="label">Action</div>
+        <div class="title">05 Controllers</div>
+        <div class="sub">organ_05_controllers.py</div>
+        <div class="events"><span class="ev-chip yellow">BROWSER_AUTOMATION_STARTED</span></div>
+      </div>
+      <div class="info-box" onclick="focusNode('chrome')">
+        <div class="label">Browser</div>
+        <div class="title">19 Chrome CDP</div>
+        <div class="sub">organ_19_chrome_cdp_runtime.py</div>
+      </div>
+      <div class="info-box" onclick="focusNode('state')">
+        <div class="label">Checkpoint / Verify</div>
+        <div class="title">32 State Catalog</div>
+        <div class="sub">organ_32_state_catalog.py</div>
+        <div class="events">
+          <span class="ev-chip green">CHECKPOINT_VERIFIED_SUCCESS</span>
+        </div>
+      </div>
+      <div class="info-box" onclick="focusNode('error_catalog')">
+        <div class="label">Recovery ⚠️ Separate Organ</div>
+        <div class="title">25 Error Catalog + Replanner</div>
+        <div class="sub">organ_25_error_catalog.py</div>
+        <div class="events">
+          <span class="ev-chip red">ACTION_FAILED</span>
+          <span class="ev-chip red">RECOVERY_DECISION</span>
+          <span class="ev-chip red">REPLAN_SUBMITTED</span>
+        </div>
+      </div>
+      <div class="info-box" onclick="focusNode('automation')">
+        <div class="label">Physical Actions</div>
+        <div class="title">06 Automation</div>
+        <div class="sub">organ_06_automation.py</div>
+        <div class="events"><span class="ev-chip yellow">TASK_DISPATCH</span></div>
+        <div class="sub" style="margin-top:4px;color:var(--green)">🖱️ + MultiTouch_3D_Physics_Engine (scroll/zoom/rotate)</div>
+      </div>
+      <div class="info-box" onclick="focusNode('graphing')">
+        <div class="label">Visualization</div>
+        <div class="title">13 Interface Layer — Graphing</div>
+        <div class="sub">organ_13_interface_layer.py</div>
+        <div class="sub" style="margin-top:4px;color:var(--green)">📈 + DataVisualizationGraphingEngine (matplotlib charts)</div>
+      </div>
+    </div>
+
+    <!-- EVENTS TAB -->
+    <div class="panel-content tab-panel" id="tab-events">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;">Real CNS event sequence — verified against organ_38 source code</div>
+      <div id="event-timeline"></div>
+    </div>
+
+    <!-- PIPELINES TAB -->
+    <div class="panel-content tab-panel" id="tab-pipelines">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;">39 connection pipelines — click to expand run command</div>
+      <div id="pipeline-list"></div>
+    </div>
+
+    <!-- COMMANDS TAB -->
+    <div class="panel-content tab-panel" id="tab-commands">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;">Copy & paste into PowerShell</div>
+      <div class="info-box">
+        <div class="label">Terminal 1 — Live Visualizer</div>
+        <div class="sub" style="margin-top:6px">
+          <code style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--accent);display:block;line-height:1.8">
+            $env:PYTHONPATH='D:\new_automation\All codes'<br>
+            python "D:\new_automation\All codes\user_io\live_visualization_ui.py"
+          </code>
+        </div>
+      </div>
+      <div class="info-box">
+        <div class="label">Terminal 2 — Standard Run (Vis ON)</div>
+        <div class="sub" style="margin-top:6px">
+          <code style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--green);display:block;line-height:1.8">
+            $env:PYTHONPATH='D:\new_automation\All codes'<br>
+            $env:HOJAIGA_CHROME_MODE='select'<br>
+            $env:HOJAIGA_CHROME_USER_DATA_BASE="$env:LOCALAPPDATA\Google\Chrome\User Data"<br>
+            python "D:\new_automation\test_hojaiga_real_task.py" --test standard_on
+          </code>
+        </div>
+      </div>
+      <div class="info-box">
+        <div class="label">Terminal 2 — Failure Recovery Test</div>
+        <div class="sub" style="margin-top:6px">
+          <code style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--red);display:block;line-height:1.8">
+            $env:PYTHONPATH='D:\new_automation\All codes'<br>
+            $env:HOJAIGA_CHROME_MODE='select'<br>
+            python "D:\new_automation\test_hojaiga_real_task.py" --test fail
+          </code>
+        </div>
+      </div>
+      <div class="info-box">
+        <div class="label">Run All Pipelines</div>
+        <div class="sub" style="margin-top:6px">
+          <code style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--yellow);display:block;line-height:1.8">
+            $env:PYTHONPATH='D:\new_automation\All codes'<br>
+            python D:\new_automation\run_pipelines.py
+          </code>
+        </div>
+      </div>
+      <div class="info-box">
+        <div class="label">Live Log Tails</div>
+        <div class="sub" style="margin-top:6px">
+          <code style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--purple);display:block;line-height:1.8">
+            Get-Content D:\new_automation\audit_log.json -Wait<br>
+            Get-Content D:\new_automation\cns_trace.json -Wait
+          </code>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GRAPH ══ -->
+  <div class="graph-wrap">
+    <div id="cy"></div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="ctrl-btn" title="Zoom In"  onclick="cy.zoom(cy.zoom()*1.2); cy.center()">+</button>
+      <button class="ctrl-btn" title="Zoom Out" onclick="cy.zoom(cy.zoom()*0.8); cy.center()">−</button>
+      <button class="ctrl-btn" title="Fit"      onclick="cy.fit(null,40)">⊙</button>
+      <button class="ctrl-btn" title="Reset"    onclick="resetHighlight()">↺</button>
+    </div>
+
+    <!-- Node detail popup -->
+    <div class="node-popup" id="node-popup">
+      <span class="popup-close" onclick="closePopup()">✕</span>
+      <div class="popup-title" id="popup-title"></div>
+      <div class="popup-file"  id="popup-file"></div>
+      <div class="popup-desc"  id="popup-desc"></div>
+      <div class="popup-events-title">CNS Events</div>
+      <div id="popup-events"></div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-title">Legend</div>
+      <div class="legend-row"><div class="legend-dot" style="background:#4a9eff"></div> Core Organ</div>
+      <div class="legend-row"><div class="legend-dot" style="background:#00e676"></div> Success Path</div>
+      <div class="legend-row"><div class="legend-dot" style="background:#ff4444"></div> Recovery Path</div>
+      <div class="legend-row"><div class="legend-dot" style="background:#ffd740"></div> Fixed / Was Missing</div>
+      <div class="legend-row"><div class="legend-dot" style="background:#ce93d8;border-radius:50%"></div> Parallel Branch</div>
+      <div class="legend-row"><div class="legend-dot" style="background:#00e676;border-radius:50%"></div> <span style="color:#00e676">New Logic Engine (v3)</span></div>
+    </div>
+
+    <!-- Trace bar -->
+    <div class="trace-bar" id="trace-bar">
+      <div class="trace-title">▶ Simulating Event Trace</div>
+      <div id="trace-events"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  NODE DATA
+// ══════════════════════════════════════════
+const nodeData = {
+  'user':          { label:'👤 USER INPUT',          file:'Manual / Voice',                desc:'User provides a natural language command via the Interface.', events:['sock.cns.inbound'] },
+  'sysboot':       { label:'⚙️ System Boot',          file:'core_runtime/system_boot.py',    desc:'Composition root. Initialises all organs and starts the async event loop.', events:['(startup)'] },
+  'interface':     { label:'11 Interface / UI',       file:'organ_13_interface_layer.py',    desc:'Accepts user input (text/voice). Publishes to sock.cns.inbound. Also handles UDP 9995 for system_boot UI integration. [v3] AudioNotificationEngine plays .wav sounds on task state changes (PAUSED, RESUMED, FINISHED, CRITICAL) using winsound — zero UI popups.', events:['sock.cns.inbound','AUDIO_WORK_PAUSED','AUDIO_WORK_FINISHED'] },
+  'cns':           { label:'02 CNS — EventBus',       file:'organ_02_cns_single_file.py',    desc:'Central Nervous System. Routes ALL events by topic. No organ talks to another directly.', events:['TASK_CREATED','INTENT_NORMALIZATION_STARTED'] },
+  'brain':         { label:'01 Brain',                file:'organ_01_brain.py',              desc:'Normalises and parses intent. Calls LLM Gateway for reasoning. Fires parallel Memory+Knowledge branches.', events:['INTENT_NORMALIZATION_STARTED','INTENT_NORMALIZATION_COMPLETED'] },
+  'llm':           { label:'37 LLM Gateway ⚠️',       file:'organ_37_llm_gateway.py',        desc:'[v3] Free_Tier_LLM_Router: 6-tier fallback — Ollama → Omnirouter → OpenRouter → Nvidia NIM → Groq → Synthetic. Zero paid API keys used. Graceful 429 degradation at every tier.', events:['LLM_REASONING_STARTED','FREE_TIER_ROUTE_FALLBACK'] },
+  'memory':        { label:'03 Memory ⟳',             file:'organ_03_memory.py',             desc:'Parallel branch. Retrieves past context. [v3] UIFunctionalityArchiver: separate SQLite tables for WebApp_History and DesktopApp_History — maps selector→action→outcome per app.', events:['MEMORY_STARTED','MEMORY_COMPLETED','UI_HISTORY_RECORDED'] },
+  'knowledge':     { label:'04 Knowledge ⟳',          file:'organ_04_knowledge.py',          desc:'Parallel branch. Looks up domain knowledge. [v3] ParadigmAnalyticsEngine: Aggregates telemetry across all 7 paradigms, outputs normalized JSON with success/fail rates per paradigm.', events:['KNOWLEDGE_STARTED','KNOWLEDGE_COMPLETED','PARADIGM_ANALYTICS_GENERATED'] },
+  'decision':      { label:'22 Decision Engine',      file:'organ_22_decision_engine.py',    desc:'Evaluates normalised intent. Determines required branches (MEMORY, KNOWLEDGE, TOOL). Fires COMPILATION_STARTED after all branches complete.', events:['DECISION_EVALUATION_STARTED','DECISION_EVALUATION_COMPLETED','COMPILATION_STARTED'] },
+  'compiler':      { label:'36 Workflow Compiler',    file:'organ_36_workflow_compiler.py',  desc:'Compiles goal into a DAG of executable steps. Emits TASK_COMPILE_REQUESTED and WORKFLOW_COMPILED.', events:['TASK_COMPILE_REQUESTED','WORKFLOW_COMPILED','COMPILATION_COMPLETED'] },
+  'security':      { label:'07 Security / Gov ⚠️',    file:'organ_07_security.py',           desc:'PLACEMENT FIXED. Fires AFTER compilation, not during resource resolution. Security gate before any execution begins.', events:['SECURITY_CHECK'] },
+  'registry':      { label:'18 Capability Registry ⚠️',file:'organ_18_capability_registry.py',desc:'PLACEMENT FIXED. Fires AFTER security check. Validates which agents/capabilities can handle the compiled plan.', events:['CAPABILITY_CHECK','RESOURCE_RESOLUTION_COMPLETED'] },
+  'orchestrator':  { label:'38 Task Orchestrator',    file:'organ_38_task_orchestrator.py',  desc:'Assigns compiled DAG steps to agents. [v3] DistributedAgentLockingLedger: thread-safe URL registry — prevents 2 agents clicking the same link. try_lock()/release() per agent.', events:['ORCHESTRATION_STARTED','AGENTS_ASSIGNED','LEDGER_URL_LOCKED','LEDGER_URL_RELEASED'] },
+  'agents':        { label:'10 Agents / Agent A',     file:'organ_10_agents.py',             desc:'Active worker. [v3] ParadigmKnowledgeBase: every agent knows all 7 paradigms. ParadigmSwitchController: assigns base paradigm at task start, allows temporary switch for complex sub-tasks, auto-reverts.', events:['PERCEPTION_REQUESTED','ACTION_REQUESTED','CHECKPOINT_CREATED','PARADIGM_SWITCH_TEMP','PARADIGM_SWITCH_REVERT'] },
+  'perception':    { label:'31 Visual Perception',    file:'organ_31_visual_perception.py',  desc:'Reads screen state. [v3] ContinuousVisionEngine: adaptive FPS (0.5→5fps). Window_Handle_Isolation_Engine: captures ONLY background automation HWND, never touches user active screen.', events:['PERCEPTION_REQUESTED','VISION_FPS_ADAPTED','WINDOW_ISOLATED'] },
+  'controllers':   { label:'05 Controllers',          file:'organ_05_controllers.py',        desc:'Dispatches physical actions — keyboard, mouse, app launch. Triggers BROWSER_AUTOMATION_STARTED for web tasks.', events:['BROWSER_AUTOMATION_STARTED'] },
+  'automation':    { label:'06 Automation',            file:'organ_06_automation.py',         desc:'[v3] MultiTouch_3D_Physics_Engine: virtual HID hooks via ctypes for scroll, zoom (Ctrl+scroll), and 3D rotation (yaw/pitch/roll drag). Zero-cost Windows native input injection.', events:['TASK_DISPATCH','PHYSICS_SCROLL','PHYSICS_ZOOM','PHYSICS_ROTATE_3D'] },
+  'chrome':        { label:'19 Chrome CDP',           file:'organ_19_chrome_cdp_runtime.py', desc:'Browser automation via Chrome DevTools Protocol. DOM interaction, navigation, JS execution.', events:['BROWSER_AUTOMATION_STARTED'] },
+  'popup':         { label:'29 Popup Handler',        file:'organ_29_popup_handler.py',      desc:'Handles OS-level dialogs, modal popups, and unexpected UI interrupts during execution.', events:['POPUP_DETECTED','POPUP_DISMISSED'] },
+  'state':         { label:'32 State Catalog',        file:'organ_32_state_catalog.py',      desc:'Persists mid-execution checkpoints. On success: CHECKPOINT_VERIFIED_SUCCESS. Enables recovery without full re-run.', events:['CHECKPOINT_CREATED','CHECKPOINT_VERIFIED_SUCCESS','VERIFICATION_COMPLETED'] },
+  'audit':         { label:'16 Audit System',         file:'observability/organ_16_audit_system.py', desc:'Writes every state transition to audit_log.json. Always active.', events:['(all events)'] },
+  'error_catalog': { label:'25 Error Catalog + Replanner ⚠️',file:'organ_25_error_catalog.py', desc:'PREVIOUSLY MERGED WITH DECISION ENGINE. Separate organ. Classifies ACTION_FAILED, decides recovery strategy, emits RECOVERY_DECISION → REPLAN_SUBMITTED back to CNS.', events:['ACTION_FAILED','RECOVERY_DECISION','REPLAN_SUBMITTED'] },
+  'graphing':      { label:'13 Graphing Engine',      file:'organ_13_interface_layer.py',    desc:'[v3] DataVisualizationGraphingEngine: renders .png charts via matplotlib — Paradigm Success Rates (bar), Agent Timeline (scatter), Intelligence vs Success (grouped bar).', events:['GRAPH_RENDERED'] },
+  'success_node':  { label:'✅ TASK_COMPLETED',        file:'Report: real_task_results.txt',  desc:'Terminal success state. Report written. Audit trail closed. AudioNotificationEngine plays WORK_FINISHED sound.', events:['TASK_COMPLETED','AUDIO_WORK_FINISHED'] },
+  'fail_node':     { label:'❌ HARD FAIL',              file:'Report: audit_log.json',         desc:'Max retries exceeded. Hard failure recorded with full trace. AudioNotificationEngine plays CRITICAL_ATTENTION sound.', events:['TASK_FAILED','AUDIO_CRITICAL_ATTENTION'] },
+};
+
+// ══════════════════════════════════════════
+//  PIPELINE DATA
+// ══════════════════════════════════════════
+const pipelines = [
+  {n:'01', route:'Brain (01) → CNS (02)',              desc:'Brain publishes intent to CNS EventBus'},
+  {n:'02', route:'CNS (02) → Memory (03)',             desc:'CNS routes to Memory for context retrieval'},
+  {n:'03', route:'CNS (02) → Knowledge (04)',          desc:'CNS routes to Knowledge organ'},
+  {n:'04', route:'CNS (02) → Controllers (05)',        desc:'CNS dispatches to controller layer'},
+  {n:'05', route:'CNS (02) → Automation (06)',         desc:'CNS to automation orchestration'},
+  {n:'06', route:'CNS (02) → Security (07)',           desc:'CNS to security kernel'},
+  {n:'07', route:'CNS (02) → Infrastructure (09)',     desc:'CNS to infrastructure organ'},
+  {n:'08', route:'CNS (02) → Learning (08)',           desc:'CNS to learning system'},
+  {n:'09', route:'CNS (02) → Agents (10)',             desc:'CNS assigns tasks to agents'},
+  {n:'10', route:'CNS (02) → Interface (11)',          desc:'CNS to interface/UI output'},
+  {n:'11', route:'CNS (02) → Integration (12)',        desc:'CNS to integration adapters'},
+  {n:'12', route:'CNS (02) → Interface Layer (13)',    desc:'CNS to full interface layer'},
+  {n:'13', route:'CNS (02) → LLM Runtime (14)',        desc:'CNS to LLM runtime'},
+  {n:'14', route:'CNS (02) → External Connectors (15)',desc:'CNS to external connectors'},
+  {n:'15', route:'CNS (02) → Audit System (16)',       desc:'CNS to audit observability'},
+  {n:'16', route:'CNS (02) → Backup Manager (17)',     desc:'CNS to backup manager'},
+  {n:'17', route:'CNS (02) → Capability Registry (18)',desc:'CNS to capability registry'},
+  {n:'18', route:'CNS (02) → Chrome CDP (19)',         desc:'CNS to Chrome CDP runtime'},
+  {n:'19', route:'CNS (02) → Config Manager (20)',     desc:'CNS to configuration manager'},
+  {n:'20', route:'CNS (02) → Config Schema (21)',      desc:'CNS to configuration schema'},
+  {n:'21', route:'CNS (02) → Decision Engine (22)',    desc:'CNS to decision engine'},
+  {n:'22', route:'CNS (02) → Organ 23',                desc:'CNS to organ 23'},
+  {n:'23', route:'CNS (02) → Kernel',                  desc:'CNS to runtime kernel'},
+  {n:'24', route:'CNS (02) → Package Manager',         desc:'CNS to package manager'},
+  {n:'25', route:'CNS (02) → DAP (24)',                desc:'CNS to Desktop Automation Protocol'},
+  {n:'26', route:'CNS (02) → Error Catalog (25)',      desc:'CNS to error catalog / replanner'},
+  {n:'27', route:'CNS (02) → Event Catalog (26)',      desc:'CNS to event catalog'},
+  {n:'28', route:'CNS (02) → Resource Manager',        desc:'CNS to resource manager'},
+  {n:'29', route:'CNS (02) → Service Registry',        desc:'CNS to service registry'},
+  {n:'30', route:'CNS (02) → State Catalog (32)',      desc:'CNS to state catalog / checkpoints'},
+  {n:'31', route:'CNS (02) → System Manifest (33)',    desc:'CNS to system manifest'},
+  {n:'32', route:'CNS (02) → Task Scheduler',          desc:'CNS to task scheduler'},
+  {n:'33', route:'CNS (02) → Update Manager (35)',     desc:'CNS to update manager'},
+  {n:'34', route:'CNS (02) → Workflow Compiler (36)',  desc:'CNS to workflow compiler'},
+  {n:'35', route:'CNS (02) → LLM Gateway (37)',        desc:'CNS to LLM gateway'},
+  {n:'36', route:'CNS (02) → Task Orchestrator (38)',  desc:'CNS to task orchestrator'},
+  {n:'37', route:'CNS (02) → Popup Handler (29)',      desc:'CNS to popup/dialog handler'},
+  {n:'38', route:'CNS (02) → App Scanner (30)',        desc:'CNS to app scanner'},
+  {n:'39', route:'CNS (02) → Visual Perception (31)',  desc:'CNS to visual perception'},
+];
+
+// ══════════════════════════════════════════
+//  CNS EVENT SEQUENCE
+// ══════════════════════════════════════════
+const eventSequence = [
+  { ev:'TASK_CREATED',                   phase:'Input',       flow:'both'    },
+  { ev:'INTENT_NORMALIZATION_STARTED',   phase:'Cognition',   flow:'both'    },
+  { ev:'MEMORY_STARTED',                 phase:'Cognition',   flow:'both',   note:'⟳ parallel' },
+  { ev:'KNOWLEDGE_STARTED',              phase:'Cognition',   flow:'both',   note:'⟳ parallel' },
+  { ev:'LLM_REASONING_STARTED',          phase:'Cognition',   flow:'both',   note:'⚠️ was missing' },
+  { ev:'MEMORY_COMPLETED',               phase:'Cognition',   flow:'both'    },
+  { ev:'KNOWLEDGE_COMPLETED',            phase:'Cognition',   flow:'both'    },
+  { ev:'INTENT_NORMALIZATION_COMPLETED', phase:'Cognition',   flow:'both'    },
+  { ev:'DECISION_EVALUATION_STARTED',    phase:'Planning',    flow:'both'    },
+  { ev:'DECISION_EVALUATION_COMPLETED',  phase:'Planning',    flow:'both'    },
+  { ev:'TASK_COMPILE_REQUESTED',         phase:'Planning',    flow:'both',   note:'⚠️ real name' },
+  { ev:'WORKFLOW_COMPILED',              phase:'Planning',    flow:'both',   note:'⚠️ real name' },
+  { ev:'COMPILATION_COMPLETED',          phase:'Planning',    flow:'both'    },
+  { ev:'SECURITY_CHECK',                 phase:'Gate',        flow:'both',   note:'⚠️ after compile now' },
+  { ev:'CAPABILITY_CHECK',               phase:'Gate',        flow:'both',   note:'⚠️ after compile now' },
+  { ev:'RESOURCE_RESOLUTION_COMPLETED',  phase:'Gate',        flow:'both'    },
+  { ev:'ORCHESTRATION_STARTED',          phase:'Orchestration',flow:'both',  note:'⚠️ real name' },
+  { ev:'AGENTS_ASSIGNED',                phase:'Orchestration',flow:'both',  note:'⚠️ real name (not AGENTS_STARTED)' },
+  { ev:'PERCEPTION_REQUESTED',           phase:'Execution',   flow:'both',   note:'⚠️ real name (not SCAN_STARTED)' },
+  { ev:'ACTION_REQUESTED',               phase:'Execution',   flow:'both'    },
+  { ev:'BROWSER_AUTOMATION_STARTED',     phase:'Execution',   flow:'both'    },
+  { ev:'CHECKPOINT_CREATED',             phase:'Execution',   flow:'both',   note:'⚠️ mid-execution, not end' },
+  { ev:'LEDGER_URL_LOCKED',              phase:'Execution',   flow:'both',   note:'🔒 v3 — agent locks URL before clicking' },
+  { ev:'PARADIGM_SWITCH_TEMP',           phase:'Execution',   flow:'both',   note:'🧠 v3 — temporary paradigm switch for sub-task' },
+  { ev:'VISION_FPS_ADAPTED',             phase:'Execution',   flow:'both',   note:'👁️ v3 — FPS adapts to screen dynamism' },
+  { ev:'PHYSICS_ROTATE_3D',              phase:'Execution',   flow:'both',   note:'🖱️ v3 — 3D rotation via MultiTouch engine' },
+  // SUCCESS
+  { ev:'CHECKPOINT_VERIFIED_SUCCESS',    phase:'Verify',      flow:'success', note:'✅ success path' },
+  { ev:'UI_HISTORY_RECORDED',            phase:'Verify',      flow:'success', note:'📁 v3 — interaction archived in web/desktop history' },
+  { ev:'PARADIGM_ANALYTICS_GENERATED',   phase:'Verify',      flow:'success', note:'📊 v3 — paradigm report JSON generated' },
+  { ev:'GRAPH_RENDERED',                 phase:'Verify',      flow:'success', note:'📈 v3 — matplotlib chart saved to .png' },
+  { ev:'AUDIO_WORK_FINISHED',            phase:'Done',        flow:'success', note:'🔊 v3 — plays WORK_FINISHED sound' },
+  { ev:'TASK_COMPLETED',                 phase:'Done',        flow:'success', note:'✅ terminal' },
+  // RECOVERY
+  { ev:'ACTION_FAILED',                  phase:'Recovery',    flow:'recovery', note:'🔴 was missing' },
+  { ev:'RECOVERY_DECISION',              phase:'Recovery',    flow:'recovery', note:'🔴 @replanner separate organ' },
+  { ev:'REPLAN_SUBMITTED',               phase:'Recovery',    flow:'recovery', note:'🔴 loops back to CNS' },
+  { ev:'AUDIO_CRITICAL_ATTENTION',       phase:'Recovery',    flow:'recovery', note:'🔊 v3 — plays CRITICAL_ATTENTION sound' },
+  { ev:'TASK_FAILED (hard)',             phase:'Done',        flow:'recovery', note:'🔴 max retries exceeded' },
+];
+
+// ══════════════════════════════════════════
+//  CYTOSCAPE GRAPH
+// ══════════════════════════════════════════
+let cy;
+
+function initGraph() {
+  cy = cytoscape({
+    container: document.getElementById('cy'),
+    style: [
+      { selector: 'node', style: {
+          'label': 'data(label)',
+          'text-wrap': 'wrap', 'text-max-width': '120px',
+          'font-family': 'Inter, sans-serif', 'font-size': '11px', 'font-weight': '500',
+          'color': '#e2e8f0', 'text-valign': 'center', 'text-halign': 'center',
+          'background-color': '#141b2d', 'border-width': 2, 'border-color': '#1e2d4a',
+          'width': 120, 'height': 48, 'shape': 'roundrectangle',
+          'padding': '8px',
+        }
+      },
+      { selector: 'node[type="input"]',       style: { 'background-color': '#0d1f33', 'border-color': '#4a9eff', 'border-width': 2 } },
+      { selector: 'node[type="cognition"]',   style: { 'background-color': '#1a0d33', 'border-color': '#6c63ff', 'border-width': 2 } },
+      { selector: 'node[type="fixed"]',       style: { 'background-color': '#1f1800', 'border-color': '#ffd740', 'border-width': 2 } },
+      { selector: 'node[type="planning"]',    style: { 'background-color': '#001a1f', 'border-color': '#4dd0e1', 'border-width': 2 } },
+      { selector: 'node[type="execution"]',   style: { 'background-color': '#0d1f1a', 'border-color': '#00c853', 'border-width': 2 } },
+      { selector: 'node[type="success"]',     style: { 'background-color': '#0d2b1a', 'border-color': '#00e676', 'border-width': 3, 'color': '#00e676' } },
+      { selector: 'node[type="recovery"]',    style: { 'background-color': '#2b0d0d', 'border-color': '#ff4444', 'border-width': 2, 'color': '#ff4444' } },
+      { selector: 'node[type="cns"]',         style: { 'background-color': '#0a1428', 'border-color': '#4a9eff', 'border-width': 3, 'width': 80, 'height': 80, 'shape': 'ellipse', 'font-weight': '700', 'font-size': '12px' } },
+      { selector: 'node[type="parallel"]',    style: { 'background-color': '#1a0d2b', 'border-color': '#ce93d8', 'border-width': 2, 'border-style': 'dashed' } },
+      { selector: 'node[type="audit"]',       style: { 'background-color': '#0d0d1f', 'border-color': '#555', 'border-width': 1, 'border-style': 'dashed', 'color': '#888' } },
+      { selector: 'node.highlighted',         style: { 'border-color': '#fff', 'border-width': 3, 'box-shadow': '0 0 15px rgba(255,255,255,0.5)' } },
+      { selector: 'node.faded',               style: { 'opacity': 0.25 } },
+      { selector: 'edge', style: {
+          'width': 2, 'line-color': '#1e2d4a', 'target-arrow-color': '#1e2d4a',
+          'target-arrow-shape': 'triangle', 'curve-style': 'bezier',
+          'label': 'data(label)', 'font-size': '9px', 'color': '#556',
+          'text-background-color': '#0a0e1a', 'text-background-opacity': 1,
+          'text-background-padding': '2px',
+        }
+      },
+      { selector: 'edge[flow="success"]', style: { 'line-color': '#00e676', 'target-arrow-color': '#00e676', 'width': 2.5, 'color': '#00c853' } },
+      { selector: 'edge[flow="recovery"]',style: { 'line-color': '#ff4444', 'target-arrow-color': '#ff4444', 'width': 2.5, 'color': '#cc3333', 'line-style': 'dashed' } },
+      { selector: 'edge[flow="parallel"]',style: { 'line-color': '#ce93d8', 'target-arrow-color': '#ce93d8', 'line-style': 'dashed' } },
+      { selector: 'edge[flow="obs"]',     style: { 'line-color': '#333', 'target-arrow-color': '#333', 'line-style': 'dotted', 'width': 1 } },
+      { selector: 'edge.faded',           style: { 'opacity': 0.1 } },
+      { selector: 'edge.highlighted',     style: { 'width': 4 } },
+    ],
+    elements: {
+      nodes: [
+        // Input
+        { data: { id:'user',         label:'👤 USER\nInput Command',       type:'input'    }, position:{x:100,  y:80}  },
+        { data: { id:'sysboot',      label:'⚙️ System Boot\nComposition Root', type:'input' }, position:{x:100,  y:200} },
+        { data: { id:'interface',    label:'11 Interface/UI\nUser Input Ingestion', type:'input' }, position:{x:300, y:140} },
+        // CNS
+        { data: { id:'cns',          label:'02 CNS\nEventBus',             type:'cns'      }, position:{x:520,  y:140} },
+        // Cognition
+        { data: { id:'brain',        label:'01 Brain\nIntent Analysis',    type:'cognition'}, position:{x:760,  y:80}  },
+        { data: { id:'llm',          label:'37 LLM Gateway ⚠️\nReasoning Engine', type:'fixed' }, position:{x:980, y:80}  },
+        { data: { id:'memory',       label:'03 Memory ⟳\nContext Retrieval', type:'parallel' }, position:{x:760, y:-40} },
+        { data: { id:'knowledge',    label:'04 Knowledge ⟳\nDomain Rules', type:'parallel' }, position:{x:980, y:-40} },
+        // Planning
+        { data: { id:'decision',     label:'22 Decision Engine\nValidates Actions', type:'planning' }, position:{x:760, y:240} },
+        { data: { id:'compiler',     label:'36 Workflow Compiler ⚠️\nBuilds Execution DAG', type:'fixed' }, position:{x:980, y:240} },
+        // Gate (fixed placement)
+        { data: { id:'security',     label:'07 Security/Gov ⚠️\nChecks Constraints', type:'fixed' }, position:{x:1180, y:160} },
+        { data: { id:'registry',     label:'18 Capability Registry ⚠️\nValidates Tools', type:'fixed' }, position:{x:1180, y:280} },
+        // Orchestration
+        { data: { id:'orchestrator', label:'38 Task Orchestrator\nSchedules DAG', type:'planning' }, position:{x:760, y:400} },
+        // Execution
+        { data: { id:'agents',       label:'10 Agents / Agent A\nActive Worker', type:'execution' }, position:{x:980, y:400} },
+        { data: { id:'perception',   label:'31 Visual Perception\nReads Screen State', type:'execution' }, position:{x:1200,y:340} },
+        { data: { id:'controllers',  label:'05 Controllers\nDispatches Actions', type:'execution' }, position:{x:1200,y:440} },
+        { data: { id:'chrome',       label:'19 Chrome CDP\nBrowser Automation', type:'execution' }, position:{x:1380,y:400} },
+        { data: { id:'popup',        label:'29 Popup Handler\nOS Dialogs', type:'execution' }, position:{x:1380,y:500} },
+        // v3 Logic Engines
+        { data: { id:'automation',   label:'06 Automation\n🖱️ MultiTouch 3D', type:'execution' }, position:{x:1380,y:340} },
+        { data: { id:'graphing',     label:'13 Graphing\n📈 matplotlib', type:'execution' }, position:{x:560, y:540} },
+        // State
+        { data: { id:'state',        label:'32 State Catalog\nCheckpoint / Verify', type:'execution' }, position:{x:980, y:520} },
+        // Branch decision
+        { data: { id:'branch',       label:'Outcome?', type:'input' }, position:{x:760, y:540} },
+        // Success
+        { data: { id:'success_node', label:'✅ TASK_COMPLETED\n🔊 Report + Sound', type:'success' }, position:{x:560, y:640} },
+        // Recovery
+        { data: { id:'error_catalog',label:'25 Error Catalog ⚠️\nReplanner (Separate!)', type:'recovery' }, position:{x:980, y:640} },
+        { data: { id:'fail_node',    label:'❌ HARD FAIL\n🔊 Critical Sound', type:'recovery'  }, position:{x:1200,y:720} },
+        // Audit (always on)
+        { data: { id:'audit',        label:'16 Audit\nAlways Writing', type:'audit' }, position:{x:520, y:400} },
+      ],
+      edges: [
+        // Input flow
+        { data: { id:'e1',  source:'user',        target:'interface',   label:'command',     flow:'default'  } },
+        { data: { id:'e2',  source:'sysboot',     target:'interface',   label:'boots',       flow:'default'  } },
+        { data: { id:'e3',  source:'interface',   target:'cns',         label:'sock.cns.inbound', flow:'default' } },
+        // CNS → Brain
+        { data: { id:'e4',  source:'cns',         target:'brain',       label:'TASK_CREATED', flow:'default' } },
+        // Brain → LLM (FIXED — was missing)
+        { data: { id:'e5',  source:'brain',       target:'llm',         label:'LLM_REASONING', flow:'default' } },
+        // Brain → parallel branches
+        { data: { id:'e6',  source:'cns',         target:'memory',      label:'MEMORY_STARTED', flow:'parallel' } },
+        { data: { id:'e7',  source:'cns',         target:'knowledge',   label:'KNOWLEDGE_STARTED', flow:'parallel' } },
+        { data: { id:'e8',  source:'memory',      target:'decision',    label:'MEMORY_COMPLETED', flow:'parallel' } },
+        { data: { id:'e9',  source:'knowledge',   target:'decision',    label:'KNOWLEDGE_COMPLETED', flow:'parallel' } },
+        // Brain → Decision
+        { data: { id:'e10', source:'brain',       target:'decision',    label:'INTENT_NORM_DONE', flow:'default' } },
+        // Decision → Compiler
+        { data: { id:'e11', source:'decision',    target:'compiler',    label:'COMPILATION_STARTED', flow:'default' } },
+        // Compiler → Security GATE (FIXED placement)
+        { data: { id:'e12', source:'compiler',    target:'security',    label:'WORKFLOW_COMPILED', flow:'default' } },
+        { data: { id:'e13', source:'security',    target:'registry',    label:'SECURITY_CHECK', flow:'default' } },
+        { data: { id:'e14', source:'registry',    target:'orchestrator',label:'CAPABILITY_CHECK', flow:'default' } },
+        // Orchestration
+        { data: { id:'e15', source:'orchestrator',target:'agents',      label:'AGENTS_ASSIGNED', flow:'default' } },
+        // Execution
+        { data: { id:'e16', source:'agents',      target:'perception',  label:'PERCEPTION_REQUESTED', flow:'default' } },
+        { data: { id:'e17', source:'agents',      target:'controllers', label:'ACTION_REQUESTED', flow:'default' } },
+        { data: { id:'e18', source:'controllers', target:'chrome',      label:'BROWSER_AUTOMATION', flow:'default' } },
+        { data: { id:'e19', source:'controllers', target:'popup',       label:'POPUP?', flow:'default' } },
+        { data: { id:'e20', source:'agents',      target:'state',       label:'CHECKPOINT_CREATED\n(mid-exec)', flow:'default' } },
+        // v3 Logic Engine edges
+        { data: { id:'e28', source:'controllers', target:'automation',  label:'PHYSICS_DISPATCH', flow:'default' } },
+        { data: { id:'e29', source:'success_node',target:'graphing',    label:'GRAPH_RENDERED', flow:'success' } },
+        { data: { id:'e30', source:'orchestrator',target:'agents',      label:'LEDGER_CHECK', flow:'default' } },
+        // State → Branch
+        { data: { id:'e21', source:'state',       target:'branch',      label:'verify result', flow:'default' } },
+        // Success path
+        { data: { id:'e22', source:'branch',      target:'success_node',label:'VERIFIED ✅', flow:'success' } },
+        // Recovery path
+        { data: { id:'e23', source:'branch',      target:'error_catalog',label:'ACTION_FAILED 🔴', flow:'recovery' } },
+        // Error catalog FIXED — separate Replanner
+        { data: { id:'e24', source:'error_catalog',target:'cns',        label:'REPLAN_SUBMITTED', flow:'recovery' } },
+        { data: { id:'e25', source:'cns',         target:'decision',    label:'retry loop', flow:'recovery' } },
+        // Hard fail
+        { data: { id:'e26', source:'error_catalog',target:'fail_node',  label:'max retries ❌', flow:'recovery' } },
+        // Audit (always on)
+        { data: { id:'e27', source:'cns',         target:'audit',       label:'all events', flow:'obs' } },
+      ]
+    },
+    layout: { name: 'preset' },
+    userZoomingEnabled: true,
+    userPanningEnabled: true,
+    autoungrabify: false,
+    minZoom: 0.2,
+    maxZoom: 3,
+  });
+
+  // Click handler
+  cy.on('tap', 'node', function(evt) {
+    const id = evt.target.id();
+    const data = nodeData[id];
+    if (data) showPopup(id, data);
+  });
+  cy.on('tap', function(evt) {
+    if (evt.target === cy) closePopup();
+  });
+
+  // Fit on load
+  cy.ready(() => { cy.fit(null, 60); });
+}
+
+// ══════════════════════════════════════════
+//  POPUP
+// ══════════════════════════════════════════
+function showPopup(id, data) {
+  document.getElementById('popup-title').textContent  = data.label;
+  document.getElementById('popup-file').textContent   = data.file;
+  document.getElementById('popup-desc').textContent   = data.desc;
+  const evContainer = document.getElementById('popup-events');
+  evContainer.innerHTML = '';
+  (data.events||[]).forEach(ev => {
+    const chip = document.createElement('span');
+    chip.className = 'ev-chip';
+    chip.style.marginRight = '4px'; chip.style.marginBottom = '4px'; chip.style.display = 'inline-block';
+    chip.textContent = ev;
+    evContainer.appendChild(chip);
+  });
+  document.getElementById('node-popup').classList.add('visible');
+  // Highlight node
+  cy.nodes().removeClass('highlighted faded');
+  cy.edges().removeClass('highlighted faded');
+  cy.nodes().not('#' + id).addClass('faded');
+  cy.getElementById(id).addClass('highlighted');
+  cy.edges().filter(e => e.source().id() === id || e.target().id() === id).addClass('highlighted');
+  cy.edges().filter(e => e.source().id() !== id && e.target().id() !== id).addClass('faded');
+}
+function closePopup() {
+  document.getElementById('node-popup').classList.remove('visible');
+  resetHighlight();
+}
+function resetHighlight() {
+  cy.nodes().removeClass('highlighted faded');
+  cy.edges().removeClass('highlighted faded');
+}
+
+// ══════════════════════════════════════════
+//  FILTER VIEWS
+// ══════════════════════════════════════════
+function filterView(mode) {
+  document.querySelectorAll('.badge').forEach(b => b.classList.remove('active'));
+  resetHighlight();
+  cy.edges().removeClass('faded');
+  cy.nodes().removeClass('faded');
+
+  if (mode === 'success') {
+    document.getElementById('btn-success').classList.add('active');
+    cy.edges().filter(e => e.data('flow') !== 'success' && e.data('flow') !== 'default' && e.data('flow') !== 'obs' && e.data('flow') !== 'parallel').addClass('faded');
+    cy.nodes('#error_catalog, #fail_node').addClass('faded');
+  } else if (mode === 'recovery') {
+    document.getElementById('btn-recovery').classList.add('active');
+    cy.edges().filter(e => e.data('flow') !== 'recovery' && e.data('flow') !== 'default' && e.data('flow') !== 'obs').addClass('faded');
+    cy.nodes('#success_node').addClass('faded');
+  } else {
+    document.getElementById('btn-all').classList.add('active');
+  }
+}
+
+// ══════════════════════════════════════════
+//  ANIMATE
+// ══════════════════════════════════════════
+const successPath = ['user','interface','cns','brain','llm','memory','knowledge','decision','compiler','security','registry','orchestrator','agents','perception','controllers','chrome','state','branch','success_node'];
+const recoveryPath = ['user','interface','cns','brain','llm','decision','compiler','security','registry','orchestrator','agents','controllers','state','branch','error_catalog','cns','decision','compiler','orchestrator','agents','fail_node'];
+
+let animTimer = null;
+let isPresentMode = false;
+let presentStep = 0;
+let presentPath = [];
+
+function togglePresentMode() {
+  if (isPresentMode) {
+    isPresentMode = false;
+    document.getElementById('btn-present').classList.remove('active');
+    resetHighlight();
+    document.getElementById('trace-bar').classList.remove('visible');
+    return;
+  }
+  if (animTimer) animateFlow(); // stop auto animation if running
+  isPresentMode = true;
+  presentStep = 0;
+  presentPath = document.getElementById('btn-recovery').classList.contains('active') ? recoveryPath : successPath;
+  
+  document.getElementById('btn-present').classList.add('active');
+  document.getElementById('trace-bar').classList.add('visible');
+  cy.nodes().addClass('faded'); cy.edges().addClass('faded');
+  updatePresentStep();
+}
+
+function updatePresentStep() {
+  if (!isPresentMode) return;
+  const traceEvents = document.getElementById('trace-events');
+  traceEvents.innerHTML = '<span style="color:var(--text2);font-size:10px;margin-right:8px;padding-top:2px">🎤 Presenting (Arrows/Space)</span>';
+  
+  cy.nodes().addClass('faded'); cy.edges().addClass('faded');
+  cy.nodes().removeClass('highlighted'); cy.edges().removeClass('highlighted');
+  
+  for(let i=0; i<=presentStep; i++) {
+    const node = cy.getElementById(presentPath[i]);
+    if (node) {
+      node.removeClass('faded').addClass('highlighted');
+      if (i > 0) {
+        cy.edges().filter(e => e.source().id() === presentPath[i-1] && e.target().id() === presentPath[i]).removeClass('faded').addClass('highlighted');
+      }
+    }
+    const relevantEvents = eventSequence.filter(e => e.flow === 'both' || (presentPath === successPath ? e.flow === 'success' : e.flow === 'recovery'));
+    if (relevantEvents[i]) {
+      const chip = document.createElement('span');
+      chip.className = 'ev-chip ' + (presentPath === successPath ? 'green' : 'red');
+      chip.textContent = relevantEvents[i].ev;
+      traceEvents.appendChild(chip);
+    }
+  }
+  const currNode = cy.getElementById(presentPath[presentStep]);
+  if (currNode) cy.animate({ center: { eles: currNode }, zoom: 1.4 }, { duration: 300 });
+}
+
+document.addEventListener('keydown', (e) => {
+  if (!isPresentMode) return;
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+    e.preventDefault();
+    if (presentStep < presentPath.length - 1) { presentStep++; updatePresentStep(); }
+  } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+    e.preventDefault();
+    if (presentStep > 0) { presentStep--; updatePresentStep(); }
+  } else if (e.key === 'Escape') {
+    togglePresentMode();
+  }
+});
+
+function animateFlow() {
+  if (isPresentMode) togglePresentMode(); // disable present mode if auto-animating
+  if (animTimer) { clearInterval(animTimer); animTimer=null; resetHighlight(); document.getElementById('trace-bar').classList.remove('visible'); document.getElementById('btn-animate').classList.remove('active'); return; }
+  document.getElementById('btn-animate').classList.add('active');
+  const traceBar = document.getElementById('trace-bar');
+  const traceEvents = document.getElementById('trace-events');
+  traceBar.classList.add('visible');
+  traceEvents.innerHTML = '';
+  cy.nodes().addClass('faded'); cy.edges().addClass('faded');
+
+  const path = document.getElementById('btn-recovery').classList.contains('active') ? recoveryPath : successPath;
+  let i = 0;
+  animTimer = setInterval(() => {
+    if (i >= path.length) {
+      clearInterval(animTimer); animTimer = null;
+      document.getElementById('btn-animate').classList.remove('active');
+      return;
+    }
+    cy.nodes().removeClass('highlighted');
+    const node = cy.getElementById(path[i]);
+    if (node) {
+      node.removeClass('faded').addClass('highlighted');
+      if (i > 0) {
+        cy.edges().filter(e => e.source().id() === path[i-1] && e.target().id() === path[i]).removeClass('faded').addClass('highlighted');
+      }
+    }
+    const relevantEvents = eventSequence.filter(e => e.flow === 'both' || (path === successPath ? e.flow === 'success' : e.flow === 'recovery'));
+    if (relevantEvents[i]) {
+      const chip = document.createElement('span');
+      chip.className = 'ev-chip ' + (path === successPath ? 'green' : 'red');
+      chip.textContent = relevantEvents[i] ? relevantEvents[i].ev : '';
+      traceEvents.appendChild(chip);
+    }
+    i++;
+  }, 700);
+}
+
+// ══════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const names = ['organs','events','pipelines','commands'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ══════════════════════════════════════════
+//  FOCUS NODE
+// ══════════════════════════════════════════
+function focusNode(id) {
+  const node = cy.getElementById(id);
+  if (!node) return;
+  cy.animate({ center: { eles: node }, zoom: 1.6 }, { duration: 400 });
+  showPopup(id, nodeData[id]);
+}
+
+// ══════════════════════════════════════════
+//  BUILD PIPELINE LIST
+// ══════════════════════════════════════════
+function buildPipelines() {
+  const container = document.getElementById('pipeline-list');
+  pipelines.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'pipe-item';
+    div.innerHTML = `
+      <div class="pipe-num">P${p.n}</div>
+      <div style="flex:1">
+        <div class="pipe-route">${p.route}</div>
+        <div class="pipe-cmd">$env:PYTHONPATH='D:\\new_automation\\All codes'<br>python D:\\new_automation\\pipelines\\pipeline_${p.n}.py</div>
+      </div>
+      <div class="pipe-status ok"></div>
+    `;
+    div.addEventListener('click', () => div.classList.toggle('expanded'));
+    container.appendChild(div);
+  });
+}
+
+// ══════════════════════════════════════════
+//  BUILD EVENT TIMELINE
+// ══════════════════════════════════════════
+function buildEventTimeline() {
+  const container = document.getElementById('event-timeline');
+  let lastPhase = '';
+  eventSequence.forEach((ev, i) => {
+    if (ev.phase !== lastPhase) {
+      const ph = document.createElement('div');
+      ph.style.cssText = 'font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin:10px 0 4px;border-bottom:1px solid var(--border);padding-bottom:3px';
+      ph.textContent = ev.phase;
+      container.appendChild(ph);
+      lastPhase = ev.phase;
+    }
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:5px';
+    const num = document.createElement('div');
+    num.style.cssText = 'font-size:9px;color:var(--text2);min-width:18px;font-family:JetBrains Mono,monospace';
+    num.textContent = (i+1);
+    const chip = document.createElement('span');
+    const cls = ev.flow === 'success' ? 'green' : ev.flow === 'recovery' ? 'red' : '';
+    chip.className = `ev-chip ${cls}`;
+    chip.style.flexShrink = '0';
+    chip.textContent = ev.ev;
+    row.appendChild(num); row.appendChild(chip);
+    if (ev.note) {
+      const note = document.createElement('span');
+      note.style.cssText = 'font-size:9px;color:var(--yellow)';
+      note.textContent = ev.note;
+      row.appendChild(note);
+    }
+    container.appendChild(row);
+  });
+}
+
+// ══════════════════════════════════════════
+//  KEEP-ALIVE (prevents browser tab sleep)
+// ══════════════════════════════════════════
+setInterval(() => {
+  const el = document.createElement('span');
+  el.style.display = 'none';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 100);
+}, 15000);
+
+// Also keep the HTTP server alive
+setInterval(() => {
+  fetch('/').catch(() => {});
+}, 30000);
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  initGraph();
+  buildPipelines();
+  buildEventTimeline();
+  filterView('success');
+});
+</script>
+</body>
+</html>

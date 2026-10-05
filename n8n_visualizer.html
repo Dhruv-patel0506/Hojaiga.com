@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hojaiga OS Architecture Visualizer</title>
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0d0d12; color: #e0e0e6; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
+    
+    .controls { width: 95vw; background: #1a1a1f; padding: 15px 25px; border-radius: 12px; margin: 15px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: space-between; border: 1px solid #2e2e38; z-index: 10; flex-wrap: wrap; gap: 10px; box-sizing: border-box; }
+    .prompt-input { flex-grow: 1; min-width: 200px; background: #0e0e11; border: 1px solid #3e3e4f; padding: 12px 16px; border-radius: 8px; color: #fff; font-size: 14px; outline: none; }
+    .btn { padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-size: 13px; transition: transform 0.2s, box-shadow 0.2s; color: white; }
+    .btn-auto { background: #9c27b0; box-shadow: 0 4px 15px rgba(156, 39, 176, 0.4); }
+    .btn-manual { background: #00bcd4; box-shadow: 0 4px 15px rgba(0, 188, 212, 0.4); }
+    .btn-control { background: #333340; border: 1px solid #5c6285; }
+    
+    .canvas-container { width: 100%; overflow-x: auto; display: flex; justify-content: center; }
+    .canvas { position: relative; background-color: #121214; width: 1600px; height: 1600px; padding: 20px; border-radius: 12px; border: 1px solid #282830; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 30px 30px; }
+    
+    .node { background-color: #1d1d24; border-radius: 8px; width: 160px; text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 5; position: absolute; display: flex; flex-direction: column; border: 2px solid #333340; transition: all 0.3s; cursor: pointer; }
+    .node-header { padding: 8px 12px; background-color: #262630; border-radius: 6px 6px 0 0; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #1a1a22; }
+    .node-body { padding: 10px 12px; font-size: 11px; color: #a0a0b0; line-height: 1.3; }
+    .icon { width: 20px; height: 20px; border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 11px; color: #fff; }
+    
+    .node.active-run { border-color: #ff3366 !important; box-shadow: 0 0 25px rgba(255, 51, 102, 0.6) !important; transform: scale(1.05); z-index: 200; }
+    .node.completed-run { border-color: #00e676 !important; box-shadow: 0 0 15px rgba(0, 230, 118, 0.3) !important; opacity: 0.8; }
+    
+    .node-11 .icon { background-color: #e91e63; }
+    .node-13 .icon { background-color: #3f51b5; }
+    .node-04 .icon { background-color: #00bcd4; }
+    .node-01 .icon { background-color: #9c27b0; }
+    .node-14 .icon { background-color: #ff5722; }
+    .node-12 .icon { background-color: #8bc34a; }
+    .node-16 .icon { background-color: #795548; }
+    .node-02 .icon { background-color: #00b0ff; }
+    .node-26 .icon { background-color: #ffb300; }
+    .node-03 .icon { background-color: #4caf50; }
+    .node-32 .icon { background-color: #9c27b0; }
+    .node-05 .icon { background-color: #e91e63; }
+    .node-06 .icon { background-color: #9c27b0; }
+    .node-34 .icon { background-color: #ff9800; }
+    .node-36 .icon { background-color: #e91e63; }
+    .node-22 .icon { background-color: #9c27b0; }
+    .node-10 .icon { background-color: #ff9800; }
+    .node-15 .icon { background-color: #009688; }
+    .node-19 .icon { background-color: #03a9f4; }
+    .node-24 .icon { background-color: #e91e63; }
+    .node-07 .icon { background-color: #ffc107; }
+    .node-08 .icon { background-color: #009688; }
+    .node-25 .icon { background-color: #f44336; }
+    .node-09 .icon { background-color: #9c27b0; }
+    .node-17 .icon { background-color: #607d8b; }
+    .node-18 .icon { background-color: #8d6e63; }
+    .node-20 .icon { background-color: #795548; }
+    .node-21 .icon { background-color: #ff5722; }
+    .node-23 .icon { background-color: #cddc39; }
+    .node-27 .icon { background-color: #4caf50; }
+    .node-28 .icon { background-color: #3f51b5; }
+    .node-33 .icon { background-color: #607d8b; }
+    .node-35 .icon { background-color: #00bcd4; }
+    .node-kernel .icon { background-color: #ff9800; }
+    .node-pkg .icon { background-color: #00bcd4; }
+    
+    svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+    path.active-flow { stroke: #ff3366 !important; filter: drop-shadow(0 0 5px #ff3366); stroke-width: 4px; }
+    
+    /* 70/30 Modal Overlay */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+    .modal-content { width: 85vw; max-width: 1200px; height: 85vh; background: #1a1a22; border-radius: 12px; border: 2px solid #ff3366; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 50px rgba(255, 51, 102, 0.3); position: relative; }
+    
+    /* Top 30% - Internal N8N */
+    .modal-top { height: 35%; background: #1d1d26; border-bottom: 2px solid #3e3e4f; padding: 20px; position: relative; overflow: auto; display: flex; align-items: center; }
+    .internal-n8n-node { min-width: 150px; background: #262630; border: 2px solid #5c6285; border-radius: 8px; padding: 12px; color: #fff; font-size: 13px; font-weight: bold; margin: 0 20px; text-align: center; opacity: 0.4; transition: all 0.3s; position: relative; z-index: 2; }
+    .internal-n8n-node.active { border-color: #00b0ff; box-shadow: 0 0 20px rgba(0, 176, 255, 0.4); opacity: 1; transform: scale(1.05); }
+    .internal-n8n-link { height: 4px; background: #5c6285; flex-grow: 1; opacity: 0.4; transition: all 0.3s; min-width: 30px; }
+    .internal-n8n-link.active { background: #00b0ff; opacity: 1; box-shadow: 0 0 10px #00b0ff; }
+    
+    /* Bottom 70% - Dynamic Video Animation */
+    .modal-bottom { height: 65%; background: #0d0d12; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    
+    /* Animation Elements */
+    .vid-container { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.5s; pointer-events: none; }
+    .vid-container.visible { opacity: 1; }
+    
+    /* Anim Generic styles */
+    .desc-text { color: #fff; position: absolute; bottom: 20px; opacity: 0.7; font-size: 24px; font-weight: bold; font-family: monospace; }
+    
+    /* Anim 0: Processing Blocks */
+    .anim-0 .block { width: 40px; height: 40px; background: #ff3366; position: absolute; border-radius: 4px; box-shadow: 0 0 15px #ff3366; }
+    @keyframes orbit { 0% { transform: rotate(0deg) translateX(100px) rotate(0deg); } 100% { transform: rotate(360deg) translateX(100px) rotate(-360deg); } }
+    .anim-0 .orbiter { animation: orbit 3s linear infinite; }
+    
+    /* Anim 1: Tree / Graph logic */
+    .anim-1 .tree-node { width: 80px; height: 40px; background: #00b0ff; border-radius: 20px; position: absolute; text-align: center; color: white; line-height: 40px; font-weight: bold; box-shadow: 0 0 15px #00b0ff; }
+    
+    /* Anim 2: Data Stream */
+    .anim-2 .data-stream { width: 200vw; height: 2px; background: linear-gradient(90deg, transparent, #ff9800, transparent); position: absolute; transform: rotate(45deg); opacity: 0.5; }
+    @keyframes slideStream { 0% { left: -100vw; top: -100vh; } 100% { left: 100vw; top: 100vh; } }
+    .anim-2 .streaming { animation: slideStream 1.5s linear infinite; }
+    
+    /* Anim 3: Security / Scan Laser */
+    .anim-3 .laser { width: 100%; height: 5px; background: #ff3366; box-shadow: 0 0 20px #ff3366; position: absolute; top: 0; }
+    @keyframes scan { 0% { top: 10%; opacity: 1; } 50% { top: 90%; opacity: 1; } 100% { top: 10%; opacity: 1; } }
+    .anim-3 .scanning { animation: scan 2s linear infinite; }
+    .anim-3 .payload { width: 150px; height: 150px; border: 2px solid #555; background: #222; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #888; font-family: monospace; }
+    
+    /* Anim 4: Pulse / DB write */
+    .anim-4 .glow-core { width: 150px; height: 150px; background: radial-gradient(circle, #00e676 0%, transparent 70%); position: absolute; border-radius: 50%; }
+    @keyframes pulse { 0% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(2.5); opacity: 1; } 100% { transform: scale(1); opacity: 0.5; } }
+    .anim-4 .pulsing { animation: pulse 1.5s ease-in-out infinite; }
+    
+    .status-badge { font-size: 10px; padding: 3px 6px; border-radius: 4px; background-color: #2d2d38; margin-top: 8px; display: inline-block; }
+    .log-panel { width: 95vw; background: #0e0e11; border: 1px solid #2e2e38; border-radius: 10px; height: 150px; margin: 20px 0; padding: 15px; overflow-y: auto; font-family: monospace; font-size: 12px; color: #00ff66; box-sizing: border-box; }
+</style>
+</head>
+<body>
+
+<div class="controls">
+    <div style="font-size: 18px; font-weight: bold; color: #fff;">⚡ Hojaiga OS <span style="color:#00b0ff;">Whiteboard System Viewer</span></div>
+    <input type="text" id="prompt-input" class="prompt-input" value="Compile new workflow and execute security audit">
+    <div style="display: flex; gap: 10px;">
+        <button id="btn-auto" class="btn btn-auto" onclick="setMode('auto')">Auto Play</button>
+        <button id="btn-manual" class="btn btn-manual" onclick="setMode('manual')">Manual Mode</button>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <button id="btn-prev" class="btn btn-control" onclick="step(-1)" disabled>◀ Prev</button>
+        <button id="btn-next" class="btn btn-control" onclick="step(1)" disabled>Next ▶</button>
+    </div>
+    <button class="btn btn-control" onclick="reset()">Reset</button>
+</div>
+
+<div class="canvas-container">
+    <div class="canvas" id="workflow">
+        <svg id="lines-svg">
+            <path id='line-11-13' d='M 180 140 C 180 240, 380 40, 380 140' stroke='#333340' stroke-width='3' fill='none'  />
+            <path id='line-13-01' d='M 380 140 C 380 240, 630 40, 630 140' stroke='#333340' stroke-width='3' fill='none'  />
+            <path id='line-01-14' d='M 630 140 C 630 240, 630 190, 630 290' stroke='#333340' stroke-width='3' fill='none' stroke-dasharray='5,5' />
+            <path id='line-01-12' d='M 630 140 C 630 240, 1030 40, 1030 140' stroke='#333340' stroke-width='3' fill='none'  />
+            <path id='line-12-16' d='M 1030 140 C 1030 240, 1230 40, 1230 140' stroke='#333340' stroke-width='3' fill='none' stroke-dasharray='5,5' />
+            <path id='line-01-02' d='M 630 140 C 630 240, 380 390, 380 490' stroke='#333340' stroke-width='3' fill='none'  />
+            <path id='line-14-02' d='M 630 290 C 630 390, 380 390, 380 490' stroke='#333340' stroke-width='3' fill='none' stroke-dasharray='5,5' />
+            <path id='line-02-26' d='M 380 490 C 380 590, 630 390, 630 490' stroke='#333340' stroke-width='3' fill='none'  />
+            <path id='line-26-03' d='M 630 490 C 630 590, 880 390, 880 490' stroke='#333340' stroke-width='3' fill='none'  />
+            <path id='line-03-32' d='M 880 490 C 880 590, 1130 390, 1130 490' stroke='#333340' stroke-width='3' fill='none' stroke-dasharray='5,5' />
+            <path id='line-02-05' d='M 380 490 C 380 590, 280 590, 280 690' stroke='#333340' stroke-width='3' fill='none'  />
+            <path id='line-26-06' d='M 630 490 C 630 590, 630 590, 630 690' stroke='#333340' stroke-width='3' fill='none'  />
+            <path id='line-03-34' d='M 880 490 C 880 590, 980 590, 980 690' stroke='#333340' stroke-width='3' fill='none'  />
+            <path id='line-05-10' d='M 280 690 C 280 790, 280 790, 280 890' stroke='#333340' stroke-width='3' fill='none'  />
+            <path id='line-06-15' d='M 630 690 C 630 790, 630 790, 630 890' stroke='#333340' stroke-width='3' fill='none'  />
+            <path id='line-34-19' d='M 980 690 C 980 790, 980 790, 980 890' stroke='#333340' stroke-width='3' fill='none'  />
+            <path id='line-36-24' d='M 1230 690 C 1230 790, 1280 790, 1280 890' stroke='#333340' stroke-width='3' fill='none'  />
+            <path id='line-10-07' d='M 280 890 C 280 990, 430 990, 430 1090' stroke='#333340' stroke-width='3' fill='none'  />
+            <path id='line-15-08' d='M 630 890 C 630 990, 830 990, 830 1090' stroke='#333340' stroke-width='3' fill='none'  />
+            <path id='line-19-08' d='M 980 890 C 980 990, 830 990, 830 1090' stroke='#333340' stroke-width='3' fill='none'  />
+            <path id='line-07-01' d='M 430 1090 Q 230 615.0 630 140' stroke='#333340' stroke-width='3' fill='none' stroke-dasharray='5,5' />
+            <path id='line-08-12' d='M 830 1090 Q 1130 615.0 1030 140' stroke='#333340' stroke-width='3' fill='none' stroke-dasharray='5,5' />
+        </svg>
+        
+        <!-- Nodes Definition -->
+        <div class="node node-11" id="node-11" style="left: 100px; top: 100px;"><div class="node-header"><div class="icon">💻</div><span>Interface</span></div><div class="node-body">UI / CLI / Tray<div class="status-badge">Idle</div></div></div>
+        <div class="node node-13" id="node-13" style="left: 300px; top: 100px;"><div class="node-header"><div class="icon">🌐</div><span>Interface Layer</span></div><div class="node-body">REST/CLI/WS<div class="status-badge">Idle</div></div></div>
+        <div class="node node-04" id="node-04" style="left: 100px; top: 250px;"><div class="node-header"><div class="icon">📚</div><span>Knowledge</span></div><div class="node-body">Retrieval & Context<div class="status-badge">Idle</div></div></div>
+        <div class="node node-01" id="node-01" style="left: 550px; top: 100px;"><div class="node-header"><div class="icon">🧠</div><span>Brain</span></div><div class="node-body">LLM Task Planning<div class="status-badge">Idle</div></div></div>
+        <div class="node node-14" id="node-14" style="left: 550px; top: 250px;"><div class="node-header"><div class="icon">🤖</div><span>LLM Runtime</span></div><div class="node-body">Inference Engine<div class="status-badge">Idle</div></div></div>
+        <div class="node node-12" id="node-12" style="left: 950px; top: 100px;"><div class="node-header"><div class="icon">🔗</div><span>Integration</span></div><div class="node-body">Output API<div class="status-badge">Idle</div></div></div>
+        <div class="node node-16" id="node-16" style="left: 1150px; top: 100px;"><div class="node-header"><div class="icon">📜</div><span>Audit System</span></div><div class="node-body">Reports/Docs<div class="status-badge">Idle</div></div></div>
+        <div class="node node-02" id="node-02" style="left: 300px; top: 450px;"><div class="node-header"><div class="icon">🔌</div><span>CNS Core</span></div><div class="node-body">Master Orchestrator<div class="status-badge">Idle</div></div></div>
+        <div class="node node-26" id="node-26" style="left: 550px; top: 450px;"><div class="node-header"><div class="icon">📬</div><span>Event</span></div><div class="node-body">Session Bus<div class="status-badge">Idle</div></div></div>
+        <div class="node node-03" id="node-03" style="left: 800px; top: 450px;"><div class="node-header"><div class="icon">💾</div><span>Memory</span></div><div class="node-body">Temp Storage<div class="status-badge">Idle</div></div></div>
+        <div class="node node-32" id="node-32" style="left: 1050px; top: 450px;"><div class="node-header"><div class="icon">💾</div><span>State</span></div><div class="node-body">Phase Cache<div class="status-badge">Idle</div></div></div>
+        <div class="node node-05" id="node-05" style="left: 200px; top: 650px;"><div class="node-header"><div class="icon">🎛️</div><span>Controllers</span></div><div class="node-body">Domain Controller<div class="status-badge">Idle</div></div></div>
+        <div class="node node-06" id="node-06" style="left: 550px; top: 650px;"><div class="node-header"><div class="icon">🤖</div><span>Automation</span></div><div class="node-body">Environment Controller<div class="status-badge">Idle</div></div></div>
+        <div class="node node-34" id="node-34" style="left: 900px; top: 650px;"><div class="node-header"><div class="icon">⏱️</div><span>Task</span></div><div class="node-body">Execution Controller<div class="status-badge">Idle</div></div></div>
+        <div class="node node-36" id="node-36" style="left: 1150px; top: 650px;"><div class="node-header"><div class="icon">🔀</div><span>Workflow</span></div><div class="node-body">Workflow Compiler<div class="status-badge">Idle</div></div></div>
+        <div class="node node-22" id="node-22" style="left: 1400px; top: 650px;"><div class="node-header"><div class="icon">⚖️</div><span>Decision</span></div><div class="node-body">Path Selection<div class="status-badge">Idle</div></div></div>
+        <div class="node node-10" id="node-10" style="left: 200px; top: 850px;"><div class="node-header"><div class="icon">🕵️</div><span>Agents</span></div><div class="node-body">Sub Agent 1<div class="status-badge">Idle</div></div></div>
+        <div class="node node-15" id="node-15" style="left: 550px; top: 850px;"><div class="node-header"><div class="icon">🔌</div><span>Connectors</span></div><div class="node-body">Sub Agent 2<div class="status-badge">Idle</div></div></div>
+        <div class="node node-19" id="node-19" style="left: 900px; top: 850px;"><div class="node-header"><div class="icon">🌐</div><span>Chrome CDP</span></div><div class="node-body">Sub Agent 3<div class="status-badge">Idle</div></div></div>
+        <div class="node node-24" id="node-24" style="left: 1200px; top: 850px;"><div class="node-header"><div class="icon">🖥️</div><span>DAP</span></div><div class="node-body">5 Perma Agents<div class="status-badge">Idle</div></div></div>
+        <div class="node node-07" id="node-07" style="left: 350px; top: 1050px;"><div class="node-header"><div class="icon">🛡️</div><span>Security</span></div><div class="node-body">Self Healer / Policy<div class="status-badge">Idle</div></div></div>
+        <div class="node node-08" id="node-08" style="left: 750px; top: 1050px;"><div class="node-header"><div class="icon">🎓</div><span>Learning</span></div><div class="node-body">Brain Growth<div class="status-badge">Idle</div></div></div>
+        <div class="node node-25" id="node-25" style="left: 1150px; top: 1050px;"><div class="node-header"><div class="icon">🚨</div><span>Errors</span></div><div class="node-body">Error Handling<div class="status-badge">Idle</div></div></div>
+        <div class="node node-09" id="node-09" style="left: 100px; top: 1250px;"><div class="node-header"><div class="icon">🏢</div><span>Infrastructure</span></div><div class="node-body">Infra Base<div class="status-badge">Idle</div></div></div>
+        <div class="node node-17" id="node-17" style="left: 300px; top: 1250px;"><div class="node-header"><div class="icon">💾</div><span>Backup</span></div><div class="node-body">Archive<div class="status-badge">Idle</div></div></div>
+        <div class="node node-18" id="node-18" style="left: 500px; top: 1250px;"><div class="node-header"><div class="icon">🎯</div><span>Capability</span></div><div class="node-body">Registry<div class="status-badge">Idle</div></div></div>
+        <div class="node node-20" id="node-20" style="left: 700px; top: 1250px;"><div class="node-header"><div class="icon">⚙️</div><span>Config Mgr</span></div><div class="node-body">Config<div class="status-badge">Idle</div></div></div>
+        <div class="node node-21" id="node-21" style="left: 900px; top: 1250px;"><div class="node-header"><div class="icon">📐</div><span>Schema</span></div><div class="node-body">Schema<div class="status-badge">Idle</div></div></div>
+        <div class="node node-23" id="node-23" style="left: 1100px; top: 1250px;"><div class="node-header"><div class="icon">🧩</div><span>Dep Mgr</span></div><div class="node-body">Deps<div class="status-badge">Idle</div></div></div>
+        <div class="node node-27" id="node-27" style="left: 1300px; top: 1250px;"><div class="node-header"><div class="icon">🔋</div><span>Resource</span></div><div class="node-body">Resources<div class="status-badge">Idle</div></div></div>
+        <div class="node node-28" id="node-28" style="left: 100px; top: 1400px;"><div class="node-header"><div class="icon">🔌</div><span>Service</span></div><div class="node-body">Services<div class="status-badge">Idle</div></div></div>
+        <div class="node node-33" id="node-33" style="left: 300px; top: 1400px;"><div class="node-header"><div class="icon">📋</div><span>Manifest</span></div><div class="node-body">Manifest<div class="status-badge">Idle</div></div></div>
+        <div class="node node-35" id="node-35" style="left: 500px; top: 1400px;"><div class="node-header"><div class="icon">🔄</div><span>Update</span></div><div class="node-body">Updates<div class="status-badge">Idle</div></div></div>
+    </div>
+</div>
+
+<div class="log-panel" id="log-panel"><div class="log-entry">[System] Ready.</div></div>
+
+<!-- Modal Overlay for Advanced Internal Workflow -->
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-content">
+        <button style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; z-index: 1000;" onclick="closeModal()">×</button>
+        
+        <!-- Internal N8N -->
+        <div class="modal-top" id="modal-top">
+            <h3 id="modal-title" style="position: absolute; top: 10px; left: 20px; color: #fff; margin:0; opacity: 0.5;">Organ Name</h3>
+            <div id="internal-nodes-container" style="display: flex; align-items: center; width: 100%; justify-content: center; margin-top: 20px;"></div>
+        </div>
+        
+        <!-- Video Animation Panel -->
+        <div class="modal-bottom" id="modal-bottom">
+            <!-- Dynamic Animation Containers inserted by JS -->
+        </div>
+    </div>
+</div>
+
+<script>
+    const execOrder = ["11", "13", "04", "01", "14", "12", "16", "02", "26", "03", "32", "05", "06", "34", "36", "22", "10", "15", "19", "24", "07", "08", "25", "33"];
+    
+    // THE 36 ORGAN LOGIC DICTIONARY
+    const ORGAN_ARCHITECTURES = {
+        "01": ["Parse Goal", "LLM Inference", "Generate Plan", "Dispatch Tasks"],
+        "02": ["Receive Message", "Registry Lookup", "Route to Target"],
+        "03": ["Shared Memory Map", "Compress Data", "Write to SQLite"],
+        "04": ["Receive Query", "Hybrid Search", "Format Response"],
+        "05": ["Load Domain Policy", "Validate Operation", "Permit Action"],
+        "06": ["Evaluate Environment", "Trigger Condition", "Execute Automation"],
+        "07": ["Security Scan", "Detect Anomaly", "Apply Policy"],
+        "08": ["Ingest Trace", "Optimize Weights", "Publish Knowledge"],
+        "09": ["Read Telemetry", "Enforce Quota", "Write to HDD"],
+        "10": ["Spawn Worker", "Assign Sub-task", "Monitor Health"],
+        "11": ["Parse UI Event", "Validate Payload", "Route via IPC"],
+        "12": ["Webhook Trigger", "Validate HMAC", "Emit Event"],
+        "13": ["REST Endpoint", "Auth Check", "Pass to Kernel"],
+        "14": ["Load Tensor Core", "VRAM Allocation", "Stream Tokens"],
+        "15": ["Initialize HTTP Client", "Check Circuit Breaker", "Execute Request"],
+        "16": ["Hash Verification", "Append Log", "Sign Ledger"],
+        "17": ["Snapshot Data", "Compress Archive", "Upload Backup"],
+        "18": ["Query Capability", "Match Provider", "Resolve Endpoint"],
+        "19": ["Launch Chrome", "Connect Websocket", "DOM Interaction"],
+        "20": ["Parse Config", "Validate Schema", "Apply Defaults"],
+        "21": ["Load Constraints", "Check Type", "Return Validated"],
+        "22": ["Ingest Metrics", "Evaluate Weights", "Select Path"],
+        "23": ["Build Dep Graph", "Detect Cycles", "Resolve Order"],
+        "24": ["Find Window HWND", "Capture Screen", "Simulate Input"],
+        "25": ["Catch Exception", "Map Error Code", "Trigger Recovery"],
+        "26": ["Subscribe Topic", "Filter Events", "Broadcast"],
+        "27": ["Check GPU RAM", "Check CPU", "Grant Access"],
+        "28": ["Register Node", "Health Check", "Deregister"],
+        "29": ["Hook Window", "Find Control", "Auto-Click"],
+        "30": ["Firewall Check", "Scan Payload", "Block Threat"],
+        "31": ["Monitor Port", "Log Traffic", "Detect Breach"],
+        "32": ["Read Phase", "Serialize State", "Cache Commit"],
+        "33": ["Read File Hash", "Verify Dependency", "Update Registry"],
+        "34": ["Queue Task", "Check Dependency", "Allocate Worker"],
+        "35": ["Fetch Manifest", "Download Patch", "Apply Update"],
+        "36": ["Parse AST", "Semantic Validation", "Build Execution Graph"]
+    };
+
+    const ANIMATION_TEMPLATES = [
+        `<div class="anim-0 vid-container"><div class="block orbiter" style="animation-delay: 0s;"></div><div class="block orbiter" style="animation-delay: -1s; background: #00b0ff;"></div><div class="block orbiter" style="animation-delay: -2s; background: #00e676;"></div><div class="desc-text" id="desc-text"></div></div>`,
+        `<div class="anim-1 vid-container"><div class="tree-node" style="top: 20%; left: 50%; transform: translateX(-50%);">Root</div><div class="tree-node" style="top: 60%; left: 30%; transform: translateX(-50%);">Sub 1</div><div class="tree-node" style="top: 60%; left: 70%; transform: translateX(-50%);">Sub 2</div><svg style="position:absolute; top:0; left:0; width:100%; height:100%;"><path d="M 50% 25% L 30% 60%" stroke="#00b0ff" stroke-width="2" fill="none"/><path d="M 50% 25% L 70% 60%" stroke="#00b0ff" stroke-width="2" fill="none"/></svg><div class="desc-text" id="desc-text"></div></div>`,
+        `<div class="anim-2 vid-container"><div class="data-stream streaming" style="animation-delay: 0s;"></div><div class="data-stream streaming" style="animation-delay: -1s; top: 20%;"></div><div class="desc-text" id="desc-text"></div></div>`,
+        `<div class="anim-3 vid-container"><div class="payload">Payload Data</div><div class="laser scanning"></div><div class="desc-text" id="desc-text"></div></div>`,
+        `<div class="anim-4 vid-container"><div class="glow-core pulsing"></div><div class="desc-text" id="desc-text"></div></div>`
+    ];
+
+    let currentIndex = -1;
+    let mode = 'idle';
+    let autoInterval = null;
+    let isModalOpen = false;
+
+    function addLog(text) {
+        const logPanel = document.getElementById("log-panel");
+        const time = new Date().toLocaleTimeString();
+        const entry = document.createElement("div");
+        entry.className = "log-entry";
+        entry.innerText = `[${time}] ${text}`;
+        logPanel.appendChild(entry);
+        logPanel.scrollTop = logPanel.scrollHeight;
+    }
+
+    function setMode(newMode) {
+        mode = newMode;
+        if (mode === 'auto') {
+            document.getElementById('btn-prev').disabled = true;
+            document.getElementById('btn-next').disabled = true;
+            addLog("Started AUTO presentation mode.");
+            runAuto();
+        } else if (mode === 'manual') {
+            document.getElementById('btn-prev').disabled = false;
+            document.getElementById('btn-next').disabled = false;
+            if(currentIndex === -1) step(1);
+        }
+    }
+
+    function reset() {
+        currentIndex = -1;
+        mode = 'idle';
+        document.getElementById('btn-prev').disabled = true;
+        document.getElementById('btn-next').disabled = true;
+        document.querySelectorAll('.node').forEach(n => {
+            n.className = n.className.replace(" active-run", "").replace(" completed-run", "");
+            n.querySelector(".status-badge").innerText = "Idle";
+        });
+        document.querySelectorAll('path').forEach(p => p.classList.remove('active-flow'));
+        document.getElementById('modal-overlay').style.display = 'none';
+        isModalOpen = false;
+        addLog("System reset.");
+    }
+
+    function closeModal() {
+        document.getElementById('modal-overlay').style.display = 'none';
+        isModalOpen = false;
+    }
+
+    async function showOrganModal(organId, organName) {
+        isModalOpen = true;
+        const modal = document.getElementById('modal-overlay');
+        modal.style.display = 'flex';
+        document.getElementById('modal-title').innerText = `Organ ${organId}: ${organName}`;
+        
+        const internalTasks = ORGAN_ARCHITECTURES[organId] || ["Initialize", "Process", "Complete"];
+        const numNodes = internalTasks.length;
+        
+        const container = document.getElementById('internal-nodes-container');
+        container.innerHTML = ""; 
+        
+        const bottomContainer = document.getElementById('modal-bottom');
+        bottomContainer.innerHTML = "";
+        
+        for(let i=0; i<numNodes; i++) {
+            // Build N8N nodes
+            const div = document.createElement('div');
+            div.className = 'internal-n8n-node';
+            div.id = `in-node-${i}`;
+            div.innerText = internalTasks[i];
+            container.appendChild(div);
+            
+            if(i < numNodes - 1) {
+                const link = document.createElement('div');
+                link.className = 'internal-n8n-link';
+                link.id = `in-link-${i}`;
+                container.appendChild(link);
+            }
+            
+            // Build Animation Frames
+            const animType = i % ANIMATION_TEMPLATES.length;
+            const animHtml = ANIMATION_TEMPLATES[animType];
+            
+            const wrapper = document.createElement('div');
+            wrapper.id = `anim-wrap-${i}`;
+            wrapper.innerHTML = animHtml;
+            // set text
+            wrapper.querySelector('#desc-text').innerText = `[Task Active] ${internalTasks[i]}...`;
+            bottomContainer.appendChild(wrapper.firstChild); 
+            // give the inserted node an ID so we can toggle it
+            bottomContainer.lastChild.id = `anim-${i}`;
+        }
+        
+        // Run animation sequence
+        for(let i=0; i<numNodes; i++) {
+            if(!isModalOpen) return;
+            
+            // Activate N8N node
+            document.getElementById(`in-node-${i}`).classList.add('active');
+            
+            // Switch Video Animation in 70% pane
+            document.querySelectorAll('.vid-container').forEach(el => el.classList.remove('visible'));
+            document.getElementById(`anim-${i}`).classList.add('visible');
+            
+            // Wait to simulate processing
+            await new Promise(r => setTimeout(r, 2000));
+            if(!isModalOpen) return;
+            
+            // Activate link to next node
+            if(i < numNodes - 1) {
+                document.getElementById(`in-link-${i}`).classList.add('active');
+                await new Promise(r => setTimeout(r, 500));
+            }
+        }
+        
+        if (mode === 'auto') {
+            await new Promise(r => setTimeout(r, 1000));
+            if(!isModalOpen) return;
+            closeModal();
+        }
+    }
+
+    async function activateOrgan(idx) {
+        if(idx < 0 || idx >= execOrder.length) return;
+        
+        const organId = execOrder[idx];
+        const node = document.getElementById(`node-${organId}`);
+        if(!node) return;
+        const organName = node.querySelector("span").innerText;
+        
+        // Mark previous as completed
+        if (idx > 0) {
+            const prevNode = document.getElementById(`node-${execOrder[idx-1]}`);
+            if (prevNode) {
+                prevNode.className = prevNode.className.replace(" active-run", " completed-run");
+                prevNode.querySelector(".status-badge").innerText = "Completed";
+            }
+        }
+        
+        // Mark current as active
+        node.className += " active-run";
+        node.querySelector(".status-badge").innerText = "Active";
+        
+        // Highlight connected SVGs going OUT from this node
+        document.querySelectorAll('path').forEach(p => {
+            if (p.id.startsWith(`line-${organId}-`)) {
+                p.classList.add('active-flow');
+            }
+        });
+        
+        addLog(`Organ ${organId} [${organName}]: Initializing deep network execution...`);
+        
+        await showOrganModal(organId, organName);
+    }
+
+    async function step(direction) {
+        if (isModalOpen && direction > 0) {
+            closeModal();
+            return;
+        }
+        
+        let nextIdx = currentIndex + direction;
+        if(nextIdx >= 0 && nextIdx < execOrder.length) {
+            currentIndex = nextIdx;
+            await activateOrgan(currentIndex);
+        } else if (nextIdx >= execOrder.length) {
+            addLog("System execution fully complete.");
+            currentIndex = execOrder.length;
+        } else if (nextIdx < 0) {
+            reset();
+        }
+    }
+
+    async function runAuto() {
+        if(currentIndex === -1) currentIndex = 0;
+        
+        while(mode === 'auto' && currentIndex < execOrder.length) {
+            await activateOrgan(currentIndex);
+            if (mode !== 'auto') break;
+            currentIndex++;
+            if(currentIndex < execOrder.length) {
+                await new Promise(r => setTimeout(r, 800)); // Pause between organs
+            }
+        }
+        if(currentIndex >= execOrder.length) {
+            addLog("AUTO: Full pipeline executed successfully.");
+        }
+    }
+</script>
+</body>
+</html>

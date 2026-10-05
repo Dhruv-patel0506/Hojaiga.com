@@ -1,0 +1,381 @@
+import * as assert from 'assert';
+import * as fs from 'fs';
+import * as http from 'http';
+import * as os from 'os';
+import * as path from 'path';
+
+import { DynamicAppScannerAndTeacher } from './DynamicAppScannerAndTeacher';
+import { WorkspaceSafetyManager } from './WorkspaceSafetyManager';
+import { SandboxTestExecutor } from './SandboxTestExecutor';
+import { AutoRepairLoopEngine } from './AutoRepairLoopEngine';
+import { HojaigaIntegrationBridge } from './HojaigaIntegrationBridge';
+import { HomeworkSocraticTutor } from './HomeworkSocraticTutor';
+import { UGCContentEngine } from './UGCContentEngine';
+import { GhostwritingEngine } from './GhostwritingEngine';
+import { ProVideoEditorDirector } from './ProVideoEditorDirector';
+import { CyberDefenseTutorEngine } from './CyberDefenseTutorEngine';
+import { InterviewCoachEngine } from './InterviewCoachEngine';
+import { LiveScreenTranslator } from './LiveScreenTranslator';
+import { ChartPatternTutor } from './ChartPatternTutor';
+import { HardwareSchematicTutor } from './HardwareSchematicTutor';
+import { MemoryPalaceEngine } from './MemoryPalaceEngine';
+import { PolyglotVisualArchitectCoder } from './PolyglotVisualArchitectCoder';
+import { LiveIDEPairProgrammer } from './LiveIDEPairProgrammer';
+import { VisualAlgorithmStepDebugger } from './VisualAlgorithmStepDebugger';
+import { FullStackScaffoldAndVerifyEngine } from './FullStackScaffoldAndVerifyEngine';
+import { BugRootCauseAutopsyEngine } from './BugRootCauseAutopsyEngine';
+import { SQLQueryPlanAndSchemaVisualizer } from './SQLQueryPlanAndSchemaVisualizer';
+import { GitTimeMachineAndConflictResolver } from './GitTimeMachineAndConflictResolver';
+import { RegexAndParserVisualWorkbench } from './RegexAndParserVisualWorkbench';
+import { APILoadAndLatencySimulator } from './APILoadAndLatencySimulator';
+import { UIUXAccessibilityAndDesignCritic } from './UIUXAccessibilityAndDesignCritic';
+import { CompanionManager } from './CompanionManager';
+
+interface ProgressiveTestCase {
+  id: string;
+  tier: 'TIER 1: EASY (UNIT)' | 'TIER 2: EASY-MEDIUM (OVERLAYS)' | 'TIER 3: MEDIUM (STATE & SQL)' | 'TIER 4: HARD (SANDBOX & SECURITY)' | 'TIER 5: EXTREME (OS & STRESS)';
+  name: string;
+  run: () => Promise<void>;
+}
+
+const ALL_TESTS: ProgressiveTestCase[] = [
+  // =========================================================================
+  // TIER 1: EASIEST — PURE DETERMINISTIC UNIT & MATH TESTS
+  // =========================================================================
+  {
+    id: 'T1.01',
+    tier: 'TIER 1: EASY (UNIT)',
+    name: 'ChartPatternTutor: Exact Fibonacci 0.382 / 0.500 / 0.618 calculation',
+    run: async () => {
+      const fib = ChartPatternTutor.calculateFibonacciLevels(25200, 24400);
+      assert.strictEqual(fib.level382, 24894.4);
+      assert.strictEqual(fib.level500, 24800);
+      assert.strictEqual(fib.level618, 24705.6);
+    }
+  },
+  {
+    id: 'T1.02',
+    tier: 'TIER 1: EASY (UNIT)',
+    name: 'UIUXAccessibilityAndDesignCritic: High vs. Low WCAG 2.1 contrast ratios',
+    run: async () => {
+      const highRatio = UIUXAccessibilityAndDesignCritic.computeHexContrastRatio('#38BDF8', '#0F172A');
+      const lowRatio = UIUXAccessibilityAndDesignCritic.computeHexContrastRatio('#475569', '#334155');
+      assert.ok(highRatio >= 7.0, `Expected AAA contrast >= 7.0, got ${highRatio}`);
+      assert.ok(lowRatio < 4.5, `Expected failing contrast < 4.5, got ${lowRatio}`);
+    }
+  },
+  {
+    id: 'T1.03',
+    tier: 'TIER 1: EASY (UNIT)',
+    name: 'InterviewCoachEngine: Clean speech vs. heavy filler-word penalty',
+    run: async () => {
+      const clean = InterviewCoachEngine.analyzeSpeechTranscript('We implemented a bounded LRU cache with Redis', 15);
+      const noisy = InterviewCoachEngine.analyzeSpeechTranscript('Um like basically I kind of literally wrote code you know', 20);
+      assert.strictEqual(clean.fillerCount, 0);
+      assert.strictEqual(clean.clarityScore, 100);
+      assert.ok(noisy.fillerCount >= 5);
+      assert.ok(noisy.clarityScore < 75);
+    }
+  },
+  {
+    id: 'T1.04',
+    tier: 'TIER 1: EASY (UNIT)',
+    name: 'LiveScreenTranslator: Gujarati, Hindi, Spanish & Japanese dictionary lookups',
+    run: async () => {
+      const guj = LiveScreenTranslator.translateLabel('Settings', 'gujarati');
+      const jpn = LiveScreenTranslator.translateLabel('Timeline', 'japanese');
+      assert.ok(guj.includes('સેટિંગ્સ'));
+      assert.ok(jpn.includes('タイムライン'));
+    }
+  },
+  {
+    id: 'T1.05',
+    tier: 'TIER 1: EASY (UNIT)',
+    name: 'PolyglotVisualArchitectCoder: 9-language detection accuracy',
+    run: async () => {
+      assert.strictEqual(PolyglotVisualArchitectCoder.detectLanguage('build a FastAPI python endpoint'), 'python');
+      assert.strictEqual(PolyglotVisualArchitectCoder.detectLanguage('rust cargo borrow checker'), 'rust');
+      assert.strictEqual(PolyglotVisualArchitectCoder.detectLanguage('golang goroutine channel'), 'go');
+      assert.strictEqual(PolyglotVisualArchitectCoder.detectLanguage('postgres sql query'), 'sql');
+    }
+  },
+
+  // =========================================================================
+  // TIER 2: EASY-MEDIUM — DOMAIN TUTOR & CONTENT ENGINE OVERLAY GRAPHS
+  // =========================================================================
+  {
+    id: 'T2.01',
+    tier: 'TIER 2: EASY-MEDIUM (OVERLAYS)',
+    name: 'HomeworkSocraticTutor: 4-step Socratic roadmap graph generation',
+    run: async () => {
+      const cmds = HomeworkSocraticTutor.buildSocraticHomeworkLesson('solve this physics homework question 2');
+      assert.strictEqual(cmds[0].type, 'BOARD');
+      assert.ok(cmds.some(c => c.type === 'GRAPH' && c.nodes?.length === 4));
+    }
+  },
+  {
+    id: 'T2.02',
+    tier: 'TIER 2: EASY-MEDIUM (OVERLAYS)',
+    name: 'UGCContentEngine & GhostwritingEngine: ACTOR & 1-3-1 Narrative Graph',
+    run: async () => {
+      const ugc = UGCContentEngine.buildUGCCampaignOverlay('create a tiktok ugc script for smart mug');
+      const ghost = GhostwritingEngine.buildGhostwriterOverlay('ghostwrite a twitter thread on AI agents');
+      assert.ok(ugc.some(c => c.type === 'ACTOR'));
+      assert.ok(ghost.some(c => c.type === 'GRAPH' && c.nodes?.includes('Bold Lead')));
+    }
+  },
+  {
+    id: 'T2.03',
+    tier: 'TIER 2: EASY-MEDIUM (OVERLAYS)',
+    name: 'BugRootCauseAutopsyEngine: Null-dereference vs. Recursion stack overflow diagnosis',
+    run: async () => {
+      const nullDiag = BugRootCauseAutopsyEngine.diagnoseBugCause('TypeError: Cannot read properties of undefined');
+      const recDiag = BugRootCauseAutopsyEngine.diagnoseBugCause('RangeError: Maximum call stack size exceeded');
+      assert.strictEqual(nullDiag.errorSignature, 'Null / Undefined Dereference Trap');
+      assert.strictEqual(recDiag.errorSignature, 'Unbounded Recursion / State Cycle');
+    }
+  },
+  {
+    id: 'T2.04',
+    tier: 'TIER 2: EASY-MEDIUM (OVERLAYS)',
+    name: 'RegexAndParserVisualWorkbench: Email, URL & SemVer DFA + ReDoS check',
+    run: async () => {
+      const emailBundle = RegexAndParserVisualWorkbench.synthesizeAndVerifyPattern('extract email address');
+      const urlBundle = RegexAndParserVisualWorkbench.synthesizeAndVerifyPattern('match https url link');
+      assert.strictEqual(emailBundle.isReDoSSafe, true);
+      assert.strictEqual(emailBundle.matchedSamples.length, 2);
+      assert.strictEqual(urlBundle.matchedSamples.length, 2);
+    }
+  },
+
+  // =========================================================================
+  // TIER 3: MEDIUM — SQL SAFETY, SM-2 MEMORY PALACE & MULTI-FILE SCAFFOLDING
+  // =========================================================================
+  {
+    id: 'T3.01',
+    tier: 'TIER 3: MEDIUM (STATE & SQL)',
+    name: 'SQLQueryPlanAndSchemaVisualizer: Blocks unguarded DELETE without WHERE',
+    run: async () => {
+      const unsafeReport = SQLQueryPlanAndSchemaVisualizer.verifyAndOptimizeSQL('DELETE FROM orders');
+      assert.strictEqual(unsafeReport.hasDestructiveUnboundedMutation, true);
+      assert.ok(unsafeReport.verificationWarnings.some(w => w.includes('CRITICAL GUARD')));
+    }
+  },
+  {
+    id: 'T3.02',
+    tier: 'TIER 3: MEDIUM (STATE & SQL)',
+    name: 'MemoryPalaceEngine: SM-2 Spaced Repetition interval growth & lapse reset',
+    run: async () => {
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'clicky-mem-'));
+      const engine = new MemoryPalaceEngine(tmpDir);
+      const cards = engine.createSpatialLociForTopic('Distributed Consensus Raft');
+      assert.strictEqual(cards.length, 4);
+
+      const afterGrade5 = engine.recordSM2Review(cards[0].id, 5);
+      assert.strictEqual(afterGrade5?.intervalDays, 6);
+
+      const afterLapse = engine.recordSM2Review(cards[0].id, 1);
+      assert.strictEqual(afterLapse?.intervalDays, 1);
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  },
+  {
+    id: 'T3.03',
+    tier: 'TIER 3: MEDIUM (STATE & SQL)',
+    name: 'FullStackScaffoldAndVerifyEngine: Safe 4-layer file generation inside allowed root',
+    run: async () => {
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'clicky-scaffold-'));
+      const safety = new WorkspaceSafetyManager(tmpDir);
+      const architect = new FullStackScaffoldAndVerifyEngine(safety);
+      const planned = architect.planVerifiedFeatureArchitecture('PaymentLedger');
+      const result = architect.writeVerifiedScaffoldToDisk(tmpDir, planned);
+
+      assert.strictEqual(result.writtenFiles.length, 4);
+      assert.strictEqual(result.blockedFiles.length, 0);
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  },
+
+  // =========================================================================
+  // TIER 4: HARD — SECURITY BOUNDARIES, SANDBOX EXECUTION & AUTO-REPAIR LOOP
+  // =========================================================================
+  {
+    id: 'T4.01',
+    tier: 'TIER 4: HARD (SANDBOX & SECURITY)',
+    name: 'WorkspaceSafetyManager: Blocks path traversal & destructive shell commands',
+    run: async () => {
+      const safety = new WorkspaceSafetyManager('D:\\new_automation\\final hojaiga tutor');
+      assert.strictEqual(safety.isPathInsideWorkspace('D:\\new_automation\\..\\Windows\\System32\\cmd.exe'), false);
+      assert.strictEqual(safety.validateCommand('rm -rf /').allowed, false);
+      assert.strictEqual(safety.validateCommand('del /f /q C:\\*').allowed, false);
+      assert.strictEqual(safety.validateCommand('powershell -enc ZQBjAGgAbwA=').allowed, false);
+      assert.strictEqual(safety.validateCommand('node --version').allowed, true);
+    }
+  },
+  {
+    id: 'T4.02',
+    tier: 'TIER 4: HARD (SANDBOX & SECURITY)',
+    name: 'SandboxTestExecutor: Strips sensitive env vars & kills infinite loops on timeout',
+    run: async () => {
+      process.env.CLICKY_TEST_SECRET = 'TOP_SECRET_DO_NOT_LEAK';
+      const executor = new SandboxTestExecutor();
+
+      const envCheck = await executor.runCodeInSandbox(
+        'console.log(process.env.CLICKY_TEST_SECRET || "CLEAN_ENV");',
+        'javascript',
+        3000
+      );
+      assert.strictEqual(envCheck.succeeded, true);
+      assert.strictEqual(envCheck.stdout, 'CLEAN_ENV');
+
+      const loopCheck = await executor.runCodeInSandbox('while (true) {}', 'javascript', 600);
+      assert.strictEqual(loopCheck.timedOut, true);
+      assert.strictEqual(loopCheck.succeeded, false);
+    }
+  },
+  {
+    id: 'T4.03',
+    tier: 'TIER 4: HARD (SANDBOX & SECURITY)',
+    name: 'AutoRepairLoopEngine: Automatically heals missing parentheses & ReferenceError',
+    run: async () => {
+      const repair = new AutoRepairLoopEngine();
+
+      // Broken snippet with missing closing parenthesis
+      const brokenSyntax = 'console.log(20 + 22';
+      const healed1 = await repair.runAutoRepairLoop(brokenSyntax, 'javascript', 3);
+      assert.strictEqual(healed1.succeeded, true);
+      assert.strictEqual(healed1.iterations[healed1.iterations.length - 1].result.stdout, '42');
+
+      // Broken snippet with undeclared variable ReferenceError
+      const brokenRef = 'missingCounter += 10; console.log(missingCounter);';
+      const healed2 = await repair.runAutoRepairLoop(brokenRef, 'javascript', 3);
+      assert.strictEqual(healed2.succeeded, true);
+      assert.strictEqual(healed2.iterations[healed2.iterations.length - 1].result.stdout, '10');
+    }
+  },
+  {
+    id: 'T4.04',
+    tier: 'TIER 4: HARD (SANDBOX & SECURITY)',
+    name: 'PolyglotVisualArchitectCoder: Full Teach -> Verify -> Sandbox Build lifecycle',
+    run: async () => {
+      const coder = new PolyglotVisualArchitectCoder();
+      const { blueprint, overlayCommands } = await coder.teachVerifyAndBuild(
+        'write code in typescript to validate and filter user events'
+      );
+      assert.strictEqual(blueprint.verifiedInSandbox, true);
+      assert.ok(overlayCommands.length >= 6);
+    }
+  },
+
+  // =========================================================================
+  // TIER 5: EXTREME — LIVE LOCALHOST SERVER, OS UIA CACHE & CONCURRENCY STRESS
+  // =========================================================================
+  {
+    id: 'T5.01',
+    tier: 'TIER 5: EXTREME (OS & STRESS)',
+    name: 'APILoadAndLatencySimulator: Blocks external SSRF & profiles live localhost server',
+    run: async () => {
+      assert.strictEqual(APILoadAndLatencySimulator.isSafeLocalhostUrl('https://example.com/api'), false);
+      assert.strictEqual(APILoadAndLatencySimulator.isSafeLocalhostUrl('http://127.0.0.1:49152/health'), true);
+
+      // Spin up ephemeral localhost test server
+      const server = http.createServer((_req, res) => {
+        setTimeout(() => {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: true }));
+        }, 15);
+      });
+
+      await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+      const addr = server.address() as { port: number };
+      const report = await APILoadAndLatencySimulator.measureLocalEndpoint(
+        `http://127.0.0.1:${addr.port}/health`,
+        4
+      );
+      server.close();
+
+      assert.strictEqual(report.samplesCount, 4);
+      assert.ok(report.p50Ms >= 10);
+    }
+  },
+  {
+    id: 'T5.02',
+    tier: 'TIER 5: EXTREME (OS & STRESS)',
+    name: 'DynamicAppScannerAndTeacher: Windows UIA scan + in-memory cache hit under 5ms',
+    run: async () => {
+      const firstSnap = await DynamicAppScannerAndTeacher.scanActiveOrNamedApp();
+      const t0 = Date.now();
+      const cachedSnap = await DynamicAppScannerAndTeacher.scanActiveOrNamedApp();
+      const cacheLatencyMs = Date.now() - t0;
+
+      assert.strictEqual(firstSnap.scannedAt, cachedSnap.scannedAt);
+      assert.ok(cacheLatencyMs <= 10, `Expected instant cache hit <= 10ms, took ${cacheLatencyMs}ms`);
+    }
+  },
+  {
+    id: 'T5.03',
+    tier: 'TIER 5: EXTREME (OS & STRESS)',
+    name: 'CompanionManager: Priority collision resolution & 30-prompt concurrent stress burst',
+    run: async () => {
+      const manager = new CompanionManager();
+
+      // Priority collision: IDE stuck + app keywords -> must route to LiveIDEPairProgrammer
+      const collisionCmds = await manager.routePromptToOverlay(
+        'I am stuck in vscode on an async await promise race condition, teach me this app'
+      );
+      assert.ok(collisionCmds[0].label.includes('Live IDE Pair Programmer'));
+
+      // 30-prompt concurrent burst across all engine categories
+      const prompts = Array.from({ length: 30 }, (_, idx) =>
+        idx % 3 === 0
+          ? 'dry run trace this sliding window loop'
+          : idx % 3 === 1
+          ? 'analyze tradingview candlestick fibonacci 25000 24000'
+          : 'explain zero trust and tls 1.3 security architecture'
+      );
+
+      const results = await Promise.all(prompts.map(p => manager.routePromptToOverlay(p)));
+      assert.strictEqual(results.length, 30);
+      assert.ok(results.every(r => r.length >= 2 && r[0].type === 'BOARD'));
+    }
+  }
+];
+
+async function executeProgressiveSuite(): Promise<void> {
+  console.log('================================================================================');
+  console.log(' CLICKY / HOJAIGA TUTOR — PROGRESSIVE MASTER TEST SUITE (EASY -> EXTREME)');
+  console.log('================================================================================');
+
+  let currentTier = '';
+  let passed = 0;
+  let failed = 0;
+
+  for (const test of ALL_TESTS) {
+    if (test.tier !== currentTier) {
+      currentTier = test.tier;
+      console.log(`\n--- ${currentTier} ---`);
+    }
+
+    const start = Date.now();
+    try {
+      await test.run();
+      const ms = Date.now() - start;
+      passed++;
+      console.log(`  [PASS] ${test.id} (${String(ms).padStart(4, ' ')}ms) : ${test.name}`);
+    } catch (err: any) {
+      failed++;
+      console.error(`  [FAIL] ${test.id} : ${test.name}`);
+      console.error(`         Reason: ${err?.message || err}`);
+    }
+  }
+
+  console.log('\n================================================================================');
+  console.log(` PROGRESSIVE TEST SUMMARY: ${passed} PASSED | ${failed} FAILED | TOTAL: ${ALL_TESTS.length}`);
+  console.log('================================================================================');
+
+  if (failed > 0) process.exit(1);
+}
+
+if (require.main === module) {
+  executeProgressiveSuite();
+}

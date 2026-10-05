@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Study Guide: RLC High-Q Bandpass Resonant Circuit & Phase Bode Plot</title>
+<style>
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; }
+  .container { max-width: 900px; margin: 0 auto; background: #1e293b; padding: 2.5rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+  h1 { color: #38bdf8; border-bottom: 2px solid #334155; padding-bottom: 0.75rem; }
+  h2, h3 { color: #a5b4fc; margin-top: 1.5rem; }
+  pre { background: #0b0f19; padding: 1rem; border-radius: 8px; overflow-x: auto; color: #e2e8f0; }
+  .badge { display: inline-block; background: #0284c7; color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <span class="badge">Hojaiga Universal Tutor</span>
+  <h1>RLC High-Q Bandpass Resonant Circuit & Phase Bode Plot</h1>
+  <pre>### TIER 1: MULTIMODAL PERCEPTION & DIAGRAM DECONSTRUCTION
+
+**RLC High-Q Bandpass Resonant Circuit:**
+- **Circuit Components:**
+  - **Resistor (R):** Acts as a load for the circuit.
+  - **Inductor (L):** Stores energy in its magnetic field.
+  - **Capacitor (C):** Stores energy in its electric field.
+  - **Voltage Source (V):** Provides the energy for the circuit.
+
+**Schematic Diagram:**
+```
+V --- R --- L --- C --- GND
+```
+- **Axes:**
+  - **Real Axis (R):** Represents the real part of the impedance.
+  - **Imaginary Axis (I):** Represents the imaginary part of the impedance.
+
+**Phase Bode Plot:**
+- **Frequency Axis (F):** Represents the frequency of the input signal.
+- **Magnitude Axis (M):** Represents the magnitude of the output signal.
+- **Phase Axis (P):** Represents the phase shift between the input and output signals.
+
+**Vector Arrows:**
+- **Impedance Vector (Z):** Represents the impedance of the circuit at a given frequency.
+- **Magnitude Vector (|Z|):** Represents the magnitude of the impedance.
+- **Phase Vector (∠Z):** Represents the phase angle of the impedance.
+
+### TIER 2: FIRST-PRINCIPLES INTUITION & MENTAL MODELS
+
+**Why This Concept Exists:**
+- **RLC Circuit Behavior:**
+  - **Resistor (R):** Acts as a load, dissipating energy.
+  - **Inductor (L):** Stores energy in its magnetic field, storing energy when current is increasing and releasing it when current is decreasing.
+  - **Capacitor (C):** Stores energy in its electric field, storing energy when voltage is increasing and releasing it when voltage is decreasing.
+- **Bandpass Resonant Circuit:**
+  - **Bandpass Filter:**
+    - Allows frequencies within a specific range to pass through while attenuating frequencies outside this range.
+  - **High-Q Resonant Circuit:**
+    - Has a high quality factor (Q), meaning it has a sharp resonance peak and a narrow bandwidth.
+
+**Real-World Analogies:**
+- **Resistor (R):** Acts as a load in a power plant, dissipating energy.
+- **Inductor (L):** Stores energy in a power transmission line, storing energy when current is increasing and releasing it when current is decreasing.
+- **Capacitor (C):** Stores energy in a power distribution network, storing energy when voltage is increasing and releasing it when voltage is decreasing.
+
+### TIER 3: FORMAL STEP-BY-STEP DERIVATION & PROOF
+
+**Mathematical Derivation:**
+1. **Impedance of RLC Circuit:**
+   \[
+   Z = R + j(\omega L - \frac{1}{\omega C})
+   \]
+   where \( \omega \) is the angular frequency, \( j \) is the imaginary unit, and \( \omega = 2\pi f \) is the frequency in radians per second.
+
+2. **Magnitude of Impedance:**
+   \[
+   |Z| = \sqrt{R^2 + (\omega L - \frac{1}{\omega C})^2}
+   \]
+
+3. **Phase Angle of Impedance:**
+   \[
+   \angle Z = \tan^{-1}\left(\frac{\omega L - \frac{1}{\omega C}}{R}\right)
+   \]
+
+4. **Bandpass Filter Transfer Function:**
+   \[
+   H(j\omega) = \frac{1}{1 + j\omega RC}
+   \]
+
+5. **High-Q Resonant Circuit:**
+   \[
+   Q = \frac{\omega L}{R} = \frac{1}{\omega C}
+   \]
+
+### TIER 4: COGNITIVE HURDLE DIAGNOSTIC
+
+**Common Pitfalls:**
+1. **Incorrect Impedance Calculation:**
+   - **Error:** Failing to account for the phase angle in the impedance calculation.
+   - **Solution:** Always include the phase angle in the impedance calculation using \( Z = R + j(\omega L - \frac{1}{\omega C}) \).
+
+2. **Incorrect Bandpass Filter Transfer Function:**
+   - **Error:** Failing to account for the phase shift in the transfer function.
+   - **Solution:** Always include the phase shift in the transfer function using \( H(j\omega) = \frac{1}{1 + j\omega RC} \).
+
+3. **Incorrect High-Q Resonant Circuit Calculation:**
+   - **Error:** Failing to account for the phase angle in the resonant circuit calculation.
+   - **Solution:** Always include the phase angle in the resonant circuit calculation using \( Q = \frac{\omega L}{R} = \frac{1}{\omega C} \).
+
+### TIER 5: SOCRATIC PRACTICE DRILLS & WORKED SOLUTIONS
+
+**Progressive Practice Problems:**
+
+**Problem 1:**
+- **RLC Circuit:**
+  - \( R = 10 \Omega \), \( L = 0.1 \text{ H} \), \( C = 1 \text{ F} \), \( V = 10 \text{ V} \).
+  - Calculate the impedance at \( \omega = 100 \text{ rad/s} \).
+
+**Solution:**
+1. **Impedance Calculation:**
+   \[
+   Z = R + j(\omega L - \frac{1}{\omega C}) = 10 + j(100 \times 0.1 - \frac{1}{100 \times 1}) = 10 + j(10 - 0.01) = 10 + j9.99
+   \]
+2. **Magnitude Calculation:**
+   \[
+   |Z| = \sqrt{10^2 + 9.99^2} = \sqrt{100 + 99.8001} = \sqrt{199.8001} \approx 14.13 \Omega
+   \]
+3. **Phase Calculation:**
+   \[
+   \angle Z = \tan^{-1}\left(\frac{9.99}{10}\right) \approx 44.5^\circ
+   \]
+
+**Problem 2:**
+- **RLC Circuit:**
+  - \( R = 20 \Omega \), \( L = 0.2 \text{ H} \), \( C = 0.5 \text{ F} \), \( V = 20 \text{ V} \).
+  - Calculate the transfer function at \( \omega = 200 \text{ rad/s} \).
+
+**Solution:**
+1. **Transfer Function Calculation:**
+   \[
+   H(j\omega) = \frac{1}{1 + j\omega RC} = \frac{1}{1 + j200 \times 20 \times 0.5} = \frac{1}{1 + j200}
+   \]
+2. **Magnitude Calculation:**
+   \[
+   |H(j\omega)| = \frac{1}{\sqrt{1^2 + 200^2}} = \frac{1}{\sqrt{40001}} \approx 0.025
+   \]
+3. **Phase Calculation:**
+   \[
+   \angle H(j\omega) = \tan^{-1}\left(\frac{200}{1}\right) \approx 89.4^\circ
+   \]
+
+**Problem 3:**
+- **RLC Circuit:**
+  - \( R = 30 \Omega \), \( L = 0.3 \text{ H} \), \( C = 1.5 \text{ F} \), \( V = 30 \text{ V} \).
+  - Calculate the resonant frequency and the quality factor.
+
+**Solution:**
+1. **Resonant Frequency Calculation:**
+   \[
+   \omega_0 = \frac{1}{\sqrt{LC}} = \frac{1}{\sqrt{0.3 \times 1.5}} = \frac{1}{\sqrt{0.45}} \approx 1.55 \text{ rad/s}
+   \]
+2. **Quality Factor Calculation:**
+   \[
+   Q = \frac{\omega_0L}{R} = \frac{1.55 \times 0.3}{30} = \frac{0.465}{30} \approx 0.0155
+   \]
+
+### TIER 6: EXECUTIVE SUMMARY & FLASHCARD CHEAT-SHEET
+
+**Executive Summary:**
+- **RLC High-Q Bandpass Resonant Circuit:**
+  - Combines a resistor, inductor, and capacitor in a circuit.
+  - Acts as a high-Q resonant circuit, allowing frequencies within a specific range to pass through.
+  - Has a sharp resonance peak and a narrow bandwidth.
+
+**Flashcard Cues:**
+1. **Impedance Calculation:**
+   - \( Z = R + j(\omega L - \frac{1}{\omega C}) \)
+   - \( |Z| = \sqrt{R^2 + (\omega L - \frac{1}{\omega C})^2} \)
+   - \( \angle Z = \tan^{-1}\left(\frac{\omega L - \frac{1}{\omega C}}{R}\right) \)
+
+2. **Bandpass Filter Transfer Function:**
+   - \( H(j\omega) = \frac{1}{1 + j\omega RC} \)
+
+3. **High-Q Resonant Circuit:**
+   - \( Q = \frac{\omega L}{R} = \frac{1}{\omega C} \)
+
+4. **Common Pitfalls:**
+   - Incorrect Impedance Calculation
+   - Incorrect Bandpass Filter Transfer Function
+   - Incorrect High-Q Resonant Circuit Calculation
+
+By mastering these concepts and techniques, you will be well-equipped to tackle complex electrical engineering problems and understand the behavior of RLC circuits in real-world applications.</pre>
+</div>
+</body>
+</html>

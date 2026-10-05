@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hojaiga OS — Node+Motion Visualizer</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --grid-color: #2c2c2c;
+            --text-color: #e0e0e0;
+            --node-bg: #2d2d2d;
+            --node-border: #444;
+            --node-title-bg: #3c3c3c;
+            --primary: #8a2be2;
+            --success: #28a745;
+            --error: #dc3545;
+            --running: #007bff;
+            --waiting: #ffc107;
+            --conn-color: #666;
+            --panel-bg: rgba(30, 30, 30, 0.9);
+            --icon-bg: #444;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        #toolbar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: var(--panel-bg);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--node-border);
+            backdrop-filter: blur(5px);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        button {
+            background: var(--node-title-bg);
+            color: white;
+            border: 1px solid var(--node-border);
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: var(--node-border);
+        }
+
+        button.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            cursor: grab;
+        }
+
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+
+        #canvas {
+            transform-origin: 0 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .node {
+            position: absolute;
+            width: 280px;
+            background: var(--node-bg);
+            border: 1px solid var(--node-border);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s, border-color 0.2s;
+            user-select: none;
+        }
+
+        .node:hover {
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+            border-color: #666;
+        }
+
+        .node.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        .node-header {
+            background: var(--node-title-bg);
+            padding: 10px 15px;
+            border-radius: 7px 7px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--node-border);
+        }
+
+        .node-icon {
+            background: var(--icon-bg);
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .node-title {
+            font-weight: 600;
+            font-size: 14px;
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .node-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #555;
+        }
+
+        .status-IDLE { background: #555; }
+        .status-QUEUED { background: var(--waiting); }
+        .status-RUNNING { background: var(--running); box-shadow: 0 0 8px var(--running); }
+        .status-SUCCESS { background: var(--success); }
+        .status-FAILED { background: var(--error); box-shadow: 0 0 8px var(--error); }
+
+        .node-body {
+            padding: 12px 15px;
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        .node-desc {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .node-meta {
+            font-family: monospace;
+            font-size: 11px;
+            color: #888;
+            background: rgba(0,0,0,0.2);
+            padding: 4px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .port {
+            width: 12px;
+            height: 12px;
+            background: var(--node-bg);
+            border: 2px solid var(--conn-color);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .port-in { left: -7px; }
+        .port-out { right: -7px; }
+
+        svg.connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .connection-line {
+            fill: none;
+            stroke: var(--conn-color);
+            stroke-width: 2;
+            transition: stroke 0.3s;
+        }
+
+        .connection-line.active {
+            stroke: var(--running);
+            stroke-width: 3;
+        }
+
+        .connection-line.error {
+            stroke: var(--error);
+        }
+
+        .motion-dot {
+            fill: var(--running);
+            r: 4;
+            filter: drop-shadow(0 0 4px var(--running));
+        }
+
+        /* Inspector Panel */
+        #inspector {
+            position: absolute;
+            top: 20px;
+            right: -350px;
+            width: 300px;
+            background: var(--panel-bg);
+            border: 1px solid var(--node-border);
+            border-radius: 8px;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        #inspector.open {
+            right: 20px;
+        }
+
+        .inspector-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--node-border);
+            padding-bottom: 10px;
+        }
+
+        .inspector-row {
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .inspector-label {
+            color: #888;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .inspector-value {
+            color: #ddd;
+            font-family: monospace;
+            word-break: break-all;
+            background: rgba(0,0,0,0.2);
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #333;
+        }
+
+        /* Execution Trace Panel */
+        #trace-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 350px;
+            background: var(--panel-bg);
+            border: 1px solid var(--node-border);
+            border-radius: 8px;
+            padding: 15px;
+            backdrop-filter: blur(5px);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .trace-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .trace-item:last-child {
+            border-bottom: none;
+        }
+        
+        .group-box {
+            position: absolute;
+            border: 1px dashed rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .group-title {
+            position: absolute;
+            top: -25px;
+            left: 10px;
+            color: rgba(255,255,255,0.4);
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toolbar">
+        <strong style="margin-right: 15px;">Hojaiga Visualizer</strong>
+        <button id="btn-target" class="active">Target Architecture</button>
+        <button id="btn-runtime">Runtime Graph</button>
+        <div style="width: 1px; height: 20px; background: #555; margin: 0 10px;"></div>
+        <button id="btn-simulate">▶ Simulate Execution</button>
+        <button id="btn-reset">Reset</button>
+    </div>
+
+    <div id="canvas-container">
+        <div id="canvas">
+            <svg class="connections" id="connections-svg"></svg>
+            <div id="nodes-container"></div>
+            <div id="groups-container"></div>
+        </div>
+    </div>
+
+    <div id="inspector">
+        <div class="inspector-title" id="insp-title">Select a Node</div>
+        <div id="insp-content">
+            <div style="color: #666; font-style: italic;">No node selected. Click a node to view its metadata.</div>
+        </div>
+    </div>
+
+    <div id="trace-panel">
+        <div style="font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px;">Live Execution Trace</div>
+        <div id="trace-content">
+            <div style="color: #666; font-style: italic;">Waiting for execution...</div>
+        </div>
+    </div>
+
+    <script>
+        // Data Models
+        let graphData = { target: { nodes: [], edges: [], groups: [] }, runtime: { nodes: [], edges: [], groups: [] } };
+        let currentMode = 'target'; // 'target' or 'runtime'
+        let selectedNodeId = null;
+        
+        // Pan & Zoom state
+        let transform = { x: 0, y: 0, scale: 1 };
+        let isDragging = false;
+        let startDrag = { x: 0, y: 0 };
+
+        // Elements
+        const canvasContainer = document.getElementById('canvas-container');
+        const canvas = document.getElementById('canvas');
+        const svg = document.getElementById('connections-svg');
+        const nodesContainer = document.getElementById('nodes-container');
+        const groupsContainer = document.getElementById('groups-container');
+        const inspector = document.getElementById('inspector');
+
+        // Fetch data
+        async function loadData() {
+            try {
+                const response = await fetch('graph_data.json');
+                graphData = await response.json();
+                renderGraph();
+            } catch (e) {
+                console.error("Failed to load graph data, using mock data.", e);
+                generateMockData();
+                renderGraph();
+            }
+        }
+
+        function generateMockData() {
+            // Mock Target Graph based on user description
+            graphData.target = {
+                groups: [
+                    { id: 'g1', title: 'INPUT / INGESTION', bounds: {x: 50, y: 50, w: 320, h: 200} },
+                    { id: 'g2', title: 'COGNITION', bounds: {x: 450, y: 50, w: 320, h: 400} },
+                    { id: 'g3', title: 'ORCHESTRATION', bounds: {x: 850, y: 50, w: 320, h: 300} },
+                    { id: 'g4', title: 'EXECUTION & CONTROLLERS', bounds: {x: 1250, y: 50, w: 320, h: 500} }
+                ],
+                nodes: [
+                    { id: 'ui', x: 70, y: 100, name: 'Interface Layer', desc: 'Ingests user commands', icon: '💬', file: 'organ_11_interface.py', status: 'IDLE' },
+                    
+                    { id: 'brain', x: 470, y: 100, name: 'Brain (Intent)', desc: 'Understands user intent', icon: '🧠', file: 'organ_01_brain.py', status: 'IDLE' },
+                    { id: 'memory', x: 470, y: 220, name: 'Memory', desc: 'Context retrieval', icon: '💾', file: 'organ_03_memory.py', status: 'IDLE' },
+                    { id: 'compiler', x: 470, y: 340, name: 'Workflow Compiler', desc: 'Converts intent to DAG', icon: '⚙️', file: 'organ_36_workflow_compiler.py', status: 'IDLE' },
+                    
+                    { id: 'cns', x: 870, y: 100, name: 'CNS', desc: 'Central Nervous System / Router', icon: '⚡', file: 'organ_02_cns_single_file.py', status: 'IDLE' },
+                    { id: 'orchestrator', x: 870, y: 220, name: 'Task Orchestrator', desc: 'Manages agent delegation', icon: '🎼', file: 'organ_38_task_orchestrator.py', status: 'IDLE' },
+                    
+                    { id: 'agent1', x: 1270, y: 100, name: 'Desktop Agent', desc: 'Permanent Agent', icon: '🤖', file: 'organ_10_agents.py', status: 'IDLE' },
+                    { id: 'chrome_cdp', x: 1270, y: 220, name: 'Chrome CDP Controller', desc: 'Browser automation', icon: '🌐', file: 'organ_19_chrome_cdp_runtime.py', status: 'IDLE' },
+                    { id: 'perception', x: 1270, y: 340, name: 'Visual Perception', desc: 'Reads screen state', icon: '👁️', file: 'organ_31_visual_perception.py', status: 'IDLE' },
+                    { id: 'checkpoint', x: 870, y: 400, name: 'Checkpoint', desc: 'Verification step', icon: '✅', file: 'organ_32_state_catalog.py', status: 'IDLE' }
+                ],
+                edges: [
+                    { source: 'ui', target: 'brain', label: 'user_input' },
+                    { source: 'brain', target: 'memory', label: 'query' },
+                    { source: 'memory', target: 'brain', label: 'context' },
+                    { source: 'brain', target: 'compiler', label: 'intent' },
+                    { source: 'compiler', target: 'cns', label: 'dag' },
+                    { source: 'cns', target: 'orchestrator', label: 'dispatch' },
+                    { source: 'orchestrator', target: 'agent1', label: 'delegate' },
+                    { source: 'agent1', target: 'chrome_cdp', label: 'action' },
+                    { source: 'chrome_cdp', target: 'perception', label: 'validate' },
+                    { source: 'perception', target: 'checkpoint', label: 'result' },
+                    { source: 'checkpoint', target: 'orchestrator', label: 'status' }
+                ]
+            };
+            
+            // Runtime graph shows bypass for example
+            graphData.runtime = JSON.parse(JSON.stringify(graphData.target));
+            graphData.runtime.nodes.push({ id: 'sysboot', x: 70, y: 220, name: 'system_boot.py', desc: 'Bootstrapper', icon: '🚀', file: 'system_boot.py', status: 'IDLE' });
+            
+            // Alter edges to show bypass
+            graphData.runtime.edges = [
+                { source: 'ui', target: 'sysboot', label: 'direct_call', error: true },
+                { source: 'sysboot', target: 'orchestrator', label: 'BYPASS_DETECTED', error: true },
+                { source: 'orchestrator', target: 'agent1', label: 'delegate' },
+                { source: 'agent1', target: 'chrome_cdp', label: 'action' }
+            ];
+        }
+
+        function renderGraph() {
+            nodesContainer.innerHTML = '';
+            groupsContainer.innerHTML = '';
+            svg.innerHTML = '';
+            
+            const data = graphData[currentMode];
+            if(!data) return;
+
+            // Render Groups
+            if (data.groups) {
+                data.groups.forEach(g => {
+                    const el = document.createElement('div');
+                    el.className = 'group-box';
+                    el.style.left = g.bounds.x + 'px';
+                    el.style.top = g.bounds.y + 'px';
+                    el.style.width = g.bounds.w + 'px';
+                    el.style.height = g.bounds.h + 'px';
+                    
+                    const title = document.createElement('div');
+                    title.className = 'group-title';
+                    title.innerText = g.title;
+                    el.appendChild(title);
+                    
+                    groupsContainer.appendChild(el);
+                });
+            }
+
+            // Render Nodes
+            data.nodes.forEach(node => {
+                const el = document.createElement('div');
+                el.className = `node ${selectedNodeId === node.id ? 'selected' : ''}`;
+                el.id = `node-${node.id}`;
+                el.style.left = `${node.x}px`;
+                el.style.top = `${node.y}px`;
+                
+                el.innerHTML = `
+                    <div class="node-header">
+                        <div class="node-icon">${node.icon || '⚙️'}</div>
+                        <div class="node-title">${node.name}</div>
+                        <div class="node-status status-${node.status || 'IDLE'}" id="status-${node.id}"></div>
+                    </div>
+                    <div class="node-body">
+                        <div class="node-desc">${node.desc}</div>
+                        <div class="node-meta">${node.file}</div>
+                    </div>
+                    <div class="port port-in"></div>
+                    <div class="port port-out"></div>
+                `;
+                
+                el.addEventListener('mousedown', (e) => {
+                    e.stopPropagation(); // prevent canvas drag
+                    selectNode(node);
+                });
+                
+                nodesContainer.appendChild(el);
+            });
+
+            // Render Edges
+            requestAnimationFrame(() => {
+                data.edges.forEach(edge => {
+                    const sourceNode = document.getElementById(`node-${edge.source}`);
+                    const targetNode = document.getElementById(`node-${edge.target}`);
+                    if (sourceNode && targetNode) {
+                        drawEdge(edge.source, edge.target, edge.error, edge.active);
+                    }
+                });
+            });
+        }
+
+        function drawEdge(sourceId, targetId, isError = false, isActive = false) {
+            const src = document.getElementById(`node-${sourceId}`);
+            const tgt = document.getElementById(`node-${targetId}`);
+            if(!src || !tgt) return;
+
+            const srcRect = src.getBoundingClientRect();
+            const tgtRect = tgt.getBoundingClientRect();
+            const canvasRect = canvas.getBoundingClientRect();
+
+            // Calculate center of out-port
+            const x1 = (srcRect.right - canvasRect.left) / transform.scale;
+            const y1 = (srcRect.top + srcRect.height/2 - canvasRect.top) / transform.scale;
+            
+            // Calculate center of in-port
+            const x2 = (tgtRect.left - canvasRect.left) / transform.scale;
+            const y2 = (tgtRect.top + tgtRect.height/2 - canvasRect.top) / transform.scale;
+
+            const cx1 = x1 + Math.max(50, Math.abs(x2 - x1) * 0.5);
+            const cx2 = x2 - Math.max(50, Math.abs(x2 - x1) * 0.5);
+
+            const pathData = `M ${x1} ${y1} C ${cx1} ${y1}, ${cx2} ${y2}, ${x2} ${y2}`;
+
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("d", pathData);
+            path.setAttribute("id", `edge-${sourceId}-${targetId}`);
+            
+            let classes = "connection-line";
+            if (isError) classes += " error";
+            if (isActive) classes += " active";
+            path.setAttribute("class", classes);
+            
+            svg.appendChild(path);
+        }
+
+        function selectNode(node) {
+            selectedNodeId = node.id;
+            document.querySelectorAll('.node').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`node-${node.id}`).classList.add('selected');
+            
+            inspector.classList.add('open');
+            document.getElementById('insp-title').innerText = node.name;
+            
+            let html = '';
+            const fields = ['file', 'desc', 'status', 'id'];
+            fields.forEach(f => {
+                if(node[f]) {
+                    html += `<div class="inspector-row">
+                        <div class="inspector-label">${f.toUpperCase()}</div>
+                        <div class="inspector-value">${node[f]}</div>
+                    </div>`;
+                }
+            });
+            document.getElementById('insp-content').innerHTML = html;
+        }
+
+        // Pan & Zoom
+        canvasContainer.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const scaleAmount = -e.deltaY * 0.001;
+            transform.scale = Math.min(Math.max(0.2, transform.scale + scaleAmount), 3);
+            updateTransform();
+        });
+
+        canvasContainer.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startDrag = { x: e.clientX - transform.x, y: e.clientY - transform.y };
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            transform.x = e.clientX - startDrag.x;
+            transform.y = e.clientY - startDrag.y;
+            updateTransform();
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        function updateTransform() {
+            canvas.style.transform = `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`;
+        }
+
+        // Toolbar
+        document.getElementById('btn-target').addEventListener('click', (e) => {
+            currentMode = 'target';
+            document.getElementById('btn-runtime').classList.remove('active');
+            e.target.classList.add('active');
+            renderGraph();
+        });
+
+        document.getElementById('btn-runtime').addEventListener('click', (e) => {
+            currentMode = 'runtime';
+            document.getElementById('btn-target').classList.remove('active');
+            e.target.classList.add('active');
+            renderGraph();
+        });
+        
+        // Simulation
+        document.getElementById('btn-simulate').addEventListener('click', async () => {
+            const data = graphData[currentMode];
+            const traceContent = document.getElementById('trace-content');
+            traceContent.innerHTML = '';
+            
+            // Reset all statuses
+            data.nodes.forEach(n => updateNodeStatus(n.id, 'IDLE'));
+            svg.innerHTML = '';
+            renderGraph();
+
+            for (let edge of data.edges) {
+                // Update Trace
+                const sourceNode = data.nodes.find(n => n.id === edge.source);
+                const targetNode = data.nodes.find(n => n.id === edge.target);
+                
+                traceContent.innerHTML = `<div class="trace-item">
+                    <span style="color: var(--running)">▶</span>
+                    <span>${sourceNode.name} ➔ ${targetNode.name}</span>
+                </div>` + traceContent.innerHTML;
+
+                // Animate
+                updateNodeStatus(edge.source, 'SUCCESS');
+                updateNodeStatus(edge.target, 'RUNNING');
+                
+                // Redraw edge as active
+                svg.innerHTML = '';
+                data.edges.forEach(e => {
+                    const isActive = (e.source === edge.source && e.target === edge.target);
+                    drawEdge(e.source, e.target, e.error, isActive);
+                });
+                
+                // Add moving dot
+                const pathEl = document.getElementById(`edge-${edge.source}-${edge.target}`);
+                if (pathEl) {
+                    animateDotOnPath(pathEl);
+                }
+
+                await new Promise(r => setTimeout(r, 1500));
+            }
+            
+            // Finalize
+            if(data.edges.length > 0) {
+                const lastEdge = data.edges[data.edges.length - 1];
+                updateNodeStatus(lastEdge.target, 'SUCCESS');
+            }
+        });
+        
+        document.getElementById('btn-reset').addEventListener('click', () => {
+            const data = graphData[currentMode];
+            data.nodes.forEach(n => updateNodeStatus(n.id, 'IDLE'));
+            document.getElementById('trace-content').innerHTML = '<div style="color: #666; font-style: italic;">Waiting for execution...</div>';
+            renderGraph();
+        });
+
+        function updateNodeStatus(nodeId, status) {
+            const node = graphData[currentMode].nodes.find(n => n.id === nodeId);
+            if(node) node.status = status;
+            
+            const statusEl = document.getElementById(`status-${nodeId}`);
+            if(statusEl) {
+                statusEl.className = `node-status status-${status}`;
+            }
+        }
+        
+        function animateDotOnPath(path) {
+            const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            dot.setAttribute("class", "motion-dot");
+            svg.appendChild(dot);
+            
+            const length = path.getTotalLength();
+            let start = null;
+            
+            function step(timestamp) {
+                if (!start) start = timestamp;
+                const progress = (timestamp - start) / 1000; // 1 second duration
+                
+                if (progress <= 1) {
+                    const point = path.getPointAtLength(progress * length);
+                    dot.setAttribute("cx", point.x);
+                    dot.setAttribute("cy", point.y);
+                    requestAnimationFrame(step);
+                } else {
+                    dot.remove();
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        // Init
+        loadData();
+    </script>
+</body>
+</html>

@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOJAIGA // WORLD 02: Local LLM Bridge</title>
+  <link rel="icon" href="data:," />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- MediaPipe Hands & Camera Utils CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=JetBrains+Mono:wght@300;400;600&display=swap');
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #06020f;
+      font-family: 'JetBrains Mono', monospace;
+      user-select: none;
+    }
+
+    .font-display {
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .hud-overlay {
+      background:
+        radial-gradient(circle at center, transparent 50%, rgba(6, 2, 15, 0.9) 100%),
+        repeating-linear-gradient(0deg, rgba(168, 85, 247, 0.03) 0px, rgba(168, 85, 247, 0.03) 1px, transparent 1px, transparent 3px);
+      pointer-events: none;
+    }
+
+    .glass-panel {
+      background: rgba(16, 6, 32, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(192, 132, 252, 0.35);
+      box-shadow: 0 0 30px rgba(168, 85, 247, 0.16), inset 0 0 15px rgba(168, 85, 247, 0.08);
+    }
+
+    /* Transform-only label compositing, no backdrop blur (60+ FPS lesson) */
+    .node-label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translate(-50%, -145%);
+      pointer-events: none;
+      white-space: nowrap;
+      padding: 6px 12px;
+      border-radius: 8px;
+      text-align: center;
+      background: rgba(16, 6, 32, 0.78);
+      border: 1px solid rgba(192, 132, 252, 0.4);
+      will-change: transform;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .node-label.targeted {
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.7) !important;
+      z-index: 5;
+    }
+
+    #hand-cursor {
+      position: fixed;
+      width: 38px;
+      height: 38px;
+      margin-left: -19px;
+      margin-top: -19px;
+      border: 2px solid #c084fc;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 40;
+      transition: transform 0.12s ease, border-color 0.15s ease;
+      box-shadow: 0 0 18px rgba(192, 132, 252, 0.85);
+      display: none;
+    }
+
+    #hand-cursor.pinching {
+      transform: scale(0.62);
+      border-color: #38bdf8;
+      background-color: rgba(56, 189, 248, 0.35);
+      box-shadow: 0 0 25px rgba(56, 189, 248, 1);
+    }
+
+    #warp-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle, #c084fc 0%, #06020f 70%);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+  </style>
+</head>
+<body class="text-purple-100">
+
+  <div id="warp-overlay"></div>
+  <div id="canvas-container" class="fixed inset-0 z-0"></div>
+  <div id="hud-overlay" class="fixed inset-0 z-10 hud-overlay"></div>
+
+  <div id="hand-cursor">
+    <div class="w-1.5 h-1.5 bg-purple-300 rounded-full m-auto mt-3.5"></div>
+  </div>
+
+  <div id="labels-container" class="fixed inset-0 z-20 pointer-events-none overflow-hidden"></div>
+
+  <!-- TOP HUD BAR WITH MULTI-WORLD SWITCHER (Ability #27: Omni-Portal) -->
+  <header class="fixed top-4 left-4 right-4 z-30 flex flex-wrap items-center justify-between gap-4 pointer-events-none">
+    <div class="glass-panel px-5 py-3 rounded-xl pointer-events-auto flex items-center gap-4">
+      <button onclick="warpTo('index.html')" class="px-3 py-1.5 rounded-lg bg-purple-500/25 border border-purple-400 text-purple-200 text-xs font-display tracking-wider hover:bg-purple-500/40 transition">
+        &larr; HUB
+      </button>
+      <div>
+        <h1 class="font-display text-sm md:text-base font-extrabold tracking-widest text-purple-300">
+          SECTOR 02 // LOCAL LLM BRIDGE &amp; VISION MATRIX
+        </h1>
+        <p class="text-[11px] text-purple-200/70 tracking-wider">
+          COGNITION WORLD &bull; <span id="fps-counter" class="text-emerald-400 font-semibold">60 FPS</span>
+          &bull; THROUGHPUT: <span id="tok-counter" class="text-sky-300 font-bold">84.2 tok/s</span>
+          &bull; <span id="gesture-readout" class="text-amber-300 font-semibold">STANDBY</span>
+          &bull; <span id="cns-status" class="text-rose-400 font-semibold">CNS LINKING&hellip;</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="glass-panel px-3 py-2 rounded-xl pointer-events-auto flex flex-wrap items-center gap-2">
+      <button onclick="warpTo('scanner-world.html')" class="px-2.5 py-1.5 rounded-lg text-xs bg-slate-900/70 border border-emerald-400/40 text-emerald-300 hover:bg-emerald-500/20 transition">
+        Sector 01: Scanner
+      </button>
+      <button onclick="warpTo('execution-world.html')" class="px-2.5 py-1.5 rounded-lg text-xs bg-slate-900/70 border border-amber-400/40 text-amber-300 hover:bg-amber-500/20 transition">
+        Sector 03: Execution
+      </button>
+      <button onclick="triggerTokenSurge()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-fuchsia-500/25 border border-fuchsia-400 text-fuchsia-200 hover:bg-fuchsia-500/40 transition">
+        &#129504; Token Burst (Space / Swipe)
+      </button>
+    </div>
+  </header>
+
+  <!-- LEFT LIVE INFERENCE STREAM -->
+  <aside class="fixed bottom-4 left-4 z-30 glass-panel p-4 rounded-xl w-84 pointer-events-auto hidden md:block">
+    <div class="text-xs font-display font-bold tracking-widest text-purple-300 uppercase mb-2 flex items-center justify-between">
+      <span>&#9889; Live Neural Inference Bus</span>
+      <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 border border-purple-400/40 animate-pulse">FP16 CUDA</span>
+    </div>
+    <div id="inference-log" class="space-y-1.5 text-[11px] font-mono text-purple-200/85 max-h-36 overflow-hidden">
+      <div class="text-sky-300">[MOONDREAM] Vision patch embeddings: 576 tokens</div>
+      <div>[INJECTOR] Context window packed: 2,048 / 8,192</div>
+      <div class="text-fuchsia-300">[LLAMA-3-8B] {"action":"CLICK","x":642,"y":410}</div>
+      <div>[KV_CACHE] PagedAttention hit ratio: 94.6%</div>
+    </div>
+  </aside>
+
+  <!-- SUB-PROCESS DETAIL MODAL -->
+  <div id="node-modal" class="fixed inset-0 z-40 flex items-center justify-center p-4 pointer-events-none opacity-0 transition-opacity duration-300">
+    <div id="node-modal-card" class="glass-panel rounded-2xl max-w-lg w-full p-6 border border-purple-400/50 transform scale-95 transition-transform duration-300 pointer-events-auto">
+      <div class="flex items-start justify-between gap-4 border-b border-purple-500/30 pb-4">
+        <div>
+          <span id="modal-badge" class="text-[10px] font-display uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-purple-500/20 border border-purple-400 text-purple-300">
+            COGNITIVE ENGINE
+          </span>
+          <h2 id="modal-title" class="font-display text-xl font-bold text-white mt-2">Node Name</h2>
+          <p id="modal-subtitle" class="text-xs text-purple-200/70 mt-0.5">Architecture Telemetry</p>
+        </div>
+        <button onclick="closeNodeModal()" class="px-3 py-1 rounded-lg bg-rose-500/20 border border-rose-400/50 text-rose-200 text-xs hover:bg-rose-500/40 transition">
+          &#10005; ESC
+        </button>
+      </div>
+      <div id="modal-metrics" class="mt-4 space-y-2.5"></div>
+      <div class="mt-4 bg-slate-950/90 border border-purple-500/30 rounded-xl p-3 font-mono text-xs text-fuchsia-300 whitespace-pre-wrap" id="modal-code"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM-RIGHT WEBCAM PREVIEW -->
+  <div class="fixed bottom-4 right-4 z-30 glass-panel rounded-xl overflow-hidden w-56 sm:w-64 border border-purple-400/40 pointer-events-auto">
+    <div class="px-3 py-1.5 bg-slate-950/80 border-b border-purple-500/30 flex items-center justify-between">
+      <span class="text-[10px] font-display tracking-wider uppercase text-purple-300 flex items-center gap-1.5">
+        <span id="cam-indicator" class="w-2 h-2 rounded-full bg-amber-400"></span>
+        Neural Hand Cam
+      </span>
+      <button onclick="initCameraTracking(true)" class="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 border border-purple-400/50 text-purple-200">
+        Sync
+      </button>
+    </div>
+    <div class="relative aspect-video bg-slate-950 flex items-center justify-center">
+      <video id="webcam-video" class="hidden" playsinline></video>
+      <canvas id="webcam-canvas" class="w-full h-full object-cover transform -scale-x-100"></canvas>
+      <div id="cam-overlay-msg" class="absolute inset-0 flex flex-col items-center justify-center text-center p-3 bg-slate-950/80 text-[11px] text-purple-200/80">
+        <span>Syncing Hand Telemetry...</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function warpTo(url) {
+      document.getElementById('warp-overlay').style.opacity = '1';
+      setTimeout(() => { window.location.href = url; }, 420);
+    }
+
+    // ============================================================================
+    // 1. BRANCH 2 COGNITIVE STATIONS DATA (Abilities #20 - #23)
+    // ============================================================================
+    const LLM_STATIONS = [
+      {
+        id: 'synapse-core',
+        role: 'BRIDGE REACTOR',
+        name: 'Neural Attention Tensor Core',
+        position: new THREE.Vector3(0, 0, 0),
+        color: 0xc084fc,
+        radius: 2.2,
+        type: 'core',
+        description: 'Central multimodal cross-attention router fusing Moondream visual embeddings with Llama 3 language tokens.',
+        metrics: [
+          { label: 'Cross-Attention Heads', val: '32 Heads Active', state: 'FUSING' },
+          { label: 'VRAM Allocation', val: '6.4 GB / 8.0 GB', state: 'OPTIMAL' },
+          { label: 'Time-To-First-Token (TTFT)', val: '19.4 ms', state: 'LOW-LATENCY' }
+        ],
+        code: '// Multimodal Tensor Fusion\nconst fused = crossAttention(visionEmbeddings, promptTokens);\nreturn llama3Gateway.generateStructuredJSON(fused);'
+      },
+      {
+        id: 'llama3-gateway',
+        role: 'SUB-PROCESS 01',
+        name: 'Llama 3 Gateway',
+        position: new THREE.Vector3(-7.0, 2.3, 1.5),
+        color: 0xf472b6,
+        radius: 1.4,
+        type: 'llama',
+        description: 'Quantized local Llama-3-8B-Instruct engine enforcing grammar-constrained JSON action plans for desktop control.',
+        metrics: [
+          { label: 'Quantization Backend', val: 'GGUF Q4_K_M', state: 'LOCKED' },
+          { label: 'Token Generation Speed', val: '84.2 tokens/sec', state: 'STREAMING' },
+          { label: 'JSON Grammar Enforcement', val: '100% Valid Schema', state: 'STRICT' }
+        ],
+        code: '// Grammar-Constrained Action Output\n{\n  "thought": "Dismiss blocking update modal",\n  "command": "CLICK",\n  "target": [642, 410]\n}'
+      },
+      {
+        id: 'moondream-vision',
+        role: 'SUB-PROCESS 02',
+        name: 'Moondream Vision Server',
+        position: new THREE.Vector3(7.0, 2.3, 1.4),
+        color: 0x38bdf8,
+        radius: 1.4,
+        type: 'moondream',
+        description: 'Lightweight SigLIP + Phi-based vision encoder translating raw desktop crops into dense semantic feature maps.',
+        metrics: [
+          { label: 'Vision Encoder', val: 'SigLIP-So400m', state: 'ONLINE' },
+          { label: 'Frame Encoding Time', val: '41.8 ms / frame', state: 'REALTIME' },
+          { label: 'Visual Token Grid', val: '24x24 (576 toks)', state: 'DENSE' }
+        ],
+        code: '// Moondream Vision Server Endpoint\nconst imgTensor = preprocessScreenCrop(hwndCrop);\nconst visualTokens = await moondream.encodeImage(imgTensor);'
+      },
+      {
+        id: 'prompt-injector',
+        role: 'SUB-PROCESS 03',
+        name: 'Prompt Injector Engine',
+        position: new THREE.Vector3(0, -5.5, 2.0),
+        color: 0xfacc15,
+        radius: 1.35,
+        type: 'injector',
+        description: 'Dynamically compiles OCR text, window coordinates, and historical SQLite context into a zero-shot system prompt.',
+        metrics: [
+          { label: 'Template Compression', val: '2.4x Token Save', state: 'ACTIVE' },
+          { label: 'Injection Latency', val: '0.85 ms', state: 'INSTANT' },
+          { label: 'Guardrail Sanitizer', val: 'Prompt-Shield v3', state: 'ENABLED' }
+        ],
+        code: '// Dynamic System Prompt Compiler\nconst sysPrompt = injectTemplate(BASE_SCHEMA, {\n  ocrTree: scannerData.tokens,\n  activeRect: scannerData.bbox\n});'
+      },
+      {
+        id: 'warp-hub',
+        role: 'DIMENSIONAL PORTAL',
+        name: '<< Warp to Main Orchestrator',
+        position: new THREE.Vector3(0, 5.6, -2.5),
+        color: 0x00f0ff,
+        radius: 1.2,
+        type: 'portal'
+      }
+    ];
+
+    // ============================================================================
+    // 2. THREE.JS SCENE & NEURAL TENSOR GEOMETRIES
+    // ============================================================================
+    const container = document.getElementById('canvas-container');
+    const labelsContainer = document.getElementById('labels-container');
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x06020f, 0.024);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 200);
+    const defaultCamPos = new THREE.Vector3(0, 1.2, 17.5);
+    camera.position.copy(defaultCamPos);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    const worldGroup = new THREE.Group();
+    scene.add(worldGroup);
+
+    scene.add(new THREE.AmbientLight(0x2a1a4a, 1.5));
+
+    const interactiveMeshes = [];
+    const stationObjects = {};
+
+    LLM_STATIONS.forEach((st) => {
+      const hitMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(st.radius * 1.45, 16, 16),
+        new THREE.MeshBasicMaterial({ visible: false })
+      );
+      hitMesh.position.copy(st.position);
+      hitMesh.userData = { stationData: st };
+      worldGroup.add(hitMesh);
+      interactiveMeshes.push(hitMesh);
+
+      const group = new THREE.Group();
+      group.position.copy(st.position);
+
+      if (st.type === 'core') {
+        // Ability #20: Pulsating Neural Attention Tensor Icosahedron
+        const inner = new THREE.Mesh(
+          new THREE.IcosahedronGeometry(1.4, 1),
+          new THREE.MeshBasicMaterial({ color: 0xc084fc, wireframe: true })
+        );
+        const outer = new THREE.LineSegments(
+          new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(2.2, 2)),
+          new THREE.LineBasicMaterial({ color: 0xf472b6, transparent: true, opacity: 0.7 })
+        );
+        group.add(inner, outer);
+      } else if (st.type === 'llama') {
+        // Ability #21: 3 Gyroscopic Transformer Layer Rings (KV-cache + JSON schema)
+        for (let i = 0; i < 3; i++) {
+          const ring = new THREE.Mesh(
+            new THREE.TorusGeometry(1.35 - i * 0.25, 0.05, 12, 48),
+            new THREE.MeshBasicMaterial({ color: st.color, wireframe: true })
+          );
+          ring.rotation.set(i * 0.8, i * 0.5, 0);
+          group.add(ring);
+        }
+      } else if (st.type === 'moondream') {
+        // Ability #22: 3D Vision Frustum Projector Cone + Eye Core
+        const cone = new THREE.LineSegments(
+          new THREE.EdgesGeometry(new THREE.ConeGeometry(1.4, 2.2, 4)),
+          new THREE.LineBasicMaterial({ color: st.color })
+        );
+        cone.rotation.x = Math.PI / 2;
+        const eye = new THREE.Mesh(
+          new THREE.SphereGeometry(0.5, 16, 16),
+          new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
+        );
+        group.add(cone, eye);
+      } else if (st.type === 'injector') {
+        // Ability #23: Prompt Injector DNA Helix Torus Knot
+        const knot = new THREE.Mesh(
+          new THREE.TorusKnotGeometry(0.95, 0.22, 64, 8, 2, 3),
+          new THREE.MeshBasicMaterial({ color: st.color, wireframe: true })
+        );
+        group.add(knot);
+      } else if (st.type === 'portal') {
+        const portalRing = new THREE.Mesh(
+          new THREE.TorusGeometry(1.1, 0.12, 16, 48),
+          new THREE.MeshBasicMaterial({ color: st.color, wireframe: true })
+        );
+        group.add(portalRing);
+      }
+
+      if (st.type !== 'core') {
+        const lineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), st.position]);
+        const lineMat = new THREE.LineBasicMaterial({ color: st.color, transparent: true, opacity: 0.45 });
+        worldGroup.add(new THREE.Line(lineGeo, lineMat));
+      }
+
+      worldGroup.add(group);
+
+      const labelEl = document.createElement('div');
+      labelEl.className = 'node-label';
+      labelEl.innerHTML =
+        '<div class="text-[9px] font-display tracking-widest text-purple-300 uppercase">' + st.role + '</div>' +
+        '<div class="text-xs font-bold text-white">' + st.name + '</div>';
+      labelsContainer.appendChild(labelEl);
+
+      stationObjects[st.id] = { data: st, hitMesh: hitMesh, group: group, labelEl: labelEl };
+    });
+
+    // Floating Neural Synapse Particles + Travelling Token Packets
+    const synCount = 1800;
+    const synGeo = new THREE.BufferGeometry();
+    const synPos = new Float32Array(synCount * 3);
+    for (let i = 0; i < synCount * 3; i++) {
+      synPos[i] = (Math.random() - 0.5) * 36;
+    }
+    synGeo.setAttribute('position', new THREE.BufferAttribute(synPos, 3));
+    const synParticles = new THREE.Points(
+      synGeo,
+      new THREE.PointsMaterial({ color: 0xc084fc, size: 0.12, transparent: true, opacity: 0.65, blending: THREE.AdditiveBlending })
+    );
+    worldGroup.add(synParticles);
+
+    // Token Stream Packets Traveling Between Nodes and Core
+    const tokenPackets = [];
+    ['llama3-gateway', 'moondream-vision', 'prompt-injector'].forEach((id) => {
+      const targetPos = stationObjects[id].data.position;
+      for (let i = 0; i < 6; i++) {
+        const pkt = new THREE.Mesh(
+          new THREE.OctahedronGeometry(0.16, 0),
+          new THREE.MeshBasicMaterial({ color: stationObjects[id].data.color })
+        );
+        worldGroup.add(pkt);
+        tokenPackets.push({ mesh: pkt, end: targetPos, t: i / 6, speed: 0.008 });
+      }
+    });
+
+    let surgeBoost = 1.0;
+    function triggerTokenSurge() {
+      surgeBoost = 4.5;
+      document.getElementById('tok-counter').textContent = '248.0 tok/s (BURST)';
+      const log = document.getElementById('inference-log');
+      const item = document.createElement('div');
+      item.className = 'text-fuchsia-300 font-semibold';
+      item.textContent = '[SURGE] FlashAttention-2 batch dispatched -> Execution Engine';
+      log.prepend(item);
+      while (log.children.length > 6) log.removeChild(log.lastElementChild);
+      setTimeout(() => { document.getElementById('tok-counter').textContent = '84.2 tok/s'; }, 1600);
+    }
+    window.triggerTokenSurge = triggerTokenSurge;
+
+    // ============================================================================
+    // 3. MODAL, RAYCASTER & MEDIAPIPE HAND TRACKING
+    // ============================================================================
+    const raycaster = new THREE.Raycaster();
+    const targetHandNDC = new THREE.Vector2(0, 0);
+    const smoothedHandNDC = new THREE.Vector2(0, 0);
+    const camTargetPos = new THREE.Vector3().copy(defaultCamPos);
+    const camLookAtTarget = new THREE.Vector3(0, 0, 0);
+    const currentLookAt = new THREE.Vector3(0, 0, 0);
+
+    let hoveredStationId = null;
+    let activeModalId = null;
+    let isHandTracked = false;
+
+    function activateStation(st) {
+      if (st.type === 'portal') {
+        warpTo('index.html');
+        return;
+      }
+      activeModalId = st.id;
+      const worldPos = new THREE.Vector3();
+      stationObjects[st.id].hitMesh.getWorldPosition(worldPos);
+      camLookAtTarget.copy(worldPos);
+      camTargetPos.copy(worldPos).add(new THREE.Vector3(0, 0.6, 5.8));
+
+      document.getElementById('modal-badge').textContent = st.role;
+      document.getElementById('modal-title').textContent = st.name;
+      document.getElementById('modal-subtitle').textContent = st.description;
+      document.getElementById('modal-metrics').innerHTML = st.metrics.map(function (m) {
+        return '<div class="p-3 rounded-xl bg-slate-900/80 border border-purple-500/30 flex items-center justify-between">' +
+          '<div><div class="text-xs font-bold text-white">' + m.label + '</div>' +
+          '<div class="text-[11px] text-purple-300">' + m.val + '</div></div>' +
+          '<span class="text-[10px] font-display px-2.5 py-1 rounded bg-purple-500/20 border border-purple-400/50 text-purple-200">' +
+          '&#9679; ' + m.state + '</span></div>';
+      }).join('');
+      document.getElementById('modal-code').textContent = st.code;
+
+      const modal = document.getElementById('node-modal');
+      const card = document.getElementById('node-modal-card');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-95');
+      card.classList.add('scale-100');
+    }
+
+    function closeNodeModal() {
+      if (!activeModalId) return;
+      activeModalId = null;
+      camLookAtTarget.set(0, 0, 0);
+      camTargetPos.copy(defaultCamPos);
+      const modal = document.getElementById('node-modal');
+      const card = document.getElementById('node-modal-card');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-100');
+      card.classList.add('scale-95');
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      if (isHandTracked) return;
+      if (e.target.closest('header, aside, #node-modal-card, .fixed.bottom-4.right-4')) return;
+      targetHandNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
+      targetHandNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target.closest('header, aside, #node-modal-card, .fixed.bottom-4.right-4')) return;
+      if (hoveredStationId) activateStation(stationObjects[hoveredStationId].data);
+      else if (activeModalId) closeNodeModal();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Escape') closeNodeModal();
+      if (e.code === 'Space') { e.preventDefault(); triggerTokenSurge(); }
+    });
+
+    // MediaPipe Hands
+    const videoElement = document.getElementById('webcam-video');
+    const canvasElement = document.getElementById('webcam-canvas');
+    const canvasCtx = canvasElement.getContext('2d');
+    const handCursor = document.getElementById('hand-cursor');
+    const gestureReadout = document.getElementById('gesture-readout');
+    let prevPalmPos = null;
+    let pinchFrames = 0;
+    let openFrames = 0;
+    let camRunning = false;
+    let mpCamera = null;
+
+    function onHandResults(results) {
+      canvasElement.width = results.image.width;
+      canvasElement.height = results.image.height;
+      canvasCtx.save();
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        isHandTracked = true;
+        const lm = results.multiHandLandmarks[0];
+        drawConnectors(canvasCtx, lm, HAND_CONNECTIONS, { color: '#c084fc', lineWidth: 2 });
+        drawLandmarks(canvasCtx, lm, { color: '#38bdf8', lineWidth: 1, radius: 2.5 });
+
+        const mirroredX = 1.0 - lm[9].x;
+        const normY = lm[9].y;
+        targetHandNDC.x = mirroredX * 2 - 1;
+        targetHandNDC.y = -(normY * 2 - 1);
+
+        const isPinch = Math.hypot(lm[8].x - lm[4].x, lm[8].y - lm[4].y) < 0.055;
+        if (prevPalmPos && Math.hypot(mirroredX - prevPalmPos.x, normY - prevPalmPos.y) > 0.16) {
+          triggerTokenSurge();
+        }
+        prevPalmPos = { x: mirroredX, y: normY };
+
+        if (isPinch) {
+          pinchFrames++;
+          openFrames = 0;
+          handCursor.classList.add('pinching');
+          gestureReadout.textContent = activeModalId ? '\u{1F590}\uFE0F HOLD OPEN HAND TO EXIT' : '\u{1F92F} PINCH LOCK';
+          if (activeModalId) {
+            if (openFrames > 45) closeNodeModal();
+          } else if (pinchFrames === 6 && hoveredStationId) {
+            activateStation(stationObjects[hoveredStationId].data);
+          }
+        } else {
+          pinchFrames = 0;
+          openFrames++;
+          handCursor.classList.remove('pinching');
+          if (activeModalId) {
+            gestureReadout.textContent = openFrames > 50 ? '\u{1F590}\uFE0F HOLDING... EXITING' : '\u{1F590}\uFE0F HOLD OPEN HAND ~1.5s TO EXIT';
+            if (openFrames > 50) closeNodeModal();
+          } else {
+            gestureReadout.textContent = '\u{1F590}\uFE0F HAND ORBIT';
+          }
+        }
+      } else {
+        isHandTracked = false;
+        prevPalmPos = null;
+        pinchFrames = 0;
+        openFrames = 0;
+      }
+      canvasCtx.restore();
+    }
+
+    async function initCameraTracking(retry) {
+      if (camRunning && !retry) return;
+      if (camRunning && mpCamera && mpCamera.stop) { try { mpCamera.stop(); } catch (e) {} camRunning = false; }
+      const overlay = document.getElementById('cam-overlay-msg');
+      overlay.style.display = 'flex';
+      try {
+        const hands = new Hands({ locateFile: (f) => 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/' + f });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.65, minTrackingConfidence: 0.65 });
+        hands.onResults(onHandResults);
+        mpCamera = new Camera(videoElement, {
+          onFrame: async () => { await hands.send({ image: videoElement }); },
+          width: 320, height: 180
+        });
+        await mpCamera.start();
+        camRunning = true;
+        overlay.style.display = 'none';
+        document.getElementById('cam-indicator').className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+      } catch (e) {
+        camRunning = false;
+        overlay.innerHTML = '<span class="text-amber-300">Mouse Fallback Active</span>';
+        document.getElementById('cam-indicator').className = 'w-2 h-2 rounded-full bg-rose-500';
+      }
+    }
+    window.initCameraTracking = initCameraTracking;
+
+    if (!window.location.search.includes('nocam')) {
+      initCameraTracking(false);
+    } else {
+      document.getElementById('cam-overlay-msg').innerHTML = '<span class="text-purple-300">Camera skipped (?nocam=1)</span>';
+      document.getElementById('cam-indicator').className = 'w-2 h-2 rounded-full bg-emerald-400';
+    }
+
+    // ============================================================================
+    // 4. 60+ FPS RENDER LOOP
+    // ============================================================================
+    const clock = new THREE.Clock();
+    let frameCount = 0;
+    let lastFpsUpdate = performance.now();
+    const fpsEl = document.getElementById('fps-counter');
+    const tmpVec = new THREE.Vector3();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsed = clock.getElapsedTime();
+      const now = performance.now();
+
+      frameCount++;
+      if (now - lastFpsUpdate >= 500) {
+        fpsEl.textContent = Math.round((frameCount * 1000) / (now - lastFpsUpdate)) + ' FPS';
+        frameCount = 0;
+        lastFpsUpdate = now;
+      }
+
+      smoothedHandNDC.lerp(targetHandNDC, 0.08);
+      surgeBoost = THREE.MathUtils.lerp(surgeBoost, 1.0, 0.04);
+
+      if (isHandTracked) {
+        handCursor.style.display = 'block';
+        handCursor.style.left = (((smoothedHandNDC.x + 1) / 2) * window.innerWidth) + 'px';
+        handCursor.style.top = (((-smoothedHandNDC.y + 1) / 2) * window.innerHeight) + 'px';
+      } else {
+        handCursor.style.display = 'none';
+      }
+
+      if (!activeModalId) {
+        camTargetPos.x = smoothedHandNDC.x * 7.2;
+        camTargetPos.y = 1.2 + smoothedHandNDC.y * 4.5;
+        camTargetPos.z = 17.5;
+        worldGroup.rotation.y = elapsed * 0.09;
+      }
+      camera.position.lerp(camTargetPos, 0.06);
+      currentLookAt.lerp(camLookAtTarget, 0.08);
+      camera.lookAt(currentLookAt);
+
+      // Animate Travelling Token Packets along Synapse Lines
+      for (let i = 0; i < tokenPackets.length; i++) {
+        const p = tokenPackets[i];
+        p.t = (p.t + p.speed * surgeBoost) % 1.0;
+        p.mesh.position.lerpVectors(tmpVec.set(0, 0, 0), p.end, p.t);
+        p.mesh.rotation.x += 0.08;
+      }
+
+      synParticles.rotation.y = elapsed * 0.03;
+
+      raycaster.setFromCamera(smoothedHandNDC, camera);
+      const hits = raycaster.intersectObjects(interactiveMeshes, false);
+      hoveredStationId = hits.length > 0 ? hits[0].object.userData.stationData.id : null;
+
+      Object.keys(stationObjects).forEach(function (key) {
+        const obj = stationObjects[key];
+        const isTargeted = hoveredStationId === obj.data.id;
+        obj.group.rotation.y = elapsed * 0.55 * surgeBoost;
+        obj.group.rotation.x = Math.sin(elapsed * 0.7) * 0.25;
+        const s = isTargeted ? 1.24 : 1.0;
+        const cs = obj.group.scale.x + (s - obj.group.scale.x) * 0.12;
+        obj.group.scale.setScalar(cs);
+
+        const worldPos = new THREE.Vector3();
+        obj.hitMesh.getWorldPosition(worldPos);
+        worldPos.y += obj.data.radius + 0.6;
+        worldPos.project(camera);
+        obj.labelEl.style.transform = 'translate(-50%,-145%) translate(' +
+          ((worldPos.x * 0.5 + 0.5) * window.innerWidth).toFixed(1) + 'px,' +
+          ((-(worldPos.y * 0.5) + 0.5) * window.innerHeight).toFixed(1) + 'px)';
+        obj.labelEl.style.visibility = worldPos.z > 1 ? 'hidden' : 'visible';
+        obj.labelEl.classList.toggle('targeted', isTargeted);
+      });
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    window.__LLM_READY = true;
+    window.__LLM = {
+      stations: stationObjects,
+      activate: activateStation,
+      close: closeNodeModal,
+      surge: triggerTokenSurge
+    };
+  </script>
+
+  <!-- Ability #38: Real-Time CNS Telemetry Streamer (live from server.py) -->
+  <script>
+    (function () {
+      var statusEl = document.getElementById('cns-status');
+      var sseStarted = false;
+      function setStatus(txt, live) {
+        if (!statusEl) return;
+        statusEl.textContent = txt;
+        statusEl.className = live ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold';
+      }
+      function handle(ev) {
+        window.__CNS_COUNT = (window.__CNS_COUNT || 0) + 1;
+        window.__CNS_LAST = ev;
+        setStatus('CNS \u25CF ' + (ev.log_line || ev.event_type || '').slice(0, 52), true);
+        try { if (window.handleCNS) window.handleCNS(ev); } catch (e) {}
+      }
+      function startSSE() {
+        if (sseStarted) return;
+        if (!window.EventSource) { setStatus('CNS \u2716 OFFLINE', false); return; }
+        sseStarted = true;
+        var es = new EventSource('/api/stream');
+        es.onopen = function () { setStatus('CNS \u25CF LINK LIVE (SSE)', true); };
+        es.onmessage = function (e) { try { handle(JSON.parse(e.data)); } catch (err) {} };
+        es.onerror = function () { setStatus('CNS \u25D0 RETRY', false); };
+      }
+      function startWS() {
+        var ws, opened = false;
+        try { ws = new WebSocket('ws://' + (location.hostname || 'localhost') + ':8765'); }
+        catch (e) { return startSSE(); }
+        ws.onopen = function () { opened = true; setStatus('CNS \u25CF LINK LIVE', true); };
+        ws.onmessage = function (e) { try { handle(JSON.parse(e.data)); } catch (err) {} };
+        ws.onerror = function () { try { ws.close(); } catch (e) {} };
+        ws.onclose = function () {
+          if (!opened) { startSSE(); }
+          else { setStatus('CNS \u25D0 RETRY', false); setTimeout(startWS, 3000); }
+        };
+      }
+      setStatus('CNS \u25C6 LINKING\u2026', false);
+      startWS();
+    })();
+
+    // LLM world: stream vision / prompt / llama3 decisions into the inference bus
+    window.handleCNS = function (ev) {
+      if (ev.sector !== 'llm' && ev.sector !== 'hub') return;
+      var log = document.getElementById('inference-log');
+      if (log && ev.log_line) {
+        var d = document.createElement('div');
+        d.className = ev.event_type === 'LLAMA3_ACTION' ? 'text-fuchsia-300 font-semibold'
+          : (ev.event_type === 'MOONDREAM_ENCODE' ? 'text-sky-300' : 'text-purple-200');
+        d.textContent = ev.log_line;
+        log.prepend(d);
+        while (log.children.length > 6) log.removeChild(log.lastElementChild);
+      }
+      if (ev.event_type === 'LLAMA3_ACTION' || ev.event_type === 'PROMPT_INJECTED') {
+        var tok = document.getElementById('tok-counter');
+        tok.textContent = '84.2 tok/s \u25CF LIVE';
+        clearTimeout(window.__tokT);
+        window.__tokT = setTimeout(function () { tok.textContent = '84.2 tok/s'; }, 1500);
+        surgeBoost = 2.4;
+      }
+    };
+  </script>
+</body>
+</html>

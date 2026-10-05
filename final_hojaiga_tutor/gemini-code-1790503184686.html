@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Clicky Overlay</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; overflow: hidden; }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.001);
+      user-select: none;
+      pointer-events: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    #drawing-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .drawn-shape {
+      fill: rgba(255, 59, 48, 0.08);
+      stroke: #FF3B30;
+      stroke-width: 3.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 8px rgba(255, 59, 48, 0.55));
+      stroke-dasharray: 3000;
+      stroke-dashoffset: 3000;
+      animation: draw-stroke 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .drawn-curve {
+      fill: none;
+      stroke-width: 3.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 3000;
+      stroke-dashoffset: 3000;
+      animation: draw-stroke 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .drawn-axes {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.75);
+      stroke-width: 2;
+      stroke-dasharray: 4 4;
+      filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
+    }
+
+    @keyframes draw-stroke {
+      to { stroke-dashoffset: 0; }
+    }
+
+    .draw-label-pill {
+      position: absolute;
+      background: #FF3B30;
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 6px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 11;
+      animation: pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes pop-in {
+      from { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    #buddy-root {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 22px;
+      height: 22px;
+      transform-origin: center center;
+      pointer-events: none;
+      will-change: transform, opacity;
+      z-index: 20;
+    }
+
+    #triangle {
+      width: 18px;
+      height: 18px;
+      background: #3380FF;
+      clip-path: polygon(50% 6.7%, 0% 93.3%, 100% 93.3%);
+      filter: drop-shadow(0 0 8px #3380FF);
+    }
+
+    #waveform {
+      display: none;
+      align-items: center;
+      gap: 2px;
+      height: 18px;
+      filter: drop-shadow(0 0 6px rgba(51, 128, 255, 0.6));
+    }
+    .wave-bar {
+      width: 2.5px;
+      height: 4px;
+      border-radius: 1.5px;
+      background: #3380FF;
+    }
+
+    #spinner {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2.5px solid rgba(51, 128, 255, 0.15);
+      border-top-color: #3380FF;
+      filter: drop-shadow(0 0 6px rgba(51, 128, 255, 0.6));
+      animation: clicky-spin 0.8s linear infinite;
+    }
+    @keyframes clicky-spin { to { transform: rotate(360deg); } }
+
+    #speech-bubble {
+      position: absolute;
+      background: #3380FF;
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 6px;
+      box-shadow: 0 0 12px rgba(51, 128, 255, 0.6);
+      white-space: nowrap;
+      opacity: 0;
+      transform: scale(0.5);
+      transform-origin: left center;
+      transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+      z-index: 21;
+    }
+  </style>
+</head>
+<body>
+  <svg id="drawing-canvas" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)">
+    <defs>
+      <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#FF3B30" />
+      </marker>
+    </defs>
+    <g id="shapes-group"></g>
+  </svg>
+  <div id="labels-container"></div>
+
+  <div id="buddy-root">
+    <div id="triangle"></div>
+    <div id="waveform">
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+    </div>
+    <div id="spinner"></div>
+  </div>
+
+  <div id="speech-bubble"></div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    const shapesGroup = document.getElementById('shapes-group');
+    const labelsContainer = document.getElementById('labels-container');
+    const buddyRoot = document.getElementById('buddy-root');
+    const triangle = document.getElementById('triangle');
+    const waveform = document.getElementById('waveform');
+    const waveBars = Array.from(document.querySelectorAll('.wave-bar'));
+    const spinner = document.getElementById('spinner');
+    const speechBubble = document.getElementById('speech-bubble');
+
+    const listeningBarProfile = [0.4, 0.7, 1.0, 0.7, 0.4];
+    const navigationPointerPhrases = ["right here!", "this one!", "over here!", "click this!", "here it is!"];
+    const curvePalette = ['#FF3B30', '#38BDF8', '#34D399', '#FBBF24'];
+
+    let buddyNavigationMode = 'followingCursor';
+    let isReturningToCursor = false;
+    let isCursorOnThisScreen = true;
+    let anotherScreenNavigating = false;
+
+    let cursorPosition = { x: 300, y: 300 };
+    let targetMousePosition = { x: 300, y: 300 };
+    let cursorPositionWhenNavigationStarted = { x: 0, y: 0 };
+
+    let triangleRotationDegrees = -35.0;
+    let buddyFlightScale = 1.0;
+    let currentAudioPowerLevel = 0;
+    let voiceState = 'idle';
+    let clearDrawingsTimeout = null;
+    let currentAudioElement = null;
+
+    function stopActiveAudio() {
+      speechSynthesis.cancel();
+      if (currentAudioElement) {
+        try {
+          currentAudioElement.pause();
+          currentAudioElement.currentTime = 0;
+        } catch (e) {}
+        currentAudioElement = null;
+      }
+    }
+
+    ipcRenderer.on('stop-tts-audio', stopActiveAudio);
+
+    function clearAllDrawings() {
+      shapesGroup.innerHTML = '';
+      labelsContainer.innerHTML = '';
+      if (clearDrawingsTimeout) {
+        clearTimeout(clearDrawingsTimeout);
+        clearDrawingsTimeout = null;
+      }
+    }
+
+    ipcRenderer.on('clear-drawings', clearAllDrawings);
+
+    function addLabelPill(text, x, y, bgColor = '#FF3B30') {
+      if (!text) return;
+      const pill = document.createElement('div');
+      pill.className = 'draw-label-pill';
+      pill.style.background = bgColor;
+      pill.textContent = text;
+      pill.style.left = `${Math.max(60, Math.min(x, window.innerWidth - 80))}px`;
+      pill.style.top = `${Math.max(25, Math.min(y, window.innerHeight - 25))}px`;
+      labelsContainer.appendChild(pill);
+    }
+
+    function createRegularPolygonPoints(cx, cy, r, sides) {
+      const pts = [];
+      for (let i = 0; i < sides; i++) {
+        const angle = (i * 2 * Math.PI) / sides - Math.PI / 2;
+        pts.push(`${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`);
+      }
+      return pts.join(' ');
+    }
+
+    ipcRenderer.on('render-drawings', (_, { drawCommands, scaleX, scaleY }) => {
+      clearAllDrawings();
+      if (!drawCommands || drawCommands.length === 0) return;
+
+      const svgNS = '[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)';
+      let curveColorIdx = 0;
+
+      drawCommands.forEach((cmd) => {
+        const c = cmd.coords;
+        const avgScale = (scaleX + scaleY) / 2;
+
+        if (cmd.type === 'CIRCLE' && c.length >= 3) {
+          const cx = c[0] * scaleX;
+          const cy = c[1] * scaleY;
+          const r = c[2] * avgScale;
+          const circle = document.createElementNS(svgNS, 'circle');
+          circle.setAttribute('cx', String(cx));
+          circle.setAttribute('cy', String(cy));
+          circle.setAttribute('r', String(r));
+          circle.setAttribute('class', 'drawn-shape');
+          shapesGroup.appendChild(circle);
+          addLabelPill(cmd.label, cx, cy + r + 20);
+        } else if (
+          ['DECAGON', 'OCTAGON', 'HEXAGON', 'PENTAGON', 'TRIANGLE'].includes(cmd.type) &&
+          c.length >= 3
+        ) {
+          const sidesMap = { DECAGON: 10, OCTAGON: 8, HEXAGON: 6, PENTAGON: 5, TRIANGLE: 3 };
+          const sides = sidesMap[cmd.type] || 6;
+          const cx = c[0] * scaleX;
+          const cy = c[1] * scaleY;
+          const r = c[2] * avgScale;
+          const poly = document.createElementNS(svgNS, 'polygon');
+          poly.setAttribute('points', createRegularPolygonPoints(cx, cy, r, sides));
+          poly.setAttribute('class', 'drawn-shape');
+          poly.style.stroke = '#38BDF8';
+          poly.style.fill = 'rgba(56, 189, 248, 0.10)';
+          shapesGroup.appendChild(poly);
+          addLabelPill(cmd.label, cx, cy - r - 18, '#0284C7');
+        } else if (cmd.type === 'PARALLELOGRAM' && c.length >= 4) {
+          const x = c[0] * scaleX;
+          const y = c[1] * scaleY;
+          const w = c[2] * scaleX;
+          const h = c[3] * scaleY;
+          const skew = (c[4] !== undefined ? c[4] : 60) * scaleX;
+          const poly = document.createElementNS(svgNS, 'polygon');
+          poly.setAttribute(
+            'points',
+            `${x + skew},${y} ${x + w + skew},${y} ${x + w},${y + h} ${x},${y + h}`
+          );
+          poly.setAttribute('class', 'drawn-shape');
+          shapesGroup.appendChild(poly);
+          addLabelPill(cmd.label, x + w / 2 + skew / 2, y - 16);
+        } else if (cmd.type === 'RECT' && c.length >= 4) {
+          const x = c[0] * scaleX;
+          const y = c[1] * scaleY;
+          const w = c[2] * scaleX;
+          const h = c[3] * scaleY;
+          const rect = document.createElementNS(svgNS, 'rect');
+          rect.setAttribute('x', String(x));
+          rect.setAttribute('y', String(y));
+          rect.setAttribute('width', String(w));
+          rect.setAttribute('height', String(h));
+          rect.setAttribute('rx', '8');
+          rect.setAttribute('class', 'drawn-shape');
+          shapesGroup.appendChild(rect);
+          addLabelPill(cmd.label, x + w / 2, y - 16);
+        } else if (cmd.type === 'POLYGON' && c.length >= 6) {
+          const pts = [];
+          for (let i = 0; i < c.length - 1; i += 2) {
+            pts.push(`${c[i] * scaleX},${c[i + 1] * scaleY}`);
+          }
+          const poly = document.createElementNS(svgNS, 'polygon');
+          poly.setAttribute('points', pts.join(' '));
+          poly.setAttribute('class', 'drawn-shape');
+          shapesGroup.appendChild(poly);
+          addLabelPill(cmd.label, c[0] * scaleX, c[1] * scaleY - 18);
+        } else if (cmd.type === 'AXES' && c.length >= 4) {
+          const ox = c[0] * scaleX;
+          const oy = c[1] * scaleY;
+          const w = c[2] * scaleX;
+          const h = c[3] * scaleY;
+
+          // Horizontal X-axis
+          const xAxis = document.createElementNS(svgNS, 'line');
+          xAxis.setAttribute('x1', String(ox - w * 0.25));
+          xAxis.setAttribute('y1', String(oy));
+          xAxis.setAttribute('x2', String(ox + w * 0.85));
+          xAxis.setAttribute('y2', String(oy));
+          xAxis.setAttribute('class', 'drawn-axes');
+          shapesGroup.appendChild(xAxis);
+
+          // Vertical Y-axis
+          const yAxis = document.createElementNS(svgNS, 'line');
+          yAxis.setAttribute('x1', String(ox));
+          yAxis.setAttribute('y1', String(oy - h * 0.6));
+          yAxis.setAttribute('x2', String(ox));
+          yAxis.setAttribute('y2', String(oy + h * 0.6));
+          yAxis.setAttribute('class', 'drawn-axes');
+          shapesGroup.appendChild(yAxis);
+        } else if (cmd.type === 'CURVE' && c.length >= 4) {
+          const color = curvePalette[curveColorIdx % curvePalette.length];
+          curveColorIdx++;
+
+          const pts = [];
+          for (let i = 0; i < c.length - 1; i += 2) {
+            pts.push(`${c[i] * scaleX},${c[i + 1] * scaleY}`);
+          }
+          const polyline = document.createElementNS(svgNS, 'polyline');
+          polyline.setAttribute('points', pts.join(' '));
+          polyline.setAttribute('class', 'drawn-curve');
+          polyline.style.stroke = color;
+          polyline.style.filter = `drop-shadow(0 0 8px ${color})`;
+          shapesGroup.appendChild(polyline);
+
+          const lastIdx = c.length - 2;
+          addLabelPill(
+            cmd.label,
+            c[lastIdx] * scaleX + 40,
+            c[lastIdx + 1] * scaleY + (curveColorIdx * 24 - 36),
+            color
+          );
+        } else if ((cmd.type === 'ARROW' || cmd.type === 'LINE') && c.length >= 4) {
+          const x1 = c[0] * scaleX;
+          const y1 = c[1] * scaleY;
+          const x2 = c[2] * scaleX;
+          const y2 = c[3] * scaleY;
+          const line = document.createElementNS(svgNS, 'line');
+          line.setAttribute('x1', String(x1));
+          line.setAttribute('y1', String(y1));
+          line.setAttribute('x2', String(x2));
+          line.setAttribute('y2', String(y2));
+          line.setAttribute('class', 'drawn-shape');
+          if (cmd.type === 'ARROW') line.setAttribute('marker-end', 'url(#arrowhead)');
+          shapesGroup.appendChild(line);
+          addLabelPill(cmd.label, x1, y1 - 16);
+        }
+      });
+
+      clearDrawingsTimeout = setTimeout(clearAllDrawings, 16000);
+    });
+
+    ipcRenderer.on('trigger-welcome', () => {
+      streamTextInBubble("hey! i'm clicky", () => {
+        setTimeout(hideBubble, 2500);
+      });
+    });
+
+    ipcRenderer.on('cursor-tick', (_, payload) => {
+      isCursorOnThisScreen = payload.isCursorOnThisScreen;
+      anotherScreenNavigating = payload.anotherScreenNavigating;
+
+      if (isCursorOnThisScreen) {
+        targetMousePosition = { x: payload.localX + 35, y: payload.localY + 25 };
+      }
+
+      if (buddyNavigationMode === 'navigatingToTarget' && isReturningToCursor) {
+        const dist = Math.hypot(
+          payload.localX - cursorPositionWhenNavigationStarted.x,
+          payload.localY - cursorPositionWhenNavigationStarted.y
+        );
+        if (dist > 100) finishNavigationAndResumeFollowing();
+      }
+    });
+
+    function renderLoop(now) {
+      const visible = buddyNavigationMode === 'followingCursor'
+        ? (!anotherScreenNavigating && isCursorOnThisScreen)
+        : true;
+      buddyRoot.style.opacity = visible ? '1' : '0';
+
+      if (buddyNavigationMode === 'followingCursor') {
+        cursorPosition.x += (targetMousePosition.x - cursorPosition.x) * 0.22;
+        cursorPosition.y += (targetMousePosition.y - cursorPosition.y) * 0.22;
+        triangleRotationDegrees = -35.0;
+        buddyFlightScale = 1.0;
+      }
+
+      buddyRoot.style.transform = `translate3d(${cursorPosition.x}px, ${cursorPosition.y}px, 0) rotate(${triangleRotationDegrees}deg) scale(${buddyFlightScale})`;
+
+      if (speechBubble.style.opacity === '1') {
+        speechBubble.style.left = `${cursorPosition.x + 18}px`;
+        speechBubble.style.top = `${cursorPosition.y + 8}px`;
+      }
+
+      if (voiceState === 'listening') {
+        waveBars.forEach((bar, idx) => {
+          const phase = (now / 1000) * 3.6 + idx * 0.35;
+          const normPower = Math.max(currentAudioPowerLevel - 0.008, 0);
+          const easedPower = Math.pow(Math.min(normPower * 2.85, 1), 0.76);
+          const reactiveHeight = easedPower * 10 * listeningBarProfile[idx];
+          const idlePulse = ((Math.sin(phase) + 1) / 2) * 1.5;
+          bar.style.height = `${3 + reactiveHeight + idlePulse}px`;
+        });
+      }
+
+      requestAnimationFrame(renderLoop);
+    }
+    requestAnimationFrame(renderLoop);
+
+    function animateBezierFlightArc(destination, onComplete) {
+      const startPosition = { ...cursorPosition };
+      const endPosition = { ...destination };
+      const distance = Math.hypot(endPosition.x - startPosition.x, endPosition.y - startPosition.y);
+      const flightDurationMs = Math.min(Math.max(distance / 800.0, 0.6), 1.4) * 1000;
+      const startTime = performance.now();
+
+      const midPoint = {
+        x: (startPosition.x + endPosition.x) / 2.0,
+        y: (startPosition.y + endPosition.y) / 2.0
+      };
+      const arcHeight = Math.min(distance * 0.2, 80.0);
+      const controlPoint = { x: midPoint.x, y: midPoint.y - arcHeight };
+
+      function step(now) {
+        if (buddyNavigationMode !== 'navigatingToTarget') return;
+        const linearProgress = Math.min((now - startTime) / flightDurationMs, 1.0);
+        const t = linearProgress * linearProgress * (3.0 - 2.0 * linearProgress);
+        const u = 1.0 - t;
+
+        cursorPosition.x = u * u * startPosition.x + 2 * u * t * controlPoint.x + t * t * endPosition.x;
+        cursorPosition.y = u * u * startPosition.y + 2 * u * t * controlPoint.y + t * t * endPosition.y;
+
+        const tx = 2 * u * (controlPoint.x - startPosition.x) + 2 * t * (endPosition.x - controlPoint.x);
+        const ty = 2 * u * (controlPoint.y - startPosition.y) + 2 * t * (endPosition.y - controlPoint.y);
+        triangleRotationDegrees = Math.atan2(ty, tx) * (180.0 / Math.PI) + 90.0;
+        buddyFlightScale = 1.0 + Math.sin(linearProgress * Math.PI) * 0.3;
+
+        if (linearProgress < 1.0) {
+          requestAnimationFrame(step);
+        } else {
+          buddyFlightScale = 1.0;
+          onComplete();
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    ipcRenderer.on('navigate-to-element', (_, { localX, localY, bubbleText }) => {
+      buddyNavigationMode = 'navigatingToTarget';
+      isReturningToCursor = false;
+      cursorPositionWhenNavigationStarted = { x: targetMousePosition.x - 35, y: targetMousePosition.y - 25 };
+
+      const clampedTarget = {
+        x: Math.max(20, Math.min(localX + 8, window.innerWidth - 20)),
+        y: Math.max(20, Math.min(localY + 12, window.innerHeight - 20))
+      };
+
+      animateBezierFlightArc(clampedTarget, () => {
+        buddyNavigationMode = 'pointingAtTarget';
+        triangleRotationDegrees = -35.0;
+        const phrase = bubbleText || navigationPointerPhrases[Math.floor(Math.random() * navigationPointerPhrases.length)];
+        streamTextInBubble(phrase, () => {
+          setTimeout(() => {
+            if (buddyNavigationMode !== 'pointingAtTarget') return;
+            hideBubble();
+            setTimeout(() => {
+              if (buddyNavigationMode !== 'pointingAtTarget') return;
+              buddyNavigationMode = 'navigatingToTarget';
+              isReturningToCursor = true;
+              animateBezierFlightArc(targetMousePosition, finishNavigationAndResumeFollowing);
+            }, 450);
+          }, 4000);
+        });
+      });
+    });
+
+    function streamTextInBubble(phrase, onComplete) {
+      speechBubble.textContent = '';
+      speechBubble.style.opacity = '1';
+      speechBubble.style.transform = 'scale(1)';
+      let idx = 0;
+      function nextChar() {
+        if (idx < phrase.length) {
+          speechBubble.textContent += phrase[idx++];
+          setTimeout(nextChar, 30 + Math.random() * 25);
+        } else if (onComplete) {
+          onComplete();
+        }
+      }
+      nextChar();
+    }
+
+    function hideBubble() {
+      speechBubble.style.opacity = '0';
+      speechBubble.style.transform = 'scale(0.5)';
+    }
+
+    function finishNavigationAndResumeFollowing() {
+      buddyNavigationMode = 'followingCursor';
+      isReturningToCursor = false;
+      triangleRotationDegrees = -35.0;
+      buddyFlightScale = 1.0;
+      hideBubble();
+      ipcRenderer.send('navigation-completed');
+    }
+
+    ipcRenderer.on('voice-state', (_, newState) => {
+      voiceState = newState;
+      triangle.style.display = (newState === 'idle' || newState === 'responding') ? 'block' : 'none';
+      waveform.style.display = newState === 'listening' ? 'flex' : 'none';
+      spinner.style.display = newState === 'processing' ? 'block' : 'none';
+    });
+
+    let recognition = null;
+    let latestTranscript = '';
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+      recognition.onresult = (event) => {
+        let text = '';
+        for (let i = 0; i < event.results.length; i++) {
+          text += event.results[i][0].transcript;
+        }
+        latestTranscript = text.trim();
+      };
+    }
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      const audioCtx = new AudioContext();
+      const source = audioCtx.createMediaStreamSource(stream);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      const buffer = new Float32Array(analyser.fftSize);
+      function pollAudioPower() {
+        analyser.getFloatTimeDomainData(buffer);
+        let sum = 0;
+        for (let i = 0; i < buffer.length; i++) sum += buffer[i] * buffer[i];
+        const rms = Math.sqrt(sum / buffer.length);
+        currentAudioPowerLevel = Math.max(Math.min(Math.max(rms * 10.2, 0), 1), currentAudioPowerLevel * 0.72);
+        requestAnimationFrame(pollAudioPower);
+      }
+      pollAudioPower();
+    }).catch(() => {});
+
+    ipcRenderer.on('start-listening', () => {
+      latestTranscript = '';
+      stopActiveAudio();
+      try { recognition && recognition.start(); } catch (e) {}
+    });
+
+    ipcRenderer.on('stop-listening', () => {
+      try { recognition && recognition.stop(); } catch (e) {}
+      setTimeout(() => {
+        ipcRenderer.invoke('submit-transcript', latestTranscript);
+      }, 350);
+    });
+
+    ipcRenderer.on('play-tts-audio', async (_, { audioBase64, spokenText }) => {
+      stopActiveAudio();
+      if (audioBase64) {
+        try {
+          const audio = new Audio(`data:audio/mp3;base64,${audioBase64}`);
+          currentAudioElement = audio;
+          audio.onended = () => {
+            currentAudioElement = null;
+            ipcRenderer.send('tts-playback-ended');
+          };
+          audio.onerror = () => {
+            currentAudioElement = null;
+            ipcRenderer.send('tts-playback-ended');
+          };
+          await audio.play();
+          return;
+        } catch (e) {}
+      }
+      const utterance = new SpeechSynthesisUtterance(spokenText);
+      utterance.onend = () => ipcRenderer.send('tts-playback-ended');
+      utterance.onerror = () => ipcRenderer.send('tts-playback-ended');
+      speechSynthesis.speak(utterance);
+    });
+  </script>
+</body>
+</html>

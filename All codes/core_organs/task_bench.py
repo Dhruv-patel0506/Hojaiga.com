@@ -23,6 +23,7 @@ def _tmp(ext):
 
 
 TXT, TXT2, TXT3, PNG = _tmp(".txt"), _tmp(".txt"), _tmp(".txt"), _tmp(".png")
+CSV = _tmp(".csv")
 
 # name, app, natural-language task, truth spec
 TASKS = [
@@ -31,8 +32,26 @@ TASKS = [
     ("paint-save-png", "Paint", f"save the image as {PNG}", {"png": PNG}),
     ("settings-bluetooth", "Settings", "open the Bluetooth & devices page; expect Add device", {"window_text": "bluetooth"}),
     ("notepad-template", "Notepad", f"write text and save as file|{TXT2}|templated text", {"file_has": (TXT2, "templated text")}),
+    ("explorer-documents", "File Explorer", "click Documents; expect Documents", {"window_text": "documents"}),
+    ("excel-cell-csv", "Excel", f"click Blank workbook; type 42; save the file as {CSV}", {"file_has": (CSV, "42")}),
     ("notepad-unverifiable", "Notepad", "type just a note", {"window_text": "just a note"}),   # typed text is verifiable in the control, so DONE is legitimate
 ]
+
+
+# window class that identifies each app's own top-level windows (apps whose class is shared with other apps are not guarded)
+_GUARD_CLASS = {"notepad": "Notepad", "paint": "MSPaintApp", "file explorer": "CabinetWClass", "excel": "XLMAIN"}
+
+
+def _users_window(app: str) -> str:
+    cls = _GUARD_CLASS.get((app or "").lower())
+    if not cls:
+        return ""
+    sys.path[:0] = [r"D:\new_automation\All codes", r"D:\new_automation"]
+    from core_organs import headless_input as hin
+    for h, t in hin.top_level_titles(visible_only=False):
+        if hin._class_name(h) == cls:
+            return t
+    return ""
 
 
 def main():
@@ -52,6 +71,15 @@ def main():
             continue
         print(f"\n### {name}: {app}: {task[:70]}", flush=True)
         t0 = time.time()
+        owned = _users_window(app)
+        if owned:
+            # the run would attach to a window that already exists (a single-instance launcher never opens a second
+            # one): that is the USER'S window, and a bench must never drive it
+            res = {"skipped": f"the user's {app} window is open ({owned[:40]!r}); not driving it", "truth_ok": None,
+                   "claimed_done": None, "name": name, "app": app, "task": task, "wall_s": 0}
+            results.append(res)
+            print(f"   SKIPPED: {res['skipped']}", flush=True)
+            continue
         try:
             p = subprocess.run([PY, "-X", "utf8", os.path.join(HERE, "task_one.py"), name, app, task, json.dumps(truth), entry],
                                capture_output=True, text=True, timeout=timeout,

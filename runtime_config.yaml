@@ -1,0 +1,88 @@
+# =============================================================================
+# HOJAIGA AUTOMATION OS — SYSTEM ENVIRONMENT CONTROLLER CONFIGURATION
+# Core Core Architecture Document: CHROME_CDP_RUNTIME_ARCHITECTURE_SPECIFICATION.md
+# =============================================================================
+
+system:
+  version: "2.0.0"
+  environment: "production"
+  platform_target: "Windows_11_x64"
+  log_level: "INFO"
+
+# ------------------------------------------------------------------------------
+# ORGAN 19: CHROME CDP RUNTIME ENGINE CONFIGURATION
+# ------------------------------------------------------------------------------
+organ_19_cdp:
+  tcp_port: 47619
+  websocket_timeout_ms: 30000
+  heartbeat_interval_ms: 5000
+  max_payload_size_mb: 64
+  
+  # Browser Instance Constraints
+  max_concurrent_browsers: 3
+  max_total_browser_launches: 8
+  launch_cooldown_s: 3.0
+  permanent_tab_budget: 4
+  temp_tab_budget: 8
+
+  # Anti-Bot & Human Execution Simulation
+  humanize_mouse_movement: true
+  typing_delay_variance_ms: [30, 110]
+  settle_delay_after_action_s: 2.0
+
+  # Network & Interception Layers
+  enable_global_interception: true
+  max_captured_body_kb: 10240
+
+  # Failsafe & Loop Protection Boundaries
+  loop_detection_threshold: 3
+  speedbump_check_interval_ms: 1000
+
+  # Visual Overlay UI Specifications
+  capsule_ui:
+    enabled: true
+    anchor_position: "bottom_center"
+    fade_animation_duration_ms: 300
+    theme:
+      background_color: "rgba(23, 23, 23, 0.9)"
+      border_color: "rgba(255, 255, 255, 0.15)"
+      text_color: "#e2e8f0"
+      dot_working: "#00ffcc"
+      dot_input_needed: "#ff3366"
+      dot_paused: "#ffcc00"
+
+# ------------------------------------------------------------------------------
+# ORGAN 24: DESKTOP AUTOMATION PROTOCOL (DAP) CONFIGURATION
+# ------------------------------------------------------------------------------
+organ_24_dap:
+  tcp_port: 8765
+  pipe_name: "hojaiga_dap_01"
+  default_framework_priority: ["UIA", "Win32"]
+
+  # Native Win32 Foreground Locking Policies
+  foreground_lock_timeout_ms: 5000
+  native_dialog_timeout_ms: 10000
+  force_foreground_fallback: true
+
+  # Win32 GDI Layered Graphics Overlay HUD
+  desktop_hud:
+    enabled: true
+    width: 240
+    height: 40
+    screen_position_x: 840
+    screen_position_y: 25
+    opacity_alpha: 235
+    theme:
+      color_working: 0x001A1A1A
+      color_input_needed: 0x001F1FFF
+      color_paused: 0x0000A5FF
+      color_text: 0x00E2E8F0
+
+# ------------------------------------------------------------------------------
+# GLOBAL DISCOVERY & PERCOVERY DIRECTORIES
+# ------------------------------------------------------------------------------
+paths:
+  base_automation_profile: "C:\\automation_profile"
+  workspace_chat_log: "memory/active/workspace_chat.md"
+  runtime_storage_dir: "var/hojaiga/organ19"
+  downloads_dir: "var/hojaiga/organ19/downloads"

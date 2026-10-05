@@ -1,0 +1,192 @@
+{
+  "app": "notepad",
+  "goals": [
+    "type \"ATLASLINE1 verifier hardening landed with four measured cases\" into the text area",
+    "type \"ATLASLINE2 grounding measured on five apps\" into the text area",
+    "save the document as D:\\new_automation\\_unattended_tmp\\atlas_status.txt",
+    "type \"ATLASLINE3 medium unattended task running\" into the text area",
+    "save the document as D:\\new_automation\\_unattended_tmp\\atlas_status.txt"
+  ],
+  "expect_map": {
+    "2": {
+      "file_created": "D:\\new_automation\\_unattended_tmp\\atlas_status.txt"
+    },
+    "4": {
+      "title_contains": "atlas_status"
+    }
+  },
+  "target_window_before": {
+    "hwnd": 19335828,
+    "title": "",
+    "minimized": false,
+    "visible": false
+  },
+  "target_window_after": {
+    "hwnd": 4195896,
+    "title": "*hj_task_6b8fa7.txt - Notepad",
+    "minimized": true,
+    "visible": true
+  },
+  "restored_from_minimized": true,
+  "file_dialogs_open_before_run": [],
+  "file_dialogs_open_after_run": [],
+  "completed": false,
+  "steps": 9,
+  "awaiting_human": true,
+  "blocked_at_goal": null,
+  "launched_by_us": false,
+  "recipe": "",
+  "recipe_ingested": false,
+  "elapsed_s": 99.71,
+  "wall_s_including_setup": 99.72,
+  "verdict_counts": {
+    "PASS": 4,
+    "NO_CHANGE": 3,
+    "WRONG_STATE": 1,
+    "HITL": 1
+  },
+  "file": {
+    "exists": true,
+    "bytes": 179,
+    "has_line1": false,
+    "has_line2": true,
+    "has_line3_after_resave": false,
+    "content_preview": "ATLASLINE2 grounding measured on five appsATLASLINE2 grounding measured on five appsATLASLINE2 grounding measured on five appsATLASLINE2 grounding measured on five appshello world"
+  },
+  "guards": {
+    "input_guard_violations_new": 0,
+    "physical_cursor_untouched": false,
+    "cursor_before": [
+      1579,
+      276
+    ],
+    "cursor_after": [
+      1419,
+      818
+    ]
+  },
+  "capsule": [
+    "working: [notepad] type 'Text editor'",
+    "working: [notepad] Verified: ui-changed, region pixel-delta unava",
+    "working: [notepad] type 'Text editor'",
+    "working: [notepad] type 'Text editor'",
+    "working: [notepad] Verified: ui-changed, region pixel-delta unava",
+    "working: [notepad] click 'File'",
+    "working: [notepad] type 'Save as type:'",
+    "working: [notepad] Verified: file atlas_status.txt exists",
+    "working: [notepad] type 'Text editor'",
+    "working: [notepad] Verified: ui-changed, region pixel-delta 0.024",
+    "input_needed: Agent needs your input"
+  ],
+  "trace": [
+    {
+      "goal": "type \"ATLASLINE1 verifier hardening landed with four measured cases\" into the text area",
+      "element": "Text editor",
+      "verb": "type",
+      "verdict": "PASS",
+      "method": "UNDELIVERABLE: window gone",
+      "evidence": "ui-changed; region pixel-delta unavailable(after:no-usable-rect(window-gone))",
+      "tiers": [
+        "uia"
+      ],
+      "ts": 1791071767.5781422
+    },
+    {
+      "goal": "type \"ATLASLINE2 grounding measured on five apps\" into the text area",
+      "element": "Text editor",
+      "verb": "type",
+      "verdict": "NO_CHANGE",
+      "method": "append:em_replacesel->RichEditD2DPT+retry-invoke+retry-postmessage+retry-postclick",
+      "evidence": "ui-unchanged; region pixel-delta unavailable(before:window-minimized)",
+      "tiers": [
+        "uia"
+      ],
+      "ts": 1791071778.3976083
+    },
+    {
+      "goal": "type \"ATLASLINE2 grounding measured on five apps\" into the text area",
+      "element": "Text editor",
+      "verb": "type",
+      "verdict": "PASS",
+      "method": "append:em_replacesel->RichEditD2DPT+retry-invoke",
+      "evidence": "ui-changed; region pixel-delta unavailable(before:window-minimized)",
+      "tiers": [
+        "uia"
+      ],
+      "ts": 1791071785.5092552
+    },
+    {
+      "goal": "save the document as D:\\new_automation\\_unattended_tmp\\atlas_status.txt",
+      "element": "File",
+      "verb": "click",
+      "verdict": "WRONG_STATE",
+      "method": "uia-invoke+retry-invoke+retry-postmessage+retry-postclick",
+      "evidence": "file atlas_status.txt MISSING",
+      "tiers": [
+        "uia"
+      ],
+      "ts": 1791071826.4952173
+    },
+    {
+      "goal": "save the document as D:\\new_automation\\_unattended_tmp\\atlas_status.txt",
+      "element": "Save as type:",
+      "verb": "type",
+      "verdict": "PASS",
+      "method": "append:postmessage-wm_char->ComboBox (50 chars)",
+      "evidence": "file atlas_status.txt exists",
+      "tiers": [
+        "uia"
+      ],
+      "ts": 1791071851.3549762
+    },
+    {
+      "goal": "type \"ATLASLINE3 medium unattended task running\" into the text area",
+      "element": "Text editor",
+      "verb": "type",
+      "verdict": "PASS",
+      "method": "append:em_replacesel->RichEditD2DPT",
+      "evidence": "ui-changed; region pixel-delta 0.024 of cells via printwindow detected",
+      "tiers": [
+        "uia"
+      ],
+      "ts": 1791071859.2672517
+    },
+    {
+      "goal": "save the document as D:\\new_automation\\_unattended_tmp\\atlas_status.txt",
+      "element": "-",
+      "verb": "-",
+      "verdict": "NO_CHANGE",
+      "method": "judge",
+      "evidence": "invalid judge choice x1",
+      "tiers": [
+        "uia"
+      ],
+      "ts": 1791071861.649463
+    },
+    {
+      "goal": "save the document as D:\\new_automation\\_unattended_tmp\\atlas_status.txt",
+      "element": "-",
+      "verb": "-",
+      "verdict": "NO_CHANGE",
+      "method": "judge",
+      "evidence": "invalid judge choice x2",
+      "tiers": [
+        "uia"
+      ],
+      "ts": 1791071863.3686607
+    },
+    {
+      "goal": "save the document as D:\\new_automation\\_unattended_tmp\\atlas_status.txt",
+      "element": "-",
+      "verb": "-",
+      "verdict": "HITL",
+      "method": "judge",
+      "evidence": "invalid judge choice x3",
+      "tiers": [
+        "uia"
+      ],
+      "ts": 1791071865.1566312
+    }
+  ],
+  "checkpoint_file": "C:\\Users\\dhruv\\AppData\\Local\\Temp\\hojaiga_desktop_checkpoints\\3216ef22.json"
+}

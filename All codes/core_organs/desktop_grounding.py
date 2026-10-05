@@ -94,7 +94,8 @@ LEGAL_VERBS = ("click", "type", "key", "invoke", "scroll", "wait", "done")
 PRO_SHORTCUT_CONF = float(os.environ.get("HOJAIGA_PRO_SHORTCUT_CONF", "0.70"))
 
 # Destructive patterns are generic word cues, not per-app hardcodes.
-DESTRUCTIVE_CUES = ("delete", "remove", "format", "overwrite", "discard", "erase")
+DESTRUCTIVE_CUES = ("delete", "remove", "format", "overwrite", "discard", "erase", "don't save", "don’t save",
+                    "do not save", "dont save")
 
 BRAINS_CHAT_URL = os.environ.get("HOJAIGA_BRAIN_URL", "http://127.0.0.1:11434/api/chat")
 JUDGE_MODEL = os.environ.get("HOJAIGA_JUDGE_MODEL", "qwen2.5:7b")
@@ -737,15 +738,25 @@ class DesktopGrounding:
                 pass
 
     # ---- capture-restore-capture rung for MINIMIZED windows ----
-    def _await_paint(self, hwnd: int, timeout_s: float = 3.0) -> float:
+    def _await_paint(self, hwnd: int, timeout_s: float = 6.0) -> float:
         """A window that was just un-minimized off-screen needs a moment before PrintWindow returns real
-        pixels (XAML / Chromium repaint lazily). Poll with a small growing delay, bounded; returns seconds."""
+        pixels (XAML / Chromium repaint lazily). Poll with a small growing delay, bounded; returns seconds.
+        A WinUI window that still has not painted after ~1 s is nudged once with a shallow UIA read - touching its
+        accessibility tree makes it lay out and compose (measured: Paint rendered blank for 3 s inside a long process
+        and fine on a fresh one)."""
         t0 = time.perf_counter()
         delay = 0.15
+        nudged = False
         while time.perf_counter() - t0 < timeout_s:
             img, _why = hin.capture_window(hwnd)
             if img is not None:
                 break
+            if not nudged and time.perf_counter() - t0 > 1.0 and HAS_UIA:
+                nudged = True
+                try:
+                    self._walk_uia(hwnd, max_depth=3, max_nodes=60)
+                except Exception:
+                    pass
             time.sleep(delay)
             delay = min(delay * 1.5, 0.5)
         return time.perf_counter() - t0
@@ -1109,6 +1120,9 @@ class DesktopVerifier:
                 time.sleep(0.25)
                 ok = os.path.exists(p)
             checks.append((ok, f"file {os.path.basename(p)} {'exists' if ok else 'MISSING'}"))
+            if ok and expect.get("file_format"):
+                fmt_ok, fmt_note = file_has_format(p, str(expect["file_format"]))
+                checks.append((fmt_ok, fmt_note))
         if "region_changed" in expect and bool(expect["region_changed"]):
             checks.append(self.pixels_changed(before, after))
         return all(c[0] for c in checks), "; ".join(c[1] for c in checks) or "no-expect"
@@ -1157,6 +1171,9 @@ class ConstrainedJudge:
     model: Optional[str] = None   # per-instance override of JUDGE_MODEL (used by model benchmarks)
     _TYPE_WORDS = ("type", "write", "enter", "input", "compose", "fill", "paste", "text")
     _TEXT_ROLES = ("edit", "document", "combobox")
+    # file extension -> the words a format menu uses for it (generic file formats, not app names)
+    _FORMAT_WORDS = {"jpg": ("jpeg", "jpg"), "jpeg": ("jpeg", "jpg"), "tif": ("tiff", "tif"), "tiff": ("tiff", "tif"),
+                     "htm": ("html", "htm"), "html": ("html", "htm")}
     _STOP = frozenset({"the", "a", "an", "to", "in", "into", "on", "of", "and", "then", "it",
                        "for", "with", "as", "at", "by", "from", "this", "that", "my"})
 
@@ -1182,11 +1199,17 @@ class ConstrainedJudge:
         if not hint_segments and (pro_hint or {}).get("element_name"):
             hint_segments = [pro_hint["element_name"].strip().lower()]
         hint_name = ((pro_hint or {}).get("element_name") or (pro_hint or {}).get("menu_path") or "").lower()
+        # The file FORMAT the goal's path asks for ('...\a.png'): a "Save as" submenu that lists formats (Paint offers
+        # "PNG picture" next to "Save as project") must be answered with the matching format, not the first "Save as".
+        ext_m = re.search(r"[a-z]:[\\/][^'<>|?*\r\n]*?\.([a-z0-9]{2,5})(?![a-z0-9])", (goal or "").lower())
+        fmt_words = set(cls._FORMAT_WORDS.get(ext_m.group(1), (ext_m.group(1),))) if ext_m else set()
         scored = []
         for i, e in enumerate(elements):
             name = (e.name or "").lower()
             ntoks = set(re.findall(r"[a-z0-9]+", name))
             score = 3.0 * len(gtoks & ntoks)
+            if fmt_words and e.role in ("menuitem", "listitem", "button") and (fmt_words & ntoks):
+                score += 25.0           # the requested format outranks any learned hint (a hint once taught "Save as project")
             score += 1.5 * sum(1 for t in gtoks if len(t) > 3 and t in name and t not in ntoks)
             if save_as and e.role == "menuitem" and name.startswith("save as"):
                 score += 7.0   # an explicit target path/name means Save AS, not in-place Save
@@ -1267,6 +1290,27 @@ class ConstrainedJudge:
             logger.debug("[judge] compose_text failed: %s", exc)
             return ""
 
+    _CELL_REF_RE = re.compile(r"\b([A-Za-z]{1,3}[1-9]\d{0,5})\b")
+
+    def _cell_target(self, goal: str, elements: List[GroundedElement]):
+        """(index, element) of the grid cell a typing goal means: the one it names ('in cell B2'), else the first cell
+        (A1 - the active cell of a fresh sheet). None when the grid exposes no addressable cell."""
+        cells = [(i, e) for i, e in enumerate(elements)
+                 if e.role == "dataitem" and re.fullmatch(r"[A-Za-z]{1,3}[1-9]\d{0,5}", (e.name or "").strip())]
+        if not cells:
+            return None
+        named = {m.group(1).upper() for m in self._CELL_REF_RE.finditer(goal or "")} - {"A", "I"}
+        for i, e in cells:
+            if e.name.strip().upper() in named:
+                return i, e
+        if named:
+            return None                  # it names a cell that is not on screen: do not type somewhere else
+
+        def _key(ie):
+            m = re.fullmatch(r"([A-Za-z]+)(\d+)", ie[1].name.strip())
+            return (int(m.group(2)), len(m.group(1)), m.group(1).upper())
+        return min(cells, key=_key)
+
     def decisive(self, goal: str, elements: List[GroundedElement],
                  pro_hint: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
         """Deterministic pick when the evidence is overwhelming; None => ask the LLM judge.
@@ -1292,6 +1336,13 @@ class ConstrainedJudge:
                       != (top[2].name or "").strip().lower()), 0.0)
         margin = top[0] - rival
         g = (goal or "").lower()
+        if re.search(r"\b(" + "|".join(self._TYPE_WORDS) + r")\b", g) and any(e.role == "datagrid" for e in elements):
+            cell = self._cell_target(goal, elements)
+            if cell is not None:
+                text = self._compose_text(goal)
+                if text:
+                    return {"choice": cell[0], "verb": "type", "text": text, "why": "decisive: spreadsheet cell",
+                            "element_index": cell[0], "element": cell[1].as_dict(), "decisive": True}
         if re.search(r"\b(" + "|".join(self._TYPE_WORDS) + r")\b", g):
             # Typing goal: only an editable control can receive text, so the candidate set IS the
             # editable controls (a tab/label/button that merely shares a word must never win).
@@ -1441,11 +1492,31 @@ def _uia_act(elem: GroundedElement, verb: str, text: str):
                             continue
                 else:  # click family
                     _errs: List[str] = []
-                    for pattern_name, attempts in (("GetInvokePattern", "invoke"),
-                                                   ("GetLegacyIAccessiblePattern", "do-default"),
-                                                   ("GetSelectionItemPattern", "select"),
-                                                   ("GetTogglePattern", "toggle"),
-                                                   ("GetExpandCollapsePattern", "expand")):
+                    # A collapsed menu item that offers no Invoke but HAS a submenu (Paint's "Save as" -> PNG / JPEG / ...):
+                    # LegacyIAccessible's default action "succeeds" without opening it, so the format items never appear.
+                    # Expand it for real.
+                    try:
+                        _ec = target.GetExpandCollapsePattern()
+                        if _ec is not None and int(_ec.ExpandCollapseState) == 0:
+                            try:
+                                _inv = target.GetInvokePattern()
+                            except Exception:
+                                _inv = None
+                            if _inv is None:
+                                _ec.Expand()
+                                return True, "uia-expand"
+                    except Exception as _e0:
+                        _errs.append(f"expand-first:{type(_e0).__name__}")
+                    _order = [("GetInvokePattern", "invoke"),
+                              ("GetLegacyIAccessiblePattern", "do-default"),
+                              ("GetSelectionItemPattern", "select"),
+                              ("GetTogglePattern", "toggle"),
+                              ("GetExpandCollapsePattern", "expand")]
+                    if (elem.role or "").lower() in ("listitem", "tabitem", "radiobutton"):
+                        # Pressing a list/tab item MEANS selecting it. LegacyIAccessible's default action "succeeds"
+                        # on Office's backstage list (File > Save As) without switching the pane, so Select goes first.
+                        _order.insert(1, _order.pop(2))
+                    for pattern_name, attempts in _order:
                         try:
                             try:
                                 pat = getattr(target, pattern_name)()
@@ -1530,7 +1601,7 @@ def _act_on_element(elem: GroundedElement, verb: str, text: str = "") -> Tuple[b
     if verb == "invoke":
         verb = "click"  # invoke is the UIA-safe synonym handled by the click ladder
 
-    if verb == "type" and text:
+    if verb == "type" and text and (elem.role or "").lower() not in ("dataitem", "cell"):
         # Typing is the one verb where the UIA pattern is wrong by default: ValuePattern.SetValue
         # REPLACES the control's content, so the second 'type' goal of a multi-part entry silently
         # deletes the first (a real unattended Notepad run wrote line 2 over line 1 and line 3 over
@@ -1699,6 +1770,10 @@ class DesktopAutonomyLoop:
         # consecutive non-PASS attempts per goal; drives the keyboard-route recovery rung
         self._goal_fails: Dict[str, int] = {}
         self._shortcut_tried: set = set()
+        # per goal: controls that were pressed and CHANGED the screen without completing the goal (WRONG_STATE) - a menu
+        # or submenu that is now open. Pressing the same control again cannot advance the goal; its children can.
+        self._opened_not_done: Dict[str, set] = {}
+        self.escalation_shots: List[Dict[str, str]] = []
         self._dap = None
         # Windows kept parked off-screen for the current run (hwnd -> BackgroundSession), apps WE started, run nesting
         self._held: Dict[int, Any] = {}
@@ -1715,6 +1790,26 @@ class DesktopAutonomyLoop:
         return self._dap
 
     # ---- popup triage (organ_29 + generic Win32/UIA dialogs) ----
+    def _save_escalation_shot(self, owner_hwnd: int, why: str) -> str:
+        """Evidence for a human: a PNG of the dialog(s) that stopped the run (PrintWindow, so nothing is raised or shown).
+        Returns the path ('' when nothing could be captured). Kept on self.escalation_shots and in the run result."""
+        try:
+            from core_organs import popup_policy as _pp
+            targets = _pp.blocking_dialogs(owner_hwnd) or [owner_hwnd]
+            for h in targets[:2]:
+                img, note = hin.capture_window(h)
+                if img is None:
+                    continue
+                folder = os.path.join(r"D:\new_automation\data", "escalations")
+                os.makedirs(folder, exist_ok=True)
+                path = os.path.join(folder, f"esc_{int(time.time())}_{h}.png")
+                img.save(path, format="PNG")
+                self.escalation_shots.append({"path": path, "why": why[:120], "title": hin.safe_window_text(h)[:60]})
+                return path
+        except Exception as exc:
+            logger.debug("[escalate] screenshot failed: %s", exc)
+        return ""
+
     def _triage_popups(self, app_hint: str, mode: str = "inflight") -> List[str]:
         """Resolve blocking dialogs of the target app (popup_policy), then let organ_29 take any
         remaining system-level modal. Headless; destructive/elevation prompts escalate to a human."""
@@ -1733,6 +1828,7 @@ class DesktopAutonomyLoop:
                 handled.extend(res["handled"])
                 if res["need_human"]:
                     self.awaiting_human = True
+                    self._save_escalation_shot(hwnd, "; ".join(res.get("handled") or [])[:100])
                     self.capsule_cb("input_needed", "A dialog needs your decision")
             except Exception as exc:
                 logger.debug("[popups] policy pass note: %s", exc)
@@ -2082,6 +2178,10 @@ class DesktopAutonomyLoop:
 
         # ---- W8 PRO PATH: a confidently-learned shortcut beats the LLM ----
         pro = self._consult_intel(app_hint, goal)
+        if pro is not None and pro.get("kind") == "shortcut" and self.judge._wants_text(goal):
+            # typing goes into an editor: a "learned" shortcut for it (Ctrl+N after a weak 'the UI changed' pass) is not typing
+            logger.info("[intel] ignoring learned shortcut %s for a typing goal", pro.get("shortcut"))
+            pro = None
         # W5 learned re-run: with no organ_47 route, fall back to the distilled recipe hint
         # (soft ranking hint only - never takes direct control, only nudges the judge).
         if pro is None:
@@ -2119,8 +2219,25 @@ class DesktopAutonomyLoop:
                 self.capsule_cb("working", f"[{app_hint}] Verified: shortcut executed")
             return self._step_result(entry, elements=after_elements)
 
-        decision = self.judge.decide(goal, elements, app_hint=app_hint, history=self._history,
+        spent = set(self._opened_not_done.get(goal) or set())
+        if re.search(r"\b(?:save|export)\b", goal or "", re.I) and not re.search(r"\b(?:close|exit|quit|discard|don'?t)\b", goal or "", re.I):
+            # a goal that SAVES is never advanced by closing the document or app (an unsaved sheet was once closed
+            # with "Don't Save" four steps into a save-as); those controls are not offered to the judge for it
+            spent |= {"close", "exit", "quit", "don't save", "do not save", "discard", "discard changes"}
+        offered = [e for e in elements if (e.name or "").strip().lower() not in spent] or elements
+        if logger.isEnabledFor(logging.INFO):
+            try:
+                _top = [(round(sc, 1), e.name[:20], e.role) for sc, _i, e in self.judge.rank_scored(goal, offered, pro)[:5]]
+                logger.info("[judge] goal=%r offered=%d avoided=%s top=%s", goal[:50], len(offered), sorted(spent)[:4], _top)
+            except Exception:
+                pass
+        decision = self.judge.decide(goal, offered, app_hint=app_hint, history=self._history,
                                      pro_hint=pro)
+        if decision and not decision.get("invalid") and offered is not elements:
+            try:                                    # element_index must keep referring to the FULL grounded list
+                decision["element_index"] = elements.index(offered[int(decision["element_index"])])
+            except (ValueError, IndexError, KeyError, TypeError):
+                decision = {"invalid": True, "raw": decision, "why": "index mapping lost"}
         if not decision or decision.get("invalid"):
             self.invalid_streak += 1
             evidence = f"invalid judge choice x{self.invalid_streak}"
@@ -2163,6 +2280,9 @@ class DesktopAutonomyLoop:
             self.trace.append(entry)
             return self._step_result(entry)
 
+        if verb == "type" and path_m and re.search(r"file ?name", elem.name or "", re.I):
+            text = path_m.group(0)             # the goal's own path, verbatim (a model typed just the file's base name)
+        self._typed_into = elem if verb == "type" else None
         self.capsule_cb("working", f"[{app_hint}] {verb} '{elem.name[:30]}'")
         if self.cursor_cb:
             try:
@@ -2257,6 +2377,14 @@ class DesktopAutonomyLoop:
                         "element_name": elem.name, "element_role": elem.role}, verdict)
 
         self._goal_fails[goal] = 0 if verdict == "PASS" else self._goal_fails.get(goal, 0) + 1
+        if verdict == "WRONG_STATE" and verb in ("click", "invoke"):
+            self._opened_not_done.setdefault(goal, set()).add((elem.name or "").strip().lower())
+        elif verdict == "WRONG_STATE" and verb == "type" and "text has '" in (evidence or ""):
+            # The text IS in that control (the goal's other conditions - the file, the dialog - are what is missing):
+            # typing it there again appends a duplicate (a filename box once read 401 chars of the same path).
+            self._opened_not_done.setdefault(goal, set()).add((elem.name or "").strip().lower())
+        elif verdict == "PASS":
+            self._opened_not_done.pop(goal, None)
         self._history.append(f"{verb} '{elem.name}' -> {verdict}")
         entry = StepTrace(goal, elem.name, verb, verdict, method, evidence, ladder["tiers_ran"])
         self.trace.append(entry)
@@ -2267,6 +2395,12 @@ class DesktopAutonomyLoop:
         """Longest readable text among the editable controls (UIA value/text pattern)."""
         best = ""
         checked = 0
+        typed = getattr(self, "_typed_into", None)
+        if typed is not None and (typed.role or "").lower() in ("dataitem", "cell") and typed.tier == "uia":
+            out = _uia_dispatch(typed, "read", "")
+            got = out[1] if out and out[0] is True else ""
+            if isinstance(got, str) and got:
+                best = got
         for e in elements:
             if (e.role or "").lower() not in ("edit", "document", "text", "richedit", "combobox"):
                 continue
@@ -2275,7 +2409,7 @@ class DesktopAutonomyLoop:
             checked += 1
             out = _uia_dispatch(e, "read", "")
             got = out[1] if out and out[0] is True else ""
-            if isinstance(got, str) and len(got) > len(best):
+            if isinstance(got, str) and len(got) > len(best) and not (best and typed is not None and typed.role in ("dataitem", "cell")):
                 best = got
             if len(best) >= 4000:
                 break
@@ -2473,6 +2607,8 @@ class DesktopAutonomyLoop:
         self._history = []
         self._goal_fails = {}
         self._shortcut_tried = set()
+        self._opened_not_done = {}
+        self.escalation_shots = []
         self.invalid_streak = 0
         self.awaiting_human = False
         self._task_paths = tuple(m.group(0) for g_ in goals
@@ -2502,9 +2638,17 @@ class DesktopAutonomyLoop:
         for gi, goal in enumerate(goals):
             advanced = False
             self.grounding.reset_vision_budget()
-            for _ in range(max_steps_per_goal):
-                res = self.step(goal, app_hint, expect=expect_map.get(gi),
-                                allow_destructive=allow_destructive, max_tier=max_tier)
+            asserted = assertion_text(goal)
+            goal_expect = expect_map.get(gi) or (derive_expectation(goal) if asserted is None else None)
+            # Saving to a named file through a rich app (Office's backstage: File > Save As > type > name > Save) honestly
+            # needs more than the few steps a menu click does; the file's existence is what ends the goal, not the budget.
+            steps_here = max_steps_per_goal + (6 if "file_created" in (goal_expect or {}) else 0)
+            for _ in range(steps_here):
+                if asserted is not None:
+                    res = self._assert_step(goal, app_hint, asserted, max_tier)
+                else:
+                    res = self.step(goal, app_hint, expect=goal_expect,
+                                    allow_destructive=allow_destructive, max_tier=max_tier)
                 results.append(res)
                 if res["verdict"] == "PASS" or self.awaiting_human:
                     advanced = True
@@ -2516,7 +2660,7 @@ class DesktopAutonomyLoop:
                         "trace": [t.as_dict() for t in self.trace]}
         return {"completed": not self.awaiting_human, "steps": len(results),
                 "trace": [t.as_dict() for t in self.trace],
-                "awaiting_human": self.awaiting_human}
+                "awaiting_human": self.awaiting_human, "escalation_shots": list(self.escalation_shots)}
 
     # ---- checkpoint + resume ----
     def _checkpoint_path(self) -> str:
@@ -2599,6 +2743,29 @@ class DesktopAutonomyLoop:
             logger.debug("[learn] recall unavailable: %s", exc)
             return ""
 
+    def _assert_step(self, goal: str, app_hint: str, text: str, max_tier: int) -> Dict[str, Any]:
+        """A pure assertion goal: PASS only when some control's name (labels and read-outs included) or the editor's text
+        really holds ``text``; NO_CHANGE otherwise. Nothing is clicked."""
+        self._hold_hidden(app_hint)
+        self._triage_popups(app_hint)
+        hwnd, elements, ladder = self.grounding.ground(app_hint, max_tier=min(max_tier, 3))
+        if not elements:
+            entry = StepTrace(goal, "-", "expect", "WRONG_STATE", "assert",
+                              f"no elements to assert against; ladder={ladder}", ladder["tiers_ran"])
+            self.trace.append(entry)
+            return self._step_result(entry, elements=[])
+        want = {"name_visible": text, "text_contains": text}
+        snap = self._snap(hwnd, elements, want)
+        ok_name, ev_name = self.verifier.check_expect({"name_visible": text}, snap, snap, elements)
+        ok_text, ev_text = self.verifier.check_expect({"text_contains": text}, snap, snap, elements)
+        verdict = "PASS" if (ok_name or ok_text) else "NO_CHANGE"
+        evidence = ev_name if ok_name else (ev_text if ok_text else f"{ev_name}; {ev_text}")
+        entry = StepTrace(goal, "-", "expect", verdict, "assert", evidence, ladder["tiers_ran"])
+        self.trace.append(entry)
+        self._write_checkpoint(entry)
+        self.capsule_cb("working", f"[{app_hint}] expect '{text[:30]}' -> {verdict}")
+        return self._step_result(entry, elements=elements)
+
     def _step_result(self, entry: StepTrace, elements: List[GroundedElement] = None) -> Dict[str, Any]:
         return {"verdict": entry.verdict, "element": entry.element, "verb": entry.verb,
                 "method": entry.method, "evidence": entry.evidence,
@@ -2608,6 +2775,95 @@ class DesktopAutonomyLoop:
 
 _WEBAPP_WATCHER = None
 _LOOP_SINGLETON: Optional[DesktopAutonomyLoop] = None
+
+
+# leading bytes of common binary formats: a file named x.<ext> must really start with one of these
+FILE_MAGIC: Dict[str, Tuple[bytes, ...]] = {
+    "png": (b"\x89PNG\r\n\x1a\n",), "jpg": (b"\xff\xd8\xff",), "jpeg": (b"\xff\xd8\xff",), "bmp": (b"BM",),
+    "gif": (b"GIF87a", b"GIF89a"), "pdf": (b"%PDF",), "zip": (b"PK\x03\x04",), "docx": (b"PK\x03\x04",),
+    "xlsx": (b"PK\x03\x04",), "pptx": (b"PK\x03\x04",), "tif": (b"II*\x00", b"MM\x00*"), "tiff": (b"II*\x00", b"MM\x00*"),
+}
+
+
+def file_has_format(path: str, ext: str) -> Tuple[bool, str]:
+    """(ok, note): does the file at ``path`` start with the signature of format ``ext``? Unknown formats pass (nothing to check)."""
+    sigs = FILE_MAGIC.get((ext or "").lower())
+    if not sigs:
+        return True, f"no signature known for .{ext}"
+    try:
+        with open(path, "rb") as fh:
+            head = fh.read(16)
+    except OSError as exc:
+        return False, f"unreadable ({type(exc).__name__})"
+    ok = any(head.startswith(sg) for sg in sigs)
+    return ok, (f"is a real .{ext}" if ok else f"NOT a .{ext} (starts {head[:6]!r})")
+
+
+_GOAL_PATH_RE = re.compile(r"[A-Za-z]:[\\/](?:[^\\/:*?\"<>|\r\n;]+[\\/])*[^\\/:*?\"<>|\r\n;]*?\.[A-Za-z0-9]{1,6}(?![A-Za-z0-9])")
+_ASSERT_GOAL_RE = re.compile(r"^\s*(?:expect|verify|check|assert|ensure|confirm)\b[:\s,]*(?:that\s+)?(.+?)\s*$", re.I)
+
+
+_TYPE_LITERAL_RE = re.compile(r"""^\s*(?:type|enter|input|write)\s+(?:in\s+)?(?:the\s+)?(?:text\s+|number\s+|value\s+)?(.+?)\s*$""", re.I)
+_NOT_LITERAL = frozenset({"a", "an", "some", "something", "about", "poem", "haiku", "sentence", "paragraph", "story", "message",
+                          "letter", "note", "essay", "email", "text", "anything", "whatever", "random", "short", "long", "just",
+                          "into", "in", "on", "to", "of", "for"})
+
+
+def literal_typed_text(goal: str) -> Optional[str]:
+    """The exact text a 'type X' goal asks for, when X is a LITERAL (quoted, or a few plain words / a number such as 'type
+    42' or 'type hello world'); None for 'type a haiku' style goals whose text must be composed."""
+    m = _TYPE_LITERAL_RE.match(goal or "")
+    if not m:
+        return None
+    body = m.group(1).strip()
+    q = re.fullmatch(r"[\"'\u201c](.+)[\"'\u201d]", body)
+    if q:
+        return q.group(1)
+    words = re.findall(r"\S+", body)
+    if not words or len(words) > 5 or re.search(r"[A-Za-z]:[\\/]", body):
+        return None
+    if re.match(r"(?:and|then)\b", body, re.I) or re.search(r"\b(?:and|then)\s+(?:save|open|click|press|close|type|print|export)\b",
+                                                          body, re.I):
+        return None                      # a compound instruction ('write text and save as file'), not a literal
+    if any(w.lower().strip(".,;:!?") in _NOT_LITERAL for w in words):
+        return None
+    return body.rstrip(".")
+
+
+def derive_expectation(goal: str) -> Dict[str, Any]:
+    """A machine-checkable postcondition read from the goal's OWN WORDS, for a caller that gave none.
+
+    A goal 'save the file as <absolute path>' is only done when that file exists; clicking the File menu changes the UI
+    and used to be accepted as 'saved' by the default (weak) postcondition - a task bench measured two tasks claiming
+    DONE with no file on disk. Only a goal that names an absolute path WITH a file extension and a saving verb gets one;
+    everything else keeps the default (and is reported weak by its callers)."""
+    g = goal or ""
+    lit = literal_typed_text(g)
+    if lit:
+        return {"text_contains": lit}          # a typed literal must really be in the control, whatever action typed it
+    m = _GOAL_PATH_RE.search(g)
+    if not m or not re.search(r"\b(?:save|saved|export|download|write)\b", g, re.I):
+        return {}
+    path = m.group(0).rstrip(".,;:!)\"'")
+    if not re.search(r"\.[A-Za-z0-9]{1,6}$", path):
+        return {}
+    exp: Dict[str, Any] = {"file_created": path}
+    ext = path.rsplit(".", 1)[-1].lower()
+    if ext in FILE_MAGIC:
+        exp["file_format"] = ext          # existence is not enough: "Save as project" wrote a non-PNG named .png
+    return exp
+
+
+def assertion_text(goal: str) -> Optional[str]:
+    """The text a pure ASSERTION goal ("expect Display is 100") says must be on screen, else None. An assertion needs no
+    action: the judge used to pick some control to click for it and the click could never satisfy it."""
+    m = _ASSERT_GOAL_RE.match(goal or "")
+    if not m:
+        return None
+    t = re.sub(r"\s+(?:(?:is|are|to be)\s+)?(?:shown|visible|displayed|present|showing|on the screen|on screen)\s*$", "",
+               m.group(1).strip(), flags=re.I)
+    t = t.strip().strip("'\"").strip()
+    return t or None
 
 
 def split_goals(goals: str) -> List[str]:

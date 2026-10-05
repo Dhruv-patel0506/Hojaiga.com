@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hojaiga - System Visualizer</title>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1e1e1e;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #ffffff;
+            overflow: hidden;
+        }
+        #network {
+            width: 100%;
+            height: 100%;
+        }
+        .header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            pointer-events: none;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #ff6d00;
+        }
+        .header p {
+            margin: 5px 0 0 0;
+            color: #aaaaaa;
+            font-size: 14px;
+        }
+        /* UI Input Bar */
+        .task-input-container {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            background: rgba(43, 43, 43, 0.85);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex;
+            gap: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid #444;
+            width: 600px;
+        }
+        .task-input-container input {
+            flex-grow: 1;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #555;
+            background: #222;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+        }
+        .task-input-container input:focus {
+            border-color: #ff6d00;
+        }
+        .task-input-container button {
+            background: #ff6d00;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .task-input-container button:hover {
+            background: #e65100;
+        }
+
+        /* Config Modal */
+        #config-modal {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 300;
+            background: rgba(30, 30, 30, 0.95);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid #444;
+            backdrop-filter: blur(15px);
+            width: 400px;
+        }
+        #config-modal h2 {
+            margin-top: 0;
+            color: #ff6d00;
+            font-size: 20px;
+        }
+        .modal-field {
+            margin-bottom: 15px;
+        }
+        .modal-field label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+            font-size: 14px;
+        }
+        .modal-field select {
+            width: 100%;
+            padding: 10px;
+            background: #222;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 6px;
+            outline: none;
+        }
+        #config-modal button {
+            width: 100%;
+            background: #0288D1;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        #config-modal button:hover {
+            background: #0277BD;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Hojaiga AI Architecture</h1>
+        <p>Live 36-Organ System State</p>
+    </div>
+    
+    <div class="task-input-container">
+        <input type="text" id="task-input" placeholder="Enter objective (e.g. Scan OBS studio and record...)">
+        <button id="send-task-btn">Execute</button>
+    </div>
+
+    <div id="config-modal">
+        <h2>Configure Execution</h2>
+        <div class="modal-field">
+            <label>Execution Paradigm</label>
+            <select id="sel-paradigm">
+                <option value="1">[WEB] Parallel Web Automation</option>
+                <option value="2">Agent Chatroom</option>
+                <option value="3">Stochastic Consensus</option>
+                <option value="4">Verification Loop</option>
+                <option value="5">Video-to-Action</option>
+                <option value="6">Auto Mode</option>
+            </select>
+        </div>
+        <div class="modal-field">
+            <label>Chrome Profile</label>
+            <select id="sel-profile">
+                <option value="Default">1. Default - dhruv15.dapatel@gmail.com</option>
+                <option value="Guest">2. Guest Profile - No Email</option>
+                <option value="Profile 1">3. Profile 1 - mdj761@mocs.utc.edu</option>
+                <option value="Profile 10">4. Profile 10 - dharmeshasha.patel@gmail.com</option>
+            </select>
+        </div>
+        <div class="modal-field">
+            <label>Tab Strategy</label>
+            <select id="sel-tab">
+                <option value="separate">1. Separate tabs (One window)</option>
+                <option value="shared">2. Shared tab (Reuse active tab)</option>
+                <option value="isolated">3. Separate Chrome Windows (Isolates agents)</option>
+                <option value="distributed">4. Distributed Tabs</option>
+            </select>
+        </div>
+        <button id="submit-config-btn">Confirm & Launch Agents</button>
+    </div>
+
+    <div id="network"></div>
+
+    <script type="text/javascript">
+        // Create an array with nodes
+        const nodesArray = [
+            // USER
+            { id: "USER_INPUT", label: "User Input\nVoice/Text", group: "user", x: -400, y: -200 },
+            { id: "OUTPUT", label: "Output & Docs\nReports", group: "user", x: 600, y: -200 },
+            
+            // BRAIN & COMPILER
+            { id: "BRAIN", label: "01: Brain\n(Intent Parser)", group: "brain", x: -100, y: -150 },
+            { id: "COMPILER", label: "36: Workflow Compiler", group: "brain", x: -100, y: -50 },
+            { id: "LLM", label: "14: LLM Runtime", group: "brain", x: 150, y: -100 },
+            
+            // CNS / BUS
+            { id: "CNS", label: "02: CNS\nEvent Bus", group: "cns", x: 100, y: 150 },
+            { id: "EVENT_CATALOG", label: "26: Event Catalog", group: "cns", x: 300, y: 150 },
+            
+            // INTERFACE
+            { id: "INTERFACE", label: "11/13: Interface Layer", group: "interface", x: -250, y: -250 },
+            
+            // REGISTRY & MEMORY
+            { id: "REGISTRY", label: "18: Registry", group: "memory", x: 0, y: 350 },
+            { id: "MEMORY", label: "03: Memory", group: "memory", x: 200, y: 350 },
+            { id: "KNOWLEDGE", label: "04: Knowledge", group: "memory", x: 400, y: 350 },
+            { id: "STATE", label: "32: State Catalog", group: "memory", x: 600, y: 350 },
+            
+            // CONTROLLERS
+            { id: "CONTROLLERS", label: "05: Domain Controllers", group: "controllers", x: -150, y: 550 },
+            { id: "AUTOMATION", label: "06: Environment Controller", group: "controllers", x: 100, y: 550 },
+            { id: "EXECUTION", label: "22: Execution Controller", group: "controllers", x: 350, y: 550 },
+            
+            // EXECUTION / CONNECTORS / AGENTS
+            { id: "CONNECTORS", label: "15: Connectors", group: "agents", x: 100, y: 750 },
+            { id: "AGENTS", label: "10: Agents", group: "agents", x: -100, y: 750 },
+            { id: "CHROME", label: "19: Chrome CDP", group: "agents", x: 300, y: 750 },
+            { id: "DAP", label: "24: DAP Desktop", group: "agents", x: 500, y: 750 },
+            
+            // SYSTEM
+            { id: "SECURITY", label: "07: Security", group: "system", x: -300, y: 100 },
+            { id: "AUDIT", label: "16: Audit", group: "system", x: -300, y: 200 },
+            { id: "BACKUP", label: "17: Backup", group: "system", x: -300, y: 300 },
+            { id: "LEARNING", label: "08: Learning (Brain Growth)", group: "system", x: 600, y: 750 },
+            { id: "INFRA", label: "09: Infrastructure", group: "system", x: -300, y: 400 },
+            { id: "INTEGRATION", label: "12: Integration", group: "system", x: -300, y: 500 },
+            { id: "CONFIG", label: "20: Config", group: "system", x: -300, y: 600 },
+            { id: "SCHEMA", label: "21: Config Schema", group: "system", x: -300, y: 700 },
+            { id: "ERROR", label: "25: Error Catalog", group: "system", x: 700, y: 100 },
+            { id: "POPUP", label: "29: Popup Handler", group: "system", x: 700, y: 200 },
+            { id: "MANIFEST", label: "33: Manifest", group: "system", x: 700, y: 300 },
+            { id: "UPDATE", label: "35: Update Manager", group: "system", x: 700, y: 400 },
+            { id: "RESOURCE", label: "30: Resource", group: "system", x: 700, y: 500 },
+            { id: "SERVICE", label: "31: Service Registry", group: "system", x: 700, y: 600 },
+            { id: "KERNEL", label: "00: Kernel", group: "system", x: -400, y: 0 }
+        ];
+
+        // Create an array with edges
+        const edgesArray = [
+            { from: "USER_INPUT", to: "INTERFACE", arrows: "to" },
+            { from: "INTERFACE", to: "BRAIN", arrows: "to" },
+            { from: "BRAIN", to: "COMPILER", arrows: "to, from" },
+            { from: "BRAIN", to: "LLM", arrows: "to, from" },
+            { from: "BRAIN", to: "CNS", arrows: "to, from" },
+            { from: "COMPILER", to: "CNS", arrows: "to, from" },
+            
+            { from: "CNS", to: "EVENT_CATALOG", arrows: "to, from" },
+            { from: "CNS", to: "CONTROLLERS", arrows: "to" },
+            { from: "CNS", to: "AUTOMATION", arrows: "to" },
+            { from: "CNS", to: "EXECUTION", arrows: "to" },
+            { from: "CNS", to: "REGISTRY", arrows: "to, from" },
+            { from: "CNS", to: "MEMORY", arrows: "to, from" },
+            
+            { from: "CONTROLLERS", to: "AUTOMATION", arrows: "to" },
+            { from: "AUTOMATION", to: "EXECUTION", arrows: "to" },
+            
+            { from: "EXECUTION", to: "CONNECTORS", arrows: "to" },
+            { from: "EXECUTION", to: "AGENTS", arrows: "to" },
+            { from: "EXECUTION", to: "CHROME", arrows: "to" },
+            { from: "EXECUTION", to: "DAP", arrows: "to" },
+            
+            { from: "CONNECTORS", to: "OUTPUT", arrows: "to" },
+            { from: "AGENTS", to: "OUTPUT", arrows: "to" },
+            
+            { from: "EXECUTION", to: "LEARNING", arrows: "to" }
+        ];
+
+        const nodes = new vis.DataSet(nodesArray);
+        const edges = new vis.DataSet(edgesArray);
+
+        const container = document.getElementById('network');
+        const data = { nodes: nodes, edges: edges };
+        
+        const options = {
+            nodes: {
+                shape: 'box',
+                margin: 10,
+                borderWidth: 2,
+                font: { color: '#ffffff', face: 'arial', size: 14, multi: 'html' },
+                shadow: true,
+                color: {
+                    border: '#333',
+                    background: '#2b2b2b',
+                    highlight: { border: '#ff6d00', background: '#3b3b3b' }
+                }
+            },
+            edges: {
+                width: 2,
+                color: { color: '#555', highlight: '#ff6d00' },
+                smooth: { type: 'cubicBezier' }
+            },
+            groups: {
+                user: { color: { background: '#1976D2', border: '#1565C0' } },
+                brain: { color: { background: '#9C27B0', border: '#7B1FA2' } },
+                cns: { color: { background: '#D84315', border: '#BF360C' } },
+                interface: { color: { background: '#00796B', border: '#004D40' } },
+                memory: { color: { background: '#F57C00', border: '#E65100' } },
+                controllers: { color: { background: '#388E3C', border: '#2E7D32' } },
+                agents: { color: { background: '#0288D1', border: '#0277BD' } },
+                system: { color: { background: '#455A64', border: '#37474F' }, font: {size: 11} }
+            },
+            physics: {
+                enabled: false // Static layout based on x, y coords above
+            },
+            interaction: {
+                hover: true,
+                zoomView: true,
+                dragView: true
+            }
+        };
+
+        const network = new vis.Network(container, data, options);
+
+        // Websocket connection to Python backend
+        const ws = new WebSocket("ws://127.0.0.1:9998");
+        ws.onmessage = function(event) {
+            try {
+                const msg = JSON.parse(event.data);
+                
+                // If the backend requests user config
+                if (msg.type === "REQUEST_CONFIG") {
+                    document.getElementById("config-modal").style.display = "block";
+                    return;
+                }
+
+                // Normal Visualization Highlights
+                const startNode = msg.start;
+                const endNode = msg.end;
+                
+                // Highlight nodes temporarily
+                if (startNode && nodes.get(startNode)) {
+                    nodes.update({ id: startNode, shadow: { color: '#ff6d00', size: 20 } });
+                    setTimeout(() => { nodes.update({ id: startNode, shadow: true }); }, 1500);
+                }
+                if (endNode && nodes.get(endNode)) {
+                    nodes.update({ id: endNode, shadow: { color: '#ff6d00', size: 20 } });
+                    setTimeout(() => { nodes.update({ id: endNode, shadow: true }); }, 1500);
+                }
+
+                // If edge exists, highlight edge temporarily
+                if (startNode && endNode) {
+                    const existingEdges = edges.get({
+                        filter: function (item) {
+                            return (item.from === startNode && item.to === endNode) || 
+                                   (item.from === endNode && item.to === startNode);
+                        }
+                    });
+                    
+                    if (existingEdges.length > 0) {
+                        const edgeId = existingEdges[0].id;
+                        edges.update({ id: edgeId, color: { color: '#ff6d00' }, width: 4 });
+                        setTimeout(() => { edges.update({ id: edgeId, color: { color: '#555' }, width: 2 }); }, 1500);
+                    } else {
+                        // Create temporary edge
+                        const tempEdgeId = 'temp_' + Date.now();
+                        edges.add({ id: tempEdgeId, from: startNode, to: endNode, color: { color: '#ff6d00' }, width: 3, dashes: true, arrows: "to" });
+                        setTimeout(() => { edges.remove(tempEdgeId); }, 1500);
+                    }
+                }
+            } catch (e) {
+                console.error("Error parsing WS message", e);
+            }
+        };
+
+        // Task submission
+        document.getElementById("send-task-btn").onclick = () => {
+            const val = document.getElementById("task-input").value;
+            if (val && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: "TASK_INPUT", text: val }));
+                document.getElementById("task-input").value = "";
+            }
+        };
+
+        // Configuration submission
+        document.getElementById("submit-config-btn").onclick = () => {
+            const paradigm = document.getElementById("sel-paradigm").value;
+            const profile = document.getElementById("sel-profile").value;
+            const tab = document.getElementById("sel-tab").value;
+            
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: "CONFIG_RESPONSE",
+                    paradigm: paradigm,
+                    profile: profile,
+                    tab_strategy: tab
+                }));
+            }
+            document.getElementById("config-modal").style.display = "none";
+        };
+    </script>
+</body>
+</html>

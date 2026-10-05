@@ -1,0 +1,348 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "host": "dhruv-patel-laptop",
+    "created": "2026-09-02",
+    "description": "Verb-to-App alias mapping based on installed applications"
+  },
+  "verbs": {
+    "record": {
+      "description": "Screen recording, video capture",
+      "apps": [
+        {
+          "name": "OBS Studio",
+          "executable": "D:\\obs-studio\\bin\\64bit\\obs64.exe",
+          "command": ["obs64"],
+          "type": "desktop",
+          "trust_score": 95,
+          "features": ["screen_record", "window_capture", "webcam", "streaming", "free"],
+          "aliases": ["obs", "screen record", "capture", "video record", "stream"],
+          "priority": 1
+        },
+        {
+          "name": "CapCut",
+          "executable": "C:\\Users\\dhruv\\AppData\\Local\\CapCut\\CapCut.exe",
+          "command": ["capcut"],
+          "type": "desktop",
+          "trust_score": 85,
+          "features": ["video_edit", "effects", "free", "social_media"],
+          "aliases": ["video editor", "edit video", "cap cut"],
+          "priority": 2
+        },
+        {
+          "name": "Medal",
+          "executable": "C:\\Users\\dhruv\\AppData\\Local\\Medal\\Medal.exe",
+          "command": ["medal"],
+          "type": "desktop",
+          "trust_score": 80,
+          "features": ["game_clip", "clip_record", "social"],
+          "aliases": ["game clip", "clip record", "medal tv"],
+          "priority": 3
+        }
+      ]
+    },
+    "type": {
+      "description": "Text input, document creation",
+      "apps": [
+        {
+          "name": "Microsoft Word",
+          "executable": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
+          "command": ["winword"],
+          "type": "desktop",
+          "trust_score": 95,
+          "features": ["document", "word_process", "formatting", "templates"],
+          "aliases": ["word", "document", "write", "word processor", "ms word", "microsoft word"],
+          "priority": 1
+        },
+        {
+          "name": "Notepad",
+          "executable": "C:\\Windows\\System32\\notepad.exe",
+          "command": ["notepad.exe"],
+          "type": "desktop",
+          "trust_score": 100,
+          "features": ["plain_text", "simple", "fast", "lightweight"],
+          "aliases": ["notepad", "text editor", "plain text", "simple text"],
+          "priority": 2
+        },
+        {
+          "name": "Visual Studio Code",
+          "executable": "C:\\Users\\dhruv\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe",
+          "command": ["code"],
+          "type": "desktop",
+          "trust_score": 95,
+          "features": ["code_editor", "ide", "extensions", "terminal"],
+          "aliases": ["vscode", "vs code", "code editor", "visual studio code", "edit code"],
+          "priority": 3
+        }
+      ]
+    },
+    "search": {
+      "description": "Web search, information lookup",
+      "apps": [
+        {
+          "name": "Google Chrome",
+          "executable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+          "command": ["chrome"],
+          "type": "browser",
+          "trust_score": 90,
+          "features": ["web_search", "browsing", "extensions", "sync"],
+          "aliases": ["chrome", "browser", "google", "web", "internet", "browse"],
+          "priority": 1
+        },
+        {
+          "name": "Microsoft Edge",
+          "executable": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+          "command": ["msedge"],
+          "type": "browser",
+          "trust_score": 85,
+          "features": ["web_search", "browsing", "edge_ai", "collections"],
+          "aliases": ["edge", "microsoft edge", "browser edge"],
+          "priority": 2
+        }
+      ]
+    },
+    "open": {
+      "description": "Launch applications",
+      "apps": [
+        {
+          "name": "File Explorer",
+          "executable": "explorer.exe",
+          "command": ["explorer"],
+          "type": "system",
+          "trust_score": 100,
+          "features": ["file_management", "navigation", "folders"],
+          "aliases": ["explorer", "file manager", "folder", "files", "browse files"],
+          "priority": 1
+        }
+      ]
+    },
+    "calculate": {
+      "description": "Mathematical calculations",
+      "apps": [
+        {
+          "name": "Calculator",
+          "executable": "C:\\Windows\\System32\\calc.exe",
+          "command": ["calc"],
+          "type": "system",
+          "trust_score": 100,
+          "features": ["basic_math", "scientific", "converter"],
+          "aliases": ["calculator", "calc", "math", "compute"],
+          "priority": 1
+        }
+      ]
+    },
+    "paint": {
+      "description": "Image editing, drawing",
+      "apps": [
+        {
+          "name": "Paint",
+          "executable": "C:\\Windows\\System32\\mspaint.exe",
+          "command": ["mspaint"],
+          "type": "system",
+          "trust_score": 100,
+          "features": ["drawing", "basic_edit", "simple"],
+          "aliases": ["paint", "draw", "drawing", "image editor"],
+          "priority": 1
+        }
+      ]
+    },
+    "compress": {
+      "description": "File compression, archiving",
+      "apps": [
+        {
+          "name": "7-Zip",
+          "executable": "C:\\Program Files\\7-Zip\\7z.exe",
+          "command": ["7z"],
+          "type": "desktop",
+          "trust_score": 95,
+          "features": ["zip", "unzip", "archive", "compress", "extract"],
+          "aliases": ["7zip", "7-zip", "zip", "unzip", "archive", "compress", "extract"],
+          "priority": 1
+        }
+      ]
+    },
+    "screenshot": {
+      "description": "Screen capture, screenshots",
+      "apps": [
+        {
+          "name": "Snipping Tool",
+          "executable": "C:\\Windows\\System32\\SnippingTool.exe",
+          "command": ["snippingtool"],
+          "type": "system",
+          "trust_score": 100,
+          "features": ["screenshot", "snip", "capture", "annotate"],
+          "aliases": ["snip", "screenshot", "capture screen", "screen capture", "snipping tool"],
+          "priority": 1
+        }
+      ]
+    },
+    "email": {
+      "description": "Email management",
+      "apps": [
+        {
+          "name": "Outlook",
+          "executable": "C:\\Program Files\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE",
+          "command": ["outlook"],
+          "type": "desktop",
+          "trust_score": 90,
+          "features": ["email", "calendar", "contacts", "tasks"],
+          "aliases": ["outlook", "mail", "email", "inbox"],
+          "priority": 1
+        }
+      ]
+    },
+    "chat": {
+      "description": "Messaging, communication",
+      "apps": [
+        {
+          "name": "Discord",
+          "executable": "C:\\Users\\dhruv\\AppData\\Local\\Discord\\Update.exe",
+          "command": ["discord"],
+          "type": "desktop",
+          "trust_score": 85,
+          "features": ["voice_chat", "text_chat", "video", "servers"],
+          "aliases": ["discord", "chat", "voice", "talk"],
+          "priority": 1
+        },
+        {
+          "name": "Skype",
+          "executable": "C:\\Program Files\\Microsoft Office\\root\\Office16\\LYNCH.EXE",
+          "command": ["lync"],
+          "type": "desktop",
+          "trust_score": 80,
+          "features": ["video_call", "chat", "screen_share"],
+          "aliases": ["skype", "lync", "video call"],
+          "priority": 2
+        }
+      ]
+    },
+    "play": {
+      "description": "Gaming, media playback",
+      "apps": [
+        {
+          "name": "Steam",
+          "executable": "D:\\steam\\steam.exe",
+          "command": ["steam"],
+          "type": "desktop",
+          "trust_score": 90,
+          "features": ["games", "library", "store", "community"],
+          "aliases": ["steam", "games", "gaming", "play game"],
+          "priority": 1
+        },
+        {
+          "name": "Windows Media Player",
+          "executable": "C:\\Program Files\\Windows Media Player\\wmplayer.exe",
+          "command": ["wmplayer"],
+          "type": "system",
+          "trust_score": 100,
+          "features": ["music", "video", "playback"],
+          "aliases": ["media player", "music", "video player", "play video"],
+          "priority": 2
+        }
+      ]
+    },
+    "code": {
+      "description": "Programming, development",
+      "apps": [
+        {
+          "name": "Visual Studio 2022",
+          "executable": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\devenv.exe",
+          "command": ["devenv"],
+          "type": "ide",
+          "trust_score": 95,
+          "features": ["ide", "debug", "compile", "full_ide"],
+          "aliases": ["visual studio", "vs", "ide", "develop"],
+          "priority": 1
+        },
+        {
+          "name": "Visual Studio Code",
+          "executable": "C:\\Users\\dhruv\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe",
+          "command": ["code"],
+          "type": "editor",
+          "trust_score": 95,
+          "features": ["code_editor", "extensions", "terminal", "lightweight"],
+          "aliases": ["vscode", "vs code", "code editor", "edit code"],
+          "priority": 2
+        },
+        {
+          "name": "Git Bash",
+          "executable": "C:\\Program Files\\Git\\git-bash.exe",
+          "command": ["git-bash"],
+          "type": "terminal",
+          "trust_score": 100,
+          "features": ["terminal", "git", "bash", "command_line"],
+          "aliases": ["git", "bash", "terminal", "command line"],
+          "priority": 3
+        }
+      ]
+    },
+    "network": {
+      "description": "Network analysis, monitoring",
+      "apps": [
+        {
+          "name": "Wireshark",
+          "executable": "C:\\Program Files\\Wireshark\\Wireshark.exe",
+          "command": ["wireshark"],
+          "type": "desktop",
+          "trust_score": 95,
+          "features": ["packet_capture", "network_analysis", "protocol"],
+          "aliases": ["wireshark", "packet capture", "network monitor"],
+          "priority": 1
+        }
+      ]
+    },
+    "database": {
+      "description": "Database management",
+      "apps": [
+        {
+          "name": "SQL Server Management Studio",
+          "executable": "C:\\Program Files (x86)\\Microsoft SQL Server Management Studio 20\\Common7\\IDE\\Ssms.exe",
+          "command": ["ssms"],
+          "type": "desktop",
+          "trust_score": 90,
+          "features": ["sql", "database", "query", "manage"],
+          "aliases": ["ssms", "sql server", "database", "sql management"],
+          "priority": 1
+        }
+      ]
+    },
+    "remote": {
+      "description": "Remote desktop, access",
+      "apps": [
+        {
+          "name": "Remote Desktop Connection",
+          "executable": "C:\\Windows\\System32\\mstsc.exe",
+          "command": ["mstsc"],
+          "type": "system",
+          "trust_score": 100,
+          "features": ["remote_desktop", "rdp", "remote_access"],
+          "aliases": ["rdp", "remote desktop", "remote access", "connect remote"],
+          "priority": 1
+        }
+      ]
+    },
+    "ai": {
+      "description": "AI assistants, language models",
+      "apps": [
+        {
+          "name": "Ollama",
+          "executable": "C:\\Users\\dhruv\\AppData\\Local\\Programs\\Ollama\\ollama.exe",
+          "command": ["ollama"],
+          "type": "desktop",
+          "trust_score": 90,
+          "features": ["llm", "local_ai", "language_model"],
+          "aliases": ["ollama", "llm", "ai model", "language model", "local ai"],
+          "priority": 1
+        }
+      ]
+    }
+  },
+  "app_categories": {
+    "browsers": ["chrome", "edge"],
+    "office": ["word", "excel", "powerpoint", "outlook"],
+    "development": ["vscode", "visual studio", "git"],
+    "media": ["obs", "capcut", "media player"],
+    "gaming": ["steam", "epic games", "discord"],
+    "system": ["explorer", "notepad", "calculator", "paint"]
+  }
+}

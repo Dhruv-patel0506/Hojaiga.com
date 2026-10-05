@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ho Jayega - Infinite Lightboard Void</title>
+    
+    <!-- Professional, neat handwritten fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Caveat+Brush&display=swap" rel="stylesheet">
+    
+    <!-- KaTeX for math formulas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    
+    <!-- Rough.js for the human touch on drawings -->
+    <script src="https://unpkg.com/roughjs@4.5.2/bundled/rough.js"></script>
+
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        :root {
+            /* Pure black void */
+            --bg-color: #020202; 
+            
+            /* Neon Marker Palette exactly matching the images */
+            --neon-cyan: #00ffff;
+            --neon-blue: #3b82f6;
+            --neon-green: #39ff14;
+            --neon-yellow: #fffb00;
+            --neon-orange: #ff9900;
+            --neon-magenta: #ff00ff;
+            --neon-white: #ffffff;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-color);
+            overflow: hidden; /* We handle panning internally */
+            font-family: 'Patrick Hand', cursive;
+            color: var(--neon-white);
+            cursor: grab;
+        }
+
+        body:active {
+            cursor: grabbing;
+        }
+
+        /* The Infinite Canvas Container */
+        #viewport {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        #infinite-void {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: 0 0;
+            /* Creates a massive drawable area, panned via JS */
+            width: 100000px;
+            height: 100000px;
+            /* Very subtle, dark grid for reference */
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Generic Element Styles */
+        .board-element {
+            position: absolute;
+            opacity: 0; /* Starts hidden for organic drawing animation */
+        }
+
+        /* Text Settings */
+        .text-element {
+            font-size: 18px; /* Smaller, lightboard-style */
+            letter-spacing: 1.5px;
+            line-height: 1.2;
+            white-space: pre-wrap;
+            /* The classic Lightboard Glow */
+            text-shadow: 0 0 4px currentColor, 0 0 10px currentColor;
+        }
+
+        /* Math Settings */
+        .math-element {
+            font-size: 20px; /* Smaller, lightboard-style */
+            text-shadow: 0 0 4px currentColor, 0 0 12px currentColor;
+        }
+
+        /* Drawing/SVG Settings */
+        .drawing-element {
+            overflow: visible;
+        }
+
+        .drawing-element path {
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            /* Drop shadow creates the glowing glass effect */
+            filter: drop-shadow(0 0 4px currentColor) drop-shadow(0 0 8px currentColor);
+        }
+
+        @keyframes drawStroke {
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* UI overlay (Not part of the drawing) */
+        #ui-layer {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid #333;
+            padding: 15px;
+            border-radius: 10px;
+            color: #888;
+            font-family: sans-serif;
+            font-size: 14px;
+        }
+
+        button {
+            background: var(--neon-cyan);
+            color: #000;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- React Root for UI -->
+    <div id="react-root"></div>
+
+    <!-- The Window into the Void -->
+    <div id="viewport">
+        <!-- The actual drawing surface -->
+        <div id="infinite-void"></div>
+    </div>
+
+    <script>
+        const voidSurface = document.getElementById('infinite-void');
+        const statusText = document.getElementById('conn-status');
+
+        // Make these global so React can access them
+        window.voidSurface = voidSurface;
+        window.camera = { x: -50000, y: -50000, zoom: 1 };
+        window.isDragging = false;
+        window.startDrag = { x: 0, y: 0 };
+        window.lastDrawPosition = { x: 100, y: 100 };
+
+        function updateCamera() {
+            voidSurface.style.transform = `translate(${window.camera.x}px, ${window.camera.y}px) scale(${window.camera.zoom})`;
+        }
+
+        window.updateCamera = updateCamera;
+
+        document.getElementById('viewport').addEventListener('mousedown', (e) => {
+            window.isDragging = true;
+            window.startDrag = { x: e.clientX - window.camera.x, y: e.clientY - window.camera.y };
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!window.isDragging) return;
+            window.camera.x = e.clientX - window.startDrag.x;
+            window.camera.y = e.clientY - window.startDrag.y;
+            updateCamera();
+        });
+
+        window.addEventListener('mouseup', () => { window.isDragging = false; });
+
+        // Center camera initially
+        window.camera.x = (window.innerWidth / 2) - 1000;
+        window.camera.y = (window.innerHeight / 2) - 500;
+        updateCamera();
+
+
+        // --- 2. THE DYNAMIC RENDERING ENGINE ---
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        window.sleep = sleep;
+
+        // Settings for a very neat, human-like marker (Matches Image 3 and 8)
+        const ROUGH_OPTIONS = {
+            strokeWidth: 4,      // Thick marker
+            roughness: 0.15,     // Very neat, almost no jitter
+            bowing: 0.2,         // Very straight lines
+            seed: 42,
+            curveFitting: 0.95
+        };
+
+        async function renderElement(item) {
+            // Use automatic positioning to avoid overlap
+            const baseX = 1000 + (item.x !== undefined ? item.x : window.lastDrawPosition.x);
+            const baseY = 500 + (item.y !== undefined ? item.y : window.lastDrawPosition.y);
+
+            if (item.type === 'text' || item.type === 'math') {
+                await drawTextOrMath(item, baseX, baseY);
+                // Update position for next element (vertical spacing)
+                window.lastDrawPosition.y += 60;
+                window.lastDrawPosition.x = item.x !== undefined ? item.x : window.lastDrawPosition.x;
+            } else if (item.type === 'shape' || item.type === 'path') {
+                await drawVector(item, baseX, baseY);
+                // Update position for next element (more spacing for drawings)
+                window.lastDrawPosition.y += 150;
+                window.lastDrawPosition.x = item.x !== undefined ? item.x : window.lastDrawPosition.x;
+            } else if (item.type === 'image') {
+                await drawImage(item, baseX, baseY);
+                // Update position for next element (more spacing for images)
+                window.lastDrawPosition.y += 450;
+                window.lastDrawPosition.x = item.x !== undefined ? item.x : window.lastDrawPosition.x;
+            } else if (item.type === 'animation') {
+                await drawAnimation(item, baseX, baseY);
+                // Update position for next element (more spacing for animations)
+                window.lastDrawPosition.y += 500;
+                window.lastDrawPosition.x = item.x !== undefined ? item.x : window.lastDrawPosition.x;
+            }
+        }
+
+        async function drawAnimation(item, x, y) {
+            const img = document.createElement('img');
+            img.style.position = 'absolute';
+            img.style.left = `${x}px`;
+            img.style.top = `${y}px`;
+            img.style.width = `${item.width || 700}px`;
+            img.style.height = `${item.height || 500}px`;
+            img.style.opacity = 0;
+            img.style.transition = "opacity 0.3s ease-in";
+            voidSurface.appendChild(img);
+
+            // Animate through frames
+            const frames = item.frames;
+            const duration = item.duration || 3000;
+            const frameDelay = duration / frames.length;
+
+            for (let i = 0; i < frames.length; i++) {
+                img.src = `data:image/png;base64,${frames[i]}`;
+                img.style.opacity = 1;
+                await window.sleep(frameDelay);
+            }
+
+            await window.sleep(200);
+        }
+
+        async function drawImage(item, x, y) {
+            const img = document.createElement('img');
+            img.src = `data:image/png;base64,${item.data}`;
+            img.style.position = 'absolute';
+            img.style.left = `${x}px`;
+            img.style.top = `${y}px`;
+            img.style.width = `${item.width || 600}px`;
+            img.style.height = `${item.height || 400}px`;
+            img.style.opacity = 0;
+            img.style.transition = "opacity 0.5s ease-in";
+            voidSurface.appendChild(img);
+
+            await window.sleep(100);
+            img.style.opacity = 1;
+            await window.sleep(300);
+        }
+
+        window.renderElement = renderElement;
+
+        async function drawTextOrMath(item, x, y) {
+            const el = document.createElement('div');
+            el.className = `board-element ${item.type === 'math' ? 'math-element' : 'text-element'}`;
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+            el.style.color = `var(--neon-${item.color || 'white'})`;
+            el.style.opacity = 1;
+            voidSurface.appendChild(el);
+
+            if (item.type === 'math') {
+                katex.render(item.content, el, { throwOnError: false, displayMode: true });
+                el.style.opacity = 0;
+                await window.sleep(50);
+                el.style.transition = "opacity 0.4s ease-in";
+                el.style.opacity = 1;
+                await window.sleep(200);
+            } else {
+                // Write all text at once for faster teaching
+                el.innerHTML = item.content;
+                el.style.opacity = 0;
+                await window.sleep(50);
+                el.style.transition = "opacity 0.3s ease-in";
+                el.style.opacity = 1;
+                await window.sleep(150);
+            }
+        }
+
+        async function drawVector(item, x, y) {
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svgEl = document.createElementNS(svgNS, "svg");
+            svgEl.setAttribute("class", "board-element drawing-element");
+            svgEl.style.left = `${x}px`;
+            svgEl.style.top = `${y}px`;
+            // Bounding box large enough for the drawing
+            svgEl.setAttribute("width", "2000"); 
+            svgEl.setAttribute("height", "2000");
+            svgEl.style.opacity = 1;
+            voidSurface.appendChild(svgEl);
+
+            const rc = rough.svg(svgEl);
+            const options = { ...ROUGH_OPTIONS, stroke: `var(--neon-${item.color || 'white'})` };
+            
+            let drawnNode = null;
+
+            if (item.type === 'shape') {
+                if (item.shape === 'line') drawnNode = rc.line(0, 0, item.w, item.h, options);
+                if (item.shape === 'rect') drawnNode = rc.rectangle(0, 0, item.w, item.h, options);
+                if (item.shape === 'circle') drawnNode = rc.circle(item.w/2, item.w/2, item.w, options);
+                if (item.shape === 'ellipse') drawnNode = rc.ellipse(item.w/2, item.h/2, item.w, item.h, options);
+            } else if (item.type === 'path') {
+                // This allows CrewAI to send complex SVGs (like the Rocket or Tree)
+                drawnNode = rc.path(item.svgPath, options);
+            }
+
+            if (drawnNode) {
+                svgEl.appendChild(drawnNode);
+                
+                // Organic drawing animation
+                const paths = drawnNode.querySelectorAll('path');
+                let maxAnimTime = 0;
+
+                paths.forEach((path, index) => {
+                    const length = path.getTotalLength();
+                    path.style.strokeDasharray = length;
+                    path.style.strokeDashoffset = length;
+                    path.style.stroke = options.stroke;
+                    
+                    const duration = Math.max(0.4, length / 400); 
+                    const delay = index * 0.15; 
+                    maxAnimTime = Math.max(maxAnimTime, (duration + delay) * 1000);
+
+                    path.style.animation = `drawStroke ${duration}s ease-in-out ${delay}s forwards`;
+                });
+
+                await sleep(maxAnimTime + 100); 
+            }
+        }
+
+
+        // --- 3. CREW AI INTERFACE (HOW YOUR BACKEND CONNECTS) ---
+
+        let aiSocket = null;
+
+        /* 
+         * Connect to Python AI backend via WebSocket
+         */
+        function connectToAI() {
+            const wsUrl = 'ws://localhost:8765';
+            aiSocket = new WebSocket(wsUrl);
+            
+            aiSocket.onopen = () => {
+                statusText.innerText = "Connected to AI Server";
+                statusText.style.color = "#39ff14";
+                console.log("Connected to AI server");
+            };
+            
+            aiSocket.onmessage = async (event) => {
+                const aiCommand = JSON.parse(event.data);
+                
+                // Handle different command types
+                if (aiCommand.type === 'connection_ok') {
+                    console.log("Server connection confirmed:", aiCommand.message);
+                }
+                else if (aiCommand.type === 'lesson_complete') {
+                    statusText.innerText = "Lesson complete! Drag around to explore.";
+                    statusText.style.color = "#fffb00";
+                }
+                // If AI commands the camera to move to a new area of the void
+                else if (aiCommand.action === 'move_camera') {
+                    camera.x -= aiCommand.x;
+                    camera.y -= aiCommand.y;
+                    updateCamera();
+                    await sleep(1000); // Wait for pan
+                } 
+                // If AI commands to draw
+                else {
+                    await renderElement(aiCommand);
+                }
+            };
+            
+            aiSocket.onerror = (error) => {
+                statusText.innerText = "Connection failed - check if server is running";
+                statusText.style.color = "#ff0000";
+                console.error("WebSocket error:", error);
+            };
+            
+            aiSocket.onclose = () => {
+                statusText.innerText = "Disconnected from AI Server";
+                statusText.style.color = "#ff0000";
+            };
+        }
+
+        function requestLesson() {
+            const topicInput = document.getElementById('topic-input');
+            const topic = topicInput.value.trim();
+            
+            if (!topic) {
+                alert("Please enter a topic");
+                return;
+            }
+            
+            if (!aiSocket || aiSocket.readyState !== WebSocket.OPEN) {
+                alert("Not connected to AI server. Please wait for connection...");
+                return;
+            }
+            
+            statusText.innerText = "Requesting lesson...";
+            statusText.style.color = "#00ffff";
+            
+            // Send lesson request to AI
+            aiSocket.send(JSON.stringify({
+                type: "start_lesson",
+                topic: topic
+            }));
+        }
+
+        // Auto-connect on page load
+        window.addEventListener('load', () => {
+            setTimeout(connectToAI, 1000);
+        });
+
+
+        // --- 4. MOCK PAYLOAD: Recreating a piece of Image 3 (Catapult) ---
+        async function simulateCrewAI() {
+            statusText.innerText = "AI is generating on the board...";
+            document.querySelector('button').style.display = 'none';
+
+            const catapultPayload = [
+                // Title
+                { type: 'text', content: "Catapult", x: 50, y: 50, color: 'white' },
+                
+                // Drawing the catapult arm (Rectangle)
+                { type: 'shape', shape: 'rect', w: 250, h: 20, x: 100, y: 250, color: 'white' },
+                // Drawing the pivot base
+                { type: 'shape', shape: 'circle', w: 60, x: 320, y: 260, color: 'white' },
+                
+                // The projectile
+                { type: 'shape', shape: 'circle', w: 40, x: 100, y: 220, color: 'cyan' },
+                { type: 'text', content: "m_1", x: 105, y: 220, color: 'cyan' },
+                
+                // Velocity vector
+                { type: 'path', svgPath: "M 0 0 L 100 -50 M 100 -50 L 80 -55 M 100 -50 L 90 -35", x: 120, y: 150, color: 'green' },
+                { type: 'text', content: "v", x: 220, y: 80, color: 'green' },
+                
+                // Some Math Formulas on the right side
+                { type: 'math', content: "\\tau = (Force)(Lever Arm)", x: 100, y: 400, color: 'magenta' },
+                { type: 'math', content: "\\tau = I\\alpha", x: 100, y: 480, color: 'yellow' },
+                { type: 'math', content: "I = \\frac{1}{3}m_2L^2 + m_1L^2", x: 500, y: 100, color: 'cyan' },
+            ];
+
+            // AI streams the commands sequentially
+            for (let command of catapultPayload) {
+                await renderElement(command);
+            }
+            
+            statusText.innerText = "AI finished drawing. Drag around!";
+        }
+    </script>
+
+    <!-- React Component for UI -->
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        function InfiniteVoidUI() {
+            const [status, setStatus] = useState('Ready - Enter topic to teach');
+            const [topic, setTopic] = useState('');
+            const [isConnected, setIsConnected] = useState(false);
+            const [ws, setWs] = useState(null);
+
+            useEffect(() => {
+                // Auto-connect to WebSocket
+                connectToServer();
+            }, []);
+
+            const connectToServer = () => {
+                const websocket = new WebSocket('ws://localhost:8765');
+
+                websocket.onopen = () => {
+                    setStatus('Connected to LLaVA-v1.6-34B Server');
+                    setIsConnected(true);
+                    console.log("Connected to server");
+                };
+
+                websocket.onmessage = async (event) => {
+                    const command = JSON.parse(event.data);
+
+                    if (command.type === 'connection_ok') {
+                        console.log("Server confirmed:", command.message);
+                    }
+                    else if (command.type === 'lesson_complete') {
+                        setStatus('Lesson complete! Drag around to explore.');
+                    }
+                    else if (command.action === 'move_camera') {
+                        window.camera.x -= command.x;
+                        window.camera.y -= command.y;
+                        window.updateCamera();
+                        window.lastDrawPosition = { x: 100, y: 100 };
+                        await window.sleep(1000);
+                    }
+                    else {
+                        await window.renderElement(command);
+                    }
+                };
+
+                websocket.onerror = (error) => {
+                    setStatus('Connection failed - ensure Python server is running');
+                    setIsConnected(false);
+                    console.error("WebSocket error:", error);
+                };
+
+                websocket.onclose = () => {
+                    setStatus('Disconnected from AI Server');
+                    setIsConnected(false);
+                };
+
+                setWs(websocket);
+            };
+
+            const handleTeach = () => {
+                if (!topic.trim()) {
+                    alert("Please enter a topic");
+                    return;
+                }
+
+                if (!ws || ws.readyState !== WebSocket.OPEN) {
+                    alert("Not connected to AI server");
+                    return;
+                }
+
+                setStatus('LLaVA is generating lesson...');
+                ws.send(JSON.stringify({
+                    type: "start_lesson",
+                    topic: topic
+                }));
+            };
+
+            const handleKeyPress = (e) => {
+                if (e.key === 'Enter') {
+                    handleTeach();
+                }
+            };
+
+            return (
+                <div style={{
+                    position: 'fixed',
+                    top: '20px',
+                    left: '20px',
+                    zIndex: 9999,
+                    background: 'rgba(10, 10, 10, 0.9)',
+                    border: '1px solid #333',
+                    padding: '20px',
+                    borderRadius: '10px',
+                    color: '#888',
+                    fontFamily: 'sans-serif',
+                    fontSize: '14px',
+                    minWidth: '320px',
+                    backdropFilter: 'blur(10px)'
+                }}>
+                    <div style={{ marginBottom: '10px' }}>
+                        <strong>Status:</strong>
+                        <span style={{
+                            color: isConnected ? '#39ff14' : '#ff0000',
+                            marginLeft: '10px'
+                        }}>
+                            {status}
+                        </span>
+                    </div>
+
+                    <div style={{ marginBottom: '15px', fontSize: '12px', color: '#666' }}>
+                        Drag to pan the infinite void. Connected to LLaVA-v1.6-34B (Yi-34B) on llama.cpp
+                    </div>
+
+                    <div style={{ marginBottom: '15px' }}>
+                        <input
+                            type="text"
+                            value={topic}
+                            onChange={(e) => setTopic(e.target.value)}
+                            onKeyPress={handleKeyPress}
+                            placeholder="Enter any topic (e.g., gravitational force, sine waves, physics concepts)"
+                            style={{
+                                padding: '10px',
+                                width: '100%',
+                                background: '#222',
+                                color: 'white',
+                                border: '1px solid #444',
+                                borderRadius: '5px',
+                                fontSize: '14px',
+                                boxSizing: 'border-box'
+                            }}
+                        />
+                    </div>
+
+                    <button
+                        onClick={handleTeach}
+                        disabled={!isConnected}
+                        style={{
+                            width: '100%',
+                            padding: '12px',
+                            background: isConnected ? '#00ffff' : '#444',
+                            color: isConnected ? '#000' : '#888',
+                            border: 'none',
+                            borderRadius: '5px',
+                            fontWeight: 'bold',
+                            cursor: isConnected ? 'pointer' : 'not-allowed',
+                            fontSize: '14px',
+                            transition: 'all 0.2s'
+                        }}
+                        onMouseOver={(e) => {
+                            if (isConnected) {
+                                e.target.style.background = '#00cccc';
+                            }
+                        }}
+                        onMouseOut={(e) => {
+                            if (isConnected) {
+                                e.target.style.background = '#00ffff';
+                            }
+                        }}
+                    >
+                        {isConnected ? '🎓 Teach Me' : '⏳ Connecting...'}
+                    </button>
+
+                    <div style={{
+                        marginTop: '15px',
+                        fontSize: '11px',
+                        color: '#555',
+                        textAlign: 'center'
+                    }}>
+                        Powered by LLaVA-v1.6-34B • React + WebSocket
+                    </div>
+                </div>
+            );
+        }
+
+        // Mount React component
+        const root = ReactDOM.createRoot(document.getElementById('react-root'));
+        root.render(<InfiniteVoidUI />);
+    </script>
+</body>
+</html>

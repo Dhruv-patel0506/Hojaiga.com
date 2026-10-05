@@ -1,0 +1,1107 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOJAIGA // The Living Interface (Step 2 — Live Event System)</title>
+  <link rel="icon" href="data:," />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Post-processing: UnrealBloom for a real deep-space glow (order matters: EffectComposer defines THREE.Pass) -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/GammaCorrectionShader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/MaskPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+
+  <!-- MediaPipe Hands & Camera Utils CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=JetBrains+Mono:wght@300;400;600&display=swap');
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #02030a;
+      font-family: 'Space Grotesk', sans-serif;
+      color: #e2e8f0;
+      user-select: none;
+    }
+
+    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+
+    .living-glass {
+      background: rgba(6, 10, 20, 0.66);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    }
+
+    .cam-btn.active {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: #38bdf8;
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+    }
+
+    #intent-overlay { transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+    #intent-overlay.minimized {
+      top: auto;
+      bottom: 1.5rem;
+      transform: translate(-50%, 0) scale(0.92);
+    }
+    #intent-overlay.minimized .hint-row { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- 3D WebGL Living Cosmos Canvas -->
+  <div id="canvas-container" class="fixed inset-0 z-0"></div>
+
+  <!-- TOP BAR: CAMERA MODES & LIVING TELEMETRY -->
+  <header id="top-hud" class="fixed top-5 left-5 right-5 z-20 flex flex-wrap items-center justify-between gap-4 opacity-0 pointer-events-none transition-opacity duration-700">
+    <div class="living-glass px-5 py-3 rounded-2xl pointer-events-auto flex items-center gap-5">
+      <div class="flex items-center gap-2.5">
+        <span id="core-pulse-dot" class="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping"></span>
+        <div>
+          <div class="text-xs uppercase tracking-[0.2em] text-slate-400">HOJAIGA // LIVING INTERFACE</div>
+          <div id="active-intent-label" class="text-sm font-medium text-white truncate max-w-xs">Awaiting Conductor Intent...</div>
+        </div>
+      </div>
+      <div class="h-7 w-px bg-slate-700/60"></div>
+      <div class="font-mono-code text-xs">
+        <span class="text-slate-400">CRYSTALLIZED:</span>
+        <span id="crystal-count" class="text-emerald-300 font-semibold text-sm ml-1">0 / 500</span>
+      </div>
+      <div class="font-mono-code text-xs hidden sm:block">
+        <span id="fps-readout" class="text-sky-400">60 FPS</span>
+      </div>
+      <a href="index.html" title="Back to Main Orchestrator"
+        class="font-mono-code text-[10px] text-sky-300/80 hover:text-sky-200 border border-sky-500/30 rounded-lg px-2 py-1 transition">&#9672; HUB</a>
+    </div>
+
+    <!-- 3 Camera Modes -->
+    <div class="living-glass p-1.5 rounded-2xl pointer-events-auto flex items-center gap-1.5">
+      <button id="cam-mode-1" onclick="setCameraMode(1)" class="cam-btn active px-3.5 py-2 rounded-xl text-xs font-medium border border-transparent transition flex items-center gap-1.5">
+        <span>1</span> <span>Global Conductor (3rd)</span>
+      </button>
+      <button id="cam-mode-2" onclick="setCameraMode(2)" class="cam-btn px-3.5 py-2 rounded-xl text-xs font-medium border border-transparent text-slate-300 hover:text-white transition flex items-center gap-1.5">
+        <span>2</span> <span>Inside Region (2nd)</span>
+      </button>
+      <button id="cam-mode-3" onclick="setCameraMode(3)" class="cam-btn px-3.5 py-2 rounded-xl text-xs font-medium border border-transparent text-slate-300 hover:text-white transition flex items-center gap-1.5">
+        <span>3</span> <span>Agent POV (1st)</span>
+      </button>
+    </div>
+
+    <!-- Simulation Controls -->
+    <div class="living-glass px-3 py-2 rounded-2xl pointer-events-auto flex items-center gap-2">
+      <button onclick="HojaigaLivingBus.emit('FORCE_DESTABILIZE')"
+        class="px-3 py-1.5 rounded-xl text-xs font-mono-code bg-rose-500/20 border border-rose-400/40 text-rose-200 hover:bg-rose-500/35 transition"
+        title="Shortcut: Press F">
+        &#9889; Simulate Failure &amp; Reroute (F)
+      </button>
+      <button onclick="cycleTargetRegion()"
+        class="px-3 py-1.5 rounded-xl text-xs font-mono-code bg-slate-800/80 border border-slate-600/50 text-slate-200 hover:bg-slate-700 transition"
+        title="Switch which Region or Agent you are inside">
+        &#8635; Cycle Target (Tab)
+      </button>
+    </div>
+  </header>
+
+  <!-- CENTER CONDUCTOR PROMPT -->
+  <div id="intent-overlay" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 w-full max-w-xl px-4">
+    <div class="living-glass p-6 rounded-3xl border border-slate-700/60">
+      <label for="intent-input" class="block text-xs uppercase tracking-[0.25em] text-sky-300/90 mb-2">
+        Conductor at Center &bull; Living Spatial Prompt
+      </label>
+      <h2 id="prompt-heading" class="text-2xl font-light text-white mb-4">
+        What should Hojaiga do?
+      </h2>
+      <form id="intent-form" class="flex items-center gap-2.5" onsubmit="handleIntentSubmit(event)">
+        <input
+          id="intent-input"
+          type="text"
+          value="Find 500 interior designers in Texas"
+          placeholder="Describe an intent to materialize..."
+          class="w-full bg-slate-950/80 border border-slate-700/80 focus:border-sky-400 rounded-2xl px-4 py-3 text-sm text-white outline-none transition"
+        />
+        <button
+          type="submit"
+          class="px-5 py-3 rounded-2xl bg-sky-500/25 hover:bg-sky-500/40 border border-sky-400/60 text-sky-100 text-sm font-medium whitespace-nowrap transition shadow-[0_0_25px_rgba(56,189,248,0.25)]">
+          Ignite Intent &rarr;
+        </button>
+      </form>
+      <div class="hint-row mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400 font-mono-code">
+        <span>&#128400;&#65039; 1 Hand: Expand + Rotate &bull; &#128075;&#128075; 2 Hands Apart/Together: Zoom</span>
+        <span>&#128433;&#65039; Drag: Rotate &bull; Scroll: Zoom &bull; Keys 1-3: Camera</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEFT STREAM LOG -->
+  <aside id="event-stream-panel" class="fixed bottom-5 left-5 z-20 living-glass p-4 rounded-2xl w-80 opacity-0 pointer-events-none transition-opacity duration-700 hidden lg:block">
+    <div class="text-[10px] font-mono-code uppercase tracking-widest text-slate-400 mb-2 flex items-center justify-between">
+      <span>Living Structure Telemetry</span>
+      <span id="gesture-state-badge" class="text-sky-300">MOUSE MODE</span>
+    </div>
+    <div id="living-log" class="space-y-1.5 font-mono-code text-[11px] text-slate-300 max-h-36 overflow-hidden"></div>
+  </aside>
+
+  <!-- BOTTOM-RIGHT CONDUCTOR HAND CAM -->
+  <div class="fixed bottom-5 right-5 z-20 living-glass rounded-2xl overflow-hidden w-52 border border-slate-700/60">
+    <div class="px-3 py-1.5 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between">
+      <span class="text-[10px] font-mono-code uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+        <span id="cam-dot" class="w-2 h-2 rounded-full bg-amber-400"></span>
+        Conductor Hands
+      </span>
+      <button onclick="initConductorHands()" class="text-[10px] font-mono-code text-sky-300 hover:underline">
+        Enable Cam
+      </button>
+    </div>
+    <div class="relative aspect-video bg-slate-950">
+      <video id="webcam-video" class="hidden" playsinline></video>
+      <canvas id="webcam-canvas" class="w-full h-full object-cover transform -scale-x-100"></canvas>
+      <div id="cam-msg" class="absolute inset-0 flex items-center justify-center text-center p-2 text-[10px] text-slate-400 bg-slate-950/80">
+        Mouse/Keys Active (Click "Enable Cam" for 1 &amp; 2-Hand Gestures)
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===========================================================================
+    // 1. MODULAR EVENT ARCHITECTURE (Ability #45 - Step 2 backend-ready bus)
+    // ===========================================================================
+    const HojaigaLivingBus = {
+      listeners: {},
+      on(event, fn) {
+        if (!this.listeners[event]) this.listeners[event] = [];
+        this.listeners[event].push(fn);
+      },
+      off(event, fn) {
+        if (!this.listeners[event]) return;
+        this.listeners[event] = this.listeners[event].filter((f) => f !== fn);
+      },
+      emit(event, payload = {}) {
+        if (this.listeners[event]) this.listeners[event].forEach((fn) => fn(payload));
+      }
+    };
+
+    function logLivingEvent(text, tone) {
+      const container = document.getElementById('living-log');
+      if (!container) return;
+      const item = document.createElement('div');
+      item.className = (tone || 'text-slate-300') + ' truncate';
+      item.textContent = text;
+      container.prepend(item);
+      while (container.children.length > 6) container.lastElementChild.remove();
+    }
+
+    // ===========================================================================
+    // 2. REAL COSMOS RENDERER (ACES tonemap + bloom composer)
+    // ===========================================================================
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x02030a);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1200);
+    camera.position.set(0, 6, 26);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.08;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    container.appendChild(renderer.domElement);
+
+    let composer = null;
+    try {
+      if (THREE.EffectComposer && THREE.RenderPass && THREE.UnrealBloomPass) {
+        composer = new THREE.EffectComposer(renderer);
+        composer.addPass(new THREE.RenderPass(scene, camera));
+        composer.addPass(new THREE.UnrealBloomPass(
+          new THREE.Vector2(window.innerWidth, window.innerHeight), 0.62, 0.5, 0.22
+        ));
+        if (THREE.GammaCorrectionShader) composer.addPass(new THREE.ShaderPass(THREE.GammaCorrectionShader));
+      }
+    } catch (e) { composer = null; }
+
+    // Deep-space lighting (a distant sun + faint galactic ambient)
+    const sunLight = new THREE.DirectionalLight(0xfff0d0, 2.1);
+    sunLight.position.set(90, 60, -70);
+    scene.add(sunLight);
+    scene.add(new THREE.AmbientLight(0x1a2440, 0.55));
+    const conductorLight = new THREE.PointLight(0x38bdf8, 2.6, 70);
+    scene.add(conductorLight);
+
+    // World root (rotated/scaled by conductor gestures)
+    const livingWorld = new THREE.Group();
+    scene.add(livingWorld);
+
+    // ===========================================================================
+    // 3. COSMOS FABRIC: STARFIELD (Milky-Way band), NEBULAE, PLANETS, DUST
+    // ===========================================================================
+    function gauss() { return (Math.random() + Math.random() + Math.random() - 1.5) / 1.5; }
+
+    function makeStarTexture() {
+      const c = document.createElement('canvas');
+      c.width = c.height = 64;
+      const x = c.getContext('2d');
+      const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+      g.addColorStop(0, 'rgba(255,255,255,1)');
+      g.addColorStop(0.35, 'rgba(255,255,255,0.5)');
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      x.fillStyle = g;
+      x.fillRect(0, 0, 64, 64);
+      return new THREE.CanvasTexture(c);
+    }
+
+    // -- Layer 1: 9,000 point stars with a tilted galactic plane + twinkle ----
+    const STAR_COUNT = 9000;
+    const starGeo = new THREE.BufferGeometry();
+    const sPos = new Float32Array(STAR_COUNT * 3);
+    const sCol = new Float32Array(STAR_COUNT * 3);
+    const sSize = new Float32Array(STAR_COUNT);
+    const sPhase = new Float32Array(STAR_COUNT);
+    const bandTilt = new THREE.Euler(0.42, 0, 0.55);
+    const STAR_TINTS = [
+      [1.0, 1.0, 1.0], [0.78, 0.86, 1.0], [1.0, 0.92, 0.78],
+      [1.0, 0.76, 0.6], [0.66, 0.8, 1.0], [1.0, 0.98, 0.9]
+    ];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      const inBand = i < STAR_COUNT * 0.62;
+      let x, y, z;
+      if (inBand) {
+        const r = 140 + Math.pow(Math.random(), 0.6) * 240;
+        const th = Math.random() * Math.PI * 2;
+        x = Math.cos(th) * r;
+        z = Math.sin(th) * r;
+        y = gauss() * 22;
+        const v = new THREE.Vector3(x, y, z).applyEuler(bandTilt);
+        x = v.x; y = v.y; z = v.z;
+      } else {
+        const r = 160 + Math.random() * 320;
+        const u = Math.random() * 2 - 1;
+        const th = Math.random() * Math.PI * 2;
+        const s = Math.sqrt(1 - u * u);
+        x = r * s * Math.cos(th); y = r * u; z = r * s * Math.sin(th);
+      }
+      sPos[i * 3] = x; sPos[i * 3 + 1] = y; sPos[i * 3 + 2] = z;
+      const tint = STAR_TINTS[(Math.random() * STAR_TINTS.length) | 0];
+      const b = 0.55 + Math.random() * 0.45;
+      sCol[i * 3] = tint[0] * b; sCol[i * 3 + 1] = tint[1] * b; sCol[i * 3 + 2] = tint[2] * b;
+      sSize[i] = 0.5 + Math.pow(Math.random(), 3.2) * 4.2;
+      sPhase[i] = Math.random() * 6.28;
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
+    starGeo.setAttribute('aColor', new THREE.BufferAttribute(sCol, 3));
+    starGeo.setAttribute('aSize', new THREE.BufferAttribute(sSize, 1));
+    starGeo.setAttribute('aPhase', new THREE.BufferAttribute(sPhase, 1));
+
+    const starMat = new THREE.ShaderMaterial({
+      uniforms: { uTime: { value: 0 }, uScale: { value: window.innerHeight * 0.5 }, uMap: { value: makeStarTexture() } },
+      vertexShader: [
+        'attribute float aSize; attribute float aPhase; attribute vec3 aColor;',
+        'uniform float uTime; uniform float uScale;',
+        'varying vec3 vColor; varying float vTw;',
+        'void main(){',
+        '  vColor = aColor;',
+        '  vTw = 0.72 + 0.28 * sin(uTime * (1.1 + aPhase * 0.55) + aPhase * 9.4);',
+        '  vec4 mv = modelViewMatrix * vec4(position, 1.0);',
+        '  gl_PointSize = aSize * vTw * (uScale / max(1.0, -mv.z));',
+        '  gl_Position = projectionMatrix * mv;',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform sampler2D uMap;',
+        'varying vec3 vColor; varying float vTw;',
+        'void main(){',
+        '  vec4 tx = texture2D(uMap, gl_PointCoord);',
+        '  gl_FragColor = vec4(vColor * (0.85 + 0.5 * vTw), tx.a);',
+        '}'
+      ].join('\n'),
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+    });
+    const starfield = new THREE.Points(starGeo, starMat);
+    scene.add(starfield);
+
+    // -- Layer 2: volumetric NEBULAE (procedural canvas sprites) --------------
+    function makeNebulaTexture(r, g, b) {
+      const c = document.createElement('canvas');
+      c.width = c.height = 512;
+      const x = c.getContext('2d');
+      x.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < 30; i++) {
+        const px = 80 + Math.random() * 352, py = 80 + Math.random() * 352;
+        const rad = 45 + Math.random() * 150;
+        const a = 0.04 + Math.random() * 0.1;
+        const gr = x.createRadialGradient(px, py, 0, px, py, rad);
+        gr.addColorStop(0, 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')');
+        gr.addColorStop(1, 'rgba(0,0,0,0)');
+        x.fillStyle = gr;
+        x.beginPath(); x.arc(px, py, rad, 0, 6.283); x.fill();
+      }
+      try { x.filter = 'blur(6px)'; x.drawImage(c, 0, 0); } catch (e) {}
+      return new THREE.CanvasTexture(c);
+    }
+
+    const NEBULA_DEFS = [
+      { c: [50, 130, 255], pos: [-190, 80, -300], s: 300, op: 0.38 },
+      { c: [175, 70, 255], pos: [240, -60, -260], s: 330, op: 0.3 },
+      { c: [255, 95, 150], pos: [60, 170, -360], s: 280, op: 0.24 },
+      { c: [40, 210, 190], pos: [-110, -160, 150], s: 300, op: 0.2 },
+      { c: [255, 170, 70], pos: [200, 140, 120], s: 240, op: 0.16 }
+    ];
+    const nebulae = NEBULA_DEFS.map((d) => {
+      const mat = new THREE.SpriteMaterial({
+        map: makeNebulaTexture(d.c[0], d.c[1], d.c[2]),
+        transparent: true, opacity: d.op,
+        blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false
+      });
+      const sp = new THREE.Sprite(mat);
+      sp.position.set(d.pos[0], d.pos[1], d.pos[2]);
+      sp.scale.set(d.s, d.s, 1);
+      scene.add(sp);
+      return sp;
+    });
+
+    // -- Layer 3: distant PLANETS with procedural surfaces + ring -------------
+    function makePlanetTexture(base, band) {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 256;
+      const x = c.getContext('2d');
+      x.fillStyle = base; x.fillRect(0, 0, 512, 256);
+      for (let i = 0; i < 46; i++) {
+        const y = Math.random() * 256;
+        const h = 3 + Math.random() * 16;
+        x.fillStyle = 'rgba(' + band + ',' + (0.06 + Math.random() * 0.16) + ')';
+        x.fillRect(0, y, 512, h);
+      }
+      for (let i = 0; i < 8; i++) {
+        x.fillStyle = 'rgba(' + band + ',' + (0.12 + Math.random() * 0.18) + ')';
+        x.beginPath();
+        x.ellipse(Math.random() * 512, Math.random() * 256, 12 + Math.random() * 40, 5 + Math.random() * 12, 0, 0, 6.283);
+        x.fill();
+      }
+      for (let i = 0; i < 900; i++) {
+        x.fillStyle = 'rgba(255,255,255,' + (Math.random() * 0.05) + ')';
+        x.fillRect(Math.random() * 512, Math.random() * 256, 1.5, 1.5);
+      }
+      return new THREE.CanvasTexture(c);
+    }
+
+    const planetA = new THREE.Mesh(
+      new THREE.SphereGeometry(15, 48, 32),
+      new THREE.MeshStandardMaterial({ map: makePlanetTexture('#274b73', '160,200,255'), roughness: 0.95, metalness: 0.0 })
+    );
+    planetA.position.set(-130, -35, -210);
+    scene.add(planetA);
+
+    const planetB = new THREE.Mesh(
+      new THREE.SphereGeometry(10, 48, 32),
+      new THREE.MeshStandardMaterial({ map: makePlanetTexture('#6b4a2f', '255,205,150'), roughness: 1.0, metalness: 0.0 })
+    );
+    planetB.position.set(165, 55, -240);
+    scene.add(planetB);
+
+    function makeRingTexture() {
+      const c = document.createElement('canvas');
+      c.width = c.height = 512;
+      const x = c.getContext('2d');
+      x.clearRect(0, 0, 512, 512);
+      for (let i = 0; i < 26; i++) {
+        const r = 90 + Math.random() * 160;
+        x.strokeStyle = 'rgba(226,203,170,' + (0.05 + Math.random() * 0.2) + ')';
+        x.lineWidth = 2 + Math.random() * 9;
+        x.beginPath(); x.arc(256, 256, r, 0, 6.283); x.stroke();
+      }
+      return new THREE.CanvasTexture(c);
+    }
+    const planetRing = new THREE.Mesh(
+      new THREE.RingGeometry(13.5, 24, 96),
+      new THREE.MeshBasicMaterial({
+        map: makeRingTexture(), transparent: true, side: THREE.DoubleSide,
+        depthWrite: false, opacity: 0.9
+      })
+    );
+    planetRing.position.copy(planetB.position);
+    planetRing.rotation.set(1.35, 0.2, 0.4);
+    scene.add(planetRing);
+
+    const moon = new THREE.Mesh(
+      new THREE.SphereGeometry(3.4, 32, 24),
+      new THREE.MeshStandardMaterial({ map: makePlanetTexture('#5a5f6b', '120,125,140'), roughness: 1.0 })
+    );
+    scene.add(moon);
+
+    // Faint horizon ring (spatial reference inside the void)
+    const horizonRing = new THREE.Mesh(
+      new THREE.RingGeometry(14.8, 15.0, 96),
+      new THREE.MeshBasicMaterial({ color: 0x27406b, side: THREE.DoubleSide, transparent: true, opacity: 0.35 })
+    );
+    horizonRing.rotation.x = Math.PI / 2;
+    horizonRing.position.y = -3.5;
+    livingWorld.add(horizonRing);
+  </script>
+
+
+  <script>
+    // ===========================================================================
+    // 4. INTENT CORE + KINETIC COSMIC STRUCTURES (Abilities #39 - #43)
+    // ===========================================================================
+    let isIntentActive = false;
+    let crystallizedTotal = 0;
+    const targetCrystalGoal = 500;
+
+    function makeGlowTexture(inner, outer) {
+      const c = document.createElement('canvas');
+      c.width = c.height = 128;
+      const x = c.getContext('2d');
+      const g = x.createRadialGradient(64, 64, 0, 64, 64, 64);
+      g.addColorStop(0, inner);
+      g.addColorStop(0.4, inner.replace(/[\d.]+\)$/, '0.35)'));
+      g.addColorStop(1, outer);
+      x.fillStyle = g;
+      x.fillRect(0, 0, 128, 128);
+      return new THREE.CanvasTexture(c);
+    }
+
+    // Central Conductor / Intent structure (hidden until intent)
+    const intentGroup = new THREE.Group();
+    intentGroup.scale.setScalar(0.001);
+    livingWorld.add(intentGroup);
+
+    const intentCoreGeo = new THREE.IcosahedronGeometry(1.7, 3);
+    const baseCorePos = intentCoreGeo.attributes.position.array.slice();
+    const coreMat = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uColorA: { value: new THREE.Color(0xa5ecff) },
+        uColorB: { value: new THREE.Color(0x0369a1) }
+      },
+      vertexShader: [
+        'varying vec3 vN; varying vec3 vP;',
+        'void main(){ vN = normalize(normalMatrix * normal);',
+        '  vec4 mv = modelViewMatrix * vec4(position, 1.0); vP = mv.xyz;',
+        '  gl_Position = projectionMatrix * mv; }'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform float uTime; uniform vec3 uColorA; uniform vec3 uColorB;',
+        'varying vec3 vN; varying vec3 vP;',
+        'void main(){',
+        '  vec3 v = normalize(-vP);',
+        '  float fres = pow(1.0 - clamp(dot(vN, v), 0.0, 1.0), 1.7);',
+        '  float pulse = 0.78 + 0.22 * sin(uTime * 2.2);',
+        '  vec3 col = mix(uColorB, uColorA, fres) * (0.85 + fres * 0.85) * pulse;',
+        '  gl_FragColor = vec4(col, 1.0);',
+        '}'
+      ].join('\n'),
+      blending: THREE.AdditiveBlending, transparent: true, depthWrite: false
+    });
+    const intentCoreMesh = new THREE.Mesh(intentCoreGeo, coreMat);
+    intentGroup.add(intentCoreMesh);
+
+    const coronaSprite = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: makeGlowTexture('rgba(165,236,255,0.95)', 'rgba(10,80,160,0)'),
+      blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, depthTest: false
+    }));
+    coronaSprite.scale.setScalar(7);
+    intentGroup.add(coronaSprite);
+
+    function makeAccretionTexture() {
+      const c = document.createElement('canvas');
+      c.width = c.height = 256;
+      const x = c.getContext('2d');
+      const g = x.createRadialGradient(128, 128, 40, 128, 128, 128);
+      g.addColorStop(0.0, 'rgba(255,255,255,0)');
+      g.addColorStop(0.35, 'rgba(160,230,255,0.55)');
+      g.addColorStop(0.6, 'rgba(70,150,255,0.3)');
+      g.addColorStop(0.85, 'rgba(140,90,255,0.14)');
+      g.addColorStop(1.0, 'rgba(0,0,0,0)');
+      x.fillStyle = g;
+      x.fillRect(0, 0, 256, 256);
+      return new THREE.CanvasTexture(c);
+    }
+    const accretionDisk = new THREE.Mesh(
+      new THREE.RingGeometry(2.4, 4.8, 96),
+      new THREE.MeshBasicMaterial({
+        map: makeAccretionTexture(), transparent: true, side: THREE.DoubleSide,
+        depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.95
+      })
+    );
+    accretionDisk.rotation.x = -Math.PI / 2 + 0.45;
+    intentGroup.add(accretionDisk);
+
+    const conductorRings = [];
+    for (let i = 0; i < 3; i++) {
+      const rMesh = new THREE.Mesh(
+        new THREE.TorusGeometry(2.3 + i * 0.45, 0.03, 12, 96),
+        new THREE.MeshBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false })
+      );
+      rMesh.rotation.set(i * 0.9, i * 0.6, 0);
+      intentGroup.add(rMesh);
+      conductorRings.push(rMesh);
+    }
+
+    // Architectural regions where Browser & Research agents work
+    const REGION_DEFS = [
+      { id: 'region-browser', name: 'Browser Swarm Structure', pos: new THREE.Vector3(-11, 1.5, -4), color: 0x38bdf8 },
+      { id: 'region-research', name: 'Directory Research Lattice', pos: new THREE.Vector3(11, 2.0, -3), color: 0xa855f7 },
+      { id: 'region-verify', name: 'Texas Entity Verifier', pos: new THREE.Vector3(0, 3.5, -12), color: 0x10b981 },
+      { id: 'region-extractor', name: 'Portfolio Extraction Rig', pos: new THREE.Vector3(-6, -1.5, 9), color: 0xf59e0b }
+    ];
+
+    const regions = [];
+    const agents = [];
+    const crystals = [];
+    const conduitMats = [];
+    const TRAIL_LEN = 16;
+
+    function makeConduitMat(colorHex) {
+      const mat = new THREE.ShaderMaterial({
+        uniforms: {
+          uTime: { value: 0 },
+          uColor: { value: new THREE.Color(colorHex) },
+          uHurt: { value: 0 }
+        },
+        vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+        fragmentShader: [
+          'uniform float uTime; uniform vec3 uColor; uniform float uHurt; varying vec2 vUv;',
+          'void main(){',
+          '  float flow = 0.5 + 0.5 * sin(vUv.x * 48.0 - uTime * 3.4);',
+          '  float body = 0.3 + 0.7 * flow;',
+          '  float edge = smoothstep(0.0, 0.5, vUv.y) * smoothstep(1.0, 0.5, vUv.y);',
+          '  vec3 col = mix(uColor, vec3(1.0, 0.3, 0.42), clamp(uHurt, 0.0, 1.0));',
+          '  gl_FragColor = vec4(col, (0.22 + 0.78 * body) * (0.3 + 0.7 * edge));',
+          '}'
+        ].join('\n'),
+        transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide
+      });
+      conduitMats.push(mat);
+      return mat;
+    }
+
+    function makeTrail(colorHex, origin) {
+      const arr = new Float32Array(TRAIL_LEN * 3);
+      for (let i = 0; i < TRAIL_LEN; i++) {
+        arr[i * 3] = origin.x; arr[i * 3 + 1] = origin.y; arr[i * 3 + 2] = origin.z;
+      }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+      const line = new THREE.Line(geo, new THREE.LineBasicMaterial({
+        color: colorHex, transparent: true, opacity: 0.55,
+        blending: THREE.AdditiveBlending, depthWrite: false
+      }));
+      livingWorld.add(line);
+      return { line: line, geo: geo, arr: arr };
+    }
+
+    function pushTrail(trail, x, y, z) {
+      const a = trail.arr;
+      for (let i = TRAIL_LEN - 1; i > 0; i--) {
+        a[i * 3] = a[(i - 1) * 3];
+        a[i * 3 + 1] = a[(i - 1) * 3 + 1];
+        a[i * 3 + 2] = a[(i - 1) * 3 + 2];
+      }
+      a[0] = x; a[1] = y; a[2] = z;
+      trail.geo.attributes.position.needsUpdate = true;
+    }
+
+    function clearStructures() {
+      regions.forEach((r) => {
+        livingWorld.remove(r.group);
+        livingWorld.remove(r.tube);
+        if (r.rerouteTube) livingWorld.remove(r.rerouteTube);
+      });
+      agents.forEach((a) => { livingWorld.remove(a.mesh); livingWorld.remove(a.trail.line); });
+      crystals.forEach((c) => { livingWorld.remove(c.mesh); livingWorld.remove(c.glow); });
+      regions.length = 0; agents.length = 0; crystals.length = 0;
+      conduitMats.length = 0;
+    }
+
+    function buildLivingStructures() {
+      clearStructures();
+
+      REGION_DEFS.forEach((def, idx) => {
+        const rGroup = new THREE.Group();
+        rGroup.position.copy(def.pos);
+
+        const outerFrame = new THREE.LineSegments(
+          new THREE.EdgesGeometry(new THREE.OctahedronGeometry(2.1, 0)),
+          new THREE.LineBasicMaterial({ color: def.color, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false })
+        );
+        const innerFrame = new THREE.LineSegments(
+          new THREE.EdgesGeometry(new THREE.BoxGeometry(1.6, 1.6, 1.6)),
+          new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, depthWrite: false })
+        );
+        const heart = new THREE.Mesh(
+          new THREE.SphereGeometry(0.42, 16, 12),
+          new THREE.MeshBasicMaterial({ color: def.color })
+        );
+        const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+          map: makeGlowTexture('rgba(255,255,255,0.9)', 'rgba(0,0,0,0)'),
+          color: def.color, transparent: true, opacity: 0.85,
+          blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false
+        }));
+        halo.scale.setScalar(5.5);
+        rGroup.add(outerFrame, innerFrame, heart, halo);
+        livingWorld.add(rGroup);
+
+        // Spline conduit: core -> region (energy-flow shader tube)
+        const midPoint = new THREE.Vector3().addVectors(new THREE.Vector3(0, 0, 0), def.pos).multiplyScalar(0.5);
+        midPoint.y += 3.2 * (idx % 2 === 0 ? 1 : -0.6);
+        const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0, 0), midPoint, def.pos]);
+        const tubeMat = makeConduitMat(def.color);
+        const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 64, 0.075, 8, false), tubeMat);
+        livingWorld.add(tube);
+
+        regions.push({
+          def: def, group: rGroup, outerFrame: outerFrame, innerFrame: innerFrame,
+          heart: heart, halo: halo, curve: curve, tube: tube, tubeMat: tubeMat,
+          rerouteTube: null, destabilized: 0, basePos: def.pos.clone()
+        });
+
+        // 2 autonomous agents per region (Ability #41)
+        for (let a = 0; a < 2; a++) {
+          const agentGeo = new THREE.ConeGeometry(0.3, 1.0, 6);
+          agentGeo.rotateX(Math.PI / 2);
+          const agentMesh = new THREE.Mesh(agentGeo, new THREE.MeshStandardMaterial({
+            color: 0x0b1220, emissive: def.color, emissiveIntensity: 1.3, metalness: 0.6, roughness: 0.35
+          }));
+          const engine = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: makeGlowTexture('rgba(255,255,255,0.95)', 'rgba(0,0,0,0)'),
+            color: def.color, transparent: true, opacity: 0.9,
+            blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false
+          }));
+          engine.scale.setScalar(2.2);
+          agentMesh.add(engine);
+          livingWorld.add(agentMesh);
+
+          const startPt = curve.getPointAt(a * 0.45);
+          agents.push({
+            id: def.id + '-agent-' + a,
+            role: idx % 2 === 0 ? 'Browser Agent' : 'Research Agent',
+            regionIndex: idx,
+            mesh: agentMesh,
+            trail: makeTrail(def.color, startPt),
+            t: a * 0.45,
+            speed: 0.0035 + Math.random() * 0.002,
+            direction: 1
+          });
+        }
+      });
+    }
+
+    // Crystallized information shards streaming home (Ability #43)
+    function spawnCrystalShard(regionObj) {
+      const shard = new THREE.Mesh(
+        new THREE.OctahedronGeometry(0.3, 0),
+        new THREE.MeshBasicMaterial({ color: 0x6ee7b7 })
+      );
+      const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: makeGlowTexture('rgba(110,231,183,0.95)', 'rgba(0,0,0,0)'),
+        transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false
+      }));
+      glow.scale.setScalar(2.6);
+      shard.add(glow);
+      livingWorld.add(shard);
+      crystals.push({ mesh: shard, glow: glow, curve: regionObj.curve, t: 1.0 });
+    }
+
+    // ===========================================================================
+    // 5. EVENT BUS HANDLERS (Intent, Destabilize/Self-Healing Reroute)
+    // ===========================================================================
+    HojaigaLivingBus.on('INTENT_IGNITED', function (payload) {
+      const intentText = payload.intentText;
+      isIntentActive = true;
+      crystallizedTotal = 0;
+      document.getElementById('crystal-count').textContent = '0 / ' + targetCrystalGoal;
+      document.getElementById('active-intent-label').textContent = intentText;
+      document.getElementById('top-hud').classList.remove('opacity-0', 'pointer-events-none');
+      document.getElementById('event-stream-panel').classList.remove('opacity-0', 'pointer-events-none');
+      document.getElementById('intent-overlay').classList.add('minimized');
+      document.getElementById('prompt-heading').classList.add('hidden');
+
+      buildLivingStructures();
+      logLivingEvent('[INTENT] Materialized: "' + intentText + '"', 'text-sky-300');
+      logLivingEvent('[SWARM] 8 Browser & Research Agents deployed into 3D space', 'text-emerald-300');
+      logLivingEvent('[COSMOS] 9,000 stars online | 5 nebulae ignited', 'text-purple-300');
+    });
+
+    HojaigaLivingBus.on('FORCE_DESTABILIZE', function () {
+      if (!isIntentActive || regions.length === 0) return;
+      const targetRegion = regions[Math.floor(Math.random() * regions.length)];
+      targetRegion.destabilized = 1.0;                       // Ability #42: vertex jitter
+      targetRegion.outerFrame.material.color.setHex(0xf43f5e);   // crimson fracture glow
+      targetRegion.heart.material.color.setHex(0xf43f5e);
+      logLivingEvent('[ALERT] ' + targetRegion.def.name + ' destabilized! Rerouting...', 'text-rose-400 font-semibold');
+
+      setTimeout(function () {
+        // Build a physical bypass conduit around the failed path
+        const bypassMid = targetRegion.basePos.clone().multiplyScalar(0.55).add(new THREE.Vector3(3.5, -3.2, 2.5));
+        const bypassCurve = new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0, 0), bypassMid, targetRegion.basePos]);
+        const mat = makeConduitMat(0xfbbf24);
+        const tube = new THREE.Mesh(new THREE.TubeGeometry(bypassCurve, 64, 0.1, 8, false), mat);
+        livingWorld.add(tube);
+        targetRegion.rerouteTube = tube;
+        targetRegion.curve = bypassCurve;
+        targetRegion.tube = tube;
+        targetRegion.tubeMat = mat;
+        targetRegion.outerFrame.material.color.setHex(0xfbbf24);
+        targetRegion.heart.material.color.setHex(targetRegion.def.color);
+        logLivingEvent('[REROUTE] Self-healing bypass conduit locked for ' + targetRegion.def.name, 'text-amber-300');
+      }, 950);
+    });
+
+    function handleIntentSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('intent-input');
+      const val = input.value.trim() || 'Find 500 interior designers in Texas';
+      HojaigaLivingBus.emit('INTENT_IGNITED', { intentText: val });
+    }
+
+    // ===========================================================================
+    // 6. THREE CAMERA MODES (Ability #40)
+    // ===========================================================================
+    let cameraMode = 1;
+    let selectedIndex = 0;
+
+    function setCameraMode(mode) {
+      cameraMode = mode;
+      [1, 2, 3].forEach(function (m) {
+        document.getElementById('cam-mode-' + m).classList.toggle('active', m === mode);
+      });
+      const modeNames = {
+        1: 'Mode 1: Global Conductor (Third-Person)',
+        2: 'Mode 2: Inside Region Cluster (Second-Person)',
+        3: 'Mode 3: Riding Agent POV (First-Person)'
+      };
+      logLivingEvent('[CAMERA] ' + modeNames[mode], 'text-sky-300');
+    }
+
+    function cycleTargetRegion() {
+      selectedIndex = (selectedIndex + 1) % Math.max(1, regions.length);
+      logLivingEvent('[TARGET] Switched focus to cluster/agent #' + (selectedIndex + 1), 'text-purple-300');
+    }
+
+    // ===========================================================================
+    // 7. DUAL-HAND MEDIAPIPE GESTURES (Ability #44) + MOUSE/KEYBOARD FALLBACKS
+    // ===========================================================================
+    let worldTargetRotY = 0;
+    let worldTargetRotX = 0.15;
+    let worldTargetZoom = 26;
+    let structureExpansion = 1.0;
+
+    let isPointerDown = false;
+    let prevPointer = { x: 0, y: 0 };
+
+    window.addEventListener('mousedown', function (e) {
+      if (e.target.closest('header, #intent-overlay, aside, .fixed.bottom-5.right-5')) return;
+      isPointerDown = true;
+      prevPointer = { x: e.clientX, y: e.clientY };
+    });
+    window.addEventListener('mousemove', function (e) {
+      if (!isPointerDown) return;
+      const dx = e.clientX - prevPointer.x;
+      const dy = e.clientY - prevPointer.y;
+      worldTargetRotY += dx * 0.006;
+      worldTargetRotX = THREE.MathUtils.clamp(worldTargetRotX + dy * 0.004, -0.8, 0.9);
+      prevPointer = { x: e.clientX, y: e.clientY };
+    });
+    window.addEventListener('mouseup', function () { isPointerDown = false; });
+    window.addEventListener('wheel', function (e) {
+      worldTargetZoom = THREE.MathUtils.clamp(worldTargetZoom + e.deltaY * 0.015, 9, 60);
+    });
+
+    window.addEventListener('keydown', function (e) {
+      if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+      if (e.key === '1') setCameraMode(1);
+      if (e.key === '2') setCameraMode(2);
+      if (e.key === '3') setCameraMode(3);
+      if (e.key.toLowerCase() === 'f') HojaigaLivingBus.emit('FORCE_DESTABILIZE');
+      if (e.key === 'Tab') { e.preventDefault(); cycleTargetRegion(); }
+      if (e.key === 'Enter' && !isIntentActive) handleIntentSubmit({ preventDefault: function () {} });
+    });
+
+    // MediaPipe 2-Hand tracking
+    const videoEl = document.getElementById('webcam-video');
+    const canvasEl = document.getElementById('webcam-canvas');
+    const ctx = canvasEl.getContext('2d');
+    const gestureBadge = document.getElementById('gesture-state-badge');
+    let conductorCamRunning = false;
+
+    function onConductorHandResults(results) {
+      canvasEl.width = results.image.width;
+      canvasEl.height = results.image.height;
+      ctx.save();
+      ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+      ctx.drawImage(results.image, 0, 0, canvasEl.width, canvasEl.height);
+
+      const hands = results.multiHandLandmarks || [];
+      hands.forEach(function (lm) {
+        drawConnectors(ctx, lm, HAND_CONNECTIONS, { color: '#38bdf8', lineWidth: 2 });
+        drawLandmarks(ctx, lm, { color: '#f8fafc', lineWidth: 1, radius: 2 });
+      });
+
+      if (hands.length === 2) {
+        const p1 = hands[0][9];
+        const p2 = hands[1][9];
+        const handDist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+        worldTargetZoom = THREE.MathUtils.clamp(38 - handDist * 40, 9, 38);
+        gestureBadge.textContent = '\u{1F450} 2-HAND ZOOM';
+      } else if (hands.length === 1) {
+        const lm = hands[0];
+        const dx = lm[9].x - lm[0].x;
+        const dy = lm[9].y - lm[0].y;
+        const palmAngle = Math.atan2(dx, -dy);
+        worldTargetRotY += palmAngle * 0.04;
+        const tips = [4, 8, 12, 16, 20];
+        let avgSpread = 0;
+        tips.forEach(function (i) { avgSpread += Math.hypot(lm[i].x - lm[0].x, lm[i].y - lm[0].y); });
+        avgSpread /= 5;
+        structureExpansion = THREE.MathUtils.clamp(0.75 + avgSpread * 1.4, 0.8, 1.55);
+        gestureBadge.textContent = avgSpread > 0.32 ? '\u{1F590}\uFE0F EXPAND + ROTATE' : '\u270A COMPACT + ROTATE';
+      } else {
+        structureExpansion = THREE.MathUtils.lerp(structureExpansion, 1.0, 0.08);
+      }
+      ctx.restore();
+    }
+
+    async function initConductorHands() {
+      if (conductorCamRunning) return;
+      try {
+        document.getElementById('cam-msg').textContent = 'Starting MediaPipe 2-Hand Tracker...';
+        const mpHands = new Hands({
+          locateFile: function (file) { return 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/' + file; }
+        });
+        mpHands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.65, minTrackingConfidence: 0.65 });
+        mpHands.onResults(onConductorHandResults);
+        const cam = new Camera(videoEl, {
+          onFrame: async function () { await mpHands.send({ image: videoEl }); },
+          width: 320, height: 180
+        });
+        await cam.start();
+        conductorCamRunning = true;
+        document.getElementById('cam-msg').style.display = 'none';
+        document.getElementById('cam-dot').className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+        gestureBadge.textContent = '\u{1F596} 2-HAND READY';
+      } catch (err) {
+        document.getElementById('cam-msg').textContent = 'Camera blocked \u2014 Mouse & Keyboard Fallback Active';
+      }
+    }
+    window.initConductorHands = initConductorHands;
+
+    // ===========================================================================
+    // 8. 60 FPS RENDER LOOP (cosmos drift, morphing core, swarms, 3 cameras)
+    // ===========================================================================
+    const clock = new THREE.Clock();
+    const camPosTarget = new THREE.Vector3(0, 6, 26);
+    const camLookTarget = new THREE.Vector3(0, 0, 0);
+    const smoothLook = new THREE.Vector3(0, 0, 0);
+    const tmpV = new THREE.Vector3();
+
+    let frameCounter = 0;
+    let lastFpsCheck = performance.now();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsed = clock.getElapsedTime();
+      const now = performance.now();
+
+      frameCounter++;
+      if (now - lastFpsCheck >= 500) {
+        document.getElementById('fps-readout').textContent =
+          Math.round((frameCounter * 1000) / (now - lastFpsCheck)) + ' FPS';
+        frameCounter = 0;
+        lastFpsCheck = now;
+      }
+
+      // -- Cosmos fabric drift ------------------------------------------------
+      starMat.uniforms.uTime.value = elapsed;
+      starfield.rotation.y = elapsed * 0.004;
+      nebulae.forEach(function (n, i) {
+        n.material.rotation += 0.00035 * (i % 2 === 0 ? 1 : -1);
+      });
+      planetA.rotation.y = elapsed * 0.03;
+      planetB.rotation.y = -elapsed * 0.02;
+      moon.position.set(
+        planetA.position.x + Math.cos(elapsed * 0.15) * 34,
+        planetA.position.y + Math.sin(elapsed * 0.1) * 7,
+        planetA.position.z + Math.sin(elapsed * 0.15) * 34
+      );
+      conduitMats.forEach(function (m) { m.uniforms.uTime.value = elapsed; });
+      coreMat.uniforms.uTime.value = elapsed;
+
+      if (isIntentActive) {
+        // -- Ability #39: materialize & breathe the Intent Core ---------------
+        intentGroup.scale.lerp(tmpV.set(structureExpansion, structureExpansion, structureExpansion), 0.06);
+
+        const posAttr = intentCoreGeo.attributes.position;
+        for (let i = 0; i < posAttr.count; i++) {
+          const bx = baseCorePos[i * 3], by = baseCorePos[i * 3 + 1], bz = baseCorePos[i * 3 + 2];
+          const pulse = 1 + 0.08 * Math.sin(elapsed * 3.0 + bx * 1.5 + by * 1.5);
+          posAttr.setXYZ(i, bx * pulse, by * pulse, bz * pulse);
+        }
+        posAttr.needsUpdate = true;
+        intentCoreGeo.computeVertexNormals();
+
+        conductorRings.forEach(function (r, i) {
+          r.rotation.z += 0.008 * (i + 1);
+          r.rotation.x += 0.005 * (i % 2 === 0 ? 1 : -1);
+        });
+        accretionDisk.rotation.z += 0.004;
+        coronaSprite.scale.setScalar(7 + Math.sin(elapsed * 2.2) * 0.7);
+        conductorLight.intensity = 2.2 + Math.sin(elapsed * 2.2) * 0.4;
+
+        // -- Regions: kinetic architecture + destabilization jitter ------------
+        regions.forEach(function (reg) {
+          reg.outerFrame.rotation.y = elapsed * 0.5;
+          reg.innerFrame.rotation.x = -elapsed * 0.8;
+          reg.heart.scale.setScalar(1 + Math.sin(elapsed * 4 + reg.basePos.x) * 0.18);
+          reg.group.scale.lerp(tmpV.set(structureExpansion, structureExpansion, structureExpansion), 0.08);
+          reg.tubeMat.uniforms.uHurt.value = Math.max(reg.tubeMat.uniforms.uHurt.value * 0.97,
+            Math.min(reg.destabilized, 1));
+
+          if (reg.destabilized > 0.01) {
+            reg.destabilized *= 0.985;
+            reg.group.position.set(
+              reg.basePos.x + (Math.random() - 0.5) * reg.destabilized * 0.9,
+              reg.basePos.y + (Math.random() - 0.5) * reg.destabilized * 0.9,
+              reg.basePos.z + (Math.random() - 0.5) * reg.destabilized * 0.9
+            );
+            reg.outerFrame.material.opacity = 0.6 + Math.random() * 0.4;
+          } else {
+            reg.group.position.lerp(reg.basePos, 0.1);
+            reg.outerFrame.material.opacity = 0.9;
+            reg.tubeMat.uniforms.uHurt.value *= 0.95;
+          }
+        });
+
+        // -- Ability #41: agents ride the 3D spline conduits ------------------
+        agents.forEach(function (ag) {
+          const reg = regions[ag.regionIndex];
+          if (!reg) return;
+          ag.t += ag.speed * ag.direction;
+          if (ag.t >= 1.0) {
+            ag.t = 1.0;
+            ag.direction = -1;
+            spawnCrystalShard(reg);   // reached region -> crystallize
+          } else if (ag.t <= 0.0) {
+            ag.t = 0.0;
+            ag.direction = 1;
+          }
+          const pt = reg.curve.getPointAt(ag.t);
+          const lookT = THREE.MathUtils.clamp(ag.t + 0.02 * ag.direction, 0, 1);
+          ag.mesh.position.copy(pt);
+          ag.mesh.lookAt(reg.curve.getPointAt(lookT));
+          pushTrail(ag.trail, pt.x, pt.y, pt.z);
+        });
+
+        // -- Ability #43: crystallized shards stream back to the core ---------
+        for (let i = crystals.length - 1; i >= 0; i--) {
+          const c = crystals[i];
+          c.t -= 0.012;
+          c.mesh.rotation.y += 0.1;
+          c.mesh.rotation.x += 0.08;
+          if (c.t <= 0.05) {
+            livingWorld.remove(c.mesh);
+            crystals.splice(i, 1);
+            if (crystallizedTotal < targetCrystalGoal) {
+              crystallizedTotal = Math.min(targetCrystalGoal, crystallizedTotal + 5);
+              document.getElementById('crystal-count').textContent = crystallizedTotal + ' / ' + targetCrystalGoal;
+              if (crystallizedTotal % 50 === 0) {
+                logLivingEvent('[CRYSTALLIZED] ' + crystallizedTotal + ' verified Texas designer records merged', 'text-emerald-300');
+              }
+            }
+          } else {
+            c.mesh.position.copy(c.curve.getPointAt(c.t));
+            // Absorb into the core: fade the shard glow as it converges (prevents blowout)
+            c.glow.material.opacity = 0.9 * Math.min(1, Math.max(0, (c.t - 0.06) * 2.2));
+          }
+        }
+      }
+
+      // -- Ability #40: camera rig -------------------------------------------
+      if (cameraMode === 1 || !isIntentActive) {
+        livingWorld.rotation.y = THREE.MathUtils.lerp(livingWorld.rotation.y, worldTargetRotY + elapsed * 0.04, 0.08);
+        livingWorld.rotation.x = THREE.MathUtils.lerp(livingWorld.rotation.x, worldTargetRotX, 0.08);
+        camPosTarget.set(0, 4.5, worldTargetZoom);
+        camLookTarget.set(0, 0, 0);
+      } else if (cameraMode === 2 && regions[selectedIndex]) {
+        const regWorldPos = new THREE.Vector3();
+        regions[selectedIndex].group.getWorldPosition(regWorldPos);
+        camPosTarget.copy(regWorldPos).add(new THREE.Vector3(0, 1.8, 5.8));
+        camLookTarget.copy(regWorldPos);
+      } else if (cameraMode === 3 && agents[selectedIndex]) {
+        const ag = agents[selectedIndex];
+        const agentWorldPos = new THREE.Vector3();
+        ag.mesh.getWorldPosition(agentWorldPos);
+        const reg = regions[ag.regionIndex];
+        const aheadT = THREE.MathUtils.clamp(ag.t + 0.08 * ag.direction, 0, 1);
+        const aheadWorld = reg.curve.getPointAt(aheadT).applyMatrix4(livingWorld.matrixWorld);
+        camPosTarget.copy(agentWorldPos).add(new THREE.Vector3(0, 0.45, 0));
+        camLookTarget.copy(aheadWorld);
+      }
+
+      camera.position.lerp(camPosTarget, 0.08);
+      smoothLook.lerp(camLookTarget, 0.12);
+      camera.lookAt(smoothLook);
+
+      if (composer) composer.render();
+      else renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', function () {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      if (composer) composer.setSize(window.innerWidth, window.innerHeight);
+      if (starMat.uniforms.uScale) starMat.uniforms.uScale.value = window.innerHeight * 0.5;
+    });
+
+    // ===========================================================================
+    // 9. CNS BRIDGE -> MOVED TO living-ws-adapter.js (Step 2: Abilities #46-50)
+    //    The adapter owns the ws://:8765 link, intent dispatch (SET_LIVING_INTENT),
+    //    telemetry-to-region mapping, fault self-heal and the Crystal Vault drawer.
+    // ===========================================================================
+
+    // ===========================================================================
+    // 10. TEST / STEP-2 HOOKS
+    // ===========================================================================
+    window.__LIVE_READY = true;
+    window.__LIVE = {
+      bus: HojaigaLivingBus,
+      ignite: function (text) { HojaigaLivingBus.emit('INTENT_IGNITED', { intentText: text || 'Find 500 interior designers in Texas' }); },
+      destabilize: function () { HojaigaLivingBus.emit('FORCE_DESTABILIZE'); },
+      setCam: setCameraMode,
+      state: function () {
+        return {
+          intentActive: isIntentActive,
+          regions: regions.length,
+          agents: agents.length,
+          crystals: crystals.length,
+          crystalTotal: crystallizedTotal,
+          cameraMode: cameraMode,
+          bloom: !!composer
+        };
+      }
+    };
+  </script>
+
+  <!-- Step 2 (Abilities #46-50): live WebSocket bridge + Crystal Vault drawer -->
+  <script src="living-ws-adapter.js"></script>
+</body>
+</html>

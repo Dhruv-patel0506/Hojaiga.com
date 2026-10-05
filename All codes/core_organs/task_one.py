@@ -36,6 +36,19 @@ def verify(truth: dict, app: str, hwnd0=None) -> tuple:
         time.sleep(1.0)
         snap = fast_uia.snapshot(hwnd, timeout_ms=8000) or []
         names = [n.name for n in snap if n.name]
+        # what a person TYPED lives in an editor's VALUE, not in any control's name: read the editors' values too
+        try:
+            import uiautomation as auto
+            for c, _d in auto.WalkControl(auto.ControlFromHandle(hwnd), maxDepth=14):
+                if c.ControlTypeName in ("DocumentControl", "EditControl"):
+                    try:
+                        v = c.GetValuePattern().Value or ""
+                    except Exception:
+                        v = ""
+                    if v.strip():
+                        names.append(v)
+        except Exception:
+            pass
     if "calc_display" in truth:
         want = truth["calc_display"]
         hit = [n for n in names if n.lower().startswith("display is") and want in n]

@@ -262,6 +262,11 @@ def wait_tree_ready(hwnd: int, timeout_s: float = 15.0, min_nodes: int = 3) -> i
 _DISCARD_RE = re.compile(r"^(don'?t save|do not save|discard( changes)?|no)$", re.I)
 
 
+# the question a window asks before closing with unsaved work ("Do you want to save changes to ...", Office's "Save your
+# changes to this file?")
+_SAVE_PROMPT_RE = re.compile(r"\bsave\b.{0,30}\bchanges?\b|want to save|keep (?:your )?changes", re.I)
+
+
 def _discard_unsaved(hwnd: int) -> bool:
     """A window WE launched is asking to save changes: answer with the non-saving button. Only ever called for
     instances this run created, so no user document is involved."""
@@ -270,7 +275,7 @@ def _discard_unsaved(hwnd: int) -> bool:
     snaps = list(fast_uia.snapshot(hwnd, timeout_ms=4000) or [])
     for w in bm._popups(hwnd)[:4]:
         snaps += fast_uia.snapshot(w, timeout_ms=3000) or []
-    asks = any("save changes" in (n.name or "").lower() or "want to save" in (n.name or "").lower() for n in snaps)
+    asks = any(_SAVE_PROMPT_RE.search(n.name or "") for n in snaps)
     if not asks:
         return False
     for n in snaps:

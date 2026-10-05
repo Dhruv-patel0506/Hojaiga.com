@@ -9,3 +9,77 @@ _e2e_tmp/
 _archive/
 _hojaiga_boot.log
 _boot_in.txt
+
+# environments & interpreters (never commit)
+.venv/
+venv*/
+hojaiga_env/
+
+# python artefacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# model weights & heavy ML dirs (downloadable, local-only)
+models/
+All codes/models/
+scratch_models/
+kokoro_models/
+stable-diffusion-webui/
+OmniParser/weights/
+OmniParser/checkpoints/
+llama.cpp/
+
+# browser profiles (contain live cookies — never commit)
+.chrome*/
+.test_*profile/
+
+# binaries, archives, media (regenerable / downloadable)
+*.exe
+*.dll
+*.7z
+*.zip
+*.tar
+*.tar.xz
+*.gz
+*.msi
+*.mp4
+*.avi
+*.mkv
+*.mov
+*.wav
+*.bin
+*.pt
+*.pth
+*.onnx
+*.gguf
+
+# ffmpeg builds & temp/video scratch
+ffmpeg*/
+All codes/ffmpeg*/
+video_audit_*/
+pixel-animation-video/
+.tmp*/
+tmpdir/
+
+# runtime output
+*.log
+screenshots/
+observation*/
+evidence/
+
+# dependency trees & IDE caches
+node_modules/
+.qoder/
+.dart_tool/
+*.lib
+*.pdb
+*.obj
+*.tlog
+*.exp
+
+# runtime memory snapshots (regenerated constantly)
+*.snap
+organ_03_memory/logs/
+*.tmp

@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus Holo-Core &amp; 3D Live Metropolis</title>
+  <link rel="icon" href="data:," />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Rough.js for sketchy architectural overlays -->
+  <script src="https://unpkg.com/roughjs@4.5.2/bundled/rough.js"></script>
+  <!-- React & ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- MediaPipe Hands for Real-Time Hand Gesture Control -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+  <style>
+    body, html { margin: 0; padding: 0; overflow: hidden; background: #0a0910; color: #c9c5d8; font-family: 'Inter', system-ui, sans-serif; user-select: none; }
+    #canvas-container { position: fixed; inset: 0; z-index: 1; }
+    #label-layer { position: fixed; inset: 0; z-index: 5; pointer-events: none; overflow: hidden; }
+    #ui-layer { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
+    .interactive { pointer-events: auto; }
+
+    .hud-panel { background: rgba(17, 15, 27, 0.94); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; box-shadow: 0 12px 44px rgba(0,0,0,0.6); backdrop-filter: blur(10px); }
+    .sec { font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: #6b6682; font-weight: 800; }
+    .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 3px 0; }
+
+    .pill { font-size: 9.5px; letter-spacing: .07em; text-transform: uppercase; padding: 4px 9px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.10); color: #9d98b3; background: transparent; cursor: pointer; transition: .15s; white-space: nowrap; font-weight: 700; }
+    .pill:hover { background: rgba(255,255,255,0.06); color: #e6e2f2; border-color: rgba(255,255,255,0.2); }
+    .pill.on { background: #7c5cff; border-color: #7c5cff; color: #fff; box-shadow: 0 0 14px rgba(124,92,255,.45); }
+    .pill.s.on { background: #f0b429; border-color: #f0b429; color: #201704; box-shadow: 0 0 14px rgba(240,180,41,.4); }
+    .pill.a.on { background: #f472b6; border-color: #f472b6; color: #2a0d1c; box-shadow: 0 0 14px rgba(244,114,182,.4); }
+    .pill.b.on { background: #60a5fa; border-color: #60a5fa; color: #06131f; box-shadow: 0 0 14px rgba(96,165,250,.4); }
+
+    .btn-ghost { font-size: 8.5px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; padding: 5px 7px; border-radius: 6px; border: 1px solid rgba(255,255,255,.12); color: #b9b4cc; background: rgba(255,255,255,.03); cursor: pointer; transition: .15s; white-space: nowrap; }
+    .btn-ghost:hover { border-color: rgba(124,92,255,.75); color: #fff; }
+    .btn-ghost.on { background: rgba(124,92,255,.28); border-color: #7c5cff; color: #fff; }
+
+    .srow { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 8.5px; letter-spacing: .1em; text-transform: uppercase; color: #7e7994; font-weight: 700; }
+    .sval { color: #8fc2ff; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; }
+    input[type="range"] { width: 100%; height: 3px; accent-color: #3b82f6; cursor: pointer; background: transparent; margin: 3px 0 6px; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 9px; height: 9px; border-radius: 50%; background: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,.9); cursor: pointer; }
+
+    .row-btn { display: flex; align-items: center; gap: 6px; width: 100%; padding: 5px 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,.06); background: rgba(255,255,255,.025); cursor: pointer; transition: .15s; text-align: left; }
+    .row-btn:hover { border-color: rgba(124,92,255,.6); background: rgba(124,92,255,.10); }
+    .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 7px currentColor; }
+    .tbadge { font-size: 7.5px; padding: 1px 4px; border-radius: 3px; background: rgba(255,255,255,.07); color: #b8b3cc; letter-spacing: .1em; font-weight: 800; }
+
+    .sq { width: 15px; height: 15px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,.14); border-radius: 4px; font-size: 9px; color: #9d98b3; cursor: pointer; background: transparent; line-height: 1; }
+    .sq:hover { border-color: #7c5cff; color: #fff; }
+    .chip { font-size: 8px; padding: 2px 5px; border-radius: 4px; border: 1px solid rgba(255,255,255,.12); cursor: pointer; display: flex; align-items: center; gap: 4px; color: #b9b4cc; background: rgba(255,255,255,.03); }
+    .chip.off { opacity: .32; text-decoration: line-through; }
+    .chip:hover { border-color: rgba(124,92,255,.7); }
+
+    .kbd { display: inline-block; padding: 0 4px; border: 1px solid rgba(255,255,255,.18); border-radius: 3px; font-size: 8.5px; color: #8fc2ff; background: rgba(255,255,255,.05); font-family: 'JetBrains Mono', monospace; }
+
+    .node-label { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; gap: 1px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #efeaf9; text-shadow: 0 0 10px rgba(0,0,0,.95), 0 0 22px rgba(0,0,0,.8); white-space: nowrap; transition: opacity .18s; pointer-events: none; }
+    .node-label .tg { font-size: .68em; letter-spacing: .2em; font-weight: 700; }
+
+    .scroll-thin::-webkit-scrollbar { width: 5px; height: 5px; }
+    .scroll-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,.16); border-radius: 3px; }
+    .scroll-thin::-webkit-scrollbar-track { background: transparent; }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <div id="label-layer"></div>
+  <div id="ui-layer"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // --- DOMAIN DATA (Used for both Hologram Nodes & City Districts/Buildings) ---
+    const DOMAINS = [
+      {
+        id: 'tutor',
+        name: 'City of Teaching (Tutor)',
+        short: 'TUTOR',
+        tier: 'S-TIER',
+        color: '#facc15',
+        hex: 0xfacc15,
+        pos: { x: -45, z: -45 },
+        holoPos: { x: -14, y: 5, z: -12 },
+        subWorlds: ['AI Socratic Mentor', 'Interactive Math Lab', 'Language Immersion Pod', 'Live Curriculum Builder'],
+        desc: 'Adaptive pedagogy towers with holographic lecture halls and AI study companions.'
+      },
+      {
+        id: 'coder',
+        name: 'City of Coder',
+        short: 'CODER',
+        tier: 'S-TIER',
+        color: '#38bdf8',
+        hex: 0x38bdf8,
+        pos: { x: 45, z: -45 },
+        holoPos: { x: 15, y: 4, z: -11 },
+        subWorlds: ['Compiler Foundry', 'Neural Debugger Matrix', 'System Architecture Vault', 'Full-Stack Sandbox'],
+        desc: 'High-density server spires, real-time AST visualizers, and automated deployment docks.'
+      },
+      {
+        id: 'animation',
+        name: 'City of Animation',
+        short: 'ANIM',
+        tier: 'A-TIER',
+        color: '#c084fc',
+        hex: 0xc084fc,
+        pos: { x: -45, z: 45 },
+        holoPos: { x: -15, y: -3, z: 12 },
+        subWorlds: ['Motion Capture Arena', 'Procedural Rigging Studio', 'Keyframe Timeline Tunnel', 'Shader FX Lab'],
+        desc: 'Kinetic architecture where facades ripple with skeletal rigs and physics simulations.'
+      },
+      {
+        id: 'artist',
+        name: 'City of Artist',
+        short: 'ARTIST',
+        tier: 'A-TIER',
+        color: '#f472b6',
+        hex: 0xf472b6,
+        pos: { x: 45, z: 45 },
+        holoPos: { x: 14, y: -2, z: 13 },
+        subWorlds: ['Rough.js Sketch Pavilion', '3D Sculpting Conservatory', 'Color Theory Prism', 'Generative Gallery'],
+        desc: 'Expressive surrealist plazas blending hand-drawn aesthetics with volumetric light.'
+      },
+      {
+        id: 'architect',
+        name: 'World Systems Hub',
+        short: 'SYSTEMS',
+        tier: 'B-TIER',
+        color: '#34d399',
+        hex: 0x34d399,
+        pos: { x: 0, z: -65 },
+        holoPos: { x: 0, y: 11, z: -16 },
+        subWorlds: ['Spatial Graph Engine', 'Twin-City Telemetry', 'Physics & Logic Core', 'NPC Behavior Tree'],
+        desc: 'Central structural nexus governing spatial layouts, simulation rules, and portal routing.'
+      },
+      {
+        id: 'research',
+        name: 'Synth Knowledge Vault',
+        short: 'VAULT',
+        tier: 'B-TIER',
+        color: '#fb923c',
+        hex: 0xfb923c,
+        pos: { x: 0, z: 65 },
+        holoPos: { x: 0, y: -8, z: 16 },
+        subWorlds: ['Deep Citation Graph', 'Hypothesis Simulator', 'Paper Synthesizer', 'Memory Palace'],
+        desc: 'Archive towers linking every concept node through semantic bridges.'
+      }
+    ];
+
+    const TIER_CLS = { 'S-TIER': 's', 'A-TIER': 'a', 'B-TIER': 'b' };
+    const ZOOM_KEYS = ['COSMOS', 'GALAXY', 'CLUSTER'];
+    const ZOOM_CFG = { COSMOS: { fov: 86, dist: 105 }, GALAXY: { fov: 64, dist: 58 }, CLUSTER: { fov: 44, dist: 27 } };
+
+    function App() {
+      // Main Section: 'CITY' | 'HOLOGRAM'
+      const [section, setSection] = useState('CITY');
+      // POV inside City: '3RD_TOP' | '1ST_POV' | 'INSIDE_BUILDING'
+      const [pov, setPov] = useState('1ST_POV');
+      // Locomotion state: 'IDLE' | 'WALK' | 'JOG' | 'RUN'
+      const [gait, setGait] = useState('IDLE');
+      const [activeWorld, setActiveWorld] = useState(null);
+      const [nearbyDomain, setNearbyDomain] = useState(null);
+
+      // --- HUD (graph-reference layout) ---
+      const [viewBy, setViewBy] = useState('DOMAIN');
+      const [uOpen, setUOpen] = useState(true);
+      const [zoom, setZoom] = useState('GALAXY');
+      const [fps, setFps] = useState(60);
+
+      // --- UTILITIES (U) ---
+      const [linkGlow, setLinkGlow] = useState(1.2);        // LINES · weight (parent -> child)
+      const [radialWidth, setRadialWidth] = useState(1.0);   // LINES · radial width (rings)
+      const [ripple, setRipple] = useState(1.0);             // LINES · ripple (node bob)
+      const [interGalaxy, setInterGalaxy] = useState(1.0);   // LINES · inter-galaxy web
+      const [crossOpacity, setCrossOpacity] = useState(1.0); // cross map lines
+      const [driftSpeed, setDriftSpeed] = useState(1.0);     // MOTION · drift speed
+      const [frozen, setFrozen] = useState(false);           // MOTION · freeze
+      const [trails, setTrails] = useState(false);           // MOTION · trails
+      const [npcSpeed, setNpcSpeed] = useState(1.0);         // MOTION · crowd
+      const [clusterOpen, setClusterOpen] = useState(false);
+      const [entitiesOpen, setEntitiesOpen] = useState(false);
+      const [nodeRadius, setNodeRadius] = useState(1.0);     // NODES · radius
+      const [boost, setBoost] = useState(1.0);               // NODES · boost
+      const [starDensity, setStarDensity] = useState(0.5);   // NODES · star density
+      const [labelsOn, setLabelsOn] = useState(true);        // LABELS · always on
+      const [labelSize, setLabelSize] = useState(11);        // LABELS · size
+      const [hoverOnly, setHoverOnly] = useState(false);
+      const [curved, setCurved] = useState(true);
+      const [tiersOn, setTiersOn] = useState({ 'S-TIER': true, 'A-TIER': true, 'B-TIER': true });
+      const [hiddenDomains, setHiddenDomains] = useState([]);
+      const [hiddenSubs, setHiddenSubs] = useState([]);
+      const [dims, setDims] = useState({ DOMAIN: true, TIER: false, 'SUB-WORLD': false });
+      const [preset, setPreset] = useState(null);
+      const [roughHud, setRoughHud] = useState(true);
+
+      // Hand gesture state
+      const [gestureEnabled, setGestureEnabled] = useState(false);
+      const [gestureStatus, setGestureStatus] = useState('Webcam Off — WASD / Mouse or Enable Hand Tracking');
+
+      const roughCanvasRef = useRef(null);
+      const videoRef = useRef(null);
+      const nearbyDomainRef = useRef(null);
+      const gestureCtlRef = useRef({ cam: null, hands: null, running: false, lastPinch: 0, lastGait: undefined, lastStatus: '' });
+
+      // Shared mutable state for Three.js animation loop
+      const simRef = useRef({
+        section: 'CITY',
+        pov: '1ST_POV',
+        gait: 'IDLE',
+        activeWorld: null,
+        playerPos: new THREE.Vector3(0, 2.2, 18),
+        yaw: 0,
+        pitch: 0,
+        keys: {},
+        handSteerX: 0,
+        handSteerY: 0,
+        handGait: null,
+        linkGlow: 1.2,
+        npcSpeed: 1.0,
+        radialWidth: 1.0,
+        ripple: 1.0,
+        interGalaxy: 1.0,
+        crossOpacity: 1.0,
+        driftSpeed: 1.0,
+        frozen: false,
+        trails: false,
+        clusterOpen: false,
+        entitiesOpen: false,
+        nodeRadius: 1.0,
+        boost: 1.0,
+        labelsOn: true,
+        labelSize: 11,
+        hoverOnly: false,
+        zoom: 'GALAXY',
+        curved: true,
+        roughHud: true,
+        tiersOn: { 'S-TIER': true, 'A-TIER': true, 'B-TIER': true },
+        hiddenDomains: [],
+        pinchAction: null
+      });
+
+      useEffect(() => { nearbyDomainRef.current = nearbyDomain; }, [nearbyDomain]);
+
+      useEffect(() => {
+        const s = simRef.current;
+        s.section = section; s.pov = pov; s.gait = gait; s.activeWorld = activeWorld;
+        s.linkGlow = linkGlow; s.npcSpeed = npcSpeed;
+        s.radialWidth = radialWidth; s.ripple = ripple; s.interGalaxy = interGalaxy;
+        s.crossOpacity = crossOpacity; s.driftSpeed = driftSpeed;
+        s.frozen = frozen; s.trails = trails;
+        s.clusterOpen = clusterOpen; s.entitiesOpen = entitiesOpen;
+        s.nodeRadius = nodeRadius; s.boost = boost;
+        s.labelsOn = labelsOn; s.labelSize = labelSize; s.hoverOnly = hoverOnly;
+        s.zoom = zoom; s.curved = curved; s.roughHud = roughHud;
+        s.tiersOn = tiersOn; s.hiddenDomains = hiddenDomains;
+      }, [section, pov, gait, activeWorld, linkGlow, npcSpeed, radialWidth, ripple,
+        interGalaxy, crossOpacity, driftSpeed, frozen, trails, clusterOpen, entitiesOpen,
+        nodeRadius, boost, labelsOn, labelSize, hoverOnly, zoom, curved, roughHud,
+        tiersOn, hiddenDomains]);
+
+      const isDomainVisible = (dom) => {
+        if (!dom) return false;
+        const s = simRef.current;
+        if (!s.tiersOn[dom.tier]) return false;
+        if (s.hiddenDomains.indexOf(dom.id) !== -1) return false;
+        return true;
+      };
+
+      const enterInterior = (dom) => {
+        simRef.current.playerPos.set(0, 2.2, 10);
+        setActiveWorld(dom);
+        setPov('INSIDE_BUILDING');
+      };
+
+      const exitInterior = (toPov) => {
+        const s = simRef.current;
+        if (s.activeWorld) {
+          s.playerPos.set(s.activeWorld.pos.x * 0.78, 2.2, s.activeWorld.pos.z * 0.78);
+          s.yaw = Math.atan2(-s.activeWorld.pos.x, -s.activeWorld.pos.z);
+        }
+        setActiveWorld(null);
+        setPov(toPov || '1ST_POV');
+      };
+
+      const teleportToDomain = (dom) => {
+        if (section === 'HOLOGRAM') {
+          // FOCUS: swing the 360 view onto that node
+          const dx = dom.holoPos.x, dy = dom.holoPos.y, dz = dom.holoPos.z;
+          simRef.current.yaw = Math.atan2(-dx, -dz);
+          simRef.current.pitch = Math.max(-1.1, Math.min(1.1, Math.atan2(dy, Math.hypot(dx, dz))));
+        } else {
+          simRef.current.playerPos.set(dom.pos.x * 0.78, 2.2, dom.pos.z * 0.78);
+          simRef.current.yaw = Math.atan2(-dom.pos.x, -dom.pos.z);
+          setActiveWorld(null);
+          setPov('1ST_POV');
+        }
+      };
+
+      const applyPreset = (name) => {
+        setPreset(name);
+        if (name === 'MINIMAL') {
+          setLinkGlow(0.5); setInterGalaxy(0.3); setCrossOpacity(0.4); setStarDensity(0.12);
+          setRipple(0.3); setNodeRadius(0.8); setBoost(0.7); setLabelSize(9);
+          setLabelsOn(false); setHoverOnly(false); setTrails(false); setCurved(true); setFrozen(false);
+        } else if (name === 'DENSE') {
+          setLinkGlow(1.5); setInterGalaxy(1.5); setCrossOpacity(1.4); setStarDensity(0.95);
+          setRipple(1.2); setNodeRadius(1.1); setBoost(1.2); setLabelSize(12);
+          setLabelsOn(true); setTrails(true); setCurved(true); setFrozen(false);
+        } else if (name === 'X-RAY') {
+          setLinkGlow(2.2); setInterGalaxy(1.9); setCrossOpacity(1.9); setStarDensity(0.3);
+          setRipple(0.6); setNodeRadius(0.5); setBoost(2.2); setLabelSize(10);
+          setLabelsOn(true); setHoverOnly(false); setTrails(false); setCurved(true); setFrozen(false);
+        }
+      };
+
+      const stepZoom = (dir) => {
+        setZoom((prev) => {
+          const i = ZOOM_KEYS.indexOf(prev);
+          const n = Math.max(0, Math.min(ZOOM_KEYS.length - 1, (i === -1 ? 1 : i) + dir));
+          return ZOOM_KEYS[n];
+        });
+      };
+
+      // --- DIRECTORY (left panel) ---
+      const visibleDomains = DOMAINS.filter((d) => tiersOn[d.tier] && hiddenDomains.indexOf(d.id) === -1);
+      let dirDomains = DOMAINS.slice();
+      if (viewBy === 'TIER') dirDomains.sort((a, b) => a.tier.localeCompare(b.tier));
+      if (viewBy === 'COLOR') dirDomains.sort((a, b) => a.hex - b.hex);
+      const dirSubs = [];
+      DOMAINS.forEach((d) => d.subWorlds.forEach((sw) => {
+        if (hiddenSubs.indexOf(sw) === -1) dirSubs.push({ dom: d, sub: sw });
+      }));
+
+      const nodeCount = visibleDomains.length * 5;
+      let edgeCount = visibleDomains.length;
+      for (let i = 0; i < visibleDomains.length; i++)
+        for (let j = i + 1; j < visibleDomains.length; j++) edgeCount++;
+
+      // --- ROUGH.JS SKETCHY ARCHITECTURAL FRAME & MINIMAP ---
+      const drawRough = () => {
+        const canvas = roughCanvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (!simRef.current.roughHud) return;
+        const rc = rough.canvas(canvas);
+        rc.rectangle(10, 10, 180, 180, {
+          stroke: '#7c5cff', strokeWidth: 1.5, roughness: 1.8,
+          fill: 'rgba(10, 9, 16, 0.7)', fillStyle: 'solid'
+        });
+        rc.line(100, 15, 100, 185, { stroke: 'rgba(160,155,190,0.22)', roughness: 1.2 });
+        rc.line(15, 100, 185, 100, { stroke: 'rgba(160,155,190,0.22)', roughness: 1.2 });
+        const holo = simRef.current.section === 'HOLOGRAM';
+        const range = holo ? 20 : 80;
+        DOMAINS.forEach((d) => {
+          if (!isDomainVisible(d)) return;
+          const p = holo ? d.holoPos : d.pos;
+          const mx = 100 + (p.x / range) * 70;
+          const mz = 100 + (p.z / range) * 70;
+          rc.circle(mx, mz, 15, { stroke: d.color, fill: d.color, fillStyle: 'hachure', roughness: 1.5, hachureGap: 3 });
+        });
+        if (!holo) {
+          const pp = simRef.current.playerPos;
+          const px = 100 + (pp.x / 80) * 70;
+          const pz = 100 + (pp.z / 80) * 70;
+          rc.circle(px, pz, 9, { stroke: '#ffffff', fill: '#ffffff', fillStyle: 'solid', roughness: 1 });
+          rc.line(px, pz, px - Math.sin(simRef.current.yaw) * 14, pz - Math.cos(simRef.current.yaw) * 14,
+            { stroke: '#8fc2ff', roughness: 1 });
+        }
+      };
+
+      useEffect(() => {
+        drawRough();
+        const iv = setInterval(drawRough, 200);
+        return () => clearInterval(iv);
+      }, [roughHud, section, viewBy, tiersOn, hiddenDomains]);
+
+      // --- THREE.JS WORLD INITIALIZATION ---
+      useEffect(() => {
+        const container = document.getElementById('canvas-container');
+        const labelLayer = document.getElementById('label-layer');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0910);
+        scene.fog = new THREE.FogExp2(0x0a0910, 0.0045);
+
+        const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 2000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.innerHTML = '';
+        container.appendChild(renderer.domElement);
+
+        // Lights
+        const ambient = new THREE.AmbientLight(0xffffff, 0.65);
+        scene.add(ambient);
+        const dirLight = new THREE.DirectionalLight(0x93c5fd, 1.1);
+        dirLight.position.set(40, 80, 30);
+        scene.add(dirLight);
+
+        // Groups for the 3 visual states
+        const cityGroup = new THREE.Group();
+        const holoGroup = new THREE.Group();
+        const interiorGroup = new THREE.Group();
+        scene.add(cityGroup);
+        scene.add(holoGroup);
+        scene.add(interiorGroup);
+
+        const clickableMeshes = [];
+
+        // --- STARFIELD (NODES · STAR DENSITY) ---
+        const STAR_COUNT = 3500;
+        const starPos = new Float32Array(STAR_COUNT * 3);
+        for (let i = 0; i < STAR_COUNT; i++) {
+          const r = 700 + Math.random() * 500;
+          const th = Math.random() * Math.PI * 2;
+          const ph = Math.acos(2 * Math.random() - 1);
+          starPos[i * 3] = r * Math.sin(ph) * Math.cos(th);
+          starPos[i * 3 + 1] = r * Math.cos(ph);
+          starPos[i * 3 + 2] = r * Math.sin(ph) * Math.sin(th);
+        }
+        const starGeo = new THREE.BufferGeometry();
+        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        const starMat = new THREE.PointsMaterial({ color: 0xbfd4ff, size: 1.7, sizeAttenuation: false, fog: false, transparent: true, opacity: 0.9 });
+        const stars = new THREE.Points(starGeo, starMat);
+        scene.add(stars);
+        starGeo.setDrawRange(0, Math.floor(STAR_COUNT * 0.5));
+
+        // ==========================================
+        // 1. BUILD LIVE 3D CITY GROUP
+        // ==========================================
+        const gridHelper = new THREE.GridHelper(240, 60, 0x232038, 0x141226);
+        cityGroup.add(gridHelper);
+
+        const floorMesh = new THREE.Mesh(
+          new THREE.PlaneGeometry(240, 240),
+          new THREE.MeshStandardMaterial({ color: 0x08070e, roughness: 0.9 })
+        );
+        floorMesh.rotation.x = -Math.PI / 2;
+        floorMesh.position.y = -0.05;
+        cityGroup.add(floorMesh);
+
+        // Central Player Avatar (Visible in 3rd POV only)
+        const playerAvatar = new THREE.Group();
+        const bodyMesh = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.6, 0.6, 2.2, 16),
+          new THREE.MeshStandardMaterial({ color: 0x7c5cff, emissive: 0x4c2fd6, emissiveIntensity: 0.7 })
+        );
+        bodyMesh.position.y = 1.1;
+        playerAvatar.add(bodyMesh);
+        const headHalo = new THREE.Mesh(
+          new THREE.TorusGeometry(0.9, 0.08, 12, 32),
+          new THREE.MeshBasicMaterial({ color: 0xf0b429 })
+        );
+        headHalo.rotation.x = Math.PI / 2;
+        headHalo.position.y = 2.6;
+        playerAvatar.add(headHalo);
+        cityGroup.add(playerAvatar);
+
+        // Entity registry shared by city + hologram views
+        const entities = DOMAINS.map((d) => ({
+          domain: d, district: null, nodeGroup: null, tether: null, beacon: null,
+          satPivot: null, sphere: null, holoRing: null, phase: 0, curveGeo: null, straightGeo: null
+        }));
+        const entById = {};
+        entities.forEach((e) => { entById[e.domain.id] = e; });
+
+        const buildingColliders = [];
+        const roadLineMats = [];
+
+        DOMAINS.forEach((dom) => {
+          const e = entById[dom.id];
+          const district = new THREE.Group();
+          district.position.set(dom.pos.x, 0, dom.pos.z);
+
+          const towerHeight = 26;
+          const towerGeo = new THREE.BoxGeometry(12, towerHeight, 12);
+          const towerMat = new THREE.MeshStandardMaterial({
+            color: 0x0d0c18, emissive: dom.hex, emissiveIntensity: 0.22, roughness: 0.3, metalness: 0.8
+          });
+          const tower = new THREE.Mesh(towerGeo, towerMat);
+          tower.position.y = towerHeight / 2;
+          tower.userData = { domain: dom };
+          district.add(tower);
+          clickableMeshes.push(tower);
+          tower.add(new THREE.LineSegments(new THREE.EdgesGeometry(towerGeo), new THREE.LineBasicMaterial({ color: dom.hex })));
+
+          const doorDir = new THREE.Vector3(-dom.pos.x, 0, -dom.pos.z).normalize();
+          const door = new THREE.Mesh(
+            new THREE.BoxGeometry(4.6, 5.5, 0.7),
+            new THREE.MeshBasicMaterial({ color: dom.hex, transparent: true, opacity: 0.8 })
+          );
+          door.position.set(doorDir.x * 6.1, 2.75, doorDir.z * 6.1);
+          door.rotation.y = Math.atan2(doorDir.x, doorDir.z);
+          district.add(door);
+
+          dom.subWorlds.forEach((sub, i) => {
+            const angle = (i / dom.subWorlds.length) * Math.PI * 2 + 0.78;
+            const sx = Math.cos(angle) * 14;
+            const sz = Math.sin(angle) * 14;
+            const sh = 10 + (i % 3) * 4;
+            const subGeo = new THREE.BoxGeometry(5, sh, 5);
+            const subMesh = new THREE.Mesh(subGeo, new THREE.MeshStandardMaterial({ color: 0x171628, emissive: dom.hex, emissiveIntensity: 0.12 }));
+            subMesh.position.set(sx, sh / 2, sz);
+            subMesh.userData = { domain: dom, subWorld: sub };
+            district.add(subMesh);
+            clickableMeshes.push(subMesh);
+            subMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(subGeo), new THREE.LineBasicMaterial({ color: dom.hex })));
+          });
+
+          // Overhead Floating Beacon Ring (LINES · RADIAL WIDTH scales it)
+          const ring = new THREE.Mesh(
+            new THREE.TorusGeometry(8, 0.25, 12, 48),
+            new THREE.MeshBasicMaterial({ color: dom.hex, transparent: true, opacity: 0.9 })
+          );
+          ring.rotation.x = Math.PI / 2;
+          ring.position.y = towerHeight + 4;
+          district.add(ring);
+          e.beacon = ring;
+
+          // glowing connection line to origin (CROSS OPACITY scales it)
+          const roadGeo = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(0, 0.2, 0),
+            new THREE.Vector3(dom.pos.x, 0.2, dom.pos.z)
+          ]);
+          const roadMat = new THREE.LineBasicMaterial({ color: dom.hex, transparent: true, opacity: 0.65 });
+          roadLineMats.push({ mat: roadMat, base: 0.65 });
+          cityGroup.add(new THREE.Line(roadGeo, roadMat));
+
+          cityGroup.add(district);
+          e.district = district;
+          buildingColliders.push({ domain: dom, x: dom.pos.x, z: dom.pos.z, radius: 11 });
+        });
+
+        // Spawn Live Walking/Jogging NPCs across the City (+ optional trails)
+        const npcs = [];
+        const TRAIL_N = 14;
+        for (let i = 0; i < 45; i++) {
+          const dom = DOMAINS[i % DOMAINS.length];
+          const npc = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.35, 0.35, 1.7, 8),
+            new THREE.MeshBasicMaterial({ color: dom.hex })
+          );
+          const angle = Math.random() * Math.PI * 2;
+          const dist = 10 + Math.random() * 75;
+          npc.position.set(Math.cos(angle) * dist, 0.85, Math.sin(angle) * dist);
+          cityGroup.add(npc);
+
+          const tPos = new Float32Array(TRAIL_N * 3);
+          for (let k = 0; k < TRAIL_N; k++) {
+            tPos[k * 3] = npc.position.x;
+            tPos[k * 3 + 1] = npc.position.y;
+            tPos[k * 3 + 2] = npc.position.z;
+          }
+          const tGeo = new THREE.BufferGeometry();
+          tGeo.setAttribute('position', new THREE.BufferAttribute(tPos, 3));
+          const trail = new THREE.Line(tGeo, new THREE.LineBasicMaterial({ color: dom.hex, transparent: true, opacity: 0.55 }));
+          trail.visible = false;
+          cityGroup.add(trail);
+
+          npcs.push({
+            mesh: npc, trail: trail,
+            target: new THREE.Vector3((Math.random() - 0.5) * 130, 0.85, (Math.random() - 0.5) * 130),
+            speed: 4 + Math.random() * 6
+          });
+        }
+
+        // ==========================================
+        // 2. BUILD 360 CENTER-OF-HOLOGRAM GROUP
+        // ==========================================
+        const cageGeo = new THREE.IcosahedronGeometry(32, 2);
+        const cageLine = new THREE.LineSegments(
+          new THREE.WireframeGeometry(cageGeo),
+          new THREE.LineBasicMaterial({ color: 0x2a2640, transparent: true, opacity: 0.5 })
+        );
+        holoGroup.add(cageLine);
+
+        DOMAINS.forEach((dom, idx) => {
+          const e = entById[dom.id];
+          const nodeGroup = new THREE.Group();
+          nodeGroup.position.set(dom.holoPos.x, dom.holoPos.y, dom.holoPos.z);
+
+          const sphere = new THREE.Mesh(
+            new THREE.SphereGeometry(2.2, 32, 32),
+            new THREE.MeshStandardMaterial({ color: dom.hex, emissive: dom.hex, emissiveIntensity: 0.8, roughness: 0.1 })
+          );
+          sphere.userData = { domain: dom };
+          nodeGroup.add(sphere);
+          clickableMeshes.push(sphere);
+
+          // equator halo (LINES · RADIAL WIDTH scales it)
+          const holoRing = new THREE.Mesh(
+            new THREE.TorusGeometry(3.1, 0.05, 8, 64),
+            new THREE.MeshBasicMaterial({ color: dom.hex, transparent: true, opacity: 0.85 })
+          );
+          nodeGroup.add(holoRing);
+
+          // dense decorative star-cluster around the node (cosmos look)
+          const CLUSTER_N = 150;
+          const cPos = new Float32Array(CLUSTER_N * 3);
+          for (let c = 0; c < CLUSTER_N; c++) {
+            const cr = 3.4 + Math.pow(Math.random(), 0.55) * 5.8;
+            const cth = Math.random() * Math.PI * 2;
+            const cph = Math.acos(2 * Math.random() - 1);
+            cPos[c * 3] = cr * Math.sin(cph) * Math.cos(cth) * 1.3;
+            cPos[c * 3 + 1] = cr * Math.cos(cph) * 0.72;
+            cPos[c * 3 + 2] = cr * Math.sin(cph) * Math.sin(cth) * 1.3;
+          }
+          const cGeo = new THREE.BufferGeometry();
+          cGeo.setAttribute('position', new THREE.BufferAttribute(cPos, 3));
+          const clusterPts = new THREE.Points(cGeo, new THREE.PointsMaterial({
+            color: dom.hex, size: 0.42, sizeAttenuation: true, transparent: true,
+            opacity: 0.9, depthWrite: false, blending: THREE.AdditiveBlending, fog: false
+          }));
+          nodeGroup.add(clusterPts);
+
+          // soft glow core (reference-style bloom blob)
+          const glow = new THREE.Mesh(
+            new THREE.SphereGeometry(6.8, 20, 20),
+            new THREE.MeshBasicMaterial({
+              color: dom.hex, transparent: true, opacity: 0.075, depthWrite: false,
+              blending: THREE.AdditiveBlending, side: THREE.BackSide, fog: false
+            })
+          );
+          nodeGroup.add(glow);
+
+          // Orbiting sub-world satellites (EXPAND ALL CLUSTERS scales the pivot)
+          const satPivot = new THREE.Group();
+          dom.subWorlds.forEach((sub, sIdx) => {
+            const satAngle = (sIdx / dom.subWorlds.length) * Math.PI * 2;
+            const sat = new THREE.Mesh(
+              new THREE.SphereGeometry(0.55, 16, 16),
+              new THREE.MeshBasicMaterial({ color: 0xffffff })
+            );
+            sat.position.set(Math.cos(satAngle) * 3.8, Math.sin(satAngle) * 1.5, Math.sin(satAngle) * 3.8);
+            sat.userData = { domain: dom, subWorld: sub };
+            satPivot.add(sat);
+            clickableMeshes.push(sat);
+          });
+          nodeGroup.add(satPivot);
+
+          // Direct Holographic Tether from User Center to Node (curved or straight)
+          const start = new THREE.Vector3(0, -1.2, 0);
+          const end = new THREE.Vector3(dom.holoPos.x, dom.holoPos.y, dom.holoPos.z);
+          const curve = new THREE.QuadraticBezierCurve3(
+            start.clone(),
+            new THREE.Vector3(dom.holoPos.x * 0.5, dom.holoPos.y + 3, dom.holoPos.z * 0.5),
+            end.clone()
+          );
+          const curveGeo = new THREE.BufferGeometry().setFromPoints(curve.getPoints(32));
+          const straightGeo = new THREE.BufferGeometry().setFromPoints([start, end]);
+          const tetherLine = new THREE.Line(curveGeo, new THREE.LineBasicMaterial({ color: dom.hex, transparent: true, opacity: 0.65 }));
+          holoGroup.add(tetherLine);
+
+          holoGroup.add(nodeGroup);
+          e.nodeGroup = nodeGroup;
+          e.tether = tetherLine;
+          e.satPivot = satPivot;
+          e.sphere = sphere;
+          e.holoRing = holoRing;
+          e.phase = idx * 1.1;
+          e.curveGeo = curveGeo;
+          e.straightGeo = straightGeo;
+        });
+
+        // Inter-node synaptic web (INTER-GALAXY opacity, CURVED LINES arcs)
+        const arcPoints = (pa, pb) => {
+          const mid = pa.clone().add(pb).multiplyScalar(0.5);
+          if (mid.length() < 1.2) mid.set(0, 15, 0);
+          else mid.multiplyScalar(1.45);
+          return new THREE.QuadraticBezierCurve3(pa.clone(), mid, pb.clone()).getPoints(24);
+        };
+        const webLines = [];
+        for (let i = 0; i < DOMAINS.length; i++) {
+          for (let j = i + 1; j < DOMAINS.length; j++) {
+            const pa = new THREE.Vector3(DOMAINS[i].holoPos.x, DOMAINS[i].holoPos.y, DOMAINS[i].holoPos.z);
+            const pb = new THREE.Vector3(DOMAINS[j].holoPos.x, DOMAINS[j].holoPos.y, DOMAINS[j].holoPos.z);
+            const w = {
+              a: DOMAINS[i], b: DOMAINS[j], base: 0.25,
+              curveGeo: new THREE.BufferGeometry().setFromPoints(arcPoints(pa, pb)),
+              straightGeo: new THREE.BufferGeometry().setFromPoints([pa, pb])
+            };
+            w.line = new THREE.Line(w.curveGeo, new THREE.LineBasicMaterial({ color: 0x8d86b8, transparent: true, opacity: 0.25 }));
+            holoGroup.add(w.line);
+            webLines.push(w);
+          }
+        }
+
+        const rebuildLinks = (ex, useCurved) => {
+          entities.forEach((e) => {
+            const p = e.domain.holoPos;
+            const start = new THREE.Vector3(0, -1.2, 0);
+            const end = new THREE.Vector3(p.x * ex, p.y * ex, p.z * ex);
+            const curve = new THREE.QuadraticBezierCurve3(
+              start.clone(),
+              new THREE.Vector3(p.x * ex * 0.5, p.y * ex + 3, p.z * ex * 0.5),
+              end.clone()
+            );
+            e.curveGeo.dispose();
+            e.straightGeo.dispose();
+            e.curveGeo = new THREE.BufferGeometry().setFromPoints(curve.getPoints(32));
+            e.straightGeo = new THREE.BufferGeometry().setFromPoints([start, end]);
+            e.tether.geometry = useCurved ? e.curveGeo : e.straightGeo;
+          });
+          webLines.forEach((w) => {
+            const pa = new THREE.Vector3(w.a.holoPos.x * ex, w.a.holoPos.y * ex, w.a.holoPos.z * ex);
+            const pb = new THREE.Vector3(w.b.holoPos.x * ex, w.b.holoPos.y * ex, w.b.holoPos.z * ex);
+            w.curveGeo.dispose();
+            w.straightGeo.dispose();
+            w.curveGeo = new THREE.BufferGeometry().setFromPoints(arcPoints(pa, pb));
+            w.straightGeo = new THREE.BufferGeometry().setFromPoints([pa, pb]);
+            w.line.geometry = useCurved ? w.curveGeo : w.straightGeo;
+          });
+        };
+
+        // ==========================================
+        // 3. BUILD INTERIOR WORLD ROOM
+        // ==========================================
+        const roomShell = new THREE.Mesh(
+          new THREE.BoxGeometry(36, 18, 36),
+          new THREE.MeshStandardMaterial({ color: 0x0a0914, side: THREE.BackSide, roughness: 0.6 })
+        );
+        roomShell.position.y = 9;
+        interiorGroup.add(roomShell);
+        interiorGroup.add(new THREE.GridHelper(36, 18, 0x7c5cff, 0x232038));
+
+        const interiorPortals = [];
+        for (let i = 0; i < 4; i++) {
+          const angle = (i / 4) * Math.PI * 2 + Math.PI / 4;
+          const px = Math.cos(angle) * 11;
+          const pz = Math.sin(angle) * 11;
+          const ped = new THREE.Mesh(
+            new THREE.CylinderGeometry(2.2, 2.6, 0.6, 24),
+            new THREE.MeshStandardMaterial({ color: 0x171628, emissive: 0x7c5cff, emissiveIntensity: 0.4 })
+          );
+          ped.position.set(px, 0.3, pz);
+          interiorGroup.add(ped);
+          const holoColumn = new THREE.Mesh(
+            new THREE.CylinderGeometry(1.8, 1.8, 7, 24, 1, true),
+            new THREE.MeshBasicMaterial({ color: 0x7c5cff, wireframe: true, transparent: true, opacity: 0.5 })
+          );
+          holoColumn.position.set(px, 3.8, pz);
+          interiorGroup.add(holoColumn);
+          interiorPortals.push(holoColumn);
+        }
+
+        // ==========================================
+        // 3D NODE LABELS (LABELS · always-on / hover-only / size)
+        // ==========================================
+        const labels = entities.map((e) => {
+          const el = document.createElement('div');
+          el.className = 'node-label';
+          el.innerHTML = '<span class="tg" style="color:' + e.domain.color + '">' + e.domain.tier + '</span>' +
+            '<span class="nm">' + e.domain.short + '</span>';
+          el.style.opacity = '0';
+          labelLayer.appendChild(el);
+          return { el: el, entity: e };
+        });
+
+        // ==========================================
+        // INPUT LISTENERS (KEYBOARD + MOUSE DRAG 360 + WHEEL ZOOM + RAYCAST)
+        // ==========================================
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2(0, 0);
+        const centerNDC = new THREE.Vector2(0, 0);
+        let hovered = null;
+        let isDragging = false;
+        let dragDist = 0;
+        let prevMouse = { x: 0, y: 0 };
+
+        const enterLocal = (dom) => {
+          simRef.current.playerPos.set(0, 2.2, 10);
+          setActiveWorld(dom);
+          setPov('INSIDE_BUILDING');
+        };
+
+        const onKeyDown = (e) => {
+          simRef.current.keys[e.code] = true;
+          if (e.code === 'KeyV') {
+            const st = simRef.current;
+            if (st.pov === 'INSIDE_BUILDING') exitInterior('3RD_TOP');
+            else setPov(st.pov === '3RD_TOP' ? '1ST_POV' : '3RD_TOP');
+          }
+          if (e.code === 'KeyU') setUOpen((v) => !v);
+          if (e.code === 'Escape') exitInterior('1ST_POV');
+        };
+        const onKeyUp = (e) => { simRef.current.keys[e.code] = false; };
+
+        const onMouseDown = (e) => {
+          if (e.target !== renderer.domElement) return;
+          if (e.button !== 0) return;
+          isDragging = true;
+          dragDist = 0;
+          prevMouse = { x: e.clientX, y: e.clientY };
+        };
+        const onMouseMove = (e) => {
+          mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+          mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+          if (!isDragging) return;
+          const dx = e.clientX - prevMouse.x;
+          const dy = e.clientY - prevMouse.y;
+          dragDist += Math.abs(dx) + Math.abs(dy);
+          simRef.current.yaw -= dx * 0.005;
+          simRef.current.pitch = Math.max(-Math.PI / 2.4, Math.min(Math.PI / 2.4, simRef.current.pitch - dy * 0.005));
+          prevMouse = { x: e.clientX, y: e.clientY };
+        };
+        const onMouseUp = () => { isDragging = false; };
+
+        const pickDomain = (ndc) => {
+          raycaster.setFromCamera(ndc, camera);
+          const hits = raycaster.intersectObjects(clickableMeshes, false);
+          for (let i = 0; i < hits.length; i++) {
+            const d = hits[i].object.userData.domain;
+            if (d && isDomainVisible(d)) return d;
+          }
+          return null;
+        };
+
+        const onClick = (e) => {
+          if (e.target !== renderer.domElement) return;
+          if (dragDist > 7) return; // it was a look-around drag, not a click
+          const ndc = new THREE.Vector2(
+            (e.clientX / window.innerWidth) * 2 - 1,
+            -(e.clientY / window.innerHeight) * 2 + 1
+          );
+          const dom = pickDomain(ndc);
+          if (!dom) return;
+          if (simRef.current.section === 'HOLOGRAM') enterLocal(dom);
+          else if (simRef.current.pov === '3RD_TOP') {
+            simRef.current.playerPos.set(dom.pos.x * 0.72, 2.2, dom.pos.z * 0.72);
+            setPov('1ST_POV');
+          } else enterLocal(dom);
+        };
+
+        const onWheel = (e) => {
+          if (e.target !== renderer.domElement) return;
+          e.preventDefault();
+          stepZoom(e.deltaY > 0 ? -1 : 1);
+        };
+
+        // Gesture pinch hook (used by the MediaPipe controller)
+        simRef.current.pinchAction = () => {
+          const st = simRef.current;
+          if (st.section === 'HOLOGRAM') {
+            const dom = pickDomain(centerNDC);
+            if (dom) enterLocal(dom);
+            return;
+          }
+          const near = nearbyDomainRef.current;
+          if (near && st.pov !== 'INSIDE_BUILDING') enterLocal(near);
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+        window.addEventListener('keyup', onKeyUp);
+        window.addEventListener('mousedown', onMouseDown);
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+        window.addEventListener('click', onClick);
+        renderer.domElement.addEventListener('wheel', onWheel, { passive: false });
+
+        const onResize = () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        };
+        window.addEventListener('resize', onResize);
+
+        // ==========================================
+        // MAIN REAL-TIME ANIMATION LOOP
+        // ==========================================
+        const clock = new THREE.Clock();
+        let animId;
+        let motionTime = 0;
+        let lastEx = 1;
+        let lastCurved = simRef.current.curved;
+        let lastLabelSize = -1;
+        let frames = 0;
+        let fpsT = 0;
+        const proj = new THREE.Vector3();
+
+        const animate = () => {
+          animId = requestAnimationFrame(animate);
+          const dt = Math.min(clock.getDelta(), 0.1);
+          const realElapsed = clock.getElapsedTime();
+          const state = simRef.current;
+
+          motionTime += state.frozen ? 0 : dt * state.driftSpeed;
+          const elapsed = motionTime;
+
+          // --- group visibility ---
+          if (state.pov === 'INSIDE_BUILDING' && state.activeWorld) {
+            cityGroup.visible = false;
+            holoGroup.visible = false;
+            interiorGroup.visible = true;
+            interiorPortals.forEach((col, idx) => {
+              col.material.color.setHex(state.activeWorld.hex);
+              col.material.opacity = 0.35 + Math.sin(realElapsed * 2 + idx) * 0.15;
+            });
+          } else if (state.section === 'HOLOGRAM') {
+            cityGroup.visible = false;
+            holoGroup.visible = true;
+            interiorGroup.visible = false;
+          } else {
+            cityGroup.visible = true;
+            holoGroup.visible = false;
+            interiorGroup.visible = false;
+          }
+
+          // --- zoom (hologram = orbit distance, city = fov + orbit distance) ---
+          const zc = ZOOM_CFG[state.zoom] || ZOOM_CFG.GALAXY;
+          const wantFov = holoGroup.visible ? (state.zoom === 'CLUSTER' ? 104 : 65) : zc.fov;
+          if (camera.fov !== wantFov) { camera.fov = wantFov; camera.updateProjectionMatrix(); }
+
+          // --- star density ---
+          const wantStars = Math.floor(STAR_COUNT * (state.section === 'HOLOGRAM' ? 1 : state.starDensity));
+          if (starGeo.drawRange.count !== wantStars) starGeo.setDrawRange(0, wantStars);
+
+          // --- tier / dimension filters + utility-driven materials ---
+          entities.forEach((e) => {
+            const vis = isDomainVisible(e.domain);
+            if (e.district) e.district.visible = vis;
+            if (e.nodeGroup) e.nodeGroup.visible = vis;
+            if (e.tether) {
+              e.tether.visible = vis;
+              e.tether.material.opacity = Math.min(1, 0.65 * state.linkGlow / 1.2);
+            }
+            if (e.beacon) e.beacon.scale.set(state.radialWidth, state.radialWidth, 1);
+            if (e.holoRing) e.holoRing.scale.set(state.radialWidth, state.radialWidth, 1);
+          });
+          webLines.forEach((w) => {
+            w.line.visible = isDomainVisible(w.a) && isDomainVisible(w.b);
+            w.line.material.opacity = Math.min(1, w.base * state.interGalaxy);
+          });
+          roadLineMats.forEach((r) => { r.mat.opacity = Math.min(1, r.base * state.crossOpacity / 1.2); });
+
+          // --- expand toggles + curved-line swap ---
+          const ex = state.entitiesOpen ? 1.42 : 1;
+          if (ex !== lastEx) { rebuildLinks(ex, state.curved); lastEx = ex; }
+          if (state.curved !== lastCurved) {
+            entities.forEach((e) => { e.tether.geometry = state.curved ? e.curveGeo : e.straightGeo; });
+            webLines.forEach((w) => { w.line.geometry = state.curved ? w.curveGeo : w.straightGeo; });
+            lastCurved = state.curved;
+          }
+
+          // --- NPCs (+ trails) ---
+          if (!state.frozen) {
+            npcs.forEach((n) => {
+              const dir = new THREE.Vector3().subVectors(n.target, n.mesh.position);
+              if (dir.length() < 2) {
+                n.target.set((Math.random() - 0.5) * 130, 0.85, (Math.random() - 0.5) * 130);
+              } else {
+                dir.normalize();
+                n.mesh.position.addScaledVector(dir, n.speed * state.npcSpeed * dt);
+              }
+            });
+          }
+          if (state.trails) {
+            npcs.forEach((n) => {
+              if (!n.trail.visible) n.trail.visible = true;
+              const attr = n.trail.geometry.attributes.position;
+              for (let i = attr.count - 1; i > 0; i--) {
+                attr.setXYZ(i, attr.getX(i - 1), attr.getY(i - 1), attr.getZ(i - 1));
+              }
+              attr.setXYZ(0, n.mesh.position.x, n.mesh.position.y, n.mesh.position.z);
+              attr.needsUpdate = true;
+            });
+          } else {
+            npcs.forEach((n) => { if (n.trail.visible) n.trail.visible = false; });
+          }
+
+          // --- hologram node drift ---
+          entities.forEach((e) => {
+            if (!e.nodeGroup) return;
+            const p = e.domain.holoPos;
+            e.nodeGroup.position.set(
+              p.x * ex,
+              p.y * ex + Math.sin(elapsed * 1.5 + e.phase) * 0.9 * state.ripple,
+              p.z * ex
+            );
+            e.nodeGroup.rotation.y = elapsed * 0.4;
+            e.nodeGroup.scale.setScalar(state.nodeRadius);
+            e.satPivot.scale.setScalar(state.clusterOpen ? 1.9 : 1);
+            e.satPivot.rotation.y = -elapsed * 0.6;
+            e.sphere.material.emissiveIntensity = 0.8 * state.boost;
+          });
+
+          // --- hand gesture steering ---
+          if (Math.abs(state.handSteerX) > 0.12) state.yaw -= state.handSteerX * 1.8 * dt;
+          if (Math.abs(state.handSteerY) > 0.15) {
+            state.pitch = Math.max(-0.8, Math.min(0.8, state.pitch - state.handSteerY * 1.2 * dt));
+          }
+
+          // --- locomotion ---
+          const keys = state.keys;
+          const movingForward = keys['KeyW'] || keys['ArrowUp'] || !!state.handGait;
+          const movingBack = keys['KeyS'] || keys['ArrowDown'];
+          const movingLeft = keys['KeyA'] || keys['ArrowLeft'];
+          const movingRight = keys['KeyD'] || keys['ArrowRight'];
+
+          let currentGait = 'IDLE';
+          let speed = 0;
+          if (state.handGait) currentGait = state.handGait;
+          else if (movingForward || movingBack || movingLeft || movingRight) {
+            if (keys['ShiftLeft'] || keys['ShiftRight']) currentGait = 'RUN';
+            else if (keys['AltLeft'] || keys['AltRight'] || state.gait === 'JOG') currentGait = 'JOG';
+            else currentGait = state.gait !== 'IDLE' ? state.gait : 'WALK';
+          }
+          if (currentGait === 'WALK') speed = 10;
+          if (currentGait === 'JOG') speed = 20;
+          if (currentGait === 'RUN') speed = 35;
+
+          if (state.section === 'CITY' || state.pov === 'INSIDE_BUILDING') {
+            const forward = new THREE.Vector3(-Math.sin(state.yaw), 0, -Math.cos(state.yaw));
+            const right = new THREE.Vector3(Math.cos(state.yaw), 0, -Math.sin(state.yaw));
+            if (movingForward) state.playerPos.addScaledVector(forward, speed * dt);
+            if (movingBack) state.playerPos.addScaledVector(forward, -speed * dt);
+            if (movingRight) state.playerPos.addScaledVector(right, speed * dt);
+            if (movingLeft) state.playerPos.addScaledVector(right, -speed * dt);
+
+            const bobFreq = currentGait === 'RUN' ? 14 : currentGait === 'JOG' ? 10 : 6;
+            const bobAmp = speed > 0 ? (currentGait === 'RUN' ? 0.22 : 0.1) : 0;
+            const headY = 2.2 + Math.sin(realElapsed * bobFreq) * bobAmp;
+
+            playerAvatar.position.set(state.playerPos.x, 0, state.playerPos.z);
+            playerAvatar.rotation.y = state.yaw;
+            playerAvatar.visible = state.section === 'CITY' && state.pov === '3RD_TOP';
+
+            // proximity -> building entry prompt / walk-through entry
+            if (state.section === 'CITY' && state.pov !== 'INSIDE_BUILDING') {
+              let foundNear = null;
+              for (let i = 0; i < buildingColliders.length; i++) {
+                const b = buildingColliders[i];
+                if (!isDomainVisible(b.domain)) continue;
+                const dist = Math.hypot(state.playerPos.x - b.x, state.playerPos.z - b.z);
+                if (dist < b.radius + 3.5) {
+                  foundNear = b.domain;
+                  if (dist < 7.2) enterLocal(b.domain);
+                  break;
+                }
+              }
+              setNearbyDomain(foundNear);
+            }
+
+            if (state.pov === '3RD_TOP' && state.section === 'CITY') {
+              const camOffset = new THREE.Vector3(Math.sin(state.yaw) * zc.dist, zc.dist * 0.9, Math.cos(state.yaw) * zc.dist);
+              camera.position.lerp(state.playerPos.clone().add(camOffset), 0.1);
+              camera.lookAt(state.playerPos.x, 2, state.playerPos.z);
+            } else {
+              camera.position.set(state.playerPos.x, headY, state.playerPos.z);
+              camera.lookAt(new THREE.Vector3(
+                state.playerPos.x - Math.sin(state.yaw) * Math.cos(state.pitch) * 10,
+                headY + Math.sin(state.pitch) * 10,
+                state.playerPos.z - Math.cos(state.yaw) * Math.cos(state.pitch) * 10
+              ));
+            }
+          } else if (state.section === 'HOLOGRAM') {
+            const dir = new THREE.Vector3(
+              -Math.sin(state.yaw) * Math.cos(state.pitch),
+              Math.sin(state.pitch),
+              -Math.cos(state.yaw) * Math.cos(state.pitch)
+            );
+            // CLUSTER = center-of-hologram POV (spec) · GALAXY/COSMOS = outside cosmos view
+            const hd = state.zoom === 'CLUSTER' ? 0 : (state.zoom === 'GALAXY' ? 46 : 84);
+            if (hd === 0) {
+              camera.position.set(0, 0, 0);
+              camera.lookAt(dir.x * 10, dir.y * 10, dir.z * 10);
+            } else {
+              camera.position.set(-dir.x * hd, -dir.y * hd, -dir.z * hd);
+              camera.lookAt(0, 0, 0);
+            }
+          }
+
+          // --- hover pick (cursor + hover-only labels) ---
+          if (state.labelsOn || state.hoverOnly) {
+            hovered = pickDomain(mouse);
+            renderer.domElement.style.cursor = hovered ? 'pointer' : 'grab';
+          } else if (hovered) {
+            hovered = null;
+            renderer.domElement.style.cursor = 'grab';
+          }
+
+          // --- project 3D labels into the HTML label layer ---
+          const showMode = state.pov === 'INSIDE_BUILDING' ? false :
+            (state.section === 'HOLOGRAM' ? holoGroup.visible : (state.section === 'CITY' && state.pov === '3RD_TOP'));
+          if (state.labelSize !== lastLabelSize) {
+            lastLabelSize = state.labelSize;
+            labels.forEach((L) => { L.el.style.fontSize = state.labelSize + 'px'; });
+          }
+          labels.forEach((L) => {
+            const e = L.entity;
+            let op = 0;
+            if (showMode && isDomainVisible(e.domain)) {
+              if (state.hoverOnly) op = hovered === e.domain ? 1 : 0;
+              else if (state.labelsOn) op = hovered === e.domain ? 1 : 0.8;
+              if (op > 0) {
+                if (state.section === 'HOLOGRAM') {
+                  e.nodeGroup.getWorldPosition(proj);
+                  proj.y += 5.4 * state.nodeRadius;
+                } else proj.set(e.domain.pos.x, 40, e.domain.pos.z);
+                proj.project(camera);
+                if (proj.z > 1) op = 0;
+                else {
+                  const sx = (proj.x * 0.5 + 0.5) * window.innerWidth;
+                  const sy = (-proj.y * 0.5 + 0.5) * window.innerHeight;
+                  L.el.style.transform = 'translate(-50%,-50%) translate(' + sx.toFixed(1) + 'px,' + sy.toFixed(1) + 'px)';
+                }
+              }
+            }
+            L.el.style.opacity = String(op);
+          });
+
+          // --- fps ---
+          frames++;
+          if (realElapsed - fpsT > 0.75) {
+            setFps(Math.round(frames / (realElapsed - fpsT)));
+            frames = 0;
+            fpsT = realElapsed;
+          }
+
+          renderer.render(scene, camera);
+        };
+
+        animate();
+
+        return () => {
+          cancelAnimationFrame(animId);
+          window.removeEventListener('keydown', onKeyDown);
+          window.removeEventListener('keyup', onKeyUp);
+          window.removeEventListener('mousedown', onMouseDown);
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
+          window.removeEventListener('click', onClick);
+          window.removeEventListener('resize', onResize);
+          renderer.domElement.removeEventListener('wheel', onWheel);
+          simRef.current.pinchAction = null;
+          labels.forEach((L) => L.el.remove());
+          renderer.dispose();
+        };
+      }, []);
+
+      // --- MEDIAPIPE REAL-TIME HAND GESTURE CONTROLLER ---
+      const toggleHandGestures = async () => {
+        const ctl = gestureCtlRef.current;
+
+        if (ctl.running) {
+          ctl.running = false;
+          try { if (ctl.cam) ctl.cam.stop(); } catch (err) { /* ignore */ }
+          try { if (ctl.hands) ctl.hands.close(); } catch (err) { /* ignore */ }
+          ctl.cam = null;
+          ctl.hands = null;
+          simRef.current.handGait = null;
+          simRef.current.handSteerX = 0;
+          simRef.current.handSteerY = 0;
+          ctl.lastGait = undefined;
+          setGestureEnabled(false);
+          setGait('IDLE');
+          setGestureStatus('Hand Tracking Paused — Keyboard/Mouse active');
+          return;
+        }
+
+        try {
+          setGestureStatus('Initializing MediaPipe Hand Engine...');
+          const videoElement = videoRef.current;
+          const hands = new window.Hands({
+            locateFile: (file) => 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/' + file
+          });
+          hands.setOptions({
+            maxNumHands: 1,
+            modelComplexity: 1,
+            minDetectionConfidence: 0.65,
+            minTrackingConfidence: 0.65
+          });
+
+          const setStatus = (s) => {
+            if (ctl.lastStatus !== s) { ctl.lastStatus = s; setGestureStatus(s); }
+          };
+          const applyGait = (g) => {
+            simRef.current.handGait = g;
+            if (ctl.lastGait !== g) { ctl.lastGait = g; setGait(g || 'IDLE'); }
+          };
+
+          hands.onResults((results) => {
+            if (!ctl.running) return;
+            if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
+              applyGait(null);
+              simRef.current.handSteerX = 0;
+              simRef.current.handSteerY = 0;
+              setStatus('Show a hand to steer & walk / jog / run');
+              return;
+            }
+            const lm = results.multiHandLandmarks[0];
+            simRef.current.handSteerX = (lm[9].x - 0.5) * 2;
+            simRef.current.handSteerY = (lm[9].y - 0.5) * 2;
+
+            const indexUp = lm[8].y < lm[6].y;
+            const middleUp = lm[12].y < lm[10].y;
+            const ringUp = lm[16].y < lm[14].y;
+            const pinkyUp = lm[20].y < lm[18].y;
+            const upCount = [indexUp, middleUp, ringUp, pinkyUp].filter(Boolean).length;
+
+            // Pinch (thumb tip 4 -> index tip 8) = Enter building / teleport node
+            const pinchDist = Math.hypot(lm[4].x - lm[8].x, lm[4].y - lm[8].y);
+            if (pinchDist < 0.045) {
+              const now = performance.now();
+              if (now - ctl.lastPinch > 900) {
+                ctl.lastPinch = now;
+                if (simRef.current.pinchAction) simRef.current.pinchAction();
+              }
+            }
+
+            if (upCount === 0) {
+              applyGait(null);
+              setStatus('Fist: STOPPED - move hand to look 360');
+            } else if (upCount === 1) {
+              applyGait('WALK');
+              setStatus('1 finger: WALKING - steer X/Y with hand');
+            } else if (upCount === 2) {
+              applyGait('JOG');
+              setStatus('2 fingers: JOGGING - steer X/Y with hand');
+            } else {
+              applyGait('RUN');
+              setStatus('Open palm: SPRINTING / RUNNING');
+            }
+          });
+
+          const cam = new window.Camera(videoElement, {
+            onFrame: async () => {
+              if (!ctl.running) return;
+              await hands.send({ image: videoElement });
+            },
+            width: 320,
+            height: 240
+          });
+
+          ctl.hands = hands;
+          ctl.cam = cam;
+          ctl.running = true;
+          ctl.lastStatus = '';
+          setGestureEnabled(true);
+          await cam.start();
+          setStatus('Show Hand to Steer & Walk/Jog/Run');
+        } catch (err) {
+          ctl.running = false;
+          ctl.cam = null;
+          ctl.hands = null;
+          setGestureEnabled(false);
+          setGestureStatus('Webcam unavailable — using Keyboard/Mouse Controls');
+        }
+      };
+
+      useEffect(() => () => {
+        const ctl = gestureCtlRef.current;
+        if (ctl.running) {
+          ctl.running = false;
+          try { if (ctl.cam) ctl.cam.stop(); } catch (e) { /* ignore */ }
+          try { if (ctl.hands) ctl.hands.close(); } catch (e) { /* ignore */ }
+        }
+      }, []);
+
+      // --- HUD helpers ---
+      const toggleTier = (t) => setTiersOn((prev) => {
+        const next = Object.assign({}, prev);
+        next[t] = !next[t];
+        return next;
+      });
+      const setAllTiers = () => setTiersOn({ 'S-TIER': true, 'A-TIER': true, 'B-TIER': true });
+      const toggleHidden = (id) => setHiddenDomains((prev) => (prev.indexOf(id) === -1 ? prev.concat([id]) : prev.filter((x) => x !== id)));
+      const toggleSub = (sw) => setHiddenSubs((prev) => (prev.indexOf(sw) === -1 ? prev.concat([sw]) : prev.filter((x) => x !== sw)));
+
+      const Slider = (props) => (
+        <div className="mb-1">
+          <div className="srow"><span>{props.label}</span><span className="sval">{props.fmt ? props.fmt(props.value) : props.value.toFixed(2)}</span></div>
+          <input type="range" min={props.min} max={props.max} step={props.step} value={props.value}
+            onChange={(e) => props.onChange(parseFloat(e.target.value))} />
+        </div>
+      );
+
+      const dimRows = [
+        { key: 'DOMAIN', color: '#7c5cff' },
+        { key: 'TIER', color: '#f0b429' },
+        { key: 'SUB-WORLD', color: '#38bdf8' }
+      ];
+
+      return (
+        <div className="w-full h-full">
+          {/* ================= TOP BAR ================= */}
+          <header className="interactive fixed top-0 inset-x-0 z-30 h-[52px] px-3 flex items-center gap-3"
+            style={{ background: 'linear-gradient(180deg, rgba(10,9,16,.97), rgba(10,9,16,.62))', borderBottom: '1px solid rgba(255,255,255,.06)' }}>
+            <span className="text-[13px] font-black tracking-[.2em] text-white">
+              HOJAIGA<span className="text-violet-400">//</span>OMNI-WORLD
+            </span>
+
+            <div className="flex gap-1.5">
+              <button className={`pill ${section === 'CITY' ? 'on' : ''}`}
+                onClick={() => { setSection('CITY'); setActiveWorld(null); setPov('1ST_POV'); }}>
+                1 &middot; Metropolis
+              </button>
+              <button className={`pill ${section === 'HOLOGRAM' ? 'on' : ''}`}
+                onClick={() => { setSection('HOLOGRAM'); setActiveWorld(null); setPov('1ST_POV'); }}>
+                2 &middot; Graph Cosmos
+              </button>
+            </div>
+
+            {section === 'CITY' && (
+              <div className="flex gap-1.5">
+                <button className="pill" style={pov === '3RD_TOP' ? { background: '#f0b429', borderColor: '#f0b429', color: '#201704', boxShadow: '0 0 14px rgba(240,180,41,.4)' } : undefined}
+                  onClick={() => { setActiveWorld(null); setPov('3RD_TOP'); }}>3rd Top</button>
+                <button className={`pill ${pov === '1ST_POV' ? 'on' : ''}`}
+                  onClick={() => { setActiveWorld(null); setPov('1ST_POV'); }}>1st Street</button>
+              </div>
+            )}
+
+            <div className="flex gap-1.5">
+              {['WALK', 'JOG', 'RUN'].map((g) => (
+                <button key={g} className={`pill ${gait === g ? 'on' : ''}`} onClick={() => setGait(g)}>{g}</button>
+              ))}
+            </div>
+
+            <div className="ml-auto flex items-center gap-1.5">
+              <button className={`pill ${gestureEnabled ? 'on' : ''}`} onClick={toggleHandGestures}>
+                {gestureEnabled ? 'Hand Gestures · Live' : 'Enable Hand Gestures'}
+              </button>
+              <button className={`pill ${uOpen ? 'on' : ''}`} onClick={() => setUOpen(!uOpen)}>U · Utilities</button>
+            </div>
+          </header>
+
+          {/* ================= LEFT PANEL ================= */}
+          <aside className="interactive hud-panel scroll-thin fixed left-3 z-20 w-[200px] p-3 flex flex-col gap-2.5"
+            style={{ top: 60, maxHeight: 'calc(100vh - 122px)', overflowY: 'auto' }}>
+            <div>
+              <div className="sec mb-1.5">View By</div>
+              <div className="grid grid-cols-2 gap-1.5">
+                {[['DOMAIN', 'DOMAIN'], ['TIER', 'TIER'], ['SUB-WORLD', 'SUB'], ['COLOR', 'COLOR']].map(([label, val]) => (
+                  <button key={val} className={`pill ${viewBy === val ? 'on' : ''}`} onClick={() => setViewBy(val)}>{label}</button>
+                ))}
+              </div>
+            </div>
+
+            <div className="divider" />
+            <div>
+              <div className="sec mb-1.5">Utilities</div>
+              <button className="btn-ghost" onClick={() => setUOpen(!uOpen)}>
+                Open U-Menu <span className="kbd ml-1">U</span>
+              </button>
+            </div>
+
+            <div className="divider" />
+            <div>
+              <div className="sec mb-1.5">Zoom</div>
+              <div className="flex gap-1.5">
+                {ZOOM_KEYS.map((z) => (
+                  <button key={z} className={`pill ${zoom === z ? 'on' : ''}`} onClick={() => setZoom(z)}>{z}</button>
+                ))}
+              </div>
+            </div>
+
+            <div className="divider" />
+            <div>
+              <div className="sec mb-1.5 flex justify-between">
+                <span>{section === 'CITY' ? 'Districts' : 'Holo Nodes'}</span>
+                <span style={{ color: '#8fc2ff' }}>{viewBy === 'SUB' ? dirSubs.length : dirDomains.length}</span>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                {viewBy !== 'SUB' && dirDomains.map((d) => {
+                  const hidden = !tiersOn[d.tier] || hiddenDomains.indexOf(d.id) !== -1;
+                  return (
+                    <div key={d.id} className="row-btn" style={hidden ? { opacity: 0.35 } : undefined}
+                      onDoubleClick={() => teleportToDomain(d)}>
+                      <span className="dot" style={{ background: d.color, color: d.color }} />
+                      <span className="flex-1 min-w-0">
+                        <span className="block text-[10px] font-bold text-slate-200 truncate">{d.name}</span>
+                        <span className="block text-[8.5px] text-slate-500 truncate">{d.subWorlds.length} sub-worlds</span>
+                      </span>
+                      <span className="tbadge">{d.tier.replace('-TIER', '')}</span>
+                    </div>
+                  );
+                })}
+                {viewBy === 'SUB' && dirSubs.map((s, i) => (
+                  <div key={i} className="row-btn" onDoubleClick={() => teleportToDomain(s.dom)}>
+                    <span className="dot" style={{ background: s.dom.color, color: s.dom.color }} />
+                    <span className="flex-1 min-w-0">
+                      <span className="block text-[10px] font-bold text-slate-200 truncate">{s.sub}</span>
+                      <span className="block text-[8.5px] text-slate-500 truncate">{s.dom.short}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-2 gap-1.5 mt-1.5">
+                <button className="btn-ghost" onClick={() => teleportToDomain(visibleDomains[0] || DOMAINS[0])}>Take</button>
+                <button className="btn-ghost" onClick={() => enterInterior(visibleDomains[0] || DOMAINS[0])}>Enter</button>
+              </div>
+            </div>
+
+            <div className="divider" />
+            <div>
+              <div className="srow mb-1"><span>Sketch Radar</span>
+                <span className="sval" style={{ cursor: 'pointer' }} onClick={() => setRoughHud(!roughHud)}>{roughHud ? 'HIDE' : 'SHOW'}</span>
+              </div>
+              <canvas ref={roughCanvasRef} width={200} height={200} style={{ width: '100%', borderRadius: 6, display: roughHud ? 'block' : 'none' }} />
+            </div>
+
+            <div className="divider" />
+            <div>
+              <div className="sec mb-1.5">Stats</div>
+              <div className="flex flex-col gap-1 text-[9px]">
+                {[['Nodes', nodeCount], ['Edges', edgeCount], ['Crowd', 45], ['FPS', fps]].map(([k, v]) => (
+                  <div key={k} className="srow"><span>{k}</span><span className="sval">{v}</span></div>
+                ))}
+              </div>
+            </div>
+          </aside>
+
+          {/* ================= RIGHT PANEL · UTILITIES (U) ================= */}
+          {uOpen && (
+            <aside className="interactive hud-panel scroll-thin fixed right-3 z-20 w-[212px] p-3 flex flex-col gap-3"
+              style={{ top: 60, bottom: 54, overflowY: 'auto' }}>
+              <div className="flex items-center justify-between">
+                <span className="sec" style={{ color: '#c4bdf5' }}>Utilities (U)</span>
+                <span className="sq" onClick={() => setUOpen(false)}>&times;</span>
+              </div>
+
+              {/* LINES */}
+              <div>
+                <div className="sec mb-1">Lines</div>
+                <Slider label="Weight (parent)" value={linkGlow} min={0.2} max={2.5} step={0.1} onChange={setLinkGlow} />
+                <Slider label="Radial width" value={radialWidth} min={0.3} max={2} step={0.1} onChange={setRadialWidth} />
+                <Slider label="Ripple" value={ripple} min={0} max={2} step={0.1} onChange={setRipple} />
+                <Slider label="Inter-galaxy" value={interGalaxy} min={0} max={2} step={0.1} onChange={setInterGalaxy} />
+              </div>
+
+              {/* MOTION */}
+              <div>
+                <div className="sec mb-1">Motion</div>
+                <Slider label="Drift speed" value={driftSpeed} min={0} max={3} step={0.1} onChange={setDriftSpeed} />
+                <div className="flex gap-1.5 mb-1.5">
+                  <button className={`btn-ghost ${frozen ? 'on' : ''}`} onClick={() => setFrozen(!frozen)}>Freeze motion</button>
+                  <button className={`btn-ghost ${trails ? 'on' : ''}`} onClick={() => setTrails(!trails)}>Trails</button>
+                </div>
+                <Slider label="Crowd speed" value={npcSpeed} min={0} max={3} step={0.1} onChange={setNpcSpeed} />
+                <div className="flex gap-1.5">
+                  <button className={`btn-ghost ${clusterOpen ? 'on' : ''}`} onClick={() => setClusterOpen(!clusterOpen)}>Expand clusters</button>
+                  <button className={`btn-ghost ${entitiesOpen ? 'on' : ''}`} onClick={() => setEntitiesOpen(!entitiesOpen)}>Expand entities</button>
+                </div>
+              </div>
+
+              {/* NODES */}
+              <div>
+                <div className="sec mb-1">Nodes</div>
+                <Slider label="Radius" value={nodeRadius} min={0.4} max={2} step={0.05} onChange={setNodeRadius} />
+                <Slider label="Boost" value={boost} min={0} max={2.5} step={0.1} onChange={setBoost} />
+                <Slider label="Star density" value={starDensity} min={0} max={1} step={0.05} onChange={setStarDensity} />
+              </div>
+
+              {/* LABELS */}
+              <div>
+                <div className="sec mb-1">Labels</div>
+                <div className="flex gap-1.5 mb-1.5">
+                  <button className={`btn-ghost ${labelsOn ? 'on' : ''}`} onClick={() => setLabelsOn(!labelsOn)}>Always on</button>
+                  <button className={`btn-ghost ${hoverOnly ? 'on' : ''}`} onClick={() => setHoverOnly(!hoverOnly)}>Hover-only</button>
+                </div>
+                <Slider label="Label size" value={labelSize} min={8} max={20} step={1} onChange={setLabelSize} fmt={(v) => v.toFixed(0)} />
+              </div>
+
+              {/* FILTERS */}
+              <div>
+                <div className="sec mb-1.5">Filters</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {['S-TIER', 'A-TIER', 'B-TIER'].map((t) => (
+                    <button key={t} className={`pill ${TIER_CLS[t] || ''} ${tiersOn[t] ? 'on' : ''}`} onClick={() => toggleTier(t)}>{t.replace('-TIER', '')}-TIER</button>
+                  ))}
+                  <button className="pill" onClick={setAllTiers}>ALL</button>
+                </div>
+              </div>
+
+              {/* DIMENSION CONNECTOR */}
+              <div>
+                <div className="sec mb-1">Dimension Connector</div>
+                <p className="text-[8.5px] leading-[1.5] text-slate-500 mb-1.5">
+                  Paint links between nodes sharing a dimension. Click <b className="text-slate-300">+</b> to bind that dimension to the cross-opacity filter.
+                </p>
+                <div className="flex flex-col gap-1">
+                  {dimRows.map((r) => (
+                    <div key={r.key}>
+                      <div className="flex items-center gap-1.5 text-[8.5px] uppercase tracking-wider text-slate-400">
+                        <span className="leg-dot" style={{ background: r.color, boxShadow: '0 0 7px ' + r.color }} />
+                        <span className="flex-1">{r.key}</span>
+                        <span className="sq" onClick={() => setDims((p) => Object.assign({}, p, { [r.key]: true }))}>+</span>
+                        <span className="sq" onClick={() => setDims((p) => Object.assign({}, p, { [r.key]: false }))}>&minus;</span>
+                      </div>
+                      {dims[r.key] && (
+                        <div className="flex flex-wrap gap-1 mt-1 pl-1">
+                          {r.key === 'DOMAIN' && DOMAINS.map((d) => (
+                            <span key={d.id} className={`chip ${hiddenDomains.indexOf(d.id) !== -1 || !tiersOn[d.tier] ? 'off' : ''}`}
+                              onClick={() => toggleHidden(d.id)}>
+                              <span className="leg-dot" style={{ background: d.color }} />{d.short}
+                            </span>
+                          ))}
+                          {r.key === 'TIER' && ['S-TIER', 'A-TIER', 'B-TIER'].map((t) => (
+                            <span key={t} className={`chip ${!tiersOn[t] ? 'off' : ''}`} onClick={() => toggleTier(t)}>{t}</span>
+                          ))}
+                          {r.key === 'SUB-WORLD' && dirSubs.map((s, i) => (
+                            <span key={i} className="chip" onClick={() => toggleSub(s.sub)}>
+                              <span className="leg-dot" style={{ background: s.dom.color }} />{s.sub}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-1.5">
+                  <Slider label="Cross opacity" value={crossOpacity} min={0} max={2} step={0.1} onChange={setCrossOpacity} />
+                </div>
+                <button className={`btn-ghost w-full ${curved ? 'on' : ''}`} onClick={() => setCurved(!curved)}>Curved lines</button>
+              </div>
+
+              {/* PRESETS */}
+              <div>
+                <div className="sec mb-1.5">Presets</div>
+                <div className="flex gap-1.5">
+                  {['MINIMAL', 'DENSE', 'X-RAY'].map((p) => (
+                    <button key={p} className={`btn-ghost ${preset === p ? 'on' : ''}`} onClick={() => applyPreset(p)}>{p}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* GESTURE ENGINE */}
+              <div>
+                <div className="sec mb-1.5">Gesture Engine</div>
+                <div style={{ border: '1px solid rgba(255,255,255,.07)', borderRadius: 6, padding: 7, background: 'rgba(255,255,255,.02)' }}>
+                  <video ref={videoRef} playsInline muted
+                    style={{ width: '100%', height: 74, objectFit: 'cover', borderRadius: 4, background: '#000', display: gestureEnabled ? 'block' : 'none' }} />
+                  <div className="text-[8.5px] text-slate-400 leading-[1.5] mt-1">{gestureStatus}</div>
+                  <ul className="text-[8px] text-slate-500 space-y-0.5 mt-1.5 pt-1.5" style={{ borderTop: '1px solid rgba(255,255,255,.06)' }}>
+                    <li>1 finger &mdash; walk forward</li>
+                    <li>2 fingers &mdash; jog forward</li>
+                    <li>Open palm &mdash; sprint / run</li>
+                    <li>Closed fist &mdash; stop moving</li>
+                    <li>Move hand L/R/U/D &mdash; 360 look</li>
+                    <li>Pinch thumb+index &mdash; enter node</li>
+                  </ul>
+                </div>
+              </div>
+            </aside>
+          )}
+
+          {/* ================= CENTER OVERLAYS ================= */}
+          <div className="fixed left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-3 pointer-events-none"
+            style={{ top: 64, width: 480, maxWidth: 'calc(100vw - 480px)' }}>
+            {nearbyDomain && pov !== 'INSIDE_BUILDING' && section === 'CITY' && (
+              <div className="interactive hud-panel px-5 py-3 text-center"
+                style={{ border: '1px solid ' + nearbyDomain.color + '99', boxShadow: '0 0 34px ' + nearbyDomain.color + '33' }}>
+                <div className="sec" style={{ color: nearbyDomain.color }}>Approaching District Portal</div>
+                <div className="text-[15px] font-black text-white mt-0.5">{nearbyDomain.name}</div>
+                <p className="text-[10px] text-slate-400 mt-1">Walk through the glowing doors, or step inside now.</p>
+                <button className="pill mt-2" style={{ background: nearbyDomain.color, borderColor: nearbyDomain.color, color: '#101018' }}
+                  onClick={() => enterInterior(nearbyDomain)}>Enter {nearbyDomain.short} building</button>
+              </div>
+            )}
+
+            {pov === 'INSIDE_BUILDING' && activeWorld && (
+              <div className="interactive hud-panel p-4" style={{ width: 460 }}>
+                <div className="flex justify-between items-center">
+                  <span className="sec" style={{ color: activeWorld.color }}>Inside World // {activeWorld.tier}</span>
+                  <button className="pill" style={{ borderColor: '#f87171', color: '#fca5a5' }}
+                    onClick={() => exitInterior('1ST_POV')}>&larr; Exit to street (ESC)</button>
+                </div>
+                <h2 className="text-lg font-black text-white mt-1">{activeWorld.name}</h2>
+                <p className="text-[10px] text-slate-400 mt-0.5">{activeWorld.desc}</p>
+
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  {activeWorld.subWorlds.filter((s) => hiddenSubs.indexOf(s) === -1).map((sub, i) => (
+                    <div key={sub} style={{ padding: 9, borderRadius: 8, background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)' }}>
+                      <div className="text-[8px] font-bold" style={{ color: activeWorld.color }}>SECTOR 0{i + 1}</div>
+                      <div className="text-[11px] font-bold text-white mt-0.5">{sub}</div>
+                      <div className="text-[8.5px] text-emerald-400 mt-1">&#9679; Active hologram chamber</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ================= BOTTOM-RIGHT HINTS ================= */}
+          <div className="interactive hud-panel fixed right-3 bottom-3 z-20 px-3 py-2 flex items-center gap-3 text-[8.5px] text-slate-400">
+            <span><b className="text-slate-200">Scroll</b> zoom &middot; <b className="text-slate-200">Drag</b> look &middot; <b className="text-slate-200">WASD</b> move &middot; <b className="text-slate-200">Shift</b> sprint</span>
+            <span style={{ color: '#8fc2ff' }}>Click node/building to enter</span>
+            <span><span className="kbd">U</span> utilities &middot; <span className="kbd">V</span> POV &middot; <span className="kbd">ESC</span> exit</span>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('ui-layer')).render(<App />);
+    </script>
+  </body>
+</html>
