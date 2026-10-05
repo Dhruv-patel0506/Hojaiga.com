@@ -104,3 +104,24 @@ path -> key (only if key delivery is proven) -> context -> control invoke -> Alt
 * "Open Navigation" is not "open a file": file-operation capabilities match only when the word IS the label.
 * Calculator's converter list ("Volume") made it a media player until single-keyword evidence was disallowed.
 * A single `.nfo` file type + shared file verbs made `msinfo32` a text editor until a *defining* capability was required.
+
+
+## 5. Added 2026-10-05 (work order rev 2): what is built, measured, and what is not
+| Piece | Module | Measured |
+|---|---|---|
+| Pointer sentinel (who moved the mouse) | `pointer_sentinel.py` + runner | PTR1 12/12; hardware vs injected vs unattributed; KM1 ended ABORTED-ENV (hand, 971 px) instead of FAIL |
+| Escalation screenshot on every need-human row | `task_lifecycle.capture_evidence` | ES2 7/7; LC2 live: PNG 4544 bytes attached to the queue row |
+| Shipped command lists, DEMOTED | `preload_sources.py`, `pe_imports.py` | OBS: 154 request names from the websocket plugin in 0.8 s; VS Code 518; every one `archetype` trust until a live probe corroborates it |
+| 1-second capability summary | `command_registry.capability_summary` | CAP1 9/9, 15 ms; surfaces with a verified task are named, the rest say "only READ" |
+| First contact in seconds | `fast_scan.deep_scan`, `scan_desktop(fast=True)` | Calculator 11.0 s, Notepad 14.5 s INCLUDING app start (excl. launch 8.4 / 9.3 s); Word 25, PowerPoint 33, Excel 34, OBS 29.5: NOT under 10 s for complex apps |
+| One place every action leaves | `dap_actuator.py` (family -> ordered providers, trace) | ACT1 9/9; no physical provider; Chromium provider acts through the RAW view |
+| Popup that exposes nothing | `popup_visual.py` + `OCREngine.words` | PV1 8/8: painted dialog read by DAP capture+OCR, `Not now` pressed by a posted click, an elevation prompt in the same disguise escalated |
+| Parallel child cursors | `loop_first.run_loop_first(parallel=True)` | Word + Excel at once: 201 s vs ~288 s sequential, two sprites, distinct paths, both files valid |
+| Canvas drawing without pointer input | `canvas_paste.py` | image -> clipboard -> app Paste -> save; clipboard overwritten only with the user's OK, text restored. See the open item below |
+
+Office save-to-path (the proof case): Excel 139 s / Word 149 s / PowerPoint 168 s, all unattended, files verified valid OOXML (see 09 P-30 for the three
+root causes). Crash relaunch (4.3) was already proven live by G2L and passes.
+
+Open / not proven: Paint draw end-to-end (the paste goal needed a canvas-change postcondition and the run was disturbed by another suite);
+Steam not exercised; Discord/WhatsApp (tray-parked Chromium) accept ValuePattern writes but the page applies them seconds later; GDI leak not
+reproduced after one occurrence; E2E-1 passes but is slow (patience waits).

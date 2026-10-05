@@ -742,6 +742,23 @@ def infer_profile(*, labels: List[str], exts: List[str], dialog_titles: List[str
 # 7. the whole static read
 # ---------------------------------------------------------------------------------------------
 
+def _install_root(exe: str) -> str:
+    """The program's install ROOT: its folder, then up to two parents while they are still the program's own tree (plugins live in a sibling
+    of the exe's folder: 'X/bin/64bit/app.exe' + 'X/obs-plugins/64bit/remote.dll'). Stops before a drive root, 'Program Files', or any shared
+    directory, so another program's files are never read."""
+    cur = os.path.dirname(exe)
+    stop = {"program files", "program files (x86)", "programs", "windowsapps", "windows", "system32", "appdata", "local", "users"}
+    layout = {"bin", "64bit", "32bit", "x64", "x86", "win64", "win32", "bin64", "bin32", "release", "app"}      # an architecture / bin folder is not the root
+    for _ in range(2):
+        if os.path.basename(cur).lower() not in layout:
+            break
+        parent = os.path.dirname(cur)
+        if not parent or parent == cur or os.path.basename(parent).lower() in stop or len(parent) <= 3 or _is_shared_dir(parent):
+            break
+        cur = parent
+    return cur
+
+
 def harvest(target: Any, *, with_install_sources: bool = True) -> Dict[str, Any]:
     """Everything knowable about `target` (hwnd | exe path | name) without running it."""
     t0 = time.time()
@@ -789,7 +806,19 @@ def harvest(target: Any, *, with_install_sources: bool = True) -> Dict[str, Any]
     if with_install_sources and not shared:
         src = harvest_install_sources(exe)
         d["install_sources"] = {k: v for k, v in src.items() if k != "commands"}
-        d["commands"].extend(src["commands"])
+        shipped = [dict(c, preload=True) for c in src["commands"]]
+        try:                                                  # operator registries, request lists, plugin request-name tables
+            from core_organs import preload_sources as _pre
+            extra = _pre.scan(pkg or _install_root(exe))
+            have = {(c.get("command_id") or c["name"]).lower() for c in shipped} | {c["name"].lower() for c in shipped}
+            for c in extra["commands"]:
+                if c.get("origin_fmt") in ("operator-registry", "protocol-json", "api-strings") and \
+                        (c.get("command_id") or c["name"]).lower() not in have and c["name"].lower() not in have:
+                    shipped.append(dict(c, preload=True))
+            d["install_sources"]["preload"] = extra["sources"]
+        except Exception as exc:  # noqa: BLE001
+            d["skipped"].append(f"preload:{type(exc).__name__}")
+        d["commands"].extend(shipped)
     labels = [c.get("menu_path") or c["name"] for c in d["commands"]]
     d["profile"] = infer_profile(labels=labels, exts=exts, dialog_titles=[x["title"] for x in d["dialogs"] if x["title"]],
                                  framework_ids=[f["id"] for f in d["frameworks"]], description=d["version_info"].get("FileDescription", ""))
@@ -813,7 +842,12 @@ def ingest(model, app_name: str, d: Dict[str, Any], *, version_hash: str = "") -
         if fact in d and d[fact] not in (None, "", {}, []):
             ks.put_fact(model, key, fact, d[fact], source=src, confidence=0.9)
             rep["facts"] += 1
-    for c in d.get("commands", []):
+    demoted = [c for c in d.get("commands", []) if c.get("preload")]
+    if demoted:                                              # shipped command lists are HINTS until a live probe corroborates them
+        from core_organs import preload_sources as _pre
+        _pre.ingest_preload(model, app_name, [{k: v for k, v in c.items() if k != "preload"} for c in demoted])
+        rep["commands"] += len(demoted)
+    for c in [c for c in d.get("commands", []) if not c.get("preload")]:
         cc = {k: v for k, v in c.items() if k not in ("origin_fmt",)}
         cc.setdefault("risk", None)
         if cc.get("risk") is None:

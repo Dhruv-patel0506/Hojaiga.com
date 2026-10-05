@@ -50,6 +50,85 @@ class Chain:
         return "\n".join(f"  [{i['status']:<7}] {i['id']:<12} {i['name']}: {i['evidence']}" for i in self.items)
 
 
+# ------------------------------------------------------------------------------------------------ evidence for the human (4.1 / P2-L)
+
+_QUEUED: Dict[str, List[Dict[str, Any]]] = {}          # run_id -> items the D3 gate queued (qid, app, goal) still waiting for a picture
+
+
+def capture_evidence(app_hint: str, why: str, hwnd: int = 0) -> Dict[str, Any]:
+    """A PNG of what the agent saw when it stopped, for the person who has to decide. The target window is captured with PrintWindow
+    (never raised or shown; a window Hojaiga holds minimized is parked off-screen for the grab and put back). Returns
+    {'path','bytes','note','title'}; path is '' with the Win32 reason in 'note' when nothing could be captured - never a fake file."""
+    out: Dict[str, Any] = {"path": "", "bytes": 0, "note": "", "title": "", "why": why[:120]}
+    try:
+        import os as _os
+        from core_organs import desktop_grounding as _dg
+        from core_organs import headless_input as _hin
+        from core_organs import background_window as _bw
+        if not hwnd:
+            hwnd = _dg.DesktopGrounding().find_window(app_hint) if app_hint else 0
+        if not hwnd or not _hin.is_alive(hwnd):
+            out["note"] = "the app window was already gone when the evidence was captured"
+            return out
+        out["title"] = _hin.safe_window_text(hwnd)[:60]
+        img, note = None, ""
+        for attempt in range(3):                                   # the first frame of a just-restored window can still be blank
+            if _hin.is_minimized(hwnd) or attempt:
+                try:
+                    with _bw.BackgroundSession(hwnd):
+                        time.sleep(0.6 + 0.4 * attempt)
+                        img, note = _hin.capture_window(hwnd)
+                except Exception as exc:  # noqa: BLE001
+                    note = f"park-and-capture failed: {type(exc).__name__}"
+            else:
+                img, note = _hin.capture_window(hwnd)
+            if img is not None:
+                break
+        if img is None:
+            out["note"] = (note or "capture failed")[:200]
+            return out
+        folder = r"D:\new_automation\data\escalations"
+        _os.makedirs(folder, exist_ok=True)
+        path = _os.path.join(folder, f"esc_{int(time.time())}_{hwnd}.png")
+        img.save(path, format="PNG")
+        size = _os.path.getsize(path)
+        from PIL import Image as _Img
+        with _Img.open(path) as chk:                                  # a real picture: decodes, has pixels, is not one flat colour
+            chk.load()
+            flat = chk.convert("L").getextrema()
+        if size <= 0 or flat[0] == flat[1]:
+            out["note"] = f"captured an empty image ({size} bytes, flat={flat})"
+            try:
+                _os.remove(path)
+            except OSError:
+                pass
+            return out
+        out.update({"path": path, "bytes": size, "note": "ok", "size": f"{img.size[0]}x{img.size[1]}"})
+    except Exception as exc:  # noqa: BLE001
+        out["note"] = f"{type(exc).__name__}: {str(exc)[:120]}"
+    return out
+
+
+def attach_queue_evidence(model, run_id: str, fallback_apps: Optional[List[str]] = None) -> List[Dict[str, Any]]:
+    """Give every queued-for-a-human item of this run a screenshot of its app (the app named by the item, else a fallback app of the
+    ticket). The path goes into the queue row's context, so the help inbox shows the picture next to the question."""
+    done: List[Dict[str, Any]] = []
+    for item in _QUEUED.pop(run_id, []):
+        shot: Dict[str, Any] = {}
+        for app in [item["app"]] + [a for a in (fallback_apps or []) if a != item["app"]]:
+            shot = capture_evidence(app, item["goal"])
+            if shot.get("path"):
+                break
+        item["screenshot"] = shot
+        try:
+            model.attach_evidence(item["qid"], {"screenshot": shot.get("path", ""), "screenshot_bytes": shot.get("bytes", 0),
+                                                "screenshot_note": shot.get("note", ""), "screenshot_title": shot.get("title", "")})
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("[lifecycle] attach_evidence failed: %s", exc)
+        done.append(item)
+    return done
+
+
 # ------------------------------------------------------------------------------------------------ D3: the risk gate
 
 def gate_plans(plans: List[lf.AppPlan], *, model, run_id: str, task: str, allow_destructive: bool,
@@ -63,8 +142,9 @@ def gate_plans(plans: List[lf.AppPlan], *, model, run_id: str, task: str, allow_
             risk = model.classify_risk_of(goal) if hasattr(model, "classify_risk_of") else _classify(goal)
             if risk == "E2" and not allow_destructive:
                 try:
-                    model.enqueue(run_id, plan.app, task, f"irreversible step needs a human: '{goal[:80]}'",
-                                  {"goal": goal, "app": plan.app, "risk": risk, "unattended": unattended})
+                    qid = model.enqueue(run_id, plan.app, task, f"irreversible step needs a human: '{goal[:80]}'",
+                                        {"goal": goal, "app": plan.app, "risk": risk, "unattended": unattended})
+                    _QUEUED.setdefault(run_id, []).append({"qid": qid, "app": plan.app, "goal": goal})
                 except Exception as exc:                          # a queue failure must still stop the step
                     logger.warning("[lifecycle] enqueue failed: %s", exc)
                 plan.notes.append(f"QUEUED FOR A HUMAN (irreversible): '{goal[:60]}'")
@@ -234,7 +314,8 @@ def _checkpoints_from_run(run: lf.AppRun, chain: Chain, *, intel_note: str = "")
     shots = r.get("escalation_shots") or []
     chain.mark("C2.popups", "popup / dialog sweep", "ESCALATED" if shots else "PASS",
                f"{popup_n} popup-related step(s); preflight + per-step triage ran before every action"
-               + (f"; a dialog needed a human, screenshot saved: {shots[0].get('path')}" if shots else ""))
+               + (f"; a dialog needed a human, screenshot saved: {shots[0].get('path')}" if shots and shots[0].get("path")
+                  else (f"; a dialog needed a human and NO picture could be captured ({shots[0].get('capture')})" if shots else "")))
     chain.mark("C3.snapshot", "pre/post state snapshot (structure + pixels + names)", "PASS" if trace else "BLOCKED",
                f"{len(trace)} step(s) verified against a before/after snapshot")
 
@@ -282,7 +363,8 @@ def run_lifecycle(command: str, *, allow_destructive: bool = False, unattended: 
                   operate: Optional[Callable[..., Dict[str, Any]]] = None,
                   prepare: Optional[Callable[..., Dict[str, Any]]] = None,
                   capsule_cb=None, cursor_cb=None, notify=None, max_steps_per_goal: int = 5,
-                  model=None, run_id: Optional[str] = None, catalog: Optional[List[str]] = None) -> Dict[str, Any]:
+                  model=None, run_id: Optional[str] = None, catalog: Optional[List[str]] = None,
+                  parallel: bool = False) -> Dict[str, Any]:
     t0 = time.perf_counter()
     run_id = run_id or "run_" + uuid.uuid4().hex[:8]
     chain = Chain()
@@ -352,9 +434,18 @@ def run_lifecycle(command: str, *, allow_destructive: bool = False, unattended: 
                     continue
             res = lf.run_loop_first(ticket, spans, operate=operate, prepare=prepare, capsule_cb=capsule_cb,
                                     cursor_cb=cursor_cb, notify=notify, allow_destructive=allow_destructive,
-                                    max_steps_per_goal=max_steps_per_goal, plan_filter=_filter)
+                                    max_steps_per_goal=max_steps_per_goal, plan_filter=_filter, parallel=parallel)
             for run in res.runs:
                 _checkpoints_from_run(run, tchain)
+            if model is not None and _QUEUED.get(run_id):
+                esc = attach_queue_evidence(model, run_id, [a for a, _p in spans])
+                tr["escalations"] = [{"qid": e["qid"], "app": e["app"], "goal": e["goal"][:100],
+                                      "screenshot": e["screenshot"].get("path", ""), "bytes": e["screenshot"].get("bytes", 0),
+                                      "note": e["screenshot"].get("note", "")} for e in esc]
+                for e in tr["escalations"]:
+                    tchain.mark("D3.evidence", "picture attached to the need-human record",
+                                "PASS" if e["screenshot"] else "BLOCKED",
+                                f"{e['qid']}: " + (f"{e['screenshot']} ({e['bytes']} bytes)" if e["screenshot"] else f"no picture ({e['note']})"))
             queued = any(i["id"] == "D3.gate" and i["status"] == "ESCALATED" for i in tchain.items)
             if res.halted_for_human:
                 tr["status"] = "ESCALATED"

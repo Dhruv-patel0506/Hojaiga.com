@@ -1108,6 +1108,20 @@ class BehaviorModel:
         self._conn.commit()
         return qid
 
+    def attach_evidence(self, qid: str, extra: Dict[str, Any]) -> bool:
+        """Merge evidence (a screenshot path ...) into a queued need-human row's context, so the help inbox shows it."""
+        row = self._conn.execute("SELECT context_json FROM bm_queue WHERE qid=?", (qid,)).fetchone()
+        if row is None:
+            return False
+        try:
+            ctx = json.loads(row[0] or "{}")
+        except Exception:
+            ctx = {}
+        ctx.update(extra)
+        self._conn.execute("UPDATE bm_queue SET context_json=? WHERE qid=?", (json.dumps(ctx, default=str)[:4000], qid))
+        self._conn.commit()
+        return True
+
     def pending_queue(self) -> List[Dict[str, Any]]:
         return [dict(r) for r in self._conn.execute(
             "SELECT * FROM bm_queue WHERE status='pending' ORDER BY ts")]
@@ -2257,11 +2271,19 @@ class EffectorLadder:
             if self.loop is None:
                 return False, "file_dialog", "no loop available"
             from core_organs import fast_uia
-            end = time.time() + 8.0                            # wait (bounded) until the dialog really has its filename box
-            while time.time() < end:
-                ready = False
+            try:
+                from core_organs import organ_24_dap as _dap_mod
+            except Exception:  # noqa: BLE001
+                _dap_mod = None
+            end = time.time() + 8.0        # wait (bounded) until the dialog really has its filename box
+            ready = False
+            while time.time() < end and not ready:
                 for w in _popups(hwnd)[:4]:
-                    if _win_class(w) == "#32770":
+                    if _dap_mod is not None:
+                        # the shared shape test, so this does not wait out one vendor's window class while a
+                        # differently drawn picker is already sitting there with its name box open
+                        ready = bool(_dap_mod.file_dialog_shape(w, timeout_ms=2000).get("name_edit"))
+                    elif _win_class(w) == "#32770":
                         kids = win32_window_controls(w)
                         ready = any(k["class"] in ("Edit", "ComboBox", "ComboBoxEx32") for k in kids)
                         if not ready:
@@ -2269,10 +2291,12 @@ class EffectorLadder:
                             ready = any(n.ctype == "EditControl" for n in snap)
                     if ready:
                         break
-                if ready:
-                    break
-                time.sleep(0.3)
-            ok, note = self.loop.handle_native_file_dialog(str(action.get("path", "")))
+                if not ready:
+                    time.sleep(0.3)
+            # scope the rung to THIS app: with no owner the driver would happily fill in and confirm a
+            # picker belonging to some other window on the desktop, including one the user opened.
+            ok, note = self.loop.handle_native_file_dialog(str(action.get("path", "")),
+                                                            owner_hwnd=int(hwnd or 0))
             return bool(ok), "file_dialog", note
         order = [e for e in self.model.effector_order(app_key, verb, self.DEFAULTS.get(verb, ["key"]))
                  if e not in avoid] or list(self.DEFAULTS.get(verb, ["key"]))

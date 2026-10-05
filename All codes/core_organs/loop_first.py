@@ -317,10 +317,15 @@ class AppRun:
     hwnd: int = 0
     elapsed_s: float = 0.0
     goal_verdicts: List[str] = field(default_factory=list)
+    cursor_id: str = ""                                         # the child virtual cursor that drove this app (parallel runs)
+    cursor_path: List[Tuple[int, int]] = field(default_factory=list)
+    t_start: float = 0.0
+    t_end: float = 0.0
 
     def as_dict(self) -> Dict[str, Any]:
         r = self.result
         return {"app": self.app, "status": self.status, "hwnd": self.hwnd, "elapsed_s": round(self.elapsed_s, 2),
+                "cursor": self.cursor_id, "cursor_points": len(self.cursor_path),
                 "steps": r.get("steps", 0), "completed": r.get("completed"), "awaiting_human": r.get("awaiting_human"),
                 "blocked_at_goal": r.get("blocked_at_goal"), "goals": self.plan.goals,
                 "strength": self.plan.strength, "goal_verdicts": self.goal_verdicts,
@@ -337,6 +342,7 @@ class LoopFirstResult:
     halted_for_human: bool = False
     capsule: str = ""
     elapsed_s: float = 0.0
+    parallel: Dict[str, Any] = field(default_factory=dict)
 
     @property
     def all_completed(self) -> bool:
@@ -349,7 +355,7 @@ class LoopFirstResult:
     def as_dict(self) -> Dict[str, Any]:
         return {"ran": self.ran, "reason": self.reason, "halted_for_human": self.halted_for_human,
                 "capsule": self.capsule, "elapsed_s": round(self.elapsed_s, 2),
-                "all_completed": self.all_completed, "apps": [r.as_dict() for r in self.runs]}
+                "all_completed": self.all_completed, "parallel": dict(self.parallel), "apps": [r.as_dict() for r in self.runs]}
 
     def evidence_text(self) -> str:
         """The block the crew receives. Plain facts: what was DONE and VERIFIED, what was weak, what is left."""
@@ -390,6 +396,92 @@ def _goal_verdicts(plan: AppPlan, trace: List[Dict[str, Any]]) -> List[str]:
     return [last.get(g, "NOT RUN") for g in plan.goals]
 
 
+def plans_independent(plans: List["AppPlan"]) -> Tuple[bool, str]:
+    """May these per-app plans run at the same time? Only when they touch DISJOINT apps and no plan talks about another plan's app (a
+    clause that names two apps is data moving between them: order matters, so the run stays sequential). DATA-driven: the app names come
+    from the plans themselves."""
+    apps = [p.app.lower() for p in plans if p.goals]
+    if len(apps) < 2:
+        return False, "fewer than two apps have goals"
+    if len(set(apps)) != len(apps):
+        return False, "two plans target the same app"
+    for p in plans:
+        others = [a for a in apps if a != p.app.lower()]
+        blob = " ".join(p.clauses or p.goals).lower()
+        for o in others:
+            if o in blob:
+                return False, f"a clause of '{p.app}' names '{o}' (data may move between them)"
+    return True, "disjoint apps, no cross-app clause"
+
+
+def _run_plans_parallel(plans, *, operate, capsule_cb, allow_destructive, max_steps_per_goal, record, out, notify) -> None:
+    """One CHILD virtual cursor per app, all running at once. Each child has its own loop (operate(..., isolated=True)), its own sprite id and
+    its own cursor path; the verifier judges every child independently. Shared, focus-dependent state (the UIA worker, the popup policy's task
+    context) is serialized inside the loop, so concurrency only overlaps the waits and the posted messages."""
+    import threading
+    runs = [AppRun(app=p.app, plan=p) for p in plans]
+    out.runs.extend(runs)
+
+    def child(run: AppRun, idx: int) -> None:
+        plan = run.plan
+        run.cursor_id = f"child:{idx}:{plan.app}"
+        sprite = None
+        try:
+            from core_organs import visual_cursor as vc
+            sprite = vc.for_agent(run.cursor_id, plan.app, ttl=None)
+        except Exception:                                      # no overlay available: the path is still recorded
+            sprite = None
+
+        def cursor_cb(x, y, _run=run, _spr=sprite):
+            _run.cursor_path.append((int(x), int(y)))
+            try:
+                if _spr is not None:
+                    _spr.fly_to(float(x), float(y), _run.app, 0.15)
+            except Exception:  # noqa: BLE001
+                pass
+        run.t_start = time.perf_counter()
+        try:
+            try:                                           # a worker thread needs its OWN COM apartment before any UI Automation call
+                import uiautomation as _auto
+                _com = _auto.UIAutomationInitializerInThread()
+                _com.__enter__()
+            except Exception:  # noqa: BLE001
+                _com = None
+            res = operate(plan.app, list(plan.goals), allow_destructive=allow_destructive, capsule_cb=capsule_cb, cursor_cb=cursor_cb,
+                          max_steps_per_goal=max_steps_per_goal, expect_map=dict(plan.expect_map) or None, isolated=True)
+            run.result = res or {}
+            run.hwnd = int(run.result.get("hwnd") or 0)
+            run.goal_verdicts = _goal_verdicts(plan, run.result.get("trace") or [])
+            run.status = "NEEDS_HUMAN" if run.result.get("awaiting_human") else ("COMPLETED" if run.result.get("completed") else "BLOCKED")
+        except Exception as exc:  # noqa: BLE001
+            logger.exception("[loop-first] child %s failed", plan.app)
+            run.status, run.result = "ERROR", {"error": f"{type(exc).__name__}: {exc}"}
+        run.t_end = time.perf_counter()
+        run.elapsed_s = run.t_end - run.t_start
+        APP_HANDLES[plan.app] = {"hwnd": run.hwnd, "title": run.result.get("window_title", ""),
+                                 "trace_tail": run.as_dict()["trace_tail"], "ts": time.time()}
+        record("LOOP_FIRST", plan.app, f"{run.status} (child cursor {run.cursor_id}) goals={len(plan.goals)} steps={run.result.get('steps', 0)}")
+        try:
+            from core_organs import visual_cursor as vc
+            vc.release_agent(run.cursor_id)
+        except Exception:  # noqa: BLE001
+            pass
+
+    threads = [threading.Thread(target=child, args=(r, i), daemon=True, name=f"child-cursor-{r.app}") for i, r in enumerate(runs)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    if any(r.status == "NEEDS_HUMAN" for r in runs):
+        out.halted_for_human = True
+        bad = next(r for r in runs if r.status == "NEEDS_HUMAN")
+        out.capsule = f"{bad.app}: {bad.result.get('ready_reason') or 'a dialog or an ambiguous choice needs you'}"
+        try:
+            notify("input_needed", f"Agent needs your input - {out.capsule}")
+        except Exception:  # noqa: BLE001
+            pass
+
+
 def run_loop_first(command: str, app_spans: List[Tuple[str, int]], *,
                    operate: Optional[Callable[..., Dict[str, Any]]] = None,
                    prepare: Optional[Callable[..., Dict[str, Any]]] = None,
@@ -398,8 +490,11 @@ def run_loop_first(command: str, app_spans: List[Tuple[str, int]], *,
                    notify: Optional[Callable[[str, str], None]] = None,
                    record_action: Optional[Callable[[str, str, str], None]] = None,
                    allow_destructive: bool = False, max_steps_per_goal: int = 5,
-                   plan_filter: Optional[Callable[[List[AppPlan]], List[AppPlan]]] = None) -> LoopFirstResult:
-    """Run operate_app for every detected desktop app, in the compiler's order. See the module docstring."""
+                   plan_filter: Optional[Callable[[List[AppPlan]], List[AppPlan]]] = None,
+                   parallel: bool = False) -> LoopFirstResult:
+    """Run operate_app for every detected desktop app, in the compiler's order. See the module docstring. `parallel=True` runs INDEPENDENT
+    apps at the same time, one child virtual cursor each (see plans_independent / _run_plans_parallel); otherwise, or when the plans are not
+    independent, the order is sequential exactly as before."""
     out = LoopFirstResult()
     if not loop_first_enabled():
         out.reason = "HOJAIGA_LOOP_FIRST=0"
@@ -423,6 +518,14 @@ def run_loop_first(command: str, app_spans: List[Tuple[str, int]], *,
     out.ran = True
     notify = notify or (lambda state, detail: None)
     record = record_action or (lambda *a: None)
+    if parallel:
+        ok_par, why_par = plans_independent(plans)
+        out.parallel = {"requested": True, "used": bool(ok_par), "why": why_par}
+        if ok_par:
+            _run_plans_parallel([p for p in plans if p.goals], operate=operate, capsule_cb=capsule_cb, allow_destructive=allow_destructive,
+                                max_steps_per_goal=max_steps_per_goal, record=record, out=out, notify=notify)
+            out.elapsed_s = time.perf_counter() - t0
+            return out
     for plan in plans:
         run = AppRun(app=plan.app, plan=plan)
         out.runs.append(run)

@@ -116,7 +116,7 @@ POLICY: Dict[str, Tuple[str, ...]] = {
     "info": ("ok", "close", "continue", "yes", "cancel"),
     "cookie_consent": ("reject", "decline", "no", "close", "cancel", "ok"),
     "browser_prompt": ("block", "ignore", "no", "cancel", "close"),
-    "unknown": ("cancel", "close", "no", "ok"),
+    "unknown": ("cancel", "close", "no", "ok", "ignore", "decline", "reject", "block"),
 }
 _ROLE_WORDS = {
     "ok": ("ok", "okay", "got it", "done", "understood", "i understand", "dismiss"),
@@ -350,6 +350,33 @@ def _inspect_native(info: DialogInfo) -> bool:
     return True
 
 
+_CHROME_BUTTONS = frozenset({"close", "minimize", "maximize", "restore", "restore down", "system", "help"})
+
+
+def _body_buttons(info: DialogInfo) -> list:
+    """Buttons that belong to the dialog's BODY: the title bar's own Close / Minimize / Maximize are not answers."""
+    return [b for b in info.buttons if _norm(b[0]) not in _CHROME_BUTTONS]
+
+
+def _inspect_visual(info: DialogInfo) -> DialogInfo:
+    """A popup that exposes no buttons to Win32 or UI Automation (custom-drawn, owner-less child surface) is READ like a person reads it:
+    DAP capture + OCR (popup_visual). The words join the dialog's message - so elevation / destructive / credential prompts are still
+    recognised and escalated - and the OCR'd buttons go through the same role policy as any other. Only runs when nothing else found a
+    button, so no ordinary dialog pays for it."""
+    if _body_buttons(info) or not (info.hwnd and hin.is_alive(info.hwnd)):
+        return info
+    try:
+        from core_organs import popup_visual as pv
+        texts, buttons, rep = pv.describe(info.hwnd, _ROLE_WORDS)
+        if buttons or texts:
+            info.texts.extend(t for t in texts if t not in info.texts)
+            info.buttons.extend(buttons)
+            logger.info("[popup] visual read of '%s': %s", info.title[:40], rep)
+    except Exception as exc:  # noqa: BLE001
+        logger.debug("[popup] visual read failed: %s", exc)
+    return info
+
+
 def inspect_dialog(hwnd: int, deep: bool = True) -> DialogInfo:
     """Read what the dialog SAYS, bounded. A classic Win32 dialog (#32770 message box) is read from its own child
     windows - milliseconds and independent of machine load; everything else (WinUI, WPF, Qt, web banners) through UI
@@ -364,11 +391,12 @@ def inspect_dialog(hwnd: int, deep: bool = True) -> DialogInfo:
     try:
         root = auto.ControlFromHandle(hwnd)
         if root is None:
-            return info
-        return _inspect_root(root, info, deep)
+            return _inspect_visual(info)
+        info = _inspect_root(root, info, deep)
+        return _inspect_visual(info) if not _body_buttons(info) else info
     except Exception as exc:  # noqa: BLE001
         logger.debug("[popup] inspect failed: %s", exc)
-    return info
+    return _inspect_visual(info)
 
 
 def inspect_view(view: PopupView, deep: bool = True) -> DialogInfo:
@@ -435,7 +463,7 @@ def _deliver(button) -> Tuple[bool, str]:
         return False, "no-control"
     try:
         ctrl.GetInvokePattern().Invoke()
-        return True, "bm-click" if getattr(ctrl, "native", False) else "uia-invoke"
+        return True, getattr(ctrl, "via", "") or ("bm-click" if getattr(ctrl, "native", False) else "uia-invoke")
     except Exception:
         pass
     try:

@@ -274,3 +274,115 @@ def sprite_paint_proof() -> Dict[str, Any]:
         release_agent("hj_paint_probe")
     changed = int((np.abs(before - after).sum(axis=2) > 60).sum())
     return {"changed_pixels": changed, "region": region, "painted": changed >= 100}
+
+
+# ---------------------------------------------------------------------------------------------------------------- PaintedDialog
+gdi32 = ctypes.WinDLL("gdi32", use_last_error=True)
+WM_PAINT = 0x000F
+WM_LBUTTONDOWN = 0x0201
+WS_CAPTION = 0x00C00000
+WS_SYSMENU = 0x00080000
+_H = ctypes.c_void_p
+gdi32.CreateFontW.restype = _H
+gdi32.SelectObject.argtypes = [_H, _H]
+gdi32.SelectObject.restype = _H
+gdi32.DeleteObject.argtypes = [_H]
+gdi32.SetBkMode.argtypes = [_H, ctypes.c_int]
+gdi32.SetTextColor.argtypes = [_H, wt.DWORD]
+gdi32.TextOutW.argtypes = [_H, ctypes.c_int, ctypes.c_int, wt.LPCWSTR, ctypes.c_int]
+gdi32.Rectangle.argtypes = [_H, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
+user32.BeginPaint.argtypes = [_H, ctypes.c_void_p]
+user32.BeginPaint.restype = _H
+user32.EndPaint.argtypes = [_H, ctypes.c_void_p]
+user32.DestroyWindow.argtypes = [_H]
+user32.UpdateWindow.argtypes = [_H]
+user32.PostMessageW.argtypes = [_H, wt.UINT, wt.WPARAM, wt.LPARAM]
+user32.IsWindow.argtypes = [_H]
+
+
+class _PAINTSTRUCT(ctypes.Structure):
+    _fields_ = [("hdc", wt.HDC), ("fErase", wt.BOOL), ("rcPaint", wt.RECT), ("fRestore", wt.BOOL), ("fIncUpdate", wt.BOOL),
+                ("rgbReserved", ctypes.c_byte * 32)]
+
+
+class PaintedDialog:
+    """An owner-less top-level window that exposes NOTHING: no child controls, no UIA children - its message and its two 'buttons' are
+    drawn with GDI, and it answers WM_LBUTTONDOWN by hit-testing its own rectangles. The only way to read or press it is to look at it.
+    `result` records which button was pressed ('' while open); `clicks` counts every click that reached it."""
+
+    def __init__(self, title: str, lines, buttons, x: int = 420, y: int = 260, sysmenu: bool = True):
+        self.title, self.lines, self.buttons = title, list(lines), list(buttons)     # buttons: [(caption, (l, t, r, b) in client coords)]
+        self._x, self._y = x, y
+        self._sysmenu = sysmenu          # False: a title bar with NO close box - the painted buttons are the only way out
+        self.result = ""
+        self.clicks = 0
+        self.hwnd: Optional[int] = None
+        self._ready = threading.Event()
+        self._thread = threading.Thread(target=self._run, daemon=True, name="PaintedDialog")
+        self._cls = f"HJPainted_{int(time.time() * 1000) % 10_000_000}_{id(self) % 1000}"
+
+    def _wndproc(self, hwnd, msg, wparam, lparam):
+        if msg == WM_PAINT:
+            ps = _PAINTSTRUCT()
+            hdc = user32.BeginPaint(hwnd, ctypes.byref(ps))
+            font = gdi32.CreateFontW(-26, 0, 0, 0, 400, 0, 0, 0, 0, 0, 0, 5, 0, "Arial")
+            old = gdi32.SelectObject(hdc, font)
+            gdi32.SetBkMode(hdc, 1)
+            gdi32.SetTextColor(hdc, 0)
+            for i, text in enumerate(self.lines):
+                gdi32.TextOutW(hdc, 24, 24 + i * 40, text, len(text))
+            for cap, (l, t, r, b) in self.buttons:
+                gdi32.Rectangle(hdc, l, t, r, b)
+                gdi32.TextOutW(hdc, l + 18, t + 12, cap, len(cap))
+            gdi32.SelectObject(hdc, old)
+            gdi32.DeleteObject(font)
+            user32.EndPaint(hwnd, ctypes.byref(ps))
+            return 0
+        if msg == WM_LBUTTONDOWN:
+            self.clicks += 1
+            x, y = lparam & 0xFFFF, (lparam >> 16) & 0xFFFF
+            for cap, (l, t, r, b) in self.buttons:
+                if l <= x <= r and t <= y <= b:
+                    self.result = cap
+                    user32.PostMessageW(hwnd, WM_CLOSE, 0, 0)
+                    break
+            return 0
+        if msg == WM_CLOSE:
+            user32.DestroyWindow(hwnd)
+            return 0
+        if msg == WM_DESTROY:
+            user32.PostQuitMessage(0)
+            return 0
+        return user32.DefWindowProcW(hwnd, msg, wparam, lparam)
+
+    def _run(self):
+        self._proc = WNDPROC(self._wndproc)
+        hinst = kernel32.GetModuleHandleW(None)
+        wc = _WNDCLASSW()
+        wc.lpfnWndProc = self._proc
+        wc.hInstance = hinst
+        wc.lpszClassName = self._cls
+        wc.hbrBackground = 6
+        user32.RegisterClassW(ctypes.byref(wc))
+        self.hwnd = user32.CreateWindowExW(0, self._cls, self.title, WS_CAPTION | (WS_SYSMENU if self._sysmenu else 0) | WS_VISIBLE,
+                                           self._x, self._y, 560, 300, None, None, hinst, None)
+        user32.UpdateWindow(self.hwnd)
+        self._ready.set()
+        msg = wt.MSG()
+        while user32.GetMessageW(ctypes.byref(msg), None, 0, 0) > 0:
+            user32.TranslateMessage(ctypes.byref(msg))
+            user32.DispatchMessageW(ctypes.byref(msg))
+
+    def start(self) -> "PaintedDialog":
+        self._thread.start()
+        self._ready.wait(5)
+        time.sleep(0.5)
+        return self
+
+    def alive(self) -> bool:
+        return bool(self.hwnd) and bool(user32.IsWindow(self.hwnd))
+
+    def stop(self):
+        if self.hwnd and user32.IsWindow(self.hwnd):
+            user32.PostMessageW(self.hwnd, WM_CLOSE, 0, 0)
+        self._thread.join(timeout=2)

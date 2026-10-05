@@ -177,8 +177,10 @@ def wake_accessibility(hwnd: int) -> str:
     return f"chromium-windows-queried={len(targets)}"
 
 
-def launch_hidden(name: str, timeout_s: float = 45.0) -> Dict[str, Any]:
-    """Start `name` and keep its window minimized / unfocused from the moment it appears."""
+def launch_hidden(name: str, timeout_s: float = 45.0, fast: bool = False) -> Dict[str, Any]:
+    """Start `name` and keep its window minimized / unfocused from the moment it appears. `fast=True` shortens the protective settle waits
+    (a window must be 0.6 s old and chosen for 0.6 s, startup is watched 3 s with 0.6 s of quiet instead of 1.0 / 1.2 / 5 s / 1.0 s): a splash
+    screen that lives longer than that is still rejected by the size / title / proven-stable test, only the margin is smaller."""
     from core_organs import background_window as bw
     info: Dict[str, Any] = {"launched": False, "hwnd": 0, "notes": []}
     app = resolve_app(name)
@@ -251,7 +253,7 @@ def launch_hidden(name: str, timeout_s: float = 45.0) -> Dict[str, Any]:
             _u32.GetWindowRect(h, ctypes.byref(r))
             big = (r.right - r.left) >= 200 and (r.bottom - r.top) >= 120
             iconic = bool(_u32.IsIconic(h))
-            return (big or iconic) and time.time() - first_seen.get(h, time.time()) >= 1.0 \
+            return (big or iconic) and time.time() - first_seen.get(h, time.time()) >= (0.6 if fast else 1.0) \
                 and now[h][1] not in ("Windows.UI.Core.CoreWindow",)
         stable = [h for h in new if _ok(h)]
         if int((time.time() - t0) * 1) != info.get("_tick"):            # compact per-second trace for diagnostics
@@ -263,13 +265,13 @@ def launch_hidden(name: str, timeout_s: float = 45.0) -> Dict[str, Any]:
             best = pick if pick in stable else max(stable, key=lambda h: len(now[h][2]) + (50 if _u32.IsIconic(h) else 0))
             if best != chosen:
                 chosen, chosen_since = best, time.time()
-            elif time.time() - chosen_since >= 1.2:
+            elif time.time() - chosen_since >= (0.6 if fast else 1.2):
                 hwnd = chosen
                 break
         time.sleep(0.05)
     if hwnd:
         # a split-second window may already have been replaced by the real one (splash -> main)
-        info["notes"].append(bw.stabilize_minimized(hwnd, fg_before, 5.0) or "stable")
+        info["notes"].append(bw.stabilize_minimized(hwnd, fg_before, 3.0 if fast else 5.0, quiet_s=0.6 if fast else 1.0) or "stable")
         info["launched"] = True
         info["hwnd"] = hwnd
         bw.mark_ours(hwnd)                       # we created it: only then may the harness close/park it freely
@@ -389,7 +391,11 @@ def leave_start_screen(hwnd: int, timeout_s: float = 20.0) -> Dict[str, Any]:
 
 def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = True,
                  e1_actions: int = 3, close_if_launched: bool = True, on_window=None,
-                 allow_visible: bool = False, force: bool = False, fresh: bool = False) -> Dict[str, Any]:
+                 allow_visible: bool = False, force: bool = False, fresh: bool = False,
+                 fast: bool = False, e0_budget_s: Optional[float] = None) -> Dict[str, Any]:
+    """`fast=True` is the first-contact profile (P1-G): readiness polled at 150-200 ms instead of 400 ms, the start-screen wait capped at
+    4 s, the menu crawl held to `e0_budget_s`, no E1 probing (the caller continues exploration later, cumulatively). Same pipeline, same
+    knowledge written; only the waits and the exploration budget change."""
     from core_organs import desktop_grounding as dg
     from core_organs import organ_48_app_behavior_model as bm
     from core_organs import organ_50_layout_map as lm
@@ -406,7 +412,7 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
     launched = False
     if not hwnd and launch:
         t = time.time()
-        li = launch_hidden(name)
+        li = launch_hidden(name, fast=fast)
         rep["launch"] = {k: v for k, v in li.items() if k != "hwnd"}
         hwnd, launched = li.get("hwnd", 0), li.get("launched", False)
         rep["phases"]["launch_s"] = round(time.time() - t, 2)
@@ -449,7 +455,7 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
             rep["accessibility"] = wake_accessibility(hwnd)
             # readiness: a freshly started or Chromium app exposes its tree late (bounded growing wait)
             t = time.time()
-            n, delay = 0, 0.4
+            n, delay = 0, (0.15 if fast else 0.4)
             import uiautomation as auto
             while time.time() - t < 20:
                 try:
@@ -460,6 +466,7 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
                     break
                 time.sleep(delay)
                 delay = min(delay * 1.5, 2.0)
+            _poll = 0.2 if fast else 0.4
             # then: wait until the tree STOPS GROWING. UWP/WinUI/Office apps resume and populate for a second
             # or two after being un-minimized; mapping at the first moment something exists saw 3 controls
             from core_organs import fast_uia
@@ -469,7 +476,8 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
                 cnt = len(snap) if snap else 0
                 steady = steady + 1 if (cnt == last and cnt > 2) else 0
                 last = cnt
-                time.sleep(0.4)
+                if steady < 2:
+                    time.sleep(_poll)
             rep["tree_nodes_when_ready"] = last
             # LAID OUT? A parked UWP/WinUI app may expose controls with EMPTY rectangles (it does not lay
             # out content that is entirely off-screen). Detect that and apply the 1-pixel sliver.
@@ -487,7 +495,7 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
             rep["phases"]["ready_s"] = round(time.time() - t, 2)
             if not polite:
                 try:
-                    rep["start_screen"] = leave_start_screen(hwnd)
+                    rep["start_screen"] = leave_start_screen(hwnd, timeout_s=4.0 if fast else 20.0)
                 except Exception as exc:
                     rep["start_screen"] = {"error": type(exc).__name__}
             t = time.time()
@@ -496,7 +504,8 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
             elif e0_cached:
                 rep["e0"] = {"skipped": f"cached ({len([c for c in existing if (c.get('origin') or '').startswith('e0:')])} menu commands known for this app version)"}
             else:
-                e0 = bm.crawl_e0(model, name, hwnd)
+                e0 = bm.crawl_e0(model, name, hwnd, budget=(bm.DiscoveryBudget(base_s=e0_budget_s * 0.6, extend_s=1.5, max_s=e0_budget_s, patience=6)
+                                                              if e0_budget_s else None))
                 rep["e0"] = {"commands": e0["ingested"], "stopped": e0["stopped"],
                              "skipped": [s for m in e0["methods"] for s in m["skipped"]][:6]}
             rep["phases"]["e0_menus_s"] = round(time.time() - t, 2)
@@ -513,7 +522,7 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
             except Exception:
                 pass
             t = time.time()
-            n_e1 = e1_actions if not (e0_cached and layout_cached) else min(e1_actions, 1)   # warm: knowledge exists, probe less
+            n_e1 = 0 if fast else (e1_actions if not (e0_cached and layout_cached) else min(e1_actions, 1))   # warm: knowledge exists, probe less
             e1 = (bm.explore_e1(model, name, hwnd, max_actions=n_e1, budget_s=30.0)
                   if (n_e1 and not polite) else {"probes": []})
             rep["phases"]["e1_s"] = round(time.time() - t, 2)

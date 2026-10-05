@@ -176,3 +176,35 @@ Each entry: **Bug class → Root cause → Fix pattern → Boundary.**
 - A posted Escape is not delivered to XAML popups (`WM_CLOSE` on the popup window closes them); UIA `ShowContextMenu` / Shift+F10 do nothing there;
   a posted `WM_CONTEXTMENU` to the CHILD window under the point works.
 - A single keyword is not evidence of what an app is ("Volume" in a converter list), and shared file verbs are not a kind.
+
+
+## P-30  Actuation / dialog pitfalls found driving Office, Chromium and canvas apps (2026-10-05)
+- **Office draws its Save / Open dialog as a title-less `NUIDialog` window**, not `#32770`. A dialog rung that only looks for `#32770` with
+  "save" in the title reports "no file dialog" while Excel sits modal behind it; the main window's backstage then renders BLANK (59 nodes, not 73).
+  Recognise it by content (an Edit named/aid "File name" in its UIA tree). Proven: `_tmp_excel_why.py` experiments (kept in git history).
+- **Office's own Save dialog disables Save for any full path** (drive colon / backslashes in "File name") however long you wait; a bare name
+  keeps it enabled. The road to a path-accepting dialog is `More options...` -> Save As pane -> `Browse` -> classic `#32770`.
+  EM_REPLACESEL / SetValue change the visible text but not the dialog's validation: type file names with one WM_CHAR per character.
+- **A stale file is not proof.** A previous run's `e1.xlsx` made a probe "pass" in 30 s with ONE step. Delete the target first; the verifier now
+  also rejects a file older than the goal's start and a 0-byte file (`_file_proof`).
+- **A goal that stalls means the loop cannot SEE what it needs.** Do not poke harder: widen perception (raw UIA view -> OCR -> Qwen locate ->
+  screenshot) and wait (bounded) for a loading pane. Office's Save As pane is an empty page for seconds; the loop clicked in it blind.
+- The loop must never press window chrome (Minimize / Restore), an account control ("Signed in as ...", a person's name), or re-press a control
+  that "passed" twice while the goal's terminal proof is still missing.
+- `paste` is a typing verb only with a quoted literal payload; "paste the image from the clipboard" is the app's PASTE COMMAND (it typed the
+  sentence into Paint's Zoom box).
+- A command that is not on screen is behind its conventional menu (Paste/Copy/Undo -> Edit, Zoom -> View): rank that menu, decisively.
+- 1-2 letter hint tokens ("no" in "no-such-app") must match whole words only: as a substring they matched "notepad".
+- **Chromium / Electron / WebView2**: the DOM is in the RAW UIA view (966 nodes, 179 invokable) - the control-view walk finds 8. Tray-parked
+  apps keep a HIDDEN top-level window whose tree still answers (`find_window` second pass). A hidden renderer applies SetValue late (seconds): read
+  back with polling, never trust the first read, and never follow a SetValue with posted characters (it doubled the text).
+  WhatsApp's content lives in an `msedgewebview2.exe` window, not in WhatsApp.Root's frame.
+- **Patch scripts eat backslashes.** Inside a non-raw Python string the two characters backslash + b become ONE backspace character, and a
+  character class written with a doubled backslash before the slash loses the backslash: regexes in patched source silently stop matching.
+  Edit regex lines with the Edit tool (raw), or build them with chr(92); scan for chr(8) after patching.
+- **The GDI cap (10,000 objects) is real but intermittent.** One suite run climbed to 9,996 by test UP1 (every later capture came back blank and
+  read as "the app did not render"); three later runs stayed at ~20. `gdi_sampler.py` (HOJAIGA_GDI_SAMPLE=1) names the stacks active while the
+  count grows WITHOUT changing behaviour; `gdi_budget_trace.py` wraps allocators and, measured, makes the leak disappear. A capture note now
+  carries `obj=<gdi>/<user>` so a blank is never blamed on the app when the process is out of budget.
+- Other agents may be running the suite in the same working tree: check `Win32_Process` for `run_system_intelligence_tests` before a live run,
+  or two suites drive Notepad/Paint at once.

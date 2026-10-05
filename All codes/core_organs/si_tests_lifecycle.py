@@ -130,6 +130,10 @@ def run_lc2(TestOutcome):
     bad = [k for k, v in ids.items() if v == "FAIL"]
     checks.append(("no-checkpoint-FAILed", not bad, f"{len(r['checkpoints'])} marks, failing: {bad}"))
     checks.append(("D3-gate-escalated", ids.get("D3.gate") == "ESCALATED", f"D3.gate={ids.get('D3.gate')}"))
+    escs = [e for t in r.get("tickets", []) for e in (t.get("escalations") or [])]
+    png_ok = bool(escs) and all(e.get("screenshot") and os.path.exists(e["screenshot"]) and os.path.getsize(e["screenshot"]) > 1500 for e in escs)
+    checks.append(("need-human-record-has-a-real-screenshot (P2-L)", png_ok,
+                   f"{len(escs)} escalation row(s): " + "; ".join(f"{os.path.basename(e.get('screenshot') or '') or 'NO PNG'} ({e.get('bytes')} bytes, {e.get('note')})" for e in escs)[:260]))
     checks.append(watch.check())
     for p_ in (path, keep):
         try:

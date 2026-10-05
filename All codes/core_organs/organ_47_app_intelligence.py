@@ -426,6 +426,13 @@ class AppIntelligence:
         """Store one executed step. PASS reinforces, anything else erodes.
         Callers do not compute confidence — this is the only place it changes."""
         key = _app_key(app_name)
+        try:                                      # the knowledge store is synced to a repository: a person's name is not knowledge
+            from core_organs.knowledge_store import redact as _redact
+            if element_name and _redact(element_name) != element_name:
+                return ""                         # 'Signed in as <name>' / 'Welcome back, <name>' controls are never recorded as a step
+            goal, menu_path = _redact(goal), _redact(menu_path)
+        except Exception:  # noqa: BLE001
+            pass
         fp = _fingerprint(element_name, element_role or verb, menu_path) + (shortcut or "")
         step_id = f"{key}:{fp}"
         row = self._conn.execute("SELECT * FROM steps WHERE step_id=?", (step_id,)).fetchone()

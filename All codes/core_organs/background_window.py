@@ -198,6 +198,22 @@ def is_ours(hwnd: int) -> bool:
     return False
 
 
+def ours_alive() -> List[int]:
+    """Live handles from the OWNERSHIP registry, and nothing else.
+
+    Membership is granted only at launch (launch_hidden / operate_app / prepare_app / LiveApp), never
+    inferred from a title or an app name - so this answers 'which windows did THIS process create and
+    still have open' with a fact instead of a guess. A test that dies mid-run leaves its window here;
+    the suite's boundary reclaim reads it here instead of looking for a filename in the title bar
+    (measured 2026-10-05: an unsaved document's title carries no artifact name, so a title rule
+    reclaimed 0 windows while nine later tests reported ENV-BLOCKED)."""
+    if not _IS_WINDOWS:
+        return []
+    live = [h for h in sorted(_ours) if _u32.IsWindow(h)]
+    _ours.intersection_update(live)
+    return live
+
+
 def last_user_window() -> int:
     return _last_user_fg
 
@@ -699,7 +715,7 @@ def exit(hwnd: int) -> bool:                            # noqa: A001 - mirrors e
         return False
 
 
-def stabilize_minimized(hwnd: int, fg_before: int = 0, seconds: float = 6.0) -> str:
+def stabilize_minimized(hwnd: int, fg_before: int = 0, seconds: float = 6.0, quiet_s: float = 1.0) -> str:
     """Apps run their own startup: session restore re-opens tabs, un-minimizes the window and
     activates it AFTER the launcher's minimize. Keep the window minimized until it has stayed that
     way for 1.5 s and hand focus straight back to what the user was using. Returns a note."""
@@ -722,7 +738,7 @@ def stabilize_minimized(hwnd: int, fg_before: int = 0, seconds: float = 6.0) -> 
             quiet_since = time.time()
             if "took focus" not in " ".join(notes):
                 notes.append("app took focus at startup (returned)")
-        if time.time() - quiet_since >= 1.0:
+        if time.time() - quiet_since >= quiet_s:
             break
         time.sleep(0.1)
     return "; ".join(notes)

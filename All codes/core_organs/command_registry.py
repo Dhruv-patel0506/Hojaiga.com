@@ -336,6 +336,82 @@ def gaps(model, app_key: str, reg: Optional[List[Dict[str, Any]]] = None) -> Lis
     return out
 
 
+def _surface_of(c: Dict[str, Any]) -> str:
+    """The surface a unified command lives on: a top-level menu, the context menus, a dropdown / tab / surface region, or the plain controls."""
+    p = (c.get("menu_path") or "").strip()
+    kind = c.get("kind") or ""
+    if p.startswith("[right-click"):
+        return "context menus"
+    if ">" in p:
+        top = p.split(">")[0].strip()
+        if top and not top.startswith("[") and kind == "menu":
+            return f"menu: {top}"
+        if top:
+            return f"panel: {top}"
+    if kind == "menu":
+        return "menu bar"
+    if kind == "key":
+        return "keyboard shortcuts"
+    return "controls"
+
+
+def capability_summary(model, app_key: str, reg: List[Dict[str, Any]], facts: Dict[str, Any], dlgs: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """'What is this app and how do I use it to the full extent' - written from DATA only (the profile inferred from evidence, the unified
+    command map, observed dialogs): no per-app text. Each SURFACE lists what lives there and ONE task that a live probe VERIFIED on that
+    surface when there is one (a learned command with a success); a surface with no verified task says so instead of inventing one."""
+    t0 = time.time()
+    prof = facts.get("profile") or {}
+    vi = facts.get("version_info") or {}
+    surfaces: Dict[str, Dict[str, Any]] = {}
+    for c in reg:
+        s = surfaces.setdefault(_surface_of(c), {"surface": _surface_of(c), "commands": 0, "verified": [], "example": None})
+        s["commands"] += 1
+        if s["example"] is None or (c["trust"] > s["example"]["trust"]):
+            s["example"] = {"command": c["name"], "path": c["menu_path"], "shortcut": c["shortcut"], "trust": c["trust"]}
+        if c["verified"]:
+            s["verified"].append({"command": c["name"], "path": c["menu_path"], "shortcut": c["shortcut"], "successes": c["successes"],
+                                  "risk": c["risk"], "route": (c.get("routes") or [{}])[0].get("effector", "") if c.get("routes") else ""})
+    for d in dlgs:                                                      # a dialog the loop actually saw OPEN is a verified surface
+        title = (d.get("title") or "").strip()
+        if not title:
+            continue
+        src = str(d.get("source") or "")
+        s = surfaces.setdefault(f"dialog: {title}", {"surface": f"dialog: {title}", "commands": 0, "verified": [], "example": None})
+        s["commands"] += len(d.get("controls") or [])
+        if src.startswith("live"):
+            s["verified"].append({"command": f"open '{title}'", "path": str(d.get("via") or ""), "successes": 1, "risk": "E1", "route": src})
+    ordered = sorted(surfaces.values(), key=lambda s: (-len(s["verified"]), -s["commands"]))
+    for s in ordered:
+        s["verified_task"] = s["verified"][0] if s["verified"] else None
+        s["verified_n"] = len(s["verified"])
+        s.pop("verified")
+    caps = prof.get("capabilities") or []
+    strat = facts.get("strategy") or {}
+    how: List[str] = []
+    if strat.get("native_menus"):
+        how.append("classic menu bar: every menu entry can be run by its command id (no focus needed)")
+    if strat.get("posted_keys") == "ignored":
+        how.append("keyboard shortcuts are NOT delivered to this app (XAML): use UIA invoke on the control instead")
+    if (facts.get("key_delivery") or {}).get("status") == "works":
+        how.append("keyboard shortcuts were verified to arrive")
+    if facts.get("cli_open"):
+        how.append(f"files can be opened from the command line: {facts['cli_open']}")
+    if facts.get("requires_elevation"):
+        how.append("the program asks for elevation: a human must approve it (never auto-accepted)")
+    covered = sum(1 for s in ordered if s["verified_task"])
+    return {
+        "what_it_is": (vi.get("FileDescription") or "") or (prof.get("archetype") or "unclassified"),
+        "archetype": prof.get("archetype") or "not classified (not enough evidence yet)",
+        "capabilities": caps,
+        "opens": sorted((prof.get("ext_categories") or {}).keys()),
+        "how_to_use": how,
+        "surfaces": ordered,
+        "coverage": {"surfaces": len(ordered), "with_verified_task": covered,
+                     "note": "a surface with no verified task has only been READ, not exercised: run mastery (know(target, live=True)) to verify more"},
+        "elapsed_ms": round((time.time() - t0) * 1000, 1),
+    }
+
+
 def dossier(model, app_key: str, *, with_registry: bool = True) -> Dict[str, Any]:
     """Everything known about an app, in one structure."""
     ks.ensure(model)
@@ -373,4 +449,11 @@ def dossier(model, app_key: str, *, with_registry: bool = True) -> Dict[str, Any
                              "route": (hit[0]["routes"] or [{}])[0].get("effector", ""), "trust": hit[0]["trust"], "verified": hit[0]["verified"]}
     d["quick_answers"] = quick
     d["gaps"] = gaps(model, app_key, reg)
+    try:
+        for c in reg[:400]:
+            if "routes" not in c:
+                c["routes"] = routes_for(model, app_key, c)
+        d["summary"] = capability_summary(model, app_key, reg, f, d["dialogs"])
+    except Exception as exc:  # noqa: BLE001
+        d["summary"] = {"error": f"{type(exc).__name__}: {str(exc)[:120]}"}
     return d
