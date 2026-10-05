@@ -1,28 +1,65 @@
-Hojaiga System Intelligence Suite — 2026-10-04 23:55:06
+Hojaiga System Intelligence Suite — 2026-10-05 11:00:54
 
-[PASS] LC2 [LIFECYCLE] LC2: the checkpoint chain on REAL apps - Notepad types and saves, Calculator computes, an irreversible delete is queued - against independent ground truth
-    evidence: file-saved-with-the-typed-words (independent read)=OK(hj_lc2_179b14.txt: 'Just a notehello worldNoteNote: Just typ'); calculator-shows-42 (independent read)=OK(display='Display is 42'); irreversible-delete-was-queued-not-run=OK(file survives=True status=ESCALATED); no-checkpoint-FAILed=OK(34 marks, failing: []); D3-gate-escalated=OK(D3.gate=ESCALATED); physical-pointer-untouched-and-no-guard-violations=OK(pointer (240, 829)->(240, 829), guard violations+=0, largest 10 ms step=0px); total 42.4s; closed 2 window(s) we launched
-    duration: 48788.9 ms  metrics: {'seconds': 42.4, 'status': 'ESCALATED'}
+[PASS] MIN1 [BACKGROUND] MIN1: a MINIMIZED app is scanned + operated without ever being shown or focused, at full quality
+    evidence: notepad: mode=parked E0=36 cmds, layout=110 controls (File@[0.0355, 0.0948]), E1 probe effect=True unwound=True, capture=ok, template completed=True truth=True, | FOCUS: target-held-foreground longest=55ms (1/1056 samples), brief-exposure-samples(>16px)=12 longest-continuous-exposure=65ms max-visible-px=528000 | ended minimized=True placement-restored=True 39s | harness note: app took focus at startup (returned) || paint: mode=parked E0=41 cmds, layout=417 controls (File@[0.026, 0.073]), E1 probe effect=True unwound=True, capture=ok, | FOCUS: target-held-foreground longest=52ms (9/1035 samples), brief-exposure-samples(>16px)=14 longest-continuous-exposure=92ms max-visible-px=182819 | ended minimized=True placement-restored=True 38s
+    duration: 84489.8 ms  metrics: {'apps': 2}
 
 
 RANKINGS
-1. Task lifecycle (A intake -> H report): 1/1 tests, score 70.0, avg 48788.9 ms
-Hojaiga System Intelligence Suite — 2026-10-05 00:24:03
+1. Background operation (minimized, never shown/focused): 1/1 tests, score 70.0, avg 84489.8 ms
+Hojaiga System Intelligence Suite — 2026-10-05 11:33:31
 
-[PASS] DE1 [GOALCHECK] DE1: a goal carries its own machine-checkable postcondition - 'save as <path>' needs that file (and its real format), 'expect X' needs X on screen, the requested format outranks 'Save as project'
-    evidence: saving-goals-derive-file-exists-and-format=OK(9/9 goals derived correctly); assertion-goals-need-no-action=OK(6/6 read correctly); requested-format-outranks-save-as-project=OK(top picks {'png': 'PNG picture', 'jpg': 'JPEG picture', 'bmp': 'BMP picture'}; .txt keeps 'Save as'); a-non-png-named-png-is-not-a-pass=OK(fake: file hj_de1_3d5465.png exists; NOT a .png (starts b'PK\x03\x04 a'); real: file hj_de1_3d5465.png exists; is a real .png); a-missing-file-is-not-a-pass=OK(file hj_de1_never_51e9df.png MISSING)
-    duration: 3549.4 ms  metrics: {'checks': 5, 'failed': 0}
+[PASS] ES1 [CHECKPOINTS] ES1 (C2): a dialog that needs a human is saved as a real PNG screenshot for the human and left open, no button pressed
+    evidence: popup-engine-asked-for-a-human=OK(awaiting_human=True); screenshot-saved-as-a-real-png=OK(esc_1791179369_30740308.png, 6522 bytes, png=True); dialog-left-open-for-the-human=OK(no button was pressed)
+    duration: 2044.3 ms  metrics: {'failed': 0}
 
-[PASS] SCK1 [SCANKNOW] SCK1: organ_30 scan consults organ_48/50 knowledge: E0 + layout first, cached on re-scan
-    evidence: scan1: 208 controls, learned 41 commands (E0 14.38s) in 35.8s; scan2: E0 ['skipped'] cached, skipped_known=0, catalog_only=10 in 33.4s; stop=budget
-    duration: 75157.9 ms  metrics: {'scan1_s': 35.8, 'scan2_s': 33.4}
+[PASS] VQ1 [CHECKPOINTS] VQ1: the targeted vision tier (Qwen2.5-VL locate on the llama.cpp server) finds real controls of a parked window, graded against UIA
+    evidence: 2/4 controls located by Qwen2.5-VL (>=50% needed); mean 17.8s each; Close Tab:miss(30.4s), View:hit(29.6s), Italic (Ctrl+I):hit(9.5s), What's new:miss(1.8s)
+    duration: 82065.0 ms  metrics: {'hits': 2, 'n': 4, 'mean_ms': 17835}
+
+[FAIL] SCK1 [SCANKNOW] SCK1: organ_30 scan consults organ_48/50 knowledge: E0 + layout first, cached on re-scan
+    evidence: scan1: 208 controls, learned 41 commands (E0 18.26s) in 48.3s; scan2: E0 ['skipped'] cached, skipped_known=0, catalog_only=10 in 51.1s; stop=budget
+    duration: 109018.9 ms  metrics: {'scan1_s': 48.3, 'scan2_s': 51.1}
+
+[FAIL] E2E-1 [E2E] E2E-1: unattended Notepad run via headless input - type a haiku, save a .txt, verify file, distill, re-run
+    evidence: run1 completed=True file=yes steps=5 61.09s awaiting_human=False trace=[('-', '-', 'NO_CHANGE'), ('type', 'Text editor', 'PASS'), ('click', 'File', 'WRONG_STATE'), ('click', 'Save as', 'WRONG_STATE'), ('file-dialog', 'file-dialog', 'PASS')]; recipe='recipe ingested to organ_04 (2 verified steps)'; run2 completed=False file=NO steps=12 107.59s trace=[('check', '-', 'PASS'), ('type', 'Text editor', 'PASS'), ('click', 'File', 'WRONG_STATE'), ('click', 'Edit', 'WRONG_STATE'), ('click', 'poem1.txt. Unmodif', 'WRONG_STATE'), ('click', 'Autumn leaves fall', 'WRONG_STATE'), ('shortcut', 'shortcut:ctrl+n', 'WRONG_STATE'), ('click', 'Untitled. Unmodifi', 'WRONG_STATE'), ('click', 'View', 'WRONG_STATE'), ('click', 'Pop-upHost', 'WRONG_STATE'), ('click', 'System', 'WRONG_STATE'), ('click', 'Minimize', 'WRONG_STATE'), ('click', 'Restore', 'WRONG_STATE')]; steps run1->run2: 5->12, seconds 61.09->107.59; physical pointer untouched=False; input-guard violations=0; notepad launched by us=True
+    duration: 171349.6 ms  metrics: {'run1_steps': 5, 'run2_steps': 12, 'run1_s': 61.09, 'run2_s': 107.59, 'recipe': True, 'pointer_untouched': False}
 
 [PASS] E2E-2 [E2E] E2E-2: UIA-sparse canvas app (Blender if installed, else Paint) driven via grounding ladder incl. vision
-    evidence: Blender not installed -> substituted Paint (honest substitution). app=mspaint; completed=True steps=2 14.62s awaiting_human=False; trace=[('click', 'Pencil', 'PASS'), ('click', 'Line', 'PASS')]; vision-tier grounding: tiers_ran=['uia', 'uia@offscreen', 'ocr', 'vision'], tiers_skipped=[], vision_elements=101, tier_ms={'uia': 551.3, 'uia@offscreen': 624.8, 'ocr': 781.9, 'vision': 448598.4}
-    duration: 512318.3 ms  metrics: {'app': 'mspaint', 'vision_elements': 101, 'tier_ms': "{'uia': 551.3, 'uia@offscreen': 624.8, 'ocr': 781.9, 'vision': 448598.4}"}
+    evidence: Blender not installed -> substituted Paint (honest substitution). app=mspaint; completed=True steps=2 16.04s awaiting_human=False; trace=[('click', 'Pencil', 'PASS'), ('click', 'Line', 'PASS')]; vision-tier grounding: tiers_ran=['uia', 'uia@offscreen', 'ocr', 'vision'], tiers_skipped=[], vision_elements=101, tier_ms={'uia': 666.7, 'uia@offscreen': 503.5, 'ocr': 2147.5, 'vision': 458217.7}
+    duration: 479308.9 ms  metrics: {'app': 'mspaint', 'vision_elements': 101, 'tier_ms': "{'uia': 666.7, 'uia@offscreen': 503.5, 'ocr': 2147.5, 'vision': 458217.7}"}
 
 
 RANKINGS
-1. Goal postconditions (honest DONE): 1/1 tests, score 89.4, avg 3549.4 ms
-2. Knowledge-assisted scanning (organ_49/50): 1/1 tests, score 70.0, avg 75157.9 ms
-3. End-to-end unattended runs: 1/1 tests, score 70.0, avg 512318.3 ms
+1. Lifecycle checkpoints (escalation, launch, modes, template, crash): 2/2 tests, score 70.0, avg 42054.6 ms
+2. End-to-end unattended runs: 1/2 tests, score 35.0, avg 325329.3 ms
+3. Knowledge-assisted scanning (organ_49/50): 0/1 tests, score 0.0, avg 109018.9 ms
+Hojaiga System Intelligence Suite — 2026-10-05 11:45:12
+
+[FAIL] LF2 [ROUTING] LF2: a REAL two-app task (Notepad then Calculator) runs both apps through the verified loop with the physical pointer untouched
+    evidence: both-apps-ran-in-order=OK(runs=[('notepad', 'COMPLETED', 1), ('calculator', 'COMPLETED', 4)]); notepad-holds-the-typed-words (independent read)=OK(document='loop first works'); calculator-shows-42 (independent read)=OK(display='Display is 42'); handles-persisted-for-later-stages=OK(notepad=25692236 calculator=14615234); completed-or-honestly-blocked=OK(statuses=['COMPLETED', 'COMPLETED']); physical-pointer-untouched-and-no-guard-violations=FAIL(pointer (280, 876)->(981, 863), guard violations+=0, largest 10 ms step=601px); total 33.1s; closed 2 window(s) we launched
+    duration: 68538.7 ms  metrics: {'seconds': 33.1, 'windows_closed': 2, 'statuses': 'COMPLETED,COMPLETED'}
+
+[FAIL] LC2 [LIFECYCLE] LC2: the checkpoint chain on REAL apps - Notepad types and saves, Calculator computes, an irreversible delete is queued - against independent ground truth
+    evidence: file-saved-with-the-typed-words (independent read)=OK(hj_lc2_0358cd.txt: 'lifecycle works'); calculator-shows-42 (independent read)=OK(display='Display is 42'); irreversible-delete-was-queued-not-run=OK(file survives=True status=ESCALATED); no-checkpoint-FAILed=OK(35 marks, failing: []); D3-gate-escalated=OK(D3.gate=ESCALATED); physical-pointer-untouched-and-no-guard-violations=FAIL(pointer (981, 863)->(341, 873), guard violations+=0, largest 10 ms step=806px); total 45.8s; closed 2 window(s) we launched
+    duration: 51831.2 ms  metrics: {'seconds': 45.8, 'status': 'ESCALATED'}
+
+[PASS] A3X [CHECKPOINTS] A3X (A3): a ticket a stored template covers runs template-first (no LLM planning) and the chain says so
+    evidence: template-ran-first=OK(A3.template=PASS: template 'write text and save as file' [learned 0.97] completed 4 leaf step(s) in 24.3s, no LLM planning); file-has-the-typed-words (independent read)=OK('template first works'); ticket-done=OK(status=DONE); 24.3s; closed 1
+    duration: 24790.6 ms  metrics: {'seconds': 24.3}
+
+[FAIL] SCK1 [SCANKNOW] SCK1: organ_30 scan consults organ_48/50 knowledge: E0 + layout first, cached on re-scan
+    evidence: scan1: 378 controls, learned 36 commands (E0 Nones) in 36.4s; scan2: E0 ['skipped'] cached, skipped_known=0, catalog_only=10 in 41.9s; stop=unwind-failed
+    duration: 83868.4 ms  metrics: {'scan1_s': 36.4, 'scan2_s': 41.9}
+
+[PASS] E2E-1 [E2E] E2E-1: unattended Notepad run via headless input - type a haiku, save a .txt, verify file, distill, re-run
+    evidence: run1 completed=True file=yes steps=4 34.58s awaiting_human=False trace=[('type', 'Text editor', 'PASS'), ('click', 'File', 'WRONG_STATE'), ('click', 'Save as', 'WRONG_STATE'), ('file-dialog', 'file-dialog', 'PASS')]; recipe='recipe ingested to organ_04 (2 verified steps)'; run2 completed=True file=yes steps=4 33.54s trace=[('check', '-', 'PASS'), ('type', 'Text editor', 'PASS'), ('click', 'File', 'WRONG_STATE'), ('click', 'Save as', 'WRONG_STATE'), ('file-dialog', 'file-dialog', 'PASS')]; steps run1->run2: 4->4, seconds 34.58->33.54; physical pointer untouched=False; input-guard violations=0; notepad launched by us=True
+    duration: 70575.2 ms  metrics: {'run1_steps': 4, 'run2_steps': 4, 'run1_s': 34.58, 'run2_s': 33.54, 'recipe': True, 'pointer_untouched': False}
+
+
+RANKINGS
+1. Lifecycle checkpoints (escalation, launch, modes, template, crash): 1/1 tests, score 70.0, avg 24790.6 ms
+2. End-to-end unattended runs: 1/1 tests, score 70.0, avg 70575.2 ms
+3. Knowledge-assisted scanning (organ_49/50): 0/1 tests, score 0.0, avg 83868.4 ms
+4. Product routing (verified loop first): 0/1 tests, score 0.0, avg 68538.7 ms
+5. Task lifecycle (A intake -> H report): 0/1 tests, score 0.0, avg 51831.2 ms

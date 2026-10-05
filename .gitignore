@@ -1,102 +1,85 @@
-# Hojaiga — environments, models & binaries NEVER get committed.
-# (The local working dir d:\new_automation keeps them; this repo does not.)
+.aider*
+.env
+**/var/ 
+**/var/ 
 
-# Virtual envs / interpreters
+# test/automation run artefacts
+audit_logs*/
+_e2e_tmp/
+_archive/
+_hojaiga_boot.log
+_boot_in.txt
+
+# environments & interpreters (never commit)
 .venv/
 venv*/
 hojaiga_env/
-Scripts/
-Lib/
-Lib64/
 
-# Python artifacts
+# python artefacts
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .mypy_cache/
-.ruff_cache/
-*.egg-info/
 
-# Model weights / ML assets (re-download, never commit)
+# model weights & heavy ML dirs (downloadable, local-only)
 models/
-checkpoints/
-*.pt
-*.pth
-*.onnx
-*.engine
-*.safetensors
-*.ckpt
-*.pkl
-*.joblib
-OmniParser/weights/
-OmniParser/X-OMNI.zip
-OmniParser/weights.zip
-stable-diffusion-webui/
+All codes/models/
+scratch_models/
 kokoro_models/
+stable-diffusion-webui/
+OmniParser/weights/
+OmniParser/checkpoints/
+llama.cpp/
 
-# Large binaries / archives / media
+# browser profiles (contain live cookies — never commit)
+.chrome*/
+.test_*profile/
+
+# binaries, archives, media (regenerable / downloadable)
 *.exe
 *.dll
-*.lib
-*.pdb
-*.obj
-*.tlog
-*.msi
-*.zip
 *.7z
+*.zip
 *.tar
-*.tar.gz
 *.tar.xz
 *.gz
+*.msi
 *.mp4
 *.avi
 *.mkv
 *.mov
-*.webm
 *.wav
-*.mp3
+*.bin
+*.pt
+*.pth
+*.onnx
+*.gguf
 
-# Browser profiles / caches / temp
-.chrome*/
-.test_*profile/
-.test_upload/
-.tmp*/
-tmp/
-tmp2/
-.cache/
-node_modules/
-ipynb_checkpoints/
-
-# Runtime output (regenerated constantly)
-audit_logs*/
-logs/
-var/
-db_backups/
-evidence/
-observation/
-observations/
-screenshots/
-videos/
-test_videos/
-.test_harness_videos/
+# ffmpeg builds & temp/video scratch
+ffmpeg*/
+All codes/ffmpeg*/
+video_audit_*/
 pixel-animation-video/
+.tmp*/
+tmpdir/
+
+# runtime output
 *.log
-hatch_patterns.png
+screenshots/
+observation*/
+evidence/
 
-# Secrets / local config
-.env
-*.env
-secrets*
-*.key
-*.pem
-
-# Editor / tooling
-.aider*
+# dependency trees & IDE caches
+node_modules/
 .qoder/
-.kilo/
-.vscode/
-.idea/
+.dart_tool/
+*.lib
+*.pdb
+*.obj
+*.tlog
+*.exp
 
+# runtime memory snapshots (regenerated constantly)
 *.snap
-
-.claude/
+organ_03_memory/logs/
+*.tmp
