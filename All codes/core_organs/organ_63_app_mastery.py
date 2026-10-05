@@ -1095,6 +1095,8 @@ def record_resting_controls(model, app_key: str, nodes) -> int:
     for n in nodes:
         if n.ctype not in _OPERABLE or not n.name or _norm(n.name) in known or is_unsafe(n.name):
             continue
+        if n.ctype in ("ListItemControl", "TreeItemControl") or len(n.name) > 60:
+            continue                                      # an item of a list / tree is CONTENT (a contact, a file, a message), not a command
         cmd = {"name": n.name, "goal": n.name, "menu_path": n.name, "verb": "invoke", "risk": "EU"}
         if n.accel:
             from core_organs import organ_48_app_behavior_model as _bm
@@ -1375,8 +1377,29 @@ def master(target: str, *, model=None, budget_s: float = 90.0, runs: int = 1, fr
         rep["phases"]["scan_s"] = round(time.time() - t, 1)
         rep["scan"] = {k: scan.get(k) for k in ("error", "window_mode", "polite_mode", "known_commands", "regions_known", "tree_nodes_when_ready", "accessibility")}
         rep["scan"]["warm"] = scan.get("warm")
-        hwnd = g.find_window(target) or 0
+        lw = scan.get("launch") or {}
+        hwnd = 0
+        for cand in (lw.get("hwnd"), None, lw.get("resolved")):         # the window the scan LAUNCHED, then by the typed name, then by the name Windows resolved it to
+            try:
+                if cand is None:
+                    hwnd = g.find_window(target) or 0
+                elif isinstance(cand, int):
+                    import ctypes
+                    hwnd = cand if ctypes.windll.user32.IsWindow(cand) else 0
+                else:
+                    hwnd = g.find_window(cand) or 0
+            except Exception:  # noqa: BLE001
+                hwnd = 0
+            if hwnd:
+                break
         launched = bool(scan.get("launch", {}).get("launched"))
+        if hwnd and not (rep.get("static") or {}).get("ok"):          # the NAME did not lead to the program file (a versioned install folder, a store package): the WINDOW does
+            try:
+                rep["static"] = _static_phase(model, target, hwnd)
+                rep["phases"]["static_s"] = round((rep["phases"].get("static_s") or 0) + (rep["static"] or {}).get("elapsed_s", 0), 2)
+                rep["static"]["via"] = "window"
+            except Exception as exc:  # noqa: BLE001
+                rep["static"] = {"error": f"{type(exc).__name__}: {str(exc)[:100]}"}
         if not hwnd or scan.get("error"):
             rep["error"] = scan.get("error") or "window not found after the scan"
             out["runs"].append(rep)

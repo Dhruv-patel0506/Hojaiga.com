@@ -97,6 +97,32 @@ def replay(model, key, hwnd, rng, n=6):
             "rate": round(same / comparable, 3) if comparable else None, "detail": detail}
 
 
+def _reap_ours(hwnd, t_start, row):
+    """A window WE launched that did not close (a tray app hides, a plugin host asks to confirm) must not outlive the run: kill the process tree
+    of THAT pid, and only when the process was created after this run started. Never by image name."""
+    import ctypes
+    import ctypes.wintypes as wt
+    try:
+        import psutil
+        pid = wt.DWORD()
+        ctypes.windll.user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+        if not pid.value or not psutil.pid_exists(pid.value):
+            return
+        pr = psutil.Process(pid.value)
+        if pr.create_time() < t_start - 1:
+            row["reap"] = f"pid {pid.value} predates this run: left alone"
+            return
+        victims = pr.children(recursive=True) + [pr]
+        for v in victims:
+            try:
+                v.kill()
+            except Exception:
+                pass
+        row["reap"] = f"killed {len(victims)} process(es) of pid {pid.value} (launched by this run, did not close)"
+    except Exception as exc:  # noqa: BLE001
+        row["reap"] = f"reap failed: {type(exc).__name__}"
+
+
 def run_app(app, runs, budget):
     from core_organs import organ_48_app_behavior_model as bm
     from core_organs import organ_63_app_mastery as am
@@ -167,7 +193,9 @@ def run_app(app, runs, budget):
                 row["replay"] = replay(model, key, hwnd, rng)
         except Exception as exc:
             row["grade_error"] = f"{type(exc).__name__}: {exc}"
-        us.close_window(hwnd, discard_unsaved=True, timeout_s=8)
+        closed = us.close_window(hwnd, discard_unsaved=True, timeout_s=8)
+        row["window_closed"] = bool(closed)
+        _reap_ours(hwnd, t0, row)
     d = cr.dossier(model, key)
     row["dossier"] = {"toolkit": d["toolkit"], "kind": (d["kind"] or {}).get("archetype"), "opens_files": len(d["opens_files"]),
                       "commands": d["commands"], "dialogs": len(d["dialogs"]), "state_variables": len(d["state_variables"]),

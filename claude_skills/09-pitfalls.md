@@ -208,3 +208,32 @@ Each entry: **Bug class → Root cause → Fix pattern → Boundary.**
   carries `obj=<gdi>/<user>` so a blank is never blamed on the app when the process is out of budget.
 - Other agents may be running the suite in the same working tree: check `Win32_Process` for `run_system_intelligence_tests` before a live run,
   or two suites drive Notepad/Paint at once.
+
+## P-31  Overnight 2026-10-06: popups, quick answers, preload noise, exposure measurement
+- **Qt / WinUI / Electron message boxes are not `#32770`.** `popup_policy.blocking_dialogs` only saw `#32770`; a start-up question in a Qt app
+  ("Crash Detected: Run in Safe Mode / Run in Normal Mode") was scanned as if it were the application (4 controls learned). It is now found by
+  STRUCTURE (`looks_like_dialog`: <=25 nodes, only buttons/text/image/group, an answer button that is not the title-bar X, no real menu bar) and, in
+  `universal_scan.launch_hidden`, answered by the role policy before the real window is chosen. No app names.
+- **The title-bar X is not an answer.** `choose_button` tries the dialog's BODY buttons first (closing a start-up question with the X quits the app).
+  "Launch Anyway / Run in Normal Mode / Start normally" are role `continue`. SmartScreen ("protected your PC", "Run anyway") is a SECURITY decision: it is
+  `permission` and is escalated, never auto-answered.
+- **Fuzzy command lookup invented answers.** "save as" matched "Mark all AS read" on the word "as" and "save" matched a form label "Save address?".
+  Function words (`as all at by or is be up out off`) never match alone, and a QUICK ANSWER needs every word of the intent (`coverage >= 0.99`).
+- **A binary's string table is not a command list.** `read_api_strings` accepted a conferencing client's internal class library (2,380 Get/Set names);
+  a cluster above `MAX_API_NAMES` (500) is an internal symbol table and is rejected, API-derived entries rank below any real control and are never
+  offered as the way a person does something (`_is_api`). `opaque` is NOT the same thing (it only means "no machine-checkable postcondition").
+- **A person's name is not knowledge.** `knowledge_store.redact` now also covers "Open conversation with <name>", "Chat with ...", "Message from ...",
+  "Profile of ..."; list / tree ITEMS and labels longer than 60 chars are content and are not recorded as commands from a resting scan.
+- **`resolve_app("vscode")` found nothing and `("code")` found "OpenCode".** Abbreviation matching (`_abbrev_match`: every word but the last may be cut
+  to a prefix) + whole-word matches + installer/uninstaller shortcuts are ignored. `master()` now uses the window the scan LAUNCHED (not a re-search
+  by the typed name) and retries the static harvest by window when the name did not lead to the program file (versioned install folders, store apps).
+- **Exposure of a parked app is a flyout problem, not a window problem.** Measured with a 2 ms timeline: each XAML flyout is created at (0,0,0,0),
+  placed ON a monitor ~20 ms later, re-placed on every animation frame, so moving it leaves it visible for the animation (130-260 ms; composed-desktop
+  pixels differed in 5 frames of a Paint menu crawl). `_PopupGuard._conceal` sets layered alpha 0 on first sight (UIA, posted messages and PrintWindow
+  still work) and `_reveal` puts every one back when the session ends. DWM cloaking is refused (E_ACCESSDENIED) for another process's window.
+  PIX1 proves it from the SCREEN's pixels, not from rectangles.
+- **A monitor's sampling period is its resolution.** MIN1 summed raw sample gaps (a full-desktop `EnumWindows` took ~85 ms per sample, so one sighting
+  read as 85-170 ms against a 120 ms gate). Episodes are now first-to-last sighting plus one period, sampled on the app's own UI threads.
+- **When nobody else has a window, the SHELL must take focus** (`Shell_TrayWnd`), otherwise the parked app stays foreground for the whole run.
+- The vision server must be UP while testing: `vision_gate.ensure_up()` starts it like `start_hojaiga.bat` does and logs every call to
+  `data/vision_log.jsonl`. Qwen2.5-VL returned a box for a control that does not exist (`zz_absent_widget_zz`): the verifier, not the box, is the judge.

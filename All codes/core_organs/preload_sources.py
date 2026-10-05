@@ -100,6 +100,9 @@ def read_protocol_json(text: str) -> List[Dict[str, Any]]:
     return found
 
 
+MAX_API_NAMES = 500
+
+
 def read_api_strings(path: str, max_bytes: int = 24_000_000) -> List[Dict[str, Any]]:
     """Request names inside a shipped plugin binary: ASCII strings shaped Verb+CamelWords. Only a CLUSTER counts (>= 20 distinct names
     in one file), so one stray identifier is never read as an API."""
@@ -116,8 +119,8 @@ def read_api_strings(path: str, max_bytes: int = 24_000_000) -> List[Dict[str, A
         s = m.group(0).decode("ascii", "ignore")
         if _API_NAME.fullmatch(s) and s not in imported and not s.endswith(("W", "A", "Ex", "ExW", "2")):
             names[s] = names.get(s, 0) + 1
-    if len(names) < 20:
-        return []
+    if len(names) < 20 or len(names) > MAX_API_NAMES:
+        return []                         # thousands of Get/Set names is a program's INTERNAL class library (measured: 2,380 in a conferencing client), not a request API
     return [{"name": humanize(n), "goal": humanize(n), "verb": "api", "command_id": n, "opaque": True, "origin_fmt": "api-strings"}
             for n in sorted(names)]
 

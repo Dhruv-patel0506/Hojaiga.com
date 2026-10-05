@@ -136,12 +136,28 @@ def start_apps() -> List[Tuple[str, str]]:
     return apps
 
 
+def _abbrev_match(n: str, words: List[str]) -> bool:
+    """'vscode' is 'visual studio code': every word but the last may be cut to a prefix (>=1 char), the last must be whole. Generic, no per-app table."""
+    if len(words) < 2 or " " in n:
+        return False
+    def rec(i: int, pos: int) -> bool:
+        if i == len(words) - 1:
+            return n[pos:] == words[i]
+        w = words[i]
+        return any(n.startswith(w[:k], pos) and rec(i + 1, pos + k) for k in range(1, len(w) + 1))
+    return rec(0, 0)
+
+
 def resolve_app(name: str) -> Optional[Tuple[str, str]]:
     n = re.sub(r"[^a-z0-9 ]", "", (name or "").lower()).strip()
     best, best_score = None, 0
     for disp, appid in start_apps():
         d = re.sub(r"[^a-z0-9 ]", "", disp.lower()).strip()
-        score = 100 if d == n else (80 if d.startswith(n) else (60 if n in d else 0))
+        if d.startswith(("uninstall ", "install ", "remove ")):          # an installer / uninstaller shortcut is never the program
+            continue
+        words = d.split()
+        score = (100 if d == n else 80 if d.startswith(n) else 70 if n in words else 60 if n in d else
+                 55 if _abbrev_match(n.replace(" ", ""), words) else 0)
         if score and (score > best_score or (score == best_score and len(d) < len(re.sub(r"[^a-z0-9 ]", "", best[0].lower())))):
             best, best_score = (disp, appid), score
     return best
@@ -175,6 +191,11 @@ def wake_accessibility(hwnd: int) -> str:
         for obj in (-4, -25):                            # OBJID_CLIENT, UiaRootObjectId
             _u32.SendMessageTimeoutW(h, 0x3D, 0, obj, 0x2, 500, ctypes.byref(res))
     return f"chromium-windows-queried={len(targets)}"
+
+
+def _is_startup_dialog(hwnd: int) -> bool:
+    from core_organs import popup_policy as pp
+    return pp.looks_like_dialog(hwnd)
 
 
 def launch_hidden(name: str, timeout_s: float = 45.0, fast: bool = False) -> Dict[str, Any]:
@@ -226,6 +247,7 @@ def launch_hidden(name: str, timeout_s: float = 45.0, fast: bool = False) -> Dic
     first_seen: Dict[int, float] = {}
     chosen_since, chosen = 0.0, 0
     dialog_seen: List[str] = []
+    answered: set = set()
     from core_organs import desktop_grounding as dg
     g = dg.DesktopGrounding()
     while time.time() - t0 < timeout_s:
@@ -255,7 +277,7 @@ def launch_hidden(name: str, timeout_s: float = 45.0, fast: bool = False) -> Dic
             iconic = bool(_u32.IsIconic(h))
             return (big or iconic) and time.time() - first_seen.get(h, time.time()) >= (0.6 if fast else 1.0) \
                 and now[h][1] not in ("Windows.UI.Core.CoreWindow",)
-        stable = [h for h in new if _ok(h)]
+        stable = [h for h in new if _ok(h) and h not in answered]
         if int((time.time() - t0) * 1) != info.get("_tick"):            # compact per-second trace for diagnostics
             info["_tick"] = int((time.time() - t0) * 1)
             info.setdefault("trace", []).append(
@@ -266,6 +288,17 @@ def launch_hidden(name: str, timeout_s: float = 45.0, fast: bool = False) -> Dic
             if best != chosen:
                 chosen, chosen_since = best, time.time()
             elif time.time() - chosen_since >= (0.6 if fast else 1.2):
+                if len(answered) < 3 and _is_startup_dialog(chosen):            # a start-up QUESTION is not the app: answer it by role policy
+                    from core_organs import popup_policy as pp
+                    res = pp.resolve_dialog(chosen, mode="preflight")
+                    answered.add(chosen)
+                    info["notes"].append(f"start-up dialog '{now[chosen][2][:40]}' -> {res.action or 'unanswered'}"
+                                         + (" (needs a human)" if res.need_human else ""))
+                    if res.need_human:
+                        info["startup_dialog_needs_human"] = now[chosen][2]
+                        break
+                    chosen = 0                                                  # now wait for the real window
+                    continue
                 hwnd = chosen
                 break
         time.sleep(0.05)

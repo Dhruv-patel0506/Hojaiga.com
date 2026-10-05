@@ -1284,6 +1284,156 @@ def run_cap1(TestOutcome):
         _rm_db(dbp)
 
 
+def run_pop2(TestOutcome):
+    """POP2: start-up questions and look-alike commands are read by MEANING: a 'Safe Mode / Normal Mode' question is answered with the body
+    button (not the title bar X that would quit the app), 'Run anyway' on a SmartScreen warning is escalated, 'save as' never matches
+    'Mark all AS read', and an abbreviation ('vscode') finds 'Visual Studio Code' while 'code' no longer picks 'OpenCode'"""
+    from core_organs import popup_policy as pp
+    from core_organs import command_registry as cr
+    from core_organs import universal_scan as us
+    mdl, dbp = _model()
+    try:
+        crash = pp.DialogInfo(hwnd=0, title="App Crash Detected", texts=["The app did not properly shut down. Run in Safe Mode?"],
+                              buttons=[("Close", "", object()), ("Run in Safe Mode", "b1", object()), ("Run in Normal Mode", "b2", object())])
+        cat = pp.classify(crash)
+        role, btn = pp.choose_button(crash, pp.POLICY.get(cat, pp.POLICY["unknown"]))
+        smart = pp.DialogInfo(hwnd=0, title="Windows protected your PC", texts=["Microsoft Defender SmartScreen prevented an unrecognized app from starting."],
+                              buttons=[("Run anyway", "", object()), ("Don't run", "", object())])
+        launch = pp.DialogInfo(hwnd=0, title="Notice", texts=["The previous session ended unexpectedly."], buttons=[("Launch Anyway", "", object()), ("Cancel", "", object())])
+        lrole, lbtn = pp.choose_button(launch, pp.POLICY.get(pp.classify(launch), pp.POLICY["unknown"]))
+        lonely = pp.DialogInfo(hwnd=0, title="Error", texts=["Something failed."], buttons=[("Close", "", object())])
+        orole, obtn = pp.choose_button(lonely, pp.POLICY["error"])
+        key = "pop2app"
+        from core_organs import knowledge_store as ks
+        ks.ensure(mdl)
+        mdl.upsert_command(key, {"name": "Mark all as read", "menu_path": "Settings > Mark all as read", "verb": "click"}, source="archetype", origin="e0:control")
+        mdl.upsert_command(key, {"name": "Save address?", "menu_path": "", "verb": "click"}, source="archetype", origin="e0:control")
+        mdl.upsert_command(key, {"name": "Save", "menu_path": "File > Save", "shortcut": "ctrl+s", "verb": "menu"}, source="catalog", origin="e0:menu")
+        mdl.upsert_command(key, {"name": "Set Menu Bold Font", "verb": "api", "opaque": True}, source="archetype", origin="preload:api-strings")
+        d = cr.dossier(mdl, key)
+        hits = [h["name"] for h in cr.lookup(mdl, key, "save as", limit=5)]
+        checks = {
+            "the Safe/Normal Mode question is answered with a BODY button, not the title-bar X": btn is not None and btn[0] == "Run in Normal Mode" and role == "continue",
+            "SmartScreen 'Run anyway' is a security decision: escalated (category permission)": pp.classify(smart) == "permission",
+            "'Launch Anyway' proceeds, it does not cancel (cancel would quit the app)": lbtn is not None and lbtn[0] == "Launch Anyway",
+            "a dialog whose only button is Close still gets answered": obtn is not None and obtn[0] == "Close",
+            "'save as' does not match 'Mark all as read' on the word 'as'": "Mark all as read" not in hits,
+            "no quick answer for 'save as' is invented from a label that shares one word": "save as" not in d.get("quick_answers", {}),
+            "a real 'Save' is still the quick answer for 'save'": (d.get("quick_answers", {}).get("save") or {}).get("command") == "Save",
+            "an API name read from a binary is never offered as the way to 'bold'": "bold" not in d.get("quick_answers", {}),
+            "an abbreviation finds the program (vscode -> visual studio code)": us._abbrev_match("vscode", ["visual", "studio", "code"]),
+            "an abbreviation does not match unrelated names": not us._abbrev_match("vscode", ["open", "code"]) and not us._abbrev_match("vsx", ["visual", "studio", "code"]),
+        }
+        return _verdict(TestOutcome, checks)
+    finally:
+        mdl.close()
+        _rm_db(dbp)
+
+
+def run_pix1(TestOutcome):
+    """PIX1: a PARKED app's flyouts never reach the SCREEN's pixels: the composed desktop is sampled every ~25 ms while the app's menus are crawled and
+    no frame differs from the baseline (independent of window geometry: a menu that is 'off-screen' by rectangle but animates in on a monitor is caught)"""
+    import threading
+    import tempfile
+    try:
+        from PIL import ImageGrab, ImageChops
+    except Exception:
+        return TestOutcome(passed=False, env_blocked=True, evidence="PIL ImageGrab unavailable (environment)")
+    from core_organs import si_tests_behavior as sb
+    from core_organs import organ_48_app_behavior_model as bm
+    from core_organs import background_window as bw
+
+    def small():
+        im = ImageGrab.grab(all_screens=True).convert("L")
+        return im.resize((max(1, im.width // 4), max(1, im.height // 4)))
+
+    def diff_px(a, b):
+        return ImageChops.difference(a, b).point(lambda v: 255 if v > 40 else 0).histogram()[255]
+    db = os.path.join(tempfile.gettempdir(), "hj_pix1_" + uuid.uuid4().hex[:6] + ".db")
+    m = bm.BehaviorModel(db)
+    try:
+        with sb.LiveApp("paint", park=True) as la:
+            if not la.ok:
+                return TestOutcome(passed=False, env_blocked=True, evidence=la.why)
+            time.sleep(1.5)
+            base = small()
+            quiet = [diff_px(small(), base) for _ in range(6)]           # is the screen changing by itself (a clock, a video, a person)?
+            noise = max(quiet)
+            if noise > 300:
+                return TestOutcome(passed=False, env_blocked=True, evidence=f"the screen changes by itself ({noise} px between idle frames): a pixel test cannot tell (environment)")
+            frames, stop = [], [False]
+
+            def grab():
+                while not stop[0]:
+                    frames.append((time.perf_counter(), diff_px(small(), base)))
+                    time.sleep(0.01)
+            th = threading.Thread(target=grab, daemon=True)
+            th.start()
+            e0 = bm.crawl_e0(m, "paint", la.hwnd)
+            stop[0] = True
+            th.join(3)
+        bad = [(t, n) for t, n in frames if n > 300 + 3 * noise]
+        gap = ((frames[-1][0] - frames[0][0]) / max(1, len(frames) - 1)) * 1000 if len(frames) > 1 else 0
+        checks = {
+            "the crawl really opened menus (the thing under test happened)": e0.get("window_mode") == "parked" and e0.get("ingested", 0) >= 25,
+            "the screen was sampled densely enough to mean something (>= 40 frames)": len(frames) >= 40,
+            "no sampled frame of the composed desktop differs from the baseline": not bad,
+        }
+        return _verdict(TestOutcome, checks, extra=f"frames={len(frames)} gap~{gap:.0f}ms noise={noise}px differing={len(bad)} max={max([n for _, n in frames] or [0])}px conceal={bw.CONCEAL_FLYOUTS}",
+                        metrics={"frames": len(frames), "differing": len(bad)})
+    finally:
+        m.close()
+        _rm_db(db)
+
+
+def run_chr1(TestOutcome):
+    """CHR1: a window's own title-bar buttons are not a way to an in-app goal: never offered when they are all there is, never TAUGHT, and a step that
+    makes the window DISAPPEAR is not a pass for a goal that never asked to close (a sign-in screen was 'completed' by pressing Close and the loop
+    learned it at 0.97)"""
+    from core_organs import desktop_grounding as dg
+    from core_organs import organ_47_app_intelligence as o47
+    import tempfile
+    GE = dg.GroundedElement
+    bar = [GE("w", "Sign in", "window", (0, 0, 0, 0), "uia"), GE("a", "System", "menuitem", (0, 0, 0, 0), "uia"), GE("b", "Minimize", "button", (0, 0, 0, 0), "uia"),
+           GE("c", "Maximize", "button", (0, 0, 0, 0), "uia"), GE("d", "Close", "button", (0, 0, 0, 0), "uia")]
+    inapp = [GE("w", "Editor", "window", (0, 0, 0, 0), "uia"), GE("s", "Save", "button", (0, 0, 0, 0), "uia"), GE("c", "Close", "button", (0, 0, 0, 0), "uia")]
+    only_close = [GE("w", "Dialog", "window", (0, 0, 0, 0), "uia"), GE("d", "Close", "button", (0, 0, 0, 0), "uia")]
+    hid = 0
+    b_ids = dg._titlebar_buttons(bar, hid)
+    in_ids = dg._titlebar_buttons(inapp, hid)
+    only_ids = dg._titlebar_buttons(only_close, hid)
+    v = dg.DesktopVerifier()
+    before = dg.Snapshot(title="Sign in to Steam", element_ids=["a", "b"], region_hash="x")
+    gone = dg.Snapshot(title="", element_ids=[], region_hash="")
+    v1 = v.verdict({}, before, gone, [], goal="open the Library tab")
+    v2 = v.verdict({}, before, gone, [], goal="close the dialog")
+    db = os.path.join(tempfile.gettempdir(), "hj_chr1_" + uuid.uuid4().hex[:6] + ".db")
+    try:
+        intel = o47.AppIntelligence(db)
+        r1 = intel.record_step("chrapp", "open the library tab", "click", element_name="Close", outcome="PASS")
+        r2 = intel.record_step("chrapp", "open the library tab", "click", element_name="Library", outcome="PASS")
+        r3 = intel.record_step("chrapp", "close the window", "click", element_name="Close", outcome="PASS")
+        n = intel._conn.execute("SELECT COUNT(*) FROM steps WHERE app_key='chrapp'").fetchone()[0]
+        checks = {
+            "all three title-bar buttons + System are recognised when nothing else is on screen": len(b_ids) == 4,
+            "an in-app 'Close' beside real controls is NOT treated as chrome": not in_ids,
+            "a window whose ONLY control is Close offers nothing (it is the title bar)": len(only_ids) == 1,
+            "a step that makes the window vanish is WRONG_STATE for an unrelated goal": v1[0] == "WRONG_STATE",
+            "...but not for a goal that says close": v2[0] != "WRONG_STATE",
+            "a title-bar Close is never learned for an in-app goal": r1 == "",
+            "a real control is still learned": bool(r2),
+            "Close is learned when the goal is to close": bool(r3),
+            "exactly two steps were stored": n == 2,
+        }
+        return _verdict(TestOutcome, checks)
+    finally:
+        for suf in ("", "-wal", "-shm"):
+            try:
+                os.remove(db + suf)
+            except OSError:
+                pass
+
+
 # ============================================================================================================== PV1
 
 def run_pv1(TestOutcome):
@@ -1309,6 +1459,14 @@ def run_pv1(TestOutcome):
         native_btns, _t = hin.native_dialog_parts(novel.hwnd)
         info = pp.inspect_dialog(novel.hwnd)
         names = [b[0].lower() for b in info.buttons]
+        try:                                                  # evidence for the in-suite-only failure: what did the eyes actually get?
+            _node = dap.Win32Provider().build_node(novel.hwnd, None)
+            _cap = dap.CaptureEngine().capture(_node, dap.CaptureOptions(format="raw_bgra"))
+            _w = dap.OCREngine().words(_node, dap.CaptureEngine())
+            _gui = (hin._u32.GetGuiResources(hin._k32.GetCurrentProcess(), 0), hin._u32.GetGuiResources(hin._k32.GetCurrentProcess(), 1))
+            diag = f"eyes: capture={_cap.status} {_cap.width}x{_cap.height} ocr_words={len(_w)} gdi/user={_gui}"
+        except Exception as _exc:  # noqa: BLE001
+            diag = f"eyes: {type(_exc).__name__}: {str(_exc)[:100]}"
         # DAP selector: ocr:'Not now' must come back with a BOX inside that button
         core = dap.DAPRuntimeCore()
         node = dap.Win32Provider().build_node(novel.hwnd, None)
@@ -1334,7 +1492,7 @@ def run_pv1(TestOutcome):
             "the answer was a POSTED click read by OCR (no pointer, no keyboard)": "ocr-click" in d.action and len(hin.VIOLATIONS) == v0,
             "the same disguise around an elevation prompt is ESCALATED, not answered": d2.need_human and not d2.handled and uac.clicks == 0 and uac.alive(),
         }
-        return _verdict(TestOutcome, checks, extra=f"novel: action={d.action} tier={d.tier} {d.ms:.0f} ms buttons={names}; uac: action={d2.action} tier={d2.tier} note={d2.note!r}",
+        return _verdict(TestOutcome, checks, extra=f"{diag}; novel: action={d.action} tier={d.tier} {d.ms:.0f} ms buttons={names}; uac: action={d2.action} tier={d2.tier} note={d2.note!r}",
                         metrics={"novel_ms": d.ms})
     finally:
         novel.stop()

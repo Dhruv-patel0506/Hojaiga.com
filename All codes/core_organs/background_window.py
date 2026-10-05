@@ -306,9 +306,18 @@ def _safe_text(h: int) -> str:
     res = ctypes.c_size_t(0)
     try:
         ok = ctypes.windll.user32.SendMessageTimeoutW(h, 0x000D, 300, ctypes.addressof(buf), 0x0002, 150, ctypes.byref(res))
-    except Exception:
-        return ""
-    return buf.value if ok else ""
+    except Exception:                       # another module sets argtypes on the shared user32 (a 64-bit buffer address overflows them): fall through to the cached read
+        ok = 0
+    if ok and buf.value:
+        return buf.value
+    if _pid(h) != os.getpid():              # Chromium / Electron windows answer WM_GETTEXT with nothing; another process's title is a cached read (no message, no deadlock)
+        try:
+            t = ctypes.create_unicode_buffer(300)
+            _u32.GetWindowTextW(h, t, 300)
+            return t.value
+        except Exception:
+            return ""
+    return ""
 
 
 def _cls(h: int) -> str:
@@ -360,6 +369,10 @@ def target_popups(target: int, visible_only: bool = True) -> List[int]:
     return out
 
 
+CONCEAL_FLYOUTS = os.environ.get("HOJAIGA_CONCEAL_FLYOUTS", "1") != "0"
+NOACTIVATE_PARKED = os.environ.get("HOJAIGA_PARK_NOACTIVATE", "0") == "1"
+
+
 class _PopupGuard(threading.Thread):
     """While a window is parked, its flyouts/dialogs still try to appear ON a monitor (XAML and the
     common dialogs clamp popups onto the screen even when their owner is far off-screen). Measured:
@@ -376,6 +389,7 @@ class _PopupGuard(threading.Thread):
         self.moved = 0
         self.hook_hits = 0
         self.refocused = 0
+        self._concealed: Dict[int, bool] = {}           # popup hwnd -> did WE add WS_EX_LAYERED (so it can be put back)
         _ensure_tracker()
         mark_automation_pid(self.pid)
         try:                                       # the guard shares an interpreter with a Python-heavy scanner:
@@ -391,6 +405,34 @@ class _PopupGuard(threading.Thread):
         _u32.GetClassNameW(hwnd, c, 128)
         self.main_cls = c.value
 
+    def _conceal(self, h: int) -> None:
+        """A flyout ANIMATES open and its framework re-places it on the screen on every frame, so moving it leaves it visible for the length
+        of the animation (measured 130-260 ms), and a common dialog opens at its default place before it is moved. Fully transparent from its first
+        frame it cannot be seen wherever it is, and UI Automation, posted messages and PrintWindow still reach it. Everything concealed is put
+        back by _reveal when the session ends."""
+        if not CONCEAL_FLYOUTS or h in self._concealed:
+            return
+        try:
+            ex = _u32.GetWindowLongW(h, -20)
+            added = not (ex & 0x00080000)
+            if added:
+                _u32.SetWindowLongW(h, -20, ex | 0x00080000)                   # WS_EX_LAYERED
+            _u32.SetLayeredWindowAttributes(h, 0, 0, 2)                         # LWA_ALPHA, alpha 0
+            self._concealed[h] = added
+        except Exception:
+            pass
+
+    def _reveal(self) -> None:
+        for h, added in list(self._concealed.items()):
+            try:
+                if _u32.IsWindow(h):
+                    _u32.SetLayeredWindowAttributes(h, 0, 255, 2)
+                    if added:
+                        _u32.SetWindowLongW(h, -20, _u32.GetWindowLongW(h, -20) & ~0x00080000)
+            except Exception:
+                pass
+        self._concealed.clear()
+
     def run(self) -> None:
         @ctypes.WINFUNCTYPE(ctypes.c_bool, wt.HWND, wt.LPARAM)
         def cb(h, _):
@@ -398,6 +440,7 @@ class _PopupGuard(threading.Thread):
                 if h != self.hwnd and _u32.IsWindowVisible(h) and _pid(h) == self.pid and not _u32.IsIconic(h) \
                         and is_target_popup(h, self.hwnd, self.pid):
                     if _on_real_screen(_rect(h)):
+                        self._conceal(h)
                         _u32.SetWindowPos(h, 0, PARK_X, PARK_Y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE)
                         self.moved += 1
             except Exception:
@@ -414,6 +457,7 @@ class _PopupGuard(threading.Thread):
             try:
                 if id_object == 0 and h and h != self.hwnd and is_target_popup(h, self.hwnd, self.pid):
                     if _on_real_screen(_rect(h)):
+                        self._conceal(h)
                         _u32.SetWindowPos(h, 0, PARK_X, PARK_Y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE)
                         self.moved += 1
                         self.hook_hits += 1
@@ -431,10 +475,13 @@ class _PopupGuard(threading.Thread):
         # The full-desktop sweep stays as a slower fallback for popups hosted on other threads.
         tid = _u32.GetWindowThreadProcessId(self.hwnd, None)
         n = 0
+        t_full = 0.0
         while not self._halt.is_set():
             try:
                 _u32.EnumThreadWindows(tid, cb, 0)
-                if n % 12 == 0:
+                now = time.perf_counter()
+                if now - t_full >= 0.25:                      # the full-desktop sweep is the BACKUP path (the hook is the fast one) and the costly one:
+                    t_full = now                              # every callback is Python, and a guard that starves the interpreter starves the scan it protects
                     _u32.EnumWindows(cb, 0)
                 self._hold_focus()
             except Exception:
@@ -447,12 +494,35 @@ class _PopupGuard(threading.Thread):
                     user32.DispatchMessageW(ctypes.byref(msg))
             except Exception:
                 pass
-            self._halt.wait(0.001)
+            # sleep until a message arrives (a WinEvent callback) or 8 ms pass: reaction stays immediate, the idle cost drops from a 1 ms spin to ~nothing
+            try:
+                user32.MsgWaitForMultipleObjects(0, None, False, 8, 0x04FF)
+            except Exception:
+                self._halt.wait(0.004)
         try:
             if self._hook:
                 user32.UnhookWinEvent(self._hook)
         except Exception:
             pass
+        self._reveal()                                    # nothing stays transparent once the session is over
+
+    def _give_focus(self, tgt: int, holder: int) -> None:
+        """Hand the foreground back to `tgt`. SwitchToThisWindow alone is refused while the window that holds the foreground belongs to ANOTHER
+        process's input queue (measured: 495 attempts in 6 s, the parked app kept the foreground for the whole session and the user's keystrokes
+        went to a minimized window). Joining the holder's input queue for the call makes SetForegroundWindow legitimate; no input is synthesised."""
+        me = ctypes.windll.kernel32.GetCurrentThreadId()
+        ftid = _u32.GetWindowThreadProcessId(holder, None) if holder else 0
+        attached = bool(ftid and ftid != me and _u32.AttachThreadInput(me, ftid, True))
+        try:
+            r = _u32.SetForegroundWindow(tgt)
+            if not r:
+                _u32.SwitchToThisWindow(tgt, True)
+            self.focus_trace = (bool(r), bool(attached), _u32.GetForegroundWindow() == tgt, time.perf_counter())
+        except Exception:
+            pass
+        finally:
+            if attached:
+                _u32.AttachThreadInput(me, ftid, False)
 
     def _hold_focus(self) -> None:
         """UIA calls into a parked app (Expand/Invoke) make WinUI take the foreground — measured:
@@ -471,11 +541,16 @@ class _PopupGuard(threading.Thread):
             tgt = self.user_fg or _last_user_fg
             if not (tgt and _u32.IsWindow(tgt) and not _u32.IsIconic(tgt) and _pid(tgt) != self.pid):
                 tgt = next_user_window(self.pid)                     # remembered window was missing or the app's own
+                if not tgt:                                          # nobody else has a window (all minimized): the SHELL takes focus, not the app
+                    tgt = int(_u32.FindWindowW("Shell_TrayWnd", None) or 0)
                 if tgt:
                     self.user_fg = tgt
             if tgt and _u32.IsWindow(tgt) and not _u32.IsIconic(tgt) and _pid(tgt) != self.pid:
-                _u32.SwitchToThisWindow(tgt, True)
-                self.refocused += 1
+                now = time.perf_counter()
+                if now - getattr(self, "_last_refocus", 0.0) >= 0.04:         # a failing attempt repeated every millisecond only burns the interpreter
+                    self._last_refocus = now
+                    self._give_focus(tgt, fg)
+                    self.refocused += 1
         else:
             self.user_fg = fg
 
@@ -638,6 +713,11 @@ def enter(hwnd: int) -> Dict[str, Any]:
             return {"mode": "failed", "why": "window-not-parkable", "rect": rect}
         p = _Parked(hwnd, orig, rect)
         p.guard = guard
+        if NOACTIVATE_PARKED:
+            ex = _u32.GetWindowLongW(hwnd, -20)
+            if not ex & 0x08000000:
+                _u32.SetWindowLongW(hwnd, -20, ex | 0x08000000)           # WS_EX_NOACTIVATE: a window nobody is looking at must not take the foreground
+                p.noactivate_added = True
         _parked[hwnd] = p
         _journal_write()
         stole = _u32.GetForegroundWindow() == hwnd and fg0 != hwnd
@@ -694,6 +774,8 @@ def exit(hwnd: int) -> bool:                            # noqa: A001 - mirrors e
             # and only then stop the guard (which keeps focus/popups in check during the transition).
             _u32.ShowWindow(hwnd, SW_SHOWMINNOACTIVE)
             time.sleep(0.05)
+            if getattr(p, "noactivate_added", False):
+                _u32.SetWindowLongW(hwnd, -20, _u32.GetWindowLongW(hwnd, -20) & ~0x08000000)
             _u32.SetWindowPlacement(hwnd, ctypes.byref(_restore_cmd(p.orig)))
             # verify: some apps (Win11 Notepad) restore themselves right after being minimized. A scan
             # must never leave the user's screen with a window it parked, so re-minimize until it sticks.
@@ -730,9 +812,10 @@ def stabilize_minimized(hwnd: int, fg_before: int = 0, seconds: float = 6.0, qui
             if "un-minimized" not in " ".join(notes):
                 notes.append("app un-minimized itself during startup (re-minimized)")
         fg = _u32.GetForegroundWindow()
-        if fg and _pid(fg) == pid and fg_before and fg_before != fg:
+        back = fg_before if (fg_before and _u32.IsWindow(fg_before) and _pid(fg_before) != pid) else int(_u32.FindWindowW("Shell_TrayWnd", None) or 0)
+        if fg and _pid(fg) == pid and back and back != fg:
             try:
-                _u32.SwitchToThisWindow(fg_before, True)
+                _u32.SwitchToThisWindow(back, True)
             except Exception:
                 pass
             quiet_since = time.time()

@@ -180,6 +180,9 @@ def _toks(s: str) -> set:
 _STOP = {"the", "a", "an", "to", "in", "on", "of", "and", "my", "it", "this", "that", "for", "with", "please", "now", "then", "file"}
 
 
+_FUNCTION_WORDS = {"as", "all", "at", "by", "or", "is", "be", "up", "out", "off"}      # carry no capability: never the ONLY reason a command matches
+
+
 def goal_tokens(goal: str) -> set:
     return {t for t in _toks(goal) if t not in {w[:5] for w in _STOP}}
 
@@ -224,6 +227,10 @@ def routes_for(model, app_key: str, cmd: Dict[str, Any]) -> List[Dict[str, Any]]
     return uniq
 
 
+def _is_api(c: Dict[str, Any]) -> bool:
+    return "api" in (c.get("verbs") or ()) or any(str(o).startswith("preload:api") for o in (c.get("origins") or ()))
+
+
 def lookup(model, app_key: str, goal: str, limit: int = 8, registry: Optional[List[Dict[str, Any]]] = None) -> List[Dict[str, Any]]:
     """Unified commands ranked for `goal` with their routes. Pure data lookup: no LLM, no per-app branches."""
     reg = registry if registry is not None else build(model, app_key)
@@ -240,8 +247,8 @@ def lookup(model, app_key: str, goal: str, limit: int = 8, registry: Optional[Li
             hay |= _toks(n)
         hay |= _toks(c["menu_path"].rsplit(">", 1)[-1])
         hay_help = _toks(c["help"]) if c["help"] else set()
-        if not (gt & (hay | hay_help)):
-            continue
+        if not ((gt - _FUNCTION_WORDS or gt) & (hay | hay_help)):
+            continue                                  # 'save as' must not match 'Mark all AS read' on the word 'as' alone
         overlap = len(gt & hay) / len(gt)
         score = overlap * 3 + 0.4 * (len(gt & hay_help) / len(gt))
         if any(canon(n) == gcanon for n in c["names"]) or canon(c["menu_path"].rsplit(">", 1)[-1]) == gcanon:
@@ -249,6 +256,8 @@ def lookup(model, app_key: str, goal: str, limit: int = 8, registry: Optional[Li
         if len(hay) > len(gt) + 3:
             score -= 0.4 * (len(hay) - len(gt) - 3) / max(len(hay), 1)       # a long unrelated label that merely contains a word
         score += 0.35 * c["trust"] + 0.25 * min(c["corroborated"], 3) + (0.3 if c["verified"] else 0)
+        if _is_api(c):
+            score -= 1.0                                                      # an API name found in a binary ranks BELOW any control the app really shows
         if c["kind"] == "context":
             score -= 0.3                                                      # prefer the direct command over a right-click route
         scored.append((score, c, overlap))
@@ -258,6 +267,7 @@ def lookup(model, app_key: str, goal: str, limit: int = 8, registry: Optional[Li
         d = {k: c[k] for k in ("name", "names", "kind", "menu_path", "shortcut", "alt_shortcuts", "menu_id", "help", "risk", "trust", "corroborated",
                               "sources", "verified", "post", "pre", "opaque", "successes", "failures", "access_chain", "cmd_ids")}
         d["score"] = round(s, 2)
+        d["api"] = _is_api(c)
         d["coverage"] = round(cov, 2)
         d["routes"] = routes_for(model, app_key, c)
         out.append(d)
@@ -443,8 +453,8 @@ def dossier(model, app_key: str, *, with_registry: bool = True) -> Dict[str, Any
         d["commands"]["by_kind"][c["kind"]] = d["commands"]["by_kind"].get(c["kind"], 0) + 1
     quick = {}
     for intent in QUICK_INTENTS:
-        hit = lookup(model, app_key, intent, limit=1, registry=reg)
-        if hit and hit[0]["score"] >= 2.0:
+        hit = [h for h in lookup(model, app_key, intent, limit=6, registry=reg) if not h.get("api")]         # an API name inside a binary is not how a person does it
+        if hit and hit[0]["score"] >= 2.0 and hit[0]["coverage"] >= 0.99:      # every word of the intent, not a label that shares one word
             quick[intent] = {"command": hit[0]["name"], "path": hit[0]["menu_path"], "shortcut": hit[0]["shortcut"],
                              "route": (hit[0]["routes"] or [{}])[0].get("effector", ""), "trust": hit[0]["trust"], "verified": hit[0]["verified"]}
     d["quick_answers"] = quick

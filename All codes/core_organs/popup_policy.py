@@ -72,7 +72,8 @@ _OVERWRITE_CUES = ("already exists", "replace it", "overwrite", "confirm save as
 _SAVE_CHANGES_CUES = ("save changes", "do you want to save", "want to save", "unsaved changes",
                       "save your changes", "changes to")
 _PERMISSION_CUES = ("user account control", "administrator", "elevat", "permission", "credential",
-                    "password", "sign in", "authenticat", "allow this app to make changes")
+                    "password", "sign in", "authenticat", "allow this app to make changes",
+                    "smartscreen", "protected your pc", "unknown publisher", "cannot verify", "can't verify")   # 'Run anyway' is a security decision
 _COOKIE_CUES = ("cookie", "consent", "gdpr", "privacy preferences", "we value your privacy")
 _ERROR_CUES = ("error", "failed", "cannot", "can't", "could not", "unable", "not responding",
                "stopped working", "problem", "exception", "crash")
@@ -124,7 +125,8 @@ _ROLE_WORDS = {
     "yes": ("yes",),
     "no": ("no", "don't save", "dont save", "do not save"),
     "close": ("close", "exit"),
-    "continue": ("continue", "next", "proceed"),
+    "continue": ("continue", "next", "proceed", "launch anyway", "start anyway", "continue anyway", "launch normally", "open anyway",
+                 "run in normal mode", "normal mode", "start normally", "start in normal mode"),
     "ignore": ("ignore", "skip", "not now", "later", "remind me later", "no thanks"),
     "retry": ("retry", "try again"),
     "reject": ("reject all", "reject", "decline", "necessary only", "only necessary", "deny", "refuse"),
@@ -442,18 +444,44 @@ def _button_role(name: str, aid: str) -> str:
     return _ID_ROLE.get(aid, "")
 
 
+_DIALOG_ROLES = {"window", "titlebar", "menubar", "menuitem", "button", "image", "text", "group", "pane", "title"}
+
+
+def looks_like_dialog(hwnd: int) -> bool:
+    """A window (any toolkit: Win32, Qt, WinUI, Electron) that is a QUESTION, not an application: a handful of nodes, only buttons / text / image / group (no edit, list, tab, tree,
+    document or real menu bar) and at least one answer button that is not the title bar's own. Structure only - no app names."""
+    try:
+        from core_organs import fast_uia
+        snap = list(fast_uia.snapshot(hwnd, timeout_ms=3000) or [])
+    except Exception:  # noqa: BLE001
+        return False
+    if not snap or len(snap) > 25:
+        return False
+    roles = {(n.role or "").lower() for n in snap}
+    if not roles <= _DIALOG_ROLES:
+        return False
+    chrome = {"close", "minimize", "maximize", "restore", "system", "help"}
+    answers = [n for n in snap if (n.role or "").lower() == "button" and (n.name or "").strip().lower() not in chrome]
+    texts = [n for n in snap if (n.role or "").lower() == "text" and len((n.name or "").strip()) > 8]
+    bar_items = [n for n in snap if (n.role or "").lower() in ("menuitem",) and (n.name or "").strip().lower() != "system"]
+    return bool(answers) and bool(texts) and not bar_items
+
+
 def choose_button(info: DialogInfo, roles: Sequence[str]):
-    """First available button whose ROLE (caption or standard control id) matches the preference."""
-    by_role: Dict[str, Tuple[str, str, object]] = {}
-    for name, aid, ctrl in info.buttons:
-        r = _button_role(name, aid)
-        if r and r not in by_role:
-            by_role[r] = (name, aid, ctrl)
-        if aid in _ID_ROLE and _ID_ROLE[aid] not in by_role:
-            by_role[_ID_ROLE[aid]] = (name, aid, ctrl)
-    for role in roles:
-        if role in by_role:
-            return role, by_role[role]
+    """First available button whose ROLE (caption or standard control id) matches the preference. The dialog's BODY buttons are tried first:
+    the title bar's own X is only a fallback (closing a start-up question such as 'Run in Safe Mode / Normal Mode' with the X quits the app)."""
+    body = _body_buttons(info)
+    for pool in ((body, info.buttons) if len(body) != len(info.buttons) else (info.buttons,)):
+        by_role: Dict[str, Tuple[str, str, object]] = {}
+        for name, aid, ctrl in pool:
+            r = _button_role(name, aid)
+            if r and r not in by_role:
+                by_role[r] = (name, aid, ctrl)
+            if aid in _ID_ROLE and _ID_ROLE[aid] not in by_role:
+                by_role[_ID_ROLE[aid]] = (name, aid, ctrl)
+        for role in roles:
+            if role in by_role:
+                return role, by_role[role]
     return None, None
 
 
@@ -892,6 +920,8 @@ def blocking_dialogs(root_hwnd: int, exclude: Sequence[int] = ()) -> List[int]:
         if h == root_hwnd or h in skip:
             continue
         if hin._class_name(h) == "#32770":
+            out.append(h)
+        elif hin._u32.GetWindow(h, 4) == root_hwnd and looks_like_dialog(h):       # GW_OWNER: a Qt / WinUI / Electron message box is a dialog too
             out.append(h)
     return out
 

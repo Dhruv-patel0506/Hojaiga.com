@@ -299,6 +299,9 @@ def classify_archetype(app_name: str, exe_path: str = "") -> str:
 # Records
 # ---------------------------------------------------------------------------
 
+_CHROME_STEP_NAMES = frozenset({"close", "minimize", "maximize", "restore", "restore down", "system", "system menu"})
+
+
 @dataclass
 class StepHint:
     """One ranked suggestion from the playbook, ready to feed the judge."""
@@ -433,6 +436,8 @@ class AppIntelligence:
             goal, menu_path = _redact(goal), _redact(menu_path)
         except Exception:  # noqa: BLE001
             pass
+        if outcome == "PASS" and (element_name or "").strip().lower() in _CHROME_STEP_NAMES                 and not re.search(r"(close|exit|quit|minimi[sz]e|maximi[sz]e|restore|window|dismiss|cancel)", (goal or "").lower()):
+            return ""                             # a title-bar Close / Minimize / System is never 'the way' to an in-app goal (a sign-in screen taught "Close" at 0.97)
         fp = _fingerprint(element_name, element_role or verb, menu_path) + (shortcut or "")
         step_id = f"{key}:{fp}"
         row = self._conn.execute("SELECT * FROM steps WHERE step_id=?", (step_id,)).fetchone()

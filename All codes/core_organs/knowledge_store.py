@@ -59,12 +59,20 @@ def ensure(model) -> None:
 _PERSONAL = re.compile(r"^\s*(signed in as|logged in as|log(?:ged)? in as|account:|welcome back,?|welcome,?|hi,?|hello,?|profile of|user:)\s+\S.*$", re.I)
 
 
+_PERSON_PREP = re.compile(r"^\s*((?:open (?:the )?)?(?:conversation|chat|dm|direct message|channel|thread)s?\s+(?:with|from|for)|(?:direct )?messages?\s+(?:with|from|to)|"
+                          r"(?:voice |video )?(?:call|chat)\s+with|profile(?: picture| photo)?\s+(?:of|for)|(?:unread )?messages?\s+from|"
+                          r"(?:add|invite|remove|block|unblock|report)\s+(?:user|member|contact|friend))\s*:?\s+\S.*$", re.I)
+
+
 def redact(text: str) -> str:
     """A UI label that carries a PERSON ('Signed in as <name>', 'Welcome back, <name>') is stored without the person: the knowledge
     database is synced to a repository, and what an app calls a control is knowledge while who is signed in is not."""
     if not text:
         return text
     m = _PERSONAL.match(text)
+    if m:
+        return m.group(1).strip() + " <redacted>"
+    m = _PERSON_PREP.match(text)                         # 'Open conversation with <name>': the control is knowledge, the person is not
     return (m.group(1).strip() + " <redacted>") if m else text
 
 
