@@ -20,15 +20,15 @@ exercises it on this machine.
 | A1 | split into tickets | VERIFIED (LC1) | a numbered/bulleted list or blank-line blocks = tickets; one line (`;`/`then`) = one task; a failing ticket never stalls the rest (LC1) |
 | A1 | clarify | VERIFIED (LC1) | ONE question only when nothing actionable is named; otherwise assumptions are recorded |
 | A2 | route web / desktop / mixed / system | VERIFIED (LC1) for classification; **PARTIAL** for web execution | a web ticket is *routed* to the CDP path (existing crew flow); this module does not drive the browser |
-| A2 | app resolved by process + largest window, not title | VERIFIED (find_window ranking, G1/LF2) | residual hardcoding: `find_window` skips titles containing a few editor names |
-| A3 | template first, LLM last | **PARTIAL** | organ_48 TemplateRunner (TPL1/DAY1) is used by the day runner; the product path plans with `loop_first` segmentation, not yet with a template lookup |
+| A2 | app resolved by process + largest window, not title | VERIFIED (find_window ranking, G1/LF2; **VS Code groundable**) | the hardcoded title skips (`visual studio`, `antigravity`, ` - editor`) are gone: `find_window` now skips only the agent's OWN host (this process and its ancestors, `_agent_host_pids`) and matches any distinctive word of the hint ('visual studio code' -> process `code`). Proven live: VS Code launched hidden, found, grounded (7 UIA elements; Electron UIA is shallow, OCR takes over when a target is missing) |
+| A3 | template first, LLM last | VERIFIED (A3X) | `task_lifecycle._template_first`: a single-app ticket made only of type/save steps, with the template's `{path}`/`{text}` stated in the task, runs the stored template (organ_48 TemplateRunner) before any free-form plan; the chain records PASS/SKIPPED/FAIL and why. A failed template falls back to the verified loop |
 | A3 | declare impossible at intake | VERIFIED (LC1) | physical-world, gestures/voice, CAPTCHA, moving money, typing passwords/cards |
 | B1 | find existing window | VERIFIED (LF2, ANY1) | |
-| B2 | launch (Start-menu catalog, hidden, single instance) | VERIFIED (LF2, E2E) | **GAP**: "verify the exe path exists before retrying a failed launch" is not implemented in the loop path |
+| B2 | launch (Start-menu catalog, hidden, single instance) | VERIFIED (LF2, E2E, B2X) | `universal_scan.launch_target_status` checks a path-style target on disk before launching; a missing exe is reported (`launch_note`) and neither retried nor replaced by another app. Packaged/ProgID targets report `exists=None` (unknown, not 'yes') |
 | B3 | window readiness | VERIFIED (ANY1, OFF1) | progress-aware wait (splash chain), parked/minimized windows grounded |
 | C1 | tiered scan ladder, honest skips | VERIFIED (G1, OFF1) | blank/unpainted captures are now reported skipped with a reason (`ocr:capture(<why>)`) |
-| C2 | popup sweep + ladder | VERIFIED (PP1, UP1, PL1, PL2) | classic dialogs read natively (3-6 ms); own Save-As is not dismissed. **GAP**: need_human parks the task with a capsule, no screenshot is attached to the queue row |
-| C3 | pre/post snapshot | VERIFIED (V1) structure + pixels + UIA names | **GAP**: no app-specific *mode indicators* (verts/faces, active tool) in the snapshot |
+| C2 | popup sweep + ladder | VERIFIED (PP1, UP1, PL1, PL2, **ES1**) | classic dialogs read natively (3-6 ms); own Save-As is not dismissed; a dialog that needs a human is saved as a real PNG (`data/escalations/`, listed in the run result `escalation_shots` and the C2 chain row) and left open - ES1 |
+| C3 | pre/post snapshot | VERIFIED (V1, C3X) | structure + pixels + UIA names + **mode indicators** (`name|selected`, `name|expanded`, read in the same bulk pass); a mode-only change counts as a change, and `mode_on` is an expectation type |
 | D1 | trust order learned > catalog > archetype | VERIFIED (W8) | **PARTIAL**: mode-change preconditions exist in organ_48's TemplateRunner, not in the free-form loop |
 | D2 | effector choice + recorded | VERIFIED | per-step method is in the trace and organ_48 `bm_effectors` |
 | D3 | risk gate | VERIFIED (LC1, LC2) | E2 goals (delete/send/pay/close/don't-save...) are queued for a human, the rest runs; `Don't Save` is also a destructive cue in the loop |
@@ -36,7 +36,7 @@ exercises it on this machine.
 | F1 | verdict from the right postcondition | VERIFIED (DE1, task bench) | goals derive their own postcondition: save-as needs the file AND its real format (PNG signature), `expect X` is an assertion, a typed literal must be in the control |
 | F2 | sub-goals in order, bounded retries | VERIFIED (LF2, LC2) | |
 | G1 | recovery ladder | VERIFIED (bench: Paint save, Excel type) | an opened-but-not-done control is not re-pressed; a text already typed is not typed again |
-| G2 | crash relaunch / login / vanished element | **PARTIAL** | crash detection + relaunch exist in the loop (not exercised live in this audit); login gates are the web path |
+| G2 | crash relaunch / login / vanished element | VERIFIED live (G2L) for the vanished window | a window that disappears mid-run is relaunched ONCE and the same goal resumes (earlier goals stay done); a second loss fails with evidence (`crashed: true`). Login gates remain the web path |
 | G3 | escalate with evidence | VERIFIED (LC2) | |
 | H1 | pathway logging | VERIFIED (D2, PL2) for popups | |
 | H2 | promote / erode knowledge | VERIFIED | **Known**: a learned shortcut earned from weak evidence once poisoned a step ("type 42" -> Ctrl+N); typing goals now ignore learned shortcuts and carry `text_contains` |

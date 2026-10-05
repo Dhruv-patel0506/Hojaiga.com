@@ -1788,6 +1788,36 @@ def test_lc2_lifecycle_live() -> TestOutcome:
     return si_tests_lifecycle.run_lc2(TestOutcome)
 
 
+def test_es1_escalation_screenshot() -> TestOutcome:
+    """ES1 (C2): a dialog that needs a human is saved as a real PNG screenshot for the human and left open, no button pressed"""
+    from core_organs import si_tests_checkpoints
+    return si_tests_checkpoints.run_es1(TestOutcome)
+
+
+def test_b2x_missing_exe_not_retried() -> TestOutcome:
+    """B2X (B2): a launch target whose executable is gone is reported as MISSING and never retried or replaced by another app"""
+    from core_organs import si_tests_checkpoints
+    return si_tests_checkpoints.run_b2x(TestOutcome)
+
+
+def test_c3x_mode_indicators() -> TestOutcome:
+    """C3X (C3): mode indicators (selected tab / open menu) are read with the snapshot and a mode-only change is noticed"""
+    from core_organs import si_tests_checkpoints
+    return si_tests_checkpoints.run_c3x(TestOutcome)
+
+
+def test_a3x_template_first() -> TestOutcome:
+    """A3X (A3): a ticket a stored template covers runs template-first (no LLM planning) and the chain says so"""
+    from core_organs import si_tests_checkpoints
+    return si_tests_checkpoints.run_a3x(TestOutcome)
+
+
+def test_g2l_crash_relaunch_live() -> TestOutcome:
+    """G2L (G2): the app's window vanishes mid-run on a real Notepad - relaunched once and the run completes; a second loss fails with evidence"""
+    from core_organs import si_tests_checkpoints
+    return si_tests_checkpoints.run_g2l(TestOutcome)
+
+
 def test_any1_any_app_discovery() -> TestOutcome:
     """ANY1: any-app discovery - scan walks are bounded by TIME with a visible depth rail, readiness follows a splash chain instead of a flat 10 s, an unnamed DataGrid is grounded by role, XAML hosts are recognised"""
     from core_organs import si_tests_fixes
@@ -2016,6 +2046,7 @@ GROUP_LABELS = {
     "POPUPENG": "Unified popup engine (popup_policy)",
     "GOALCHECK": "Goal postconditions (honest DONE)",
     "LIFECYCLE": "Task lifecycle (A intake -> H report)",
+    "CHECKPOINTS": "Lifecycle checkpoints (escalation, launch, modes, template, crash)",
     "VISIONBUDGET": "Vision budget (real parser, honest timings)",
     "E2E": "End-to-end unattended runs",
 }
@@ -2097,6 +2128,11 @@ def main() -> int:
         ("DE1", "GOALCHECK", test_de1_goal_postconditions),
         ("LC1", "LIFECYCLE", test_lc1_lifecycle_offline),
         ("LC2", "LIFECYCLE", test_lc2_lifecycle_live),
+        ("ES1", "CHECKPOINTS", test_es1_escalation_screenshot),
+        ("B2X", "CHECKPOINTS", test_b2x_missing_exe_not_retried),
+        ("C3X", "CHECKPOINTS", test_c3x_mode_indicators),
+        ("A3X", "CHECKPOINTS", test_a3x_template_first),
+        ("G2L", "CHECKPOINTS", test_g2l_crash_relaunch_live),
         ("BM1", "BEHAVIOR", test_bm1_behavior),
         ("BM2", "BEHAVIOR", test_bm2_behavior),
         ("BM3", "BEHAVIOR", test_bm3_behavior),

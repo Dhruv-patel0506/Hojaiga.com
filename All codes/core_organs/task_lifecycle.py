@@ -17,6 +17,7 @@ a per-checkpoint verdict derived from what the run actually measured. A checkpoi
 from __future__ import annotations
 
 import logging
+import re
 import time
 import uuid
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -88,6 +89,90 @@ def _classify(goal: str) -> str:
 
 
 # ------------------------------------------------------------------------------------------------ B-H from a run
+
+_TEMPLATE_COVERED = re.compile(r"^(?:type|write|enter|input|save|export)\b", re.I)
+
+
+def _template_params(ticket: str) -> Dict[str, str]:
+    """Parameters a template may need, read from the ticket's own words: a target path and a literal text."""
+    from core_organs import desktop_grounding as dg
+    params: Dict[str, str] = {}
+    m = dg._GOAL_PATH_RE.search(ticket or "")
+    if m:
+        params["path"] = m.group(0).rstrip(".,;:!)\"'")
+    tm = re.search(r"\b(?:type|write|enter|input)\s+(?:the\s+text\s+)?(?:\"([^\"]+)\"|'([^']+)'|(.+?))(?=\s*(?:,|;|\bthen\b|\band\s+save\b|\bsave\b|$))",
+                   ticket or "", re.I)
+    if tm:
+        txt = (tm.group(1) or tm.group(2) or tm.group(3) or "").strip().rstrip(".")
+        lit = dg.literal_typed_text("type " + txt) if not (tm.group(1) or tm.group(2)) else txt
+        if lit:
+            params["text"] = lit
+    return params
+
+
+def _template_first(ticket, spans, plans, model, run_id, allow_destructive, chain: "Chain"):
+    """Run a matching template (organ_48 TemplateRunner) when it covers the WHOLE ticket. Returns a ticket-result dict
+    when it completed, else None (the verified loop then plans freely; the chain says why the template was not used)."""
+    if model is None or len(spans) != 1:
+        chain.mark("A3.template", "template-first lookup", "SKIPPED",
+                   "behavior model unavailable" if model is None else "ticket names several apps: templates cover one app")
+        return None
+    app = spans[0][0]
+    goals = [g for p in plans for g in p.goals]
+    if not goals or not all(_TEMPLATE_COVERED.match(g) for g in goals):
+        chain.mark("A3.template", "template-first lookup", "SKIPPED", "the ticket has steps no template covers (it is not just type/save)")
+        return None
+    try:
+        from core_organs import organ_48_app_behavior_model as bm
+        try:
+            from core_organs.organ_47_app_intelligence import classify_archetype
+            arch = classify_archetype(app)
+        except Exception:
+            arch = ""
+        tpl = model.match_template(app, ticket, arch)
+        if tpl is None or tpl.score < 0.5:
+            chain.mark("A3.template", "template-first lookup", "SKIPPED",
+                       "no template matched" if tpl is None else f"best template '{tpl.name}' scored {tpl.score:.2f} (<0.5)")
+            return None
+        need = set(re.findall(r"\{(\w+)\}", __import__("json").dumps(tpl.steps)))
+        params = _template_params(ticket)
+        missing = sorted(need - set(params))
+        if missing:
+            chain.mark("A3.template", "template-first lookup", "SKIPPED",
+                       f"template '{tpl.name}' needs {missing} which the task does not state")
+            return None
+        t0 = time.perf_counter()
+        # a template does not launch the app: bring it up (hidden, ready) first, and give a freshly launched editor a blank
+        # document if it restored an old one
+        from core_organs import desktop_grounding as dg
+        prep = dg.prepare_app(app)
+        fresh = ""
+        if prep.get("launched"):
+            lp = dg.get_loop()
+            lp._launched_apps.add(app.lower())
+            try:
+                lp._run_depth += 1
+                fresh = lp._ensure_blank_document(app)
+            finally:
+                lp._run_depth -= 1
+                if lp._run_depth == 0:
+                    lp._release_held()
+        r = bm.TemplateRunner(model).run(app, ticket, params, run_id=run_id, archetype=arch, allow_destructive=allow_destructive)
+        if r.get("completed"):
+            chain.mark("A3.template", "template-first run", "PASS",
+                       f"template '{tpl.name}' [{tpl.source} {tpl.confidence:.2f}] completed {len(r.get('leaves', []))} leaf step(s) in "
+                       f"{time.perf_counter() - t0:.1f}s, no LLM planning" + (f"; {fresh}" if fresh else ""))
+            return {"status": "DONE", "via": "template", "template": tpl.name, "evidence": f"template '{tpl.name}' completed (leaves verified)"}
+        if r.get("escalated"):
+            chain.mark("A3.template", "template-first run", "ESCALATED", f"stopped at '{r.get('blocked_at')}' for a human")
+            return {"status": "ESCALATED", "via": "template", "template": tpl.name, "evidence": f"template blocked at {r.get('blocked_at')}"}
+        chain.mark("A3.template", "template-first run", "FAIL",
+                   f"template '{tpl.name}' did not complete (blocked at '{r.get('blocked_at')}'): falling back to the verified loop")
+        return None
+    except Exception as exc:
+        chain.mark("A3.template", "template-first lookup", "FAIL", f"{type(exc).__name__}: {exc}: falling back to the verified loop")
+        return None
+
 
 def _checkpoints_from_run(run: lf.AppRun, chain: Chain, *, intel_note: str = "") -> None:
     """Derive the B-H checkpoint verdicts from what this app's run actually measured."""
@@ -221,6 +306,18 @@ def run_lifecycle(command: str, *, allow_destructive: bool = False, unattended: 
                         "PASS" if any(p.goals for p in plans_preview) else "BLOCKED",
                         "; ".join(f"{p.app}: {len(p.goals)} goal(s) ({sum(1 for s in p.strength if s == 'strong')} strong)"
                                   for p in plans_preview) or "no goals")
+            # A3 template-first: a learned/seeded template (DATA) that covers the whole ticket runs before any free-form plan
+            if operate is None:                      # tests that stub the operator exercise the loop path only
+                done_by_template = _template_first(ticket, spans, plans_preview, model, run_id, allow_destructive, tchain)
+                if done_by_template is not None:
+                    tr.update(done_by_template)
+                    tr["checkpoints"] = tchain.items
+                    try:
+                        model.audit(run_id, spans[0][0], "task", ticket,
+                                    "DONE" if tr["status"] == "DONE" else "ESCALATED", tr.get("evidence", "")[:200], "")
+                    except Exception:
+                        pass
+                    continue
             res = lf.run_loop_first(ticket, spans, operate=operate, prepare=prepare, capsule_cb=capsule_cb,
                                     cursor_cb=cursor_cb, notify=notify, allow_destructive=allow_destructive,
                                     max_steps_per_goal=max_steps_per_goal, plan_filter=_filter)
