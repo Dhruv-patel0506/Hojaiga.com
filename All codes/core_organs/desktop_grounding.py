@@ -197,14 +197,14 @@ _HOST_PIDS_CACHE: Dict[str, Any] = {"t": 0.0, "pids": frozenset()}
 
 
 def _agent_host_pids() -> frozenset:
-    """PIDs of the processes THIS agent runs inside: itself and its ancestors (the IDE / terminal / desktop app that
+    """PIDs of the processes THIS agent runs inside: its ancestors (the IDE / terminal / desktop app that
     launched it). Their windows are the agent's own host, never an automation target. Data-driven - it replaces a
     hardcoded list of editor titles that also made a user's real VS Code ungroundable. A window of the same app that
     the user (or the launcher) started separately has a different process and is unaffected. Cached for 30 s."""
     now = time.monotonic()
     if now - _HOST_PIDS_CACHE["t"] < 30.0 and _HOST_PIDS_CACHE["pids"]:
         return _HOST_PIDS_CACHE["pids"]
-    pids = {os.getpid()}
+    pids: set = set()          # ANCESTORS only: this process's own windows (test fixtures, overlays) are legitimate targets
     try:
         import psutil
         proc = psutil.Process(os.getpid())
@@ -706,8 +706,43 @@ class DesktopGrounding:
             except Exception:
                 pass
 
-    def _walk_vision(self, hwnd: int, report: Optional[Dict[str, Any]] = None) -> List[GroundedElement]:
+    def _qwen_locate(self, hwnd: int, target_text: str, report: Dict[str, Any]) -> List[GroundedElement]:
+        """Targeted vision: ask the local Qwen2.5-VL server (llama.cpp :8081, booted by start_hojaiga.bat) WHERE one named
+        control is. Measured on this machine against UIA ground truth: ~4.5 s per control and 90% hits on a plain Win32
+        window (Notepad) but only 20% on a dense icon toolbar (Paint), versus 80-260 s for a full OmniParser parse on CPU.
+        The postcondition verifier still judges whatever gets clicked, so a wrong box costs time, never a false PASS."""
+        if os.environ.get("HOJAIGA_QWEN_VL", "1") == "0" or not (target_text or "").strip():
+            return []
+        try:
+            from core_organs import qwen_vl_scanner as qv
+            if not qv.available():
+                report.setdefault("tiers_skipped", []).append("vision:qwen-locate(server :8081 not reachable)")
+                return []
+            img, why = hin.capture_window(hwnd)
+            if img is None or self._unpainted(img):
+                report.setdefault("tiers_skipped", []).append(f"vision:qwen-locate(no painted capture: {why})")
+                return []
+            box, meta = qv.locate(img, target_text, backend="llamacpp", timeout_s=40)
+            report["vision_engine"] = "qwen-locate"
+            report["vision_locate_ms"] = meta.get("ms")
+            if not box:
+                report.setdefault("tiers_skipped", []).append(f"vision:qwen-locate(no box for '{target_text[:24]}'{': ' + meta['error'][:40] if meta.get('error') else ''})")
+                return []
+            ox, oy = self._window_origin(hwnd)
+            bbox = (int(box[0]) + ox, int(box[1]) + oy, int(box[2]) + ox, int(box[3]) + oy)
+            self._vision_ran = True
+            return [GroundedElement(id=_element_id(hwnd, "vision", target_text, bbox), name=target_text, role="unknown",
+                                    bbox=bbox, tier="vision", confidence=0.5, hwnd=hwnd)]
+        except Exception as exc:
+            logger.debug("[grounding] qwen locate unavailable: %s", exc)
+            return []
+
+    def _walk_vision(self, hwnd: int, report: Optional[Dict[str, Any]] = None, target_text: str = "") -> List[GroundedElement]:
         report = report if report is not None else {}
+        self._vision_ran = False
+        located = self._qwen_locate(hwnd, target_text, report)
+        if located:
+            return located
         if not (HAS_TORCH and os.path.isdir(OMNI_LOCAL_REPO) and HAS_PIL):
             return []
         self._vision_ran = False
@@ -876,7 +911,7 @@ class DesktopGrounding:
                         pass                                        # already reported above
                     elif max_tier >= 4 and HAS_TORCH:
                         _t = time.perf_counter()
-                        vis = self._walk_vision(hwnd, report)
+                        vis = self._walk_vision(hwnd, report, target_text)
                         report["tier_ms"]["vision"] = round((time.perf_counter() - _t) * 1000, 1)
                         if getattr(self, "_vision_ran", False):
                             report["tiers_ran"].append("vision")
@@ -974,7 +1009,7 @@ class DesktopGrounding:
                     report["tiers_skipped"].append("ocr:cap")
             if HAS_TORCH and max_tier >= 4:
                 _t = time.perf_counter()
-                vis = self._walk_vision(hwnd, report)
+                vis = self._walk_vision(hwnd, report, target_text)
                 report["tier_ms"]["vision"] = round((time.perf_counter() - _t) * 1000, 1)
                 if getattr(self, "_vision_ran", False):
                     report["tiers_ran"].append("vision")
@@ -2841,6 +2876,7 @@ class DesktopAutonomyLoop:
         'type X ... save as Y' task would then save the old text with X. When the editor already holds text and the app
         offers a 'New tab / New document' button, open a blank one first (non-destructive: the old tab stays). Never
         clears anything. Returns a note ('' when there was nothing to do)."""
+        self._hold_hidden(app_hint)          # the window is held parked for the whole run, like every other step
         hwnd, els, _rep = self.grounding.ground(app_hint, max_tier=2)
         if not hwnd or not els:
             return ""

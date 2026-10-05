@@ -166,3 +166,29 @@ App ladder run 2026-10-04 23:55:51  judge=qwen2.5:7b  qwen-vl=up
 
 total 186s; physical-input guard violations=0
 
+App ladder run 2026-10-05 09:31:53  judge=qwen2.5:7b  qwen-vl=up
+
+== tier: custom
+  calculator                   easy   score=15.2 nodes=80 act=33 depth=6 scan=613ms vision_needed=False trunc=False
+      ladder: 36 elements (uia 36; by tier {'uia': 36}) per-tier ms {'uia': 617.1} in 0.7s; ready after 1.68s
+      cleanup: window closed; stopped 2 process(es) of its own family
+      brain[qwen2.5:7b]: valid=33% correct=33% 8567ms/decision (n=3)
+      vision[Qwen2.5-VL-7B locate]: hit 1/2 21541ms/locate 
+  notepad                      easy   score=21.4 nodes=80 act=28 depth=7 scan=791ms vision_needed=False trunc=False
+      ladder: 34 elements (uia 34; by tier {'uia': 34}) per-tier ms {'uia': 817.1} in 0.9s; ready after 1.65s
+      cleanup: window closed; stopped 1 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=67% 1876ms/decision (n=3)
+      vision[Qwen2.5-VL-7B locate]: hit 1/2 18662ms/locate 
+  paint                        easy   score=27.0 nodes=120 act=53 depth=8 scan=1253ms vision_needed=False trunc=True
+      ladder: 136 elements (uia 136; by tier {'uia': 136}) per-tier ms {'uia': 2542.8} in 2.6s; ready after 3.16s
+      cleanup: window closed; stopped 1 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1803ms/decision (n=3)
+      vision[Qwen2.5-VL-7B locate]: hit 1/2 20109ms/locate 
+  excel                        easy   score=20.4 nodes=67 act=42 depth=7 scan=351ms vision_needed=False trunc=False
+      ladder: 54 elements (uia 54; by tier {'uia': 54}) per-tier ms {'uia': 374.9} in 0.4s; ready after 0.77s
+      cleanup: window closed; stopped 6 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1817ms/decision (n=3)
+      vision[Qwen2.5-VL-7B locate]: hit 1/2 22163ms/locate 
+
+total 269s; physical-input guard violations=0
+

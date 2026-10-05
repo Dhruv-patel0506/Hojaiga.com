@@ -708,3 +708,575 @@ RANKINGS
 26. End-to-end unattended runs: 1/2 tests, score 35.0, avg 40557.9 ms
 27. Goal postconditions (honest DONE): 0/1 tests, score 20.9, avg 3018.9 ms
 28. Background operation (minimized, never shown/focused): 0/1 tests, score 0.0, avg 86157.2 ms
+Hojaiga System Intelligence Suite — 2026-10-05 10:43:55
+
+[PASS] B1 [BRAIN] B1: Brain compiler parses 10 differently-phrased natural tasks
+    evidence: 11/12 natural phrasings routed to the right agent family; deep LinkedIn flow: 5 checkpoints -> 15 granular tasks [OK]; intent vocabulary=5 distinct | misses: 'calculate the monthly totals in the spre' spec data_processing != desktop_automation (intent='perform the requested task')
+    duration: 776.7 ms  metrics: {'routing_accuracy': '11/12', 'linkedin_checkpoints': 5, 'linkedin_granular_tasks': 15}
+
+[PASS] B2 [BRAIN] B2: Organ-01 router classifies intent/nature/confidence on raw text (no LLM needed)
+    evidence: 7/7 total; design-covered natures (analytical/creative/unknown) 5/5 correct; operational verbs routed 2/2 ('open chrome'/'click send' -> OPERATIONAL); empty-task guard=ON
+    duration: 273.9 ms  metrics: {'nature_accuracy': '7/7', 'operational_routed': '2/2'}
+
+[PASS] B3 [BRAIN] B3: enhanced_brain_compiler specialty routing (the 'open excel'->web fix)
+    evidence: 6/6 specialty routes correct | 'open excel'->desktop_automationOK; 'open notepad and type hell'->desktop_automationOK; 'launch obs studio and reco'->desktop_automationOK; 'calculate the sum of this '->data_processingOK; 'open gmail and send an ema'->web_automationOK; 'browse a website for hotel'->web_automationOK
+    duration: 0.1 ms  metrics: {'specialty_accuracy': '6/6'}
+
+[PASS] P1 [POPUP] P1: Organ-29 enumerates live windows and classifies modal vs in-window popups
+    evidence: 7 visible windows enumerated, 0 classic modal HWNDs, 0 in-window modals found on foreground window ('Claude')
+    duration: 330.1 ms  metrics: {'windows_seen': 7, 'classic_modals': 0, 'in_window_modals': 0}
+
+[PASS] P2 [POPUP] P2: Organ-29 mitigation engine resolves synthetic + live popups (dry-run safe)
+    evidence: 3/3 popup types produced a mitigation decision; live mitigation=DRY-RUN | 'Save changes before closing?'->need_human (1113.0ms) ; 'Microsoft Store Update'->dismiss (307.1ms) ; 'Allow notifications?'->key:escape (152.9ms)
+    duration: 1573.7 ms  metrics: {'decisions_made': 3, 'modes_tested': 3}
+
+[PASS] S1 [SCANNER] S1: Organ-30 deep scan — how deep and how much it learns (target-aware)
+    evidence: scanned 1 target(s); best='<foreground>': 1277 nodes walked, depth 40/64, 169 actionable controls, 0 menu items, 144 elements learned in 1.43s
+    duration: 1444.7 ms  metrics: {'nodes_walked': 1277, 'depth_seen': 40, 'depth_cap': 64, 'actionable_controls': 169, 'elements_learned': 144, 'scan_seconds': 1.425, 'targets_tried': 1}
+
+[PASS] S2 [SCANNER] S2: Organ-41 continuous scanner — real cycles, change detection, budget behaviour
+    evidence: 5 cycles (incl. real notepad spawn/kill mutation), avg 424 ms/cycle (min 205 max 656), 4 change-detections (expected >=2), peak elements 225
+    duration: 4930.0 ms  metrics: {'avg_cycle_ms': 424.0, 'min_cycle_ms': 205.0, 'max_cycle_ms': 656.3, 'change_detections': 4, 'peak_elements': 225}
+
+[FAIL] M1 [MOUSE] M1: virtual-mouse-only input - physical pointer untouched; headless delivery to minimized/covered windows
+    evidence: A normal-window PostMessage click=True; B MINIMIZED window UIA-invoke=False (None, state=None); C COVERED window click landed on the covered button only=True; D posted Ctrl+Shift+S arrived WITH modifiers=True (saw [(True, True)]); WM_CHAR text=True; E physical pointer untouched=True ((604, 495)->(604, 495)), guard violations during actions=0; F input guard refused a legacy SetCursorPos=True; sprite painted 953 px (painted=True)
+    duration: 4505.1 ms  metrics: {'A_postmessage_click': True, 'B_uia_landed': False, 'C_covered_click_landed': True, 'D_combo_mods_arrived': True, 'E_pointer_untouched': True, 'F_guard_refused_legacy_call': True, 'sprite_changed_pixels': 953}
+
+[PASS] L1 [LAUNCHER] L1: Dynamic app resolution on 12 NEW phrasings not in the original 23-case matrix
+    evidence: 12/12 new phrasings routed correctly @ 1.046 ms/task | 'calculate seventeen times nine'->calculatorOK; 'sketch a sunset with a brush'->paintOK; 'take a screenshot of this mess'->snipping toolOK; 'play my downloaded music'->windows media playerOK; 'set an alarm for six am'->google chromeOK; 'draw a diagram of the system'->paintOK; 'write text in notepad for later'->notepadOK; 'rename my files in downloads'->file explorerOK; 'browse hotel deals online'->google chromeOK; 'send an email to my brother'->mailOK; 'check my outlook inbox'->mailOK; 'cook me a three course dinner'->google chromeOK
+    duration: 14.0 ms  metrics: {'matrix_accuracy': '12/12', 'resolve_ms_per_task': 1.046}
+
+[PASS] L2 [LAUNCHER] L2: launcher action semantics on the 4 designer cases (dry-run, no OS input)
+    evidence: 5/5 launcher-semantic checks pass | (a) open gmail -> browser_web/type_bar=False | (b) open obs studio -> src=alias target='obs studio' action=launch_app | (c) 'record ...' -> src=alias target='obs studio' | (d) open blender -> src=named target='blender' action=not_found | (d2) open photoshop -> src=named target='photoshop'
+    duration: 1.9 ms  metrics: {'semantic_checks': '5/5'}
+
+[PASS] R1 [MEMORY] R1: Memory organ working store, fetch throughput, TTL expiry
+    evidence: 200/200 keys round-tripped; store 20 ms (0.101 ms/op), fetch 0 ms (0.001 ms/op); TTL alive=True, expired=True
+    duration: 1404.8 ms  metrics: {'store_ms_per_op': 0.1007, 'fetch_ms_per_op': 0.0009, 'keys_round_tripped': 200}
+
+[PASS] R2 [MEMORY] R2: Memory session rooms, conversational history, snapshot persistence
+    evidence: room 511742f3: 3 messages replayed, snapshot id=1791176340_a505d
+    duration: 86.1 ms  metrics: {'messages_replayed': 3}
+
+[PASS] K1 [KNOWLEDGE] K1: Knowledge organ ingests prose documents and retrieves them by meaning
+    evidence: 3 chunks ingested in 3 ms; 2/2 paraphrased queries returned the SEMANTICALLY correct doc; capability 'launch_app' -> 0 provider(s) | 'how do we handle the sql server ' -> top='SSMS error dialogs' score=0.144338 RELEVANT; 'which app needs pixel coordinate' -> top='Paint canvas behaviour' score=0.101827 RELEVANT
+    duration: 58.7 ms  metrics: {'chunks_ingested': 3, 'semantic_queries_hit': '2/2'}
+
+[PASS] K2 [KNOWLEDGE] K2: How easily/fast the system parses knowledge — 50 ingest+search round trips
+    evidence: 50 ingest+search round trips: avg 1.33 ms, p50 1.25 ms, p95 1.83 ms
+    duration: 145.7 ms  metrics: {'kg_roundtrip_avg_ms': 1.329, 'kg_roundtrip_p95_ms': 1.83}
+
+[PASS] D1 [DATABASE] D1: DAP batch-store 200 element profiles, then read them back from the DB
+    evidence: 200/200 profiles written in 312 ms (1.56 ms/element); 200 read back
+    duration: 2062.8 ms  metrics: {'written': 200, 'read_back': 200, 'ms_per_element': 1.559}
+
+[PASS] D2 [DATABASE] D2: Popup-resolution cache + session cookie persistence round-trip
+    evidence: modal resolution read-back=OK; cookies=OK
+    duration: 54.5 ms  metrics: {}
+
+[PASS] G1 [GROUNDING] G1: desktop_grounding perceives a real app AND reports tiers honestly
+    evidence: notepad grounded to 50 elements via tiers ['uia', 'ocr']; target-hunt escalated=True; skipped=['vision:qwen-locate(no painted capture: window-minimized)', 'vision:capture(window-minimized)']; honesty-integrity=OK (torch=True, ocr=True, uia=True)
+    duration: 34917.7 ms  metrics: {'elements': 50, 'tiers_ran': 'uia,ocr', 'escalated': True, 'integrity': True}
+
+[PASS] V1 [VERIFY] V1: DesktopVerifier emits PASS / NO_CHANGE / WRONG_STATE on live + synthetic state
+    evidence: 7/7 verdict transitions correct: change->PASS ; same->NO_CHANGE ; expect-met->PASS ; wrong->WRONG_STATE ; title->PASS ; disappeared->PASS ; file_created->PASS
+    duration: 1.4 ms  metrics: {'verdict_checks': '7/7'}
+
+[PASS] P3 [POPUP] P3: organ_29 Tier-3 gatekeeper is hard-capped so a dead LLM can't stall the loop
+    evidence: Tier-3 cap=5.0s (must be <=5s): OK; unresolvable modal resolved in 0.47s -> action='dismiss'; no multi-30s stall: OK
+    duration: 473.8 ms  metrics: {'tier3_cap_s': 5.0, 'resolve_s': 0.47, 'fell_through': True}
+
+[PASS] PL1 [POPUP] PL1: organ_29 Tier-2.5 lexical intent resolves known categories instantly,
+escalates elevation/destructive to human, and never clicks/blind-types in test
+    evidence: 8/8 lexical checks: uac->('key:escape', True) ; destructive->('key:escape', True) ; crash->('key:escape', False) ; msgbox->('key:enter', False) ; ambiguous->None ; cookie live-resolved in 0.30s via key:escape ; uac->need_human, pressed=0 (must be 0) ; repeat hit cache in 0.32s replay=['key:escape']
+    duration: 621.7 ms  metrics: {'checks': '8/8', 'first_resolve_s': 0.3}
+
+[PASS] SK1 [SKILL] SK1: loop distills verified steps into a reusable organ_04 skill recipe and recalls it
+    evidence: 2-PASS trace -> distill=True (recipe ingested to organ_04 (2 verified steps)); recall_hit=True; 1-PASS trace -> refused=True (not enough verified steps to distill)
+    duration: 81.8 ms  metrics: {'distilled': True, 'thin_refused': True, 'recall_hit': True}
+
+[PASS] CP1 [CHECKPOINT] CP1: loop persists a resumable checkpoint after each verified step and resumes
+    evidence: checkpoint round-trip: last-verdict-recovered=True, steps=1, unknown-session->None=True, resume_session=True
+    duration: 16.2 ms  metrics: {'recovered': True, 'unknown_absent': True, 'resumed': True}
+
+[ENV-BLOCKED] TG1 [TASKGRAPH] TG1: 'I'm busy, model a 3D chair from scratch' compiles to skip-ReAct native graph
+    evidence: graph skip_react=False mode=react_fallback kind= save= steps=0 reason='construct intent but no 3d suite installed'; bpy_recipe=OK; calculator_kept_react=True
+    duration: 5770.3 ms  metrics: {'mode': 'react_fallback', 'steps': 0, 'vision_tier': 2}
+
+[PASS] W6 [HYGIENE] W6: _derive_web_url resolves brand destinations without the goto.com verb alias bug
+    evidence: 6/6 hygiene checks: go to gmail -> https://www.gmail.com; goto gmail -> https://www.gmail.com; open browser and check gmail -> https://www.gmail.com; browse hotel deals -> https://www.google.com; explicit -> https://news.ycombinator.com/item?id=1; is_site(goto)=False, is_site(gmail)=True
+    duration: 9676.9 ms  metrics: {'checks': '6/6'}
+
+[PASS] W8 [INTELLIGENCE] W8: organ_47 turns verified outcomes into pro shortcuts — and never trusts a guess
+    evidence: archetype-route=OK; guess-never-learned=OK; verified-ctrl+s-trusted=OK(conf 0.85); climbs-to-cap=OK(0.85->0.97); failure-erodes=OK(0.85->0.60)
+    duration: 222.0 ms  metrics: {'checks': '5/5', 'learned_confidence': 0.97}
+
+[PASS] H1 [HEALTH] H1: Every core organ module imports cleanly with its main symbol present
+    evidence: 33/33 organs import clean (225 ms cold-import sweep)
+    duration: 225.1 ms  metrics: {'organs_healthy': '33/33'}
+
+[FAIL] G2 [GROUNDING] G2: vision tier is budgeted per goal, cached per window signature, and per-tier ms is reported - with the REAL OmniParser, instrumented
+    evidence: REAL OmniParser (warm, waited 0 ms for the warmup thread): first ground ran vision 0x, parse None ms; 2nd identical window cache_hit=False (9000000000.0 ms vs None ms miss); budget 2/goal enforced=False (ran 0 of 3 attempts); refill-on-new-goal=False; all 0 real parses (ms)=[]; measured per-tier ms (miss)={}
+    duration: 545.4 ms  metrics: {'cache_hit': False, 'budget_enforced': False, 'refilled': False, 'real_parse_ms': [], 'tier_ms_miss': '{}', 'tier_ms_hit': 9000000000.0}
+
+[PASS] OM1 [VISION] OM1: real OmniParser warmup (easyocr download happens once) + blank image = 0 elements, no ERROR
+    evidence: warmup 5545 ms (warmed=True); blank 640x400 PNG -> 0 elements in 2643 ms; ERROR-level logs=0 []
+    duration: 8198.9 ms  metrics: {'warmup_ms': 5545, 'blank_parse_ms': 2643, 'error_logs': 0}
+
+[PASS] PL2 [POPUP] PL2: dynamic-title popups hit the class+button fingerprint cache; real DB round-trips it
+    evidence: normalize->'installer error # (attempt #)', fp-stable=True, distinct-for-other-class/title=True; different-title popup resolved via fingerprint cache in 2 ms -> key:escape; exact-title lookup alone would have MISSED (the pre-fix behaviour); real-db fingerprint round-trip=OK
+    duration: 487.5 ms  metrics: {'fingerprint_resolve_ms': 2.0}
+
+[PASS] W9 [HYGIENE] W9: the compiled WEB.NAVIGATE step (what pre-navigation uses) never carries goto.com
+    evidence: 4/4 compiled nav URLs correct: 'go to gmail and check my inbox' -> https://www.gmail.com; 'goto gmail' -> https://www.gmail.com; 'open chrome and go to gmail.com' -> https://gmail.com; 'navigate to figma' -> https://www.figma.com
+    duration: 27.6 ms  metrics: {'correct': '4/4'}
+
+[PASS] J1 [GROUNDING] J1: judge shortlist is goal-aware (text area / 'Save as' reach the 8-slot window, indices map back)
+    evidence: pre-fix first-8 shortlist was blind to the targets=True; type-goal top pick='Text editor'; save-goal top pick='Save as'; original-index mapping intact=True; absolute path extracted from goal=True; popup triage spares Save/Open pickers & escalates overwrite-confirm=True
+    duration: 1.1 ms  metrics: {'type_top': 'Text editor', 'save_top': 'Save as'}
+
+[PASS] PP1 [POPUP] PP1: popup policy reads REAL dialogs, answers non-destructively, escalates elevation/overwrite, headless
+    evidence: overwrite-not-ours -> No: OK (returned=7, human=False); save-changes -> Cancel: OK (returned=2, human=False); error -> OK: OK (returned=1, human=False); UAC-like -> human, stays open: OK (returned=2, human=True); task's own target exists -> human: OK (returned=2, human=True); physical pointer untouched=False; guard violations=0
+    duration: 7807.8 ms  metrics: {'cases': 5, 'pointer_untouched': False}
+
+[PASS] LF1 [ROUTING] LF1: the product routes detected desktop apps through the verified loop IN ORDER, stops at a human gate, and is switchable
+    evidence: flag-default-on-and-0-disables=OK(default_on=True off=False ran_when_off=False calls=[]); compiler-positions-drive-per-app-goals=OK(spans=[('notepad', 5), ('calculator', 45)] -> notepad:['type "hello world"'] | calculator:['press Seven', 'press Multiply by', 'press Eight', 'press Equals']); save-path-gets-file-postcondition=OK(goals=['type "notes"', 'save as C:\\tmp\\lf1.txt'] expect={1: {'file_created': 'C:\\tmp\\lf1.txt'}}); canvas-drawing-is-delegated-not-faked=OK(paint=['draw a circle'] notepad=['type "done"']); sequence-in-compiled-order-with-persisted-handles=OK(order=['notepad', 'calculator'] handles=(1001,1002) expect2={3: {'name_visible': '56'}}); human-gate-stops-the-sequence=OK(ran=['notepad'] notified=[('input_needed', 'Agent needs your input - notepad: a dialog or an ambiguous choice needs you')]); execute_task-halts-with-NEEDS_INPUT-before-the-crew-exists=OK(status=NEEDS_INPUT crew_built=False attempts=0); flag-0-leaves-the-crew-path-untouched=OK(result=None evidence=''); evidence-is-honest-about-weak-and-undone=OK(weak calculator presses flagged; unrun goals marked NOT DONE; human stop stated)
+    duration: 19639.1 ms  metrics: {'checks': '9/9'}
+
+[FAIL] LF2 [ROUTING] LF2: a REAL two-app task (Notepad then Calculator) runs both apps through the verified loop with the physical pointer untouched
+    evidence: both-apps-ran-in-order=OK(runs=[('notepad', 'COMPLETED', 1), ('calculator', 'COMPLETED', 4)]); notepad-holds-the-typed-words (independent read)=OK(document='loop first works'); calculator-shows-42 (independent read)=OK(display='Display is 42'); handles-persisted-for-later-stages=OK(notepad=16123044 calculator=10358118); completed-or-honestly-blocked=OK(statuses=['COMPLETED', 'COMPLETED']); physical-pointer-untouched-and-no-guard-violations=FAIL(pointer (1481, 524)->(1561, 597), guard violations+=0, largest 10 ms step=971px); total 31.0s; closed 3 window(s) we launched
+    duration: 37171.1 ms  metrics: {'seconds': 31.0, 'windows_closed': 3, 'statuses': 'COMPLETED,COMPLETED'}
+
+[PASS] OFF1 [HEADLESS] OFF1: a real MINIMIZED Notepad is read by OCR through the off-screen capture rung, ends minimized again, and a structurally-grounded app never pays for it
+    evidence: starts-minimized=OK(state=minimized); structurally-grounded-app-pays-nothing=OK(target 'Restore' found among 34 UIA elements in 307 ms, escalated=False, offscreen=False); parked-uia-resolves-before-any-pixel-tier=OK('Minimize' is absent from the minimized tree (29 names) but present parked (30); resolved_by=uia-parked ran=['uia@offscreen'] round_trip_ms=979.5 total 980 ms); offscreen-rung-ran-and-read-pixels=OK(used=True mode=parked ocr_elements=13 words=['File', 'Windows', '(CRLF)', 'Plain', '100%', 'text'] skipped=['vision:offscreen-capture(cap)']); round-trip-timed-and-ended-minimized=OK(round_trip_ms=1577.7 park_ms=167.6 paint_wait_ms=47.0 ended_minimized=True tiers_via=['ocr:offscreen-capture']); refuses-a-window-the-user-can-see=OK(offscreen={'used': False, 'ours': False, 'refused': 'user-can-see', 'escalate_to_human': True} skipped=['ocr:offscreen-refused(user-can-see)', 'vision:offscreen-refused(u); physical-pointer-untouched-and-no-guard-violations=OK(pointer (1561, 597)->(1579, 558), guard violations+=0, largest 10 ms step=12px (a smooth path = the user's own hand; the guard saw 0 physical-input calls))
+    duration: 10543.6 ms  metrics: {'parked_uia_gain': 1, 'offscreen_round_trip_ms': 1577.7, 'ground_total_ms': 1910, 'uia_hit_ms': 307, 'ocr_elements': 13}
+
+[PASS] DR1 [HEADLESS] DR1: headless drag - ordered, time-sliced WM_MOUSEMOVE/LBUTTONDOWN/UP draws a circle on a real canvas; physical pointer untouched; an app that ignores posted mouse input is reported INEFFECTIVE, not success
+    evidence: ordered-move-down-moves-up=OK(delivered=True events=51 sequence=['0x200', '0x201', '0x200']...0x202 moves_with_button=48 (path has 49 points)); time-sliced-not-a-burst=OK(moves spread over 0.78s of the 0.80s budget, longest gap 17 ms (slice 17 ms); call took 0.84s); client-relative-coordinates=OK(button-down at client (250,80) expected (250,80)); circle-really-drawn-ring-not-blob=OK(2124 px changed, bbox 223x223 (expect ~220x220), centre untouched=True, ring samples inked 24/24); visual-cursor-draw_shape-routes-through-post_drag=OK(last_stroke={'delivered': True, 'effective': True, 'changed_pixels': 2140} note=postmessage-drag-left->HJCanvas_6478966 41 points (829,468)->(829,468) over 0.49); no-resolvable-target-is-refused-not-physical=OK(note=UNDELIVERABLE: no target window resolved (refused; no physical-input fallback)); real-app-that-ignores-posted-mouse-is-reported-not-faked=OK(paint(parked,parked): delivered=True effective=False changed_pixels=0 note=delivered but INEFFECTIVE: the window did not react to posted mouse input (no pixel changed)); physical-pointer-untouched-and-no-guard-violations=OK(pointer (1579, 558)->(1588, 560), guard violations+=0, largest 10 ms step=3px (a smooth path = the user's own hand; the guard saw 0 physical-input calls)) || paint(parked,parked): delivered=True effective=False changed_pixels=0 note=delivered but INEFFECTIVE: the window did not react to posted mouse input (no pixel changed)
+    duration: 13188.8 ms  metrics: {'changed_pixels': 2124, 'move_events': 48, 'span_s': 0.78, 'paint_posted_mouse_effective': False}
+
+[FAIL] CN1 [HEADLESS] CN1: organ_15's desktop connector delivers click/type/hotkey/press as posted messages to a resolved window, and REFUSES (never pyautogui) when no window resolves
+    evidence: no-target-window-is-refused=OK(status=ResponseStatus.ERROR err=REFUSED: click needs a target window in the payload (hwnd | window_title | app); none of hwnd / window_title /); click-lands-on-the-button=OK(status=ResponseStatus.OK BN_CLICKED 0->1); type-posts-characters=OK(status=ResponseStatus.OK chars=['h', 'i']); hotkey-arrives-with-modifiers=OK(status=ResponseStatus.OK combos=[(True, True)]); launch-reports-an-existing-window-truthfully=FAIL(status=ResponseStatus.ERROR data=None); launch-without-a-window-is-not-an-optimistic-true=OK(status=ResponseStatus.ERROR err=App did not launch: started, but no window appeared within 1.5 s (tray-only, sign-in gated, or slow)); physical-pointer-untouched-and-no-guard-violations=OK(pointer (1588, 560)->(1588, 560), guard violations+=0, largest 10 ms step=0px)
+    duration: 3181.9 ms  metrics: {}
+
+[PASS] TY1 [HEADLESS] TY1: the launch / switch / type tools never touch the physical keyboard or mouse and never raise, restore or maximize a window (a minimized target is parked off-screen for the call); a delivery the target did not accept is never reported - or recorded - as typed
+    evidence: instrumentation-sees-raise-and-keystroke-attempts=OK(refused/keys/guard-violations=(3, 1, 1) (expected 3/1/1) - so zero below is a real zero); launch-visible-existing-window-is-tracked-not-raised=OK(tracked=True state (260, 180, 680, 420)->(260, 180, 680, 420) zoomed=False raise-attempts=[] key-attempts=[]); launch-minimized-existing-window-stays-minimized=OK(tracked=True minimized=True raise-attempts=[]); switch-tracked-and-previous-branches-do-not-raise=OK(tracked-branch(now bravo, still minimized)=(True, True) previous-branch(now alpha, unmoved)=(True, True) raise-attempts=[]); type-visible-editor-lands-and-is-recorded-once=OK(control reads 'hello headless'; TYPE_TEXT records 0->1; window unmoved=True; reply="[10:31:37.408] Typed via UIA into 'HJ-TY1-Alpha': 'hello headless' (re"); refusing-target-is-FAILED-on-both-routes-not-typed-and-not-recorded=OK(control still reads 'locked'; TYPE_TEXT records 1->1; minimized again=True; UIA-route reply="[10:31:38.843] FAILED: 'HJ-TY1-Charlie' accepted the delivery via UIA SetValue but its text still re" posted-route reply="[10:31:41.532] FAILED: 'HJ-TY1-Charlie' accepted the delivery via posted window messages but its tex"); delivered-but-unreadable-target-is-UNVERIFIED-not-recorded=OK(WM_CHAR received by the window=3 (delivery is not proof); TYPE_TEXT records 1->1; reply="[10:31:42.932] UNVERIFIED: delivered 3 chars to 'HJ-TY1-Delta' via posted window messages, but its text cannot"); type-minimized-editor-lands-and-ends-minimized=OK(control reads 'parked text'; minimized again=True still-parked=False; reply="[10:31:44.626] Typed via UIA into 'HJ-TY1-Bravo': 'parked text' (read "); posted-message-route-delivers-and-is-verified=OK(control 'hello headless' -> 'posted okhello headless'; TYPE_TEXT records 2->3; reply="[10:31:45.315] Typed via posted window messages into 'HJ-TY1-Alpha': 'posted ok'"); start-menu-app-launches-through-launch_hidden-and-stays-minimized=OK(launch_hidden('HJ-TY1-Echo') called=True tracked-its-window=True minimized=True LAUNCH_NEW records=1 legacy ShellExecute calls=0); fallback-launch-is-minimized-and-a-window-that-never-appears-is-not-a-launch=OK(ShellExecute calls=1 showcmd=[7] (7 = SW_SHOWMINNOACTIVE) LAUNCH_NEW records=0 reply="[10:31:47.959] UNVERIFIED: started 'HJ-TY1-Nothing' via ShellExecute(HJ-TY1-Nothing, SW_SHOWMINNOACT"); window-tracker-finds-the-window-without-raising-it=OK(tracked=True state (260, 180, 680, 420)->(260, 180, 680, 420) raise-attempts=[]); hygiene-leaves-a-look-alike-window-it-did-not-launch-alone=OK(alive=True text='user text' (a window titled 'untitled' for an unlaunched app used to be WM_CLOSEd)); popup-dismisser-only-touches-popups-it-owns=OK(look-alike window owned before=False after we launched it=True); focus-helper-names-the-window-without-raising-it=OK(returned 'HJ-TY1-Alpha'; raise-attempts=[]); organ_01-source-has-no-key-injection-raise-restore-or-user-app-taskkill=OK(offending call sites: none (the only taskkill left restarts ollama.exe, a service)); parked-windows-never-shown-and-nothing-became-foreground=OK(2753 samples; (ms a non-minimized window overlapped a monitor by >1 px, samples as foreground) per window = {'Alpha': (13012, 0), 'Bravo': (5, 0), 'Charlie': (9, 0), 'Delta': (0, 0), 'Echo-Window': (0, 0), 'untitled': (0, None)}; gate <= 120 ms per window (the documented park floor is ~40-110 ms); all minimized again, none left ); no-physical-input-or-raise-attempt-in-any-step=OK(raise/restore/maximize attempts=[] keystroke/mouse attempts=[] spawned processes=[]); physical-pointer-untouched-and-no-guard-violations=OK(guard violations+=0; key/mouse API attempts=0; cursor changes observed=660 (informational: tool calls covered 12.1s of the run, so any movement is not attributable; 0 changes means nothing moved it at all))
+    duration: 14378.0 ms  metrics: {'checks': '19/19'}
+
+[PASS] ANY1 [ANYAPP] ANY1: any-app discovery - scan walks are bounded by TIME with a visible depth rail, readiness follows a splash chain instead of a flat 10 s, an unnamed DataGrid is grounded by role, XAML hosts are recognised
+    evidence: splash-chain-extends-the-deadline-then-ready=OK(ready after 3.4s with a flat deadline of 1s; extended by 1.2s because the window set kept changing); a-static-never-ready-app-still-gives-up-at-the-flat-deadline=OK(gave up after 1.0s (deadline 1s), no extension); deep-scan-reports-its-limits=OK({'nodes_walked': 78, 'max_depth_seen': 7, 'walk_max_depth': 64, 'depth_hit_cap': False, 'time_budget_ms': 6000, 'time_budget_hit': False, 'walk_ms': 180}); time-budget-cuts-the-walk-and-says-so=OK(1 ms budget: 10 of 78 nodes, time_budget_hit=True); depth-rail-is-secondary-and-visible=OK(rail=2: depth_hit_cap=True (default rail 64: hit=False)); organ_41-time-budget-and-visible-rails=OK(full 69 nodes (depth rail 32, hit=False); 1 ms budget -> 5 nodes time_budget_hit=True; rail 2 -> depth_hit_cap=True); xaml-host-recognised-and-win32-window-not=OK(calculator frame xaml=True; native Win32 window xaml=False); excel-grid-grounded-by-role-with-honest-sampling=OK(263 elements; datagrid elements=1 (named ['Grid']); cells surfaced 120 of 492 (cap 120, sampled out 372)); physical-pointer-untouched-and-no-guard-violations=OK(pointer (552, 615)->(744, 396), guard violations+=0, largest 10 ms step=166px (a smooth path = the user's own hand; the guard saw 0 physical-input calls))
+    duration: 28364.0 ms  metrics: {'excel_elements': 263}
+
+[PASS] UP1 [POPUPENG] UP1: ONE popup engine - organ_29 only detects; escalation presses zero buttons; benign prompts are dismissed not escalated; the cold LLM tier is capped AND a breaker stops later popups paying it again (measured)
+    evidence: organ_29-and-the-loop-share-one-engine=OK(resolve_view reached by organ_29 and resolve_dialog (2 calls); retired from organ_29: nothing left behind; organ_29 is now 511 lines (was 989)); uac-like-real-dialog-needs-a-human-and-zero-buttons-pressed=OK(organ_29 returned (False, 970, 547, 'need_human'); dialog still open=1; button pressed by us before cleanup=None; keys sent=[]); organ_29-detected-real-save-changes-box-answered-Cancel-headless=OK(organ_29 -> (True, 1087, 614, 'cancel(bm-click)'); the box returned 2 (2 = Cancel; 6 = Yes would have been destructive)); browser-save-password-bubble-dismissed-but-real-credential-prompt-escalated=OK(save-password bubble -> key:escape via T2.5; cookie banner -> key:escape via T2.5; authentication -> need_human=True via escalate, keys sent=[]); cold-llm-tier-is-hard-capped=OK(never-answering model: resolved via T4 in 801 ms (cap 800 ms; unbounded before the cap existed was ~30 s)); breaker-stops-every-later-cold-popup-paying-the-cap-again=OK(next cold popup: 2 ms vs 801 ms for the first; LLM calls made=1; breaker open=True); repeat-of-a-learned-popup-is-a-cache-hit=OK(repeat of the first popup: T2 in 0.9 ms); answered-once-then-fingerprint-cached-for-dynamic-titles=OK(first: T3 1 ms; same popup with a different error code: T2 1.0 ms); real-cold-path-inside-the-cap=OK(unseen ambiguous popup with the REAL gatekeeper (http://127.0.0.1:11435/api/chat, listening=False): resolved via T4 in 161 ms (cap 5.0 s). Before the listener probe a CLO); physical-pointer-untouched-and-no-guard-violations=OK(pointer (744, 396)->(1516, 361), guard violations+=0, largest 10 ms step=270px (a smooth path = the user's own hand; the guard saw 0 physical-input calls))
+    duration: 4208.2 ms  metrics: {'cold_first_ms': 801, 'cold_next_ms': 2, 'repeat_ms': 0.9, 'real_cold_ms': 161}
+
+[PASS] DE1 [GOALCHECK] DE1: a goal carries its own machine-checkable postcondition - 'save as <path>' needs that file (and its real format), 'expect X' needs X on screen, the requested format outranks 'Save as project'
+    evidence: saving-goals-derive-file-exists-and-format=OK(9/9 goals derived correctly); assertion-goals-need-no-action=OK(6/6 read correctly); requested-format-outranks-save-as-project=OK(top picks {'png': 'PNG picture', 'jpg': 'JPEG picture', 'bmp': 'BMP picture'}; .txt keeps 'Save as'); a-non-png-named-png-is-not-a-pass=OK(fake: file hj_de1_0ae840.png exists; NOT a .png (starts b'PK\x03\x04 a'); real: file hj_de1_0ae840.png exists; is a real .png); a-missing-file-is-not-a-pass=OK(file hj_de1_never_650865.png MISSING)
+    duration: 3071.1 ms  metrics: {'checks': 5, 'failed': 0}
+
+[PASS] LC1 [LIFECYCLE] LC1: intake (secrets, tickets, domain, impossible, one question) + the D3 risk gate + the per-checkpoint record, with a stubbed operator
+    evidence: A1-secrets-redacted=OK(found ['api-key', 'password']; clean='key [REDACTED:api-key] then open notepad'); A1-list-becomes-tickets=OK(tickets=['open calculator and compute 6*7', 'open notepad and type done']); A1-one-line-stays-one-task=OK(tickets=1); A2-web-vs-desktop-vs-mixed=OK(['web', 'desktop', 'mixed', 'system']); A3-impossible-declared-at-intake=OK([True, True, True, True, False]); A1-vague-task-gets-ONE-question=OK(question="Which application or file should I work on? The task ('clean this up') does not name one."); D3-irreversible-queued-rest-runs=OK(status=ESCALATED executed=['type "hello world"']); every-checkpoint-is-marked=OK(21 marks; missing=[]); no-checkpoint-without-evidence=OK(marks without evidence: []); clean-task-is-DONE=OK(status=DONE); impossible-task-never-reaches-the-desktop=OK(status=IMPOSSIBLE reason='hand / body gesture or voice input (the input laye'); one-failing-ticket-never-stalls-the-queue=OK(ticket statuses=['FAILED', 'DONE'])
+    duration: 43.2 ms  metrics: {'checks': 12, 'failed': 0}
+
+[PASS] LC2 [LIFECYCLE] LC2: the checkpoint chain on REAL apps - Notepad types and saves, Calculator computes, an irreversible delete is queued - against independent ground truth
+    evidence: file-saved-with-the-typed-words (independent read)=OK(hj_lc2_9c9fa4.txt: 'lifecycle works'); calculator-shows-42 (independent read)=OK(display='Display is 42'); irreversible-delete-was-queued-not-run=OK(file survives=True status=ESCALATED); no-checkpoint-FAILed=OK(35 marks, failing: []); D3-gate-escalated=OK(D3.gate=ESCALATED); physical-pointer-untouched-and-no-guard-violations=OK(pointer (402, 599)->(902, 583), guard violations+=0, largest 10 ms step=328px (a smooth path = the user's own hand; the guard saw 0 physical-input calls)); total 41.1s; closed 2 window(s) we launched
+    duration: 42967.3 ms  metrics: {'seconds': 41.1, 'status': 'ESCALATED'}
+
+[PASS] ES1 [CHECKPOINTS] ES1 (C2): a dialog that needs a human is saved as a real PNG screenshot for the human and left open, no button pressed
+    evidence: popup-engine-asked-for-a-human=OK(awaiting_human=True); screenshot-saved-as-a-real-png=OK(esc_1791176589_22087906.png, 6474 bytes, png=True); dialog-left-open-for-the-human=OK(no button was pressed)
+    duration: 1126.2 ms  metrics: {'failed': 0}
+
+[PASS] B2X [CHECKPOINTS] B2X (B2): a launch target whose executable is gone is reported as MISSING and never retried or replaced by another app
+    evidence: target-checked-on-disk=OK({'found': True, 'app_id': 'C:\\hj_no_such_dir\\ghost.exe', 'kind': 'path', 'exists': False}); missing-exe-is-reported=OK(launch_note="target path 'C:\\hj_no_such_dir\\ghost.exe': exists=False - the executable is MISSING; not launching (no re); no-launch-or-retry-attempted=OK(launch_hidden calls=0 launched=False); nothing-else-got-started=OK(new windows=0); task-not-reported-done=OK(completed=False)
+    duration: 10841.1 ms  metrics: {'failed': 0}
+
+[PASS] C3X [CHECKPOINTS] C3X (C3): mode indicators (selected tab / open menu) are read with the snapshot and a mode-only change is noticed
+    evidence: mode-only-change-is-noticed=OK(ui-changed; region pixel-delta unavailable(before:no-capture); modes +['tab two|selected']/-['tab one|selected); mode_on-expectation=OK(mode 'tab two' on among 1 mode indicator(s)); live-modes-read=OK(1 indicator(s): ['hj_lc2_9c9fa4.txt. unmodified.|selected'])
+    duration: 6603.8 ms  metrics: {'failed': 0}
+
+[PASS] A3X [CHECKPOINTS] A3X (A3): a ticket a stored template covers runs template-first (no LLM planning) and the chain says so
+    evidence: template-ran-first=OK(A3.template=PASS: template 'write text and save as file' [learned 0.97] completed 4 leaf step(s) in 19.8s, no LLM planning; restored document (15 ch); file-has-the-typed-words (independent read)=OK('template first works'); ticket-done=OK(status=DONE); 19.8s; closed 1
+    duration: 20248.5 ms  metrics: {'seconds': 19.8}
+
+[PASS] G2L [CHECKPOINTS] G2L (G2): the app's window vanishes mid-run on a real Notepad - relaunched once and the run completes; a second loss fails with evidence
+    evidence: killed-our-instance-once=OK(kills=1); relaunched-once-and-completed=OK(completed=True relaunches=1 in 14s); second-goal-landed-after-the-relaunch (independent read)=OK(document='crash-two'); second-loss-fails-with-evidence=OK(completed=False crashed=True relaunches=1 evidence=['the window vanished again after 1 relaunch(es): failing with']); closed 0
+    duration: 33858.0 ms  metrics: {'failed': 0}
+
+[PASS] VQ1 [CHECKPOINTS] VQ1: the targeted vision tier (Qwen2.5-VL locate on the llama.cpp server) finds real controls of a parked window, graded against UIA
+    evidence: 3/4 controls located by Qwen2.5-VL (>=50% needed); mean 9.4s each; Add New Tab:miss(0.0s), Edit:hit(14.3s), Formatting:hit(12.5s), More options:hit(10.7s)
+    duration: 43754.7 ms  metrics: {'hits': 3, 'n': 4, 'mean_ms': 9371}
+
+[PASS] BM1 [BEHAVIOR] BM1: knowledge-pack format validates strictly, enforces the trust cap, loads as unverified data
+    evidence: valid-pack-accepted=OK; rejects-wrong-schema=OK; rejects-self-declared-learned=OK; rejects-unknown-assertion=OK; rejects-unknown-verb=OK; rejects-dup-step-id=OK; rejects-bad-risk=OK; rejects-no-target=OK; loads-as-catalog-unverified=OK; template-matches-alias=OK; invalid-pack-not-ingested=OK; shipped-packs-valid=OK; nothing-ships-learned=OK; chair-is-a-data-row=OK
+    duration: 149.5 ms  metrics: {'checks': '14/14'}
+
+[PASS] BM2 [BEHAVIOR] BM2: pre/postconditions are machine-checkable; an unobservable effect is OPAQUE, never PASS
+    evidence: title_contains=OK; element_appeared=OK; element_absent=OK; window_opened=OK; value_contains=OK; ocr_number_increase 0->8 (the 'verts' proof)=OK; ocr_number_increase rejects too-small delta=OK; one failing assertion fails the whole step=OK; unobservable tier => OPAQUE (not PASS)=OK; skipped assertion never counts as satisfied but others still decide=OK; empty postcondition is OPAQUE=OK; file_exists + file_contains=OK; file_exists MISSING fails=OK; slot substitution=OK; mode indicator via OCR regex=OK
+    duration: 265.0 ms  metrics: {'checks': '15/15'}
+
+[PASS] BM3 [BEHAVIOR] BM3: autonomy gate, trust climb/erosion, version demotion, state-machine path, effector learning
+    evidence: fresh reversible step -> SAFE_ATTEMPT (verify, don't trust)=OK; no postcondition -> QUEUE=OK; opaque -> QUEUE=OK; E2 never auto-executes=OK; EU without unwind -> QUEUE=OK; 3 verified successes -> EXECUTE=OK; verified E2 still needs the explicit allow flag=OK; a failure erodes confidence and revokes unattended execution=OK; pack/catalog entry is NOT learned=OK; verified outcome promotes to learned=OK; a weaker source never overwrites a stronger one=OK; same version keeps trust=OK; version change demotes learned->catalog + stale=OK; template: failure erodes, verified run promotes to learned=OK; BFS finds object->edit->sculpt=OK; no path => None (no invention)=OK; current_mode read from perception=OK; transition recorded once with count 2=OK; doc-name changes don't fork the state=OK; learned effector order flips to what works=OK; risk cues=OK; budget: yield extends the deadline=OK; budget: flattening stops early=OK
+    duration: 234.1 ms  metrics: {'checks': '23/23'}
+
+[PASS] BM4 [BEHAVIOR] BM4: harvest the app's own artifacts (keymaps/settings/CLI registry) as unverified candidates
+    evidence: json keybindings=OK; python-literal keymap (exported-keymap shape)=OK; ini accelerator table=OK; settings schema -> opaque toggles=OK; cli command-registry dump (marker + JSON)=OK; missing exe self-reports skipped (not an error, not faked)=OK; nonexistent binary self-reports skipped=OK; harvested entries land as catalog (unverified)=OK; missing artifact reported in 'skipped'=OK
+    duration: 386.4 ms  metrics: {'checks': '9/9'}
+
+[FAIL] MIN1 [BACKGROUND] MIN1: a MINIMIZED app is scanned + operated without ever being shown or focused, at full quality
+    evidence: notepad: mode=parked E0=36 cmds, layout=70 controls (File@[0.0939, 0.2845]), E1 probe effect=True unwound=True, capture=ok, template completed=True truth=True, | FOCUS: target-held-foreground longest=1164ms (42/1308 samples), brief-exposure-samples(>16px)=12 longest-continuous-exposure=91ms max-visible-px=528000 | ended minimized=True placement-restored=True 37s | harness note: app took focus at startup (returned) || paint: mode=parked E0=41 cmds, layout=417 controls (File@[0.026, 0.073]), E1 probe effect=True unwound=True, capture=ok, | FOCUS: target-held-foreground longest=35ms (10/1347 samples), brief-exposure-samples(>16px)=16 longest-continuous-exposure=96ms max-visible-px=420030 | ended minimized=True placement-restored=True 39s || FAILED: ['notepad']
+    duration: 82002.3 ms  metrics: {'apps': 2}
+
+[PASS] SC1 [SCANKNOW] SC1: read-only E0 crawl maps ANY app's menus through one code path; no clicks, popups unwound
+    evidence: notepad: 36 cmds (26 w/ accelerators, 6 nested) in 9.4s stop=complete leftover_popups=0 title_unchanged=True | paint: 41 cmds (15 w/ accelerators, 24 nested) in 11.8s stop=complete leftover_popups=0 title_unchanged=True
+    duration: 31652.4 ms  metrics: {'apps_mapped': 2}
+
+[FAIL] LM1 [SCANKNOW] LM1: every section + control + window-relative position is mapped generically; deepening reversible
+    evidence: notepad: 67 controls in 6 regions {'window': 1, 'document': 1, 'tabstrip': 1, 'list': 1, 'menubar': 2} deepen={'tabs_visited': 4, 'tab_strips_restored': 1, 'dropdowns_candidates': 0, 'dropdowns_opened': 0, 'tree_nodes_expanded': 0, 'scrollables_paged': 1} opaque=0 File@[0.0939, 0.2845] view_similarity=1.000 9.0s | conds={'File_top': False} | paint: 417 controls in 18 regions {'window': 1, 'menubar': 2, 'header': 1, 'content': 3, 'list': 2, 'canvas': 1, 'titlebar': 1, 'dropdown': 4, 'menu': 3} deepen={'tabs_visited': 0, 'tab_strips_restored': 0, 'dropdowns_candidates': 4, 'dropdowns_opened': 4, 'tree_nodes_expanded': 0, 'scrollables_paged': 2} opaque=1 File@[0.026, 0.073] view_similarity=1.000 12.9s | conds=all-true | FAILED: ['notepad']
+    duration: 36577.6 ms  metrics: {'apps': 2}
+
+[PASS] SC2 [SCANKNOW] SC2: E1 reversible probing discovers a child window invisible to E0, then unwinds to baseline
+    evidence: probe 'File > Page setup': effect=True new_windows=['page setup'] new_controls=20 effector=menu_command unwound=True promoted=True in 2.68s; E0 knew 0 child-window regions beforehand; E2 probe refused=True; explore_e1 stop=action-cap probes=2
+    duration: 27964.3 ms  metrics: {'controls_discovered_by_E1': 20, 'regions_known_by_E0': 0}
+
+[PASS] PM1 [POPUP] PM1: popup_mode - probe dialogs are cancel-only (never accepted/cached); expected dialogs are kept
+    evidence: default policy is task=OK; probe policy visible cross-process (file flag)=OK; expected popup registered=OK; real dialog opened for the test=OK; probe-mode closes via cancel_only=OK; cancel-only is fast (no LLM tier)=OK; nothing NEW written to the pathway cache in probe mode=OK; expected dialog left open=OK
+    duration: 12204.8 ms  metrics: {'checks': '8/8'}
+
+[FAIL] SCK1 [SCANKNOW] SCK1: organ_30 scan consults organ_48/50 knowledge: E0 + layout first, cached on re-scan
+    evidence: scan1: 378 controls, learned 36 commands (E0 Nones) in 33.8s; scan2: E0 ['skipped'] cached, skipped_known=0, catalog_only=10 in 35.3s; stop=unwind-failed
+    duration: 74423.2 ms  metrics: {'scan1_s': 33.8, 'scan2_s': 35.3}
+
+[PASS] TPL1 [AUTONOMY] TPL1: a task decomposed from DATA templates runs verified leaf-by-leaf on two unrelated apps
+    evidence: notepad: completed=True truth=True 11.87s leaves=[('type_text', 'PASS', 1), ('open_save_as', 'PASS', 1), ('save_to_path', 'PASS', 1), ('verify_content', 'PASS', 1)] | paint: completed=True truth=True 34.23s leaves=[('open_save_as', 'PASS', 2), ('save_to_path', 'PASS', 1)] | verify-only leaf acted=NO | unmatched task matched=False | templates promoted to learned by verified runs: 2
+    duration: 56711.9 ms  metrics: {'apps': 2}
+
+[PASS] DAY1 [AUTONOMY] DAY1: unattended task-list day: never stalls the queue, report matches ground truth
+    evidence: report done=2 failed=2 escalated=0 in 57s; self-report==ground-truth: True; every task accounted for: True; failed reasons=[('T3 no such skill', 'no template for this task'), ('T4 3D chair (no 3D app here)', "blocked at leaf 'seat'")]
+    duration: 66849.5 ms  metrics: {'done': 2, 'failed': 2, 'escalated': 0}
+
+[FAIL] E2E-1 [E2E] E2E-1: unattended Notepad run via headless input - type a haiku, save a .txt, verify file, distill, re-run
+    evidence: run1 completed=True file=yes steps=4 36.59s awaiting_human=False trace=[('check', '-', 'PASS'), ('type', 'Text editor', 'PASS'), ('click', 'File', 'WRONG_STATE'), ('click', 'Save as', 'WRONG_STATE'), ('file-dialog', 'file-dialog', 'PASS')]; recipe='recipe ingested to organ_04 (3 verified steps)'; run2 completed=False file=NO steps=12 82.23s trace=[('check', '-', 'PASS'), ('type', 'Text editor', 'PASS'), ('click', 'File', 'WRONG_STATE'), ('click', 'Edit', 'WRONG_STATE'), ('click', 'Pop-upHost', 'WRONG_STATE'), ('click', 'View', 'WRONG_STATE'), ('shortcut', 'shortcut:ctrl+n', 'WRONG_STATE'), ('click', 'More options', 'WRONG_STATE'), ('click', 'Text editor', 'WRONG_STATE'), ('click', 'kb_notepad_41e71.t', 'WRONG_STATE'), ('click', 'again-oneagain-two', 'WRONG_STATE'), ('click', 'kb_notepad_39659.t', 'WRONG_STATE'), ('click', 'kb_notepad_71834.t', 'WRONG_STATE')]; steps run1->run2: 4->12, seconds 36.59->82.23; physical pointer untouched=True; input-guard violations=0; notepad launched by us=True
+    duration: 121248.7 ms  metrics: {'run1_steps': 4, 'run2_steps': 12, 'run1_s': 36.59, 'run2_s': 82.23, 'recipe': True, 'pointer_untouched': True}
+
+[FAIL] E2E-2 [E2E] E2E-2: UIA-sparse canvas app (Blender if installed, else Paint) driven via grounding ladder incl. vision
+    evidence: Blender not installed -> substituted Paint (honest substitution). app=mspaint; completed=True steps=2 12.38s awaiting_human=False; trace=[('click', 'Pencil', 'PASS'), ('click', 'Line', 'PASS')]; vision-tier grounding: tiers_ran=['uia', 'uia@offscreen'], tiers_skipped=['ocr:capture(capture-blank (window did not render into PrintWindow))', 'vision:offscreen-capture(no painted capture: capture-blank (window did not render into PrintWindow))'], vision_elements=0, tier_ms={'uia': 359.0, 'uia@offscreen': 412.6, 'ocr': 13.4}
+    duration: 20354.0 ms  metrics: {'app': 'mspaint', 'vision_elements': 0, 'tier_ms': "{'uia': 359.0, 'uia@offscreen': 412.6, 'ocr': 13.4}"}
+
+
+RANKINGS
+1. App resolution (organ_40): 2/2 tests, score 100.0, avg 8.0 ms
+2. Desktop verification loop (W2): 1/1 tests, score 100.0, avg 1.4 ms
+3. Checkpoint / resume (W5): 1/1 tests, score 100.0, avg 16.2 ms
+4. Recipe distillation (W5): 1/1 tests, score 99.8, avg 81.8 ms
+5. Knowledge organ (organ_04): 2/2 tests, score 99.7, avg 102.2 ms
+6. System import health: 1/1 tests, score 99.3, avg 225.1 ms
+7. App-intelligence organ (organ_47): 1/1 tests, score 99.3, avg 222.0 ms
+8. Behavior model (organ_48: packs/gate/state machine): 4/4 tests, score 99.2, avg 258.8 ms
+9. Brain (compile + route + nature): 3/3 tests, score 98.9, avg 350.2 ms
+10. Memory organ (organ_03): 2/2 tests, score 97.8, avg 745.4 ms
+11. Database (batch + caches): 2/2 tests, score 96.8, avg 1058.7 ms
+12. Goal postconditions (honest DONE): 1/1 tests, score 90.8, avg 3071.1 ms
+13. Scanning (deep + continuous): 2/2 tests, score 90.4, avg 3187.4 ms
+14. Popup handler (organ_29): 7/7 tests, score 89.9, avg 3357.1 ms
+15. Unified popup engine (popup_policy): 1/1 tests, score 87.4, avg 4208.2 ms
+16. Web URL hygiene (W6): 2/2 tests, score 85.4, avg 4852.2 ms
+17. Task graph compiler (skip-ReAct) (env-only): 0/1 (+1B ENV) tests, score 82.7, avg 5770.3 ms
+18. Vision tier (OmniParser): 1/1 tests, score 75.4, avg 8198.9 ms
+19. Unattended task runs (templates + day report): 2/2 tests, score 70.0, avg 61780.7 ms
+20. Any-app discovery (time-budget scan, window find): 1/1 tests, score 70.0, avg 28364.0 ms
+21. Task lifecycle (A intake -> H report): 2/2 tests, score 70.0, avg 21505.3 ms
+22. Lifecycle checkpoints (escalation, launch, modes, template, crash): 6/6 tests, score 70.0, avg 19405.4 ms
+23. Headless input (drag / off-screen capture): 3/4 tests, score 52.5, avg 10323.1 ms
+24. Desktop grounding ladder (W1): 2/3 tests, score 46.7, avg 11821.4 ms
+25. Knowledge-assisted scanning (organ_49/50): 2/4 tests, score 35.0, avg 42654.4 ms
+26. Product routing (verified loop first): 1/2 tests, score 35.0, avg 28405.1 ms
+27. Virtual mouse: 0/1 tests, score 16.5, avg 4505.1 ms
+28. Background operation (minimized, never shown/focused): 0/1 tests, score 0.0, avg 82002.3 ms
+29. End-to-end unattended runs: 0/2 tests, score 0.0, avg 70801.4 ms
+Hojaiga System Intelligence Suite — 2026-10-05 11:17:17
+
+[PASS] B1 [BRAIN] B1: Brain compiler parses 10 differently-phrased natural tasks
+    evidence: 11/12 natural phrasings routed to the right agent family; deep LinkedIn flow: 5 checkpoints -> 15 granular tasks [OK]; intent vocabulary=5 distinct | misses: 'calculate the monthly totals in the spre' spec data_processing != desktop_automation (intent='perform the requested task')
+    duration: 797.5 ms  metrics: {'routing_accuracy': '11/12', 'linkedin_checkpoints': 5, 'linkedin_granular_tasks': 15}
+
+[PASS] B2 [BRAIN] B2: Organ-01 router classifies intent/nature/confidence on raw text (no LLM needed)
+    evidence: 7/7 total; design-covered natures (analytical/creative/unknown) 5/5 correct; operational verbs routed 2/2 ('open chrome'/'click send' -> OPERATIONAL); empty-task guard=ON
+    duration: 240.6 ms  metrics: {'nature_accuracy': '7/7', 'operational_routed': '2/2'}
+
+[PASS] B3 [BRAIN] B3: enhanced_brain_compiler specialty routing (the 'open excel'->web fix)
+    evidence: 6/6 specialty routes correct | 'open excel'->desktop_automationOK; 'open notepad and type hell'->desktop_automationOK; 'launch obs studio and reco'->desktop_automationOK; 'calculate the sum of this '->data_processingOK; 'open gmail and send an ema'->web_automationOK; 'browse a website for hotel'->web_automationOK
+    duration: 0.1 ms  metrics: {'specialty_accuracy': '6/6'}
+
+[PASS] P1 [POPUP] P1: Organ-29 enumerates live windows and classifies modal vs in-window popups
+    evidence: 8 visible windows enumerated, 0 classic modal HWNDs, 5 in-window modals found on foreground window ('New chat - Claude - Google Chr')
+    duration: 616.9 ms  metrics: {'windows_seen': 8, 'classic_modals': 0, 'in_window_modals': 5}
+
+[PASS] P2 [POPUP] P2: Organ-29 mitigation engine resolves synthetic + live popups (dry-run safe)
+    evidence: 3/3 popup types produced a mitigation decision; live mitigation=DRY-RUN | 'Save changes before closing?'->need_human (689.2ms) ; 'Microsoft Store Update'->dismiss (327.5ms) ; 'Allow notifications?'->key:escape (169.0ms)
+    duration: 1186.4 ms  metrics: {'decisions_made': 3, 'modes_tested': 3}
+
+[PASS] S1 [SCANNER] S1: Organ-30 deep scan — how deep and how much it learns (target-aware)
+    evidence: scanned 1 target(s); best='<foreground>': 307 nodes walked, depth 27/64, 47 actionable controls, 0 menu items, 43 elements learned in 0.61s
+    duration: 642.4 ms  metrics: {'nodes_walked': 307, 'depth_seen': 27, 'depth_cap': 64, 'actionable_controls': 47, 'elements_learned': 43, 'scan_seconds': 0.614, 'targets_tried': 1}
+
+[PASS] S2 [SCANNER] S2: Organ-41 continuous scanner — real cycles, change detection, budget behaviour
+    evidence: 5 cycles (incl. real notepad spawn/kill mutation), avg 548 ms/cycle (min 423 max 734), 2 change-detections (expected >=2), peak elements 120
+    duration: 6440.1 ms  metrics: {'avg_cycle_ms': 547.7, 'min_cycle_ms': 423.1, 'max_cycle_ms': 734.1, 'change_detections': 2, 'peak_elements': 120}
+
+[FAIL] M1 [MOUSE] M1: virtual-mouse-only input - physical pointer untouched; headless delivery to minimized/covered windows
+    evidence: A normal-window PostMessage click=True; B MINIMIZED window UIA-invoke=True (uia-invoke, state=minimized); C COVERED window click landed on the covered button only=True; D posted Ctrl+Shift+S arrived WITH modifiers=True (saw [(True, True)]); WM_CHAR text=True; E physical pointer untouched=False ((1136, 533)->(826, 547)), guard violations during actions=0; F input guard refused a legacy SetCursorPos=True; sprite painted 953 px (painted=True)
+    duration: 5420.8 ms  metrics: {'A_postmessage_click': True, 'B_uia_landed': True, 'C_covered_click_landed': True, 'D_combo_mods_arrived': True, 'E_pointer_untouched': False, 'F_guard_refused_legacy_call': True, 'sprite_changed_pixels': 953}
+
+[PASS] L1 [LAUNCHER] L1: Dynamic app resolution on 12 NEW phrasings not in the original 23-case matrix
+    evidence: 12/12 new phrasings routed correctly @ 1.099 ms/task | 'calculate seventeen times nine'->calculatorOK; 'sketch a sunset with a brush'->paintOK; 'take a screenshot of this mess'->snipping toolOK; 'play my downloaded music'->windows media playerOK; 'set an alarm for six am'->google chromeOK; 'draw a diagram of the system'->paintOK; 'write text in notepad for later'->notepadOK; 'rename my files in downloads'->file explorerOK; 'browse hotel deals online'->google chromeOK; 'send an email to my brother'->mailOK; 'check my outlook inbox'->mailOK; 'cook me a three course dinner'->google chromeOK
+    duration: 14.3 ms  metrics: {'matrix_accuracy': '12/12', 'resolve_ms_per_task': 1.099}
+
+[PASS] L2 [LAUNCHER] L2: launcher action semantics on the 4 designer cases (dry-run, no OS input)
+    evidence: 5/5 launcher-semantic checks pass | (a) open gmail -> browser_web/type_bar=False | (b) open obs studio -> src=alias target='obs studio' action=launch_app | (c) 'record ...' -> src=alias target='obs studio' | (d) open blender -> src=named target='blender' action=not_found | (d2) open photoshop -> src=named target='photoshop'
+    duration: 2.2 ms  metrics: {'semantic_checks': '5/5'}
+
+[PASS] R1 [MEMORY] R1: Memory organ working store, fetch throughput, TTL expiry
+    evidence: 200/200 keys round-tripped; store 59 ms (0.297 ms/op), fetch 1 ms (0.003 ms/op); TTL alive=True, expired=True
+    duration: 1458.3 ms  metrics: {'store_ms_per_op': 0.2965, 'fetch_ms_per_op': 0.0032, 'keys_round_tripped': 200}
+
+[PASS] R2 [MEMORY] R2: Memory session rooms, conversational history, snapshot persistence
+    evidence: room a406fe82: 3 messages replayed, snapshot id=1791178279_eb099
+    duration: 154.6 ms  metrics: {'messages_replayed': 3}
+
+[PASS] K1 [KNOWLEDGE] K1: Knowledge organ ingests prose documents and retrieves them by meaning
+    evidence: 3 chunks ingested in 7 ms; 2/2 paraphrased queries returned the SEMANTICALLY correct doc; capability 'launch_app' -> 0 provider(s) | 'how do we handle the sql server ' -> top='SSMS error dialogs' score=0.173344 RELEVANT; 'which app needs pixel coordinate' -> top='Paint canvas behaviour' score=0.070186 RELEVANT
+    duration: 104.9 ms  metrics: {'chunks_ingested': 3, 'semantic_queries_hit': '2/2'}
+
+[PASS] K2 [KNOWLEDGE] K2: How easily/fast the system parses knowledge — 50 ingest+search round trips
+    evidence: 50 ingest+search round trips: avg 3.68 ms, p50 3.56 ms, p95 6.09 ms
+    duration: 256.9 ms  metrics: {'kg_roundtrip_avg_ms': 3.683, 'kg_roundtrip_p95_ms': 6.087}
+
+[PASS] D1 [DATABASE] D1: DAP batch-store 200 element profiles, then read them back from the DB
+    evidence: 200/200 profiles written in 351 ms (1.75 ms/element); 200 read back
+    duration: 1376.9 ms  metrics: {'written': 200, 'read_back': 200, 'ms_per_element': 1.754}
+
+[PASS] D2 [DATABASE] D2: Popup-resolution cache + session cookie persistence round-trip
+    evidence: modal resolution read-back=OK; cookies=OK
+    duration: 49.7 ms  metrics: {}
+
+[PASS] G1 [GROUNDING] G1: desktop_grounding perceives a real app AND reports tiers honestly
+    evidence: notepad grounded to 40 elements via tiers ['uia', 'ocr', 'vision']; target-hunt escalated=True; skipped=[]; honesty-integrity=OK (torch=True, ocr=True, uia=True)
+    duration: 70684.4 ms  metrics: {'elements': 40, 'tiers_ran': 'uia,ocr,vision', 'escalated': True, 'integrity': True}
+
+[PASS] V1 [VERIFY] V1: DesktopVerifier emits PASS / NO_CHANGE / WRONG_STATE on live + synthetic state
+    evidence: 7/7 verdict transitions correct: change->PASS ; same->NO_CHANGE ; expect-met->PASS ; wrong->WRONG_STATE ; title->PASS ; disappeared->PASS ; file_created->PASS
+    duration: 1.5 ms  metrics: {'verdict_checks': '7/7'}
+
+[PASS] P3 [POPUP] P3: organ_29 Tier-3 gatekeeper is hard-capped so a dead LLM can't stall the loop
+    evidence: Tier-3 cap=5.0s (must be <=5s): OK; unresolvable modal resolved in 0.51s -> action='dismiss'; no multi-30s stall: OK
+    duration: 509.9 ms  metrics: {'tier3_cap_s': 5.0, 'resolve_s': 0.51, 'fell_through': True}
+
+[PASS] PL1 [POPUP] PL1: organ_29 Tier-2.5 lexical intent resolves known categories instantly,
+escalates elevation/destructive to human, and never clicks/blind-types in test
+    evidence: 8/8 lexical checks: uac->('key:escape', True) ; destructive->('key:escape', True) ; crash->('key:escape', False) ; msgbox->('key:enter', False) ; ambiguous->None ; cookie live-resolved in 0.34s via key:escape ; uac->need_human, pressed=0 (must be 0) ; repeat hit cache in 0.31s replay=['key:escape']
+    duration: 652.0 ms  metrics: {'checks': '8/8', 'first_resolve_s': 0.34}
+
+[PASS] SK1 [SKILL] SK1: loop distills verified steps into a reusable organ_04 skill recipe and recalls it
+    evidence: 2-PASS trace -> distill=True (recipe ingested to organ_04 (2 verified steps)); recall_hit=True; 1-PASS trace -> refused=True (not enough verified steps to distill)
+    duration: 53.0 ms  metrics: {'distilled': True, 'thin_refused': True, 'recall_hit': True}
+
+[PASS] CP1 [CHECKPOINT] CP1: loop persists a resumable checkpoint after each verified step and resumes
+    evidence: checkpoint round-trip: last-verdict-recovered=True, steps=1, unknown-session->None=True, resume_session=True
+    duration: 10.8 ms  metrics: {'recovered': True, 'unknown_absent': True, 'resumed': True}
+
+[ENV-BLOCKED] TG1 [TASKGRAPH] TG1: 'I'm busy, model a 3D chair from scratch' compiles to skip-ReAct native graph
+    evidence: graph skip_react=False mode=react_fallback kind= save= steps=0 reason='construct intent but no 3d suite installed'; bpy_recipe=OK; calculator_kept_react=True
+    duration: 5234.2 ms  metrics: {'mode': 'react_fallback', 'steps': 0, 'vision_tier': 2}
+
+[PASS] W6 [HYGIENE] W6: _derive_web_url resolves brand destinations without the goto.com verb alias bug
+    evidence: 6/6 hygiene checks: go to gmail -> https://www.gmail.com; goto gmail -> https://www.gmail.com; open browser and check gmail -> https://www.gmail.com; browse hotel deals -> https://www.google.com; explicit -> https://news.ycombinator.com/item?id=1; is_site(goto)=False, is_site(gmail)=True
+    duration: 8253.2 ms  metrics: {'checks': '6/6'}
+
+[PASS] W8 [INTELLIGENCE] W8: organ_47 turns verified outcomes into pro shortcuts — and never trusts a guess
+    evidence: archetype-route=OK; guess-never-learned=OK; verified-ctrl+s-trusted=OK(conf 0.85); climbs-to-cap=OK(0.85->0.97); failure-erodes=OK(0.85->0.60)
+    duration: 196.8 ms  metrics: {'checks': '5/5', 'learned_confidence': 0.97}
+
+[PASS] H1 [HEALTH] H1: Every core organ module imports cleanly with its main symbol present
+    evidence: 33/33 organs import clean (289 ms cold-import sweep)
+    duration: 288.7 ms  metrics: {'organs_healthy': '33/33'}
+
+[PASS] G2 [GROUNDING] G2: vision tier is budgeted per goal, cached per window signature, and per-tier ms is reported - with the REAL OmniParser, instrumented
+    evidence: REAL OmniParser (warm, waited 0 ms for the warmup thread): first ground ran vision 1x, parse 18757.3 ms; 2nd identical window cache_hit=True (31.6 ms vs 18781.1 ms miss, x594); budget 2/goal enforced=True (ran 2 of 3 attempts); refill-on-new-goal=True; all 4 real parses (ms)=[18757.3, 17692.2, 17829.6, 17650.8]; measured per-tier ms (miss)={'uia': 20.6, 'ocr': 214.5, 'vision': 18781.1}
+    duration: 77465.4 ms  metrics: {'cache_hit': True, 'budget_enforced': True, 'refilled': True, 'real_parse_ms': [18757.3, 17692.2, 17829.6, 17650.8], 'tier_ms_miss': "{'uia': 20.6, 'ocr': 214.5, 'vision': 18781.1}", 'tier_ms_hit': 31.6}
+
+[PASS] OM1 [VISION] OM1: real OmniParser warmup (easyocr download happens once) + blank image = 0 elements, no ERROR
+    evidence: warmup 4619 ms (warmed=True); blank 640x400 PNG -> 0 elements in 2273 ms; ERROR-level logs=0 []
+    duration: 6898.7 ms  metrics: {'warmup_ms': 4619, 'blank_parse_ms': 2273, 'error_logs': 0}
+
+[PASS] PL2 [POPUP] PL2: dynamic-title popups hit the class+button fingerprint cache; real DB round-trips it
+    evidence: normalize->'installer error # (attempt #)', fp-stable=True, distinct-for-other-class/title=True; different-title popup resolved via fingerprint cache in 2 ms -> key:escape; exact-title lookup alone would have MISSED (the pre-fix behaviour); real-db fingerprint round-trip=OK
+    duration: 553.4 ms  metrics: {'fingerprint_resolve_ms': 2.0}
+
+[PASS] W9 [HYGIENE] W9: the compiled WEB.NAVIGATE step (what pre-navigation uses) never carries goto.com
+    evidence: 4/4 compiled nav URLs correct: 'go to gmail and check my inbox' -> https://www.gmail.com; 'goto gmail' -> https://www.gmail.com; 'open chrome and go to gmail.com' -> https://gmail.com; 'navigate to figma' -> https://www.figma.com
+    duration: 50.3 ms  metrics: {'correct': '4/4'}
+
+[PASS] J1 [GROUNDING] J1: judge shortlist is goal-aware (text area / 'Save as' reach the 8-slot window, indices map back)
+    evidence: pre-fix first-8 shortlist was blind to the targets=True; type-goal top pick='Text editor'; save-goal top pick='Save as'; original-index mapping intact=True; absolute path extracted from goal=True; popup triage spares Save/Open pickers & escalates overwrite-confirm=True
+    duration: 2.9 ms  metrics: {'type_top': 'Text editor', 'save_top': 'Save as'}
+
+[PASS] PP1 [POPUP] PP1: popup policy reads REAL dialogs, answers non-destructively, escalates elevation/overwrite, headless
+    evidence: overwrite-not-ours -> No: OK (returned=7, human=False); save-changes -> Cancel: OK (returned=2, human=False); error -> OK: OK (returned=1, human=False); UAC-like -> human, stays open: OK (returned=2, human=True); task's own target exists -> human: OK (returned=2, human=True); physical pointer untouched=False; guard violations=0
+    duration: 7978.7 ms  metrics: {'cases': 5, 'pointer_untouched': False}
+
+[PASS] LF1 [ROUTING] LF1: the product routes detected desktop apps through the verified loop IN ORDER, stops at a human gate, and is switchable
+    evidence: flag-default-on-and-0-disables=OK(default_on=True off=False ran_when_off=False calls=[]); compiler-positions-drive-per-app-goals=OK(spans=[('notepad', 5), ('calculator', 45)] -> notepad:['type "hello world"'] | calculator:['press Seven', 'press Multiply by', 'press Eight', 'press Equals']); save-path-gets-file-postcondition=OK(goals=['type "notes"', 'save as C:\\tmp\\lf1.txt'] expect={1: {'file_created': 'C:\\tmp\\lf1.txt'}}); canvas-drawing-is-delegated-not-faked=OK(paint=['draw a circle'] notepad=['type "done"']); sequence-in-compiled-order-with-persisted-handles=OK(order=['notepad', 'calculator'] handles=(1001,1002) expect2={3: {'name_visible': '56'}}); human-gate-stops-the-sequence=OK(ran=['notepad'] notified=[('input_needed', 'Agent needs your input - notepad: a dialog or an ambiguous choice needs you')]); execute_task-halts-with-NEEDS_INPUT-before-the-crew-exists=OK(status=NEEDS_INPUT crew_built=False attempts=0); flag-0-leaves-the-crew-path-untouched=OK(result=None evidence=''); evidence-is-honest-about-weak-and-undone=OK(weak calculator presses flagged; unrun goals marked NOT DONE; human stop stated)
+    duration: 18233.3 ms  metrics: {'checks': '9/9'}
+
+[PASS] LF2 [ROUTING] LF2: a REAL two-app task (Notepad then Calculator) runs both apps through the verified loop with the physical pointer untouched
+    evidence: both-apps-ran-in-order=OK(runs=[('notepad', 'COMPLETED', 1), ('calculator', 'COMPLETED', 4)]); notepad-holds-the-typed-words (independent read)=OK(document='loop first works'); calculator-shows-42 (independent read)=OK(display='Display is 42'); handles-persisted-for-later-stages=OK(notepad=11667722 calculator=39587290); completed-or-honestly-blocked=OK(statuses=['COMPLETED', 'COMPLETED']); physical-pointer-untouched-and-no-guard-violations=OK(pointer (604, 961)->(213, 877), guard violations+=0, largest 10 ms step=238px (a smooth path = the user's own hand; the guard saw 0 physical-input calls)); total 23.3s; closed 2 window(s) we launched
+    duration: 32516.8 ms  metrics: {'seconds': 23.3, 'windows_closed': 2, 'statuses': 'COMPLETED,COMPLETED'}
+
+[PASS] OFF1 [HEADLESS] OFF1: a real MINIMIZED Notepad is read by OCR through the off-screen capture rung, ends minimized again, and a structurally-grounded app never pays for it
+    evidence: starts-minimized=OK(state=minimized); structurally-grounded-app-pays-nothing=OK(target 'Restore' found among 29 UIA elements in 302 ms, escalated=False, offscreen=False); parked-uia-resolves-before-any-pixel-tier=OK('Minimize' is absent from the minimized tree (24 names) but present parked (25); resolved_by=uia-parked ran=['uia@offscreen'] round_trip_ms=977.7 total 978 ms); offscreen-rung-ran-and-read-pixels=OK(used=True mode=parked ocr_elements=10 words=['File', 'Windows', '(CRLF)', 'Plain', '100%', 'text'] skipped=['vision:offscreen-capture(cap)']); round-trip-timed-and-ended-minimized=OK(round_trip_ms=1436.5 park_ms=168.4 paint_wait_ms=41.1 ended_minimized=True tiers_via=['ocr:offscreen-capture']); refuses-a-window-the-user-can-see=OK(offscreen={'used': False, 'ours': False, 'refused': 'user-can-see', 'escalate_to_human': True} skipped=['ocr:offscreen-refused(user-can-see)', 'vision:offscreen-refused(u); physical-pointer-untouched-and-no-guard-violations=OK(pointer (293, 719)->(576, 658), guard violations+=0, largest 10 ms step=51px (a smooth path = the user's own hand; the guard saw 0 physical-input calls))
+    duration: 10857.7 ms  metrics: {'parked_uia_gain': 1, 'offscreen_round_trip_ms': 1436.5, 'ground_total_ms': 1740, 'uia_hit_ms': 302, 'ocr_elements': 10}
+
+[PASS] DR1 [HEADLESS] DR1: headless drag - ordered, time-sliced WM_MOUSEMOVE/LBUTTONDOWN/UP draws a circle on a real canvas; physical pointer untouched; an app that ignores posted mouse input is reported INEFFECTIVE, not success
+    evidence: ordered-move-down-moves-up=OK(delivered=True events=51 sequence=['0x200', '0x201', '0x200']...0x202 moves_with_button=48 (path has 49 points)); time-sliced-not-a-burst=OK(moves spread over 0.78s of the 0.80s budget, longest gap 19 ms (slice 17 ms); call took 0.84s); client-relative-coordinates=OK(button-down at client (250,80) expected (250,80)); circle-really-drawn-ring-not-blob=OK(2124 px changed, bbox 223x223 (expect ~220x220), centre untouched=True, ring samples inked 24/24); visual-cursor-draw_shape-routes-through-post_drag=OK(last_stroke={'delivered': True, 'effective': True, 'changed_pixels': 2140} note=postmessage-drag-left->HJCanvas_8521586 41 points (829,468)->(829,468) over 0.49); no-resolvable-target-is-refused-not-physical=OK(note=UNDELIVERABLE: no target window resolved (refused; no physical-input fallback)); real-app-that-ignores-posted-mouse-is-reported-not-faked=OK(paint(parked,parked): delivered=True effective=False changed_pixels=0 note=delivered but INEFFECTIVE: the window did not react to posted mouse input (no pixel changed)); physical-pointer-untouched-and-no-guard-violations=OK(pointer (576, 658)->(475, 468), guard violations+=0, largest 10 ms step=189px (a smooth path = the user's own hand; the guard saw 0 physical-input calls)) || paint(parked,parked): delivered=True effective=False changed_pixels=0 note=delivered but INEFFECTIVE: the window did not react to posted mouse input (no pixel changed)
+    duration: 13150.1 ms  metrics: {'changed_pixels': 2124, 'move_events': 48, 'span_s': 0.78, 'paint_posted_mouse_effective': False}
+
+[PASS] CN1 [HEADLESS] CN1: organ_15's desktop connector delivers click/type/hotkey/press as posted messages to a resolved window, and REFUSES (never pyautogui) when no window resolves
+    evidence: no-target-window-is-refused=OK(status=ResponseStatus.ERROR err=REFUSED: click needs a target window in the payload (hwnd | window_title | app); none of hwnd / window_title /); click-lands-on-the-button=OK(status=ResponseStatus.OK BN_CLICKED 0->1); type-posts-characters=OK(status=ResponseStatus.OK chars=['h', 'i']); hotkey-arrives-with-modifiers=OK(status=ResponseStatus.OK combos=[(True, True)]); launch-reports-an-existing-window-truthfully=OK(status=ResponseStatus.OK data={'launched': True, 'note': 'already running'}); launch-without-a-window-is-not-an-optimistic-true=OK(status=ResponseStatus.ERROR err=App did not launch: started, but no window appeared within 1.5 s (tray-only, sign-in gated, or slow)); physical-pointer-untouched-and-no-guard-violations=OK(pointer (475, 468)->(891, 488), guard violations+=0, largest 10 ms step=50px (a smooth path = the user's own hand; the guard saw 0 physical-input calls))
+    duration: 2778.8 ms  metrics: {}
+
+[PASS] TY1 [HEADLESS] TY1: the launch / switch / type tools never touch the physical keyboard or mouse and never raise, restore or maximize a window (a minimized target is parked off-screen for the call); a delivery the target did not accept is never reported - or recorded - as typed
+    evidence: instrumentation-sees-raise-and-keystroke-attempts=OK(refused/keys/guard-violations=(3, 1, 1) (expected 3/1/1) - so zero below is a real zero); launch-visible-existing-window-is-tracked-not-raised=OK(tracked=True state (260, 180, 680, 420)->(260, 180, 680, 420) zoomed=False raise-attempts=[] key-attempts=[]); launch-minimized-existing-window-stays-minimized=OK(tracked=True minimized=True raise-attempts=[]); switch-tracked-and-previous-branches-do-not-raise=OK(tracked-branch(now bravo, still minimized)=(True, True) previous-branch(now alpha, unmoved)=(True, True) raise-attempts=[]); type-visible-editor-lands-and-is-recorded-once=OK(control reads 'hello headless'; TYPE_TEXT records 0->1; window unmoved=True; reply="[11:05:39.303] Typed via UIA into 'HJ-TY1-Alpha': 'hello headless' (re"); refusing-target-is-FAILED-on-both-routes-not-typed-and-not-recorded=OK(control still reads 'locked'; TYPE_TEXT records 1->1; minimized again=True; UIA-route reply="[11:05:40.724] FAILED: 'HJ-TY1-Charlie' accepted the delivery via UIA SetValue but its text still re" posted-route reply="[11:05:43.415] FAILED: 'HJ-TY1-Charlie' accepted the delivery via posted window messages but its tex"); delivered-but-unreadable-target-is-UNVERIFIED-not-recorded=OK(WM_CHAR received by the window=3 (delivery is not proof); TYPE_TEXT records 1->1; reply="[11:05:44.838] UNVERIFIED: delivered 3 chars to 'HJ-TY1-Delta' via posted window messages, but its text cannot"); type-minimized-editor-lands-and-ends-minimized=OK(control reads 'parked text'; minimized again=True still-parked=False; reply="[11:05:46.559] Typed via UIA into 'HJ-TY1-Bravo': 'parked text' (read "); posted-message-route-delivers-and-is-verified=OK(control 'hello headless' -> 'posted okhello headless'; TYPE_TEXT records 2->3; reply="[11:05:47.317] Typed via posted window messages into 'HJ-TY1-Alpha': 'posted ok'"); start-menu-app-launches-through-launch_hidden-and-stays-minimized=OK(launch_hidden('HJ-TY1-Echo') called=True tracked-its-window=True minimized=True LAUNCH_NEW records=1 legacy ShellExecute calls=0); fallback-launch-is-minimized-and-a-window-that-never-appears-is-not-a-launch=OK(ShellExecute calls=1 showcmd=[7] (7 = SW_SHOWMINNOACTIVE) LAUNCH_NEW records=0 reply="[11:05:49.984] UNVERIFIED: started 'HJ-TY1-Nothing' via ShellExecute(HJ-TY1-Nothing, SW_SHOWMINNOACT"); window-tracker-finds-the-window-without-raising-it=OK(tracked=True state (260, 180, 680, 420)->(260, 180, 680, 420) raise-attempts=[]); hygiene-leaves-a-look-alike-window-it-did-not-launch-alone=OK(alive=True text='user text' (a window titled 'untitled' for an unlaunched app used to be WM_CLOSEd)); popup-dismisser-only-touches-popups-it-owns=OK(look-alike window owned before=False after we launched it=True); focus-helper-names-the-window-without-raising-it=OK(returned 'HJ-TY1-Alpha'; raise-attempts=[]); organ_01-source-has-no-key-injection-raise-restore-or-user-app-taskkill=OK(offending call sites: none (the only taskkill left restarts ollama.exe, a service)); parked-windows-never-shown-and-nothing-became-foreground=OK(2714 samples; (ms a non-minimized window overlapped a monitor by >1 px, samples as foreground) per window = {'Alpha': (12901, 0), 'Bravo': (0, 0), 'Charlie': (4, 0), 'Delta': (0, 0), 'Echo-Window': (0, 0), 'untitled': (0, None)}; gate <= 120 ms per window (the documented park floor is ~40-110 ms); all minimized again, none left ); no-physical-input-or-raise-attempt-in-any-step=OK(raise/restore/maximize attempts=[] keystroke/mouse attempts=[] spawned processes=[]); physical-pointer-untouched-and-no-guard-violations=OK(guard violations+=0; key/mouse API attempts=0; cursor changes observed=279 (informational: tool calls covered 12.0s of the run, so any movement is not attributable; 0 changes means nothing moved it at all))
+    duration: 14257.0 ms  metrics: {'checks': '19/19'}
+
+[FAIL] ANY1 [ANYAPP] ANY1: any-app discovery - scan walks are bounded by TIME with a visible depth rail, readiness follows a splash chain instead of a flat 10 s, an unnamed DataGrid is grounded by role, XAML hosts are recognised
+    evidence: splash-chain-extends-the-deadline-then-ready=OK(ready after 3.4s with a flat deadline of 1s; extended by 1.2s because the window set kept changing); a-static-never-ready-app-still-gives-up-at-the-flat-deadline=OK(gave up after 1.0s (deadline 1s), no extension); deep-scan-reports-its-limits=OK({'nodes_walked': 67, 'max_depth_seen': 7, 'walk_max_depth': 64, 'depth_hit_cap': False, 'time_budget_ms': 6000, 'time_budget_hit': False, 'walk_ms': 392}); time-budget-cuts-the-walk-and-says-so=OK(1 ms budget: 10 of 67 nodes, time_budget_hit=True); depth-rail-is-secondary-and-visible=OK(rail=2: depth_hit_cap=True (default rail 64: hit=False)); organ_41-time-budget-and-visible-rails=OK(full 58 nodes (depth rail 32, hit=False); 1 ms budget -> 5 nodes time_budget_hit=True; rail 2 -> depth_hit_cap=True); xaml-host-recognised-and-win32-window-not=OK(calculator frame xaml=True; native Win32 window xaml=False); excel-grid-grounded-by-role-with-honest-sampling=OK(263 elements; datagrid elements=1 (named ['Grid']); cells surfaced 120 of 492 (cap 120, sampled out 372)); physical-pointer-untouched-and-no-guard-violations=FAIL(pointer (1374, 17)->(467, 406), guard violations+=0, largest 10 ms step=495px)
+    duration: 31427.3 ms  metrics: {'excel_elements': 263}
+
+[PASS] UP1 [POPUPENG] UP1: ONE popup engine - organ_29 only detects; escalation presses zero buttons; benign prompts are dismissed not escalated; the cold LLM tier is capped AND a breaker stops later popups paying it again (measured)
+    evidence: organ_29-and-the-loop-share-one-engine=OK(resolve_view reached by organ_29 and resolve_dialog (2 calls); retired from organ_29: nothing left behind; organ_29 is now 511 lines (was 989)); uac-like-real-dialog-needs-a-human-and-zero-buttons-pressed=OK(organ_29 returned (False, 970, 547, 'need_human'); dialog still open=1; button pressed by us before cleanup=None; keys sent=[]); organ_29-detected-real-save-changes-box-answered-Cancel-headless=OK(organ_29 -> (True, 1087, 614, 'cancel(bm-click)'); the box returned 2 (2 = Cancel; 6 = Yes would have been destructive)); browser-save-password-bubble-dismissed-but-real-credential-prompt-escalated=OK(save-password bubble -> key:escape via T2.5; cookie banner -> key:escape via T2.5; authentication -> need_human=True via escalate, keys sent=[]); cold-llm-tier-is-hard-capped=OK(never-answering model: resolved via T4 in 802 ms (cap 800 ms; unbounded before the cap existed was ~30 s)); breaker-stops-every-later-cold-popup-paying-the-cap-again=OK(next cold popup: 1 ms vs 802 ms for the first; LLM calls made=1; breaker open=True); repeat-of-a-learned-popup-is-a-cache-hit=OK(repeat of the first popup: T2 in 0.5 ms); answered-once-then-fingerprint-cached-for-dynamic-titles=OK(first: T3 0 ms; same popup with a different error code: T2 0.7 ms); real-cold-path-inside-the-cap=OK(unseen ambiguous popup with the REAL gatekeeper (http://127.0.0.1:11435/api/chat, listening=False): resolved via T4 in 161 ms (cap 5.0 s). Before the listener probe a CLO); physical-pointer-untouched-and-no-guard-violations=OK(pointer (465, 406)->(695, 464), guard violations+=0, largest 10 ms step=57px (a smooth path = the user's own hand; the guard saw 0 physical-input calls))
+    duration: 4241.3 ms  metrics: {'cold_first_ms': 802, 'cold_next_ms': 1, 'repeat_ms': 0.5, 'real_cold_ms': 161}
+
+[PASS] DE1 [GOALCHECK] DE1: a goal carries its own machine-checkable postcondition - 'save as <path>' needs that file (and its real format), 'expect X' needs X on screen, the requested format outranks 'Save as project'
+    evidence: saving-goals-derive-file-exists-and-format=OK(9/9 goals derived correctly); assertion-goals-need-no-action=OK(6/6 read correctly); requested-format-outranks-save-as-project=OK(top picks {'png': 'PNG picture', 'jpg': 'JPEG picture', 'bmp': 'BMP picture'}; .txt keeps 'Save as'); a-non-png-named-png-is-not-a-pass=OK(fake: file hj_de1_7d3d0c.png exists; NOT a .png (starts b'PK\x03\x04 a'); real: file hj_de1_7d3d0c.png exists; is a real .png); a-missing-file-is-not-a-pass=OK(file hj_de1_never_b5080f.png MISSING)
+    duration: 3027.7 ms  metrics: {'checks': 5, 'failed': 0}
+
+[PASS] LC1 [LIFECYCLE] LC1: intake (secrets, tickets, domain, impossible, one question) + the D3 risk gate + the per-checkpoint record, with a stubbed operator
+    evidence: A1-secrets-redacted=OK(found ['api-key', 'password']; clean='key [REDACTED:api-key] then open notepad'); A1-list-becomes-tickets=OK(tickets=['open calculator and compute 6*7', 'open notepad and type done']); A1-one-line-stays-one-task=OK(tickets=1); A2-web-vs-desktop-vs-mixed=OK(['web', 'desktop', 'mixed', 'system']); A3-impossible-declared-at-intake=OK([True, True, True, True, False]); A1-vague-task-gets-ONE-question=OK(question="Which application or file should I work on? The task ('clean this up') does not name one."); D3-irreversible-queued-rest-runs=OK(status=ESCALATED executed=['type "hello world"']); every-checkpoint-is-marked=OK(21 marks; missing=[]); no-checkpoint-without-evidence=OK(marks without evidence: []); clean-task-is-DONE=OK(status=DONE); impossible-task-never-reaches-the-desktop=OK(status=IMPOSSIBLE reason='hand / body gesture or voice input (the input laye'); one-failing-ticket-never-stalls-the-queue=OK(ticket statuses=['FAILED', 'DONE'])
+    duration: 56.3 ms  metrics: {'checks': 12, 'failed': 0}
+
+[PASS] LC2 [LIFECYCLE] LC2: the checkpoint chain on REAL apps - Notepad types and saves, Calculator computes, an irreversible delete is queued - against independent ground truth
+    evidence: file-saved-with-the-typed-words (independent read)=OK(hj_lc2_544139.txt: 'lifecycle works'); calculator-shows-42 (independent read)=OK(display='Display is 42'); irreversible-delete-was-queued-not-run=OK(file survives=True status=ESCALATED); no-checkpoint-FAILed=OK(35 marks, failing: []); D3-gate-escalated=OK(D3.gate=ESCALATED); physical-pointer-untouched-and-no-guard-violations=OK(pointer (192, 686)->(914, 862), guard violations+=0, largest 10 ms step=233px (a smooth path = the user's own hand; the guard saw 0 physical-input calls)); total 42.9s; closed 3 window(s) we launched
+    duration: 45149.1 ms  metrics: {'seconds': 42.9, 'status': 'ESCALATED'}
+
+[FAIL] ES1 [CHECKPOINTS] ES1 (C2): a dialog that needs a human is saved as a real PNG screenshot for the human and left open, no button pressed
+    evidence: popup-engine-asked-for-a-human=OK(awaiting_human=True); screenshot-saved-as-a-real-png=FAIL(None, 0 bytes, png=False); dialog-left-open-for-the-human=OK(no button was pressed)
+    duration: 1027.1 ms  metrics: {'failed': 1}
+
+[PASS] B2X [CHECKPOINTS] B2X (B2): a launch target whose executable is gone is reported as MISSING and never retried or replaced by another app
+    evidence: target-checked-on-disk=OK({'found': True, 'app_id': 'C:\\hj_no_such_dir\\ghost.exe', 'kind': 'path', 'exists': False}); missing-exe-is-reported=OK(launch_note="target path 'C:\\hj_no_such_dir\\ghost.exe': exists=False - the executable is MISSING; not launching (no re); no-launch-or-retry-attempted=OK(launch_hidden calls=0 launched=False); nothing-else-got-started=OK(new windows=0); task-not-reported-done=OK(completed=False)
+    duration: 11297.8 ms  metrics: {'failed': 0}
+
+[PASS] C3X [CHECKPOINTS] C3X (C3): mode indicators (selected tab / open menu) are read with the snapshot and a mode-only change is noticed
+    evidence: mode-only-change-is-noticed=OK(ui-changed; region pixel-delta unavailable(before:no-capture); modes +['tab two|selected']/-['tab one|selected); mode_on-expectation=OK(mode 'tab two' on among 1 mode indicator(s)); live-modes-read=OK(1 indicator(s): ['hj_lc2_544139.txt. unmodified.|selected'])
+    duration: 6684.5 ms  metrics: {'failed': 0}
+
+[PASS] A3X [CHECKPOINTS] A3X (A3): a ticket a stored template covers runs template-first (no LLM planning) and the chain says so
+    evidence: template-ran-first=OK(A3.template=PASS: template 'write text and save as file' [learned 0.97] completed 4 leaf step(s) in 16.6s, no LLM planning); file-has-the-typed-words (independent read)=OK('template first works'); ticket-done=OK(status=DONE); 16.7s; closed 1
+    duration: 16931.9 ms  metrics: {'seconds': 16.7}
+
+[PASS] G2L [CHECKPOINTS] G2L (G2): the app's window vanishes mid-run on a real Notepad - relaunched once and the run completes; a second loss fails with evidence
+    evidence: killed-our-instance-once=OK(kills=1); relaunched-once-and-completed=OK(completed=True relaunches=1 in 15s); second-goal-landed-after-the-relaunch (independent read)=OK(document='crash-two'); second-loss-fails-with-evidence=OK(completed=False crashed=True relaunches=1 evidence=['the window vanished again after 1 relaunch(es): failing with']); closed 0
+    duration: 33445.0 ms  metrics: {'failed': 0}
+
+[FAIL] VQ1 [CHECKPOINTS] VQ1: the targeted vision tier (Qwen2.5-VL locate on the llama.cpp server) finds real controls of a parked window, graded against UIA
+    evidence: 0/4 controls located by Qwen2.5-VL (>=50% needed); mean 0.0s each; Add New Tab:miss(0.0s), Headings:miss(0.0s), Link (Ctrl+K):miss(0.0s), User avatar:miss(0.0s)
+    duration: 12258.4 ms  metrics: {'hits': 0, 'n': 4, 'mean_ms': 25}
+
+[PASS] BM1 [BEHAVIOR] BM1: knowledge-pack format validates strictly, enforces the trust cap, loads as unverified data
+    evidence: valid-pack-accepted=OK; rejects-wrong-schema=OK; rejects-self-declared-learned=OK; rejects-unknown-assertion=OK; rejects-unknown-verb=OK; rejects-dup-step-id=OK; rejects-bad-risk=OK; rejects-no-target=OK; loads-as-catalog-unverified=OK; template-matches-alias=OK; invalid-pack-not-ingested=OK; shipped-packs-valid=OK; nothing-ships-learned=OK; chair-is-a-data-row=OK
+    duration: 145.1 ms  metrics: {'checks': '14/14'}
+
+[PASS] BM2 [BEHAVIOR] BM2: pre/postconditions are machine-checkable; an unobservable effect is OPAQUE, never PASS
+    evidence: title_contains=OK; element_appeared=OK; element_absent=OK; window_opened=OK; value_contains=OK; ocr_number_increase 0->8 (the 'verts' proof)=OK; ocr_number_increase rejects too-small delta=OK; one failing assertion fails the whole step=OK; unobservable tier => OPAQUE (not PASS)=OK; skipped assertion never counts as satisfied but others still decide=OK; empty postcondition is OPAQUE=OK; file_exists + file_contains=OK; file_exists MISSING fails=OK; slot substitution=OK; mode indicator via OCR regex=OK
+    duration: 259.1 ms  metrics: {'checks': '15/15'}
+
+[PASS] BM3 [BEHAVIOR] BM3: autonomy gate, trust climb/erosion, version demotion, state-machine path, effector learning
+    evidence: fresh reversible step -> SAFE_ATTEMPT (verify, don't trust)=OK; no postcondition -> QUEUE=OK; opaque -> QUEUE=OK; E2 never auto-executes=OK; EU without unwind -> QUEUE=OK; 3 verified successes -> EXECUTE=OK; verified E2 still needs the explicit allow flag=OK; a failure erodes confidence and revokes unattended execution=OK; pack/catalog entry is NOT learned=OK; verified outcome promotes to learned=OK; a weaker source never overwrites a stronger one=OK; same version keeps trust=OK; version change demotes learned->catalog + stale=OK; template: failure erodes, verified run promotes to learned=OK; BFS finds object->edit->sculpt=OK; no path => None (no invention)=OK; current_mode read from perception=OK; transition recorded once with count 2=OK; doc-name changes don't fork the state=OK; learned effector order flips to what works=OK; risk cues=OK; budget: yield extends the deadline=OK; budget: flattening stops early=OK
+    duration: 275.4 ms  metrics: {'checks': '23/23'}
+
+[PASS] BM4 [BEHAVIOR] BM4: harvest the app's own artifacts (keymaps/settings/CLI registry) as unverified candidates
+    evidence: json keybindings=OK; python-literal keymap (exported-keymap shape)=OK; ini accelerator table=OK; settings schema -> opaque toggles=OK; cli command-registry dump (marker + JSON)=OK; missing exe self-reports skipped (not an error, not faked)=OK; nonexistent binary self-reports skipped=OK; harvested entries land as catalog (unverified)=OK; missing artifact reported in 'skipped'=OK
+    duration: 406.9 ms  metrics: {'checks': '9/9'}
+
+[FAIL] MIN1 [BACKGROUND] MIN1: a MINIMIZED app is scanned + operated without ever being shown or focused, at full quality
+    evidence: notepad: mode=parked E0=36 cmds, layout=92 controls (File@[0.0355, 0.0948]), E1 probe effect=True unwound=True, capture=capture-blank (window did not render into PrintWindow), template completed=True truth=True, | FOCUS: target-held-foreground longest=29ms (8/1512 samples), brief-exposure-samples(>16px)=17 longest-continuous-exposure=82ms max-visible-px=528000 | ended minimized=True placement-restored=True 42s | harness note: app took focus at startup (returned) || paint: mode=parked E0=41 cmds, layout=417 controls (File@[0.026, 0.073]), E1 probe effect=True unwound=True, capture=capture-blank (window did not render into PrintWindow), | FOCUS: target-held-foreground longest=31ms (11/1330 samples), brief-exposure-samples(>16px)=21 longest-continuous-exposure=98ms max-visible-px=420030 | ended minimized=True placement-restored=True 37s || FAILED: ['notepad', 'paint']
+    duration: 84471.6 ms  metrics: {'apps': 2}
+
+[PASS] SC1 [SCANKNOW] SC1: read-only E0 crawl maps ANY app's menus through one code path; no clicks, popups unwound
+    evidence: notepad: 36 cmds (26 w/ accelerators, 6 nested) in 9.3s stop=complete leftover_popups=0 title_unchanged=True | paint: 41 cmds (15 w/ accelerators, 24 nested) in 16.0s stop=complete leftover_popups=0 title_unchanged=True
+    duration: 35150.8 ms  metrics: {'apps_mapped': 2}
+
+[PASS] LM1 [SCANKNOW] LM1: every section + control + window-relative position is mapped generically; deepening reversible
+    evidence: notepad: 90 controls in 17 regions {'window': 1, 'document': 1, 'tabstrip': 1, 'list': 3, 'menubar': 2, 'dropdown': 3, 'sidebar_right': 2, 'content': 3, 'menu': 1} deepen={'tabs_visited': 0, 'tab_strips_restored': 0, 'dropdowns_candidates': 4, 'dropdowns_opened': 4, 'tree_nodes_expanded': 0, 'scrollables_paged': 0} opaque=0 File@[0.0355, 0.0948] view_similarity=1.000 6.7s | conds=all-true | paint: 417 controls in 18 regions {'window': 1, 'menubar': 2, 'header': 1, 'content': 3, 'list': 2, 'canvas': 1, 'titlebar': 1, 'dropdown': 4, 'menu': 3} deepen={'tabs_visited': 0, 'tab_strips_restored': 0, 'dropdowns_candidates': 4, 'dropdowns_opened': 4, 'tree_nodes_expanded': 0, 'scrollables_paged': 2} opaque=1 File@[0.026, 0.073] view_similarity=1.000 13.1s | conds=all-true
+    duration: 32977.8 ms  metrics: {'apps': 2}
+
+[PASS] SC2 [SCANKNOW] SC2: E1 reversible probing discovers a child window invisible to E0, then unwinds to baseline
+    evidence: probe 'File > Page setup': effect=True new_windows=['page setup'] new_controls=20 effector=menu_command unwound=True promoted=True in 2.56s; E0 knew 0 child-window regions beforehand; E2 probe refused=True; explore_e1 stop=action-cap probes=2
+    duration: 28531.1 ms  metrics: {'controls_discovered_by_E1': 20, 'regions_known_by_E0': 0}
+
+[PASS] PM1 [POPUP] PM1: popup_mode - probe dialogs are cancel-only (never accepted/cached); expected dialogs are kept
+    evidence: default policy is task=OK; probe policy visible cross-process (file flag)=OK; expected popup registered=OK; real dialog opened for the test=OK; probe-mode closes via cancel_only=OK; cancel-only is fast (no LLM tier)=OK; nothing NEW written to the pathway cache in probe mode=OK; expected dialog left open=OK
+    duration: 9730.8 ms  metrics: {'checks': '8/8'}
+
+[FAIL] SCK1 [SCANKNOW] SCK1: organ_30 scan consults organ_48/50 knowledge: E0 + layout first, cached on re-scan
+    evidence: scan1: 378 controls, learned 36 commands (E0 Nones) in 30.9s; scan2: E0 ['skipped'] cached, skipped_known=0, catalog_only=10 in 34.0s; stop=unwind-failed
+    duration: 70194.7 ms  metrics: {'scan1_s': 30.9, 'scan2_s': 34.0}
+
+[PASS] TPL1 [AUTONOMY] TPL1: a task decomposed from DATA templates runs verified leaf-by-leaf on two unrelated apps
+    evidence: notepad: completed=True truth=True 9.8s leaves=[('type_text', 'PASS', 1), ('open_save_as', 'PASS', 1), ('save_to_path', 'PASS', 1), ('verify_content', 'PASS', 1)] | paint: completed=True truth=True 27.63s leaves=[('open_save_as', 'PASS', 2), ('save_to_path', 'PASS', 1)] | verify-only leaf acted=NO | unmatched task matched=False | templates promoted to learned by verified runs: 2
+    duration: 47349.6 ms  metrics: {'apps': 2}
+
+[PASS] DAY1 [AUTONOMY] DAY1: unattended task-list day: never stalls the queue, report matches ground truth
+    evidence: report done=2 failed=2 escalated=0 in 49s; self-report==ground-truth: True; every task accounted for: True; failed reasons=[('T3 no such skill', 'no template for this task'), ('T4 3D chair (no 3D app here)', "blocked at leaf 'seat'")]
+    duration: 59227.1 ms  metrics: {'done': 2, 'failed': 2, 'escalated': 0}
+
+[FAIL] E2E-1 [E2E] E2E-1: unattended Notepad run via headless input - type a haiku, save a .txt, verify file, distill, re-run
+    evidence: run1 completed=True file=yes steps=5 51.96s awaiting_human=False trace=[('-', '-', 'NO_CHANGE'), ('type', 'Text editor', 'PASS'), ('click', 'File', 'WRONG_STATE'), ('click', 'Save as', 'WRONG_STATE'), ('file-dialog', 'file-dialog', 'PASS')]; recipe='recipe ingested to organ_04 (2 verified steps)'; run2 completed=False file=NO steps=12 76.37s trace=[('check', '-', 'PASS'), ('type', 'Text editor', 'PASS'), ('click', 'File', 'WRONG_STATE'), ('click', 'Edit', 'WRONG_STATE'), ('click', 'poem1.txt. Unmodif', 'WRONG_STATE'), ('click', 'Autumn leaves fall', 'WRONG_STATE'), ('shortcut', 'shortcut:ctrl+n', 'WRONG_STATE'), ('click', 'Untitled. Unmodifi', 'WRONG_STATE'), ('click', 'View', 'WRONG_STATE'), ('click', 'Pop-upHost', 'WRONG_STATE'), ('click', 'System', 'WRONG_STATE'), ('-', '-', 'NO_CHANGE'), ('-', '-', 'NO_CHANGE')]; steps run1->run2: 5->12, seconds 51.96->76.37; physical pointer untouched=False; input-guard violations=0; notepad launched by us=True
+    duration: 130786.8 ms  metrics: {'run1_steps': 5, 'run2_steps': 12, 'run1_s': 51.96, 'run2_s': 76.37, 'recipe': True, 'pointer_untouched': False}
+
+[FAIL] E2E-2 [E2E] E2E-2: UIA-sparse canvas app (Blender if installed, else Paint) driven via grounding ladder incl. vision
+    evidence: Blender not installed -> substituted Paint (honest substitution). app=mspaint; completed=True steps=2 12.06s awaiting_human=False; trace=[('click', 'Pencil', 'PASS'), ('click', 'Line', 'PASS')]; vision-tier grounding: tiers_ran=['uia', 'uia@offscreen'], tiers_skipped=['ocr:capture(capture-blank (window did not render into PrintWindow))', 'vision:offscreen-capture(no painted capture: capture-blank (window did not render into PrintWindow))'], vision_elements=0, tier_ms={'uia': 426.6, 'uia@offscreen': 441.5, 'ocr': 12.8}
+    duration: 20202.4 ms  metrics: {'app': 'mspaint', 'vision_elements': 0, 'tier_ms': "{'uia': 426.6, 'uia@offscreen': 441.5, 'ocr': 12.8}"}
+
+
+RANKINGS
+1. App resolution (organ_40): 2/2 tests, score 100.0, avg 8.3 ms
+2. Desktop verification loop (W2): 1/1 tests, score 100.0, avg 1.5 ms
+3. Checkpoint / resume (W5): 1/1 tests, score 100.0, avg 10.8 ms
+4. Recipe distillation (W5): 1/1 tests, score 99.8, avg 53.0 ms
+5. Knowledge organ (organ_04): 2/2 tests, score 99.5, avg 180.9 ms
+6. App-intelligence organ (organ_47): 1/1 tests, score 99.4, avg 196.8 ms
+7. Behavior model (organ_48: packs/gate/state machine): 4/4 tests, score 99.2, avg 271.6 ms
+8. System import health: 1/1 tests, score 99.1, avg 288.7 ms
+9. Brain (compile + route + nature): 3/3 tests, score 99.0, avg 346.0 ms
+10. Database (batch + caches): 2/2 tests, score 97.9, avg 713.3 ms
+11. Memory organ (organ_03): 2/2 tests, score 97.6, avg 806.5 ms
+12. Popup handler (organ_29): 7/7 tests, score 90.9, avg 3032.6 ms
+13. Goal postconditions (honest DONE): 1/1 tests, score 90.9, avg 3027.7 ms
+14. Scanning (deep + continuous): 2/2 tests, score 89.4, avg 3541.3 ms
+15. Web URL hygiene (W6): 2/2 tests, score 87.5, avg 4151.7 ms
+16. Unified popup engine (popup_policy): 1/1 tests, score 87.3, avg 4241.3 ms
+17. Task graph compiler (skip-ReAct) (env-only): 0/1 (+1B ENV) tests, score 84.3, avg 5234.2 ms
+18. Vision tier (OmniParser): 1/1 tests, score 79.3, avg 6898.7 ms
+19. Desktop grounding ladder (W1): 3/3 tests, score 70.0, avg 49384.2 ms
+20. Unattended task runs (templates + day report): 2/2 tests, score 70.0, avg 53288.4 ms
+21. Product routing (verified loop first): 2/2 tests, score 70.0, avg 25375.1 ms
+22. Headless input (drag / off-screen capture): 4/4 tests, score 70.0, avg 10260.9 ms
+23. Task lifecycle (A intake -> H report): 2/2 tests, score 70.0, avg 22602.7 ms
+24. Knowledge-assisted scanning (organ_49/50): 3/4 tests, score 52.5, avg 41713.6 ms
+25. Lifecycle checkpoints (escalation, launch, modes, template, crash): 4/6 tests, score 46.7, avg 13607.5 ms
+26. Virtual mouse: 0/1 tests, score 13.7, avg 5420.8 ms
+27. Background operation (minimized, never shown/focused): 0/1 tests, score 0.0, avg 84471.6 ms
+28. Any-app discovery (time-budget scan, window find): 0/1 tests, score 0.0, avg 31427.3 ms
+29. End-to-end unattended runs: 0/2 tests, score 0.0, avg 75494.6 ms

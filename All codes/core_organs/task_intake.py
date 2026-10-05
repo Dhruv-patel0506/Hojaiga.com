@@ -26,7 +26,7 @@ _SECRET_PATTERNS: List[Tuple[str, "re.Pattern[str]"]] = [
     ("api-key", re.compile(r"\b(?:sk|pk|rk|gsk|ghp|gho|xox[abp]|AKIA|AIza)[-_A-Za-z0-9]{16,}\b")),
     ("bearer-token", re.compile(r"\bbearer\s+[A-Za-z0-9._\-]{16,}", re.I)),
     ("jwt", re.compile(r"\beyJ[A-Za-z0-9_\-]{8,}\.[A-Za-z0-9_\-]{8,}\.[A-Za-z0-9_\-]{8,}\b")),
-    ("password", re.compile(r"(?i)\b(pass(?:word|wd|code)?|pwd|secret|token|api[ _-]?key)\b\s*(?:is|=|:)\s*(\S+)")),
+    ("password", re.compile(r"(?i)(?:\b(?:my|the|our)\s+)?\b(pass(?:word|wd|code)?|pwd|secret|token|api[ _-]?key)\b\s*(?:is|=|:)\s*(\S+?)(?:[,;.]\s*|\s+|$)")),
     ("card-number", re.compile(r"(?<!\d)(?:\d[ -]?){12,18}\d(?!\d)")),
     ("ssn", re.compile(r"\b\d{3}-\d{2}-\d{4}\b")),
     ("url-secret", re.compile(r"(?i)([?&](?:token|key|api_?key|access_token|auth|sig|signature|password)=)[^&\s]+")),
@@ -62,7 +62,7 @@ def sanitize(text: str) -> Tuple[str, List[str]]:
         elif kind == "password":
             def _pw(m):
                 found.append(kind)
-                return f"{m.group(1)} is [REDACTED:{kind}]"
+                return ""             # the whole statement goes: it is neither plan text nor a goal
             out = pat.sub(_pw, out)
         elif kind == "url-secret":
             def _u(m):
@@ -102,6 +102,7 @@ _URL_RE = re.compile(r"(?i)\b(?:https?://|www\.)\S+|\b[a-z0-9\-]+\.(?:com|org|ne
 _WEB_WORDS = re.compile(r"(?i)\b(website|web ?site|web ?page|browser|google|search (?:for|the web)|url|link|online|webmail|"
                         r"sign in to|log ?in to|download from)\b")
 _BROWSER_NAMES = ("chrome", "edge", "firefox", "brave", "opera", "safari", "browser")
+_RESEARCH_RE = re.compile(r"(?i)\b(find|search(?:\s+for)?|look\s*up|research|scrape|collect|gather|get me|list|compare)\b")
 _SYSTEM_WORDS = re.compile(r"(?i)\b(rename|move|copy|delete|zip|unzip|extract|compress)\b.*(?:\b(?:file|folder|directory)\b|\b[\w\-]+\.[a-z0-9]{2,5}\b)|"
                            r"\b(list|find) (?:the )?files\b|\bdisk (?:space|usage)\b")
 
@@ -113,6 +114,14 @@ def installed_app_names() -> List[str]:
         return [n for n, _a in us.start_apps() if n]
     except Exception:
         return []
+
+
+_APP_CUE_RE = re.compile(r"(?:\b(?:open|opens|launch|start|run|use|using|in|into|on|with|via|inside|from)|\bswitch to|\bgo to|\bthen)\s+(?:the\s+|my\s+|a\s+|an\s+)?$")
+
+
+def _app_cue(low: str, pos: int) -> bool:
+    before = low[max(0, pos - 24):pos]
+    return pos <= 3 or bool(_APP_CUE_RE.search(before)) or bool(re.search(r"[.;:\n]\s*$", before))
 
 
 def detect_apps(text: str, catalog: Optional[List[str]] = None) -> List[Tuple[str, int]]:
@@ -136,8 +145,14 @@ def detect_apps(text: str, catalog: Optional[List[str]] = None) -> List[Tuple[st
                 break
             pos.append(m.start())
         if pos:
+            first = min(pos)
+            # A single common word that merely APPEARS ('click' for the app 'Click to Do', 'weather' in 'search for weather')
+            # is not a mention of the app. A one-word name counts when it is introduced the way apps are ('open X', 'in X',
+            # 'using X', 'switch to X'), or opens the text; a multi-word name is distinctive enough on its own.
+            if len(words) == 1 and not _app_cue(low, first):
+                continue
             key = name.lower()
-            hits.setdefault(key, min(pos))
+            hits.setdefault(key, first)
     # several catalog entries can match the same words ('Notepad' / 'Notepad++', 'Paint' / 'Paint 3D'): the mention
     # means the most direct one - keep, per position, the entry with the shortest name
     best: Dict[int, str] = {}
@@ -164,6 +179,8 @@ def classify_domain(text: str, apps: Optional[List[Tuple[str, int]]] = None) -> 
         return "desktop", f"installed apps named: {desktop_apps[:3]}"
     if _SYSTEM_WORDS.search(t):
         return "system", "file/system operation, no app named"
+    if _RESEARCH_RE.search(t):
+        return "web", "research verbs (find/search/look up/collect...) with no app named imply the browser"
     return "unknown", "no URL, installed app or file operation recognised"
 
 
@@ -206,6 +223,8 @@ def ambiguity(ticket: str, domain: str, apps: List[Tuple[str, int]]) -> Tuple[Op
     t = ticket or ""
     if _VAGUE_RE.search(t) and not apps and domain in ("unknown",):
         return ("Which application or file should I work on? The task ('%s') does not name one." % t[:60], assumptions)
+    if domain == "unknown" and _ACTION_VERB_RE.search(t) and not apps:
+        return ("Which application should I use for '%s'? No installed app, site or file is named." % t[:60], assumptions)
     if domain == "unknown" and not _ACTION_VERB_RE.search(t):
         return ("I could not find an action or an application in '%s'. What should I do, and in which app?" % t[:60], assumptions)
     if domain == "unknown":

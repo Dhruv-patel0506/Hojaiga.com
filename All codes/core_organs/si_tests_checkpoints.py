@@ -209,3 +209,63 @@ def run_g2l(TestOutcome):
     failed = [n for n, ok, _d in checks if not ok]
     return TestOutcome(passed=not failed, evidence="; ".join(f"{n}={'OK' if ok else 'FAIL'}({d[:150]})" for n, ok, d in checks) + f"; closed {closed}",
                        metrics={"failed": len(failed)})
+
+
+def run_vq1(TestOutcome):
+    """VQ1: the product's targeted vision tier (Qwen2.5-VL 'locate') finds real controls on a real parked window, graded against UIA."""
+    import uiautomation as auto
+    from core_organs import background_window as bw
+    from core_organs import desktop_grounding as dg
+    from core_organs import headless_input as hin
+    from core_organs import qwen_vl_scanner as qv
+    from core_organs import universal_scan as us
+    os.environ["HOJAIGA_QWEN_VL"] = "1"        # G2 switches the targeted locator off for itself; this test is about it
+    if not qv.available():
+        return TestOutcome(passed=False, env_blocked=True, evidence="llama.cpp vision server :8081 is not reachable (start_hojaiga.bat boots it)")
+    if any(hin._class_name(h) == "Notepad" for h, _t in hin.top_level_titles(visible_only=False)):
+        return TestOutcome(passed=False, env_blocked=True, evidence="the user's Notepad is open; VQ1 will not touch it")
+    info = us.launch_hidden("notepad", timeout_s=30.0)
+    h = info.get("hwnd")
+    rows, ms = [], []
+    try:
+        g = dg.DesktopGrounding()
+        with bw.BackgroundSession(h):
+            g._await_paint(h)
+            time.sleep(0.8)
+            rc = hin.wt.RECT()
+            hin._u32.GetWindowRect(h, hin.ctypes.byref(rc))
+            gt = []
+            for c, _d in auto.WalkControl(auto.ControlFromHandle(h), maxDepth=18):
+                nm = (c.Name or "").strip()
+                r = c.BoundingRectangle
+                if c.ControlTypeName in ("ButtonControl", "MenuItemControl", "TabItemControl") and 3 <= len(nm) <= 20 and r.right - r.left > 12:
+                    gt.append((nm, (r.left, r.top, r.right, r.bottom)))
+            seen, picks = set(), []
+            for nm, rect in gt:
+                if nm.lower() not in seen:
+                    seen.add(nm.lower())
+                    picks.append((nm, rect))
+            picks = picks[:: max(1, len(picks) // 4)][:4]
+            hits = 0
+            for nm, (l, t, r_, b) in picks:
+                rep = {}
+                t0 = time.perf_counter()
+                els = g._qwen_locate(h, nm, rep)
+                dt = (time.perf_counter() - t0) * 1000
+                ms.append(dt)
+                ok = False
+                if els:
+                    x0, y0, x1, y1 = els[0].bbox
+                    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+                    ix = max(0, min(x1, r_) - max(x0, l)) * max(0, min(y1, b) - max(y0, t))
+                    un = (x1 - x0) * (y1 - y0) + (r_ - l) * (b - t) - ix
+                    ok = bool((un and ix / un > 0.3) or (l <= cx <= r_ and t <= cy <= b))
+                hits += ok
+                rows.append(f"{nm}:{'hit' if ok else 'miss'}({dt / 1000:.1f}s)")
+    finally:
+        if h:
+            us.close_window(h, discard_unsaved=True, timeout_s=8)
+    n = len(rows)
+    return TestOutcome(passed=n >= 3 and hits / n >= 0.5 and max(ms) < 40000,
+                       evidence=f"{hits}/{n} controls located by Qwen2.5-VL (>=50% needed); mean {sum(ms) / max(n, 1) / 1000:.1f}s each; " + ", ".join(rows),
+                       metrics={"hits": hits, "n": n, "mean_ms": int(sum(ms) / max(n, 1))})

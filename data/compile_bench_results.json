@@ -1,0 +1,438 @@
+{
+ "summary": {
+  "cases": 20,
+  "catalog_load_s": 0.002,
+  "installed_apps": 327,
+  "verdict_accuracy_pct": 100.0,
+  "domain_accuracy_pct": 100.0,
+  "app_detection_accuracy_pct": 100.0,
+  "goal_plan_accuracy_pct": 100.0,
+  "risk_gate_accuracy_pct": 100.0,
+  "mean_intake_ms": 5.6,
+  "mean_plan_ms": 2.73
+ },
+ "rows": [
+  {
+   "task": "open notepad and type hello world",
+   "intake_ms": 13.7,
+   "verdict_ok": true,
+   "domain": "desktop",
+   "domain_ok": true,
+   "apps_found": [
+    "notepad"
+   ],
+   "apps_ok": true,
+   "plan_ms": 6.05,
+   "goals_ok": true,
+   "goals": {
+    "notepad": [
+     "type \"hello world\""
+    ]
+   },
+   "strong": 1,
+   "goal_count": 1,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "open notepad, type hello and save it as C:\\temp\\a.txt",
+   "intake_ms": 7.9,
+   "verdict_ok": true,
+   "domain": "desktop",
+   "domain_ok": true,
+   "apps_found": [
+    "notepad"
+   ],
+   "apps_ok": true,
+   "plan_ms": 2.35,
+   "goals_ok": true,
+   "goals": {
+    "notepad": [
+     "type \"hello\"",
+     "save it as C:\\temp\\a.txt"
+    ]
+   },
+   "strong": 2,
+   "goal_count": 2,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "open calculator and compute 6 * 7",
+   "intake_ms": 6.5,
+   "verdict_ok": true,
+   "domain": "desktop",
+   "domain_ok": true,
+   "apps_found": [
+    "calculator"
+   ],
+   "apps_ok": true,
+   "plan_ms": 7.16,
+   "goals_ok": true,
+   "goals": {
+    "calculator": [
+     "press Six",
+     "press Multiply by",
+     "press Seven",
+     "press Equals"
+    ]
+   },
+   "strong": 1,
+   "goal_count": 4,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "open paint and save the image as C:\\temp\\x.png",
+   "intake_ms": 6.6,
+   "verdict_ok": true,
+   "domain": "desktop",
+   "domain_ok": true,
+   "apps_found": [
+    "paint"
+   ],
+   "apps_ok": true,
+   "plan_ms": 2.26,
+   "goals_ok": true,
+   "goals": {
+    "paint": [
+     "save the image as C:\\temp\\x.png"
+    ]
+   },
+   "strong": 1,
+   "goal_count": 1,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "open notepad and type done, then open calculator and compute 12 + 30",
+   "intake_ms": 5.4,
+   "verdict_ok": true,
+   "domain": "desktop",
+   "domain_ok": true,
+   "apps_found": [
+    "notepad",
+    "calculator"
+   ],
+   "apps_ok": true,
+   "plan_ms": 2.71,
+   "goals_ok": true,
+   "goals": {
+    "notepad": [
+     "type \"done\""
+    ],
+    "calculator": [
+     "press One",
+     "press Two",
+     "press Plus",
+     "press Three",
+     "press Zero",
+     "press Equals"
+    ]
+   },
+   "strong": 2,
+   "goal_count": 7,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "open excel, click Blank workbook, type 42",
+   "intake_ms": 4.8,
+   "verdict_ok": true,
+   "domain": "desktop",
+   "domain_ok": true,
+   "apps_found": [
+    "excel"
+   ],
+   "apps_ok": true,
+   "plan_ms": 2.13,
+   "goals_ok": true,
+   "goals": {
+    "excel": [
+     "click Blank workbook",
+     "type \"42\""
+    ]
+   },
+   "strong": 1,
+   "goal_count": 2,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "open notepad then type hello and delete the old file",
+   "intake_ms": 4.8,
+   "verdict_ok": true,
+   "domain": "desktop",
+   "domain_ok": true,
+   "apps_found": [
+    "notepad"
+   ],
+   "apps_ok": true,
+   "plan_ms": 3.84,
+   "goals_ok": true,
+   "goals": {
+    "notepad": [
+     "type \"hello\"",
+     "delete the old file"
+    ]
+   },
+   "strong": 1,
+   "goal_count": 2,
+   "irreversible_queued": true,
+   "gate_ok": true
+  },
+  {
+   "task": "in notepad write a haiku about autumn then save it as C:\\temp\\h.txt",
+   "intake_ms": 5.2,
+   "verdict_ok": true,
+   "domain": "desktop",
+   "domain_ok": true,
+   "apps_found": [
+    "notepad"
+   ],
+   "apps_ok": true,
+   "plan_ms": 2.21,
+   "goals_ok": true,
+   "goals": {
+    "notepad": [
+     "write a haiku about autumn",
+     "save it as C:\\temp\\h.txt"
+    ]
+   },
+   "strong": 2,
+   "goal_count": 2,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "open visual studio code and type print hello",
+   "intake_ms": 5.6,
+   "verdict_ok": true,
+   "domain": "desktop",
+   "domain_ok": true,
+   "apps_found": [
+    "visual studio code"
+   ],
+   "apps_ok": true,
+   "plan_ms": 3.97,
+   "goals_ok": true,
+   "goals": {
+    "visual studio code": [
+     "type \"print hello\""
+    ]
+   },
+   "strong": 1,
+   "goal_count": 1,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "open settings and click Bluetooth & devices",
+   "intake_ms": 5.9,
+   "verdict_ok": true,
+   "domain": "desktop",
+   "domain_ok": true,
+   "apps_found": [
+    "settings"
+   ],
+   "apps_ok": true,
+   "plan_ms": 4.78,
+   "goals_ok": true,
+   "goals": {
+    "settings": [
+     "click Bluetooth & devices"
+    ]
+   },
+   "strong": 0,
+   "goal_count": 1,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "go to https://example.org and read the heading",
+   "intake_ms": 4.6,
+   "verdict_ok": true,
+   "domain": "web",
+   "domain_ok": true,
+   "apps_found": [],
+   "apps_ok": true,
+   "plan_ms": 1.53,
+   "goals_ok": true,
+   "goals": {},
+   "strong": 0,
+   "goal_count": 0,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "open excel and also search google for weather in Atlanta",
+   "intake_ms": 5.1,
+   "verdict_ok": true,
+   "domain": "mixed",
+   "domain_ok": true,
+   "apps_found": [
+    "excel"
+   ],
+   "apps_ok": true,
+   "plan_ms": 1.8,
+   "goals_ok": true,
+   "goals": {
+    "excel": [
+     "search google for weather in Atlanta"
+    ]
+   },
+   "strong": 0,
+   "goal_count": 1,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "1. open calculator and compute 6*7 | 2. open notepad and type done",
+   "intake_ms": 6.5,
+   "verdict_ok": true,
+   "domain": "desktop",
+   "domain_ok": true,
+   "apps_found": [
+    "calculator",
+    "notepad"
+   ],
+   "apps_ok": true,
+   "plan_ms": 1.51,
+   "goals_ok": true,
+   "goals": {
+    "calculator": [
+     "press Six",
+     "press Multiply by",
+     "press Seven",
+     "press Equals"
+    ]
+   },
+   "strong": 1,
+   "goal_count": 4,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "rename the file report.txt to final.txt",
+   "intake_ms": 5.7,
+   "verdict_ok": true,
+   "domain": "system",
+   "domain_ok": true,
+   "apps_found": [],
+   "apps_ok": true,
+   "plan_ms": 1.38,
+   "goals_ok": true,
+   "goals": {},
+   "strong": 0,
+   "goal_count": 0,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "clean this up",
+   "intake_ms": 4.2,
+   "verdict_ok": true,
+   "domain": "unknown",
+   "domain_ok": true,
+   "apps_found": [],
+   "apps_ok": true,
+   "plan_ms": 1.33,
+   "goals_ok": true,
+   "goals": {},
+   "strong": 0,
+   "goal_count": 0,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "use hand gestures to control the app",
+   "intake_ms": 3.0,
+   "verdict_ok": true,
+   "domain": "unknown",
+   "domain_ok": true,
+   "apps_found": [],
+   "apps_ok": true,
+   "plan_ms": 2.77,
+   "goals_ok": true,
+   "goals": {},
+   "strong": 0,
+   "goal_count": 0,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "solve the captcha on the login page",
+   "intake_ms": 2.9,
+   "verdict_ok": true,
+   "domain": "unknown",
+   "domain_ok": true,
+   "apps_found": [],
+   "apps_ok": true,
+   "plan_ms": 1.38,
+   "goals_ok": true,
+   "goals": {},
+   "strong": 0,
+   "goal_count": 0,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "my password is hunter2 open notepad and type hi",
+   "intake_ms": 3.9,
+   "verdict_ok": true,
+   "domain": "desktop",
+   "domain_ok": true,
+   "apps_found": [
+    "notepad"
+   ],
+   "apps_ok": true,
+   "plan_ms": 1.64,
+   "goals_ok": true,
+   "goals": {
+    "notepad": [
+     "type \"hi\""
+    ]
+   },
+   "strong": 1,
+   "goal_count": 1,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "open obs studio",
+   "intake_ms": 5.3,
+   "verdict_ok": true,
+   "domain": "desktop",
+   "domain_ok": true,
+   "apps_found": [
+    "obs studio"
+   ],
+   "apps_ok": true,
+   "plan_ms": 2.43,
+   "goals_ok": true,
+   "goals": {
+    "obs studio": []
+   },
+   "strong": 0,
+   "goal_count": 0,
+   "irreversible_queued": false,
+   "gate_ok": true
+  },
+  {
+   "task": "send the report to my boss",
+   "intake_ms": 4.1,
+   "verdict_ok": true,
+   "domain": "unknown",
+   "domain_ok": true,
+   "apps_found": [],
+   "apps_ok": true,
+   "plan_ms": 1.32,
+   "goals_ok": true,
+   "goals": {},
+   "strong": 0,
+   "goal_count": 0,
+   "irreversible_queued": false,
+   "gate_ok": true
+  }
+ ]
+}

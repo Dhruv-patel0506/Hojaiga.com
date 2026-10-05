@@ -1,0 +1,12 @@
+Vision benchmark - OmniParser vs Qwen2.5-VL-7B (same Paint screens, UIA ground truth)
+
+[main-window] GT controls=127
+  OmniParser :   0 dets        0 ms  localized   0.0%  labelled   0.0%
+  Qwen2.5-VL :   0 dets    60061 ms  localized   0.0%  labelled   0.0% TimeoutError: timed out
+[file-menu-open] GT controls=139
+  OmniParser :   0 dets        0 ms  localized   0.0%  labelled   0.0%
+  Qwen2.5-VL :   0 dets    60044 ms  localized   0.0%  labelled   0.0% TimeoutError: timed out
+
+MEAN  OmniParser: localized 0.0% labelled 0.0% 0 ms
+MEAN  Qwen2.5-VL: localized 0.0% labelled 0.0% 60052 ms
+VERDICT: OmniParser stays primary; Qwen-VL stays behind HOJAIGA_QWEN_VL=1
