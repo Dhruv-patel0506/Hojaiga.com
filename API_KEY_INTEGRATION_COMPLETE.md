@@ -15,7 +15,7 @@ Your API keys have been successfully integrated into Hojaiga with **SHA-256 hash
 ## Keys Integrated
 
 ### ✅ Discord API Key
-- **Key:** `d5f83a3fc8c7e8544413018207f685157615d18af84ac06da9976271c49978a0`
+- **Key:** `REDACTED_DISCORD__LOAD_FROM_ENV`
 - **Length:** 64 characters
 - **Status:** ✅ Integrated securely
 - **Cost:** FREE (50 requests/second)
@@ -27,7 +27,7 @@ Your API keys have been successfully integrated into Hojaiga with **SHA-256 hash
 - **Cost:** FREE (5000 requests/hour)
 
 ### ✅ Telegram API Key
-- **Key:** `8716987781:AAHAfIgCrlehFtn3UItUqhcVIt2PETzHJ0M`
+- **Key:** `REDACTED_TELEGRAM__LOAD_FROM_ENV`
 - **Length:** 46 characters
 - **Status:** ✅ Integrated securely
 - **Cost:** FREE (very generous rate limits)

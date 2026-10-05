@@ -4,6 +4,7 @@ Test API Key Integration
 Tests the secure storage and API key manager with the provided keys.
 """
 
+import os
 import sys
 
 if r"D:\new_automation\All codes" not in sys.path:
@@ -52,7 +53,7 @@ def test_api_key_integration():
     
     # Re-add the key
     print("\nRe-adding Discord key...")
-    manager.set_user_key("discord", "d5f83a3fc8c7e8544413018207f685157615d18af84ac06da9976271c49978a0", provided_by="admin")
+    manager.set_user_key("discord", os.environ.get("DISCORD_TOKEN", ""), provided_by="admin")
     info = manager.get_key_info("discord")
     print(f"  Discord key re-added: {info.get('has_secure_key', False)}")
     

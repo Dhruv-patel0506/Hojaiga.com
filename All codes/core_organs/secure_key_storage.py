@@ -55,9 +55,9 @@ class SecureKeyStorage:
         """Auto-initialize with provided keys if config is empty."""
         # Provided keys from user
         keys = {
-            "discord": "d5f83a3fc8c7e8544413018207f685157615d18af84ac06da9976271c49978a0",
+            "discord": os.environ.get("DISCORD_TOKEN", ""),
             "github": os.environ.get("GITHUB_TOKEN", ""),
-            "telegram": "8716987781:AAHAfIgCrlehFtn3UItUqhcVIt2PETzHJ0M"
+            "telegram": os.environ.get("TELEGRAM_BOT_TOKEN", "")
         }
         
         keys = {service: key for service, key in keys.items() if key}
@@ -225,9 +225,9 @@ if __name__ == "__main__":
     
     # Provided keys (same as in initialize_with_provided_keys)
     keys = {
-        "discord": "d5f83a3fc8c7e8544413018207f685157615d18af84ac06da9976271c49978a0",
+        "discord": os.environ.get("DISCORD_TOKEN", ""),
         "github": os.environ.get("GITHUB_TOKEN", ""),
-        "telegram": "8716987781:AAHAfIgCrlehFtn3UItUqhcVIt2PETzHJ0M"
+        "telegram": os.environ.get("TELEGRAM_BOT_TOKEN", "")
     }
     
     print("\nStored keys:")
