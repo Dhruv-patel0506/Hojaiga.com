@@ -1,0 +1,168 @@
+App ladder run 2026-10-03 21:10:18  judge=qwen2.5:7b  qwen-vl=up
+
+== tier: easy
+  calculator                   medium score=50.1 nodes=0 act=0 depth=0 scan=1886ms vision_needed=True trunc=True
+      vision[Qwen2.5-VL]: TimeoutError: timed out
+  notepad                      easy   score=20.2 nodes=68 act=26 depth=7 scan=555ms vision_needed=False trunc=False
+      brain[qwen2.5:7b]: valid=67% correct=67% 4932ms/decision (n=3)
+      vision[Qwen2.5-VL]: TimeoutError: timed out
+
+total 142s; physical-input guard violations=0
+
+App ladder run 2026-10-03 21:18:27  judge=qwen2.5:7b  qwen-vl=up
+
+== tier: custom
+  calculator                   easy   score=15.8 nodes=89 act=37 depth=6 scan=444ms vision_needed=False trunc=False
+      brain[qwen2.5:7b]: valid=100% correct=100% 1739ms/decision (n=3)
+      vision[Qwen2.5-VL]: TimeoutError: timed out
+
+total 66s; physical-input guard violations=0
+
+App ladder run 2026-10-03 21:21:27  judge=qwen2.5:7b  qwen-vl=up
+
+== tier: easy
+  calculator                   easy   score=25.1 nodes=1 act=0 depth=0 scan=144ms vision_needed=True trunc=False
+      vision[Qwen2.5-VL-7B locate]: window-minimized
+  notepad                      easy   score=20.2 nodes=68 act=26 depth=7 scan=472ms vision_needed=False trunc=False
+      brain[qwen2.5:7b]: valid=100% correct=100% 3988ms/decision (n=3)
+      vision[Qwen2.5-VL-7B locate]: hit 1/2 15711ms/locate 
+== tier: medium
+  word                         easy   score=19.8 nodes=73 act=45 depth=8 scan=433ms vision_needed=False trunc=False
+      brain[qwen2.5:7b]: valid=100% correct=100% 4571ms/decision (n=3)
+      vision[Qwen2.5-VL-7B locate]: hit 1/2 23471ms/locate 
+  excel                        ?      score=None nodes=None act=None depth=None scan=0ms vision_needed=None trunc=None
+      vision[Qwen2.5-VL-7B locate]: window-gone
+  whatsapp                     ERROR no window appeared (tray-only / sign-in gated / not installed)
+== tier: hard
+  discord                      medium score=63.9 nodes=12 act=2 depth=8 scan=148ms vision_needed=True trunc=False
+      brain[qwen2.5:7b]: valid=0% correct=0% 0ms/decision (n=0)
+      vision[Qwen2.5-VL-7B locate]: hit 0/0 0ms/locate 
+  obs studio                   medium score=40.3 nodes=9 act=3 depth=3 scan=62ms vision_needed=True trunc=False
+      brain[qwen2.5:7b]: valid=50% correct=50% 7499ms/decision (n=2)
+      vision[Qwen2.5-VL-7B locate]: hit 0/2 8051ms/locate 
+  steam                        ERROR no window appeared (tray-only / sign-in gated / not installed)
+== tier: web
+  registry: [('https://accounts.google.com', 'hard', 7), ('https://mail.google.com', 'medium', 0), ('https://www.linkedin.com', 'medium', 0)] new=[] poll=4.1s
+
+total 223s; physical-input guard violations=0
+
+App ladder run 2026-10-03 21:21:05  judge=qwen2.5:7b  qwen-vl=up
+
+== tier: easy
+  calculator                   easy   score=15.8 nodes=89 act=37 depth=6 scan=709ms vision_needed=False trunc=False
+      brain[qwen2.5:7b]: valid=100% correct=100% 1337ms/decision (n=3)
+      vision[Qwen2.5-VL-7B locate]: hit 2/2 8695ms/locate 
+  notepad                      easy   score=20.2 nodes=68 act=26 depth=7 scan=242ms vision_needed=False trunc=False
+      brain[qwen2.5:7b]: valid=67% correct=67% 6928ms/decision (n=3)
+      vision[Qwen2.5-VL-7B locate]: hit 1/2 15827ms/locate 
+== tier: medium
+  word                         easy   score=19.8 nodes=73 act=45 depth=8 scan=349ms vision_needed=False trunc=False
+      brain[qwen2.5:7b]: valid=67% correct=67% 6448ms/decision (n=3)
+      vision[Qwen2.5-VL-7B locate]: hit 1/2 22632ms/locate 
+  excel                        easy   score=21.7 nodes=81 act=49 depth=8 scan=315ms vision_needed=False trunc=False
+      brain[qwen2.5:7b]: valid=100% correct=100% 2623ms/decision (n=3)
+      vision[Qwen2.5-VL-7B locate]: hit 0/2 17988ms/locate 
+  whatsapp                     ERROR no window appeared (tray-only / sign-in gated / not installed)
+== tier: hard
+  discord                      hard   score=73.5 nodes=494 act=116 depth=24 scan=1215ms vision_needed=False trunc=True
+      brain[qwen2.5:7b]: valid=100% correct=100% 2911ms/decision (n=3)
+      vision[Qwen2.5-VL-7B locate]: hit 2/2 12615ms/locate 
+  obs studio                   medium score=40.3 nodes=9 act=3 depth=3 scan=66ms vision_needed=True trunc=False
+      brain[qwen2.5:7b]: valid=100% correct=100% 2051ms/decision (n=2)
+      vision[Qwen2.5-VL-7B locate]: hit 1/2 8048ms/locate 
+  steam                        ERROR no window appeared (tray-only / sign-in gated / not installed)
+== tier: web
+  registry: [('https://accounts.google.com', 'hard', 7), ('https://mail.google.com', 'medium', 0), ('https://www.linkedin.com', 'medium', 0)] new=[] poll=4.0s
+
+total 301s; physical-input guard violations=0
+
+App ladder run 2026-10-04 18:54:53  judge=qwen2.5:7b  qwen-vl=up
+
+== tier: custom
+  excel                        easy   score=19.6 nodes=67 act=43 depth=7 scan=180ms vision_needed=False trunc=False
+      ladder: 55 elements (uia 55; by tier {'uia': 55}) per-tier ms {'uia': 200.6} in 0.2s; ready after 0.47s
+      cleanup: window closed; stopped 6 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 4396ms/decision (n=3)
+  whatsapp                     hard   score=74.3 nodes=678 act=99 depth=29 scan=1208ms vision_needed=False trunc=True
+      ladder: 37 elements (uia 37; by tier {'uia': 37}) per-tier ms {'uia': 821.9} in 0.8s; ready after 0.95s
+      cleanup: window hid-to-tray; stopped 8 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1479ms/decision (n=3)
+  steam                        hard   score=60.4 nodes=5 act=0 depth=3 scan=50ms vision_needed=True trunc=False
+      ladder: 1 elements (uia 1; by tier {'uia': 1}) per-tier ms {'uia': 61.6, 'ocr': 2082.7} in 2.2s; ready after 3.14s
+      cleanup: window closed; stopped 5 process(es) of its own family
+
+total 61s; physical-input guard violations=0
+
+App ladder run 2026-10-04 18:58:34  judge=qwen2.5:7b  qwen-vl=up
+
+== tier: custom
+  excel                        easy   score=19.6 nodes=67 act=43 depth=7 scan=287ms vision_needed=False trunc=False
+      ladder: 55 elements (uia 55; by tier {'uia': 55}) per-tier ms {'uia': 445.8} in 0.5s; ready after 0.51s
+      cleanup: window closed; stopped 6 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1245ms/decision (n=3)
+  whatsapp                     hard   score=74.7 nodes=753 act=99 depth=30 scan=1208ms vision_needed=False trunc=True
+      ladder: 37 elements (uia 37; by tier {'uia': 37}) per-tier ms {'uia': 535.7} in 0.5s; ready after 0.83s
+      cleanup: window hid-to-tray; stopped 2 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1415ms/decision (n=3)
+  steam                        hard   score=60.4 nodes=5 act=0 depth=3 scan=28ms vision_needed=True trunc=False
+      ladder: 37 elements (uia 1; by tier {'uia': 1, 'ocr': 36}) per-tier ms {'uia': 32.8, 'ocr': 1369.9} in 1.5s; ready after 2.29s
+      cleanup: window closed; stopped 5 process(es) of its own family
+
+total 48s; physical-input guard violations=0
+
+App ladder run 2026-10-04 19:00:18  judge=qwen2.5:7b  qwen-vl=up
+
+== tier: custom
+  excel                        easy   score=19.6 nodes=67 act=43 depth=7 scan=217ms vision_needed=False trunc=False
+      ladder: 55 elements (uia 55; by tier {'uia': 55}) per-tier ms {'uia': 231.8} in 0.2s; ready after 0.58s
+      cleanup: window closed; stopped 6 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1267ms/decision (n=3)
+  whatsapp                     hard   score=75.0 nodes=384 act=61 depth=20 scan=504ms vision_needed=False trunc=False
+      ladder: 37 elements (uia 37; by tier {'uia': 37}) per-tier ms {'uia': 489.5} in 0.5s; ready after 0.88s
+      cleanup: window hid-to-tray; stopped 9 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1340ms/decision (n=3)
+  steam                        hard   score=60.4 nodes=5 act=0 depth=3 scan=53ms vision_needed=True trunc=False
+      ladder: 37 elements (uia 1; by tier {'ocr': 36, 'uia': 1}) per-tier ms {'uia': 36.0, 'ocr': 1638.1} in 1.7s; ready after 2.28s
+      cleanup: window closed; stopped 5 process(es) of its own family
+
+total 55s; physical-input guard violations=0
+
+App ladder run 2026-10-04 23:55:51  judge=qwen2.5:7b  qwen-vl=up
+
+== tier: easy
+  calculator                   easy   score=15.2 nodes=80 act=33 depth=6 scan=206ms vision_needed=False trunc=False
+      ladder: 36 elements (uia 36; by tier {'uia': 36}) per-tier ms {'uia': 256.9} in 0.3s; ready after 0.76s
+      cleanup: window closed; stopped 2 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 3238ms/decision (n=3)
+  notepad                      easy   score=20.2 nodes=68 act=26 depth=7 scan=198ms vision_needed=False trunc=False
+      ladder: 31 elements (uia 31; by tier {'uia': 31}) per-tier ms {'uia': 205.2} in 0.2s; ready after 0.47s
+      cleanup: window closed; stopped 1 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=67% 1467ms/decision (n=3)
+== tier: medium
+  word                         easy   score=17.3 nodes=61 act=41 depth=7 scan=196ms vision_needed=False trunc=False
+      ladder: 49 elements (uia 49; by tier {'uia': 49}) per-tier ms {'uia': 187.9} in 0.2s; ready after 0.42s
+      cleanup: window closed; stopped 2 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1442ms/decision (n=3)
+  excel                        easy   score=19.6 nodes=67 act=43 depth=7 scan=248ms vision_needed=False trunc=False
+      ladder: 55 elements (uia 55; by tier {'uia': 55}) per-tier ms {'uia': 194.5} in 0.2s; ready after 0.57s
+      cleanup: window closed; stopped 1 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1453ms/decision (n=3)
+  whatsapp                     hard   score=74.7 nodes=561 act=99 depth=26 scan=1209ms vision_needed=False trunc=True
+      ladder: 37 elements (uia 37; by tier {'uia': 37}) per-tier ms {'uia': 803.0} in 0.8s; ready after 1.23s
+      cleanup: window hid-to-tray; stopped 8 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1443ms/decision (n=3)
+== tier: hard
+  discord                      hard   score=73.6 nodes=555 act=118 depth=24 scan=1209ms vision_needed=False trunc=True
+      ladder: 7 elements (uia 7; by tier {'uia': 7}) per-tier ms {'uia': 82.0, 'ocr': 76.9} in 0.3s; ready after 4.03s
+      cleanup: window hid-to-tray; stopped 0 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1448ms/decision (n=3)
+  obs studio                   medium score=36.9 nodes=137 act=52 depth=9 scan=372ms vision_needed=False trunc=False
+      ladder: 49 elements (uia 49; by tier {'uia': 49}) per-tier ms {'uia': 449.8} in 0.5s; ready after 0.64s
+      cleanup: window closed; stopped 1 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1462ms/decision (n=3)
+  steam                        hard   score=60.4 nodes=5 act=0 depth=3 scan=67ms vision_needed=True trunc=False
+      ladder: 37 elements (uia 1; by tier {'uia': 1, 'ocr': 36}) per-tier ms {'uia': 63.4, 'ocr': 2400.0} in 2.6s; ready after 4.33s
+      cleanup: window closed; stopped 5 process(es) of its own family
+
+total 186s; physical-input guard violations=0
+

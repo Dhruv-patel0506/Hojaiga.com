@@ -1,3 +1,8 @@
+---
+name: hojaiga-performance
+description: Performance budget and caching discipline - DB-backed pathway cache, capped LLM calls, cheapest-signal-first ordering, latency regression guards, and the popup hardening case study that cut 29.5s to 0.12s.
+---
+
 # Skill 10 — Performance Budget & Caching Discipline
 
 The autonomy loop is only usable if each step is fast. The cost model is the ladder:

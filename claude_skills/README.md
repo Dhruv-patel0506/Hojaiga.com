@@ -1,3 +1,8 @@
+---
+name: hojaiga-skill-set-index
+description: Index of the Hojaiga Claude skill set - the 14 fragmented skill files, what each covers, and the recommended load order starting from the 8 laws in CLAUDE.md.
+---
+
 # Hojaiga Automation — Claude Skill Set (Index)
 
 > Drop this folder into your context (or reference it from CLAUDE.md). Each file is a

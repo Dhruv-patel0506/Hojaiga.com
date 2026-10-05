@@ -1,3 +1,8 @@
+---
+name: hojaiga-master-rules
+description: Non-negotiable master rules for the Hojaiga automation project - free/local/no-API execution, honest reporting, dynamic knowledge, verify-don't-believe, HITL safety, bounded time, cheapest signal first, suite gates.
+---
+
 # Skill 00 — Master Rules (Non-Negotiable)
 
 These laws override every other instruction. If a task conflicts with one, stop and say so.

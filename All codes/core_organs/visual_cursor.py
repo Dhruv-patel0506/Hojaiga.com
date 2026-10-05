@@ -87,6 +87,9 @@ if _HAS_CTYPES:
     def _ensure_interactive_desktop():
         """Ensures calling thread is attached to the active interactive input desktop."""
         try:
+            from core_organs import headless_input as _hin
+            if _hin.on_input_desktop():
+                return  # already on the interactive desktop: do not touch window station/desktop
             user32 = ctypes.windll.user32
             hwinsta = user32.OpenWindowStationW("WinSta0", False, 0x0002 | 0x0100 | 0x0200)
             if hwinsta:
@@ -138,6 +141,20 @@ if _HAS_CTYPES:
         ctypes.windll.user32.SetCursorPos.restype = wintypes.BOOL
         ctypes.windll.user32.GetCursorPos.argtypes = [ctypes.c_void_p]
         ctypes.windll.user32.GetCursorPos.restype = wintypes.BOOL
+
+        # 64-bit handle prototypes for the remaining GDI calls used by _render_frame.
+        # Without these ctypes treats handles as C int and raises OverflowError, so the
+        # overlay silently never painted a single frame.
+        ctypes.windll.gdi32.CreateDIBSection.argtypes = [
+            wintypes.HDC, ctypes.c_void_p, ctypes.c_uint, ctypes.c_void_p,
+            wintypes.HANDLE, wintypes.DWORD]
+        ctypes.windll.gdi32.CreateDIBSection.restype = wintypes.HANDLE
+        ctypes.windll.gdi32.CreateSolidBrush.argtypes = [wintypes.COLORREF]
+        ctypes.windll.gdi32.CreateSolidBrush.restype = wintypes.HANDLE
+        ctypes.windll.gdi32.CreatePen.argtypes = [ctypes.c_int, ctypes.c_int, wintypes.COLORREF]
+        ctypes.windll.gdi32.CreatePen.restype = wintypes.HANDLE
+        ctypes.windll.user32.CreateWindowExW.restype = wintypes.HWND
+        ctypes.windll.user32.DestroyWindow.argtypes = [wintypes.HWND]
 
         ctypes.windll.user32.UpdateLayeredWindow.argtypes = [
             wintypes.HWND, wintypes.HDC,
@@ -193,6 +210,15 @@ class CursorShape:
         self._rotation_angle = 0.0  # Rotation angle in degrees
         self._is_buffering = False  # Buffering state
         self._rotation_speed = 180.0  # Degrees per second when buffering
+        self._name = "pointer"      # logical mode label ('pointer' / 'pencil'); the sprite itself stays the blue arrow
+
+    # VisualCursor.set_shape and the drag/draw routines call these. They did not exist, so every drag and every
+    # draw_shape raised AttributeError before it delivered a single point (another reason drawing was dead).
+    def set_shape(self, name: str, animate: bool = True) -> None:
+        self._name = str(name or "pointer")
+
+    def get_shape(self) -> str:
+        return self._name
 
     def set_buffering(self, buffering: bool):
         """Set buffering state - enables rotation animation."""
@@ -652,13 +678,15 @@ class VisualCursor:
             pt_src = wintypes.POINT(0, 0)
             # AC_SRC_OVER=0, Flags=0, SourceConstantAlpha=255, AlphaFormat=AC_SRC_ALPHA=1
             blend = _BLENDFUNCTION(0, 0, 255, 1)
-            ctypes.windll.user32.UpdateLayeredWindow(
+            _ulw_ok = ctypes.windll.user32.UpdateLayeredWindow(
                 self._hwnd, hdc_screen, None,
                 ctypes.byref(sz),
                 hdc_mem,
                 ctypes.byref(pt_src),
                 0, ctypes.byref(blend), 0x00000002  # ULW_ALPHA
             )
+            if not _ulw_ok:
+                logger.debug("[VisualCursor] UpdateLayeredWindow failed err=%d", ctypes.GetLastError())
         except Exception as e:
             logger.debug(f"[VisualCursor] _render_frame error: {e}")
         finally:
@@ -1038,23 +1066,25 @@ class VisualCursor:
             self._y = y
 
     def click_at(self, x: float, y: float, color: int = 0x00FF8800, hwnd: Optional[int] = None):
-        """Fly to (x, y), trigger expanding ripple, and click.
-        Uses SendInput to simulate hardware click if needed."""
+        """Fly to (x, y), trigger the expanding ripple, and click the window under that point with POSTED window
+        messages (headless_input.post_click). The physical pointer is never moved; if no target window can be
+        resolved the click is refused and recorded in ``self.last_click``."""
         self.show()
         self._active_state = "CLICKING"
         self.fly_to(x, y, label="Click", duration=0.35)
 
         def _on_click_finish():
             self._click_animations.append((x, y, time.time(), color))
-            if _HAS_WIN32 and _HAS_CTYPES:
-                orig_pos = self._get_physical_cursor()
-                self._send_input_mouse(x, y, 0x0001)  # MOVE
-                time.sleep(0.01)
-                self._send_input_mouse(x, y, 0x0002)  # DOWN
-                time.sleep(0.04)
-                self._send_input_mouse(x, y, 0x0004)  # UP
-                # Restore physical mouse position
-                self._send_input_mouse(orig_pos[0], orig_pos[1], 0x0001)
+            try:
+                from core_organs import headless_input as hin
+                target = self._stroke_target(hwnd, x, y)
+                if target:
+                    ok, note = hin.post_click(target, int(x), int(y))
+                else:
+                    ok, note = False, "UNDELIVERABLE: no target window resolved (refused; no physical-input fallback)"
+                self.last_click = {"delivered": ok, "note": note}
+            except Exception as exc:
+                self.last_click = {"delivered": False, "note": f"click failed: {exc}"}
             time.sleep(0.2)
             self._active_state = "ACTIVE"
 
@@ -1081,34 +1111,10 @@ class VisualCursor:
         self._target_y = y
 
     def _send_input_mouse(self, x: float, y: float, flags: int):
-        """Helper to inject hardware-level mouse events via SendInput and mouse_event."""
-        if not _HAS_CTYPES:
-            return
-        
-        screen_w = ctypes.windll.user32.GetSystemMetrics(0)
-        screen_h = ctypes.windll.user32.GetSystemMetrics(1)
-        sx = int(x * 65535 / screen_w)
-        sy = int(y * 65535 / screen_h)
-        
-        # 1. Direct hardware injection via mouse_event (Guaranteed stroke delivery)
-        try:
-            ctypes.windll.user32.mouse_event(flags | 0x8000, sx, sy, 0, 0)
-        except Exception:
-            pass
-
-        # 2. Modern SendInput injection
-        try:
-            inp = INPUT()
-            inp.type = 0  # INPUT_MOUSE
-            inp._input.mi.dx = sx
-            inp._input.mi.dy = sy
-            inp._input.mi.dwFlags = flags | 0x8000  # MOUSEEVENTF_ABSOLUTE
-            inp._input.mi.mouseData = 0
-            inp._input.mi.time = 0
-            inp._input.mi.dwExtraInfo = ctypes.pointer(ctypes.c_ulong(0))
-            ctypes.windll.user32.SendInput(1, ctypes.byref(inp), ctypes.sizeof(INPUT))
-        except Exception:
-            pass
+        """REMOVED. This used to inject hardware mouse events (mouse_event + SendInput), which the product forbids:
+        input goes through headless_input only (post_click / post_drag). Kept as a no-op so an old caller cannot
+        reach the physical pointer; it logs instead."""
+        logger.warning("[VisualCursor] _send_input_mouse is retired (headless_input only); ignored")
 
     def _get_physical_cursor(self) -> Tuple[int, int]:
         if not _HAS_CTYPES:
@@ -1131,42 +1137,61 @@ class VisualCursor:
         self._attached = False
         self._last_action_ts = time.time()
 
+    def _stroke_target(self, hwnd: Optional[int], x: float, y: float) -> int:
+        """Window that receives a stroke: the caller's hwnd, else the top-level window under the point (a
+        read-only lookup that skips this overlay). 0 = unresolvable -> the stroke is REFUSED, never sent to the
+        physical pointer."""
+        if hwnd:
+            return int(hwnd)
+        if not (_HAS_WIN32 and _HAS_CTYPES):
+            return 0
+        try:
+            h = win32gui.WindowFromPoint((int(x), int(y)))
+            if h == self._hwnd:
+                h = win32gui.GetWindow(h, win32con.GW_HWNDNEXT)
+            return int(ctypes.windll.user32.GetAncestor(h, 2) or h) if h else 0
+        except Exception:
+            return 0
+
+    def _post_stroke(self, target_h: int, pts: List[Tuple[int, int]], duration_s: float) -> Dict[str, Any]:
+        """Deliver ONE stroke as posted window messages (headless_input.post_drag) while the visible sprite follows
+        the same points, then report whether pixels actually changed. Never touches the physical pointer."""
+        from core_organs import headless_input as hin
+
+        def _follow(x: int, y: int):
+            self.set_position(float(x), float(y))
+            self._trail_points.append((float(x), float(y), time.time()))
+        if not target_h:
+            return {"delivered": False, "effective": None, "changed_pixels": -1,
+                    "note": "UNDELIVERABLE: no target window resolved for the stroke (refused; no physical-input fallback)"}
+        before, _w = hin.capture_window(target_h)
+        ok, note = hin.post_drag(target_h, pts[0][0], pts[0][1], pts[-1][0], pts[-1][1],
+                                 path=pts if len(pts) > 2 else None, duration_s=duration_s, on_point=_follow)
+        time.sleep(0.3)
+        after, _w2 = hin.capture_window(target_h)
+        n, bbox = hin.changed_pixels(before, after)
+        effective = None if n < 0 else (n > 0)
+        if ok and effective is False:
+            note = "delivered but INEFFECTIVE: the window did not react to posted mouse input (no pixel changed)"
+        return {"delivered": ok, "effective": effective, "changed_pixels": n, "bbox": bbox, "note": note}
+
     def drag_to(self, start_x: float, start_y: float, end_x: float, end_y: float,
                 steps: int = 30, label: str = "Drag", physical: bool = False, hwnd: Optional[int] = None):
-        """100% Decoupled Virtual Drag from (start_x, start_y) to (end_x, end_y) with real-time glowing trail.
-        Zero hardware mouse theft: operates via virtual cursor overlay and background client window messages."""
+        """Virtual drag from (start_x, start_y) to (end_x, end_y) with a real-time glowing trail. The stroke is
+        delivered as POSTED window messages to the target window (headless_input.post_drag): the physical mouse is
+        never used (the `physical` flag is accepted for old callers and ignored). The outcome - delivered AND
+        effective (pixels changed) - is left in ``self.last_stroke``."""
         self.show()
         self._active_state = "DRAWING"
         if hasattr(self, "shape"):
             self.shape.set_shape("pencil")
         self.fly_to(start_x, start_y, label=label, duration=0.25)
         time.sleep(0.28)
-
-        orig_pos = self._get_physical_cursor()
         try:
-            # Dispatch background mouse down
-            if _HAS_WIN32 and _HAS_CTYPES:
-                self._send_input_mouse(start_x, start_y, 0x0001)  # MOVE
-                time.sleep(0.01)
-                self._send_input_mouse(start_x, start_y, 0x0002)  # DOWN
-            time.sleep(0.02)
-
-            for i in range(1, steps + 1):
-                cur_x = start_x + (end_x - start_x) * (i / float(steps))
-                cur_y = start_y + (end_y - start_y) * (i / float(steps))
-                self.set_position(cur_x, cur_y)
-                self._trail_points.append((cur_x, cur_y, time.time()))
-                if _HAS_WIN32 and _HAS_CTYPES:
-                    self._send_input_mouse(cur_x, cur_y, 0x0001)  # MOVE
-                time.sleep(0.015)
-
-            time.sleep(0.02)
-            if _HAS_WIN32 and _HAS_CTYPES:
-                self._send_input_mouse(end_x, end_y, 0x0004)  # UP
-            time.sleep(0.03)
+            target_h = self._stroke_target(hwnd, start_x, start_y)
+            self.last_stroke = self._post_stroke(target_h, [(int(start_x), int(start_y)), (int(end_x), int(end_y))],
+                                                 max(0.2, steps * 0.015))
         finally:
-            if _HAS_WIN32 and _HAS_CTYPES:
-                self._send_input_mouse(orig_pos[0], orig_pos[1], 0x0001)  # MOVE
             self._active_state = "ACTIVE"
             if hasattr(self, "shape"):
                 self.shape.set_shape("pointer")
@@ -1600,14 +1625,15 @@ Example 2: {{"pollinations_prompt": "a highly detailed futuristic spaceship, whi
     def draw_shape(self, shape: Any, cx: float, cy: float, width: float = 150.0, height: float = 150.0,
                    steps: int = 50, label: str = "Drawing...", physical: bool = False, hwnd: Optional[int] = None):
         """Draws ANY parametric shape, multi-stroke figure (e.g. human IRL with background, house),
-        or vectorized image coordinates.
-        100% Decoupled Virtual Drawing: Zero hardware mouse theft.
-        Animates luminous cyber stylus and renders visible strokes on screen."""
+        or vectorized image coordinates, as POSTED window messages to the target window (headless_input.post_drag
+        over a sampled point list): the physical mouse is never touched (`physical` is ignored). The visible
+        sprite follows every point. ``self.last_stroke`` reports delivered / effective (pixels changed) honestly."""
         self.show()
         self._active_state = "DRAWING"
         old_shape = self.shape.get_shape() if hasattr(self, "shape") else "pointer"
         if hasattr(self, "shape"):
             self.shape.set_shape("pencil")
+        self.last_stroke = {"delivered": False, "effective": None, "changed_pixels": -1, "note": "nothing drawn"}
 
         strokes = self._resolve_drawing_strokes(shape, cx, cy, width, height, steps)
         if not strokes:
@@ -1615,63 +1641,46 @@ Example 2: {{"pollinations_prompt": "a highly detailed futuristic spaceship, whi
             if hasattr(self, "shape"): self.shape.set_shape(old_shape)
             return
 
-        target_h = hwnd or 0
-        if not target_h and _HAS_WIN32:
-            try:
-                h = win32gui.WindowFromPoint((int(cx), int(cy)))
-                if h == self._hwnd:
-                    h = win32gui.GetWindow(h, win32con.GW_HWNDNEXT)
-                target_h = h
-            except Exception:
-                target_h = 0
-
+        target_h = self._stroke_target(hwnd, cx, cy)
+        from core_organs import headless_input as hin
         total_strokes = len(strokes)
-        orig_pos = self._get_physical_cursor()
+        before_all, _why = hin.capture_window(target_h) if target_h else (None, "no-target")
+        delivered, notes = True, []
         try:
             for s_idx, stroke in enumerate(strokes):
                 if not stroke:
                     continue
                 sx, sy = stroke[0]
-                # Pen Up Flight to stroke origin
+                # Pen-up flight of the visible sprite to the stroke origin
                 flight_label = f"Draw {shape} ({s_idx + 1}/{total_strokes})" if total_strokes > 1 else f"Draw {shape}"
                 self.fly_to(sx, sy, label=flight_label, duration=0.20)
                 time.sleep(0.22)
+                pts = [(int(round(p[0])), int(round(p[1]))) for p in stroke]
+                if not target_h:
+                    delivered = False
+                    notes.append("UNDELIVERABLE: no target window resolved (refused; no physical-input fallback)")
+                    break
+                ok, note = hin.post_drag(target_h, pts[0][0], pts[0][1], pts[-1][0], pts[-1][1],
+                                         path=pts if len(pts) > 2 else None,
+                                         duration_s=max(0.15, len(pts) * 0.012),
+                                         on_point=lambda x, y: (self.set_position(float(x), float(y)),
+                                                                self._trail_points.append((float(x), float(y), time.time()))))
+                delivered = delivered and ok
+                notes.append(note)
 
-                # Pen Down (Hardware injection)
-                if _HAS_WIN32 and _HAS_CTYPES:
-                    self._send_input_mouse(sx, sy, 0x0001)  # MOVE
-                    time.sleep(0.01)
-                    self._send_input_mouse(sx, sy, 0x0002)  # DOWN
-                time.sleep(0.015)
-
-                # Trace stroke points
-                for pt in stroke[1:]:
-                    self.set_position(pt[0], pt[1])
-                    self._trail_points.append((pt[0], pt[1], time.time()))
-                    if _HAS_WIN32 and _HAS_CTYPES:
-                        self._send_input_mouse(pt[0], pt[1], 0x0001)  # MOVE
-                    time.sleep(0.012)
-
-                # Pen Up
-                if _HAS_WIN32 and _HAS_CTYPES:
-                    self._send_input_mouse(stroke[-1][0], stroke[-1][1], 0x0004)  # UP
-                time.sleep(0.02)
-
-                # Render stroke visibly on screen canvas
-                try:
-                    from core_organs.intelligent_mouse import IntelligentMouse
-                    im = IntelligentMouse()
-                    if hasattr(im, "drawing") and im.drawing:
-                        im.drawing.show()
-                        int_pts = [(int(p[0]), int(p[1])) for p in stroke]
-                        im.drawing.draw_path(int_pts, color=0x00FF88, width=3, duration=0)
-                except Exception:
-                    pass
-
+                # (No second overlay: IntelligentMouse's "Hojaiga Drawing" is a full-screen window created on whatever
+                #  thread draws first and nobody pumps its messages, so any other thread's GetWindowText/EnumWindows sweep
+                #  of this process blocks on it - measured as a hang. The sprite's own glowing trail already shows the stroke.)
+            time.sleep(0.3)
+            after_all, _why2 = hin.capture_window(target_h) if target_h else (None, "no-target")
+            n, bbox = hin.changed_pixels(before_all, after_all)
+            effective = None if n < 0 else (n > 0)
+            summary = notes[0] if notes else "no stroke"
+            if delivered and effective is False:
+                summary = "delivered but INEFFECTIVE: the window did not react to posted mouse input (no pixel changed)"
+            self.last_stroke = {"delivered": delivered, "effective": effective, "changed_pixels": n, "bbox": bbox,
+                                "note": summary, "strokes": total_strokes}
         finally:
-            # Restore physical mouse position
-            if _HAS_WIN32 and _HAS_CTYPES:
-                self._send_input_mouse(orig_pos[0], orig_pos[1], 0x0001)  # MOVE
             self._active_state = "ACTIVE"
             if hasattr(self, "shape"):
                 self.shape.set_shape(old_shape)

@@ -21,6 +21,7 @@ Architecture:
 import asyncio
 import json
 import logging
+import re
 import os
 import sys
 import time
@@ -395,7 +396,23 @@ class OmniParserScanner:
             w, h = img.size
             with open(image_path, "rb") as fh:
                 b64 = _b64.b64encode(fh.read()).decode("ascii")
-            _labeled, parsed_content_list = self._model.parse(b64)
+            try:
+                parsed = self._model.parse(b64)
+            except (TypeError, ValueError) as pe:
+                # Upstream OmniParser has no guard for "nothing detected" (blank / icon-free
+                # window): depending on the stage it raises "'NoneType' object is not
+                # iterable" (OCR empty) or "not enough values to unpack (expected 4, got 0)"
+                # (torchvision box_convert on 0 boxes). Both are a legitimate empty result;
+                # every other error still falls through to the ERROR path below.
+                if re.search(r"NoneType|expected 4, got 0", str(pe)):
+                    logger.info("[OmniParserScanner] PARSE returned 0 elements (no detections)")
+                    return []
+                raise
+            # OmniParser returns None when OCR/detection finds nothing.
+            if not parsed:
+                logger.info("[OmniParserScanner] PARSE returned 0 elements (no detections)")
+                return []
+            _labeled, parsed_content_list = parsed
 
             elements: List[UIElementEnhanced] = []
             for i, item in enumerate(parsed_content_list or []):

@@ -1,0 +1,43 @@
+{
+  "schema": "hojaiga.pack/1",
+  "archetype": "3d_suite",
+  "scope": "archetype",
+  "trust": "archetype",
+  "version_hash": "*",
+  "note": "3D-suite family seed. Every entry is UNVERIFIED. The geometry check reads the viewport statistics overlay (vertex counter) through OCR: a counter that rises proves geometry was added, which is cheaper and more honest than asking a model whether the picture looks like a chair.",
+  "modes": [
+    {"name": "object_mode", "indicator": [{"kind": "ocr_regex", "pattern": "object\\s+mode"}]},
+    {"name": "edit_mode", "indicator": [{"kind": "ocr_regex", "pattern": "edit\\s+mode"}]}
+  ],
+  "commands": [
+    {"name": "toggle edit mode", "goal": "enter edit mode", "verb": "key", "shortcut": "tab", "risk": "E1",
+     "pre": [{"kind": "mode_is", "mode": "object_mode"}], "post": [{"kind": "mode_is", "mode": "edit_mode"}], "unwind": "tab"},
+    {"name": "toggle object mode", "goal": "enter object mode", "verb": "key", "shortcut": "tab", "risk": "E1",
+     "pre": [{"kind": "mode_is", "mode": "edit_mode"}], "post": [{"kind": "mode_is", "mode": "object_mode"}], "unwind": "tab"}
+  ],
+  "templates": [
+    {
+      "name": "model a simple chair",
+      "aliases": ["build a chair", "make a 3d chair", "model a chair from scratch", "create a chair model"],
+      "seed_note": "UNVERIFIED seed: written from general 3D-modelling convention; never executed (no 3D suite installed on the authoring host). Counter pattern and keystrokes must be confirmed by a real run before this earns trust.",
+      "steps": [
+        {"id": "seat", "goal": "add a cube for the seat and flatten it", "risk": "E1", "unwind": "undo (ctrl+z)",
+         "pre": [{"kind": "mode_is", "mode": "object_mode"}],
+         "do": [{"verb": "key", "keys": "shift+a"}, {"verb": "judge", "goal": "choose Mesh > Cube from the Add menu"},
+                {"verb": "key", "keys": "s"}, {"verb": "judge", "goal": "scale the cube flat on the Z axis"}],
+         "post": [{"kind": "ocr_number_increase", "pattern": "vert\\w*\\s*[:=]?\\s*([\\d,]+)", "min_delta": 8}], "retries": 2},
+        {"id": "legs", "goal": "create four legs under the seat", "risk": "E1", "unwind": "undo (ctrl+z)",
+         "do": [{"verb": "judge", "goal": "add four thin tall boxes under the seat corners"}],
+         "post": [{"kind": "ocr_number_increase", "pattern": "vert\\w*\\s*[:=]?\\s*([\\d,]+)", "min_delta": 32}], "retries": 2},
+        {"id": "back", "goal": "add a backrest behind the seat", "risk": "E1", "unwind": "undo (ctrl+z)",
+         "do": [{"verb": "judge", "goal": "add a thin tall box at the rear edge of the seat"}],
+         "post": [{"kind": "ocr_number_increase", "pattern": "vert\\w*\\s*[:=]?\\s*([\\d,]+)", "min_delta": 8}], "retries": 2},
+        {"id": "join", "goal": "join all parts into one object", "risk": "E1", "unwind": "undo (ctrl+z)",
+         "do": [{"verb": "key", "keys": "a"}, {"verb": "key", "keys": "ctrl+j"}],
+         "post": [{"kind": "ui_changed"}], "retries": 1},
+        {"id": "verify_geometry", "goal": "confirm the scene holds chair-scale geometry", "risk": "E1", "do": [],
+         "post": [{"kind": "ocr_number_min", "pattern": "vert\\w*\\s*[:=]?\\s*([\\d,]+)", "min": 40}], "retries": 0}
+      ]
+    }
+  ]
+}

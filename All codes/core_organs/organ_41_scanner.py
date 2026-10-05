@@ -127,6 +127,7 @@ class ScreenSnapshot:
     active_window: Optional[Dict[str, Any]] = None
     vision_data: Optional[str] = None  # base64 screenshot
     raw_uia_tree: Optional[Dict[str, Any]] = None
+    scan_stats: Dict[str, Any] = field(default_factory=dict)   # nodes, depth_hit_cap, time_budget_hit, sampled/skipped...
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -137,6 +138,7 @@ class ScreenSnapshot:
             "active_window": self.active_window,
             "vision_data": self.vision_data,
             "raw_uia_tree": self.raw_uia_tree,
+            "scan_stats": self.scan_stats,
         }
 
 
@@ -247,7 +249,15 @@ class ScannerOrgan:
         # are still more than enough for VLM context.
         self._vision_max_width = int(os.environ.get("HOJAIGA_SCAN_VISION_WIDTH", "1280"))
         # UIA frame walk knobs
-        self._element_max_depth = int(os.environ.get("HOJAIGA_SCAN_ELEMENT_DEPTH", "8"))
+        # DEPTH is only a secondary safety rail now (default 32, was 8): the time budget below is the primary limit,
+        # the same approach app_scan.py uses. Whether the rail was hit is reported (scan_stats.depth_hit_cap).
+        self._element_max_depth = int(os.environ.get("HOJAIGA_SCAN_ELEMENT_DEPTH", "32"))
+        # A floor of nodes is always walked (a slow first touch must not yield an empty frame); containers with
+        # dozens of same-type children are sampled (first/last few) and counted, not exhaustively expanded.
+        self._min_nodes = int(os.environ.get("HOJAIGA_SCAN_MIN_NODES", "120"))
+        self._hard_extra_s = float(os.environ.get("HOJAIGA_SCAN_HARD_EXTRA_S", "1.5"))
+        self._sample_over = int(os.environ.get("HOJAIGA_SCAN_SAMPLE_OVER", "30"))
+        self.last_walk_stats: Dict[str, Any] = {}
         self._max_nodes = int(os.environ.get("HOJAIGA_SCAN_MAX_NODES", "3000"))
         # Time budget for one frame walk in milliseconds (0 = unlimited). Rich
         # trees cost ~1ms per UIA property read; the budget keeps the
@@ -519,6 +529,7 @@ class ScannerOrgan:
             active_window=active_window,
             vision_data=vision_b64,
             raw_uia_tree=raw_uia_tree,
+            scan_stats=dict(self.last_walk_stats),
         )
 
     # ------------------------------------------------------------------ #
@@ -527,18 +538,26 @@ class ScannerOrgan:
     def _collect_uia_frame(self, root, max_depth: int, max_nodes: int) -> List[Dict[str, Any]]:
         """Walk the UIA tree ONCE and materialise plain dicts for every node.
 
-        Both the flat element list and the nested raw tree are derived from
-        this traversal, halving the cross-process COM chatter that the old
-        two-walk implementation (extract + build) incurred every frame. The
-        walk stops early when the configured time budget is exhausted so the
-        continuous loop stays responsive on very rich trees.
-        """
+        Both the flat element list and the nested raw tree are derived from this traversal, halving the
+        cross-process COM chatter of the old two-walk implementation. TIME is the primary limit (the configured
+        budget, with a floor of ``_min_nodes`` always walked and a hard cap ``_hard_extra_s`` past the budget); depth
+        and node count are secondary rails. Wide containers are sampled. What stopped the walk is recorded in
+        ``self.last_walk_stats`` (and on the snapshot) - truncation is never silent."""
         nodes: List[Dict[str, Any]] = []
         budget_s = self._walk_budget_ms / 1000.0 if self._walk_budget_ms else 0.0
         started = time.time()
+        stats = {"nodes": 0, "max_depth_seen": 0, "depth_hit_cap": False, "time_budget_hit": False,
+                 "node_cap_hit": False, "sampled_containers": 0, "skipped_nodes": 0,
+                 "depth_cap": max_depth, "time_budget_ms": self._walk_budget_ms}
         stack: List[Tuple[Any, int, int]] = [(root, 0, -1)]
-        while stack and len(nodes) < max_nodes:
-            if budget_s and (time.time() - started) > budget_s:
+        while stack:
+            if len(nodes) >= max_nodes:
+                stats["node_cap_hit"] = True
+                break
+            elapsed = time.time() - started
+            if budget_s and ((elapsed > budget_s and len(nodes) >= self._min_nodes)
+                             or elapsed > budget_s + self._hard_extra_s):
+                stats["time_budget_hit"] = True
                 break
             control, depth, parent_idx = stack.pop()
             try:
@@ -564,20 +583,32 @@ class ScannerOrgan:
                 continue
             idx = len(nodes)
             nodes.append(node)
+            if depth > stats["max_depth_seen"]:
+                stats["max_depth_seen"] = depth
             if parent_idx >= 0:
                 nodes[parent_idx]["child_idxs"].append(idx)
             if depth >= max_depth:
+                stats["depth_hit_cap"] = True
                 continue
             try:
                 children = control.GetChildren()
             except Exception:
                 children = []
+            if len(children) > self._sample_over:
+                stats["sampled_containers"] += 1
+                stats["skipped_nodes"] += len(children) - 10
+                children = children[:8] + children[-2:]
             for child in reversed(children):
                 try:
                     if _is_control_visible(child):
                         stack.append((child, depth + 1, idx))
                 except Exception:
                     continue
+        stats["nodes"] = len(nodes)
+        stats["walk_ms"] = int((time.time() - started) * 1000)
+        stats["truncated"] = bool(stats["time_budget_hit"] or stats["depth_hit_cap"] or stats["node_cap_hit"]
+                                  or stats["skipped_nodes"])
+        self.last_walk_stats = stats
         return nodes
 
     def _nodes_to_elements(self, nodes: List[Dict[str, Any]]) -> List[UIElement]:

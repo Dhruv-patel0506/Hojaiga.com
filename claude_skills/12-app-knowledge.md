@@ -1,3 +1,8 @@
+---
+name: hojaiga-app-knowledge
+description: Procedural app knowledge system in organ_47_app_intelligence.py - trust order learned over catalog over archetype over distilled, confidence climb and erosion mechanics, and the direct-control gate reserved for verified shortcuts.
+---
+
 # Skill 12 — Pro App Knowledge (`organ_47_app_intelligence.py`)
 
 Scanning finds **where** the button is. organ_47 decides **what a pro would do**. This is

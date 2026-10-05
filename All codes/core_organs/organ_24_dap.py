@@ -123,6 +123,7 @@ r"""
 
 
 import asyncio
+from core_organs import headless_input as hin  # input guard + headless delivery
 import ctypes
 import dataclasses
 import enum
@@ -565,15 +566,19 @@ class Win32Primitives:
 
     def scroll(self, amount: int, horizontal: bool = False) -> None:
         """Wheel scroll; positive amount scrolls up (vertical) / right (horizontal)."""
-        if not IS_WINDOWS:
+        if not IS_WINDOWS or hin.physical_input_blocked("organ_24.WIN32.scroll"):
             return
         flag = 0x01000 if horizontal else 0x0800  # MOUSEEVENTF_HWHEEL / MOUSEEVENTF_WHEEL
         user32.mouse_event(flag, 0, 0, int(amount), 0)  # type: ignore
 
     def _move_cursor(self, x: int, y: int) -> None:
+        if hin.physical_input_blocked("organ_24.WIN32._move_cursor"):
+            return
         user32.SetCursorPos(int(x), int(y))  # type: ignore
 
     def _send_mouse_event(self, flag: int) -> None:
+        if hin.physical_input_blocked("organ_24.WIN32._send_mouse_event"):
+            return
         user32.mouse_event(flag, 0, 0, 0, 0)  # type: ignore
 
     def send_unicode_text(self, text: str) -> None:
@@ -583,6 +588,8 @@ class Win32Primitives:
             self._send_unicode_char(ch)
 
     def _send_unicode_char(self, ch: str) -> None:
+        if hin.physical_input_blocked("organ_24.WIN32._send_unicode_char"):
+            return
         KEYEVENTF_UNICODE = 0x0004
         KEYEVENTF_KEYUP = 0x0002
         user32.keybd_event(0, ord(ch) if False else 0, 0, 0)  # placeholder no-op guard  # type: ignore
@@ -611,7 +618,7 @@ class Win32Primitives:
         user32.SendInput(1, ctypes.byref(inp), ctypes.sizeof(inp))  # type: ignore
 
     def send_vk(self, vk: int, keyup: bool = False) -> None:
-        if not IS_WINDOWS:
+        if not IS_WINDOWS or hin.physical_input_blocked("organ_24.WIN32.send_vk"):
             return
         KEYEVENTF_KEYUP = 0x0002
         user32.keybd_event(vk, 0, KEYEVENTF_KEYUP if keyup else 0, 0)  # type: ignore
@@ -1081,7 +1088,7 @@ class InputInjector:
         WIN32._send_mouse_event(0x0004)  # left up
 
     def scroll(self, delta_x: int, delta_y: int) -> None:
-        if not IS_WINDOWS:
+        if not IS_WINDOWS or hin.physical_input_blocked("organ_24.InputInjector.scroll"):
             return
         MOUSEEVENTF_WHEEL = 0x0800
         MOUSEEVENTF_HWHEEL = 0x01000

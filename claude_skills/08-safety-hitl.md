@@ -1,3 +1,8 @@
+---
+name: hojaiga-safety-hitl
+description: Safety and human-in-the-loop law - elevation, payment, deletion and other destructive or risky actions require explicit approval, need_human routing, sandbox boundaries, and never recording credentials or secrets anywhere.
+---
+
 # Skill 08 — Safety & Human-in-the-Loop (HITL) Law
 
 Autonomy without guardrails is a liability. These rules make the bot trustworthy enough to

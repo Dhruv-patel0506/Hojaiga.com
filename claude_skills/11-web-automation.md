@@ -1,3 +1,8 @@
+---
+name: hojaiga-web-automation
+description: Web and browser automation - direct Chrome launch without profile picker, CDP session on port 9222, session cookie seeding, dynamic web detection and tool wiring, and URL derivation guards against fake domains.
+---
+
 # Skill 11 — Web & Browser Automation (CDP, Chrome, cookies)
 
 Web is a first-class citizen next to desktop, and it shares the SAME element contract

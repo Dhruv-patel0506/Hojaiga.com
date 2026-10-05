@@ -36,6 +36,9 @@ _DESKTOP_ATTACHED = False
 def ensure_interactive_desktop():
     """Ensures calling thread is attached to the active interactive input desktop."""
     try:
+        from core_organs import headless_input as _hin
+        if _hin.on_input_desktop():
+            return  # already on the interactive desktop: do not touch window station/desktop
         user32 = ctypes.windll.user32
         hwinsta = user32.OpenWindowStationW("WinSta0", False, 0x0002 | 0x0100 | 0x0200)
         if hwinsta:
@@ -156,11 +159,26 @@ def _safe_walk_control(root_ctrl, includeTop=False, maxDepth=14):
 
 
 def _deep_scan_max_depth() -> int:
-    """Max UIA tree depth for deep scans (env-overridable, default 32)."""
+    """SECONDARY safety rail only (pathological / recursive trees): the primary limit is the time budget below.
+    Default 64 (was 32). Whether it was reached is always reported as ``depth_hit_cap``."""
     try:
-        return max(1, int(os.environ.get("HOJAIGA_DEEP_SCAN_MAX_DEPTH", "32")))
+        return max(1, int(os.environ.get("HOJAIGA_DEEP_SCAN_MAX_DEPTH", "64")))
     except ValueError:
-        return 32
+        return 64
+
+
+# Time budget for one deep UIA walk (the same approach app_scan.py uses): a tiny app finishes in milliseconds and a
+# huge one is cut by TIME, never by a depth guess. A floor of MIN_NODES is always walked so a slow first touch
+# (UWP / Electron roots can take >1 s cold) never yields an empty scan; HARD_EXTRA_S is the absolute cap past the budget.
+DEEP_SCAN_MIN_NODES = 120
+DEEP_SCAN_HARD_EXTRA_S = 4.0
+
+
+def _deep_scan_budget_ms() -> int:
+    try:
+        return max(1, int(os.environ.get("HOJAIGA_DEEP_SCAN_BUDGET_MS", "6000")))
+    except ValueError:
+        return 6000
 
 
 # --------------------------------------------------------------------------- #
@@ -454,6 +472,8 @@ class EyeAndBrainOrchestrator:
         menu_headers = set()
         nodes_walked = 0      # total nodes yielded by the walker (pre-filter)
         max_depth_seen = 0    # deepest level actually reached
+        time_budget_hit = False
+        walk_t0 = time.perf_counter()
         try:
             if auto:
                 if not quiet or is_uwp:
@@ -479,10 +499,17 @@ class EyeAndBrainOrchestrator:
                     current_tab = ""
                     current_group = ""
 
+                    walk_t0 = time.perf_counter()
+                    budget_s = _deep_scan_budget_ms() / 1000.0
                     for ctrl, depth in walker:
                         nodes_walked += 1
                         if depth > max_depth_seen:
                             max_depth_seen = depth
+                        _elapsed = time.perf_counter() - walk_t0
+                        if (_elapsed > budget_s and nodes_walked >= DEEP_SCAN_MIN_NODES) \
+                                or _elapsed > budget_s + DEEP_SCAN_HARD_EXTRA_S:
+                            time_budget_hit = True
+                            break
                         try:
                             box = safe_bounding_rect(ctrl)
                             if not box:
@@ -831,6 +858,12 @@ class EyeAndBrainOrchestrator:
                 "actionable_controls": len(all_controls),
                 "max_depth_seen": max_depth_seen,
                 "walk_max_depth": _deep_scan_max_depth(),
+                # truncation is VISIBLE, never silent: which limit (if any) cut the walk
+                "depth_hit_cap": bool(max_depth_seen >= _deep_scan_max_depth()),
+                "time_budget_ms": _deep_scan_budget_ms(),
+                "time_budget_hit": bool(time_budget_hit),
+                "walk_ms": int((time.perf_counter() - walk_t0) * 1000),
+                "truncated": bool(time_budget_hit or max_depth_seen >= _deep_scan_max_depth()),
             },
             "status": "success" if ui_elements else "partial",
             "scan_timestamp": time.time(),
@@ -1030,6 +1063,17 @@ SCREEN_H = win32api.GetSystemMetrics(1) if win32api else 1080
 # --------------------------------------------------------------------------- #
 
 
+def _in_parked_window(l: int, t: int, r: int, b: int) -> bool:
+    """True when the box lies inside a window background_window has parked off-screen. A parked
+    (formerly minimized) window is laid out at real size but outside every monitor, so the
+    'is it on screen' filters must treat its interior as valid coordinate space."""
+    try:
+        from core_organs import background_window as _bw
+        return any(pl <= l and pt <= t and r <= pr + 2 and b <= pb + 2 for pl, pt, pr, pb in _bw.parked_rects())
+    except Exception:
+        return False
+
+
 def safe_bounding_rect(ctrl) -> Optional[Tuple[int, int, int, int]]:
     """Return (l, t, r, b) or None. Wraps COMError-prone BoundingRectangle."""
     if not ctrl:
@@ -1042,7 +1086,8 @@ def safe_bounding_rect(ctrl) -> Optional[Tuple[int, int, int, int]]:
         if rr <= l or b <= t:
             return None
         if l < -500 or t < -500 or rr > SCREEN_W + 500 or b > SCREEN_H + 500:
-            return None
+            if not _in_parked_window(l, t, rr, b):
+                return None
         return (l, t, rr, b)
     except Exception:
         return None
@@ -1053,6 +1098,8 @@ def is_onscreen(box: Tuple[int, int, int, int]) -> bool:
         return False
     l, t, r, b = box
     cx, cy = (l + r) // 2, (t + b) // 2
+    if _in_parked_window(l, t, r, b):
+        return True
     return 0 <= cx < SCREEN_W and 0 <= cy < SCREEN_H
 
 
@@ -1332,39 +1379,35 @@ def sort_controls_spatially(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]
 
 
 def send_keys(*vks_and_pauses, target_hwnd: int = 0):
-    """Send key presses via keybd_event (keyboard only — NEVER moves mouse cursor).
-    Keys go to the foreground window. Caller must ensure target is foreground."""
-    user32 = ctypes.windll.user32
-    for vk in vks_and_pauses:
-        try:
-            user32.keybd_event(vk, 0, 0, 0)
-            time.sleep(0.04)
-            user32.keybd_event(vk, 0, 2, 0)  # KEYEVENTF_KEYUP
-            time.sleep(0.06)
-        except Exception:
-            pass
+    """Deliver key presses to ``target_hwnd`` as posted window messages (headless).
+
+    The physical keyboard is never used. With no target window the keys are NOT sent
+    (undeliverable) - they would otherwise land in whatever the user has in front."""
+    from core_organs import headless_input as _hin
+    if not target_hwnd:
+        logger.warning("send_keys: no target_hwnd; refusing to send keys blind")
+        return False
+    vks = [v for v in vks_and_pauses if isinstance(v, int)]
+    # A leading modifier + key is one chord (e.g. Ctrl+N); otherwise each key is its own press.
+    if len(vks) == 2 and vks[0] in (0x11, 0x10, 0x12):
+        return _hin.post_vk_chord(target_hwnd, vks)[0]
+    ok = True
+    for vk in vks:
+        ok = _hin.post_vk_chord(target_hwnd, [vk])[0] and ok
+        time.sleep(0.05)
+    return ok
 
 
 def send_alt_sequence(accel: str, target_hwnd: int = 0):
-    """Send Alt+key sequence via keybd_event (keyboard only — NEVER moves mouse cursor)."""
-    if not accel.startswith("%"):
-        return
-    user32 = ctypes.windll.user32
-    keys = accel[1:]
-    VK_MENU = 0x12
-    try:
-        user32.keybd_event(VK_MENU, 0, 0, 0)
-        time.sleep(0.06)
-        for ch in keys:
-            vk = ord(ch.upper())
-            user32.keybd_event(vk, 0, 0, 0)
-            time.sleep(0.04)
-            user32.keybd_event(vk, 0, 2, 0)
-            time.sleep(0.04)
-        user32.keybd_event(VK_MENU, 0, 2, 0)
-        time.sleep(0.18)
-    except Exception as e:
-        logger.debug("send_alt_sequence failed: %s", e)
+    """Alt+key accelerator sequence, posted to ``target_hwnd`` (headless)."""
+    from core_organs import headless_input as _hin
+    if not accel.startswith("%") or not target_hwnd:
+        return False
+    ok = True
+    for ch in accel[1:]:
+        ok = _hin.post_vk_chord(target_hwnd, [0x12, ord(ch.upper())])[0] and ok
+        time.sleep(0.08)
+    return ok
 
 
 def virtual_send_text(text: str, target_hwnd: int):
@@ -2432,6 +2475,21 @@ class AppScanner:
         menu_header_names = {it["name"] for it in raw_items if is_menu_header(it)}
         menu_scanner = MenuScanner(target_hwnd, menu_header_names, root_ctrl=root_ctrl)
 
+        # Knowledge side by side with the scan (organ_48/49): read-only E0 map first, then every
+        # control is consulted before it is touched. None => the scan runs exactly as before.
+        ksess = None
+        try:
+            from core_organs import organ_49_scan_knowledge as _sk
+            ksess = _sk.open_session(app_name, target_hwnd)
+            if ksess is not None:
+                e0 = ksess.start()
+                logger.info("[SCAN-KNOWLEDGE] %s: E0 map %s", app_name,
+                            {k: v for k, v in e0.items() if k != "methods"})
+        except Exception as _ke:
+            logger.debug("scan-knowledge unavailable: %s", _ke)
+            ksess = None
+        probing_stopped = False
+
         # Proactively persist any discovered control to SSMS
         def _persist_element(it: Dict[str, Any]):
             try:
@@ -2493,7 +2551,12 @@ class AppScanner:
             if is_menu_header(item):
                 try:
                     logger.info("[MENU SCAN] Traversing menu '%s'", name)
-                    menu_items = menu_scanner.scan_menu(name, ctrl_obj=ctrl_obj)
+                    menu_items = ksess.menu_elements(name) if ksess is not None else []
+                    if menu_items:
+                        logger.info("[MENU SCAN] '%s' served from E0 knowledge map (%d items, no popup opened)",
+                                    name, len(menu_items))
+                    else:
+                        menu_items = menu_scanner.scan_menu(name, ctrl_obj=ctrl_obj)
                     elements.append(item)
                     _persist_element(item)
                     for mi in menu_items:
@@ -2505,6 +2568,26 @@ class AppScanner:
                     self.controls_failed += 1
                 continue
 
+            # Knowledge consultation: graded risk (E2 never actuated), verified branches never
+            # re-probed, and a yield-based stop rule: catalogue the rest once exploration flattens.
+            k_decision = ksess.policy(item) if ksess is not None else None
+            if k_decision is not None and k_decision.action in ("catalog_only", "skip_known"):
+                logger.info("[SCAN-KNOWLEDGE] %s '%s': %s", k_decision.action, name, k_decision.reason)
+                elements.append(item)
+                _persist_element(item)
+                self.controls_scanned += 1
+                continue
+            if ksess is not None and not probing_stopped:
+                _why = ksess.should_stop()
+                if _why:
+                    probing_stopped = True
+                    logger.info("[SCAN-KNOWLEDGE] exploration stopped (%s); cataloguing remaining controls", _why)
+            if probing_stopped:
+                elements.append(item)
+                _persist_element(item)
+                self.controls_scanned += 1
+                continue
+
             # Child Dialog Triggers ("Settings", "Properties", "Filters", "Add", etc.)
             if norm_name in DIALOG_TRIGGER_NAMES:
                 logger.info("[DIALOG TRIGGER] Activating '%s' to spawn child dialog", name)
@@ -2512,17 +2595,24 @@ class AppScanner:
                 _persist_element(item)
                 self.controls_scanned += 1
                 try:
+                    _k_before = ksess.light_state() if ksess is not None else None
                     activated = uia_activate(ctrl_obj, fallback_coords=(cx, cy))
                     time.sleep(0.6)
                     child_hwnd = self._find_spawned_dialog(target_hwnd, target_pid)
                     if child_hwnd:
+                        _dlg_title = win32gui.GetWindowText(child_hwnd) if win32gui else ""
                         dialog_elements = self.dialog_traversal.scan_dialog(child_hwnd, parent_button=name, main_hwnd=target_hwnd)
                         elements.extend(dialog_elements)
                         for de in dialog_elements:
                             _persist_element(de)
                         self.controls_scanned += len(dialog_elements)
+                        if ksess is not None and _k_before is not None:
+                            ksess.record_probe(item, _k_before, "dialog", len(dialog_elements),
+                                               dialog_elements, dialog_title=_dlg_title, decision=k_decision)
                     else:
                         logger.debug("No child dialog detected after activating '%s'", name)
+                        if ksess is not None and _k_before is not None:
+                            ksess.record_probe(item, _k_before, "none", 0, decision=k_decision)
                 except Exception as e:
                     logger.warning("Error interacting with dialog trigger '%s': %s", name, e)
                     self.controls_failed += 1
@@ -2545,6 +2635,8 @@ class AppScanner:
                         item["suggested_alias"] = brain_decision["suggested_alias"]
                         logger.info("[BRAIN] Assigned semantic alias: '%s' -> '%s'", name, brain_decision["suggested_alias"])
 
+            _k_before = ksess.light_state() if ksess is not None else None
+            _k_n0 = len(elements)
             try:
                 logger.info("[ACTIVE PROBE] Clicking / Activating %s: '%s' at (%d, %d)", ctype, name, cx, cy)
                 activated = uia_activate(ctrl_obj, fallback_coords=(cx, cy))
@@ -2554,11 +2646,15 @@ class AppScanner:
                 child_hwnd = self._find_spawned_dialog(target_hwnd, target_pid)
                 if child_hwnd:
                     logger.info("[ACTIVE PROBE] Child dialog spawned by '%s' (hwnd=%s)", name, child_hwnd)
+                    _dlg_title = win32gui.GetWindowText(child_hwnd) if win32gui else ""
                     dialog_elements = self.dialog_traversal.scan_dialog(child_hwnd, parent_button=name, main_hwnd=target_hwnd)
                     elements.extend(dialog_elements)
                     for de in dialog_elements:
                         _persist_element(de)
                     self.controls_scanned += len(dialog_elements)
+                    if ksess is not None and _k_before is not None:
+                        ksess.record_probe(item, _k_before, "dialog", len(dialog_elements),
+                                           dialog_elements, dialog_title=_dlg_title, decision=k_decision)
                     bring_to_foreground(target_hwnd)
                     continue
 
@@ -2567,6 +2663,8 @@ class AppScanner:
                 if modal_hwnd:
                     logger.info("[ACTIVE PROBE] Top-level modal popup detected by '%s' (hwnd=%s)", name, modal_hwnd)
                     self._handle_possible_modal(target_hwnd, target_pid, elements)
+                    if ksess is not None and _k_before is not None:
+                        ksess.record_probe(item, _k_before, "modal", 0, decision=k_decision)
                     bring_to_foreground(target_hwnd)
                     continue
 
@@ -2575,6 +2673,8 @@ class AppScanner:
                 if in_win_modals:
                     logger.info("[ACTIVE PROBE] In-window modal detected by '%s'", name)
                     self._handle_in_window_modal(root_ctrl, in_win_modals, elements)
+                    if ksess is not None and _k_before is not None:
+                        ksess.record_probe(item, _k_before, "modal", 0, decision=k_decision)
                     bring_to_foreground(target_hwnd)
                     continue
 
@@ -2599,6 +2699,12 @@ class AppScanner:
                     self._probe_context_menu(
                         target_hwnd, ctrl_obj, name, box, elements, persist_fn=_persist_element
                     )
+
+                # Plain probe finished without a spawned window: record what (if anything) changed.
+                if ksess is not None and _k_before is not None:
+                    _gained = len(elements) - _k_n0
+                    ksess.record_probe(item, _k_before, "expanded" if _gained > 0 else "none",
+                                       max(_gained, 0), decision=k_decision)
 
             except Exception as probe_err:
                 logger.debug("Failed to actively probe '%s': %s", name, probe_err)
@@ -2627,13 +2733,19 @@ class AppScanner:
         except Exception as e:
             logger.debug(f"Visual memory feed failed: {e}")
 
-        return {
+        result = {
             "status": "completed",
             "tree_hash": tree_hash,
             "controls_scanned": self.controls_scanned,
             "controls_failed": self.controls_failed,
             "elements": cleaned_elements,
         }
+        if ksess is not None:
+            try:
+                result["knowledge"] = ksess.finish()
+            except Exception as _kf:
+                logger.debug("scan-knowledge finish failed: %s", _kf)
+        return result
 
     # --- internals -----------------------------------------------------
     def _collect_actionable_controls(self, root_ctrl, win_box: Optional[Tuple[int, int, int, int]],

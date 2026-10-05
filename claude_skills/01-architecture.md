@@ -1,3 +1,8 @@
+---
+name: hojaiga-architecture-map
+description: Architecture map of the Hojaiga organ system under All codes/core_organs - what each organ does, orchestrator wiring, the closed autonomy loop, and where to change a capability.
+---
+
 # Skill 01 — Architecture Map (Organs)
 
 Everything lives under `All codes/core_organs/`. Organs are numbered modules wired

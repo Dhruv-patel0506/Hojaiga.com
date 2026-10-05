@@ -1,3 +1,8 @@
+---
+name: hojaiga-testing
+description: Testing and honest reporting via run_system_intelligence_tests.py - how to run the suite, per-organ scores, ENV-BLOCKED semantics, PL1/P3 regression tests, and the rule that suite gates must pass before declaring anything done.
+---
+
 # Skill 07 — Testing & Honest Reporting (`run_system_intelligence_tests.py`)
 
 ## The suite

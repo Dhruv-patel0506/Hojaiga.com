@@ -377,32 +377,77 @@ class AppCatalog:
             return True
         return False
 
+    # Words that appear in countless unrelated launchers; they can never identify an app.
+    _GENERIC_TOKENS = frozenset({
+        "windows", "microsoft", "app", "apps", "application", "program", "the", "a", "an",
+        "desktop", "classic", "new", "free", "pro", "x64", "x86", "launcher", "software",
+    })
+    _NEVER_LAUNCH = ("uninst", "setup", "helper", "crashpad", "update", "installer", "wizard",
+                     "appxlauncher", "softwarelogo", "certification", "elevation", "service",
+                     "bootstrap", "report", "crash")
+
+    def _distinctive_keywords(self, app_name: str) -> list[str]:
+        raw = re.findall(r"[a-z0-9]+", (app_name or "").lower())
+        return [k for k in raw if k not in self._GENERIC_TOKENS and len(k) >= 2]
+
+    def path_lookup(self, app_name: str) -> str | None:
+        """Exact '<keyword>.exe' on PATH / system dirs (notepad, calc, mspaint ...).
+        Deterministic and keystroke-free, so it is tried before any UI-driven launch."""
+        import shutil
+        for k in self._distinctive_keywords(app_name):
+            hit = shutil.which(k + ".exe")
+            if hit:
+                return hit
+        return None
+
     def crawl_for_exe(self, app_name: str) -> str | None:
-        """Fallback: crawl the file explorer for the app's real launcher (.exe)."""
-        keywords = re.findall(r"[a-z0-9]+", app_name.lower())
+        """Fallback: locate the app's real launcher (.exe).
+
+        Matching is deliberately strict (a wrong launch executes an arbitrary program):
+          1. every DISTINCTIVE keyword (generic words like 'windows'/'microsoft' ignored)
+             must appear in the exe file name - not 'any' keyword;
+          2. PATH lookup first (cheap, authoritative for system tools such as notepad/calc);
+          3. among crawl hits the shortest file name wins (closest to the bare app name).
+        """
+        keywords = self._distinctive_keywords(app_name)
+        if not keywords:
+            return None
+        hit = self.path_lookup(app_name)
+        if hit:
+            return hit
         roots = [
             r"C:\Program Files", r"C:\Program Files (x86)",
             r"C:\ProgramData", os.path.expandvars(r"%LOCALAPPDATA%\Programs"),
             os.path.expandvars(r"%APPDATA%"),
         ]
+        best: tuple[int, str] | None = None
+        # L6: a crawl is bounded. A miss on a huge Program Files must not stall a task.
+        deadline = time.time() + float(os.environ.get("HOJAIGA_CRAWL_BUDGET_S", "5"))
         for root in roots:
-            if not os.path.isdir(root):
+            if not os.path.isdir(root) or time.time() > deadline:
                 continue
             for dirpath, _, files in os.walk(root):
                 depth = dirpath[len(root):].count(os.sep)
                 if depth > 4:
                     continue
+                if time.time() > deadline:
+                    return best[1] if best else None
                 for f in files:
                     fl = f.lower()
                     if not fl.endswith(".exe"):
                         continue
-                    if any(k in fl for k in keywords):
-                        # Exclude uninstallers / setup / wizard helpers.
-                        if any(x in fl for x in ("uninst", "setup", "helper",
-                                                  "crashpad", "update", "installer",
-                                                  "wizard")):
-                            continue
-                        return os.path.join(dirpath, f)
+                    stem_tokens = re.findall(r"[a-z0-9]+", fl[:-4])
+                    stem = fl[:-4]
+                    # keyword must be a whole token or the stem prefix ('paint' must not hit 'edgepaint')
+                    if not all(k in stem_tokens or stem.startswith(k) for k in keywords):
+                        continue
+                    if any(x in fl for x in self._NEVER_LAUNCH):
+                        continue
+                    cand = (len(fl), os.path.join(dirpath, f))
+                    if best is None or cand < best:
+                        best = cand
+            if best:
+                return best[1]
         return None
 
 
@@ -650,16 +695,22 @@ class AppLauncher:
         # profile picker. Route them to a direct, isolated automation launch.
         if self._looks_like_browser(app_name):
             return self.launch_browser_direct(app_name)
-        # Primary: Windows search bar (type full name, open top suggestion).
-        logger.info("Launch: attempting Windows search-bar launch for '%s'", app_name)
-        if self.launch_via_search(app_name):
-            logger.info("Launch: '%s' opened via Windows search bar", app_name)
+        # Single instance: an app that is already open is never launched a second time.
+        if self._already_running(app_name):
+            logger.info("Launch: '%s' already has a window; not starting another instance", app_name)
             return True
-        # Fallback: catalog launcher path (Start Menu .lnk -> .exe).
-        logger.info("Launch: search-bar failed for '%s'; trying catalog launcher path", app_name)
+        # Tier 0: deterministic exact-exe launch (no keystrokes, no UI automation).
+        exact = self.catalog.path_lookup(app_name)
+        if exact and self.launch_via_path(exact):
+            logger.info("Launch: '%s' opened via exact PATH exe %s", app_name, exact)
+            return True
+        # Tier 1: catalog launcher path (Start Menu .lnk -> .exe).
         _, path = self.catalog.find(app_name)
         if path and self.launch_via_path(path):
             logger.info("Launch: '%s' opened via catalog launcher path", app_name)
+            return True
+        # Tier 2: OS Start-apps list (covers Store/UWP apps), started through the shell.
+        if self.launch_via_start_apps(app_name):
             return True
         # Fallback 2: crawl the file explorer for the actual launcher .exe.
         logger.info("Launch: catalog path missing; crawling file explorer for '%s' launcher", app_name)
@@ -670,28 +721,60 @@ class AppLauncher:
         logger.error("Launch: could not open '%s' by any method", app_name)
         return False
 
-    def launch_via_search(self, app_name: str) -> bool:
+    _start_apps_cache: "list[tuple[str, str]] | None" = None
+
+    def _start_apps(self) -> "list[tuple[str, str]]":
+        """(display name, AppUserModelID) for every Start-menu app incl. Store/UWP apps.
+        Read from the OS (Get-StartApps): no keystrokes, no UI automation."""
+        if AppLauncher._start_apps_cache is not None:
+            return AppLauncher._start_apps_cache
+        rows: "list[tuple[str, str]]" = []
         try:
-            import pyautogui
-            pyautogui.press("win")
-            time.sleep(0.6)
-            pyautogui.write(app_name)
-            time.sleep(1.2)
-            pyautogui.press("enter")
-            time.sleep(2.0)
+            out = subprocess.run(
+                ["powershell", "-NoProfile", "-NonInteractive", "-Command",
+                 "Get-StartApps | ForEach-Object { $_.Name + '|' + $_.AppID }"],
+                capture_output=True, text=True, timeout=15, creationflags=0x08000000)
+            for line in out.stdout.splitlines():
+                if "|" in line:
+                    n, _, appid = line.rpartition("|")
+                    if n.strip() and appid.strip():
+                        rows.append((n.strip(), appid.strip()))
+        except Exception as exc:
+            logger.debug("Get-StartApps failed: %s", exc)
+        AppLauncher._start_apps_cache = rows
+        return rows
+
+    def launch_via_start_apps(self, app_name: str) -> bool:
+        """Headless replacement for the old Win-key + typing launch. Matches the app by name in
+        the OS Start-apps list and starts it through the shell (explorer shell:AppsFolder\\AUMID)."""
+        keywords = self.catalog._distinctive_keywords(app_name)
+        if not keywords:
+            return False
+        best = None
+        for name, appid in self._start_apps():
+            nt = re.findall(r"[a-z0-9]+", name.lower())
+            if all(k in nt for k in keywords):
+                cand = (len(name), name, appid)
+                if best is None or cand < best:
+                    best = cand
+        if not best:
+            return False
+        try:
+            subprocess.Popen(["explorer.exe", f"shell:AppsFolder\\{best[2]}"])
+            time.sleep(1.5)
+            logger.info("Launch: '%s' started via Start-apps entry '%s'", app_name, best[1])
             return True
         except Exception:
-            try:
-                from pywinauto.keyboard import send_keys
-                send_keys("{VK_LWIN}")
-                time.sleep(0.6)
-                send_keys(app_name)
-                time.sleep(1.2)
-                send_keys("{ENTER}")
-                time.sleep(2.0)
-                return True
-            except Exception:
-                return False
+            return False
+
+    @staticmethod
+    def _already_running(app_name: str) -> bool:
+        """One instance only: if a real top-level window for this app exists, do not spawn another."""
+        try:
+            from core_organs.desktop_grounding import DesktopGrounding
+            return DesktopGrounding().find_window(app_name) is not None
+        except Exception:
+            return False
 
     def launch_via_path(self, path: str) -> bool:
         try:

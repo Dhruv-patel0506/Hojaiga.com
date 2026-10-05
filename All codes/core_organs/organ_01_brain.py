@@ -1214,6 +1214,7 @@ class BrainOrgan:
                 if crew_engine.is_available():
                     res = crew_engine.execute_task(task.raw_text, task.task_id)
                     is_failed = res.get("status") == "FAILED"
+                    needs_input = res.get("status") == "NEEDS_INPUT"   # the verified loop hit a human gate (dialog/ambiguity)
                     agent_tasks = [
                         AgentTask(
                             agent_id="CrewAI_Autonomous_Swarm",
@@ -1236,6 +1237,20 @@ class BrainOrgan:
                             intent_analysis="Autonomous CrewAI swarm failed verification or physical actions.",
                             checkpoints_enforced=True,
                             controller_access=["browser", "desktop", "os"]
+                        )
+
+                    if needs_input:
+                        LOG.log(event="brain_crewai_needs_input", task_id=task.task_id)
+                        return ExecutionPlan(
+                            task_id=task.task_id,
+                            steps=[PhaseStep(phase="NEEDS_INPUT", instruction="Agent needs your input: " + res.get("crew_output", "")[:300])],
+                            agent_tasks=agent_tasks,
+                            raw_plan_text=res.get("crew_output", ""),
+                            risk_report=RiskReport(level=RiskLevel.MEDIUM, notes="A human decision is required before the task can continue."),
+                            requires_escalation=True,
+                            intent_analysis="Verified desktop loop stopped at a human gate.",
+                            checkpoints_enforced=True,
+                            controller_access=["desktop"]
                         )
 
                     return ExecutionPlan(

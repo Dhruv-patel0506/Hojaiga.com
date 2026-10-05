@@ -1,3 +1,8 @@
+---
+name: hojaiga-environment-rules
+description: Windows environment and command rules - Python 3.13 venv path, PYTHONPATH setup, PowerShell semicolon syntax, UTF-8 flag, and local service ports (Ollama gatekeeper 11435, CNS bridge 11436, Chrome CDP 9222).
+---
+
 # Skill 02 — Environment & Command Rules (Windows)
 
 ## Interpreter / venv

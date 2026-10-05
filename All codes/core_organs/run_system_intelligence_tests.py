@@ -7,12 +7,17 @@ Extends run_realtime_tests.py with the deep, real-behaviour checks:
   BRAIN        B1 compiler natural-language parsing | B2 router nature/confidence
   POPUP        P1 live window classification        | P2 mitigation decision engine
   SCANNER      S1 organ_30 deep scan (how deep)     | S2 organ_41 continuous cycles
-  MOUSE        M1 unified virtual mouse real movement + Win32 position verify
+  MOUSE        M1 virtual-mouse-only headless input (minimized/covered windows, pointer untouched)
   LAUNCHER     L1 expanded dynamic resolution matrix
   MEMORY       R1 working memory + TTL expiry       | R2 rooms/history/snapshot
   KNOWLEDGE    K1 ingest natural-language knowledge | K2 search it back by meaning
   DATABASE     D1 batch element store round-trip    | D2 modal + cookie round-trip
   HEALTH       H1 every core organ imports cleanly
+
+Flags:
+  --e2e   also run the live unattended E2E-1 (Notepad) / E2E-2 (canvas app) proofs
+  --only A,B     run just these test ids (writes system_intelligence_results_partial.txt, never the full log)
+  --vision-bench also run VB1: real cold-start head-to-head of the vision warmup thread (minutes)
 
 Each test reports: PASS/FAIL, latency, and a measured evidence string.
 At the end a RECONCILED RANKING table scores every subsystem 0-100.
@@ -45,6 +50,39 @@ class TestOutcome:
     evidence: str
     metrics: Dict[str, Any] = field(default_factory=dict)
     env_blocked: bool = False  # correct+verified but OS/environment prevented the action
+
+
+def _windows_of_class(*class_names: str) -> set:
+    """Visible-or-minimized top-level windows of the given classes (case-insensitive)."""
+    import ctypes.wintypes as _wt
+    u = ctypes.windll.user32
+    want = {c.lower() for c in class_names}
+    found = set()
+
+    @ctypes.WINFUNCTYPE(ctypes.c_bool, _wt.HWND, _wt.LPARAM)
+    def _cb(h, _l):
+        if u.IsWindowVisible(h) or u.IsIconic(h):
+            b = ctypes.create_unicode_buffer(128)
+            u.GetClassNameW(h, b, 128)
+            if b.value.lower() in want:
+                found.add(int(h))
+        return True
+    u.EnumWindows(_cb, 0)
+    return found
+
+
+def _close_new_windows_of(before: set, *class_names: str) -> int:
+    """Close ONLY windows of these classes that did not exist when `before` was taken - i.e. ones THIS TEST started.
+    The old teardown was `taskkill /f /im notepad.exe`, which also killed whatever the user had open."""
+    from core_organs import universal_scan as us
+    n = 0
+    for h in sorted(_windows_of_class(*class_names) - before):
+        try:
+            if us.close_window(h, timeout_s=5.0, discard_unsaved=True):
+                n += 1
+        except Exception:
+            pass
+    return n
 
 
 def run_test(test_id: str, group: str, func: Callable[[], TestOutcome]) -> None:
@@ -424,6 +462,7 @@ def test_s2_continuous_scanner_cycles() -> TestOutcome:
     # Real mutation: spawn a throwaway app owned by this test, detect the UI
     # change, then clean it up again.
     import subprocess
+    notepads_before = _windows_of_class("Notepad")
     proc = subprocess.Popen(["notepad.exe"])
     try:
         time.sleep(1.2)  # let the window appear
@@ -436,8 +475,7 @@ def test_s2_continuous_scanner_cycles() -> TestOutcome:
             proc.wait(timeout=3)
         except Exception:
             pass
-        subprocess.run(["taskkill", "/f", "/im", "notepad.exe"],
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        _close_new_windows_of(notepads_before, "Notepad")      # only the window THIS test opened
     time.sleep(0.6)
     changed, n = one_cycle()  # window gone -> should change again
     diffs += changed
@@ -461,150 +499,34 @@ def test_s2_continuous_scanner_cycles() -> TestOutcome:
 # ═══════════════════════════════════════════════════════════════════════
 
 def test_m1_virtual_mouse_real_motion() -> TestOutcome:
-    """M1: Virtual mouse — real Win32 motion via DAP primitives + API-contract verify"""
-    from core_organs.organ_24_dap import WIN32
-    import ctypes.wintypes as wt
-    import inspect
-    import core_organs.unified_virtual_mouse as uvm
-
-    user32 = ctypes.windll.user32
-    user32.SetCursorPos.restype = wt.BOOL
-    user32.ClipCursor.restype = wt.BOOL
-    scr_w = user32.GetSystemMetrics(0)
-    scr_h = user32.GetSystemMetrics(1)
-    pts = wt.POINT()
-    get_pos = user32.GetCursorPos
-    targets = [(100, 100), (960, 540), (1400, 300), (250, 800)]
-    latencies, hits, contested, _diag = [], 0, 0, []
-
-    def run_moves():
-        """Release any cursor confinement a foreground app holds (real automation
-        must do this before driving the pointer), then drive each target and
-        poll briefly for the OS cursor to settle (another process may be fighting
-        for the pointer)."""
-        nonlocal hits, contested
-        hits, contested = 0, 0
-        _diag.clear()
-        user32.ClipCursor(None)
-        time.sleep(0.15)
-        for x, y in targets:
-            t0 = time.perf_counter()
-            WIN32._move_cursor(x, y)
-            get_pos(ctypes.byref(pts))
-            landed = (pts.x, pts.y) == (x, y)
-            if not landed:
-                contested += 1
-                deadline = time.perf_counter() + 0.3
-                while time.perf_counter() < deadline and not landed:
-                    WIN32._move_cursor(x, y)
-                    time.sleep(0.02)
-                    get_pos(ctypes.byref(pts))
-                    landed = (pts.x, pts.y) == (x, y)
-            latencies.append((time.perf_counter() - t0) * 1000)
-            if landed:
-                hits += 1
-            else:
-                _diag.append(f"want({x},{y}) got({pts.x},{pts.y})")
-
-    run_moves()
-    if hits < len(targets):  # transient pointer grab by another app — retry once
-        run_moves()
-
-    # --- Contestation diagnostics + primitive correctness ---------------------
-    # A foreground app can CLIP the pointer on ITS thread and/or continuously
-    # re-drive it, so the visible cursor may not land even though our primitive
-    # is 100% correct. ClipCursor(NULL) only clears OUR thread's clip; it cannot
-    # remove another thread's clip, which is exactly why a hard lock survives.
-    def clip_rect():
-        r = wt.RECT()
-        accepted = user32.ClipCursor(ctypes.byref(r)) == 1
-        confined = accepted and (r.left, r.top, r.right, r.bottom) != (0, 0, scr_w, scr_h)
-        return accepted, (r.left, r.top, r.right, r.bottom), confined
-
-    setcursor_ret = None
+    """M1: virtual-mouse-only input - physical pointer untouched; headless delivery to minimized/covered windows"""
+    from core_organs import si_test_support as sup
     try:
-        setcursor_ret = int(user32.SetCursorPos(100, 100))
-    except Exception:
-        setcursor_ret = -1
-    clip_accepted, clip_box, clip_confined = clip_rect()
-
-    src = inspect.getsource(WIN32._move_cursor)
-    primitive_wired = "SetCursorPos" in src
-    in_range = all(0 <= x < scr_w and 0 <= y < scr_h for x, y in targets)
-
-    # Detect a hard external lock: pointer pinned to ONE constant OFF-target
-    # coordinate across every distinct move command = another process owns it.
-    got_coords = [d.split("got")[1] for d in _diag]
-    distinct_got = set(got_coords)
-    pinned = distinct_got.pop() if len(distinct_got) == 1 else None
-    pointer_hard_locked = (hits == 0 and len(got_coords) >= 3
-                           and pinned is not None and pinned not in {f"({x},{y})" for x, y in targets})
-    # The lock is NOT ours if our own thread holds no clip we failed to release.
-    not_our_clip = not clip_confined
-
-    # Click injection primitive must fire without error (safe spot: bottom-left
-    # desktop corner — deselects, no app chrome lives there)
-    click_ok = True
+        proof = sup.headless_action_proof()
+    except Exception as exc:  # noqa: BLE001
+        return TestOutcome(passed=False, evidence=f"proof crashed: {type(exc).__name__}: {exc}")
     try:
-        WIN32._move_cursor(3, scr_h - 3)
-        WIN32._send_mouse_event(0x0002)
-        WIN32._send_mouse_event(0x0004)
-    except Exception:
-        click_ok = False
-
-    # Audit finding: the standalone UnifiedVirtualMouse facade — is it wired to real input?
-    vm = uvm.UnifiedVirtualMouse()
-    facade_src = inspect.getsource(vm._execute_move)
-    # Direct Win32 calls OR delegation to the DAP input primitives both count as
-    # "wired" — the facade was refactored to delegate to organ_24 WIN32.move_cursor
-    # (the single source of truth), so the raw tokens now live one layer down.
-    _facade_direct = ("SetCursorPos", "SendInput", "mouse_event")
-    _facade_delegates = ("move_cursor", "self._dap", "dap.", "WIN32")
-    facade_wired = any(tok in facade_src for tok in _facade_direct) or \
-        (any(tok in facade_src for tok in _facade_delegates) and hasattr(vm, "_dap"))
-
-    motion_verified = hits >= 3
-    # The OS itself refusing SetCursorPos (return 0) while OUR thread holds no
-    # clip is the unambiguous proof that another process owns the pointer — the
-    # primitive is wired correctly and executes without error; the environment
-    # rejects the move. A hard single-point lock is a second, weaker signal.
-    os_refused = (setcursor_ret == 0)
-    env_blocked = (not motion_verified and primitive_wired and in_range and click_ok
-                   and not_our_clip and (os_refused or pointer_hard_locked))
-    # Motion counts as a PASS only when the pointer demonstrably landed; a
-    # correct-but-environment-blocked run is reported honestly as ENV-BLOCKED.
-    passed = motion_verified and click_ok
-
-    if motion_verified:
-        motion_state = f"{hits}/{len(targets)} DAP Win32 moves landed & GetCursorPos-verified"
-    elif env_blocked:
-        reason = (f"OS refused SetCursorPos (ret={setcursor_ret}) under a foreign-thread clip we "
-                  f"cannot remove" if os_refused else
-                  f"pointer pinned at constant {pinned} across all {len(targets)} distinct targets")
-        motion_state = (f"ENVIRONMENT-BLOCKED (NOT a code defect) — {reason}; our thread holds no clip "
-                        f"(release confirmed); primitive wired to Win32 SetCursorPos={primitive_wired} and "
-                        f"executes without error; passes 4/4 in isolation when the pointer is free")
-    else:
-        motion_state = f"Genuine motion failure — only {hits}/{len(targets)} landed, pointer free but not driven to target"
-
+        paint = sup.sprite_paint_proof()
+    except Exception as exc:  # noqa: BLE001
+        paint = {"painted": False, "changed_pixels": 0, "error": str(exc)}
+    passed = bool(proof.get("ok")) and bool(paint.get("painted"))
     return TestOutcome(
         passed=passed,
-        env_blocked=env_blocked,
         evidence=(
-            f"{motion_state}; click injection={'OK' if click_ok else 'FAIL'}; "
-            f"unified_virtual_mouse facade executes real input: {facade_wired} "
-            f"({'wired' if facade_wired else 'STUB — position-tracking only'})"
-            + (f" | {contested} needed retries" if contested and not env_blocked else "")
-            + (" | diag: " + "; ".join(_diag) if _diag else "")
-        ),
-        metrics={"moves_verified": hits, "moves_total": len(targets),
-                 "avg_move_ms": round(sum(latencies) / len(latencies), 3) if latencies else 0.0,
-                 "primitive_wired_setcursorpos": primitive_wired,
-                 "raw_setcursorpos_return": setcursor_ret,
-                 "pointer_hard_locked_by_other_app": pointer_hard_locked,
-                 "os_refused_setcursorpos": os_refused,
-                 "our_thread_clip_confined": clip_confined,
-                 "facade_wired_to_win32": facade_wired},
+            f"A normal-window PostMessage click={proof.get('A_postmessage_click')}; "
+            f"B MINIMIZED window UIA-invoke={proof.get('B_uia_landed')} ({proof.get('B_method')}, "
+            f"state={proof.get('B_window_state')}); C COVERED window click landed on the covered "
+            f"button only={proof.get('C_covered_click_landed')}; D posted Ctrl+Shift+S arrived WITH "
+            f"modifiers={proof.get('D_combo_mods_arrived')} (saw {proof.get('D_combos_seen')}); "
+            f"WM_CHAR text={proof.get('text_wm_char_ok')}; E physical pointer untouched="
+            f"{proof.get('E_pointer_untouched')} ({proof.get('E_pointer')}), guard violations during "
+            f"actions={proof.get('E_guard_violations_during')}; F input guard refused a legacy "
+            f"SetCursorPos={proof.get('F_guard_refused_legacy_call')}; sprite painted "
+            f"{paint.get('changed_pixels')} px (painted={paint.get('painted')})"),
+        metrics={k: proof.get(k) for k in ("A_postmessage_click", "B_uia_landed", "C_covered_click_landed",
+                                           "D_combo_mods_arrived", "E_pointer_untouched",
+                                           "F_guard_refused_legacy_call")}
+        | {"sprite_changed_pixels": paint.get("changed_pixels")},
     )
 
 
@@ -1014,10 +936,95 @@ ORGAN_IMPORTS = [
     ("core_organs.organ_41_scanner", "ScannerOrgan"),
     ("core_organs.desktop_grounding", "DesktopAutonomyLoop"),
     ("core_organs.organ_47_app_intelligence", "AppIntelligence"),
+    ("core_organs.organ_48_app_behavior_model", "BehaviorModel"),
+    ("core_organs.organ_49_scan_knowledge", "ScanKnowledgeSession"),
+    ("core_organs.organ_50_layout_map", "LayoutMapper"),
+    ("core_organs.popup_mode", "current_policy"),
+    ("core_organs.background_window", "BackgroundSession"),
     ("core_organs.unified_virtual_mouse", "UnifiedVirtualMouse"),
     ("core_organs.enhanced_brain_compiler", "EnhancedBrainCompiler"),
+    # the A-G fix brief's modules: the product router, the one popup engine, the headless drag, the drawing cursor
+    ("core_organs.loop_first", "run_loop_first"),
+    ("core_organs.organ_01_crewai_engine", "CrewAIEngine"),
+    ("core_organs.popup_policy", "resolve_view"),
+    ("core_organs.headless_input", "post_drag"),
+    ("core_organs.visual_cursor", "VisualCursor"),
+    ("core_organs.organ_15_external_connectors", "DesktopConnector"),
 ]
 
+
+
+def test_bm1_behavior() -> TestOutcome:
+    """BM1: knowledge-pack format validates strictly, enforces the trust cap, loads as unverified data"""
+    from core_organs import si_tests_behavior
+    return si_tests_behavior.run_bm1(TestOutcome)
+
+
+def test_bm2_behavior() -> TestOutcome:
+    """BM2: pre/postconditions are machine-checkable; an unobservable effect is OPAQUE, never PASS"""
+    from core_organs import si_tests_behavior
+    return si_tests_behavior.run_bm2(TestOutcome)
+
+
+def test_bm3_behavior() -> TestOutcome:
+    """BM3: autonomy gate, trust climb/erosion, version demotion, state-machine path, effector learning"""
+    from core_organs import si_tests_behavior
+    return si_tests_behavior.run_bm3(TestOutcome)
+
+
+def test_bm4_behavior() -> TestOutcome:
+    """BM4: harvest the app's own artifacts (keymaps/settings/CLI registry) as unverified candidates"""
+    from core_organs import si_tests_behavior
+    return si_tests_behavior.run_bm4(TestOutcome)
+
+
+def test_sc1_behavior() -> TestOutcome:
+    """SC1: read-only E0 crawl maps ANY app's menus through one code path; no clicks, popups unwound"""
+    from core_organs import si_tests_behavior
+    return si_tests_behavior.run_sc1(TestOutcome)
+
+
+def test_lm1_behavior() -> TestOutcome:
+    """LM1: every section + control + window-relative position is mapped generically; deepening reversible"""
+    from core_organs import si_tests_behavior
+    return si_tests_behavior.run_lm1(TestOutcome)
+
+
+def test_sc2_behavior() -> TestOutcome:
+    """SC2: E1 reversible probing discovers a child window invisible to E0, then unwinds to baseline"""
+    from core_organs import si_tests_behavior
+    return si_tests_behavior.run_sc2(TestOutcome)
+
+
+def test_pm1_behavior() -> TestOutcome:
+    """PM1: popup_mode - probe dialogs are cancel-only (never accepted/cached); expected dialogs are kept"""
+    from core_organs import si_tests_behavior
+    return si_tests_behavior.run_pm1(TestOutcome)
+
+
+def test_tpl1_behavior() -> TestOutcome:
+    """TPL1: a task decomposed from DATA templates runs verified leaf-by-leaf on two unrelated apps"""
+    from core_organs import si_tests_behavior
+    return si_tests_behavior.run_tpl1(TestOutcome)
+
+
+def test_sck1_behavior() -> TestOutcome:
+    """SCK1: organ_30 scan consults organ_48/50 knowledge: E0 + layout first, cached on re-scan"""
+    from core_organs import si_tests_behavior
+    return si_tests_behavior.run_sck1(TestOutcome)
+
+
+def test_day1_behavior() -> TestOutcome:
+    """DAY1: unattended task-list day: never stalls the queue, report matches ground truth"""
+    from core_organs import si_tests_behavior
+    return si_tests_behavior.run_day1(TestOutcome)
+
+
+
+def test_min1_behavior() -> TestOutcome:
+    """MIN1: a MINIMIZED app is scanned + operated without ever being shown or focused, at full quality"""
+    from core_organs import si_tests_behavior
+    return si_tests_behavior.run_min1(TestOutcome)
 
 def test_h1_organ_import_health() -> TestOutcome:
     """H1: Every core organ module imports cleanly with its main symbol present"""
@@ -1053,17 +1060,19 @@ def test_g1_grounding_ladder_honesty() -> TestOutcome:
         DesktopGrounding, HAS_UIA, HAS_TORCH, HAS_PYTESSERACT,
     )
 
-    subprocess.run(["taskkill", "/f", "/im", "notepad.exe"],
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    time.sleep(0.3)
+    notepads_before = _windows_of_class("Notepad")           # the user's own Notepad is never touched
     proc = subprocess.Popen(["notepad.exe"])
     try:
+        _ready, _blocked = _vision_ready_or_blocked(300.0)   # warmup happens off the goal path; tests wait for it
+        if not _ready:
+            return _blocked
         g = DesktopGrounding()
         hwnd = None
         deadline = time.perf_counter() + 10
         while time.perf_counter() < deadline:
-            hwnd = g.find_window("notepad")
-            if hwnd:
+            new_np = _windows_of_class("Notepad") - notepads_before
+            if new_np:
+                hwnd = g.find_window("notepad")
                 break
             time.sleep(0.3)
         if not hwnd:
@@ -1106,8 +1115,7 @@ def test_g1_grounding_ladder_honesty() -> TestOutcome:
             proc.wait(timeout=3)
         except Exception:
             pass
-        subprocess.run(["taskkill", "/f", "/im", "notepad.exe"],
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        _close_new_windows_of(notepads_before, "Notepad")
 
 
 def test_v1_verifier_verdict_logic() -> TestOutcome:
@@ -1207,7 +1215,7 @@ def test_pl1_popup_lexical_tier() -> TestOutcome:
     mgr = DesktopInteractionManager()
     # Dry-run: capture key intents instead of firing real hardware keystrokes.
     pressed = []
-    mgr._execute_key_intent = lambda action: (pressed.append(action), True)[1]
+    mgr._execute_key_intent = lambda action, hwnd=0: (pressed.append(action), True)[1]
 
     def node(title, wtype, text=""):
         return WindowNode(
@@ -1348,8 +1356,11 @@ def test_tg1_taskgraph_blender_chair() -> TestOutcome:
     calc_react = (not g_calc.skip_react) and g_calc.mode == "react_fallback"
 
     passed = skip_react and mode == "native_runtime" and kind == "chair" and bpy_ok and calc_react
+    # No 3D suite installed on this host => the compiler correctly refuses to plan it: environmental.
+    env_no_3d = (not passed) and "no 3d suite installed" in str(g.reason).lower() and bpy_ok and calc_react
     return TestOutcome(
         passed=passed,
+        env_blocked=env_no_3d,
         evidence=(
             f"graph skip_react={skip_react} mode={mode} kind={kind} save={save} "
             f"steps={steps_len} reason={g.reason!r}; bpy_recipe={'OK' if bpy_ok else 'FAIL'}; "
@@ -1463,6 +1474,516 @@ def test_w8_app_intelligence_pro_learning() -> TestOutcome:
             pass
 
 
+
+# ═══════════════════════════════════════════════════════════════════════
+# OUTSTANDING-ISSUES FIX PLAN: vision budget/cache, blank parse, PL2, W9, E2E
+# ═══════════════════════════════════════════════════════════════════════
+
+def _vision_ready_or_blocked(timeout_s: float = 300.0):
+    """(ready, ENV-BLOCKED outcome | None). A warmup that fails or times out is an ENVIRONMENT result that must be
+    SAID - never a silent skip that lets a vision test pass without vision."""
+    from core_organs import desktop_grounding as dg
+    ready = dg.DesktopGrounding.wait_vision_ready(timeout_s)
+    if ready:
+        return True, None
+    warm = dict(dg.DesktopGrounding._warm)
+    return False, TestOutcome(
+        passed=False, env_blocked=True,
+        evidence=f"ENV-BLOCKED: vision warmup did not become ready within {timeout_s:.0f} s "
+                 f"(state={warm.get('state')}, result={warm.get('result')}); the vision tier cannot be measured on this host right now")
+
+
+def test_g2_vision_budget_cache_timing() -> TestOutcome:
+    """G2: vision tier is budgeted per goal, cached per window signature, and per-tier ms is reported - with the REAL OmniParser, instrumented"""
+    from core_organs import si_test_support as sup
+    from core_organs import desktop_grounding as dg
+
+    if not (dg.HAS_TORCH and dg.HAS_PIL and os.path.isdir(dg.OMNI_LOCAL_REPO)):
+        return TestOutcome(passed=False, env_blocked=True,
+                           evidence="vision prerequisites missing (torch/PIL/OmniParser repo)")
+    t_w = time.perf_counter()
+    ready, blocked = _vision_ready_or_blocked(300.0)
+    if not ready:
+        return blocked
+    warm_wait_ms = (time.perf_counter() - t_w) * 1000
+
+    parser = dg.DesktopGrounding._get_vision_parser()
+    if parser is None:
+        return TestOutcome(passed=False, env_blocked=True, evidence="OmniParser reported itself unavailable after warmup")
+    calls: List[Dict[str, Any]] = []
+    real_parse = parser.parse_screenshot
+
+    def instrumented(path):
+        t0 = time.perf_counter()
+        els = real_parse(path)
+        calls.append({"ms": round((time.perf_counter() - t0) * 1000, 1), "elements": len(els or [])})
+        return els
+    parser.parse_screenshot = instrumented
+    win = sup.NativeButtonWindow(title="HJ-G2-VisionProbe").start()
+    try:
+        g = dg.DesktopGrounding()
+        absent = "zz_absent_widget_zz"
+        # 1st ground: vision runs (cache miss) - the REAL parser
+        _h, _e, r1 = g.ground(win.title, target_text=absent, max_tier=4)
+        n_after_first = len(calls)
+        cold_parse_ms = calls[0]["ms"] if calls else None
+        # 2nd ground, identical pixels, inside the TTL: cache hit, parser NOT called again
+        _h, _e, r2 = g.ground(win.title, target_text=absent, max_tier=4)
+        cache_hit = bool(r2.get("vision_cache_hit")) and len(calls) == n_after_first
+        t_cached = r2["tier_ms"].get("vision", 9e9)
+        # Budget: force misses by clearing the cache; calls beyond VISION_MAX_CALLS are refused
+        g.reset_vision_budget()
+        n0 = len(calls)
+        reports = []
+        for _ in range(dg.VISION_MAX_CALLS + 1):
+            g._vision_cache.clear()
+            reports.append(g.ground(win.title, target_text=absent, max_tier=4)[2])
+        ran = len(calls) - n0
+        budget_enforced = ran == dg.VISION_MAX_CALLS and any(
+            "vision:budget-exhausted" in rp.get("tiers_skipped", []) for rp in reports)
+        # New goal => budget refilled
+        g.reset_vision_budget()
+        g._vision_cache.clear()
+        n1 = len(calls)
+        g.ground(win.title, target_text=absent, max_tier=4)
+        refilled = len(calls) == n1 + 1
+        tier_ms_ok = all(k in r1["tier_ms"] for k in ("uia", "vision")) and "ocr" in r1["tier_ms"]
+        parse_ms = [c["ms"] for c in calls]
+        passed = (n_after_first == 1 and cache_hit and budget_enforced and refilled and tier_ms_ok)
+        speedup = (cold_parse_ms / t_cached) if (cold_parse_ms and t_cached and t_cached > 0) else None
+        return TestOutcome(
+            passed=passed,
+            evidence=(f"REAL OmniParser (warm, waited {warm_wait_ms:.0f} ms for the warmup thread): first ground ran vision "
+                      f"{n_after_first}x, parse {cold_parse_ms} ms; 2nd identical window cache_hit={cache_hit} "
+                      f"({t_cached} ms vs {r1['tier_ms'].get('vision')} ms miss{f', x{speedup:.0f}' if speedup else ''}); budget "
+                      f"{dg.VISION_MAX_CALLS}/goal enforced={budget_enforced} (ran {ran} of {dg.VISION_MAX_CALLS + 1} attempts); "
+                      f"refill-on-new-goal={refilled}; all {len(calls)} real parses (ms)={parse_ms}; "
+                      f"measured per-tier ms (miss)={r1['tier_ms']}"),
+            metrics={"cache_hit": cache_hit, "budget_enforced": budget_enforced, "refilled": refilled,
+                     "real_parse_ms": parse_ms, "tier_ms_miss": str(r1["tier_ms"]), "tier_ms_hit": t_cached},
+        )
+    finally:
+        parser.parse_screenshot = real_parse
+        win.stop()
+
+
+def test_om1_blank_image_parse_and_warmup() -> TestOutcome:
+    """OM1: real OmniParser warmup (easyocr download happens once) + blank image = 0 elements, no ERROR"""
+    import logging
+    from PIL import Image
+    from core_organs import desktop_grounding as dg
+
+    if not (dg.HAS_TORCH and dg.HAS_PIL and os.path.isdir(dg.OMNI_LOCAL_REPO)):
+        return TestOutcome(passed=False, env_blocked=True,
+                           evidence="vision prerequisites missing (torch/PIL/OmniParser repo)")
+    warm = dg.DesktopGrounding.warmup_vision()
+    if not warm.get("warmed"):
+        return TestOutcome(passed=False, env_blocked=True,
+                           evidence=f"OmniParser could not warm up: {warm}")
+
+    class _Capture(logging.Handler):
+        def __init__(self):
+            super().__init__(level=logging.INFO)
+            self.records = []
+
+        def emit(self, record):
+            self.records.append(record)
+
+    cap = _Capture()
+    log = logging.getLogger("core_organs.organ_44_enhanced_scanner")
+    root_names = ["core_organs.organ_44_enhanced_scanner", "organ_44_enhanced_scanner", ""]
+    loggers = [logging.getLogger(n) for n in root_names]
+    for lg in loggers:
+        lg.addHandler(cap)
+    blank = os.path.join(os.environ.get("TEMP", "."), "hj_blank_" + uuid.uuid4().hex[:6] + ".png")
+    try:
+        Image.new("RGB", (640, 400), "white").save(blank)
+        parser = dg.DesktopGrounding._get_vision_parser()
+        t0 = time.perf_counter()
+        els = parser.parse_screenshot(blank)
+        dur = (time.perf_counter() - t0) * 1000
+    finally:
+        for lg in loggers:
+            lg.removeHandler(cap)
+        try:
+            os.remove(blank)
+        except Exception:
+            pass
+    errors = [r.getMessage() for r in cap.records
+              if r.levelno >= logging.ERROR and "OmniParser" in r.getMessage()]
+    passed = (els == []) and not errors
+    return TestOutcome(
+        passed=passed,
+        evidence=(f"warmup {warm['ms']} ms (warmed={warm['warmed']}); blank 640x400 PNG -> {len(els)} elements "
+                  f"in {dur:.0f} ms; ERROR-level logs={len(errors)} {errors[:1]}"),
+        metrics={"warmup_ms": warm["ms"], "blank_parse_ms": round(dur), "error_logs": len(errors)},
+    )
+
+
+def test_pl2_popup_fingerprint_cache() -> TestOutcome:
+    """PL2: dynamic-title popups hit the class+button fingerprint cache; real DB round-trips it"""
+    from core_organs.organ_29_popup_handler import (
+        DesktopInteractionManager, WindowNode, WindowRect, WindowType, normalize_popup_title,
+    )
+
+    os.environ["HOJAIGA_POPUP_PREWARM"] = "0"
+
+    class _MemDB:
+        def __init__(self):
+            self.rows = []
+
+        def generate_layout_hash(self, t):
+            return t
+
+        def check_popup_history(self, title):
+            for r in self.rows:
+                if r["title"] == title:
+                    return r
+            return None
+
+        def check_popup_fingerprint(self, fp):
+            for r in self.rows:
+                if r["fingerprint"] == fp:
+                    return r
+            return None
+
+        def log_new_pathway(self, layout_hash, element_name, x, y, action_type, parent_path="",
+                            fingerprint=""):
+            self.rows.append({"title": element_name, "x": x, "y": y, "action": action_type,
+                              "parent_path": parent_path, "fingerprint": fingerprint})
+
+    def node(title, cls="#32770"):
+        return WindowNode(
+            handle=0, parent_handle=None, owner_handle=None, process_id=os.getpid(),
+            title=title, class_name=cls, win_type=WindowType.UNKNOWN,
+            bounds=WindowRect(left=100, top=100, right=500, bottom=400),
+            extra_data={"buttons": ["Retry", "Cancel"]})
+
+    mgr = DesktopInteractionManager()
+    mgr.db = _MemDB()
+    pressed = []
+    mgr._execute_key_intent = lambda a, hwnd=0: (pressed.append(a), True)[1]
+
+    checks, detail = [], []
+    n1 = node("Installer Error 0x80070005 (attempt 3)")
+    n2 = node("Installer Error 0x8007271D (attempt 17)")
+    n3 = node("Totally Different Dialog")
+    n4 = node("Installer Error 0x80070005 (attempt 3)", cls="OtherClass")
+    fp1, fp2 = mgr.popup_fingerprint(n1), mgr.popup_fingerprint(n2)
+    checks.append(fp1 == fp2 and fp1 != mgr.popup_fingerprint(n3) and fp1 != mgr.popup_fingerprint(n4))
+    detail.append(f"normalize->'{normalize_popup_title(n1.title)}', fp-stable={fp1 == fp2}, "
+                  f"distinct-for-other-class/title={fp1 != mgr.popup_fingerprint(n4)}")
+
+    # Learn n1 (as a prior Tier-4/Tier-3 outcome would), then resolve n2 with a DIFFERENT title.
+    mgr._log_pathway(n1, 0, 0, "key:escape", "organ_29_tier4_escape_cached")
+    t0 = time.perf_counter()
+    ok, _x, _y, act = mgr.resolve_and_mitigate(n2)
+    dur = time.perf_counter() - t0
+    hit = ok and act == "key:escape" and pressed == ["key:escape"] and dur < 1.0
+    checks.append(hit)
+    detail.append(f"different-title popup resolved via fingerprint cache in {dur * 1000:.0f} ms -> {act}")
+    checks.append(mgr.db.check_popup_history(n2.title) is None)
+    detail.append("exact-title lookup alone would have MISSED (the pre-fix behaviour)")
+
+    # Real database round-trip of the fingerprint column-in-JSON
+    real_note = "real-db: skipped"
+    try:
+        from core_organs.database_manager import DatabaseManager
+        db = DatabaseManager()
+        uniq = "zz-pl2-" + uuid.uuid4().hex[:8]
+        fp = DesktopInteractionManager.__new__(DesktopInteractionManager)
+        fp_val = uuid.uuid4().hex
+        db.log_new_pathway(db.generate_layout_hash(uniq), uniq, 7, 9, "key:escape", "pl2-test",
+                           fingerprint=fp_val)
+        got = db.check_popup_fingerprint(fp_val)
+        real_ok = bool(got) and got.get("action") == "key:escape"
+        checks.append(real_ok)
+        real_note = f"real-db fingerprint round-trip={'OK' if real_ok else 'MISS'}"
+    except Exception as exc:  # noqa: BLE001
+        return TestOutcome(passed=False, env_blocked=True,
+                           evidence=f"database unreachable ({type(exc).__name__}: {exc}); in-memory checks: "
+                                    + "; ".join(detail))
+    detail.append(real_note)
+    return TestOutcome(passed=all(checks), evidence="; ".join(detail),
+                       metrics={"fingerprint_resolve_ms": round(dur * 1000, 1)})
+
+
+def test_w9_compiled_nav_step_url() -> TestOutcome:
+    """W9: the compiled WEB.NAVIGATE step (what pre-navigation uses) never carries goto.com"""
+    from core_organs.organ_01_crewai_engine import _compile_task_with_organ36, _derive_web_url
+
+    cases = [("go to gmail and check my inbox", "gmail.com"), ("goto gmail", "gmail.com"),
+             ("open chrome and go to gmail.com", "gmail.com"), ("navigate to figma", "figma.com")]
+    bad, ok_n, detail = [], 0, []
+    for cmd, want in cases:
+        comp = _compile_task_with_organ36(cmd)
+        nav = [st for st in comp.get("steps", []) if st.get("capability") == "WEB.NAVIGATE"]
+        url = (nav[0].get("parameters") or {}).get("url") if nav else _derive_web_url(cmd, "")
+        good = bool(url) and want in url and "goto" not in url
+        ok_n += int(good)
+        detail.append(f"'{cmd}' -> {url}")
+        if not good:
+            bad.append(cmd)
+    return TestOutcome(passed=not bad, evidence=f"{ok_n}/{len(cases)} compiled nav URLs correct: " + "; ".join(detail),
+                       metrics={"correct": f"{ok_n}/{len(cases)}"})
+
+
+def test_pp1_popup_policy_real_dialogs() -> TestOutcome:
+    """PP1: popup policy reads REAL dialogs, answers non-destructively, escalates elevation/overwrite, headless"""
+    from core_organs import si_tests_extra
+    return si_tests_extra.run_pp1(TestOutcome)
+
+
+def test_lf1_loop_first_routing() -> TestOutcome:
+    """LF1: the product routes detected desktop apps through the verified loop IN ORDER, stops at a human gate, and is switchable"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_lf1(TestOutcome)
+
+
+def test_lf2_loop_first_two_apps_live() -> TestOutcome:
+    """LF2: a REAL two-app task (Notepad then Calculator) runs both apps through the verified loop with the physical pointer untouched"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_lf2(TestOutcome)
+
+
+def test_off1_offscreen_capture_rung() -> TestOutcome:
+    """OFF1: a real MINIMIZED Notepad is read by OCR through the off-screen capture rung, ends minimized again, and a structurally-grounded app never pays for it"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_off1(TestOutcome)
+
+
+def test_dr1_headless_drag() -> TestOutcome:
+    """DR1: headless drag - ordered, time-sliced WM_MOUSEMOVE/LBUTTONDOWN/UP draws a circle on a real canvas; physical pointer untouched; an app that ignores posted mouse input is reported INEFFECTIVE, not success"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_dr1(TestOutcome)
+
+
+def test_cn1_desktop_connector_headless() -> TestOutcome:
+    """CN1: organ_15's desktop connector delivers click/type/hotkey/press as posted messages to a resolved window, and REFUSES (never pyautogui) when no window resolves"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_cn1(TestOutcome)
+
+
+def test_ty1_headless_launch_switch_type() -> TestOutcome:
+    """TY1: the launch / switch / type tools never touch the physical keyboard or mouse and never raise, restore or maximize a window (a minimized target is parked off-screen for the call); a delivery the target did not accept is never reported - or recorded - as typed"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_ty1(TestOutcome)
+
+
+def test_de1_goal_postconditions() -> TestOutcome:
+    """DE1: a goal carries its own machine-checkable postcondition - 'save as <path>' needs that file (and its real format), 'expect X' needs X on screen, the requested format outranks 'Save as project'"""
+    from core_organs import si_tests_derive
+    return si_tests_derive.run_de1(TestOutcome)
+
+
+def test_lc1_lifecycle_offline() -> TestOutcome:
+    """LC1: intake (secrets, tickets, domain, impossible, one question) + the D3 risk gate + the per-checkpoint record, with a stubbed operator"""
+    from core_organs import si_tests_lifecycle
+    return si_tests_lifecycle.run_lc1(TestOutcome)
+
+
+def test_lc2_lifecycle_live() -> TestOutcome:
+    """LC2: the checkpoint chain on REAL apps - Notepad types and saves, Calculator computes, an irreversible delete is queued - against independent ground truth"""
+    from core_organs import si_tests_lifecycle
+    return si_tests_lifecycle.run_lc2(TestOutcome)
+
+
+def test_any1_any_app_discovery() -> TestOutcome:
+    """ANY1: any-app discovery - scan walks are bounded by TIME with a visible depth rail, readiness follows a splash chain instead of a flat 10 s, an unnamed DataGrid is grounded by role, XAML hosts are recognised"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_any1(TestOutcome)
+
+
+def test_up1_unified_popup_engine() -> TestOutcome:
+    """UP1: ONE popup engine - organ_29 only detects; escalation presses zero buttons; benign prompts are dismissed not escalated; the cold LLM tier is capped AND a breaker stops later popups paying it again (measured)"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_up1(TestOutcome)
+
+
+def test_vb1_warmup_head_to_head() -> TestOutcome:
+    """VB1: REAL cold starts, head to head - does the warmup thread buy anything? (A = warmup at t0, B = lazy), same workload, alternating order, real OmniParser"""
+    import json as _json
+    import subprocess
+    from core_organs import desktop_grounding as dg
+    if not (dg.HAS_TORCH and dg.HAS_PIL and os.path.isdir(dg.OMNI_LOCAL_REPO)):
+        return TestOutcome(passed=False, env_blocked=True, evidence="vision prerequisites missing (torch/PIL/OmniParser repo)")
+    bench = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vision_bench.py")
+    t0 = time.perf_counter()
+    p = subprocess.run([sys.executable, "-X", "utf8", bench, "h2h", "--work-s", "8", "--rounds", "2"],
+                       capture_output=True, text=True, timeout=2400,
+                       env=dict(os.environ, PYTHONPATH="D:\\new_automation;D:\\new_automation\\All codes"))
+    line = next((l for l in reversed((p.stdout or "").splitlines()) if l.startswith("H2H_JSON ") or "H2H_JSON " in l), "")
+    if "H2H_JSON " not in line:
+        return TestOutcome(passed=False, env_blocked=True, evidence=f"bench produced no result (rc={p.returncode}): {(p.stderr or '')[-300:]}")
+    data = _json.loads(line.split("H2H_JSON ", 1)[1])
+    runs = data.get("runs", [])
+    missing = [r.get("mode") for r in runs if not r.get("vision_ran")]
+    if missing or "warmup_thread_saved_ms" not in data:
+        return TestOutcome(passed=False, env_blocked=True,
+                           evidence=f"vision never became available in {len(missing)} cold run(s) {missing}: {[r.get('error') or r.get('tiers_skipped_last') for r in runs]}")
+    per = "; ".join(f"{r['mode']}: vision@{r['vision_result_at_ms']} ms (goal waited {r['goal_waited_for_vision_ms']} ms; "
+                    f"warmup load {r.get('warmup_result_ms')} ms; tier_ms {r.get('ground_report_tier_ms')})" for r in runs)
+    return TestOutcome(
+        passed=True,
+        evidence=(f"{len(runs)} fresh-process cold starts in {time.perf_counter() - t0:.0f} s (alternating A/B order, 8 s of UIA goal-path "
+                  f"work before the first pixel need): mean time the goal WAITED for vision A(warmup thread)={data['mean_goal_wait_A_ms']} ms vs "
+                  f"B(lazy)={data['mean_goal_wait_B_ms']} ms; vision available at A={data['mean_vision_ready_A_ms']} ms vs B={data['mean_vision_ready_B_ms']} ms "
+                  f"=> the warmup thread saved {data['warmup_thread_saved_ms']} ms. {per}"),
+        metrics={k: data[k] for k in data if k.startswith("mean_") or k == "warmup_thread_saved_ms"})
+
+
+def test_j1_judge_shortlist_ranking() -> TestOutcome:
+    """J1: judge shortlist is goal-aware (text area / 'Save as' reach the 8-slot window, indices map back)"""
+    from core_organs.desktop_grounding import ConstrainedJudge, GroundedElement, MAX_JUDGE_ELEMENTS
+
+    def el(i, name, role, y):
+        return GroundedElement(id=f"e{i}", name=name, role=role, bbox=(10, y, 90, y + 20),
+                               tier="uia", confidence=0.9, hwnd=1)
+
+    # 30 chrome buttons ranked ahead by confidence/top-to-bottom; the target controls sit last.
+    elements = [el(i, f"Toolbar button {i}", "button", 10 + i * 25) for i in range(30)]
+    elements.append(el(30, "Save as", "menuitem", 900))
+    elements.append(el(31, "Text editor", "edit", 950))
+    old_top = [e.name for e in elements[:MAX_JUDGE_ELEMENTS]]
+    r_type = ConstrainedJudge.rank_candidates("type a haiku into the text area", elements)
+    r_save = ConstrainedJudge.rank_candidates(r"save the document as C:\temp\poem.txt", elements)
+    top_type = [e.name for _i, e in r_type[:MAX_JUDGE_ELEMENTS]]
+    top_save = [e.name for _i, e in r_save[:MAX_JUDGE_ELEMENTS]]
+    idx_ok = all(elements[i] is e for i, e in r_type + r_save)
+    pre_fix_blind = "Text editor" not in old_top and "Save as" not in old_top
+    type_ok = top_type[0] == "Text editor"
+    save_ok = top_save[0] == "Save as"
+    import re as _re
+    # Same pattern DesktopAutonomyLoop.step uses to find a path inside a goal.
+    m = _re.search(r"[A-Za-z]:[\\/][^\s'<>|?*]+", r"save the document as C:\Users\x\Temp\poem.txt")
+    path_ok = bool(m) and m.group(0).endswith("poem.txt") and "\\" in m.group(0)
+    from core_organs.desktop_grounding import _is_file_dialog_title, _is_overwrite_confirm
+    triage_ok = (_is_file_dialog_title("Save As") and _is_file_dialog_title("Open")
+                 and not _is_file_dialog_title("Confirm Save As")
+                 and _is_overwrite_confirm("Confirm Save As")
+                 and not _is_file_dialog_title("Notepad") and not _is_overwrite_confirm("Save As"))
+    return TestOutcome(
+        passed=pre_fix_blind and type_ok and save_ok and idx_ok and path_ok and triage_ok,
+        evidence=(f"pre-fix first-{MAX_JUDGE_ELEMENTS} shortlist was blind to the targets={pre_fix_blind}; "
+                  f"type-goal top pick='{top_type[0]}'; save-goal top pick='{top_save[0]}'; "
+                  f"original-index mapping intact={idx_ok}; absolute path extracted from goal={path_ok}; "
+                  f"popup triage spares Save/Open pickers & escalates overwrite-confirm={triage_ok}"),
+        metrics={"type_top": top_type[0], "save_top": top_save[0]},
+    )
+
+
+# ── E2E (live desktop; behind --e2e so the normal suite stays fast) ─────────────
+
+def _e2e_run(app: str, goals: List[str], expect_map: Dict[int, Dict[str, Any]], env_note: str) -> Dict[str, Any]:
+    from core_organs.desktop_grounding import operate_app
+    return operate_app(app, goals, expect_map=expect_map, max_steps_per_goal=5)
+
+
+def test_e2e1_notepad_haiku_save() -> TestOutcome:
+    """E2E-1: unattended Notepad run via headless input - type a haiku, save a .txt, verify file, distill, re-run"""
+    import shutil
+    from core_organs import headless_input as hin
+    from core_organs.desktop_grounding import get_loop, DesktopGrounding
+
+    # NOT under %LOCALAPPDATA%: Notepad is a packaged Store app and Windows silently redirects its
+    # writes there into a private package folder (the file would 'not exist' from outside).
+    out_dir = os.path.join(r"D:\new_automation", "_e2e_tmp")
+    shutil.rmtree(out_dir, ignore_errors=True)
+    os.makedirs(out_dir, exist_ok=True)
+    os.environ.setdefault("HOJAIGA_KNOWLEDGE_ROOT", os.path.join(r"D:\new_automation", "organ_04_knowledge"))
+    viol0 = len(hin.VIOLATIONS)
+    pointer0 = si_pointer()
+    g = DesktopGrounding()
+    pre_existing = g.find_window("notepad") is not None   # never kill the user's own Notepad
+    def _close_our_notepad():
+        # Reset app state between runs: run 2 is the LEARNED re-run and must start on a
+        # clean Notepad, not one still holding run 1's haiku + poem1.txt file association
+        # (that carryover was the run-2 NO_CHANGE/HITL flakiness). Only when we launched it.
+        if pre_existing:
+            return
+        h = g.find_window("notepad")
+        if h:
+            hin._u32.PostMessageW(h, 0x0010, 0, 0)  # WM_CLOSE (document already saved)
+            end = time.time() + 5
+            while time.time() < end and g.find_window("notepad"):
+                time.sleep(0.2)
+        time.sleep(0.6)
+
+    results = []
+    try:
+        for n in (1, 2):
+            _close_our_notepad()  # fresh process each run -> operate_app relaunches clean
+            target = os.path.join(out_dir, f"poem{n}.txt")
+            goals = ["type a haiku into the text area", f"save the document as {target}"]
+            r = _e2e_run("notepad", goals, {1: {"file_created": target}}, f"run{n}")
+            results.append((r, os.path.exists(target), target))
+    finally:
+        # Close OUR notepad window gracefully (document is saved, so no unsaved-state is left to
+        # resurrect later). Only when we launched it.
+        _close_our_notepad()
+    (r1, f1, t1), (r2, f2, t2) = results
+    shown = lambda r: [(st["verb"], st["element"][:18], st["verdict"]) for st in r.get("trace", [])]  # noqa: E731
+    c1, c2 = bool(r1.get("completed")) and f1, bool(r2.get("completed")) and f2
+    recipe = r1.get("recipe", "")
+    pointer_ok = si_pointer() == pointer0
+    guard_clean = len(hin.VIOLATIONS) == viol0
+    evidence = (f"run1 completed={r1.get('completed')} file={'yes' if f1 else 'NO'} steps={r1.get('steps')} "
+                f"{r1.get('elapsed_s')}s awaiting_human={r1.get('awaiting_human')} trace={shown(r1)}; "
+                f"recipe='{recipe}'; run2 completed={r2.get('completed')} file={'yes' if f2 else 'NO'} "
+                f"steps={r2.get('steps')} {r2.get('elapsed_s')}s trace={shown(r2)}; "
+                f"steps run1->run2: {r1.get('steps')}->{r2.get('steps')}, seconds {r1.get('elapsed_s')}->"
+                f"{r2.get('elapsed_s')}; physical pointer untouched={pointer_ok}; input-guard violations="
+                f"{len(hin.VIOLATIONS) - viol0}; notepad launched by us={not pre_existing}")
+    return TestOutcome(passed=c1 and c2 and bool(recipe) and guard_clean, evidence=evidence,
+                       metrics={"run1_steps": r1.get("steps"), "run2_steps": r2.get("steps"),
+                                "run1_s": r1.get("elapsed_s"), "run2_s": r2.get("elapsed_s"),
+                                "recipe": bool(recipe), "pointer_untouched": pointer_ok})
+
+
+def si_pointer():
+    import ctypes.wintypes as _wt
+    p = _wt.POINT()
+    ctypes.windll.user32.GetCursorPos(ctypes.byref(p))
+    return (p.x, p.y)
+
+
+def test_e2e2_canvas_app_vision() -> TestOutcome:
+    """E2E-2: UIA-sparse canvas app (Blender if installed, else Paint) driven via grounding ladder incl. vision"""
+    import shutil
+    import subprocess
+    from core_organs.desktop_grounding import DesktopGrounding, get_loop, operate_app
+    blender = shutil.which("blender") or next(
+        (p for p in (r"C:\Program Files\Blender Foundation", r"D:\Program Files\Blender Foundation")
+         if os.path.isdir(p)), None)
+    app = "blender" if blender else "mspaint"
+    subst = "" if blender else "Blender not installed -> substituted Paint (honest substitution). "
+    paint_before = _windows_of_class("MSPaintApp")
+    if app == "mspaint" and paint_before:
+        return TestOutcome(passed=False, env_blocked=True,
+                           evidence=f"Paint is already open ({len(paint_before)} window(s)) and is the USER'S: E2E-2 will not drive or "
+                                    "close it (the old teardown was taskkill /im mspaint.exe). Close it and re-run.")
+    goals = ["select the pencil or brush tool", "draw a short line on the canvas"]
+    _ready, _blocked = _vision_ready_or_blocked(300.0)
+    if not _ready:
+        return _blocked
+    r = operate_app(app, goals, max_steps_per_goal=5)
+    g = get_loop().grounding
+    hwnd, els, rep = g.ground(app, target_text="zz_absent_canvas_widget_zz", max_tier=4)
+    tiers = rep.get("tiers_ran", [])
+    vision_els = sum(1 for e in els if e.tier == "vision")
+    if app == "mspaint":
+        _close_new_windows_of(paint_before, "MSPaintApp")        # only the window this test started
+    verdicts = [(st["verb"], st["element"][:20], st["verdict"]) for st in r.get("trace", [])]
+    return TestOutcome(
+        passed=bool(r.get("completed")) and "vision" in tiers and vision_els > 0,
+        evidence=(f"{subst}app={app}; completed={r.get('completed')} steps={r.get('steps')} {r.get('elapsed_s')}s "
+                  f"awaiting_human={r.get('awaiting_human')}; trace={verdicts}; vision-tier grounding: "
+                  f"tiers_ran={tiers}, tiers_skipped={rep.get('tiers_skipped')}, vision_elements={vision_els}, "
+                  f"tier_ms={rep.get('tier_ms')}"),
+        metrics={"app": app, "vision_elements": vision_els, "tier_ms": str(rep.get("tier_ms"))},
+    )
+
+
 # ═══════════════════════════════════════════════════════════════════════
 # RANKING
 # ═══════════════════════════════════════════════════════════════════════
@@ -1484,6 +2005,19 @@ GROUP_LABELS = {
     "TASKGRAPH": "Task graph compiler (skip-ReAct)",
     "HYGIENE": "Web URL hygiene (W6)",
     "INTELLIGENCE": "App-intelligence organ (organ_47)",
+    "VISION": "Vision tier (OmniParser)",
+    "BEHAVIOR": "Behavior model (organ_48: packs/gate/state machine)",
+    "SCANKNOW": "Knowledge-assisted scanning (organ_49/50)",
+    "AUTONOMY": "Unattended task runs (templates + day report)",
+    "BACKGROUND": "Background operation (minimized, never shown/focused)",
+    "ROUTING": "Product routing (verified loop first)",
+    "HEADLESS": "Headless input (drag / off-screen capture)",
+    "ANYAPP": "Any-app discovery (time-budget scan, window find)",
+    "POPUPENG": "Unified popup engine (popup_policy)",
+    "GOALCHECK": "Goal postconditions (honest DONE)",
+    "LIFECYCLE": "Task lifecycle (A intake -> H report)",
+    "VISIONBUDGET": "Vision budget (real parser, honest timings)",
+    "E2E": "End-to-end unattended runs",
 }
 
 
@@ -1546,7 +2080,44 @@ def main() -> int:
         ("W6", "HYGIENE", test_w6_web_url_hygiene),
         ("W8", "INTELLIGENCE", test_w8_app_intelligence_pro_learning),
         ("H1", "HEALTH", test_h1_organ_import_health),
+        ("G2", "GROUNDING", test_g2_vision_budget_cache_timing),
+        ("OM1", "VISION", test_om1_blank_image_parse_and_warmup),
+        ("PL2", "POPUP", test_pl2_popup_fingerprint_cache),
+        ("W9", "HYGIENE", test_w9_compiled_nav_step_url),
+        ("J1", "GROUNDING", test_j1_judge_shortlist_ranking),
+        ("PP1", "POPUP", test_pp1_popup_policy_real_dialogs),
+        ("LF1", "ROUTING", test_lf1_loop_first_routing),
+        ("LF2", "ROUTING", test_lf2_loop_first_two_apps_live),
+        ("OFF1", "HEADLESS", test_off1_offscreen_capture_rung),
+        ("DR1", "HEADLESS", test_dr1_headless_drag),
+        ("CN1", "HEADLESS", test_cn1_desktop_connector_headless),
+        ("TY1", "HEADLESS", test_ty1_headless_launch_switch_type),
+        ("ANY1", "ANYAPP", test_any1_any_app_discovery),
+        ("UP1", "POPUPENG", test_up1_unified_popup_engine),
+        ("DE1", "GOALCHECK", test_de1_goal_postconditions),
+        ("LC1", "LIFECYCLE", test_lc1_lifecycle_offline),
+        ("LC2", "LIFECYCLE", test_lc2_lifecycle_live),
+        ("BM1", "BEHAVIOR", test_bm1_behavior),
+        ("BM2", "BEHAVIOR", test_bm2_behavior),
+        ("BM3", "BEHAVIOR", test_bm3_behavior),
+        ("BM4", "BEHAVIOR", test_bm4_behavior),
+        ("MIN1", "BACKGROUND", test_min1_behavior),
+        ("SC1", "SCANKNOW", test_sc1_behavior),
+        ("LM1", "SCANKNOW", test_lm1_behavior),
+        ("SC2", "SCANKNOW", test_sc2_behavior),
+        ("PM1", "POPUP", test_pm1_behavior),
+        ("SCK1", "SCANKNOW", test_sck1_behavior),
+        ("TPL1", "AUTONOMY", test_tpl1_behavior),
+        ("DAY1", "AUTONOMY", test_day1_behavior),
     ]
+    if "--e2e" in sys.argv:
+        plan += [("E2E-1", "E2E", test_e2e1_notepad_haiku_save),
+                 ("E2E-2", "E2E", test_e2e2_canvas_app_vision)]
+    if "--vision-bench" in sys.argv:     # 4 REAL cold starts (several minutes): opt-in, results also land in data/vision_bench_results.json
+        plan += [("VB1", "VISIONBUDGET", test_vb1_warmup_head_to_head)]
+    if "--only" in sys.argv:          # iterate on a few tests: --only LM1,SC1  (a partial run never overwrites the full log)
+        wanted = {t.strip().upper() for t in sys.argv[sys.argv.index("--only") + 1].split(",") if t.strip()}
+        plan = [p for p in plan if p[0].upper() in wanted]
     for test_id, group, func in plan:
         run_test(test_id, group, func)
 
@@ -1569,8 +2140,9 @@ def main() -> int:
     for i, row in enumerate(rankings, 1):
         print(f"{i:>2}  {row['group']:<38} {row['tests']:>13} {row['score']:>6.1f} {row['avg_ms']:>9.1f}")
 
-    out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "system_intelligence_results.txt")
-    with open(out_path, "w", encoding="utf-8") as f:
+    out_name = "system_intelligence_results_partial.txt" if "--only" in sys.argv else "system_intelligence_results.txt"
+    out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), out_name)
+    with open(out_path, "a" if "--e2e" in sys.argv else "w", encoding="utf-8") as f:
         f.write(f"Hojaiga System Intelligence Suite — {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n")
         for r in RESULTS:
             f.write(f"[{r['status']}] {r['id']} [{r['group']}] {r['name']}\n")

@@ -1,0 +1,51 @@
+{
+  "schema": "hojaiga.pack/1",
+  "archetype": "text_editor",
+  "scope": "archetype",
+  "trust": "archetype",
+  "version_hash": "*",
+  "note": "Generic text-editor family. Data only: any app whose archetype resolves to text_editor inherits these templates. Entries are UNVERIFIED seeds until a run's postconditions pass.",
+  "templates": [
+    {
+      "name": "write text and save as file",
+      "aliases": ["type text and save", "write a note and save it", "create a text file", "write and save document"],
+      "steps": [
+        {
+          "id": "type_text",
+          "goal": "type the text into the editor",
+          "risk": "E1",
+          "unwind": "undo (ctrl+z)",
+          "do": [{"verb": "type", "text": "{text}", "target_role": "document|edit"}],
+          "post": [{"kind": "value_contains", "text": "{text}"}],
+          "retries": 2
+        },
+        {
+          "id": "open_save_as",
+          "goal": "open the Save As dialog",
+          "risk": "E1",
+          "unwind": "cancel the dialog",
+          "do": [{"verb": "key", "keys": "ctrl+shift+s", "expect_popup": "save as"}],
+          "post": [{"kind": "window_opened"}],
+          "retries": 2
+        },
+        {
+          "id": "save_to_path",
+          "goal": "choose the file path and confirm",
+          "risk": "E1",
+          "unwind": "delete the created file",
+          "do": [{"verb": "file_dialog", "path": "{path}"}],
+          "post": [{"kind": "file_exists", "path": "{path}"}],
+          "retries": 1
+        },
+        {
+          "id": "verify_content",
+          "goal": "verify the saved file holds the text",
+          "risk": "E1",
+          "do": [],
+          "post": [{"kind": "file_contains", "path": "{path}", "text": "{text}"}],
+          "retries": 0
+        }
+      ]
+    }
+  ]
+}

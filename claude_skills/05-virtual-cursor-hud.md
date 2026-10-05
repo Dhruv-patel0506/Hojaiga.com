@@ -1,3 +1,8 @@
+---
+name: hojaiga-virtual-cursor-hud
+description: Multi-agent virtual cursor and floating capsule HUD in visual_cursor.py - one full-screen layered overlay drawing N color-coded triangle sprites (one per temporary agent), magnetic stick/detach, 60fps UpdateLayeredWindow rendering.
+---
+
 # Skill 05 — Multi-Agent Virtual Cursor & Capsule (`visual_cursor.py`)
 
 ## What it physically is

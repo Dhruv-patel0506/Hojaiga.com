@@ -1,3 +1,8 @@
+---
+name: hojaiga-dependency-policy
+description: Dependency and model policy - everything free, local, no paid APIs; known-good version pins (transformers 4.51.3, torch CPU wheels, lazy easyocr); the 5-question pre-install gate; model weights stay out of git and are downloaded locally.
+---
+
 # Skill 06 — Dependency & Model Policy (FREE / LOCAL / NO-API)
 
 This is the project's cost law. Every dependency and every model must be free and run

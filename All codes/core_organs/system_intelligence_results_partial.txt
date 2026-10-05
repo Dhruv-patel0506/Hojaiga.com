@@ -1,0 +1,28 @@
+Hojaiga System Intelligence Suite — 2026-10-04 23:55:06
+
+[PASS] LC2 [LIFECYCLE] LC2: the checkpoint chain on REAL apps - Notepad types and saves, Calculator computes, an irreversible delete is queued - against independent ground truth
+    evidence: file-saved-with-the-typed-words (independent read)=OK(hj_lc2_179b14.txt: 'Just a notehello worldNoteNote: Just typ'); calculator-shows-42 (independent read)=OK(display='Display is 42'); irreversible-delete-was-queued-not-run=OK(file survives=True status=ESCALATED); no-checkpoint-FAILed=OK(34 marks, failing: []); D3-gate-escalated=OK(D3.gate=ESCALATED); physical-pointer-untouched-and-no-guard-violations=OK(pointer (240, 829)->(240, 829), guard violations+=0, largest 10 ms step=0px); total 42.4s; closed 2 window(s) we launched
+    duration: 48788.9 ms  metrics: {'seconds': 42.4, 'status': 'ESCALATED'}
+
+
+RANKINGS
+1. Task lifecycle (A intake -> H report): 1/1 tests, score 70.0, avg 48788.9 ms
+Hojaiga System Intelligence Suite — 2026-10-05 00:24:03
+
+[PASS] DE1 [GOALCHECK] DE1: a goal carries its own machine-checkable postcondition - 'save as <path>' needs that file (and its real format), 'expect X' needs X on screen, the requested format outranks 'Save as project'
+    evidence: saving-goals-derive-file-exists-and-format=OK(9/9 goals derived correctly); assertion-goals-need-no-action=OK(6/6 read correctly); requested-format-outranks-save-as-project=OK(top picks {'png': 'PNG picture', 'jpg': 'JPEG picture', 'bmp': 'BMP picture'}; .txt keeps 'Save as'); a-non-png-named-png-is-not-a-pass=OK(fake: file hj_de1_3d5465.png exists; NOT a .png (starts b'PK\x03\x04 a'); real: file hj_de1_3d5465.png exists; is a real .png); a-missing-file-is-not-a-pass=OK(file hj_de1_never_51e9df.png MISSING)
+    duration: 3549.4 ms  metrics: {'checks': 5, 'failed': 0}
+
+[PASS] SCK1 [SCANKNOW] SCK1: organ_30 scan consults organ_48/50 knowledge: E0 + layout first, cached on re-scan
+    evidence: scan1: 208 controls, learned 41 commands (E0 14.38s) in 35.8s; scan2: E0 ['skipped'] cached, skipped_known=0, catalog_only=10 in 33.4s; stop=budget
+    duration: 75157.9 ms  metrics: {'scan1_s': 35.8, 'scan2_s': 33.4}
+
+[PASS] E2E-2 [E2E] E2E-2: UIA-sparse canvas app (Blender if installed, else Paint) driven via grounding ladder incl. vision
+    evidence: Blender not installed -> substituted Paint (honest substitution). app=mspaint; completed=True steps=2 14.62s awaiting_human=False; trace=[('click', 'Pencil', 'PASS'), ('click', 'Line', 'PASS')]; vision-tier grounding: tiers_ran=['uia', 'uia@offscreen', 'ocr', 'vision'], tiers_skipped=[], vision_elements=101, tier_ms={'uia': 551.3, 'uia@offscreen': 624.8, 'ocr': 781.9, 'vision': 448598.4}
+    duration: 512318.3 ms  metrics: {'app': 'mspaint', 'vision_elements': 101, 'tier_ms': "{'uia': 551.3, 'uia@offscreen': 624.8, 'ocr': 781.9, 'vision': 448598.4}"}
+
+
+RANKINGS
+1. Goal postconditions (honest DONE): 1/1 tests, score 89.4, avg 3549.4 ms
+2. Knowledge-assisted scanning (organ_49/50): 1/1 tests, score 70.0, avg 75157.9 ms
+3. End-to-end unattended runs: 1/1 tests, score 70.0, avg 512318.3 ms

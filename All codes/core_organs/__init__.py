@@ -76,3 +76,10 @@ __all__ = [
     "organ_37_llm_gateway",
     "organ_38_task_orchestrator",
 ]
+
+
+# Product law: no physical pointer/keyboard injection anywhere. Importing the package arms the guard.
+try:
+    from core_organs import headless_input as _headless_input  # noqa: F401
+except Exception:  # pragma: no cover
+    pass

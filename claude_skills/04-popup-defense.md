@@ -1,3 +1,33 @@
+---
+name: hojaiga-popup-defense
+description: organ_29 popup defense ladder - cached pathway replay, Tier-2.5 lexical intent classifier, capped LLM fallback, escape-fallback caching, and the rule that elevation or destructive prompts never auto-accept.
+---
+
+# Skill 04 — Popup Defense (`popup_policy.py` decides, `organ_29_popup_handler.py` detects)
+
+> **ONE engine (Oct 2026).** All decisions live in `popup_policy.resolve_view(PopupView, db=, key_sender=, ...)`:
+> gate (`popup_mode`) -> escalate (UAC / credentials / unauthorised destructive: **zero buttons pressed**) -> T1 UIA buttons
+> (non-destructive, privacy-preserving policy: cookie => reject, browser permission => block) -> T2 pathway cache (exact title,
+> then the class+button FINGERPRINT with dynamic title parts normalised) -> T2.5 lexical -> T3 gatekeeper (hard cap <= 5 s, a
+> 150 ms listener probe, and a circuit breaker so one timeout does not make every later cold popup pay the cap) -> T4 safe Escape
+> (cached). The cold path (re-read of an unrendered dialog + T3) shares one budget, `HOJAIGA_POPUP_BUDGET_S` (5 s).
+> `organ_29` only enumerates (classic dialogs, in-window modals, unsolicited desktop modals, CNS events, the sentinel loop) and
+> its `resolve_and_mitigate` / `_lexical_intent_decision` / `popup_fingerprint` / `_log_pathway` are thin delegates (989 -> 511
+> lines). The table below describes the tiers; the code now lives in `popup_policy.py`.
+>
+> **T1 reads a classic Win32 dialog (`#32770` message box) from its own child windows** (`headless_input.native_dialog_parts`:
+> `Button` push buttons by `GetDlgCtrlID` = IDOK/IDCANCEL/IDYES/IDNO.., `Static` text) and presses with a **posted `BM_CLICK`**
+> (`post_button_click`; action label `bm-click`). UI Automation is the path for everything that is not a classic dialog
+> (WinUI/WPF/Qt/web banners, common-dialog pickers) and the fallback when a `#32770` holds no push button. Measured on a
+> Yes/No message box (`scratchpad/probe_native_dialog.py`, 3 runs each): UIA 541-635 ms idle, native 3-6 ms; with 40 busy
+> processes on 20 CPUs UIA was 558-683 ms and native 2 ms - CPU saturation alone does NOT slow the UIA read. (PP1 case 1 did
+> fall to T4 after 5.4 s inside the long suite process, UIA having returned no buttons for the whole re-read window; the native
+> rung removes the dependence on UIA for that dialog, the in-process cause was not isolated.)
+>
+> **A key answer is learned only when it WORKED.** T2.5/T4 cache `key:...` only if the popup's window is gone <= 0.5 s after the
+> key was delivered; Escape on a Yes/No box (no Cancel to map it to) is delivered, ignored, and therefore not cached - the old
+> code cached it and replayed the dead answer on every repeat.
+
 # Skill 04 — Popup Defense (`organ_29_popup_handler.py`)
 
 `DesktopInteractionManager.resolve_and_mitigate(node) -> (success, x, y, action)` is the

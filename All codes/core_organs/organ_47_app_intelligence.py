@@ -139,6 +139,16 @@ ARCHETYPES: Dict[str, Dict[str, Any]] = {
             {"goal": "undo", "verb": "shortcut", "shortcut": "ctrl+z"},
         ],
     },
+    "text_editor": {
+        "match": ("notepad", "wordpad", "textedit", "gedit", "text editor"),
+        "conventions": [
+            {"goal": "new document", "verb": "shortcut", "shortcut": "ctrl+n"},
+            {"goal": "save as", "verb": "shortcut", "shortcut": "ctrl+shift+s",
+             "menu_path": "File > Save As"},
+            {"goal": "find", "verb": "shortcut", "shortcut": "ctrl+f"},
+            {"goal": "select all", "verb": "shortcut", "shortcut": "ctrl+a"},
+        ],
+    },
     "raster_editor": {
         "match": ("photoshop", "gimp", "paint.net", "krita", "affinity photo",
                   "paint", "photo"),

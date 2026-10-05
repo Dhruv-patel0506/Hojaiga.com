@@ -1,3 +1,8 @@
+---
+name: hojaiga-scenario-playbook
+description: Scenario playbook - every plausible desktop/web automation situation mapped to its physical execution path through the organ system, with fallbacks when a tier cannot run.
+---
+
 # Skill 13 — Scenario Playbook (every plausible situation & its physical path)
 
 When a task looks unusual, find the row. The design intent: **fully robust and autonomous**

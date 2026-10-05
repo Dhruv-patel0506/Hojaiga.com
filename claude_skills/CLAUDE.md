@@ -1,3 +1,8 @@
+---
+name: hojaiga-claude-rules
+description: The 8 laws of the Hojaiga project in one page - free/local/no-API, honesty, dynamic knowledge, verify-don't-believe, HITL safety, bounded time, cheapest signal first, suite gates - plus the environment cheat sheet; paste to repo root or import into agent context.
+---
+
 # CLAUDE.md — Hojaiga Automation (paste to repo root / import into context)
 
 > Condensed always-on rules. Full detail lives in the numbered skill files `00`–`13` in

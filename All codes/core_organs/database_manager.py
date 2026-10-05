@@ -123,16 +123,45 @@ class DatabaseManager:
             return None
         return self._safe_call(_query)
 
-    def log_new_pathway(self, layout_hash, element_name, x, y, action_type, parent_path=""):
+    def check_popup_fingerprint(self, fingerprint):
+        """Fallback cache lookup for popups whose TITLE carries dynamic text
+        (error codes, counters, file names). Matches on the stable fingerprint
+        (class + normalized title + button set) stored alongside the pathway."""
+        if not fingerprint:
+            return None
+
+        def _query(conn):
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT TOP 1 info FROM ui_scanned WHERE info LIKE ? ORDER BY last_scanned DESC",
+                (f'%"fingerprint": "{fingerprint}"%',),
+            )
+            row = cursor.fetchone()
+            if row and row[0]:
+                try:
+                    data = json.loads(row[0])
+                    return {"x": data.get("x", 0), "y": data.get("y", 0),
+                            "action": data.get("detected_type", "click"),
+                            "parent_path": data.get("parent_path", "")}
+                except Exception:
+                    return None
+            return None
+        return self._safe_call(_query)
+
+    def log_new_pathway(self, layout_hash, element_name, x, y, action_type, parent_path="",
+                        fingerprint=""):
         def _insert(conn):
             cursor = conn.cursor()
-            info_json = json.dumps({
+            payload = {
                 "title": element_name,
                 "detected_type": action_type,
                 "x": x,
                 "y": y,
                 "parent_path": parent_path,
-            })
+            }
+            if fingerprint:
+                payload["fingerprint"] = fingerprint
+            info_json = json.dumps(payload)
             # Use unique sig to avoid constraint violation
             import hashlib as _hashlib
             unique_sig = _hashlib.md5(f"{element_name}_{time.time()}".encode()).hexdigest()[:16]
