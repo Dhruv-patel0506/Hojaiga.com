@@ -8,7 +8,7 @@ holds your rich data), apps closed by PID only (never by image name), every fail
 |---|---|
 | tag | `overnight-start` -> `8d5abe87` (my files by explicit path) |
 | commit 2 | `5708eada` (popup/scanner/registry/vision gate/conceal) |
-| commit 3 | `2c291019` (focus policy, PV1/B2X wait-for-paint, docs, this report) |
+| commit 3 | `9b87fd65` (focus policy, PV1/B2X wait-for-paint, docs, this report) |
 | NOT committed, needs a manual hunk split (other session's edits are mixed in) | `desktop_grounding.py`, `organ_24_dap.py`, `run_system_intelligence_tests.py`, `si_tests_behavior.py`, `si_tests_checkpoints.py`, `headless_input.py`, `visual_cursor.py`, `si_tests_derive.py`, `si_tests_fixes.py` |
 | not committed on purpose | `data/*.db` (learned knowledge written by probes), `test_ga_real.xlsx` (your file), pyc/logs |
 
