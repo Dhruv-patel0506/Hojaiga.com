@@ -91,3 +91,15 @@ API_KEY_INTEGRATION_COMPLETE.md
 # secret store (XOR-obfuscated keys) - local only, never committed
 config/secure_keys.json
 config/.api_keys_encrypted
+
+# --- runtime state & artifacts (Blocker#1: stop the tree churning on regenerable files) ---
+__pycache__/
+*.pyc
+*.sqlite
+*.sqlite.*
+*.db
+*.jsonl
+@AutomationLog.txt
+_ollama_serve.err
+*system_intelligence_results*.txt
+snapshots/LATEST
