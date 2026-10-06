@@ -68,9 +68,10 @@ class LiveApp:
     park=False leaves the window truly minimized so the library entry points must park by
                themselves (that is what MIN1 verifies)."""
 
-    def __init__(self, app: str, park: bool = True):
+    def __init__(self, app: str, park: bool = True, args: Optional[List[str]] = None):
         self.app = app
         self.exe, self.cls = APPS[app]
+        self.args = list(args or [])      # a real file to open at launch (RBG1 drives an EXISTING document)
         self.hwnd = 0
         self.ok = False
         self.why = ""
@@ -112,7 +113,7 @@ class LiveApp:
             si = subprocess.STARTUPINFO()
             si.dwFlags = 1                                       # STARTF_USESHOWWINDOW
             si.wShowWindow = 7                                   # SW_SHOWMINNOACTIVE
-            subprocess.Popen([self.exe], startupinfo=si)
+            subprocess.Popen([self.exe] + self.args, startupinfo=si)
         except Exception as exc:
             self.why = f"cannot launch {self.exe}: {exc}"
             return self
@@ -1443,6 +1444,275 @@ def run_rst1(TestOutcome):
             except Exception:
                 pass
         _rm_db(db)
+        try:
+            if path and os.path.exists(path):
+                os.remove(path)
+        except Exception:
+            pass
+
+
+# --------------------------------------------------------------------------- RBG1: iterative quality
+
+def _find_box(title: str) -> int:
+    """A live, visible #32770 in THIS process with `title` (our injected distractor). The box is
+    created by a MessageBoxW on a test thread, so its window belongs to THIS process regardless of
+    which app frame was named its owner - enumerate by our own PID (os.getpid()), NEVER the target
+    app's pid (that was the bug: process_windows(notepad) could not see a test-process dialog)."""
+    try:
+        from core_organs import headless_input as hin
+        my_pid = os.getpid()
+        hits: List[int] = []
+
+        @ctypes.WINFUNCTYPE(wt.BOOL, ctypes.c_void_p, wt.LPARAM)
+        def _cb(h, _l):
+            try:
+                if (hin.window_pid(int(h)) == my_pid and _u32.IsWindowVisible(h)
+                        and hin._class_name(int(h)) == "#32770" and _title(int(h)) == title):
+                    hits.append(int(h))
+            except Exception:
+                pass
+            return True
+        _u32.EnumWindows(_cb, 0)
+        return hits[0] if hits else 0
+    except Exception:
+        pass
+    return 0
+
+
+def run_rbg1(TestOutcome):
+    """RBG1 (#7): LLM-driven robustness + iterative quality. A real task (headless edit + save in a
+    fresh Notepad holding an existing file) runs inside the bounded quality loop while (a) an
+    UNRELATED popup appears mid-run - the generic popup ladder classifies and answers it from its
+    own words, no per-app rule - and (b) the first attempt is an injected quality failure (half the
+    text). Acceptance: the run completes anyway, every attempt is scored, the retry carries the
+    planner's feedback, the artifact is checked against the goal's exact postcondition, and a loop
+    that cannot meet its postcondition reports NOT_DONE honestly instead of accepting funky output.
+    The RESTORE-STATE law still applies to every window this touches."""
+    import threading
+    from core_organs import quality_loop as ql
+    from core_organs import state_keeper as sk
+    from core_organs import si_test_support as sup
+    from core_organs import headless_input as hin
+    t0 = time.time()
+    checks, rows = {}, []
+    sk.reset()
+    fx = la = None
+    box_t = None
+    path = ""
+    law_rep: Dict[str, Any] = {}
+    rep1: Dict[str, Any] = {"status": "no-run", "attempts": [], "scores": [], "tiers_used": [],
+                            "self_relied_on": {}, "planner_used": "n/a", "goal_met": False}
+    try:
+        p0 = wt.POINT()
+        _u32.GetCursorPos(ctypes.byref(p0))
+        v0 = len(hin.VIOLATIONS)
+        BOX_TITLE = "Download failed"                       # unrelated to Notepad; error-category words
+        text = "rbg1-" + uuid.uuid4().hex[:8] + " steady rises keep the pen dry"
+        path = os.path.join(tempfile.gettempdir(), "hj_rbg1_" + uuid.uuid4().hex[:6] + ".txt")
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write("base line\n")
+        box_state = {"opened_attempt": 0, "appeared": False, "handled": [], "gone": False,
+                     "threads": 0, "answer_code": None}
+
+        def _open_box(owner):
+            def _run():
+                mb = ctypes.WinDLL("user32")
+                mb.MessageBoxW.argtypes = [wt.HWND, wt.LPCWSTR, wt.LPCWSTR, wt.UINT]
+                box_state["answer_code"] = mb.MessageBoxW(
+                    owner, "A background download failed while the connection was interrupted.",
+                    BOX_TITLE, 0x10 | 0x0)                  # MB_ICONERROR | MB_OK
+            box_state["threads"] += 1
+            bt = threading.Thread(target=_run, daemon=True, name="RBG1-Box")
+            bt.start()
+            return bt
+
+        def _set_text(hwnd, val):
+            """Write the document headlessly: select-all + type into the real edit surface (Win32 EDIT
+            / RichEdit child; XAML surfaces get ValuePattern). Returns (ok, how)."""
+            from core_organs import fast_uia
+            errs = []
+            # 1) classic edit child (works minimized; proven on this machine 2026-10-06)
+            kids = []
+
+            @ctypes.WINFUNCTYPE(ctypes.c_bool, wt.HWND, wt.LPARAM)
+            def _cb(h, _l):
+                b = ctypes.create_unicode_buffer(128)
+                _u32.GetClassNameW(h, b, 128)
+                kids.append((h, b.value.lower()))
+                return True
+            try:
+                _u32.EnumChildWindows(hwnd, _cb, 0)
+            except Exception:
+                pass
+            for h, c in kids:
+                if any(k in c for k in ("richted", "richedit", "edit")) and "site" not in c:
+                    try:
+                        hin.post_key_combo(h, "ctrl+a")
+                        time.sleep(0.2)
+                        _ok, note = hin.post_text(h, val)      # replaces the selection
+                        time.sleep(0.3)
+                        return True, f"selectall+type {c}: {note}"
+                    except Exception as exc:
+                        errs.append(f"{c}:{type(exc).__name__}")
+            # 2) UIA ValuePattern (replace semantics)
+            for n in fast_uia.snapshot(hwnd, timeout_ms=8000) or []:
+                if n.role not in ("edit", "document"):
+                    continue
+                try:
+                    n.ctrl.GetValuePattern().SetValue(val)
+                    return True, f"SetValue via {n.role}"
+                except Exception as exc:
+                    errs.append(f"{n.role}:{type(exc).__name__}")
+            # 3) root window chars (last resort; appends)
+            try:
+                _ok, note = hin.post_text(hwnd, val)
+                return bool(_ok), f"post_text root: {note}"
+            except Exception as exc:
+                return False, "; ".join(errs[:3]) or type(exc).__name__
+
+        def executor(attempt, prev):
+            if not _u32.IsWindow(hwnd):
+                return {"success": False, "note": "our notepad window vanished (app consolidation)"}
+            # (b) INJECTED first-attempt quality failure: attempt 1 writes only half the required text
+            val = text[:16] if attempt == 1 else text
+            ok_set, how = _set_text(hwnd, val)
+            if ok_set:
+                hin.post_key_combo(hwnd, "ctrl+s")             # the file was opened at launch: silent save
+            time.sleep(0.5)
+            # (a) UNRELATED popup mid-run: appears while this attempt is in flight, owned by the
+            # target - exactly the dialog the loop must get past generically.
+            if attempt == 1:
+                time.sleep(1.2)
+                box_state["opened_attempt"] = attempt
+                nonlocal box_t
+                box_t = _open_box(fx.hwnd)
+                time.sleep(0.8)
+                box_state["appeared"] = bool(_find_box(BOX_TITLE))
+            else:
+                time.sleep(0.4)
+            content = (open(path, encoding="utf-8", errors="replace").read()
+                       if os.path.exists(path) else "")
+            return {"success": True, "set": how, "content": content[:80], "content_len": len(content),
+                    "carries_plan": (attempt == 1) or bool((prev.get("last_plan") or "").strip()),
+                    "plan_words": len(str(prev.get("last_plan") or "").split())}
+
+        def _c_file(ctx):
+            return os.path.exists(path)
+
+        def _c_exact(ctx):
+            try:
+                got = open(path, encoding="utf-8", errors="replace").read()
+                return got == text or got.rstrip("\r\n") == text     # notepad may keep/append an EOF newline
+            except Exception:
+                return False
+
+        def _c_plan(ctx):
+            return bool(ctx.get("carries_plan"))
+
+        # ---- Phase 1: the real run (injected popup + injected first-attempt failure)
+        # (Win11 Notepad may consolidate/destroy a second, test-owned window mid-run - same ENV story
+        # RST1 met: retry once clean, then report ENV-BLOCKED, never a fake pass.)
+        for r_try in (1, 2):
+            box_state.update({"opened_attempt": 0, "appeared": False, "handled": [], "gone": False,
+                              "threads": 0, "answer_code": None})
+            fx = sup.NativeButtonWindow(title="HJ-RBG1-Site").start()
+            la = LiveApp("notepad", park=False, args=[path])
+            if not la.__enter__().ok:
+                return TestOutcome(passed=False, env_blocked=True, evidence=f"notepad: {la.why}")
+            hwnd = la.hwnd
+            pre_law = sk.observe(hwnd)                      # the law applies here too
+            pre_popups = [w for w in hin.popup_windows(hwnd)]
+            loop = ql.QualityLoop("save " + text[:20] + " into the opened file (exact content)",
+                                  [ql.Check("file exists", _c_file),
+                                   ql.Check("file holds exactly the required text", _c_exact),
+                                   ql.Check("a retry carries the planner's feedback", _c_plan)],
+                                  max_attempts=3, popup_owner=fx.hwnd, popup_exclude=pre_popups)
+            rep1 = loop.run(executor, app_hwnd=hwnd)
+            law_rep = sk.restore(hwnd)                      # law: unwind our side effects, keep the save
+            rows.append(f"1(real,try{r_try}): status={rep1['status']} scores={rep1['scores']} "
+                        f"attempt_details={[(a['n'], a['score'], a['delta'], len(a['popups_cleared'])) for a in rep1['attempts']]} "
+                        f"box_opened={box_state['opened_attempt']} box_appeared={box_state['appeared']} box_gone={box_state['gone']} answer={box_state['answer_code']} "
+                        f"tiers={rep1['tiers_used']} planner={rep1['planner_used']} "
+                        f"relied={str(rep1['self_relied_on'])[:120]} "
+                        f"law={law_rep.get('status')}/{law_rep.get('matches_pre_state')} "
+                        f"base_popups={len(pre_popups)} iconic={bool(pre_law.get('iconic'))}")
+            la.__exit__(None, None, None)
+            la = None
+            fx.stop()
+            fx = None
+            if law_rep.get("status") == "window-gone":
+                continue                                    # the APP ended our window: one clean retry
+            break
+        if law_rep.get("status") == "window-gone":
+            return TestOutcome(passed=False, env_blocked=True,
+                               evidence="P1: notepad consolidated/destroyed our test window twice mid-run "
+                                        "(app behaviour, not the loop): " + " | ".join(rows),
+                               metrics={"phases": "P1(env-early-exit)", "seconds": round(time.time() - t0, 1)})
+        box_state["gone"] = box_state["gone"] or not bool(_find_box(BOX_TITLE))
+        box_state["handled"] = [c for r in rep1["attempts"] for r_ in [r] for c in r_["popups_cleared"]]
+
+        att2 = next((a for a in rep1["attempts"] if a["n"] == 2), {})
+        checks["P1: the unrelated popup really appeared mid-run (a live #32770 the test did not pre-place)"] = box_state["appeared"]
+        checks["P1: the GENERIC ladder answered it from its own words (no per-app rule; categories/policy)"] = bool(box_state["handled"]) and box_state["gone"]
+        checks["P1: first attempt was a MEASURABLE quality failure (exact-text postcondition unmet)"] = \
+            bool(rep1["scores"]) and rep1["attempts"][0]["score"] < 1.0 and \
+            "file holds exactly the required text" in (rep1["attempts"][0]["failed"] or [])
+        checks["P1: the retry carried planner feedback and scored measurably better"] = \
+            bool(att2) and "unmet" in (att2.get("plan") or "").lower() and att2["delta"] > 0
+        checks["P1: the task COMPLETED despite the popup - final artifact meets the exact postcondition"] = \
+            rep1["status"] == "DONE" and rep1["goal_met"] and _c_exact({})
+        checks["P1: attempts[] reports per-attempt improvement (delta column)"] = \
+            len(rep1["attempts"]) >= 2 and any(a["delta"] > 0 for a in rep1["attempts"])
+        checks["P1: the ladder's answer tier is self-reported (tiers_used)"] = bool(rep1["tiers_used"])
+        checks["P1: RESTORE-STATE law still kept on the app we drove"] = \
+            law_rep.get("status") in ("restored", "partially-restored")
+        p1pt = wt.POINT()
+        _u32.GetCursorPos(ctypes.byref(p1pt))
+        checks["P1: zero physical input (posted/UIA only)"] = \
+            len(hin.VIOLATIONS) == v0 and (p0.x, p0.y) == (p1pt.x, p1pt.y)
+
+        # ---- Phase 2: a goal that cannot be met reports NOT_DONE honestly, bounded, never a fake pass
+        loop2 = ql.QualityLoop("a goal whose postcondition can never be met",
+                               [ql.Check("always true", lambda ctx: True),
+                                ql.Check("never true", lambda ctx: False)],
+                               max_attempts=3,
+                               planner=lambda goal, rnd, a: f"static: {', '.join(rnd.failed)}")
+        rep2 = loop2.run(lambda a, p: {"success": True})
+        checks["P2: un-meetable goal ends NOT_DONE (never DONE, never faked)"] = \
+            rep2["status"] == "NOT_DONE" and rep2["goal_met"] is False
+        checks["P2: bounded (stopped at its own bound/early-stop, <= max_attempts)"] = \
+            0 < len(rep2["attempts"]) <= 3 and "stopped_early" in rep2["self_relied_on"]
+        checks["P2: final_gaps names the failing postcondition"] = "never true" in rep2["final_gaps"]
+        rows.append(f"2(honesty): status={rep2['status']} attempts={len(rep2['attempts'])} "
+                    f"gaps={rep2['final_gaps']} stopped={str(rep2['self_relied_on'])[:90]}")
+
+        passed = all(checks.values())
+        ev = "; ".join(f"{k}={'OK' if v else 'FAIL'}" for k, v in checks.items()) + " | " + " || ".join(rows)
+        return TestOutcome(passed=passed, evidence=ev[:2400],
+                           metrics={"checks": f"{sum(1 for v in checks.values() if v)}/{len(checks)}",
+                                    "scores": rep1.get("scores"),
+                                    "attempts": len(rep1.get("attempts") or []),
+                                    "tiers_used": rep1.get("tiers_used"),
+                                    "planner": rep1.get("planner_used"),
+                                    "seconds": round(time.time() - t0, 1)})
+    finally:
+        try:
+            sk.close_sessions()
+        except Exception:
+            pass
+        sk.reset()
+        if box_t is not None:
+            box_t.join(timeout=3)
+        if la is not None:
+            try:
+                la.__exit__(None, None, None)
+            except Exception:
+                pass
+        if fx is not None:
+            try:
+                fx.stop()
+            except Exception:
+                pass
         try:
             if path and os.path.exists(path):
                 os.remove(path)

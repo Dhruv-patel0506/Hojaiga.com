@@ -1254,6 +1254,11 @@ def test_rst1_behavior() -> TestOutcome:
     from core_organs import si_tests_behavior
     return si_tests_behavior.run_rst1(TestOutcome)
 
+def test_rbg1_behavior() -> TestOutcome:
+    """RBG1 (#7): LLM-driven robustness + iterative quality - an unrelated popup answered generically by the ladder mid-run, an injected first-attempt failure retried with carried planner feedback and scored better, the exact postcondition gates DONE, an un-meetable goal reports NOT_DONE honestly"""
+    from core_organs import si_tests_behavior
+    return si_tests_behavior.run_rbg1(TestOutcome)
+
 def test_h1_organ_import_health() -> TestOutcome:
     """H1: Every core organ module imports cleanly with its main symbol present"""
     import importlib
@@ -2517,6 +2522,7 @@ def main() -> int:
         ("CAP2", "BACKGROUND", test_cap2_behavior),
         ("PRO1", "BEHAVIOR", test_pro1_behavior),
         ("RST1", "BACKGROUND", test_rst1_behavior),
+        ("RBG1", "BACKGROUND", test_rbg1_behavior),
         ("PIX1", "BACKGROUND", test_pix1_behavior),
         ("SC1", "SCANKNOW", test_sc1_behavior),
         ("LM1", "SCANKNOW", test_lm1_behavior),
