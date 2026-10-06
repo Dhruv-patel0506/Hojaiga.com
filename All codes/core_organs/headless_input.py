@@ -785,6 +785,185 @@ def capture_window(hwnd: int):
 
 
 # ---------------------------------------------------------------------------
+# Robust capture for MINIMIZED / partial windows (robustness #4)
+# ---------------------------------------------------------------------------
+# PrintWindow(PW_RENDERFULLCONTENT) - what both capture paths use - returns BLANK for many minimized
+# windows (Windows does not render an iconized window), and the raw BitBlt fallback reads a phantom
+# -32000,-32000 rect. The ladder below escalates honestly and, when it must briefly RESTORE a window
+# to capture it, returns the window to exactly the state the user left it in (law [6] in miniature).
+
+class _WINDOWPLACEMENT(ctypes.Structure):
+    _fields_ = [("length", wt.UINT), ("flags", wt.UINT), ("showCmd", wt.UINT),
+                ("ptMinPos", wt.POINT), ("ptMaxPos", wt.POINT), ("rcNormalPosition", wt.RECT)]
+
+
+def _get_placement(hwnd: int):
+    p = _WINDOWPLACEMENT()
+    p.length = ctypes.sizeof(_WINDOWPLACEMENT)
+    if _u32.GetWindowPlacement(hwnd, ctypes.byref(p)):
+        return p
+    return None
+
+
+def _is_blank_render(img) -> bool:
+    """Blank in the PRINTWINDOW-FAILED sense: near-black AND no detail. A legitimately uniform white
+    document is real pixels and is never 'blank' - misjudging it would fire a state-changing fallback
+    for nothing. Pure black with zero variance is what an unrendered DIB reads as."""
+    if img is None:
+        return True
+    try:
+        px = list(img.convert("L").resize((32, 32)).getdata())
+    except Exception:  # noqa: BLE001
+        return True
+    mean = sum(px) / len(px)
+    var = sum((v - mean) ** 2 for v in px) / len(px)
+    return mean <= 10.0 and var ** 0.5 <= 6.0
+
+
+def _dap_print(hwnd: int):
+    """Rung 2 - the DAP print: PrintWindow(flag 0) then a GetWindowDC+BitBlt of the window rect.
+    Cheap, state-free, and some classic windows answer the plain WM_PRINT path when the
+    full-content one returns nothing. Meaningless for iconic windows (phantom -32000 rect)."""
+    try:
+        from PIL import Image
+        r = wt.RECT()
+        _u32.GetWindowRect(hwnd, ctypes.byref(r))
+        w, h = r.right - r.left, r.bottom - r.top
+        if w <= 1 or h <= 1 or w * h > 8000 * 5000:
+            return None, "bad-window-size"
+        sdc = _u32.GetWindowDC(hwnd)
+        if not sdc:
+            return None, "no-window-dc"
+        mdc = _g32.CreateCompatibleDC(sdc)
+        bmp = _g32.CreateCompatibleBitmap(sdc, w, h)
+        old = None
+        try:
+            if not mdc or not bmp:
+                return None, "gdi-create-failed"
+            old = _g32.SelectObject(mdc, bmp)
+            ok = _u32.PrintWindow(hwnd, mdc, 0)          # classic DAP print
+            if not ok:                                   # last resort: BitBlt the window DC
+                _g32.BitBlt(mdc, 0, 0, w, h, sdc, 0, 0, 0x00CC0020)
+
+            class BIH(ctypes.Structure):
+                _fields_ = [("biSize", wt.DWORD), ("biWidth", ctypes.c_long), ("biHeight", ctypes.c_long),
+                            ("biPlanes", wt.WORD), ("biBitCount", wt.WORD), ("biCompression", wt.DWORD),
+                            ("biSizeImage", wt.DWORD), ("biXPelsPerMeter", ctypes.c_long),
+                            ("biYPelsPerMeter", ctypes.c_long), ("biClrUsed", wt.DWORD),
+                            ("biClrImportant", wt.DWORD)]
+            bmi = BIH(ctypes.sizeof(BIH), w, -h, 1, 32, 0, 0, 0, 0, 0, 0)
+            buf = (ctypes.c_ubyte * (w * h * 4))()
+            if not _g32.GetDIBits(mdc, bmp, 0, h, buf, ctypes.byref(bmi), 0):
+                return None, "dib-read-failed"
+            img = Image.frombuffer("RGBA", (w, h), bytes(buf), "raw", "BGRA", 0, 1).convert("RGB")
+            return img, "dap-print" if ok else "dap-bitblt"
+        finally:
+            if old:
+                try:
+                    _g32.SelectObject(mdc, old)
+                except Exception:  # noqa: BLE001
+                    pass
+            if bmp:
+                _g32.DeleteObject(bmp)
+            if mdc:
+                _g32.DeleteDC(mdc)
+            _u32.ReleaseDC(hwnd, sdc)
+    except Exception as exc:  # noqa: BLE001
+        return None, f"dap-print-error: {type(exc).__name__}: {exc}"
+
+
+def _hand_back_focus(was_fg: int) -> None:
+    """Give foreground back to whatever held it before we acted. SetForegroundWindow alone is refused
+    when the caller is not the foreground process (Windows' focus lock), so we brief the CURRENT
+    foreground thread through AttachThreadInput for the duration of the hand-back only."""
+    if not was_fg:
+        return
+    cur = int(_u32.GetForegroundWindow() or 0)
+    if cur == int(was_fg):
+        return
+    other_tid = _u32.GetWindowThreadProcessId(cur or was_fg, None)
+    my_tid = _k32.GetCurrentThreadId()
+    attached = bool(_u32.AttachThreadInput(my_tid, other_tid, True))
+    try:
+        _u32.BringWindowToTop(was_fg)
+        _u32.SetForegroundWindow(was_fg)
+    finally:
+        if attached:
+            _u32.AttachThreadInput(my_tid, other_tid, False)
+
+
+def _restore_capture_rehide(hwnd: int):
+    """Rung 3 - restore -> capture -> re-hide, preserving the exact prior state. Only ever runs for a
+    window WE find minimized, and it always returns the window to iconic (placement restored).
+    Shown with SW_SHOWNOACTIVATE so the user's focus is never borrowed in the first place; in the
+    rare app that self-activates on show, focus is handed back explicitly. Never leaves a change:
+    returns (img|None, note, state_restored: bool)."""
+    if not _u32.IsIconic(hwnd):
+        return None, "not-iconic: restore rung does not apply", False
+    was_fg = int(_u32.GetForegroundWindow() or 0)
+    placement = _get_placement(hwnd)
+    img, why = None, "restore-failed"
+    try:
+        _u32.ShowWindow(hwnd, 4)                          # SW_SHOWNOACTIVATE: show WITHOUT stealing focus
+        deadline = time.time() + 3.0
+        ready = False
+        while time.time() < deadline:
+            r = wt.RECT()
+            if _u32.IsWindowVisible(hwnd) and not _u32.IsIconic(hwnd) and _u32.GetWindowRect(hwnd, ctypes.byref(r)):
+                if r.right - r.left > 50 and r.bottom - r.top > 50:
+                    ready = True
+                    break
+            time.sleep(0.05)
+        if ready:
+            time.sleep(0.25)                              # let the first frame paint
+            img, why = capture_window(hwnd)
+    finally:
+        _u32.ShowWindow(hwnd, 6)                          # SW_MINIMIZE: back to the state found
+        if placement is not None:
+            now = _get_placement(hwnd)
+            def _rect(p):
+                return (p.rcNormalPosition.left, p.rcNormalPosition.top,
+                        p.rcNormalPosition.right, p.rcNormalPosition.bottom)
+            if now is None or _rect(now) != _rect(placement) or now.showCmd != 2:
+                _u32.SetWindowPlacement(hwnd, ctypes.byref(placement))
+        if was_fg and was_fg != int(hwnd):
+            _hand_back_focus(was_fg)                      # normally a no-op: focus never moved
+    state_ok = bool(_u32.IsIconic(hwnd))
+    return img, (f"{why} [restore->capture->re-hide]" if img is not None else why), state_ok
+
+
+def capture_window_robust(hwnd: int):
+    """(PIL.Image | None, note, rung) - capture that does not give up on a minimized or odd window.
+    Ladder: 1) PrintWindow(PW_RENDERFULLCONTENT); 2) classic DAP print / BitBlt; 3) restore -> capture
+    -> re-hide (minimized only, state fully restored). NEVER fakes a picture: every rung that fails is
+    named in the note, and the returned rung is the one that PRODUCED the pixels. A minimized window
+    is left minimized, period (law [6])."""
+    rungs = []
+    if is_minimized(hwnd):
+        # rung 1/2 are honest dead ends for an iconized window (Windows renders nothing to print)
+        img, why, state_ok = _restore_capture_rehide(hwnd)
+        if img is not None and not _is_blank_render(img):
+            return img, f"minimized window captured by briefly restoring it; state_restored={state_ok}", \
+                   "restore->capture->re-hide"
+        rungs.append(f"restore-rung: {why}")
+        return None, "; ".join(rungs), "none"
+    img, why = capture_window(hwnd)
+    if img is not None and not _is_blank_render(img):
+        return img, why, "printwindow-renderfull"
+    rungs.append(f"printwindow-renderfull: {why if img is None else 'blank render'}")
+    img2, why2 = _dap_print(hwnd)
+    if img2 is not None and not _is_blank_render(img2):
+        return img2, why2, why2
+    rungs.append(f"dap-print: {why2}")
+    if _u32.IsIconic(hwnd):                               # got minimized during the ladder
+        img3, why3, state_ok = _restore_capture_rehide(hwnd)
+        if img3 is not None and not _is_blank_render(img3):
+            return img3, f"{why3}, state_restored={state_ok}", "restore->capture->re-hide"
+        rungs.append(f"restore-rung: {why3}")
+    return None, "; ".join(rungs), "none"
+
+
+# ---------------------------------------------------------------------------
 # Physical-input guard (product law: the user's pointer/keyboard are never touched)
 # ---------------------------------------------------------------------------
 # No first-party code calls the Win32/pyautogui injection APIs any more (1.1: the code paths were DELETED, and

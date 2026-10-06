@@ -601,6 +601,13 @@ class Win32Primitives:
         creation returns honestly instead of painting on nothing."""
         if not IS_WINDOWS:
             return (0, 0, b"")
+        if user32.IsIconic(ctypes.c_void_p(hwnd)):  # type: ignore
+            # #4: a minimized window has NO full render to print - PrintWindow answers an all-blank
+            # or icon-sized phantom (measured: 199x34 for a 1100x760 Notepad). Go straight to the
+            # honest ladder, which restores -> captures -> re-hides and leaves the window minimized.
+            fb = self._robust_fallback_bgra(hwnd)
+            if fb:
+                return fb
         rect = self.get_window_rect(hwnd)
         width = max(1, rect.right - rect.left)
         height = max(1, rect.bottom - rect.top)
@@ -646,7 +653,16 @@ class Win32Primitives:
             got = gdi32.GetDIBits(mem_dc, bitmap, 0, height, buf, ctypes.byref(bmi), 0)  # type: ignore
             if not got:
                 return (0, 0, b"")
-            return (width, height, buf.raw)
+            raw = buf.raw
+            # #4: PrintWindow(PW_RENDERFULLCONTENT) reads BLANK for many minimized windows (and the
+            # BitBlt fallback above captures a phantom -32000 rect). Detect the all-zero render and
+            # escalate the honest ladder - which restores->captures->re-hides and never leaves the
+            # window in a changed state. None is returned honestly when NOTHING can produce pixels.
+            if self._bytes_look_blank(raw):
+                fb = self._robust_fallback_bgra(hwnd)
+                if fb:
+                    return fb
+            return (width, height, raw)
         except Exception:                          # a capture is never worth killing an organ
             return (0, 0, b"")
         finally:
@@ -661,6 +677,26 @@ class Win32Primitives:
                 gdi32.DeleteDC(mem_dc)  # type: ignore
             if hwnd_dc:
                 user32.ReleaseDC(ctypes.c_void_p(hwnd), hwnd_dc)  # type: ignore
+
+    @staticmethod
+    def _bytes_look_blank(raw: bytes) -> bool:
+        """True when a captured DIB is an UNRENDERED black buffer: every sampled pixel is zero.
+        Sampling every 64th pixel keeps the check at ~1 ms for a full-HD grab."""
+        if not raw:
+            return True
+        sample = raw[::256]
+        return not any(sample)
+
+    def _robust_fallback_bgra(self, hwnd: int):
+        """(w, h, BGRA bytes) from headless_input's minimized/partial-window ladder, or None."""
+        try:
+            from core_organs import headless_input as hin
+            img, _note, rung = hin.capture_window_robust(hwnd)
+            if img is None or rung == "none":
+                return None
+            return (img.size[0], img.size[1], img.convert("RGBA").tobytes("raw", "BGRA"))
+        except Exception:                          # noqa: BLE001 - same rule as the capture itself
+            return None
 
 
 WIN32 = Win32Primitives()

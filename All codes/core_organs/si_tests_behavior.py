@@ -1145,3 +1145,59 @@ def run_min1(TestOutcome):
         _rm_db(db)
     return TestOutcome(passed=not fails, evidence=" || ".join(rows) + (f" || FAILED: {fails}" if fails else ""),
                        metrics={"apps": 2})
+
+
+def run_cap2(TestOutcome):
+    """CAP2 (#4): a MINIMIZED window is captured anyway - blank/low-variance detection escalates the honest ladder
+    (PrintWindow -> DAP print/BitBlt -> restore->capture->re-hide) - the rung used is REPORTED, and every window is
+    left exactly as the user had it: still minimized, placement intact, focus handed back (law [6] in miniature)."""
+    from core_organs import background_window as bw
+    from core_organs import headless_input as hin
+    from core_organs import organ_24_dap as o24
+
+    rows, checks, rungs = [], {}, []
+    for app in ("notepad", "paint"):
+        with LiveApp(app, park=False) as la:
+            if not la.ok:
+                return TestOutcome(passed=False, env_blocked=True, evidence=f"{app}: {la.why}")
+            hwnd = la.hwnd
+            if not _u32.IsIconic(hwnd):
+                return TestOutcome(passed=False, env_blocked=True, evidence=f"{app}: window did not stay minimized")
+            fg0 = int(_u32.GetForegroundWindow() or 0)
+            pl0 = bw._placement(hwnd)
+            orig_rect = (pl0.rcNormalPosition.left, pl0.rcNormalPosition.top,
+                         pl0.rcNormalPosition.right, pl0.rcNormalPosition.bottom)
+
+            # the OLD wall, recorded honestly: the plain PrintWindow path refuses a minimized window
+            naive_img, naive_why = hin.capture_window(hwnd)
+            naive_wall = naive_img is None
+
+            # the DAP bitmap consumer (capture_window_bitmap_bytes) used to hand back an all-zero blank here
+            dw, dh, draw = o24.WIN32.capture_window_bitmap_bytes(hwnd)
+            dap_pixels = dw > 50 and dh > 50 and any(draw[::256])
+
+            # the ladder: succeeds where the naive path could not, and says WHICH rung made the pixels
+            img, note, rung = hin.capture_window_robust(hwnd)
+            good = img is not None and not hin._is_blank_render(img)
+            if good:
+                rungs.append(f"{app}:{rung}")
+            time.sleep(0.35)                                     # let any restore/re-hide settle
+            still_min = bool(_u32.IsIconic(hwnd))
+            pl1 = bw._placement(hwnd)
+            pos_ok = (pl1.rcNormalPosition.left, pl1.rcNormalPosition.top,
+                      pl1.rcNormalPosition.right, pl1.rcNormalPosition.bottom) == orig_rect
+            fg1 = int(_u32.GetForegroundWindow() or 0)
+            focus_ok = fg1 != int(hwnd)                           # we never END owning the user's focus
+            checks[f"{app}: real pixels captured although minimized"] = good and dap_pixels
+            checks[f"{app}: left EXACTLY as found (still minimized, placement restored, focus not kept)"] = \
+                still_min and pos_ok and focus_ok
+            rows.append(f"{app}: naive={naive_why if naive_wall else 'captured'} ladder={rung} "
+                        f"size={getattr(img, 'size', None)} dap={dw}x{dh} "
+                        f"min_after={still_min} pos_restored={pos_ok} fg={fg0}->{fg1} | {str(note)[:90]}")
+
+    checks["the wall was real: a minimized window needs a fallback rung (not plain PrintWindow)"] = \
+        bool(rungs) and all(r != "printwindow-renderfull" for r in rungs)
+    passed = all(checks.values())
+    ev = "; ".join(f"{k}={'OK' if v else 'FAIL'}" for k, v in checks.items()) + " | " + " || ".join(rows)
+    return TestOutcome(passed=passed, evidence=ev[:2000],
+                       metrics={"rungs_used": rungs, "checks": f"{sum(checks.values())}/{len(checks)}"})

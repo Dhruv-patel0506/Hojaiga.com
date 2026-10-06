@@ -1239,6 +1239,11 @@ def test_min1_behavior() -> TestOutcome:
     from core_organs import si_tests_behavior
     return si_tests_behavior.run_min1(TestOutcome)
 
+def test_cap2_behavior() -> TestOutcome:
+    """CAP2 (#4): a MINIMIZED window is still captured - blank detection escalates the fallback ladder (DAP print / restore->capture->re-hide) and the window is left exactly as found"""
+    from core_organs import si_tests_behavior
+    return si_tests_behavior.run_cap2(TestOutcome)
+
 def test_h1_organ_import_health() -> TestOutcome:
     """H1: Every core organ module imports cleanly with its main symbol present"""
     import importlib
@@ -2470,6 +2475,7 @@ def main() -> int:
         ("BM3", "BEHAVIOR", test_bm3_behavior),
         ("BM4", "BEHAVIOR", test_bm4_behavior),
         ("MIN1", "BACKGROUND", test_min1_behavior),
+        ("CAP2", "BACKGROUND", test_cap2_behavior),
         ("PIX1", "BACKGROUND", test_pix1_behavior),
         ("SC1", "SCANKNOW", test_sc1_behavior),
         ("LM1", "SCANKNOW", test_lm1_behavior),
