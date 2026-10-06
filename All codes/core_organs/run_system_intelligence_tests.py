@@ -17,6 +17,7 @@ Extends run_realtime_tests.py with the deep, real-behaviour checks:
 Flags:
   --e2e   also run the live unattended E2E-1 (Notepad) / E2E-2 (canvas app) proofs
   --only A,B     run just these test ids (writes system_intelligence_results_partial.txt, never the full log)
+  --first N      run only the first N tests of the plan, in plan order (history-dependent defects)
   --vision-bench also run VB1: real cold-start head-to-head of the vision warmup thread (minutes)
 
 Each test reports: PASS/FAIL, latency, and a measured evidence string.
@@ -29,6 +30,8 @@ Env:
   HOJAIGA_TEST_POPUP_MITIGATE=1  allow real dismissal of detected modals (default: dry-run)
 """
 
+from __future__ import annotations
+
 import ctypes
 import os
 import sys
@@ -36,7 +39,7 @@ import time
 import uuid
 import asyncio
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Tuple
 
 sys.path.insert(0, r"D:\new_automation\All codes")
 sys.path.insert(0, r"D:\new_automation\All codes\core_organs")
@@ -85,27 +88,184 @@ def _close_new_windows_of(before: set, *class_names: str) -> int:
     return n
 
 
+# The harness's own artifact namespace: every file a test writes is hj_<tag>_<hex>.<ext>. A window whose TITLE
+# carries such a name is therefore a document this harness opened, never the user's work.
+# Measured 2026-10-05: one autonomy test failed mid-save and left 'hj_tpl1_d76b24.txt - Notepad' on the desktop.
+# Five later tests each found a Notepad that was not theirs, refused to drive it (the correct call) and reported
+# ENV-BLOCKED - so the guard was right and the LEAK was the bug. Reclaim at the test boundary instead of
+# punishing the next five tests for one test's failure.
+_HARNESS_ARTIFACT_PATTERN = r"\bhj_[\w.\-]*[0-9a-f]{6,8}\.[A-Za-z0-9]{1,6}"
+
+
+def _reclaim_harness_artifacts() -> Tuple[int, int]:
+    """Close windows the HARNESS owns and left open. Returns (owned_closed, titled_closed).
+
+    Two rules, in order of proof strength:
+      1. OWNERSHIP - background_window.ours_alive(): a handle is in that set only because a launch by
+         THIS process put it there. No name, no title, no app string involved.
+      2. ARTIFACT NAME - a title carrying hj_<tag>_<hex>.<ext>, i.e. a file this harness wrote.
+         Kept as a back-stop for windows owned by a layer that never marks ours.
+    A window matching neither is the user's and is never touched."""
+    import re
+    import ctypes.wintypes as _wt
+    pat = re.compile(_HARNESS_ARTIFACT_PATTERN, re.I)
+    from core_organs import universal_scan as us
+    u = ctypes.windll.user32
+    closed = 0
+
+    def _close(h: int) -> bool:
+        nonlocal closed
+        try:
+            if us.close_window(h, timeout_s=5.0, discard_unsaved=True):
+                closed += 1
+                return True
+        except Exception:  # noqa: BLE001
+            pass
+        return False                                   # refused: say so through the count, never claim a clean desk
+
+    # 1. by ownership (the registry, not the desktop)
+    owned: List[int] = []
+    try:
+        from core_organs import background_window as bw
+        owned = list(bw.ours_alive())
+    except Exception:  # noqa: BLE001
+        owned = []
+    for h in owned:
+        _close(h)
+
+    # 2. by artifact name in the title, minus whatever the ownership pass already handled
+    hits: List[int] = []
+
+    @ctypes.WINFUNCTYPE(ctypes.c_bool, _wt.HWND, _wt.LPARAM)
+    def _cb(h, _l):
+        if u.IsWindowVisible(h) or u.IsIconic(h):
+            n = u.GetWindowTextLengthW(h)
+            if n:
+                b = ctypes.create_unicode_buffer(n + 1)
+                u.GetWindowTextW(h, b, n + 1)
+                if pat.search(b.value) and int(h) not in owned:
+                    hits.append(int(h))
+        return True
+    u.EnumWindows(_cb, 0)
+    for h in hits[:]:
+        if not _close(h):
+            hits.remove(h)
+    return closed - len(hits), len(hits)
+
+
+def _gui_counts() -> Tuple[int, int]:
+    """(GDI, USER) object handles this process holds, -1 when unavailable. Windows caps a process at
+    10,000 of each, and the cap is invisible until it bites: a capped process cannot make a device
+    context, so EVERY later PrintWindow capture comes back blank and reads as 'the app did not paint'.
+    The suite therefore records its own object curve per test instead of guessing who leaks."""
+    try:
+        from core_organs import headless_input as hin
+        return hin._gui_objects()
+    except Exception:  # noqa: BLE001
+        return -1, -1
+
+
+class TestHang(BaseException):      # BaseException: a test's own broad `except Exception` must not swallow the watchdog
+    def __str__(self) -> str:
+        return "the test exceeded its per-test time limit (HOJAIGA_TEST_TIMEOUT_S): a hang is a FAIL, never a pass; thread stacks were written to scratch/hang_<id>.txt"
+
+
+def _arm_watchdog(test_id: str):
+    """Bounded time everywhere (L6): a test that never returns used to stall the whole overnight run (SCK1, 16+ minutes). At the limit the stacks of every
+    thread are written out and TestHang is raised in the main thread (it lands as soon as the thread is back in Python; a thread stuck inside a COM call only
+    gets it when the call returns, so a second, harder deadline ends the process with the partial results already printed)."""
+    import faulthandler
+    import threading
+    limit = float(os.environ.get("HOJAIGA_TEST_TIMEOUT_S", "1200"))
+    main_tid = threading.main_thread().ident
+
+    def _fire():
+        try:
+            d = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "scratch")
+            os.makedirs(d, exist_ok=True)
+            with open(os.path.join(d, f"hang_{test_id}.txt"), "w") as fh:
+                faulthandler.dump_traceback(file=fh, all_threads=True)
+        except Exception:  # noqa: BLE001
+            pass
+        print(f"\n[watchdog] {test_id} exceeded {limit:.0f}s: raising TestHang in the main thread", flush=True)
+        ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_ulong(main_tid), ctypes.py_object(TestHang))
+        hard = threading.Timer(180.0, lambda: (print(f"[watchdog] {test_id} still stuck 180 s later: ending the run (results so far are above)", flush=True), os._exit(3)))
+        hard.daemon = True
+        hard.start()
+    t = threading.Timer(limit, _fire)
+    t.daemon = True
+    t.start()
+    return t
+
+
 def run_test(test_id: str, group: str, func: Callable[[], TestOutcome]) -> None:
     print(f"\n{'=' * 80}\nTEST {test_id} [{group}]: {func.__doc__}\n{'=' * 80}")
     start = time.perf_counter()
+    _wd = _arm_watchdog(test_id)
+    g0 = _gui_counts()
+    g1 = g0
+    sentinel = None
     try:
-        outcome = func()
+        from core_organs import gdi_sampler as _gs
+        if _gs.enabled():
+            _gs.start()
+            _gs.set_test(test_id)
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        from core_organs import pointer_sentinel as _ps          # P0-C: who moved the mouse (read-only watcher)
+        sentinel = _ps.Sentinel().start()
+    except Exception:  # noqa: BLE001
+        sentinel = None
+    try:
+        try:
+            outcome = func()
+        except TestHang as _th:
+            outcome = TestOutcome(passed=False, evidence=str(_th), metrics={"hang": "timeout"})
+        finally:
+            _wd.cancel()
+            g1 = _gui_counts()
+            if sentinel is not None:
+                sentinel.stop()
         duration = time.perf_counter() - start
+        if sentinel is not None:
+            try:
+                from core_organs import pointer_sentinel as _ps
+                prep = sentinel.report()
+                outcome.metrics["pointer"] = f"{prep['cause']} drift={prep['drift_px']}px hw={prep['hardware_events']} inj={prep['injected_events']}"
+                if not outcome.passed and not outcome.env_blocked:
+                    note = _ps.abort_if_env_only(outcome.evidence, prep)
+                    if note:
+                        outcome.env_blocked = True
+                        outcome.evidence = f"{note} | {outcome.evidence}"
+            except Exception:  # noqa: BLE001
+                pass
         if outcome.passed:
             status = "PASS"
         elif outcome.env_blocked:
             status = "ENV-BLOCKED"
         else:
             status = "FAIL"
+        outcome.metrics["gdi_user_end"] = f"{g1[0]}/{g1[1]}"
+        try:                                  # process-history diagnostics: a long suite process degrades (UIA / OCR slow in-suite, fine alone)
+            import psutil as _ps
+            _pr = _ps.Process()
+            outcome.metrics["proc"] = f"threads={_pr.num_threads()} handles={_pr.num_handles()} rss_mb={_pr.memory_info().rss // (1 << 20)}"
+        except Exception:  # noqa: BLE001
+            pass
+        outcome.metrics["gdi_growth"] = f"{g1[0] - g0[0]:+d}/{g1[1] - g0[1]:+d}"
         RESULTS.append({
             "id": test_id, "group": group, "status": status,
             "duration": duration, "evidence": outcome.evidence,
             "metrics": outcome.metrics, "name": func.__doc__ or test_id,
+            "gdi": g1[0], "gdi_growth": g1[0] - g0[0],
         })
         print(f"[{status}] {duration:.2f}s — {outcome.evidence}")
         if outcome.metrics:
             for k, v in outcome.metrics.items():
                 print(f"        {k} = {v}")
+        if g1[0] >= 9000 or g1[1] >= 9000:
+            print(f"        !! GDI/USER budget {g1[0]}/{g1[1]} of the 10000 cap — captures start failing here\n")
     except Exception as exc:  # noqa: BLE001
         duration = time.perf_counter() - start
         import traceback
@@ -113,7 +273,9 @@ def run_test(test_id: str, group: str, func: Callable[[], TestOutcome]) -> None:
         RESULTS.append({
             "id": test_id, "group": group, "status": "FAIL",
             "duration": duration, "evidence": f"{type(exc).__name__}: {exc}",
-            "metrics": {}, "name": func.__doc__ or test_id,
+            "metrics": {"gdi_user_end": f"{g1[0]}/{g1[1]}", "gdi_growth": f"{g1[0] - g0[0]:+d}/{g1[1] - g0[1]:+d}"},
+            "name": func.__doc__ or test_id,
+            "gdi": g1[0], "gdi_growth": g1[0] - g0[0],
         })
         print(f"[FAIL] {duration:.2f}s — {type(exc).__name__}: {exc}")
 
@@ -382,8 +544,8 @@ def _enum_candidate_windows() -> List[Dict[str, Any]]:
 
 
 def test_s1_deep_scan_depth() -> TestOutcome:
-    """S1: Organ-30 deep scan — how deep and how much it learns (target-aware)"""
-    from core_organs.organ_30_app_scanner import EyeAndBrainOrchestrator
+    """S1: modern fast_scan deep scan (Blocker #2) — usable tree within budget, legacy tree_stats keys mapped"""
+    from core_organs import fast_scan
 
     user32 = ctypes.windll.user32
     fg = user32.GetForegroundWindow()
@@ -394,22 +556,22 @@ def test_s1_deep_scan_depth() -> TestOutcome:
         if c["hwnd"] != fg:
             candidates.append(c)
 
-    orch = EyeAndBrainOrchestrator()
-
     def scan(hwnd):
         t = time.perf_counter()
-        r = orch.deep_scan_unknown_app(app_name="s1-target", target_hwnd=hwnd, quiet=True)
+        r = fast_scan.deep_scan_legacy_shape("s1-target", target_hwnd=hwnd, budget_s=10.0)
         s = r.get("tree_stats", {})
         return s.get("nodes_walked", 0), s.get("max_depth_seen", 0), \
             s.get("walk_max_depth", 0), r.get("total_elements", 0), \
-            r.get("total_controls", 0), r.get("total_menu_items", 0), time.perf_counter() - t
+            r.get("total_controls", 0), r.get("total_menu_items", 0), time.perf_counter() - t, r
 
     # Try targets richest-first until the scanner demonstrates real depth.
     best = None
     tried = 0
+    within = False
     for cand in candidates[:4]:
         tried += 1
-        nodes, depth_seen, depth_cap, elements, controls, menus, elapsed = scan(cand["hwnd"])
+        nodes, depth_seen, depth_cap, elements, controls, menus, elapsed, r = scan(cand["hwnd"])
+        within = within or bool(r.get("within_budget"))
         if best is None or nodes > best[0]:
             best = (nodes, depth_seen, depth_cap, elements, controls, menus, elapsed, cand["title"])
         if nodes > 50 and elements > 0 and depth_seen >= 6:
@@ -421,16 +583,18 @@ def test_s1_deep_scan_depth() -> TestOutcome:
     nodes, depth_seen, depth_cap, elements, controls, menus, elapsed, title = best
 
     evidence = (
-        f"scanned {tried} target(s); best='{title[:28]}': {nodes} nodes walked, "
-        f"depth {depth_seen}/{depth_cap}, {controls} actionable controls, "
+        f"modern fast_scan (adapter over bulk UIA snapshot): scanned {tried} target(s); "
+        f"best='{title[:28]}': {nodes} nodes walked, "
+        f"depth {depth_seen}/{'uncapped' if not depth_cap else depth_cap}, {controls} actionable controls, "
         f"{menus} menu items, {elements} elements learned in {elapsed:.2f}s"
     )
     return TestOutcome(
-        passed=nodes > 50 and elements > 0 and depth_seen >= 6,
-        evidence=evidence,
+        passed=nodes > 50 and elements > 0 and depth_seen >= 6 and within,
+        evidence=evidence + ("" if within else f" — OVER BUDGET on every target tried (honest: {elapsed:.1f}s, steps in tree_stats.stopped_by)"),
         metrics={"nodes_walked": nodes, "depth_seen": depth_seen, "depth_cap": depth_cap,
                  "actionable_controls": controls, "elements_learned": elements,
-                 "scan_seconds": round(elapsed, 3), "targets_tried": tried},
+                 "scan_seconds": round(elapsed, 3), "targets_tried": tried,
+                 "within_budget": within, "scanner": "fast_scan.deep_scan_legacy_shape"},
     )
 
 
@@ -932,6 +1096,7 @@ ORGAN_IMPORTS = [
     ("core_organs.organ_36_workflow_compiler", None),
     ("core_organs.organ_37_llm_gateway", None),
     ("core_organs.organ_38_task_orchestrator", None),
+    ("core_organs.organ_38_progressive_refinement", "ProgressiveRefinementEngine"),
     ("core_organs.organ_40_app_launcher", "VerbAliasEngine"),
     ("core_organs.organ_41_scanner", "ScannerOrgan"),
     ("core_organs.desktop_grounding", "DesktopAutonomyLoop"),
@@ -950,6 +1115,13 @@ ORGAN_IMPORTS = [
     ("core_organs.headless_input", "post_drag"),
     ("core_organs.visual_cursor", "VisualCursor"),
     ("core_organs.organ_15_external_connectors", "DesktopConnector"),
+    # the app-knowledge engine
+    ("core_organs.pe_resources", "read_resources"),
+    ("core_organs.static_knowledge", "harvest"),
+    ("core_organs.knowledge_store", "ensure"),
+    ("core_organs.command_registry", "dossier"),
+    ("core_organs.knowledge_bridge", "KnowledgeBridge"),
+    ("core_organs.organ_63_app_mastery", "master"),
 ]
 
 
@@ -1019,6 +1191,47 @@ def test_day1_behavior() -> TestOutcome:
     from core_organs import si_tests_behavior
     return si_tests_behavior.run_day1(TestOutcome)
 
+
+
+def _kn(name: str, doc: str):
+    """Wrapper factory for si_tests_knowledge (the app-knowledge engine tests): same TestOutcome, doc = the test's name."""
+    def _t() -> TestOutcome:
+        from core_organs import si_tests_knowledge
+        return getattr(si_tests_knowledge, name)(TestOutcome)
+    _t.__doc__ = doc
+    _t.__name__ = "test_" + name
+    return _t
+
+
+test_kp1_behavior = _kn("run_kp1", "KP1: the PE resource reader agrees with Windows' own menu loader; static knowledge of a real classic program is complete and honest")
+test_kp2_behavior = _kn("run_kp2", "KP2: shipped data sources (toolkit files, asar package.json, keymaps, manifests, settings) are found by SHAPE and ingested at catalog trust")
+test_ks1_behavior = _kn("run_ks1", "KS1: one command map per app: sources merge + corroborate, E2 stays out, routes follow how the app takes input, frontier persists")
+test_kb1_behavior = _kn("run_kb1", "KB1: direct control needs >= 2 verified successes (6.4); the bridge and organ_47 obey the same gate")
+test_inf1_behavior = _kn("run_inf1", "INF1: what an app IS is inferred from evidence, not its name; thin evidence stays unclassified")
+test_b2n_behavior = _kn("run_b2n", "B2N: an invented app name fails at launch with a reason and launches nothing else")
+test_pure1_behavior = _kn("run_pure1", "PURE1: no first-party source reaches for a physical-input API (AST scan); the guard still refuses a physical call")
+test_pop2_behavior = _kn("run_pop2", "POP2: start-up questions are answered by meaning (body button, never the title-bar X), SmartScreen is escalated, look-alike commands do not match")
+test_pix1_behavior = _kn("run_pix1", "PIX1: a parked app's flyouts never reach the screen's pixels (composed-desktop frames during a menu crawl equal the baseline)")
+test_chr1_behavior = _kn("run_chr1", "CHR1: title-bar buttons are never offered / taught for an in-app goal, and a vanished window is not a pass")
+test_ptr1_behavior = _kn("run_ptr1", "PTR1: the pointer sentinel names who moved the mouse (human / foreign = ABORTED-ENV, this code = FAIL)")
+test_es2_behavior = _kn("run_es2", "ES2: every need-human record carries a real screenshot of what the agent saw (visible and minimized windows)")
+test_pre1_behavior = _kn("run_pre1", "PRE1: shipped command lists are preloaded as DEMOTED hints and promoted only by a live verified probe")
+test_cap1_behavior = _kn("run_cap1", "CAP1: a capability summary (what it is, how to drive it, a verified task per exercised surface) is written from data in about a second")
+test_pv1_behavior = _kn("run_pv1", "PV1: a popup that exposes nothing is read via DAP capture+OCR and answered by the role policy; an elevation prompt in disguise is escalated")
+test_rank1_behavior = _kn("run_rank1", "RANK1: element ranking encodes what a person does (no window chrome / accounts, File -> Save As -> Browse, conventional menus, paste is a command)")
+test_paint1_behavior = _kn("run_paint1", "PAINT1: a drawing from DATA is drawn in WinUI Paint with zero physical input (clipboard -> Paste -> save -> pixel proof)")
+test_par1_behavior = _kn("run_par1", "PAR1: two independent apps run in parallel, one child virtual cursor each, each verified on disk")
+test_lc2ia_behavior = _kn("run_lc2ia", "LC2-IA: two DISJOINT cursors drive ONE app at the same time (region ownership enforced, both effects pixel-verified, concurrent overlap measured); same-child pairs degrade honestly to serialized")
+test_act1_behavior = _kn("run_act1", "ACT1: every action leaves through the DAP actuation backbone (family -> ordered providers, trace, registered providers, no physical rung)")
+test_km1_behavior = _kn("run_km1", "KM1: mastery learns an app across runs, invisibly; the knowledge is true against an independent UIA walk")
+test_kc1_behavior = _kn("run_kc1", "KC1: a context menu is discovered headless, read, closed again; a dropdown is expanded and collapsed; the app is left as found")
+test_km2_behavior = _kn("run_km2", "KM2: a command that needs a mode is never fired in the wrong one: mode repaired via the learned graph or refused")
+test_day2_behavior = _kn("run_day2", "DAY2: the unattended day survives a KILLED process: no redo of finished tickets, one retry of the cut-off one, E2 waits for a human, a hang times out, a false DONE is caught")
+test_org1_behavior = _kn("run_org1", "ORG1: per-app hard-coding in organ_01 only shrinks (ratchet) and the refactor stays in place")
+test_day3_behavior = _kn("run_day3", "DAY3 (live, --day-live): 8 real tickets across 4 apps with no human: E2 waits, an invented app does not stall, nothing is reported DONE that is not there")
+test_priv1_behavior = _kn("run_priv1", "PRIV1: a UI label that names a person is stored without the person in every sink and is never pressed")
+test_tf1_behavior = _kn("run_tf1", "TF1: the free-form path tries a learned template before any goal planning")
+test_kt1_behavior = _kn("run_kt1", "KT1: the loop uses verified knowledge as a direct route and records the verified step as a transition")
 
 
 def test_min1_behavior() -> TestOutcome:
@@ -1148,12 +1361,20 @@ def test_v1_verifier_verdict_logic() -> TestOutcome:
     vd, ev = v.verdict({"element_disappeared": "Loading"}, mk(["e0"], "App"), mk(["e1"], "App"), els)
     checks.append(("disappeared_pass", vd == "PASS")); detail.append(f"disappeared->{vd}")
     # 7) file_created / file_saved satisfied -> PASS
+    # Measured 2026-10-05: an Excel task reported DONE because a stale e1.xlsx from an earlier, killed run was
+    # still on disk. Existence alone is therefore not proof of a WRITE, so the file here must hold content - an
+    # empty file is the same false positive wearing a smaller hat (a dialog that "created" a 0-byte stub).
     import tempfile
-    with tempfile.NamedTemporaryFile(delete=False) as tf:
-        tf_name = tf.name
+    tf_name = tempfile.mktemp(suffix=".txt")
     try:
+        with open(tf_name, "wb") as fh:
+            fh.write(b"saved by the app")
         vd, ev = v.verdict({"file_created": tf_name}, mk(["e0"], "App"), mk(["e0"], "App"), els)
         checks.append(("file_created_pass", vd == "PASS")); detail.append(f"file_created->{vd}")
+        # 7b) a 0-byte file is NOT proof of a save -> the expect fails (WRONG_STATE/NO_CHANGE, never PASS)
+        open(tf_name, "wb").close()
+        vd, ev = v.verdict({"file_created": tf_name}, mk(["e0"], "App"), mk(["e0"], "App"), els)
+        checks.append(("empty_file_is_not_a_save", vd != "PASS")); detail.append(f"empty-file->{vd}")
     finally:
         try:
             os.remove(tf_name)
@@ -1753,6 +1974,12 @@ def test_off1_offscreen_capture_rung() -> TestOutcome:
     return si_tests_fixes.run_off1(TestOutcome)
 
 
+def test_eye1_capture_soak() -> TestOutcome:
+    """EYE1: 300 headless captures of one parked window in THIS long-lived process never go blank and never grow the GDI/USER budget (the trust eyes must not flicker)"""
+    from core_organs import si_tests_fixes
+    return si_tests_fixes.run_eye1(TestOutcome)
+
+
 def test_dr1_headless_drag() -> TestOutcome:
     """DR1: headless drag - ordered, time-sliced WM_MOUSEMOVE/LBUTTONDOWN/UP draws a circle on a real canvas; physical pointer untouched; an app that ignores posted mouse input is reported INEFFECTIVE, not success"""
     from core_organs import si_tests_fixes
@@ -1952,8 +2179,12 @@ def test_e2e1_notepad_haiku_save() -> TestOutcome:
             _close_our_notepad()  # fresh process each run -> operate_app relaunches clean
             target = os.path.join(out_dir, f"poem{n}.txt")
             goals = ["type a haiku into the text area", f"save the document as {target}"]
+            t0 = time.time()      # ground truth must be "written DURING this run", not "is on the disk":
             r = _e2e_run("notepad", goals, {1: {"file_created": target}}, f"run{n}")
-            results.append((r, os.path.exists(target), target))
+            # an old file of the same name would otherwise flatter the agent's own verdict
+            fresh = os.path.exists(target) and os.stat(target).st_mtime >= t0 - 1.0 \
+                and os.stat(target).st_size > 0
+            results.append((r, fresh, target))
     finally:
         # Close OUR notepad window gracefully (document is saved, so no unsaved-state is left to
         # resurrect later). Only when we launched it.
@@ -1965,7 +2196,8 @@ def test_e2e1_notepad_haiku_save() -> TestOutcome:
     pointer_ok = si_pointer() == pointer0
     guard_clean = len(hin.VIOLATIONS) == viol0
     evidence = (f"run1 completed={r1.get('completed')} file={'yes' if f1 else 'NO'} steps={r1.get('steps')} "
-                f"{r1.get('elapsed_s')}s awaiting_human={r1.get('awaiting_human')} trace={shown(r1)}; "
+                f"{r1.get('elapsed_s')}s awaiting_human={r1.get('awaiting_human')} "
+                f"ready_reason={r1.get('ready_reason') or 'n/a'} trace={shown(r1)}; "
                 f"recipe='{recipe}'; run2 completed={r2.get('completed')} file={'yes' if f2 else 'NO'} "
                 f"steps={r2.get('steps')} {r2.get('elapsed_s')}s trace={shown(r2)}; "
                 f"steps run1->run2: {r1.get('steps')}->{r2.get('steps')}, seconds {r1.get('elapsed_s')}->"
@@ -1982,6 +2214,84 @@ def si_pointer():
     p = _wt.POINT()
     ctypes.windll.user32.GetCursorPos(ctypes.byref(p))
     return (p.x, p.y)
+
+
+def _close_our_app(g, app: str) -> None:
+    """WM_CLOSE a window of THIS app only if this suite process created it (ownership registry). Used between
+    learned re-runs: a stale document carrying run 1's state made run 2 read as NO_CHANGE (measured on Notepad)."""
+    from core_organs import background_window as bw
+    from core_organs import universal_scan as us
+    for h in bw.ours_alive():
+        if g._process_stem_cached(h) == app.lower():
+            us.close_window(h, timeout_s=6.0, discard_unsaved=True)
+            time.sleep(0.4)
+
+
+def test_xls1_spreadsheet_cell_and_full_path_save() -> TestOutcome:
+    """XLS1: unattended spreadsheet run - type a value into a cell, save to an ABSOLUTE path, and prove the
+    value is really inside the file. This family broke twice for DATA reasons, not app reasons: its own picker is
+    an UNTITLED window of a non-common class (invisible to a '#32770 + title' rule), and that picker DISABLES
+    accept when a full path is typed into it, so the loop has to walk the app's own controls to reach the classic
+    dialog. Reading the file back with file_holds_text closes the third hole: an 8 KB workbook holding nothing at
+    all used to be reported as a successful save."""
+    import shutil
+    from core_organs import headless_input as hin
+    from core_organs import desktop_grounding as dg
+    from core_organs.desktop_grounding import DesktopGrounding
+
+    exe = shutil.which("excel") or next(
+        (p for p in (r"C:\Program Files\Microsoft Office\root\Office16\EXCEL.EXE",
+                     r"C:\Program Files (x86)\Microsoft Office\root\Office16\EXCEL.EXE")
+         if os.path.isfile(p)), None)
+    if not exe:
+        return TestOutcome(passed=False, env_blocked=True,
+                           evidence="no spreadsheet app found on this host (checked PATH and the usual Office "
+                                    "install folders) -> XLS1 cannot be proven here")
+    g = DesktopGrounding()
+    if g.find_window("excel") is not None:      # a window we did not launch is the user's: never drive, never close
+        return TestOutcome(passed=False, env_blocked=True,
+                           evidence="a spreadsheet window is already open and is not ours: XLS1 will not touch it. "
+                                    "Close it and re-run.")
+
+    out_dir = os.path.join(r"D:\new_automation", "_e2e_tmp")
+    shutil.rmtree(out_dir, ignore_errors=True)
+    os.makedirs(out_dir, exist_ok=True)
+    os.environ.setdefault("HOJAIGA_KNOWLEDGE_ROOT", os.path.join(r"D:\new_automation", "organ_04_knowledge"))
+    viol0 = len(hin.VIOLATIONS)
+    pointer0 = si_pointer()
+    value = "42"
+    results = []
+    try:
+        for n in (1, 2):
+            _close_our_app(g, "excel")          # run 2 is the learned re-run and starts on a fresh document
+            target = os.path.join(out_dir, f"hj_xls{n}.xlsx")
+            goals = [f"type {value} in cell A1", f"save the workbook as {target}"]
+            t0 = time.time()
+            r = _e2e_run("excel", goals, {1: {"file_created": target}}, f"run{n}")
+            holds = dg.file_holds_text(target, value)      # independent read: the format itself is the witness
+            fresh = os.path.exists(target) and os.stat(target).st_mtime >= t0 - 1.0 \
+                and os.stat(target).st_size > 0
+            results.append((r, fresh, holds, target))
+    finally:
+        _close_our_app(g, "excel")
+    (r1, f1, h1, _t1), (r2, f2, h2, _t2) = results
+    shown = lambda r: [(st["verb"], st["element"][:18], st["verdict"]) for st in r.get("trace", [])]  # noqa: E731
+    ok1 = bool(r1.get("completed")) and f1 and h1[0] is True
+    ok2 = bool(r2.get("completed")) and f2 and h2[0] is True
+    pointer_ok = si_pointer() == pointer0
+    guard_clean = len(hin.VIOLATIONS) == viol0
+    evidence = (f"run1 completed={r1.get('completed')} file={'yes' if f1 else 'NO'} "
+                f"content[{value}]={h1[0]}/{h1[1]} steps={r1.get('steps')} {r1.get('elapsed_s')}s "
+                f"awaiting_human={r1.get('awaiting_human')} trace={shown(r1)}; recipe='{r1.get('recipe', '')}'; "
+                f"run2 completed={r2.get('completed')} file={'yes' if f2 else 'NO'} content={h2[0]}/{h2[1]} "
+                f"steps={r2.get('steps')} {r2.get('elapsed_s')}s trace={shown(r2)}; "
+                f"steps run1->run2: {r1.get('steps')}->{r2.get('steps')}, seconds {r1.get('elapsed_s')}->"
+                f"{r2.get('elapsed_s')}; physical pointer untouched={pointer_ok}; input-guard violations="
+                f"{len(hin.VIOLATIONS) - viol0}")
+    return TestOutcome(passed=ok1 and ok2 and guard_clean, evidence=evidence,
+                       metrics={"run1_steps": r1.get("steps"), "run2_steps": r2.get("steps"),
+                                "run1_s": r1.get("elapsed_s"), "run2_s": r2.get("elapsed_s"),
+                                "content_ok": f"{h1[0]},{h2[0]}", "pointer_untouched": pointer_ok})
 
 
 def test_e2e2_canvas_app_vision() -> TestOutcome:
@@ -2098,6 +2408,11 @@ def main() -> int:
     print("Hojaiga System Intelligence & Reliability Suite")
     print("=" * 80)
     suite_start = time.perf_counter()
+    # Optional handle-level trace (HOJAIGA_GDI_TRACE=1): the budget curve above says WHO leaked in
+    # aggregate, this says WHICH LINE allocated the handles that are still live.
+    from core_organs import gdi_budget_trace as _gbt
+    if _gbt.install():
+        print("GDI trace ON: outstanding handles reported after the run")
 
     plan = [
         ("B1", "BRAIN", test_b1_compiler_natural_language),
@@ -2136,6 +2451,7 @@ def main() -> int:
         ("LF2", "ROUTING", test_lf2_loop_first_two_apps_live),
         ("OFF1", "HEADLESS", test_off1_offscreen_capture_rung),
         ("DR1", "HEADLESS", test_dr1_headless_drag),
+        ("LC2-IA", "HEADLESS", test_lc2ia_behavior),
         ("CN1", "HEADLESS", test_cn1_desktop_connector_headless),
         ("TY1", "HEADLESS", test_ty1_headless_launch_switch_type),
         ("ANY1", "ANYAPP", test_any1_any_app_discovery),
@@ -2154,6 +2470,7 @@ def main() -> int:
         ("BM3", "BEHAVIOR", test_bm3_behavior),
         ("BM4", "BEHAVIOR", test_bm4_behavior),
         ("MIN1", "BACKGROUND", test_min1_behavior),
+        ("PIX1", "BACKGROUND", test_pix1_behavior),
         ("SC1", "SCANKNOW", test_sc1_behavior),
         ("LM1", "SCANKNOW", test_lm1_behavior),
         ("SC2", "SCANKNOW", test_sc2_behavior),
@@ -2161,16 +2478,72 @@ def main() -> int:
         ("SCK1", "SCANKNOW", test_sck1_behavior),
         ("TPL1", "AUTONOMY", test_tpl1_behavior),
         ("DAY1", "AUTONOMY", test_day1_behavior),
+        ("KP1", "APPKNOW", test_kp1_behavior),
+        ("KP2", "APPKNOW", test_kp2_behavior),
+        ("KS1", "APPKNOW", test_ks1_behavior),
+        ("KB1", "APPKNOW", test_kb1_behavior),
+        ("INF1", "APPKNOW", test_inf1_behavior),
+        ("B2N", "APPKNOW", test_b2n_behavior),
+        ("PURE1", "APPKNOW", test_pure1_behavior),
+        ("PTR1", "APPKNOW", test_ptr1_behavior),
+        ("ES2", "CHECKPOINTS", test_es2_behavior),
+        ("PRE1", "APPKNOW", test_pre1_behavior),
+        ("CAP1", "APPKNOW", test_cap1_behavior),
+        ("POP2", "POPUP", test_pop2_behavior),
+        ("CHR1", "POPUP", test_chr1_behavior),
+        ("PV1", "POPUP", test_pv1_behavior),
+        ("RANK1", "GROUNDING", test_rank1_behavior),
+        ("ACT1", "HEADLESS", test_act1_behavior),
+        ("KM1", "APPKNOW", test_km1_behavior),
+        ("KC1", "APPKNOW", test_kc1_behavior),
+        ("KT1", "APPKNOW", test_kt1_behavior),
+        ("KM2", "APPKNOW", test_km2_behavior),
+        ("TF1", "APPKNOW", test_tf1_behavior),
+        ("PRIV1", "APPKNOW", test_priv1_behavior),
+        ("ORG1", "APPKNOW", test_org1_behavior),
+        ("DAY2", "AUTONOMY", test_day2_behavior),
+        # LAST on purpose: the defect this guards is process-history dependent (the same captures pass in a fresh
+        # process), so the soak has to run on a process that already did a full day of scanning and acting.
+        ("EYE1", "HEADLESS", test_eye1_capture_soak),
     ]
+    if "--day-live" in sys.argv:         # the 8-ticket unattended day (several minutes, drives Notepad / Calculator / Paint / Excel)
+        plan += [("DAY3", "AUTONOMY", test_day3_behavior)]
     if "--e2e" in sys.argv:
-        plan += [("E2E-1", "E2E", test_e2e1_notepad_haiku_save),
-                 ("E2E-2", "E2E", test_e2e2_canvas_app_vision)]
+        plan += [("PAINT1", "E2E", test_paint1_behavior),
+                 ("PAR1", "E2E", test_par1_behavior),
+                 ("E2E-1", "E2E", test_e2e1_notepad_haiku_save),
+                 ("E2E-2", "E2E", test_e2e2_canvas_app_vision),
+                 ("XLS1", "E2E", test_xls1_spreadsheet_cell_and_full_path_save)]
     if "--vision-bench" in sys.argv:     # 4 REAL cold starts (several minutes): opt-in, results also land in data/vision_bench_results.json
         plan += [("VB1", "VISIONBUDGET", test_vb1_warmup_head_to_head)]
     if "--only" in sys.argv:          # iterate on a few tests: --only LM1,SC1  (a partial run never overwrites the full log)
         wanted = {t.strip().upper() for t in sys.argv[sys.argv.index("--only") + 1].split(",") if t.strip()}
         plan = [p for p in plan if p[0].upper() in wanted]
+    if "--first" in sys.argv:         # the FIRST n tests of the plan, in order: --first 22. Needed for a defect that
+        plan = plan[:int(sys.argv[sys.argv.index("--first") + 1])]   # only exists in the process history an earlier test leaves behind
+    try:                                                    # P0-C: say up front whether somebody is using the mouse
+        from core_organs import pointer_sentinel as _ps0
+        _pre = _ps0.preflight(1.5)
+        print(f"[pointer preflight] {_ps0.describe(_pre)}" + ("  -> a hand is on the mouse: pointer assertions may end ABORTED-ENV, not FAIL"
+                                                             if _pre["cause"] != "still" else "  -> quiet"))
+    except Exception as _exc:  # noqa: BLE001
+        print(f"[pointer preflight] unavailable: {type(_exc).__name__}: {_exc}")
+    if os.environ.get("HOJAIGA_NO_VISION_GATE") != "1":     # the eyes must be OPEN while testing: start Qwen2.5-VL when down, log every use
+        try:
+            import atexit
+            from core_organs import vision_gate as _vg
+            _up = _vg.ensure_up(90.0)
+            print(f"[vision gate] up={_up['up']} started={_up['started']} ({_up['why']})")
+            _vg.install()
+            atexit.register(lambda: print("[vision gate] " + _vg.summary()))
+        except Exception as _exc:  # noqa: BLE001
+            print(f"[vision gate] unavailable: {type(_exc).__name__}: {_exc}")
     for test_id, group, func in plan:
+        by_owner, by_title = _reclaim_harness_artifacts()
+        if by_owner or by_title:
+            print(f"[hygiene] reclaimed {by_owner} harness-OWNED window(s) "
+                  f"(+{by_title} by artifact name) before {test_id} "
+                  f"(a failed test must not ENV-BLOCK the next one)")
         run_test(test_id, group, func)
 
     total_ms = (time.perf_counter() - suite_start) * 1000
@@ -2186,15 +2559,36 @@ def main() -> int:
     for r in RESULTS:
         print(f"[{r['status']}] {r['id']:>3} {r['name'][:58]:<58} {r['duration']*1000:8.1f} ms")
 
+    # GDI/USER budget curve: which test consumed the process's object handles. A process at the
+    # 10,000 cap can no longer create a device context, and EVERY capture after that reads as
+    # 'the app did not paint' - so the suite names the consumer instead of blaming the apps.
+    curve = [(r["id"], r.get("gdi", -1), r.get("gdi_growth", 0)) for r in RESULTS]
+    print(f"\n{'=' * 80}\nGDI OBJECT BUDGET (cap 10000) — end-of-test count / growth\n{'=' * 80}")
+    print("  curve: " + " ".join(f"{i}:{g}({gr:+d})" for i, g, gr in curve))
+    big = sorted((c for c in curve if c[2] > 0), key=lambda c: -c[2])[:12]
+    for i, g, gr in big:
+        print(f"  {i:>5} consumed {gr:>5} handles (process at {g})")
+    if not big:
+        print("  no test grew the GDI budget - the process released everything it allocated")
+    if _gbt.enabled():
+        print(_gbt.report(16))
+    try:
+        from core_organs import gdi_sampler as _gs2
+        if _gs2.enabled():
+            print(_gs2.report())
+    except Exception:  # noqa: BLE001
+        pass
+
     print(f"\n{'=' * 80}\nRECONCILED SUBSYSTEM RANKINGS (70% pass-rate, 30% latency; B=env-blocked, neutral)\n{'=' * 80}")
     rankings = compute_rankings()
     print(f"{'#':>2}  {'SUBSYSTEM':<38} {'TESTS':>13} {'SCORE':>7} {'AVG MS':>9}")
     for i, row in enumerate(rankings, 1):
         print(f"{i:>2}  {row['group']:<38} {row['tests']:>13} {row['score']:>6.1f} {row['avg_ms']:>9.1f}")
 
-    out_name = "system_intelligence_results_partial.txt" if "--only" in sys.argv else "system_intelligence_results.txt"
+    partial = "--only" in sys.argv or "--first" in sys.argv      # a short run must never touch the full-log file
+    out_name = "system_intelligence_results_partial.txt" if partial else "system_intelligence_results.txt"
     out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), out_name)
-    with open(out_path, "a" if "--e2e" in sys.argv else "w", encoding="utf-8") as f:
+    with open(out_path, "w" if partial or "--e2e" not in sys.argv else "a", encoding="utf-8") as f:
         f.write(f"Hojaiga System Intelligence Suite — {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n")
         for r in RESULTS:
             f.write(f"[{r['status']}] {r['id']} [{r['group']}] {r['name']}\n")

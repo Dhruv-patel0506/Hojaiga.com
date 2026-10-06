@@ -2141,9 +2141,10 @@ if _HAS_CREWAI:
                 # Auto-scan the app so execution never stalls
                 logger.info(f"[BTN] No scan found for '{app_name}', performing instant scan now...")
                 try:
-                    from core_organs.organ_30_app_scanner import EyeAndBrainOrchestrator
-                    scanner = EyeAndBrainOrchestrator()
-                    scanner.deep_scan_unknown_app(app_name=app_name, target_hwnd=target_hwnd, quiet=False)
+                    # BLOCKER #2: modern fast_scan first-contact (bulk UIA + static harvest + async vision),
+                    # not the legacy serial organ_30 walk. Result keeps the legacy keys via the adapter.
+                    from core_organs import fast_scan
+                    fast_scan.deep_scan_legacy_shape(app_name or "unknown", target_hwnd=target_hwnd, budget_s=10.0)
                 except Exception as auto_scan_err:
                     logger.warning(f"[BTN] Instant scan failed: {auto_scan_err}")
 
@@ -2156,9 +2157,8 @@ if _HAS_CREWAI:
                     target_hwnd = new_hwnd
                     # Re-scan after recovery
                     try:
-                        from core_organs.organ_30_app_scanner import EyeAndBrainOrchestrator
-                        scanner = EyeAndBrainOrchestrator()
-                        scanner.deep_scan_unknown_app(app_name=app_name, target_hwnd=new_hwnd, quiet=True)
+                        from core_organs import fast_scan
+                        fast_scan.deep_scan_legacy_shape(app_name or "unknown", target_hwnd=new_hwnd, budget_s=10.0)
                     except Exception:
                         pass
                 else:
@@ -3875,8 +3875,10 @@ if _HAS_CREWAI:
                         logger.info(f"[SCAN] Auto-launched '{resolved_name}' hwnd={found_hwnd}")
 
             # MANDATORY SCAN: always scan with the correct window
-            scanner = EyeAndBrainOrchestrator()
-            result = scanner.deep_scan_unknown_app(app_name=resolved_name, target_hwnd=target_hwnd, quiet=False)
+            # BLOCKER #2: hot scan entry now runs the modern fast_scan pipeline (result adapted to
+            # the legacy dict shape: tree_stats/total_*/ui_elements all stay readable).
+            from core_organs import fast_scan
+            result = fast_scan.deep_scan_legacy_shape(resolved_name, target_hwnd=target_hwnd, budget_s=10.0)
             ui_elems = result.get("ui_elements", []) if result else []
 
             # If scan returned 0 elements, report it — do NOT auto-launch again (causes duplicates)

@@ -58,6 +58,10 @@ GATE_MIN_SUCCESSES = int(os.environ.get("HOJAIGA_GATE_MIN_SUCCESSES", "3"))
 CRAWL_BUDGET_S = float(os.environ.get("HOJAIGA_CRAWL_BUDGET_S", "5"))   # soft base (organ_40's 5 s lesson)
 CRAWL_MAX_S = float(os.environ.get("HOJAIGA_CRAWL_MAX_S", "45"))        # hard cap; soft extends while yield continues
 CLI_HARVEST_TIMEOUT_S = float(os.environ.get("HOJAIGA_CLI_HARVEST_TIMEOUT_S", "20"))
+# One observation of an app (its own tree + every popup + a bulk snapshot) must fit a single deadline: the
+# scanner observes BEFORE and AFTER every probe, so an unbounded observation is what turns a bounded probe
+# count into an unbounded scan.
+OBSERVE_BUDGET_S = float(os.environ.get("HOJAIGA_OBSERVE_BUDGET_S", "8"))
 
 TRUST_RANK = {"learned": 4, "catalog": 3, "archetype": 2, "distilled": 1}
 PACK_MAX_TRUST = {"catalog", "archetype", "distilled"}      # packs can never self-declare learned
@@ -85,6 +89,8 @@ CREATE TABLE IF NOT EXISTS bm_templates (
     source TEXT, confidence REAL, hits INTEGER DEFAULT 0, failures INTEGER DEFAULT 0,
     stale INTEGER DEFAULT 0, seed_note TEXT, ts REAL);
 CREATE INDEX IF NOT EXISTS bm_tpl_app ON bm_templates(app_key);
+CREATE TABLE IF NOT EXISTS bm_cmd_sources (
+    cmd_id TEXT, origin_class TEXT, origin TEXT, ts REAL, PRIMARY KEY (cmd_id, origin_class));
 CREATE TABLE IF NOT EXISTS bm_stats (
     key TEXT PRIMARY KEY, successes INTEGER DEFAULT 0, failures INTEGER DEFAULT 0,
     consecutive_fail INTEGER DEFAULT 0, confidence REAL DEFAULT 0.3, last_outcome TEXT, ts REAL);
@@ -140,6 +146,7 @@ class ObservedState:
     ocr: Optional[str] = None
     ocr_status: str = "not-requested"                    # ok | not-requested | skipped:<why>
     region_hash: str = ""
+    cut: str = ""                                        # what this observation did NOT get to read (budget)
     hwnd: int = 0
     mode: str = ""
 
@@ -166,24 +173,40 @@ def ocr_window_text(hwnd: int) -> Tuple[Optional[str], str]:
 
 
 def observe(hwnd: int, *, grounding=None, want_ocr: bool = False,
-            want_region: bool = False, max_nodes: int = 500) -> ObservedState:
+            want_region: bool = False, max_nodes: int = 500,
+            budget_s: Optional[float] = None) -> ObservedState:
     """Snapshot the app: title, control names/values (UIA incl. popup hosts),
-    sibling windows, and optionally OCR text / pixel hash."""
+    sibling windows, and optionally OCR text / pixel hash.
+
+    ONE deadline covers the whole observation (the app walk, every popup walk and the bulk snapshot): a scan
+    observes the app after every probe, so serial per-call timeouts added up to tens of seconds per probe."""
     from core_organs import desktop_grounding as dg
     from core_organs import headless_input as hin
     g = grounding or dg.DesktopGrounding()
     st = ObservedState(hwnd=hwnd, title=_win_title(hwnd))
+    _deadline = time.perf_counter() + (OBSERVE_BUDGET_S if budget_s is None else max(0.3, float(budget_s)))
+
+    def _left() -> float:
+        return _deadline - time.perf_counter()
+
     elements = []
+    cut = []
     try:
-        elements = g._walk_uia(hwnd, max_depth=14, max_nodes=max_nodes) if dg.HAS_UIA else g._walk_win32(hwnd)
+        elements = (g._walk_uia(hwnd, max_depth=14, max_nodes=max_nodes, budget_s=max(0.3, _left()))
+                    if dg.HAS_UIA else g._walk_win32(hwnd))
+        if getattr(g, "last_walk", {}).get("truncated"):
+            cut.append(f"app-walk:{g.last_walk.get('stopped_by') or 'depth'}")
     except Exception:
         pass
     others: List[int] = []
     try:
         others = _open_popups(hwnd)[:10]
         for w in others:
+            if _left() < 0.5:                       # no budget left for another popup: say so, do not stall
+                cut.append(f"popups-unsurfaced({len(others) - others.index(w)})")
+                break
             try:
-                elements += g._walk_uia(w, max_depth=8, max_nodes=200) if dg.HAS_UIA else []
+                elements += g._walk_uia(w, max_depth=8, max_nodes=200, budget_s=_left()) if dg.HAS_UIA else []
             except Exception:
                 continue
     except Exception:
@@ -194,19 +217,26 @@ def observe(hwnd: int, *, grounding=None, want_ocr: bool = False,
     # really changed the UI looks like "nothing happened" and gets wrongly failed.
     try:
         from core_organs import fast_uia
-        snap = fast_uia.snapshot(hwnd, timeout_ms=6000)
-        if snap:
-            seen = set(names)
-            for n in snap:
-                nm = (n.name or "").lower().strip()
-                if nm and nm != "pop-uphost" and nm not in seen:
-                    names.append(nm)
-                    seen.add(nm)
+        if _left() < 0.3:
+            cut.append("snapshot:no-budget")
+        else:
+            snap = fast_uia.snapshot(hwnd, timeout_ms=int(max(300, _left() * 1000)))
+            if snap:
+                seen = set(names)
+                for n in snap:
+                    nm = (n.name or "").lower().strip()
+                    if nm and nm != "pop-uphost" and nm not in seen:
+                        names.append(nm)
+                        seen.add(nm)
     except Exception:
         pass
     st.names = names
     st.values = [(e.value or "").lower() for e in elements if getattr(e, "value", "")]
     st.windows = sorted({(_win_title(w) or _win_class(w)).lower() for w in others})
+    st.cut = ";".join(cut)
+    if cut:
+        logger.info("[observe] hwnd=%s answered inside %.1fs of budget but was cut: %s",
+                    hwnd, OBSERVE_BUDGET_S, st.cut)
     if want_ocr:
         st.ocr, st.ocr_status = ocr_window_text(hwnd)
     if want_region:
@@ -774,14 +804,21 @@ class BehaviorModel:
     def upsert_command(self, app_key: str, cmd: Dict[str, Any], *, source: str,
                        origin: str = "", evidence: str = "") -> str:
         assert source in TRUST_RANK
+        try:
+            from core_organs.knowledge_store import redact
+            cmd = dict(cmd, name=redact(cmd.get("name", "")), goal=redact(cmd.get("goal", "") or ""),
+                       menu_path=" > ".join(redact(seg.strip()) for seg in (cmd.get("menu_path", "") or "").split(">")) if cmd.get("menu_path") else "")
+        except Exception:
+            pass
         name = cmd.get("name", "")
         ident = f"{app_key}|{_norm(name)}|{_norm(cmd.get('menu_path', ''))}|{_norm(cmd.get('shortcut', ''))}"
         cmd_id = "cmd_" + hashlib.md5(ident.encode()).hexdigest()[:12]
         risk = cmd.get("risk") or classify_risk(name, cmd.get("menu_path", ""))
         post = cmd.get("post") or []
         opaque = 1 if cmd.get("opaque") or not post else 0
-        row = self._conn.execute("SELECT source, confidence FROM bm_commands WHERE cmd_id=?",
+        row = self._conn.execute("SELECT source, confidence, evidence FROM bm_commands WHERE cmd_id=?",
                                  (cmd_id,)).fetchone()
+        evidence = evidence or cmd.get("evidence", "") or (row["evidence"] if row and row["evidence"] else "")   # a later source never wipes earlier help/mnemonic evidence
         if row:
             # never let a weaker source overwrite a stronger one
             if TRUST_RANK.get(row["source"], 0) >= TRUST_RANK[source]:
@@ -800,7 +837,15 @@ class BehaviorModel:
              cmd.get("shortcut", ""), cmd.get("menu_path", ""), cmd.get("automation_id", ""),
              cmd.get("menu_id"), risk, json.dumps(cmd.get("pre") or []), json.dumps(post),
              cmd.get("unwind", ""), opaque, source, conf, cmd_id, cmd_id, origin,
-             evidence or cmd.get("evidence", ""), time.time()))
+             evidence, time.time()))
+        # PROVENANCE: two sources that describe the SAME command (same name/path/shortcut) land on one row, so the row's own `origin`
+        # keeps only the last writer. Every source is recorded here so cross-source corroboration is never lost.
+        try:
+            from core_organs.knowledge_store import origin_class
+            self._conn.execute("INSERT OR REPLACE INTO bm_cmd_sources(cmd_id, origin_class, origin, ts) VALUES (?,?,?,?)",
+                               (cmd_id, origin_class(origin), origin, time.time()))
+        except Exception:
+            pass
         self._conn.commit()
         return cmd_id
 
@@ -853,8 +898,13 @@ class BehaviorModel:
     def record_region(self, app_key: str, title: str, elements: List[Dict[str, Any]], via: str = "") -> str:
         """Persist the FULL tree of a UI region a probe revealed (dialog / settings pane / palette),
         so what a child window contains is knowledge, not something re-discovered every scan."""
-        slim = [{"name": e.get("name", ""), "type": e.get("type", e.get("role", "")),
-                 "parent": e.get("parent_tab") or e.get("parent_menu") or ""} for e in elements][:400]
+        try:
+            from core_organs.knowledge_store import redact as _red
+        except Exception:
+            _red = lambda t: t
+        title = _red(title)
+        slim = [{"name": _red(e.get("name", "")), "type": e.get("type", e.get("role", "")),
+                 "parent": _red(e.get("parent_tab") or e.get("parent_menu") or "")} for e in elements][:400]
         rid = hashlib.md5(f"{app_key}|{_norm(title)}|{sorted(x['name'] for x in slim)[:40]}".encode()).hexdigest()[:14]
         self._conn.execute(
             "INSERT OR REPLACE INTO bm_ui_regions(region_id, app_key, title, via, elements_json, n_elements, ts)"
@@ -1086,6 +1136,20 @@ class BehaviorModel:
         self._conn.commit()
         return qid
 
+    def attach_evidence(self, qid: str, extra: Dict[str, Any]) -> bool:
+        """Merge evidence (a screenshot path ...) into a queued need-human row's context, so the help inbox shows it."""
+        row = self._conn.execute("SELECT context_json FROM bm_queue WHERE qid=?", (qid,)).fetchone()
+        if row is None:
+            return False
+        try:
+            ctx = json.loads(row[0] or "{}")
+        except Exception:
+            ctx = {}
+        ctx.update(extra)
+        self._conn.execute("UPDATE bm_queue SET context_json=? WHERE qid=?", (json.dumps(ctx, default=str)[:4000], qid))
+        self._conn.commit()
+        return True
+
     def pending_queue(self) -> List[Dict[str, Any]]:
         return [dict(r) for r in self._conn.execute(
             "SELECT * FROM bm_queue WHERE status='pending' ORDER BY ts")]
@@ -1312,8 +1376,14 @@ class DiscoveryBudget:
         return time.time() - self.t0
 
     def credit(self, new_items: int) -> None:
-        """Report one unit of work (a menu, a dialog) and how many NEW items it yielded."""
+        """Report one unit of work (a menu, a dialog) and how many NEW items it yielded.
+
+        A NEGATIVE count means the unit could not be read at all (an expand that answered nothing, a
+        popup that never opened). That is inconclusive, not a flatline: it must not spend patience, or
+        three impatient failures end the crawl while whole menus sit untried."""
         self.units += 1
+        if new_items < 0:
+            return
         self.yield_total += new_items
         if new_items > 0:
             self.dry = 0
@@ -1819,16 +1889,21 @@ def _crawl_menus_uia_e0_slow(hwnd: int, *, budget: Optional[DiscoveryBudget] = N
                 return True
         return not _open_popups(hwnd)
 
-    def _collect_new(known: set, main_root) -> List[Tuple[Dict[str, Any], Any]]:
+    def _collect_new(known: set, main_root, empty_s: Optional[float] = None) -> List[Tuple[Dict[str, Any], Any]]:
         """Poll until the opened menu's item set stops growing. A COLD first open can take well over
         a second to materialise, so the wait is long only while NOTHING has appeared yet (bounded),
-        and after 0.8 s the search widens from popup hosts/focus container to the main tree."""
+        and after 0.8 s the search widens from popup hosts/focus container to the main tree.
+
+        `empty_s` overrides how long to keep waiting while nothing has appeared: the retry ladder in
+        `_expand_and_collect` grows it per attempt, because deciding 'this menu is empty' after one
+        impatient second is how whole menus went missing (measured: notepad's Edit and View and three
+        of paint's headers read empty in one run and full in the next, same code)."""
         found: List[Tuple[Dict[str, Any], Any]] = []
         last_n, stable = -1, 0
         t_start = time.time()
         while True:
             waited = time.time() - t_start
-            limit_empty = 3.0 if cold["first"] else 1.2
+            limit_empty = empty_s if empty_s is not None else (3.0 if cold["first"] else 1.2)
             if (found and stable >= 1) or waited > (1.0 if found else limit_empty):
                 break
             found = []
@@ -1843,7 +1918,11 @@ def _crawl_menus_uia_e0_slow(hwnd: int, *, budget: Optional[DiscoveryBudget] = N
                     if k and k not in known and k not in seen_keys:
                         seen_keys.add(k)
                         info = _uia_item_info(it)
-                        if info["name"]:
+                        # The title bar's own System menu is not application knowledge. When a header
+                        # refuses to open on a parked window, the widened search used to file whatever
+                        # the title bar exposes as that menu's contents ('Edit > System'), which both
+                        # pollutes the catalogue and looks like a successful, non-empty read.
+                        if info["name"] and info["name"].lower() != "system":
                             found.append((info, it))
             stable = stable + 1 if (found and len(found) == last_n) else 0
             last_n = len(found)
@@ -1865,7 +1944,12 @@ def _crawl_menus_uia_e0_slow(hwnd: int, *, budget: Optional[DiscoveryBudget] = N
         label = " > ".join(path)
         children: List[Tuple[Dict[str, Any], Any]] = []
         opened = False
-        for attempt in (1, 2):                    # a cold/loaded app can drop the first Expand
+        # A top-level header gets three tries, with a longer wait for its items each time: on a parked
+        # window Expand() can be refused once and answered on the next attempt, and the cost of giving
+        # up early is every command under that menu (measured: 41 -> 18 for paint between two runs of
+        # unchanged code, decided by nothing but how quickly the first read gave up).
+        attempts = (1, 2, 3) if depth == 1 else (1, 2)
+        for attempt in attempts:
             try:
                 pat.Expand()
                 rep.expand_collapse += 1
@@ -1873,20 +1957,24 @@ def _crawl_menus_uia_e0_slow(hwnd: int, *, budget: Optional[DiscoveryBudget] = N
             except Exception:
                 opened = False
             if opened:
-                children = _collect_new(known, main_root)
+                children = _collect_new(known, main_root,
+                                        empty_s=(3.0 if cold["first"] else 1.2) + 1.3 * (attempt - 1))
                 if children:
                     break
-            if attempt == 1:
+            if attempt != attempts[-1]:
                 if depth == 1:
                     _clean_slate(2)               # reset before retrying a top-level menu
-                time.sleep(0.3)
+                time.sleep(0.3 * attempt)
         if not opened:
             rep.skipped.append(f"expand-failed:{label}")      # never drop a menu silently
-            return 0
+            return 0 if depth > 1 else -1
         cold["first"] = False
         if not children:
+            # -1 at the top level means INCONCLUSIVE, not "this menu is empty": a unit that could not
+            # be read must not spend the patience budget, or three impatient reads end the whole crawl
+            # (`flattened`) and the remaining menus are never even tried.
             rep.skipped.append(f"empty-menu:{label}")
-            return 0
+            return 0 if depth > 1 else -1
         budget.extend(len(children))
         for info, it in children:
             known.add(_cheap_key(it) or _item_key(info, it))
@@ -2235,11 +2323,19 @@ class EffectorLadder:
             if self.loop is None:
                 return False, "file_dialog", "no loop available"
             from core_organs import fast_uia
-            end = time.time() + 8.0                            # wait (bounded) until the dialog really has its filename box
-            while time.time() < end:
-                ready = False
+            try:
+                from core_organs import organ_24_dap as _dap_mod
+            except Exception:  # noqa: BLE001
+                _dap_mod = None
+            end = time.time() + 8.0        # wait (bounded) until the dialog really has its filename box
+            ready = False
+            while time.time() < end and not ready:
                 for w in _popups(hwnd)[:4]:
-                    if _win_class(w) == "#32770":
+                    if _dap_mod is not None:
+                        # the shared shape test, so this does not wait out one vendor's window class while a
+                        # differently drawn picker is already sitting there with its name box open
+                        ready = bool(_dap_mod.file_dialog_shape(w, timeout_ms=2000).get("name_edit"))
+                    elif _win_class(w) == "#32770":
                         kids = win32_window_controls(w)
                         ready = any(k["class"] in ("Edit", "ComboBox", "ComboBoxEx32") for k in kids)
                         if not ready:
@@ -2247,10 +2343,12 @@ class EffectorLadder:
                             ready = any(n.ctype == "EditControl" for n in snap)
                     if ready:
                         break
-                if ready:
-                    break
-                time.sleep(0.3)
-            ok, note = self.loop.handle_native_file_dialog(str(action.get("path", "")))
+                if not ready:
+                    time.sleep(0.3)
+            # scope the rung to THIS app: with no owner the driver would happily fill in and confirm a
+            # picker belonging to some other window on the desktop, including one the user opened.
+            ok, note = self.loop.handle_native_file_dialog(str(action.get("path", "")),
+                                                            owner_hwnd=int(hwnd or 0))
             return bool(ok), "file_dialog", note
         order = [e for e in self.model.effector_order(app_key, verb, self.DEFAULTS.get(verb, ["key"]))
                  if e not in avoid] or list(self.DEFAULTS.get(verb, ["key"]))

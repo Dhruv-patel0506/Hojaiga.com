@@ -136,12 +136,28 @@ def start_apps() -> List[Tuple[str, str]]:
     return apps
 
 
+def _abbrev_match(n: str, words: List[str]) -> bool:
+    """'vscode' is 'visual studio code': every word but the last may be cut to a prefix (>=1 char), the last must be whole. Generic, no per-app table."""
+    if len(words) < 2 or " " in n:
+        return False
+    def rec(i: int, pos: int) -> bool:
+        if i == len(words) - 1:
+            return n[pos:] == words[i]
+        w = words[i]
+        return any(n.startswith(w[:k], pos) and rec(i + 1, pos + k) for k in range(1, len(w) + 1))
+    return rec(0, 0)
+
+
 def resolve_app(name: str) -> Optional[Tuple[str, str]]:
     n = re.sub(r"[^a-z0-9 ]", "", (name or "").lower()).strip()
     best, best_score = None, 0
     for disp, appid in start_apps():
         d = re.sub(r"[^a-z0-9 ]", "", disp.lower()).strip()
-        score = 100 if d == n else (80 if d.startswith(n) else (60 if n in d else 0))
+        if d.startswith(("uninstall ", "install ", "remove ")):          # an installer / uninstaller shortcut is never the program
+            continue
+        words = d.split()
+        score = (100 if d == n else 80 if d.startswith(n) else 70 if n in words else 60 if n in d else
+                 55 if _abbrev_match(n.replace(" ", ""), words) else 0)
         if score and (score > best_score or (score == best_score and len(d) < len(re.sub(r"[^a-z0-9 ]", "", best[0].lower())))):
             best, best_score = (disp, appid), score
     return best
@@ -177,11 +193,35 @@ def wake_accessibility(hwnd: int) -> str:
     return f"chromium-windows-queried={len(targets)}"
 
 
-def launch_hidden(name: str, timeout_s: float = 45.0) -> Dict[str, Any]:
-    """Start `name` and keep its window minimized / unfocused from the moment it appears."""
+def _is_startup_dialog(hwnd: int) -> bool:
+    from core_organs import popup_policy as pp
+    return pp.looks_like_dialog(hwnd)
+
+
+def launch_hidden(name: str, timeout_s: float = 45.0, fast: bool = False) -> Dict[str, Any]:
+    """Start `name` and keep its window minimized / unfocused from the moment it appears. `fast=True` shortens the protective settle waits
+    (a window must be 0.6 s old and chosen for 0.6 s, startup is watched 3 s with 0.6 s of quiet instead of 1.0 / 1.2 / 5 s / 1.0 s): a splash
+    screen that lives longer than that is still rejected by the size / title / proven-stable test, only the margin is smaller."""
     from core_organs import background_window as bw
     info: Dict[str, Any] = {"launched": False, "hwnd": 0, "notes": []}
     app = resolve_app(name)
+    if not app:
+        # Not a Start-menu entry: any INSTALLED program still resolves by path / PATH / App Paths (an exe path is accepted
+        # as is). A program whose manifest asks for elevation is never launched here: the UAC prompt is a human step.
+        try:
+            from core_organs import static_knowledge as sk
+            from core_organs import pe_resources as pr
+            exe = sk.exe_for(name)
+            if exe and os.path.isfile(exe) and not sk.package_root(exe):
+                level = (pr.read_resources(exe).get("manifest") or {}).get("execution_level", "")
+                if level in ("requireAdministrator", "highestAvailable"):
+                    info["notes"].append(f"not in the Start menu; {os.path.basename(exe)} requests elevation ({level}): a UAC prompt is a human step, not launched")
+                    info["requires_elevation"] = True
+                    return info
+                app = (os.path.splitext(os.path.basename(exe))[0], exe)
+                info["notes"].append("resolved by program path (not a Start-menu entry)")
+        except Exception as exc:
+            info["notes"].append(f"program-path resolution unavailable ({type(exc).__name__})")
     if not app:
         info["notes"].append("not in the Start menu")
         return info
@@ -207,6 +247,7 @@ def launch_hidden(name: str, timeout_s: float = 45.0) -> Dict[str, Any]:
     first_seen: Dict[int, float] = {}
     chosen_since, chosen = 0.0, 0
     dialog_seen: List[str] = []
+    answered: set = set()
     from core_organs import desktop_grounding as dg
     g = dg.DesktopGrounding()
     while time.time() - t0 < timeout_s:
@@ -234,9 +275,9 @@ def launch_hidden(name: str, timeout_s: float = 45.0) -> Dict[str, Any]:
             _u32.GetWindowRect(h, ctypes.byref(r))
             big = (r.right - r.left) >= 200 and (r.bottom - r.top) >= 120
             iconic = bool(_u32.IsIconic(h))
-            return (big or iconic) and time.time() - first_seen.get(h, time.time()) >= 1.0 \
+            return (big or iconic) and time.time() - first_seen.get(h, time.time()) >= (0.6 if fast else 1.0) \
                 and now[h][1] not in ("Windows.UI.Core.CoreWindow",)
-        stable = [h for h in new if _ok(h)]
+        stable = [h for h in new if _ok(h) and h not in answered]
         if int((time.time() - t0) * 1) != info.get("_tick"):            # compact per-second trace for diagnostics
             info["_tick"] = int((time.time() - t0) * 1)
             info.setdefault("trace", []).append(
@@ -246,13 +287,24 @@ def launch_hidden(name: str, timeout_s: float = 45.0) -> Dict[str, Any]:
             best = pick if pick in stable else max(stable, key=lambda h: len(now[h][2]) + (50 if _u32.IsIconic(h) else 0))
             if best != chosen:
                 chosen, chosen_since = best, time.time()
-            elif time.time() - chosen_since >= 1.2:
+            elif time.time() - chosen_since >= (0.6 if fast else 1.2):
+                if len(answered) < 3 and _is_startup_dialog(chosen):            # a start-up QUESTION is not the app: answer it by role policy
+                    from core_organs import popup_policy as pp
+                    res = pp.resolve_dialog(chosen, mode="preflight")
+                    answered.add(chosen)
+                    info["notes"].append(f"start-up dialog '{now[chosen][2][:40]}' -> {res.action or 'unanswered'}"
+                                         + (" (needs a human)" if res.need_human else ""))
+                    if res.need_human:
+                        info["startup_dialog_needs_human"] = now[chosen][2]
+                        break
+                    chosen = 0                                                  # now wait for the real window
+                    continue
                 hwnd = chosen
                 break
         time.sleep(0.05)
     if hwnd:
         # a split-second window may already have been replaced by the real one (splash -> main)
-        info["notes"].append(bw.stabilize_minimized(hwnd, fg_before, 5.0) or "stable")
+        info["notes"].append(bw.stabilize_minimized(hwnd, fg_before, 3.0 if fast else 5.0, quiet_s=0.6 if fast else 1.0) or "stable")
         info["launched"] = True
         info["hwnd"] = hwnd
         bw.mark_ours(hwnd)                       # we created it: only then may the harness close/park it freely
@@ -372,7 +424,12 @@ def leave_start_screen(hwnd: int, timeout_s: float = 20.0) -> Dict[str, Any]:
 
 def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = True,
                  e1_actions: int = 3, close_if_launched: bool = True, on_window=None,
-                 allow_visible: bool = False, force: bool = False, fresh: bool = False) -> Dict[str, Any]:
+                 allow_visible: bool = False, force: bool = False, fresh: bool = False,
+                 fast: bool = False, e0_budget_s: Optional[float] = None,
+                 hwnd_hint: int = 0) -> Dict[str, Any]:
+    """`fast=True` is the first-contact profile (P1-G): readiness polled at 150-200 ms instead of 400 ms, the start-screen wait capped at
+    4 s, the menu crawl held to `e0_budget_s`, no E1 probing (the caller continues exploration later, cumulatively). Same pipeline, same
+    knowledge written; only the waits and the exploration budget change."""
     from core_organs import desktop_grounding as dg
     from core_organs import organ_48_app_behavior_model as bm
     from core_organs import organ_50_layout_map as lm
@@ -385,16 +442,23 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
     bw.pin_user_window(_u32.GetForegroundWindow())     # whose window is the user's, for the whole scan
     # fresh=True: always start our OWN window and never reuse (or touch) one that already exists —
     # the safe default for unattended scans, since an existing window may hold the user's work.
-    hwnd = 0 if fresh else (g.find_window(name) or 0)
+    # hwnd_hint: scan THIS exact window (callers that already resolved the handle — hot UIA paths, tests);
+    # an existing window is reused, never launched-closed.
+    if hwnd_hint and _u32.IsWindow(hwnd_hint):
+        fresh = False
+        hwnd = hwnd_hint
+    else:
+        hwnd = 0 if fresh else (g.find_window(name) or 0)
     launched = False
     if not hwnd and launch:
         t = time.time()
-        li = launch_hidden(name)
+        li = launch_hidden(name, fast=fast)
         rep["launch"] = {k: v for k, v in li.items() if k != "hwnd"}
         hwnd, launched = li.get("hwnd", 0), li.get("launched", False)
         rep["phases"]["launch_s"] = round(time.time() - t, 2)
     if hwnd and not (_u32.IsWindow(hwnd) and bm._win_class(hwnd)):     # a vanished/phantom handle: re-resolve once
         hwnd = g.find_window(name) or 0
+    rep["hwnd"] = int(hwnd or 0)          # the EXACT window this scan walked/launched — callers must not re-resolve by name
     rep["pre_existing_window"] = bool(hwnd) and not launched
     if not hwnd:
         dlg = (rep.get("launch") or {}).get("already_running_dialog")
@@ -424,7 +488,8 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
     existing = model.commands(key, limit=5000)
     e0_cached = (not force) and (any((c.get("origin") or "").startswith("e0:") and not c.get("stale") for c in existing)
                                  or model.step_stats(f"{key}:e0_done:{vh}")["successes"] > 0)
-    layout_cached = (not force) and lm.layout_cached(model, key, vh) is not None
+    warm_layout = None if force else lm.layout_cached(model, key, vh)
+    layout_cached = warm_layout is not None
     rep["warm"] = {"e0_cached": e0_cached, "layout_cached": layout_cached, "known_commands_before": len(existing)}
     try:
         with bw.BackgroundSession(hwnd) as sess:
@@ -432,7 +497,7 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
             rep["accessibility"] = wake_accessibility(hwnd)
             # readiness: a freshly started or Chromium app exposes its tree late (bounded growing wait)
             t = time.time()
-            n, delay = 0, 0.4
+            n, delay = 0, (0.15 if fast else 0.4)
             import uiautomation as auto
             while time.time() - t < 20:
                 try:
@@ -443,6 +508,7 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
                     break
                 time.sleep(delay)
                 delay = min(delay * 1.5, 2.0)
+            _poll = 0.2 if fast else 0.4
             # then: wait until the tree STOPS GROWING. UWP/WinUI/Office apps resume and populate for a second
             # or two after being un-minimized; mapping at the first moment something exists saw 3 controls
             from core_organs import fast_uia
@@ -452,7 +518,8 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
                 cnt = len(snap) if snap else 0
                 steady = steady + 1 if (cnt == last and cnt > 2) else 0
                 last = cnt
-                time.sleep(0.4)
+                if steady < 2:
+                    time.sleep(_poll)
             rep["tree_nodes_when_ready"] = last
             # LAID OUT? A parked UWP/WinUI app may expose controls with EMPTY rectangles (it does not lay
             # out content that is entirely off-screen). Detect that and apply the 1-pixel sliver.
@@ -470,7 +537,7 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
             rep["phases"]["ready_s"] = round(time.time() - t, 2)
             if not polite:
                 try:
-                    rep["start_screen"] = leave_start_screen(hwnd)
+                    rep["start_screen"] = leave_start_screen(hwnd, timeout_s=4.0 if fast else 20.0)
                 except Exception as exc:
                     rep["start_screen"] = {"error": type(exc).__name__}
             t = time.time()
@@ -479,16 +546,31 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
             elif e0_cached:
                 rep["e0"] = {"skipped": f"cached ({len([c for c in existing if (c.get('origin') or '').startswith('e0:')])} menu commands known for this app version)"}
             else:
-                e0 = bm.crawl_e0(model, name, hwnd)
+                e0 = bm.crawl_e0(model, name, hwnd, budget=(bm.DiscoveryBudget(base_s=e0_budget_s * 0.6, extend_s=1.5, max_s=e0_budget_s, patience=6)
+                                                              if e0_budget_s else None))
                 rep["e0"] = {"commands": e0["ingested"], "stopped": e0["stopped"],
                              "skipped": [s for m in e0["methods"] for s in m["skipped"]][:6]}
             rep["phases"]["e0_menus_s"] = round(time.time() - t, 2)
             t = time.time()
             do_deepen = deepen and not polite and not layout_cached
-            lay = lm.map_layout(model, name, hwnd, deepen=do_deepen, version_hash=vh)
+            if layout_cached and not force:
+                # WARM START (same law as e0): the layout for this exact version is already mapped — reuse it,
+                # do not rebuild. Re-walking a cached Explorer layout cost ~6 s of every scan (measured 2026-10-06)
+                # and pushed first-contact past its budget while learning nothing new.
+                n_ctrl = None
+                try:
+                    n_ctrl = model._conn.execute("SELECT COUNT(*) c FROM bm_layout WHERE app_key=?", (key,)).fetchone()["c"]
+                except Exception:
+                    pass
+                lay = {"cached": True, "controls": n_ctrl, "regions": (warm_layout or {}).get("regions"),
+                       "region_kinds": None, "deepen": False, "opaque_regions": None,
+                       "skipped": "warm start: layout cached for this version"}
+            else:
+                lay = lm.map_layout(model, name, hwnd, deepen=do_deepen, version_hash=vh)
             rep["phases"]["layout_s"] = round(time.time() - t, 2)
             rep["layout"] = {k: lay.get(k) for k in ("controls", "regions", "region_kinds", "deepen", "opaque_regions",
                                                      "skipped", "elapsed_s")}
+            rep["layout"]["cached"] = bool(lay.get("cached"))
             rep["sections"] = lay.get("sections", [])[:40]
             try:
                 zero = model._conn.execute("SELECT COUNT(*) c FROM bm_layout WHERE app_key=? AND rx0=0 AND ry0=0 AND rx1=0 AND ry1=0", (key,)).fetchone()["c"]
@@ -496,7 +578,7 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
             except Exception:
                 pass
             t = time.time()
-            n_e1 = e1_actions if not (e0_cached and layout_cached) else min(e1_actions, 1)   # warm: knowledge exists, probe less
+            n_e1 = 0 if fast else (e1_actions if not (e0_cached and layout_cached) else min(e1_actions, 1))   # warm: knowledge exists, probe less
             e1 = (bm.explore_e1(model, name, hwnd, max_actions=n_e1, budget_s=30.0)
                   if (n_e1 and not polite) else {"probes": []})
             rep["phases"]["e1_s"] = round(time.time() - t, 2)
