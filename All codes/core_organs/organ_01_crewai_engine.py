@@ -3626,6 +3626,9 @@ if _HAS_CREWAI:
                 "Describe in detail: What windows are open? What text is visible? "
                 "What buttons or UI elements can you see? Is there any error message?"
             )
+            import time as _t_vhm
+            _vhm_ok = False
+            _vhm_t0 = _t_vhm.perf_counter()
             try:
                 vlm_result = pool.execute_sync(
                     prompt=prompt,
@@ -3635,9 +3638,24 @@ if _HAS_CREWAI:
                     image_b64=screenshot_b64,
                     timeout=60.0
                 )
+                _vhm_ok = True
             except Exception as vlm_err:
                 logger.warning(f"[VIS] VLM inspection query note: {vlm_err}")
                 vlm_result = f"Visual snapshot captured. (VLM note: {vlm_err})"
+            # --- organ_31: feed this vision call into the health monitor. Pure observation, guard-wrapped,
+            #     so a missing/raising organ_31 NEVER alters the inspection result. Accumulated latency /
+            #     success data make get_best_model()/should_use_fallback() meaningful for future routing.
+            try:
+                from core_organs import organ_31_vision_health_monitor as _vhm31
+                _mon31 = _vhm31.get_vision_health_monitor()
+                _vhm_model = _vhm31.VisionModel.QWEN2_5VL_3B
+                _mon31.record_request(_vhm_model, (_t_vhm.perf_counter() - _vhm_t0) * 1000.0,
+                                      success=_vhm_ok,
+                                      error=(str(vlm_result[-120:]) if not _vhm_ok else None))
+                if _mon31.should_use_fallback(_vhm_model):
+                    logger.info("[CrewAI][organ_31] vision health: %s flagged for fallback (degraded vision)", _vhm_model.value)
+            except Exception as _vhm_err:
+                logger.debug("[CrewAI][organ_31] health record skipped (inspection unaffected): %s", _vhm_err)
 
             # Direct UIA text extraction for robust verification
             uia_text = ""
@@ -4210,6 +4228,14 @@ class CrewAIEngine:
         except Exception as e:
             logger.warning("[CrewAI] llama.cpp vision server unhealthy: %s", e)
             logger.info("[CrewAI] Vision tasks may fall back to Ollama if llama.cpp is down")
+        # --- organ_31: activate the vision health monitor at boot so model routing has live health data.
+        #     Best-effort + guard-wrapped: if organ_31 is unavailable the boot proceeds unchanged (no crash).
+        try:
+            from core_organs import organ_31_vision_health_monitor as _vhm31_boot
+            _vhm31_boot.get_vision_health_monitor().start()
+            logger.info("[CrewAI][organ_31] vision health monitor started at boot")
+        except Exception as _vhm_boot_err:
+            logger.debug("[CrewAI][organ_31] monitor start skipped (boot unaffected): %s", _vhm_boot_err)
 
     def execute_task(self, command: str, task_id: str) -> Dict[str, Any]:
         """Execute a user command using a specialized, autonomous CrewAI Multi-Agent crew."""
@@ -5061,6 +5087,31 @@ class CrewAIEngine:
                     "3. Action: visually_inspect_screen\n"
                     "4. Give Final Answer"
                 )
+
+            # --- organ_38: DYNAMIC, app-agnostic refinement augments the static corrective chain above.
+            #     It queries the local LLM to suggest a better approach for THIS specific failure. The
+            #     engine already falls back internally on any LLM/parse error, and this whole block is
+            #     guard-wrapped + env-togglable (HOJAIGA_REFINE=0 disables) so the retry behaves exactly
+            #     as before if organ_38 is missing or raises -> a run can NEVER be broken by this hook.
+            try:
+                if os.environ.get("HOJAIGA_REFINE", "1") != "0":
+                    from core_organs import organ_38_progressive_refinement as _ref38
+                    _fb38 = _ref38.ExecutionFeedback(
+                        step_id=f"{task_id}#attempt{attempt}",
+                        status="failed",
+                        error_message=failure_reason[:300],
+                        unexpected_outcome=failure_reason[:120],
+                    )
+                    _plan38 = {"task_id": task_id, "task": command, "attempt": attempt, "steps": retry_steps}
+                    _eng38 = _ref38.get_refinement_engine()
+                    if _eng38.should_refine(_fb38, _plan38):
+                        _act38 = _eng38.generate_refinement(_fb38, _plan38, context={"max_retries": MAX_RETRIES})
+                        _dyn38 = "; ".join([s for s in (getattr(_act38, "suggested_changes", None) or []) if s]).strip()
+                        if _dyn38:
+                            corrective = f"DYNAMIC REFINEMENT (attempt {attempt} failed): {_dyn38}\n{corrective}"
+                            logger.info("[CrewAI][organ_38] dynamic refinement injected: %s", _dyn38[:160])
+            except Exception as _ref38_err:
+                logger.debug("[CrewAI][organ_38] refinement skipped (degraded, retry unaffected): %s", _ref38_err)
 
             task_description = (
                 f"{command}\n\n"
