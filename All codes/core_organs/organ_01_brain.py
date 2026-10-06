@@ -175,6 +175,19 @@ PHASE_TAG_VOCAB = (
     "RISK_CHECK", "DELEGATE", "VERIFY_REQUEST", "REFLECT",
 )
 
+# Terminal / outcome markers the brain itself attaches to an ExecutionPlan AFTER an engine
+# run (see _plan_with_big_brain: FAILED, NEEDS_INPUT). These are NOT planner decomposition
+# phases, so the LLM planner prompt still offers only PHASE_TAG_VOCAB and can never invent a
+# tag. Without this, a CrewAI FAILED / NEEDS_INPUT result raised "Illegal phase tag" inside
+# PhaseStep and silently dropped the whole run to the fallback engine (and skipped the
+# CrewAI boxed output, because the crew never got to run).
+TERMINAL_PHASE_TAGS = (
+    "FAILED", "NEEDS_INPUT", "IMPOSSIBLE", "PARTIAL",
+    "ESCALATED", "ROUTED_WEB", "SUCCESS", "DONE",
+)
+
+ALLOWED_PHASE_TAGS = PHASE_TAG_VOCAB + TERMINAL_PHASE_TAGS
+
 
 @dataclass
 class TaskRequest:
@@ -199,7 +212,7 @@ class PhaseStep:
     instruction: str
 
     def __post_init__(self) -> None:
-        if self.phase not in PHASE_TAG_VOCAB:
+        if self.phase not in ALLOWED_PHASE_TAGS:
             raise InvalidTaskError(f"Illegal phase tag: {self.phase}")
 
 

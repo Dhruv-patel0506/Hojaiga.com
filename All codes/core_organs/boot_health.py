@@ -64,7 +64,13 @@ def _get(url: str, timeout_s: float = 3.0, headers=None):
 def check_services() -> list:
     rows = []
 
-    code, body = _get(os.environ.get("HOJAIGA_BRAIN_URL", "http://127.0.0.1:11434").split("/api")[0] + "/api/tags")
+    # Probe RAW Ollama on :11434. Do NOT reuse HOJAIGA_BRAIN_URL here: the launcher points
+    # BRAIN_URL at the authenticated Gatekeeper (:11435), which answers a bare GET /api/tags
+    # with 401 - that falsely marked a perfectly-healthy Ollama as ABSENT/critical and printed
+    # "BOOT INCOMPLETE" even though CrewAI was using it fine. The Gatekeeper gets its own
+    # authenticated probe below.
+    ollama_base = os.environ.get("HOJAIGA_OLLAMA_URL", "http://127.0.0.1:11434").split("/api")[0]
+    code, body = _get(ollama_base + "/api/tags")
     if code == 200:
         n = body.count('"name"')
         rows.append(("SERVICE", "ollama :11434", READY, f"{n} model(s) listed"))
