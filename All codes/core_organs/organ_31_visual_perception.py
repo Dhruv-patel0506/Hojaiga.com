@@ -160,14 +160,51 @@ class VisualElementMatch:
 
 
 class VisualGroundingEngine:
-    """True closed-loop Visual Grounding Engine powered by local Ollama Vision (qwen2.5vl:3b).
-    Extracts high-precision 2D coordinates of arbitrary target elements from screen or browser frames."""
+    """True closed-loop Visual Grounding Engine.
+
+    Model tier is resolved dynamically (no per-app / context hardcode -- the same call serves
+    desktop apps, webapps and websites because it is endpoint-based, not app-based):
+      * PREFERRED: the flagship Qwen2.5-VL-7B on llama.cpp (:8081) when that server is reachable
+        -- the same precision tier CrewAI already routes to. Grounding for KNOWLEDGE uses the 7B
+        whenever it is up, so 'what it does' is decided by the stronger eye.
+      * FALLBACK: Ollama (default qwen2.5vl:3b) when :8081 is down, so we degrade honestly
+        instead of failing.
+    Availability is probed every call (cheap /health) and nothing is invented when both are absent.
+    """
 
     def __init__(self, ollama_url: str = "http://127.0.0.1:11434", model_name: Optional[str] = None):
         self.ollama_url = ollama_url
         if not model_name:
             model_name = os.environ.get("HOJAIGA_VISION_REASON_MODEL", "qwen2.5vl:3b")
         self.model_name = model_name
+        # 7B precision endpoint (llama.cpp). Empty / HOJAIGA_QWEN_VL=0 disables the preferred tier.
+        self.precision_enabled = os.environ.get("HOJAIGA_QWEN_VL", "1") != "0"
+
+    def _locate_7b(self, image_base64: str, target_description: str,
+                   width: int, height: int) -> Optional[VisualElementMatch]:
+        """Ask the local Qwen2.5-VL-7B where a control is. Returns a match, or None to fall back."""
+        if not self.precision_enabled:
+            return None
+        try:
+            from core_organs import qwen_vl_scanner as qv
+            if not qv.available():                       # honest: :8081 not up -> caller uses Ollama tier
+                return None
+            import io, base64
+            from PIL import Image
+            img = Image.open(io.BytesIO(base64.b64decode(image_base64)))
+            box, meta = qv.locate(img, target_description, backend="llamacpp")
+            if not box:
+                return None
+            cx = max(0, min(width - 1, (box[0] + box[2]) // 2))
+            cy = max(0, min(height - 1, (box[1] + box[3]) // 2))
+            return VisualElementMatch(
+                found=True, label=target_description, pixel_x=cx, pixel_y=cy,
+                box_2d=list(box), confidence=0.90,
+                reason=f"grounded by Qwen2.5-VL-7B ({meta.get('ms', 0)}ms)",
+                screenshot_dims=(width, height))
+        except Exception as exc:
+            logger.debug(f"7B precision tier unavailable, falling back to Ollama: {exc}")
+            return None
 
     def capture_desktop_frame(self) -> tuple[Optional[str], int, int]:
         """Capture desktop frame via PIL ImageGrab and return base64 string and dimensions."""
@@ -217,6 +254,12 @@ class VisualGroundingEngine:
                 width, height = img.size
             except Exception:
                 width, height = 1920, 1080
+
+        # Preferred tier: Qwen2.5-VL-7B on llama.cpp (:8081) when reachable, so knowledge grounding uses the
+        # stronger eye. If :8081 is down or the box is not found we fall through to the Ollama tier below.
+        _match_7b = self._locate_7b(image_base64, target_description, width or 1920, height or 1080)
+        if _match_7b is not None:
+            return _match_7b
 
         prompt = (
             f"Locate the UI element: '{target_description}' in this {width}x{height} image.\n"
