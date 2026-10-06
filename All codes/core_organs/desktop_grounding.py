@@ -66,6 +66,20 @@ HAS_TORCH = _module_available("torch")
 
 OMNI_LOCAL_REPO = r"D:\new_automation\OmniParser"
 
+# --- vision/OCR environment preflight ----------------------------------------
+# Fail LOUD at import when an installed dependency is past a documented breaking
+# boundary (e.g. transformers>=5 silently bricks Florence-2 in OmniParser only at
+# the first vision call). Runs hard when the vision tier is present, soft otherwise;
+# an absent optional package is a warning, never a failure, so non-vision paths still
+# import. A missing guard module must not itself break this organ -> catch ImportError
+# only, letting a real EnvPinError propagate. See core_organs/env_guard.py.
+try:
+    from core_organs import env_guard as _env_guard
+
+    _env_guard.check_runtime_pins(strict=bool(HAS_TORCH))
+except ImportError:
+    _env_guard = None
+
 # Vision (OmniParser) is far slower than UIA on CPU, so it is budgeted per goal
 # and cached per window pixel-signature. Both are env-tunable.
 VISION_MAX_CALLS = int(os.environ.get("HOJAIGA_VISION_MAX_CALLS", "2"))
@@ -541,10 +555,17 @@ class DesktopGrounding:
         return out
 
     # ---- Tier 1: UIA ----
-    def _walk_uia(self, root_hwnd: int, max_depth: int = 12, max_nodes: int = 900) -> List[GroundedElement]:
+    def _walk_uia(self, root_hwnd: int, max_depth: int = 12, max_nodes: int = 900,
+                  budget_s: Optional[float] = None) -> List[GroundedElement]:
+        """Ground the actionable controls of one window by UIA.
+
+        `budget_s` lets a CALLER that has several walks to fund (organ_48's observation, which also walks the
+        popup windows and takes a bulk snapshot) hand this walk its share of one deadline instead of each call
+        getting a fresh default. The default stays UIA_WALK_BUDGET_S."""
         if not HAS_UIA:
             return []
         _t_walk = time.perf_counter()
+        _bud = UIA_WALK_BUDGET_S if budget_s is None else max(0.2, float(budget_s))
         import uiautomation as auto
         elements: List[GroundedElement] = []
         try:                                        # a frame that hosts a Chromium content window (WebView2 / CEF): its DOM tree is THERE
@@ -571,6 +592,7 @@ class DesktopGrounding:
             return []
         count = 0
         visited = 0
+        deepest = 0
         stopped_by = ""
         walk_errors = 0
         first_error = ""
@@ -583,17 +605,26 @@ class DesktopGrounding:
         mini = hin.is_minimized(root_hwnd) or _is_parked_offscreen(root_hwnd) or not ctypes.windll.user32.IsWindowVisible(root_hwnd)   # hidden (tray) windows report everything off-screen too
 
         def _visit(c, depth: int):
-            nonlocal count, cells_seen, cells_kept, visited, stopped_by, walk_errors, first_error
-            if stopped_by or depth > max_depth or count > max_nodes:
+            nonlocal count, cells_seen, cells_kept, visited, stopped_by, walk_errors, first_error, deepest
+            if stopped_by:
+                return
+            if depth > deepest:
+                deepest = depth
+            if depth > max_depth:
+                return
+            if count >= max_nodes:
+                # Stopping at a cap has to be a STOP, not a per-node early return: the caller is still walking
+                # siblings, and with an endless chain an early return means the walk never ends.
+                stopped_by = f"surface-budget({max_nodes})"
                 return
             visited += 1
             if visited > UIA_WALK_NODE_BUDGET:
                 stopped_by = f"node-budget({UIA_WALK_NODE_BUDGET})"
                 return
             el = time.perf_counter() - _t_walk
-            if (el > UIA_WALK_BUDGET_S and visited >= UIA_WALK_MIN_NODES) \
-                    or el > UIA_WALK_BUDGET_S + UIA_WALK_HARD_EXTRA_S:
-                stopped_by = f"time-budget({UIA_WALK_BUDGET_S:g}s)"
+            if (el > _bud and visited >= UIA_WALK_MIN_NODES) \
+                    or el > _bud + UIA_WALK_HARD_EXTRA_S:
+                stopped_by = f"time-budget({_bud:g}s)"
                 return
             try:
                 role = (c.ControlTypeName or "").lower().replace("control", "")
@@ -630,12 +661,15 @@ class DesktopGrounding:
                 # ONE COM call at a time. Control.GetChildren() materialises the whole sibling list first, so a
                 # provider with a broken or cyclic sibling chain makes that single call never return: it grew the
                 # suite process to gigabytes inside one walk (measured, py-spy: GetNextSiblingControl).
-                child = c.GetFirstChildControl()
-                while child is not None:
-                    _visit(child, depth + 1)
-                    if stopped_by:
-                        break
-                    child = child.GetNextSiblingControl()
+                # The depth rail is tested BEFORE the chain is opened - every sibling shares one depth, so
+                # returning per node here would leave the sibling loop spinning forever on an endless chain.
+                if depth + 1 <= max_depth:
+                    child = c.GetFirstChildControl()
+                    while child is not None:
+                        _visit(child, depth + 1)
+                        if stopped_by:
+                            break
+                        child = child.GetNextSiblingControl()
             except Exception as exc:
                 # A node that throws prunes its own subtree; the walk continues. It is COUNTED, never silent.
                 walk_errors += 1
@@ -646,11 +680,15 @@ class DesktopGrounding:
         self.last_walk = {"grid_cells_seen": cells_seen, "grid_cells_surfaced": cells_kept,
                           "grid_cells_sampled_out": max(0, cells_seen - cells_kept),
                           "nodes_walked": visited, "surfaced": count,
-                          "time_budget_ms": int(UIA_WALK_BUDGET_S * 1000),
+                          "max_depth_seen": deepest, "walk_max_depth": max_depth,
+                          "depth_hit_cap": deepest >= max_depth,
+                          "time_budget_ms": int(_bud * 1000),
                           "node_budget": UIA_WALK_NODE_BUDGET,
                           "time_budget_hit": stopped_by.startswith("time"),
                           "node_budget_hit": stopped_by.startswith("node"),
-                          "truncated": bool(stopped_by), "stopped_by": stopped_by,
+                          "surface_budget_hit": stopped_by.startswith("surface"),
+                          "truncated": bool(stopped_by) or deepest >= max_depth,
+                          "stopped_by": stopped_by,
                           "node_errors": walk_errors, "first_error": first_error,
                           "walk_ms": int((time.perf_counter() - _t_walk) * 1000)}
         if stopped_by:
