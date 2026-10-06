@@ -4868,7 +4868,11 @@ class CrewAIEngine:
                     logger.info(f"[CrewAI] Auto-recovering LLM backends...")
                     self._ensure_ollama_healthy(force_restart=True)
                     self._ensure_llamacpp_healthy()
-                    time.sleep(3)  # breathing room for servers to stabilize
+                    # module-qualified: a nested `import win32gui, time` later in this function binds
+                    # the name `time` function-local, which made a bare time.sleep HERE an UnboundLocalError
+                    # exactly when recovering from a dropped LLM connection (the failure path crashing).
+                    import time as _t_rec
+                    _t_rec.sleep(3)  # breathing room for servers to stabilize
                     # Retry this attempt from scratch
                     try:
                         logger.info(f"[CrewAI] Re-kicking crew after LLM recovery...")

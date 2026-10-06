@@ -104,6 +104,16 @@ echo [6/6] Skipping Living Interface Visualizer 2 (disabled by user)...
 echo   [SKIPPED] Visualizer and CNS server not started.
 
 :: ------------------------------------------------------------
+:: [BOOT HEALTH] One honest line per service and organ (ready / degraded / absent)
+:: ------------------------------------------------------------
+echo.
+echo [health] Probing services and organs...
+"%HOJAIGA_PYTHON%" -u "D:\new_automation\All codes\core_organs\boot_health.py"
+if %ERRORLEVEL% NEQ 0 (
+    echo   [!] BOOT INCOMPLETE - a critical service/organ is absent. See lines above.
+)
+
+:: ------------------------------------------------------------
 :: [ATTACHED] Launch CrewAI Multi-Agent Execution
 :: ------------------------------------------------------------
 echo.
