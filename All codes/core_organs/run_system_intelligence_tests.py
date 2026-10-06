@@ -544,8 +544,8 @@ def _enum_candidate_windows() -> List[Dict[str, Any]]:
 
 
 def test_s1_deep_scan_depth() -> TestOutcome:
-    """S1: Organ-30 deep scan — how deep and how much it learns (target-aware)"""
-    from core_organs.organ_30_app_scanner import EyeAndBrainOrchestrator
+    """S1: modern fast_scan deep scan (Blocker #2) — usable tree within budget, legacy tree_stats keys mapped"""
+    from core_organs import fast_scan
 
     user32 = ctypes.windll.user32
     fg = user32.GetForegroundWindow()
@@ -556,22 +556,22 @@ def test_s1_deep_scan_depth() -> TestOutcome:
         if c["hwnd"] != fg:
             candidates.append(c)
 
-    orch = EyeAndBrainOrchestrator()
-
     def scan(hwnd):
         t = time.perf_counter()
-        r = orch.deep_scan_unknown_app(app_name="s1-target", target_hwnd=hwnd, quiet=True)
+        r = fast_scan.deep_scan_legacy_shape("s1-target", target_hwnd=hwnd, budget_s=10.0)
         s = r.get("tree_stats", {})
         return s.get("nodes_walked", 0), s.get("max_depth_seen", 0), \
             s.get("walk_max_depth", 0), r.get("total_elements", 0), \
-            r.get("total_controls", 0), r.get("total_menu_items", 0), time.perf_counter() - t
+            r.get("total_controls", 0), r.get("total_menu_items", 0), time.perf_counter() - t, r
 
     # Try targets richest-first until the scanner demonstrates real depth.
     best = None
     tried = 0
+    within = False
     for cand in candidates[:4]:
         tried += 1
-        nodes, depth_seen, depth_cap, elements, controls, menus, elapsed = scan(cand["hwnd"])
+        nodes, depth_seen, depth_cap, elements, controls, menus, elapsed, r = scan(cand["hwnd"])
+        within = within or bool(r.get("within_budget"))
         if best is None or nodes > best[0]:
             best = (nodes, depth_seen, depth_cap, elements, controls, menus, elapsed, cand["title"])
         if nodes > 50 and elements > 0 and depth_seen >= 6:
@@ -583,16 +583,18 @@ def test_s1_deep_scan_depth() -> TestOutcome:
     nodes, depth_seen, depth_cap, elements, controls, menus, elapsed, title = best
 
     evidence = (
-        f"scanned {tried} target(s); best='{title[:28]}': {nodes} nodes walked, "
-        f"depth {depth_seen}/{depth_cap}, {controls} actionable controls, "
+        f"modern fast_scan (adapter over bulk UIA snapshot): scanned {tried} target(s); "
+        f"best='{title[:28]}': {nodes} nodes walked, "
+        f"depth {depth_seen}/{'uncapped' if not depth_cap else depth_cap}, {controls} actionable controls, "
         f"{menus} menu items, {elements} elements learned in {elapsed:.2f}s"
     )
     return TestOutcome(
-        passed=nodes > 50 and elements > 0 and depth_seen >= 6,
-        evidence=evidence,
+        passed=nodes > 50 and elements > 0 and depth_seen >= 6 and within,
+        evidence=evidence + ("" if within else f" — OVER BUDGET on every target tried (honest: {elapsed:.1f}s, steps in tree_stats.stopped_by)"),
         metrics={"nodes_walked": nodes, "depth_seen": depth_seen, "depth_cap": depth_cap,
                  "actionable_controls": controls, "elements_learned": elements,
-                 "scan_seconds": round(elapsed, 3), "targets_tried": tried},
+                 "scan_seconds": round(elapsed, 3), "targets_tried": tried,
+                 "within_budget": within, "scanner": "fast_scan.deep_scan_legacy_shape"},
     )
 
 

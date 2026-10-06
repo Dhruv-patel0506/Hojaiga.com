@@ -425,7 +425,8 @@ def leave_start_screen(hwnd: int, timeout_s: float = 20.0) -> Dict[str, Any]:
 def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = True,
                  e1_actions: int = 3, close_if_launched: bool = True, on_window=None,
                  allow_visible: bool = False, force: bool = False, fresh: bool = False,
-                 fast: bool = False, e0_budget_s: Optional[float] = None) -> Dict[str, Any]:
+                 fast: bool = False, e0_budget_s: Optional[float] = None,
+                 hwnd_hint: int = 0) -> Dict[str, Any]:
     """`fast=True` is the first-contact profile (P1-G): readiness polled at 150-200 ms instead of 400 ms, the start-screen wait capped at
     4 s, the menu crawl held to `e0_budget_s`, no E1 probing (the caller continues exploration later, cumulatively). Same pipeline, same
     knowledge written; only the waits and the exploration budget change."""
@@ -441,7 +442,13 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
     bw.pin_user_window(_u32.GetForegroundWindow())     # whose window is the user's, for the whole scan
     # fresh=True: always start our OWN window and never reuse (or touch) one that already exists —
     # the safe default for unattended scans, since an existing window may hold the user's work.
-    hwnd = 0 if fresh else (g.find_window(name) or 0)
+    # hwnd_hint: scan THIS exact window (callers that already resolved the handle — hot UIA paths, tests);
+    # an existing window is reused, never launched-closed.
+    if hwnd_hint and _u32.IsWindow(hwnd_hint):
+        fresh = False
+        hwnd = hwnd_hint
+    else:
+        hwnd = 0 if fresh else (g.find_window(name) or 0)
     launched = False
     if not hwnd and launch:
         t = time.time()
@@ -451,6 +458,7 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
         rep["phases"]["launch_s"] = round(time.time() - t, 2)
     if hwnd and not (_u32.IsWindow(hwnd) and bm._win_class(hwnd)):     # a vanished/phantom handle: re-resolve once
         hwnd = g.find_window(name) or 0
+    rep["hwnd"] = int(hwnd or 0)          # the EXACT window this scan walked/launched — callers must not re-resolve by name
     rep["pre_existing_window"] = bool(hwnd) and not launched
     if not hwnd:
         dlg = (rep.get("launch") or {}).get("already_running_dialog")
@@ -480,7 +488,8 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
     existing = model.commands(key, limit=5000)
     e0_cached = (not force) and (any((c.get("origin") or "").startswith("e0:") and not c.get("stale") for c in existing)
                                  or model.step_stats(f"{key}:e0_done:{vh}")["successes"] > 0)
-    layout_cached = (not force) and lm.layout_cached(model, key, vh) is not None
+    warm_layout = None if force else lm.layout_cached(model, key, vh)
+    layout_cached = warm_layout is not None
     rep["warm"] = {"e0_cached": e0_cached, "layout_cached": layout_cached, "known_commands_before": len(existing)}
     try:
         with bw.BackgroundSession(hwnd) as sess:
@@ -544,10 +553,24 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
             rep["phases"]["e0_menus_s"] = round(time.time() - t, 2)
             t = time.time()
             do_deepen = deepen and not polite and not layout_cached
-            lay = lm.map_layout(model, name, hwnd, deepen=do_deepen, version_hash=vh)
+            if layout_cached and not force:
+                # WARM START (same law as e0): the layout for this exact version is already mapped — reuse it,
+                # do not rebuild. Re-walking a cached Explorer layout cost ~6 s of every scan (measured 2026-10-06)
+                # and pushed first-contact past its budget while learning nothing new.
+                n_ctrl = None
+                try:
+                    n_ctrl = model._conn.execute("SELECT COUNT(*) c FROM bm_layout WHERE app_key=?", (key,)).fetchone()["c"]
+                except Exception:
+                    pass
+                lay = {"cached": True, "controls": n_ctrl, "regions": (warm_layout or {}).get("regions"),
+                       "region_kinds": None, "deepen": False, "opaque_regions": None,
+                       "skipped": "warm start: layout cached for this version"}
+            else:
+                lay = lm.map_layout(model, name, hwnd, deepen=do_deepen, version_hash=vh)
             rep["phases"]["layout_s"] = round(time.time() - t, 2)
             rep["layout"] = {k: lay.get(k) for k in ("controls", "regions", "region_kinds", "deepen", "opaque_regions",
                                                      "skipped", "elapsed_s")}
+            rep["layout"]["cached"] = bool(lay.get("cached"))
             rep["sections"] = lay.get("sections", [])[:40]
             try:
                 zero = model._conn.execute("SELECT COUNT(*) c FROM bm_layout WHERE app_key=? AND rx0=0 AND ry0=0 AND rx1=0 AND ry1=0", (key,)).fetchone()["c"]

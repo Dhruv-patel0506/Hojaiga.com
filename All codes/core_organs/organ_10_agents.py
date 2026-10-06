@@ -688,9 +688,16 @@ class AgentsOrgan:
                     target_app = parameters.get("app_name") or parameters.get("target") or at.get("objective") or ""
                     log.info(f"Agent {agent_id}: Deep scanning '{target_app}'...")
                     try:
-                        from core_organs.organ_30_app_scanner import EyeAndBrainOrchestrator
-                        scanner_brain = EyeAndBrainOrchestrator()
-                        scan_result = scanner_brain.deep_scan_unknown_app(app_name=target_app)
+                        # BLOCKER #2: modern fast_scan pipeline (bulk UIA + static harvest + async vision),
+                        # result adapted to the legacy organ_30 dict shape (tree_stats/total_* keys).
+                        from core_organs import fast_scan
+                        scan_result = fast_scan.deep_scan_legacy_shape(target_app or "unknown", budget_s=10.0)
+                        if scan_result.get("status") == "error":
+                            self.results[task_id] = {"_status": "FAILED", "success": False,
+                                                     "error": scan_result.get("message") or "scan found no window",
+                                                     "scan_result": scan_result}
+                            task_failed = True
+                            continue
                         self.results[task_id] = {"_status": "SUCCESS", "success": True, "scan_result": scan_result}
                         continue
                     except Exception as e:
