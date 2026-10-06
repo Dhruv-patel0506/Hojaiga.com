@@ -897,9 +897,6 @@ def run_lm1(TestOutcome):
 
 # --------------------------------------------------------------------------- MIN1: never seen, never focused
 
-_gdi = ctypes.windll.gdi32
-
-
 class _ScreenMonitor:
     """Samples every ~20 ms: did the target app (or any of its windows) ever become the foreground
     window, and how many pixels of any of its windows were ever on a REAL monitor?"""
@@ -1003,7 +1000,11 @@ class _ScreenMonitor:
                     p = ctypes.c_ulong()
                     _u32.GetWindowThreadProcessId(h, ctypes.byref(p))
                     if self._ours(h) and _u32.IsWindowVisible(h) and not _u32.IsIconic(h):
-                        if _gdi.GetWindowRgn(h, self._rgn) == 1:            # NULLREGION: a window with an empty region draws nothing anywhere
+                        # GetWindowRgn is USER32, not gdi32 (CreateRectRgn is the GDI half). Asked of gdi32 it raised
+                        # AttributeError inside this callback on every sweep: ctypes swallows a callback exception, so
+                        # the NULLREGION skip never happened, the overlap math after it never ran, and stderr filled
+                        # with 11k tracebacks per MIN1.
+                        if _u32.GetWindowRgn(h, self._rgn) == 1:            # NULLREGION: a window with an empty region draws nothing anywhere
                             return True
                         if _u32.GetWindowLongW(h, -20) & 0x00080000:        # a LAYERED window at alpha 0 puts no pixel on any screen
                             _al, _fl, _ck = ctypes.c_ubyte(255), wt.DWORD(0), wt.DWORD(0)

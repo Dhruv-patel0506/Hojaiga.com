@@ -58,6 +58,10 @@ GATE_MIN_SUCCESSES = int(os.environ.get("HOJAIGA_GATE_MIN_SUCCESSES", "3"))
 CRAWL_BUDGET_S = float(os.environ.get("HOJAIGA_CRAWL_BUDGET_S", "5"))   # soft base (organ_40's 5 s lesson)
 CRAWL_MAX_S = float(os.environ.get("HOJAIGA_CRAWL_MAX_S", "45"))        # hard cap; soft extends while yield continues
 CLI_HARVEST_TIMEOUT_S = float(os.environ.get("HOJAIGA_CLI_HARVEST_TIMEOUT_S", "20"))
+# One observation of an app (its own tree + every popup + a bulk snapshot) must fit a single deadline: the
+# scanner observes BEFORE and AFTER every probe, so an unbounded observation is what turns a bounded probe
+# count into an unbounded scan.
+OBSERVE_BUDGET_S = float(os.environ.get("HOJAIGA_OBSERVE_BUDGET_S", "8"))
 
 TRUST_RANK = {"learned": 4, "catalog": 3, "archetype": 2, "distilled": 1}
 PACK_MAX_TRUST = {"catalog", "archetype", "distilled"}      # packs can never self-declare learned
@@ -142,6 +146,7 @@ class ObservedState:
     ocr: Optional[str] = None
     ocr_status: str = "not-requested"                    # ok | not-requested | skipped:<why>
     region_hash: str = ""
+    cut: str = ""                                        # what this observation did NOT get to read (budget)
     hwnd: int = 0
     mode: str = ""
 
@@ -168,24 +173,40 @@ def ocr_window_text(hwnd: int) -> Tuple[Optional[str], str]:
 
 
 def observe(hwnd: int, *, grounding=None, want_ocr: bool = False,
-            want_region: bool = False, max_nodes: int = 500) -> ObservedState:
+            want_region: bool = False, max_nodes: int = 500,
+            budget_s: Optional[float] = None) -> ObservedState:
     """Snapshot the app: title, control names/values (UIA incl. popup hosts),
-    sibling windows, and optionally OCR text / pixel hash."""
+    sibling windows, and optionally OCR text / pixel hash.
+
+    ONE deadline covers the whole observation (the app walk, every popup walk and the bulk snapshot): a scan
+    observes the app after every probe, so serial per-call timeouts added up to tens of seconds per probe."""
     from core_organs import desktop_grounding as dg
     from core_organs import headless_input as hin
     g = grounding or dg.DesktopGrounding()
     st = ObservedState(hwnd=hwnd, title=_win_title(hwnd))
+    _deadline = time.perf_counter() + (OBSERVE_BUDGET_S if budget_s is None else max(0.3, float(budget_s)))
+
+    def _left() -> float:
+        return _deadline - time.perf_counter()
+
     elements = []
+    cut = []
     try:
-        elements = g._walk_uia(hwnd, max_depth=14, max_nodes=max_nodes) if dg.HAS_UIA else g._walk_win32(hwnd)
+        elements = (g._walk_uia(hwnd, max_depth=14, max_nodes=max_nodes, budget_s=max(0.3, _left()))
+                    if dg.HAS_UIA else g._walk_win32(hwnd))
+        if getattr(g, "last_walk", {}).get("truncated"):
+            cut.append(f"app-walk:{g.last_walk.get('stopped_by') or 'depth'}")
     except Exception:
         pass
     others: List[int] = []
     try:
         others = _open_popups(hwnd)[:10]
         for w in others:
+            if _left() < 0.5:                       # no budget left for another popup: say so, do not stall
+                cut.append(f"popups-unsurfaced({len(others) - others.index(w)})")
+                break
             try:
-                elements += g._walk_uia(w, max_depth=8, max_nodes=200) if dg.HAS_UIA else []
+                elements += g._walk_uia(w, max_depth=8, max_nodes=200, budget_s=_left()) if dg.HAS_UIA else []
             except Exception:
                 continue
     except Exception:
@@ -196,19 +217,26 @@ def observe(hwnd: int, *, grounding=None, want_ocr: bool = False,
     # really changed the UI looks like "nothing happened" and gets wrongly failed.
     try:
         from core_organs import fast_uia
-        snap = fast_uia.snapshot(hwnd, timeout_ms=6000)
-        if snap:
-            seen = set(names)
-            for n in snap:
-                nm = (n.name or "").lower().strip()
-                if nm and nm != "pop-uphost" and nm not in seen:
-                    names.append(nm)
-                    seen.add(nm)
+        if _left() < 0.3:
+            cut.append("snapshot:no-budget")
+        else:
+            snap = fast_uia.snapshot(hwnd, timeout_ms=int(max(300, _left() * 1000)))
+            if snap:
+                seen = set(names)
+                for n in snap:
+                    nm = (n.name or "").lower().strip()
+                    if nm and nm != "pop-uphost" and nm not in seen:
+                        names.append(nm)
+                        seen.add(nm)
     except Exception:
         pass
     st.names = names
     st.values = [(e.value or "").lower() for e in elements if getattr(e, "value", "")]
     st.windows = sorted({(_win_title(w) or _win_class(w)).lower() for w in others})
+    st.cut = ";".join(cut)
+    if cut:
+        logger.info("[observe] hwnd=%s answered inside %.1fs of budget but was cut: %s",
+                    hwnd, OBSERVE_BUDGET_S, st.cut)
     if want_ocr:
         st.ocr, st.ocr_status = ocr_window_text(hwnd)
     if want_region:
@@ -1348,8 +1376,14 @@ class DiscoveryBudget:
         return time.time() - self.t0
 
     def credit(self, new_items: int) -> None:
-        """Report one unit of work (a menu, a dialog) and how many NEW items it yielded."""
+        """Report one unit of work (a menu, a dialog) and how many NEW items it yielded.
+
+        A NEGATIVE count means the unit could not be read at all (an expand that answered nothing, a
+        popup that never opened). That is inconclusive, not a flatline: it must not spend patience, or
+        three impatient failures end the crawl while whole menus sit untried."""
         self.units += 1
+        if new_items < 0:
+            return
         self.yield_total += new_items
         if new_items > 0:
             self.dry = 0
@@ -1855,16 +1889,21 @@ def _crawl_menus_uia_e0_slow(hwnd: int, *, budget: Optional[DiscoveryBudget] = N
                 return True
         return not _open_popups(hwnd)
 
-    def _collect_new(known: set, main_root) -> List[Tuple[Dict[str, Any], Any]]:
+    def _collect_new(known: set, main_root, empty_s: Optional[float] = None) -> List[Tuple[Dict[str, Any], Any]]:
         """Poll until the opened menu's item set stops growing. A COLD first open can take well over
         a second to materialise, so the wait is long only while NOTHING has appeared yet (bounded),
-        and after 0.8 s the search widens from popup hosts/focus container to the main tree."""
+        and after 0.8 s the search widens from popup hosts/focus container to the main tree.
+
+        `empty_s` overrides how long to keep waiting while nothing has appeared: the retry ladder in
+        `_expand_and_collect` grows it per attempt, because deciding 'this menu is empty' after one
+        impatient second is how whole menus went missing (measured: notepad's Edit and View and three
+        of paint's headers read empty in one run and full in the next, same code)."""
         found: List[Tuple[Dict[str, Any], Any]] = []
         last_n, stable = -1, 0
         t_start = time.time()
         while True:
             waited = time.time() - t_start
-            limit_empty = 3.0 if cold["first"] else 1.2
+            limit_empty = empty_s if empty_s is not None else (3.0 if cold["first"] else 1.2)
             if (found and stable >= 1) or waited > (1.0 if found else limit_empty):
                 break
             found = []
@@ -1879,7 +1918,11 @@ def _crawl_menus_uia_e0_slow(hwnd: int, *, budget: Optional[DiscoveryBudget] = N
                     if k and k not in known and k not in seen_keys:
                         seen_keys.add(k)
                         info = _uia_item_info(it)
-                        if info["name"]:
+                        # The title bar's own System menu is not application knowledge. When a header
+                        # refuses to open on a parked window, the widened search used to file whatever
+                        # the title bar exposes as that menu's contents ('Edit > System'), which both
+                        # pollutes the catalogue and looks like a successful, non-empty read.
+                        if info["name"] and info["name"].lower() != "system":
                             found.append((info, it))
             stable = stable + 1 if (found and len(found) == last_n) else 0
             last_n = len(found)
@@ -1901,7 +1944,12 @@ def _crawl_menus_uia_e0_slow(hwnd: int, *, budget: Optional[DiscoveryBudget] = N
         label = " > ".join(path)
         children: List[Tuple[Dict[str, Any], Any]] = []
         opened = False
-        for attempt in (1, 2):                    # a cold/loaded app can drop the first Expand
+        # A top-level header gets three tries, with a longer wait for its items each time: on a parked
+        # window Expand() can be refused once and answered on the next attempt, and the cost of giving
+        # up early is every command under that menu (measured: 41 -> 18 for paint between two runs of
+        # unchanged code, decided by nothing but how quickly the first read gave up).
+        attempts = (1, 2, 3) if depth == 1 else (1, 2)
+        for attempt in attempts:
             try:
                 pat.Expand()
                 rep.expand_collapse += 1
@@ -1909,20 +1957,24 @@ def _crawl_menus_uia_e0_slow(hwnd: int, *, budget: Optional[DiscoveryBudget] = N
             except Exception:
                 opened = False
             if opened:
-                children = _collect_new(known, main_root)
+                children = _collect_new(known, main_root,
+                                        empty_s=(3.0 if cold["first"] else 1.2) + 1.3 * (attempt - 1))
                 if children:
                     break
-            if attempt == 1:
+            if attempt != attempts[-1]:
                 if depth == 1:
                     _clean_slate(2)               # reset before retrying a top-level menu
-                time.sleep(0.3)
+                time.sleep(0.3 * attempt)
         if not opened:
             rep.skipped.append(f"expand-failed:{label}")      # never drop a menu silently
-            return 0
+            return 0 if depth > 1 else -1
         cold["first"] = False
         if not children:
+            # -1 at the top level means INCONCLUSIVE, not "this menu is empty": a unit that could not
+            # be read must not spend the patience budget, or three impatient reads end the whole crawl
+            # (`flattened`) and the remaining menus are never even tried.
             rep.skipped.append(f"empty-menu:{label}")
-            return 0
+            return 0 if depth > 1 else -1
         budget.extend(len(children))
         for info, it in children:
             known.add(_cheap_key(it) or _item_key(info, it))

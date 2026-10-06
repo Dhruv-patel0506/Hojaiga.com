@@ -20,7 +20,7 @@ import sys
 import tempfile
 import time
 import uuid
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 os.environ.setdefault("HOJAIGA_WEBAPP_WATCH", "0")
 
@@ -1777,3 +1777,267 @@ def run_par1(TestOutcome):
                 except Exception:  # noqa: BLE001
                     pass
         shutil.rmtree(tmp, ignore_errors=True)
+
+
+# ============================================================================================================ LC2-IA
+
+class _DualCanvasApp:
+    """A REAL one-window app for LC2: a top-level Win32 window whose client area holds TWO sibling child canvases
+    (left/right). Each canvas paints a black polyline for every WM_MOUSEMOVE it receives with the button held and
+    logs its mouse messages, so 'two disjoint cursors drove ONE app' is provable per region, with real posted
+    input and a real message pump - and no user app is ever touched."""
+
+    def __init__(self, title: str = "HJ-LC2-App", x: int = 320, y: int = 220, w: int = 760, h: int = 420):
+        import threading
+        self.title, self._x, self._y, self._w, self._h = title, x, y, w, h
+        self.frame_hwnd = 0
+        self.child_hwnds: List[int] = []
+        self.events: Dict[int, List[Tuple[float, int, int, int, int]]] = {}
+        self.strokes: Dict[int, List[List[Tuple[int, int]]]] = {}
+        self._ready = threading.Event()
+        self._procs: List[Any] = []
+        self._stamp = int(time.time() * 1000) % 10_000_000
+        self._frame_cls = f"HJLC2Frame_{self._stamp}"
+        self._canvas_cls = f"HJLC2Canvas_{self._stamp}"
+        self._thread = threading.Thread(target=self._run, daemon=True, name="DualCanvasApp")
+
+    def _frame_proc(self, hwnd, msg, wparam, lparam):
+        sup = self._sup
+        if msg == sup.WM_DESTROY:
+            sup.user32.PostQuitMessage(0)
+            return 0
+        return sup.user32.DefWindowProcW(hwnd, msg, wparam, lparam)
+
+    def _canvas_proc(self, cid: int):
+        def proc(hwnd, msg, wparam, lparam):
+            sup = self._sup
+            if msg in (0x0200, 0x0201, 0x0202):
+                x = ctypes.c_short(lparam & 0xFFFF).value
+                y = ctypes.c_short((lparam >> 16) & 0xFFFF).value
+                self.events[hwnd].append((time.perf_counter(), msg, int(wparam), x, y))
+                if msg == 0x0201:
+                    self.strokes[hwnd].append([(x, y)])
+                elif msg == 0x0200 and (wparam & 0x1) and self.strokes[hwnd]:
+                    self.strokes[hwnd][-1].append((x, y))
+                    sup.user32.InvalidateRect(hwnd, None, False)
+                elif msg == 0x0202:
+                    sup.user32.InvalidateRect(hwnd, None, False)
+                return 0
+            if msg == 0x000F:                                   # WM_PAINT
+                ps = self._PAINTSTRUCT()
+                hdc = sup.user32.BeginPaint(hwnd, ctypes.byref(ps))
+                self._paint(hdc, hwnd)
+                sup.user32.EndPaint(hwnd, ctypes.byref(ps))
+                return 0
+            if msg == 0x0318:                                   # WM_PRINTCLIENT (PrintWindow)
+                self._paint(wparam, hwnd)
+                return 0
+            if msg == 0x0014:                                   # WM_ERASEBKGND: WM_PAINT paints it all
+                return 1
+            return sup.user32.DefWindowProcW(hwnd, msg, wparam, lparam)
+        return proc
+
+    def _paint(self, hdc, hwnd):
+        sup = self._sup
+        r = wt.RECT()
+        sup.user32.GetClientRect(hwnd, ctypes.byref(r))
+        gdi = ctypes.WinDLL("gdi32", use_last_error=True)
+        gdi.GetStockObject.restype = gdi.CreatePen.restype = gdi.SelectObject.restype = ctypes.c_void_p
+        gdi.SelectObject.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
+        gdi.MoveToEx.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int, ctypes.c_void_p]
+        gdi.LineTo.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int]
+        gdi.DeleteObject.argtypes = [ctypes.c_void_p]
+        sup.user32.FillRect.argtypes = [ctypes.c_void_p, ctypes.POINTER(wt.RECT), ctypes.c_void_p]
+        sup.user32.FillRect(hdc, ctypes.byref(r), gdi.GetStockObject(0))     # WHITE_BRUSH
+        for st in list(self.strokes[hwnd]):
+            if len(st) < 2:
+                continue
+            pen = gdi.CreatePen(0, 3, 0x000000)
+            old = gdi.SelectObject(hdc, pen)
+            gdi.MoveToEx(hdc, st[0][0], st[0][1], None)
+            for px, py in st[1:]:
+                gdi.LineTo(hdc, px, py)
+            gdi.SelectObject(hdc, old)
+            gdi.DeleteObject(pen)
+
+    def _run(self):
+        from core_organs import si_test_support as sup
+        self._sup = sup
+
+        class PAINTSTRUCT(ctypes.Structure):
+            _fields_ = [("hdc", ctypes.c_void_p), ("fErase", wt.BOOL), ("rcPaint", wt.RECT), ("fRestore", wt.BOOL),
+                        ("fIncUpdate", wt.BOOL), ("rgbReserved", ctypes.c_byte * 32)]
+        self._PAINTSTRUCT = PAINTSTRUCT
+        sup.user32.BeginPaint.argtypes = [wt.HWND, ctypes.POINTER(PAINTSTRUCT)]
+        sup.user32.BeginPaint.restype = ctypes.c_void_p
+        sup.user32.EndPaint.argtypes = [wt.HWND, ctypes.POINTER(PAINTSTRUCT)]
+        sup.user32.InvalidateRect.argtypes = [wt.HWND, ctypes.c_void_p, wt.BOOL]
+        sup.user32.GetClientRect.argtypes = [wt.HWND, ctypes.POINTER(wt.RECT)]
+        sup.user32.PostQuitMessage.argtypes = [ctypes.c_int]
+        hinst = sup.kernel32.GetModuleHandleW(None)
+        self._frame_proc_ref = sup.WNDPROC(self._frame_proc)
+        wc = sup._WNDCLASSW()
+        wc.lpfnWndProc = self._frame_proc_ref
+        wc.hInstance = hinst
+        wc.lpszClassName = self._frame_cls
+        wc.hbrBackground = 6
+        sup.user32.RegisterClassW(ctypes.byref(wc))
+        self.frame_hwnd = sup.user32.CreateWindowExW(0, self._frame_cls, self.title,
+                                                     sup.WS_OVERLAPPEDWINDOW | sup.WS_VISIBLE,
+                                                     self._x, self._y, self._w, self._h,
+                                                     None, None, hinst, None)
+        cw = (self._w - 44) // 2
+        for i, (cx, _cy) in enumerate(((8, 8), (8 + cw + 12, 8))):
+            proc = sup.WNDPROC(self._canvas_proc(i))
+            self._procs.append(proc)
+            cc = sup._WNDCLASSW()
+            cc.lpfnWndProc = proc
+            cc.hInstance = hinst
+            cc.lpszClassName = f"{self._canvas_cls}{i}"
+            sup.user32.RegisterClassW(ctypes.byref(cc))
+            h = sup.user32.CreateWindowExW(0, f"{self._canvas_cls}{i}", "", sup.WS_CHILD | sup.WS_VISIBLE,
+                                           cx, 8, cw, self._h - 60, self.frame_hwnd, None, hinst, None)
+            self.child_hwnds.append(int(h))
+            self.events[int(h)] = []
+            self.strokes[int(h)] = []
+        self._ready.set()
+        msg = wt.MSG()
+        while sup.user32.GetMessageW(ctypes.byref(msg), None, 0, 0) > 0:
+            sup.user32.TranslateMessage(ctypes.byref(msg))
+            sup.user32.DispatchMessageW(ctypes.byref(msg))
+
+    def start(self) -> "_DualCanvasApp":
+        self._thread.start()
+        self._ready.wait(5)
+        time.sleep(0.4)
+        return self
+
+    def ink_points(self, child_hwnd: int) -> int:
+        return sum(len(st) for st in self.strokes.get(child_hwnd, []))
+
+    def stop(self):
+        if self.frame_hwnd:
+            self._sup.user32.PostMessageW(self.frame_hwnd, 0x0010, 0, 0)   # WM_CLOSE
+        self._thread.join(timeout=3)
+
+
+def run_lc2ia(TestOutcome):
+    """LC2-IA (law [2]): TWO disjoint cursors drive ONE app at the same time. Region ownership is enforced, not guessed:
+    an overlapping claim is refused; an out-of-region action is refused before anything is posted; strokes on DIFFERENT
+    child windows run truly concurrently (both effects pixel-proved, overlap measured); strokes that must share one child
+    degrade honestly to serialized, with the reason in the report. PostMessage only - the physical pointer is untouched."""
+    import threading
+    from core_organs import headless_input as hin
+    from core_organs import same_app_parallel as sap
+
+    app = _DualCanvasApp().start()
+    checks: Dict[str, bool] = {}
+    metrics: Dict[str, Any] = {}
+    try:
+        if len(app.child_hwnds) != 2 or not app.frame_hwnd:
+            return TestOutcome(passed=False, env_blocked=True,
+                               evidence="LC2-IA: the one-app/two-canvas fixture did not come up (environment)")
+        left, right = app.child_hwnds
+        lr, rr = sap.child_rect_screen(left), sap.child_rect_screen(right)
+        base_l, why_l = hin.capture_window(left)
+        base_r, why_r = hin.capture_window(right)
+        if base_l is None or base_r is None:
+            return TestOutcome(passed=False, env_blocked=True,
+                               evidence=f"LC2-IA: cannot capture the fixture canvases headlessly ({why_l}/{why_r})")
+
+        # (a) disjointness is decided AT CLAIM TIME, not by hoping
+        ok_a, note_a = sap.claim(app.frame_hwnd, "alpha", lr)
+        ok_b, note_b = sap.claim(app.frame_hwnd, "beta", rr)
+        ref = sap.claim(app.frame_hwnd, "gamma", (lr[0], lr[1], (lr[0] + lr[2]) // 2, lr[3]))
+        checks["disjoint claims accepted; an OVERLAPPING claim is refused at claim time"] = \
+            ok_a and ok_b and not ref[0]
+
+        # (b) two contexts, one window, two DISJOINT child canvases, driven concurrently
+        ctx_a = sap.InputContext(app.frame_hwnd, "alpha", "LC2 alpha")
+        ctx_b = sap.InputContext(app.frame_hwnd, "beta", "LC2 beta")
+        rad = 60
+        pts_a = hin.ellipse_points((lr[0] + lr[2]) // 2, (lr[1] + lr[3]) // 2, rad, rad, 40)
+        pts_b = hin.ellipse_points((rr[0] + rr[2]) // 2, (rr[1] + rr[3]) // 2, rad, rad, 40)
+        res: Dict[str, Any] = {}
+
+        def _go(tag, ctx, pts):
+            res[tag] = ctx.stroke(pts, duration_s=0.9)
+
+        threads = [threading.Thread(target=_go, args=("alpha", ctx_a, pts_a)),
+                   threading.Thread(target=_go, args=("beta", ctx_b, pts_b))]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join(timeout=8)
+        time.sleep(0.5)                                        # let the pump finish painting
+        rep = sap.parallelism_report(app.frame_hwnd, ["alpha", "beta"])
+        after_l, _ = hin.capture_window(left)
+        after_r, _ = hin.capture_window(right)
+        n_l, bbox_l = hin.changed_pixels(base_l, after_l)
+        n_r, bbox_r = hin.changed_pixels(base_r, after_r)
+        ring_l = app.strokes[left][-1] if app.strokes[left] else []
+        ring_r = app.strokes[right][-1] if app.strokes[right] else []
+        metrics.update(ink_left=n_l, ink_right=n_r, report=rep)
+        checks["both cursors drew CONCURRENTLY in ONE window (overlap >= 250 ms, report says parallel)"] = \
+            rep["concurrent_ms"] >= 250 and rep["concurrency"] == "parallel" and \
+            bool(res.get("alpha", {}).get("ok")) and bool(res.get("beta", {}).get("ok"))
+        checks["alpha's region REALLY got its ring, independent of beta"] = \
+            n_l >= 200 and bbox_l and abs((bbox_l[2] - bbox_l[0]) - 2 * rad) <= 12 and len(ring_l) >= 30
+        checks["beta's region REALLY got its ring, independent of alpha"] = \
+            n_r >= 200 and bbox_r and abs((bbox_r[2] - bbox_r[0]) - 2 * rad) <= 12 and len(ring_r) >= 30
+
+        # (c) enforcement at ACTION time: alpha may not stroke into beta's half
+        ink_before_r = app.ink_points(right)
+        refused = ctx_a.stroke(pts_b, duration_s=0.2)
+        checks["an out-of-region action is REFUSED before anything is posted (zero effect there)"] = \
+            bool(refused.get("refused")) and app.ink_points(right) == ink_before_r
+
+        # (d) the honest degradation: ONE child window has ONE logical mouse. beta releases its half of the right
+        # canvas; gamma and delta then own the two disjoint halves of that SAME child. Their actions may never
+        # share space (overlapping claim refused) and must SERIALIZE on the child's lock - the wait is measured,
+        # the reason is reported, and both rings still land in their own halves.
+        sap.release(app.frame_hwnd, "beta")
+        half = (rr[0] + rr[2]) // 2
+        ok_g, _n1 = sap.claim(app.frame_hwnd, "gamma", (rr[0] + 2, rr[1] + 2, half - 2, rr[3] - 2))
+        bad_d = sap.claim(app.frame_hwnd, "delta", (half - 20, rr[1], rr[2], rr[3]))   # overlaps gamma: refused
+        ok_d, _n2 = sap.claim(app.frame_hwnd, "delta", (half + 2, rr[1] + 2, rr[2] - 2, rr[3] - 2))
+        ctx_g = sap.InputContext(app.frame_hwnd, "gamma", "LC2 gamma")
+        ctx_d = sap.InputContext(app.frame_hwnd, "delta", "LC2 delta")
+        pts_g = hin.ellipse_points(rr[0] + (half - rr[0]) // 2, (rr[1] + rr[3]) // 2, 40, 40, 32)
+        pts_d = hin.ellipse_points(half + (rr[2] - half) // 2, (rr[1] + rr[3]) // 2, 40, 40, 32)
+        ink_before_r2 = app.ink_points(right)
+        strokes_before_r2 = len(app.strokes[right])
+        res2: Dict[str, Any] = {}
+        t1 = threading.Thread(target=lambda: res2.__setitem__("g", ctx_g.stroke(pts_g, duration_s=0.6)))
+        t2 = threading.Thread(target=lambda: res2.__setitem__("d", ctx_d.stroke(pts_d, duration_s=0.6)))
+        t1.start()
+        time.sleep(0.15)                                       # gamma holds the shared canvas' mouse first
+        t2.start()
+        t1.join(timeout=8)
+        t2.join(timeout=8)
+        dwait = res2.get("d", {}).get("wait_ms", 0)
+        rep2 = sap.parallelism_report(app.frame_hwnd, ["gamma", "delta"])
+        time.sleep(0.4)
+        new_strokes = app.strokes[right][strokes_before_r2:]
+        half_local = half - rr[0]
+        left_ring = [s for s in new_strokes if s and max(p[0] for p in s) <= half_local]
+        right_ring = [s for s in new_strokes if s and min(p[0] for p in s) >= half_local]
+        checks["same-child owners get NO shared space and degrade to SERIALIZED honestly (measured wait, reason given)"] = \
+            ok_g and ok_d and not bad_d[0] and dwait >= 100 and rep2["serialized_wait_ms"] >= 100 and \
+            rep2["concurrency"] == "serialized" and bool(rep2["reason_when_serialized"]) and \
+            bool(res2.get("g", {}).get("ok")) and bool(res2.get("d", {}).get("ok"))
+        checks["serialization did not break the work: both rings landed, each inside its OWN half"] = \
+            len(new_strokes) == 2 and len(left_ring) == 1 and len(right_ring) == 1 and \
+            app.ink_points(right) > ink_before_r2
+        ctx_a.close()
+        ctx_b.close()
+        ctx_g.close()
+        ctx_d.close()
+        return _verdict(TestOutcome, checks,
+                        extra=(f"one window, two cursors: concurrent_ms={rep['concurrent_ms']}, "
+                               f"same-child serialized_wait_ms={rep2['serialized_wait_ms']} (d wait {dwait} ms); "
+                               f"rings inked L={n_l}px R={n_r}px; overlap claim refused='{ref[1][:60]}'"),
+                        metrics=metrics)
+    finally:
+        sap.release(app.frame_hwnd)
+        app.stop()

@@ -1,0 +1,42 @@
+Hojaiga System Intelligence & Reliability Suite
+================================================================================
+[pointer preflight] pointer (1452, 28)->(1452, 28) cause=still (guard calls=0, hardware events=0, injected events=0, hardware keys=0, fastest step=0px at 0.0px/ms, hook=on)  -> quiet
+[vision gate] up=True started=False (already running)
+
+================================================================================
+TEST MIN1 [BACKGROUND]: MIN1: a MINIMIZED app is scanned + operated without ever being shown or focused, at full quality
+================================================================================
+[FAIL] 167.47s — COMError: (-2147220991, 'An event was unable to invoke any of the subscribers', (None, None, None, 0, None))
+
+================================================================================
+TEST SCK1 [SCANKNOW]: SCK1: organ_30 scan consults organ_48/50 knowledge: E0 + layout first, cached on re-scan
+================================================================================
+[ENV-BLOCKED] 104.00s — ABORTED-ENV (not a code failure): somebody was using this machine while the test ran (547 physical input events, 0 synthetic) -> its outcome is not measurable. Unsettled checks: the run itself. pointer (1074, 556)->(1233, 417) cause=human-hand (guard calls=0, hardware events=547, injected events=0, hardware keys=0, fastest step=50px at 9.04px/ms, hook=on) | scan1: 194 controls, learned 108 commands (E0 Nones) in 46.6s; scan2: E0 ['skipped'] cached, skipped_known=41, catalog_only=10 in 52.2s; stop=unwind-failed
+        scan1_s = 46.6
+        scan2_s = 52.2
+        pointer = human-hand drift=298px hw=547 inj=0
+        gdi_user_end = 11/10
+        proc = threads=31 handles=496 rss_mb=146
+        gdi_growth = +0/+5
+
+================================================================================
+SUMMARY — 0/2 PASS, 1 ENV-BLOCKED, 1 FAIL in 273.6s
+================================================================================
+[FAIL] MIN1 MIN1: a MINIMIZED app is scanned + operated without ever b 167473.2 ms
+[ENV-BLOCKED] SCK1 SCK1: organ_30 scan consults organ_48/50 knowledge: E0 + l 103997.6 ms
+
+================================================================================
+GDI OBJECT BUDGET (cap 10000) — end-of-test count / growth
+================================================================================
+  curve: MIN1:11(+10) SCK1:11(+0)
+   MIN1 consumed    10 handles (process at 11)
+
+================================================================================
+RECONCILED SUBSYSTEM RANKINGS (70% pass-rate, 30% latency; B=env-blocked, neutral)
+================================================================================
+ #  SUBSYSTEM                                      TESTS   SCORE    AVG MS
+ 1  Knowledge-assisted scanning (organ_49/50) (env-only) 0/1 (+1B ENV)   70.0  103997.6
+ 2  Background operation (minimized, never shown/focused)           0/1    0.0  167473.2
+
+Full log written: D:\new_automation\All codes\core_organs\system_intelligence_results_partial.txt
+[vision gate] vision(Qwen2.5-VL-7B :8081) server=up calls=0 found=0 errors=0 avg=0ms by_fn={} log=data\vision_log.jsonl

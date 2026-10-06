@@ -624,6 +624,33 @@ def _journal_write() -> None:
         pass
 
 
+# A foreign window is only restorable if the thread that owns it is pumping messages. Asking costs microseconds
+# on a live window; on a wedged one it costs exactly this timeout, and that is the whole point - the alternative
+# is an unbounded Send() inside SetWindowPlacement/ShowWindow that never comes back.
+_WIN_ANSWER_MS = int(os.environ.get("HOJAIGA_WIN_ANSWER_MS", "500"))
+# Crash-recovery hygiene runs at IMPORT time, so one unbounded call can wedge the whole suite before its first
+# test prints. The rail bounds the total, whatever the desktop is holding.
+_RECOVER_BUDGET_S = float(os.environ.get("HOJAIGA_RECOVER_BUDGET_S", "5.0"))
+
+
+def _win_answers(hwnd: int, timeout_ms: int = 0) -> bool:
+    """False when the window is gone or its owning thread is not pumping messages.
+
+    IsHungAppWindow only reports what the shell decided after seconds of silence, so a freshly wedged window can
+    still read 'not hung'. WM_NULL behind SendMessageTimeout asks the thread directly and returns immediately."""
+    if not (_IS_WINDOWS and hwnd) or not _u32.IsWindow(hwnd):
+        return False
+    try:
+        if _u32.IsHungAppWindow(hwnd):
+            return False
+        res = ctypes.c_size_t(0)
+        return bool(_u32.SendMessageTimeoutW(hwnd, 0x0000, 0, 0, 0x0002 | 0x0001,      # WM_NULL, ABORTIFHUNG|BLOCK
+                                            timeout_ms or _WIN_ANSWER_MS,
+                                            ctypes.byref(res)))
+    except Exception:
+        return False
+
+
 def _pid_alive(pid: int) -> bool:
     try:
         h = ctypes.windll.kernel32.OpenProcess(0x1000, False, pid)        # PROCESS_QUERY_LIMITED_INFORMATION
@@ -639,12 +666,18 @@ def _pid_alive(pid: int) -> bool:
 
 def recover_parked() -> int:
     """Restore windows a DEAD process left parked off-screen: minimize them again at their original
-    normal rect. Journals of processes that are still alive are never touched."""
-    n = 0
+    normal rect. Journals of processes that are still alive are never touched.
+
+    Every window is asked whether its thread is answering BEFORE any synchronous call is made on it, and the whole
+    pass runs inside a hard budget: a window left frozen by the crash being cleaned up is exactly the window that
+    would otherwise block SetWindowPlacement here forever (measured: a wedged 'Untitled - Paint' hung suite start
+    for minutes before its first banner). A skip is logged, never silently reported as restored."""
+    n = skipped = 0
     try:
         names = [f for f in os.listdir(_JOURNAL_DIR) if f.startswith("hojaiga_parked_") and f.endswith(".json")]
     except Exception:
         return 0
+    t_deadline = time.perf_counter() + _RECOVER_BUDGET_S
     for fn in names:
         try:
             owner = int(fn[len("hojaiga_parked_"):-len(".json")])
@@ -663,8 +696,18 @@ def recover_parked() -> int:
             try:
                 if not _u32.IsWindow(hwnd):
                     continue
+                if time.perf_counter() > t_deadline:
+                    skipped += 1
+                    continue                              # out of budget: leave the entry, say so below
                 rc = _rect(hwnd)
                 if rc[0] <= PARK_X + 100 and rc[1] <= PARK_Y + 100 and not is_minimized(hwnd):
+                    if not _win_answers(hwnd):
+                        # The owner is dead; nobody will ever un-wedge this window. It cannot be restored and the
+                        # journal for it is spent - dropping it stops every future run re-blocking on the same corpse.
+                        logger.warning("recover_parked: hwnd=%s is not answering - skipped (frozen leftover window)",
+                                       hwnd)
+                        skipped += 1
+                        continue
                     wp = _placement(hwnd)
                     wp.rcNormalPosition = wt.RECT(info["left"], info["top"], info["right"], info["bottom"])
                     wp.showCmd = SW_SHOWMINNOACTIVE
@@ -676,6 +719,9 @@ def recover_parked() -> int:
             os.remove(path)
         except Exception:
             pass
+    if skipped:
+        logger.warning("recover_parked: %d window(s) skipped (unresponsive or out of the %.1fs hygiene budget)",
+                       skipped, _RECOVER_BUDGET_S)
     return n
 
 
@@ -796,7 +842,7 @@ def exit(hwnd: int) -> bool:                            # noqa: A001 - mirrors e
         except Exception:
             return False
     try:
-        if _u32.IsWindow(hwnd) and _u32.IsHungAppWindow(hwnd):
+        if _u32.IsWindow(hwnd) and not _win_answers(hwnd):
             # ShowWindow / SetWindowPlacement are SYNCHRONOUS calls into the window's thread: on a window that has stopped answering
             # they block this process for ever (measured: a colour dialog wedged Paint and the run hung in here). Nothing can be
             # restored on a frozen window; the caller reports it.
