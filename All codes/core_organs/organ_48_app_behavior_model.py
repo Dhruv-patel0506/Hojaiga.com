@@ -149,6 +149,7 @@ class ObservedState:
     cut: str = ""                                        # what this observation did NOT get to read (budget)
     hwnd: int = 0
     mode: str = ""
+    light: bool = False                                   # names/windows only: control VALUES were never read
 
     def uia_signature(self) -> str:
         return hashlib.md5(("|".join(sorted(self.names)) + "|".join(sorted(self.windows))
@@ -174,43 +175,51 @@ def ocr_window_text(hwnd: int) -> Tuple[Optional[str], str]:
 
 def observe(hwnd: int, *, grounding=None, want_ocr: bool = False,
             want_region: bool = False, max_nodes: int = 500,
-            budget_s: Optional[float] = None) -> ObservedState:
+            budget_s: Optional[float] = None, deep: bool = True) -> ObservedState:
     """Snapshot the app: title, control names/values (UIA incl. popup hosts),
     sibling windows, and optionally OCR text / pixel hash.
 
     ONE deadline covers the whole observation (the app walk, every popup walk and the bulk snapshot): a scan
-    observes the app after every probe, so serial per-call timeouts added up to tens of seconds per probe."""
+    observes the app after every probe, so serial per-call timeouts added up to tens of seconds per probe.
+
+    deep=False reads the tree ONCE through the cached bulk snapshot instead of walking it. A scan calls this
+    before and after every probe, and everything that gets compared back (uia_signature, state_signature, the
+    restored-window check) is names + windows + title — all of which the snapshot answers in one round-trip.
+    The walk's unique output is `values`, which only `value_contains` reads, and that never runs on a scan
+    state. If the snapshot answers nothing, the walk runs anyway: a light read must never report a blind app.
+    """
     from core_organs import desktop_grounding as dg
     from core_organs import headless_input as hin
     g = grounding or dg.DesktopGrounding()
-    st = ObservedState(hwnd=hwnd, title=_win_title(hwnd))
+    st = ObservedState(hwnd=hwnd, title=_win_title(hwnd), light=not deep)
     _deadline = time.perf_counter() + (OBSERVE_BUDGET_S if budget_s is None else max(0.3, float(budget_s)))
 
     def _left() -> float:
         return _deadline - time.perf_counter()
 
+    def _walk(target: int, depth: int, nodes: int) -> List[Any]:
+        try:
+            return (g._walk_uia(target, max_depth=depth, max_nodes=nodes, budget_s=max(0.3, _left()))
+                    if dg.HAS_UIA else g._walk_win32(target))
+        except Exception:
+            return []
+
     elements = []
     cut = []
-    try:
-        elements = (g._walk_uia(hwnd, max_depth=14, max_nodes=max_nodes, budget_s=max(0.3, _left()))
-                    if dg.HAS_UIA else g._walk_win32(hwnd))
-        if getattr(g, "last_walk", {}).get("truncated"):
-            cut.append(f"app-walk:{g.last_walk.get('stopped_by') or 'depth'}")
-    except Exception:
-        pass
     others: List[int] = []
     try:
         others = _open_popups(hwnd)[:10]
+    except Exception:
+        pass
+    if deep:
+        elements = _walk(hwnd, 14, max_nodes)
+        if getattr(g, "last_walk", {}).get("truncated"):
+            cut.append(f"app-walk:{g.last_walk.get('stopped_by') or 'depth'}")
         for w in others:
             if _left() < 0.5:                       # no budget left for another popup: say so, do not stall
                 cut.append(f"popups-unsurfaced({len(others) - others.index(w)})")
                 break
-            try:
-                elements += g._walk_uia(w, max_depth=8, max_nodes=200, budget_s=_left()) if dg.HAS_UIA else []
-            except Exception:
-                continue
-    except Exception:
-        pass
+            elements += _walk(w, 8, 200)
     names = [(e.name or "").lower() for e in elements if (e.name or "").lower() != "pop-uphost"]
     # The old walk drops controls with empty rectangles, which is EVERYTHING in a hidden UWP app (Calculator's
     # display, Settings' pages). A bulk snapshot needs no geometry, so union its names in: otherwise a step that
@@ -231,6 +240,12 @@ def observe(hwnd: int, *, grounding=None, want_ocr: bool = False,
     except Exception:
         pass
     st.names = names
+    if not names and not deep:
+        # the bulk snapshot is the whole idea behind a light read; if it answered nothing, walk after all
+        # rather than hand back an empty state that would read as "the probe changed nothing".
+        elements = _walk(hwnd, 14, max_nodes)
+        st.names = names = [(e.name or "").lower() for e in elements if (e.name or "").lower() != "pop-uphost"]
+        st.light = False
     st.values = [(e.value or "").lower() for e in elements if getattr(e, "value", "")]
     st.windows = sorted({(_win_title(w) or _win_class(w)).lower() for w in others})
     st.cut = ";".join(cut)
@@ -302,6 +317,9 @@ def _a_element_appeared(p, b, a, ctx):
 
 def _a_value_contains(p, b, a, ctx):
     want = str(p["text"]).lower()
+    if a.light and not a.values:
+        # a light observation never read control VALUES: report "this tier cannot see that", not "absent"
+        return None, f"value-text '{want[:30]}' unverifiable: light observation read names only"
     ok = any(want in v for v in a.values)
     return ok, f"value-text '{want[:30]}' {'found' if ok else 'not found'} in {len(a.values)} control value(s)"
 
@@ -681,7 +699,7 @@ class TemplateMatch:
     tpl_id: str
     app_key: str
     name: str
-    steps: List[dict]
+    steps: List[Dict[str, Any]]
     source: str
     confidence: float
     score: float
@@ -2352,13 +2370,36 @@ class EffectorLadder:
             return bool(ok), "file_dialog", note
         order = [e for e in self.model.effector_order(app_key, verb, self.DEFAULTS.get(verb, ["key"]))
                  if e not in avoid] or list(self.DEFAULTS.get(verb, ["key"]))
+        # per-control capability probe (#5): a STRUCTURAL read (framework child classes, HMENU,
+        # native-tree reach) informs the tier order - native tree first, pixel geometry last - and
+        # if the whole ladder runs dry the WALL it records says so with the full trail, never a pass.
+        probe_info: Dict[str, Any] = {}
+        try:
+            from core_organs import capability_probe
+            probe_info = capability_probe.probe(hwnd)
+            order, probe_rationale = capability_probe.order_routes(order, probe_info, verb)
+        except Exception as _pe:  # noqa: BLE001 - a probe failure may never block the ladder itself
+            probe_info = {"surface": "probe-error"}
+            probe_rationale = [f"probe unavailable: {type(_pe).__name__}: {_pe}"]
+        self.last_probe = {"profile": probe_info, "rationale": probe_rationale, "order": list(order)}
         trail: List[str] = []
         for eff in order:
             ok, note = self._try(eff, verb, action, hwnd, dg, hin)
             if ok:
                 return True, eff, note
             trail.append(f"{eff}: {note}")
-        return False, "none", " | ".join(trail) or "no-effector-applicable"     # the WHOLE trail, not just the last miss
+        # the wall is LEARNING: every tier that could not even deliver is recorded as a failure for
+        # this app+verb (the callers record the effect separately), and the note names the surface.
+        try:
+            for eff in order:
+                self.model.record_effector(app_key, verb, eff, False)
+        except Exception:  # noqa: BLE001
+            pass
+        try:
+            from core_organs import capability_probe as _cp
+            return False, "none", _cp.wall_note(probe_info, order, trail)[:600]
+        except Exception:  # noqa: BLE001
+            return False, "none", " | ".join(trail) or "no-effector-applicable"     # the WHOLE trail, not just the last miss
 
     def _command_for_chord(self, app_key: str, hwnd: int, chord: str) -> Optional[Dict[str, Any]]:
         """Knowledge lookup: which known menu command is bound to this chord? If nothing is known

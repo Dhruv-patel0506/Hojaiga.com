@@ -1244,6 +1244,11 @@ def test_cap2_behavior() -> TestOutcome:
     from core_organs import si_tests_behavior
     return si_tests_behavior.run_cap2(TestOutcome)
 
+def test_pro1_behavior() -> TestOutcome:
+    """PRO1 (#5): the capability probe reads a wall surface (XAML/Chromium/DirectX) structurally, informs the effector ladder, escalation proven with an independent effect check, un-actuable controls return an honest WALL"""
+    from core_organs import si_tests_behavior
+    return si_tests_behavior.run_pro1(TestOutcome)
+
 def test_h1_organ_import_health() -> TestOutcome:
     """H1: Every core organ module imports cleanly with its main symbol present"""
     import importlib
@@ -2476,6 +2481,7 @@ def main() -> int:
         ("BM4", "BEHAVIOR", test_bm4_behavior),
         ("MIN1", "BACKGROUND", test_min1_behavior),
         ("CAP2", "BACKGROUND", test_cap2_behavior),
+        ("PRO1", "BEHAVIOR", test_pro1_behavior),
         ("PIX1", "BACKGROUND", test_pix1_behavior),
         ("SC1", "SCANKNOW", test_sc1_behavior),
         ("LM1", "SCANKNOW", test_lm1_behavior),

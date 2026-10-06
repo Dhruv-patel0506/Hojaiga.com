@@ -53,7 +53,10 @@ def _top_windows(cls_sub: str) -> List[int]:
     return out
 
 
-APPS = {"notepad": ("notepad.exe", "notepad"), "paint": ("mspaint.exe", "mspaintapp")}
+APPS = {"notepad": ("notepad.exe", "notepad"), "paint": ("mspaint.exe", "mspaintapp"),
+        # a live XAML-island app (what #5 is about): ApplicationFrameWindow + CoreWindow children.
+        # This is a LAUNCH registry (which exe to start, which class to find), never actuation logic.
+        "calc": ("calc.exe", "applicationframewindow")}
 
 
 class LiveApp:
@@ -1201,3 +1204,67 @@ def run_cap2(TestOutcome):
     ev = "; ".join(f"{k}={'OK' if v else 'FAIL'}" for k, v in checks.items()) + " | " + " || ".join(rows)
     return TestOutcome(passed=passed, evidence=ev[:2000],
                        metrics={"rungs_used": rungs, "checks": f"{sum(checks.values())}/{len(checks)}"})
+
+
+def run_pro1(TestOutcome):
+    """PRO1 (#5): the per-control capability probe reads the SURFACE structurally (framework classes, HMENU,
+    native-tree reach - never an app-name table), informs the existing effector ladder (native tree first,
+    pixel geometry last), demonstrates escalation on a live XAML app that rejects posted mouse, and returns an
+    honest WALL with the full tiers_used trail when nothing actuates - never a faked pass."""
+    from core_organs import capability_probe as cp
+    from core_organs import fast_uia
+    bm = _bm()
+    db = _tmpdb()
+    m = bm.BehaviorModel(db)
+    try:
+        with LiveApp("calc", park=True) as la:            # a real XAML-island app, fresh window, ours only
+            if not la.ok:
+                return TestOutcome(passed=False, env_blocked=True, evidence=f"calc: {la.why}")
+            hwnd = la.hwnd
+            prof = cp.probe(hwnd)
+            checks: Dict[str, bool] = {}
+
+            # (a) STRUCTURAL classification: the probe saw the framework's own window classes
+            structural = (prof["surface"] not in ("unknown", "probe-error")) \
+                and bool(prof["evidence_classes"] or prof["flags"]["classic_menu"])
+            checks["probe classified the surface from STRUCTURE only (framework child classes, no app-name table)"] = \
+                structural
+            # (b) the app really is one of these walls (posted mouse does not reach XAML islands)
+            checks["the live app IS a posted-input-rejecting surface (probe: surface flags xaml island)"] = \
+                bool(prof["flags"]["xaml_island"]) and prof["posted_mouse_expectation"] == "unlikely"
+
+            # (c) the informed ladder: native tiers ahead of pixel geometry, rationale kept
+            order, rationale = cp.order_routes(list(bm.EffectorLadder.DEFAULTS["invoke"]), prof, "invoke")
+            geo_after_native = all(order.index(g) > order.index("snapshot_invoke")
+                                   for g in cp.GEOMETRY_TIERS if g in order)
+            ladder = bm.EffectorLadder(m)
+            key = bm._app_key("calc")
+            ok_a, eff_a, note_a = ladder.perform(key, hwnd, {"verb": "invoke", "label": "7"})
+            wired = getattr(ladder, "last_probe", None) or {}
+            checks["probe informs the EXISTING ladder (native tree first, pixels last; rationale recorded)"] = \
+                bool(rationale) and geo_after_native and bool(wired.get("profile"))
+
+            # (d) escalation demonstrated WITH an independent effect postcondition: the display reads back 7
+            snap = fast_uia.snapshot(hwnd, timeout_ms=4000) or []
+            disp = [str(n.name or "") for n in snap if n.name]
+            effect = any(d.strip() == "7" or d.startswith("Display is 7") or " 7" in d for d in disp)
+            checks["actuation escalated to a tier that WORKS on the wall app, and the effect is PROVEN "
+                   "independently (display reads 7)"] = bool(ok_a) and effect
+
+            # (e) no false PASS: an unreachable control returns the WALL, success=False, full tiers trail
+            ok_b, eff_b, note_b = ladder.perform(key, hwnd, {"verb": "invoke", "label": "Zeta-Photon-9000"})
+            wall = (not ok_b) and str(note_b).startswith("WALL") and "tiers_used=[" in str(note_b) and \
+                "not faked" in str(note_b)
+            checks["an un-actuable control returns an honest WALL (tiers_used trail, NO success claim)"] = wall
+
+            extra = (f"surface={prof['surface']} evidence={prof['evidence_classes'][:3]} "
+                     f"native_tree={prof['native_tree']} tiers={order} delivered_via={eff_a} "
+                     f"note={str(note_a)[:70]} | wall_note={str(note_b)[:120]}")
+            passed = all(checks.values())
+            ev = "; ".join(f"{k}={'OK' if v else 'FAIL'}" for k, v in checks.items()) + " | " + extra
+            return TestOutcome(passed=passed, evidence=ev[:2000],
+                               metrics={"surface": prof["surface"], "tiers_used": order,
+                                        "delivered_via": eff_a, "checks": f"{sum(checks.values())}/{len(checks)}"})
+    finally:
+        m.close()
+        _rm_db(db)
