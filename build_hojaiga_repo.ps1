@@ -19,7 +19,8 @@ $excludeDirs = @(
     'pixel-animation-video', '_stale_top_level_backup_*', 'node_modules',
     '.ipynb_checkpoints', 'xvfb', '.cache', 'Clicky (2) (1)_file',
     'videos', 'screenshots', 'observation', 'observations',
-    '.tmp_video_frames', 'kokoro_models', 'ffmeg', 'snapshots', '.claude'
+    '.tmp_video_frames', 'kokoro_models', 'ffmeg', 'snapshots', '.claude',
+    'ffmpeg-2026*', 'overnight_results', 'grounding_reports'
 )
 $excludeFiles = @(
     '*.dll','*.lib','*.pdb','*.tlog','*.ilk','*.obj','*.o','*.bcf','*.sbr',
@@ -27,7 +28,12 @@ $excludeFiles = @(
     '*.zip','*.7z','*.tar','*.gz','*.rar',
     '*.pt','*.pth','*.ckpt','*.onnx','*.engine','*.safetensors','*.pkl','*.joblib','*.xz','*.msi','*.bin','*.log',
     '*.mp4','*.avi','*.mkv','*.mov','*.webm','*.wmv','*.flv','*.wav','*.mp3',
-    'secure_keys.json','.api_keys_encrypted'
+    'secure_keys.json', '.api_keys_encrypted',
+    # runtime state / knowledge DBs (privacy + churn) — never ship
+    '*.db', '*.sqlite', '*.sqlite.*', '*.snap.tmp', 'session_cookies.sqlite', 'hojaiga_agent_state.json',
+    # runtime scan / scrape artifacts (contain pulled PII) — never ship
+    '*_scan_result.json', 'chrome_web_scan.json', 'all_apps_scan_master.json', 'all_apps_scan_result.json',
+    '*_contacts.csv', '*_contacts.xlsx', 'coffee_shops*', 'coffee_austin_final.csv', 'interior_designers*.csv', 'interior+designers*_contacts.xlsx'
 )
 
 $rcArgs = @($src, $dst, '/MIR', '/MAX:95000000', '/NFL', '/NDL', '/NJH', '/NP',

@@ -34,8 +34,9 @@ def run_es1(TestOutcome):
             with open(shots[0]["path"], "rb") as fh:
                 valid_png = fh.read(8) == b"\x89PNG\r\n\x1a\n"
         checks = [("popup-engine-asked-for-a-human", loop.awaiting_human, f"awaiting_human={loop.awaiting_human}"),
-                  ("screenshot-saved-as-a-real-png", ok_path and valid_png, f"{shots[0]['path'].rsplit(chr(92), 1)[-1] if shots else None}, "
-                                                                           f"{os.path.getsize(shots[0]['path']) if ok_path else 0} bytes, png={valid_png}"),
+                  ("screenshot-saved-as-a-real-png", ok_path and valid_png, f"{shots[0]['path'].rsplit(chr(92), 1)[-1] if shots and shots[0]['path'] else None}, "
+                                                                           f"{os.path.getsize(shots[0]['path']) if ok_path else 0} bytes, png={valid_png}"
+                                                                           f"{'' if ok_path or not shots else ', capture=' + str(shots[0].get('capture') or 'no-record')}"),
                   ("dialog-left-open-for-the-human", any(hin.is_alive(d) for d in __import__('core_organs.popup_policy', fromlist=['x']).blocking_dialogs(root.hwnd)),
                    "no button was pressed")]
     finally:
@@ -63,10 +64,25 @@ def run_b2x(TestOutcome):
     finally:
         us.start_apps, us.launch_hidden = orig, orig_launch
     after = {h for h, _t in hin.top_level_titles(visible_only=False)}
+    # 'nothing else got started' is about what THIS run started: a window a person (or another program) opened meanwhile is not ours
+    import ctypes as _ct
+    import ctypes.wintypes as _wt
+    try:
+        import psutil as _ps
+        _mine = {os.getpid()} | {c.pid for c in _ps.Process().children(recursive=True)}
+    except Exception:  # noqa: BLE001
+        _mine = {os.getpid()}
+    _ours_new = set()
+    for _h in (after - before):
+        _p = _wt.DWORD()
+        _ct.windll.user32.GetWindowThreadProcessId(_h, _ct.byref(_p))
+        if _p.value in _mine:
+            _ours_new.add(_h)
+    foreign = len(after - before) - len(_ours_new)
     checks = [("target-checked-on-disk", tgt.get("kind") == "path" and tgt.get("exists") is False, str(tgt)),
               ("missing-exe-is-reported", "MISSING" in str(r.get("launch_note", "")), f"launch_note={r.get('launch_note')!r}"),
               ("no-launch-or-retry-attempted", not launched_calls and not r.get("launched"), f"launch_hidden calls={len(launched_calls)} launched={r.get('launched')}"),
-              ("nothing-else-got-started", not (after - before), f"new windows={len(after - before)}"),
+              ("nothing-else-got-started", not _ours_new, f"new windows of this run's processes={len(_ours_new)} (foreign windows opened meanwhile: {foreign}, not ours)"),
               ("task-not-reported-done", not r.get("completed"), f"completed={r.get('completed')}")]
     failed = [n for n, ok, _d in checks if not ok]
     return TestOutcome(passed=not failed, evidence="; ".join(f"{n}={'OK' if ok else 'FAIL'}({d[:120]})" for n, ok, d in checks), metrics={"failed": len(failed)})

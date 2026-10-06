@@ -425,6 +425,7 @@ class VisualCursor:
         self.shape = CursorShape()
         self._active_state = "ACTIVE"  # "ACTIVE", "MOVING", "DRAWING", "CLICKING"
         self._show_state_badge = True
+        self._hfont_badge: int = 0     # the badge font, created once on the render thread
 
         # Magnetic rest state: virtual cursor rides on the physical mouse when idle,
         # detaches the moment the agent acts, and snaps back once idle again.
@@ -748,46 +749,85 @@ class VisualCursor:
         ctypes.windll.gdi32.DeleteObject(brush)
         ctypes.windll.gdi32.DeleteObject(pen)
 
+    def _badge_font(self):
+        """One font handle for the life of the overlay, created on first use (and deleted by
+        destroy()). Measured reason this is not a micro-optimisation: the badge used to create a
+        font per frame AND ask user32 for GetTextExtentPoint32W -- an entry point of GDI32, so the
+        call raised AttributeError, the local `except Exception: pass` swallowed it, and the frame's
+        font handle was stranded. 4,154 live fonts later the process walked past the ~10,000
+        per-process GDI cap, after which no device context can be created and EVERY PrintWindow
+        capture in the session comes back blank and reads as "the app did not render"."""
+        if not _HAS_CTYPES:
+            return 0
+        cached = getattr(self, "_hfont_badge", 0)
+        if cached:
+            return cached
+        self._hfont_badge = ctypes.windll.gdi32.CreateFontW(
+            12, 0, 0, 0, 600, 0, 0, 0, 1, 0, 0, 0, 0, "Segoe UI")
+        return self._hfont_badge or 0
+
     def _draw_badge(self, hdc_mem, x: int, y: int, text: str,
                     border_color: int = 0x00FFFF00):
-        """Render sleek cyberpunk rounded pill badge showing active state."""
+        """Render sleek cyberpunk rounded pill badge showing active state.
+
+        Three rules this function used to break, and now cannot: measure text with the GDI32
+        entry point (not user32), deselect an object before deleting it (a still-selected object
+        cannot be deleted), and release every object in `finally` -- an error is logged, never
+        swallowed, because a hidden error here costs the whole session its eyes."""
         try:
             import ctypes.wintypes as wt
-            hfont = ctypes.windll.gdi32.CreateFontW(
-                12, 0, 0, 0, 600, 0, 0, 0,
-                1, 0, 0, 0, 0, "Segoe UI"
-            )
-            old_font = ctypes.windll.gdi32.SelectObject(hdc_mem, hfont)
+            g32 = ctypes.windll.gdi32
+            u32 = ctypes.windll.user32
+            hfont = self._badge_font()
+            if not hfont:
+                return
+            old_font = g32.SelectObject(hdc_mem, hfont)
+            pen_b = brush_b = None
+            old_p = old_br = None
+            try:
+                # GetTextExtentPoint32W lives in gdi32; typed here because the windll loaders are
+                # thread-local and this runs on the animation thread, not the importing one.
+                g32.GetTextExtentPoint32W.argtypes = [ctypes.c_void_p, ctypes.c_wchar_p,
+                                                      ctypes.c_int, ctypes.c_void_p]
+                g32.GetTextExtentPoint32W.restype = ctypes.c_int
+                size = wt.SIZE()
+                if not g32.GetTextExtentPoint32W(hdc_mem, text, len(text), ctypes.byref(size)):
+                    size.cx, size.cy = 90, 16          # a failed measurement must not lose the badge
 
-            size = wt.SIZE()
-            ctypes.windll.user32.GetTextExtentPoint32W(hdc_mem, text, len(text), ctypes.byref(size))
+                pad_x = 7
+                pad_y = 3
+                rect_left = x
+                rect_top = y
+                rect_right = x + size.cx + pad_x * 2
+                rect_bottom = y + size.cy + pad_y * 2
 
-            pad_x = 7
-            pad_y = 3
-            rect_left = x
-            rect_top = y
-            rect_right = x + size.cx + pad_x * 2
-            rect_bottom = y + size.cy + pad_y * 2
+                pen_b = g32.CreatePen(0, 1, border_color)      # tinted border
+                brush_b = g32.CreateSolidBrush(0x001A1624)  # Cyber dark
+                old_p = g32.SelectObject(hdc_mem, pen_b)
+                old_br = g32.SelectObject(hdc_mem, brush_b)
 
-            pen_b = ctypes.windll.gdi32.CreatePen(0, 1, border_color)      # tinted border
-            brush_b = ctypes.windll.gdi32.CreateSolidBrush(0x001A1624)  # Cyber dark
-            old_p = ctypes.windll.gdi32.SelectObject(hdc_mem, pen_b)
-            old_br = ctypes.windll.gdi32.SelectObject(hdc_mem, brush_b)
+                u32.RoundRect(hdc_mem, rect_left, rect_top, rect_right, rect_bottom, 10, 10)
 
-            ctypes.windll.user32.RoundRect(hdc_mem, rect_left, rect_top, rect_right, rect_bottom, 10, 10)
-
-            ctypes.windll.gdi32.SetBkMode(hdc_mem, 1)  # Transparent
-            ctypes.windll.gdi32.SetTextColor(hdc_mem, 0x00FFFFFF)
-            ctypes.windll.user32.TextOutW(hdc_mem, rect_left + pad_x, rect_top + pad_y, text, len(text))
-
-            ctypes.windll.gdi32.SelectObject(hdc_mem, old_p)
-            ctypes.windll.gdi32.SelectObject(hdc_mem, old_br)
-            ctypes.windll.gdi32.SelectObject(hdc_mem, old_font)
-            ctypes.windll.gdi32.DeleteObject(pen_b)
-            ctypes.windll.gdi32.DeleteObject(brush_b)
-            ctypes.windll.gdi32.DeleteObject(hfont)
-        except Exception:
-            pass
+                g32.SetBkMode(hdc_mem, 1)  # Transparent
+                g32.SetTextColor(hdc_mem, 0x00FFFFFF)
+                u32.TextOutW(hdc_mem, rect_left + pad_x, rect_top + pad_y, text, len(text))
+            finally:
+                # Restore every slot we touched (SelectObject returns the object of that TYPE that
+                # was in the slot, so old_p is the old pen and old_br the old brush), then delete
+                # what this call created -- nothing can be deleted while it is still selected. The
+                # font is the shared cached one and is never deleted here (destroy() does that).
+                if old_br is not None:
+                    g32.SelectObject(hdc_mem, old_br)
+                if old_p is not None:
+                    g32.SelectObject(hdc_mem, old_p)
+                if old_font is not None:
+                    g32.SelectObject(hdc_mem, old_font)
+                if brush_b:
+                    g32.DeleteObject(brush_b)
+                if pen_b:
+                    g32.DeleteObject(pen_b)
+        except Exception as e:
+            logger.debug("[VisualCursor] badge draw failed: %s", e)
 
     def _draw_trail(self, hdc_mem, now: float):
         """Draw bright blue glowing trail dots along the primary movement path."""
@@ -1693,6 +1733,9 @@ Example 2: {{"pollinations_prompt": "a highly detailed futuristic spaceship, whi
         if self._hwnd:
             ctypes.windll.user32.DestroyWindow(self._hwnd)
             self._hwnd = 0
+        if getattr(self, "_hfont_badge", 0):        # the badge's one cached font (see _badge_font)
+            ctypes.windll.gdi32.DeleteObject(self._hfont_badge)
+            self._hfont_badge = 0
         for brush in [self._brush_cursor, self._brush_center]:
             if brush:
                 ctypes.windll.gdi32.DeleteObject(brush)

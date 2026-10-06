@@ -1695,3 +1695,76 @@ def run_ty1(TestOutcome):
                 pass
     return TestOutcome(passed=all(ok for _n, ok, _d in checks), evidence=_fmt(checks, 330)[:5200],
                        metrics={"checks": f"{sum(1 for _n, ok, _d in checks if ok)}/{len(checks)}"})
+
+
+# ----------------------------------------------------------------------------------------------- Job 1 (the eyes)
+
+def run_eye1(TestOutcome):
+    """EYE1: the eyes do not flicker - 300 headless captures of ONE parked window in a long-lived process, with real UIA
+    walks interleaved, never comes back blank and never grows the process's GDI/USER budget"""
+    from core_organs import headless_input as hin, universal_scan as us, background_window as bw
+    from core_organs import desktop_grounding as dg
+
+    n_captures = 300
+    before = _top_hwnds()
+    watch = _PointerWatch()
+    info = us.launch_hidden("notepad")
+    hwnd = int(info.get("hwnd") or 0)
+    if not hwnd:
+        return TestOutcome(passed=False, env_blocked=True,
+                           evidence=f"could not start a hidden Notepad: {info.get('notes')}")
+    checks: List[Tuple[str, bool, str]] = []
+    metrics: Dict[str, Any] = {}
+    g = dg.DesktopGrounding()
+    hin.CAPTURE_LOG.clear()
+    g0 = hin._gui_objects()
+    try:
+        with bw.BackgroundSession(hwnd) as bg:
+            # let it paint once before the soak (the loop does the same settling); bounded wait, honest on failure
+            img, note = (None, "")
+            t_end = time.perf_counter() + 8.0
+            while img is None and time.perf_counter() < t_end:
+                img, note = hin.capture_window(hwnd)
+                if img is None:
+                    time.sleep(0.25)
+            checks.append(("parked-window-paints-at-all", img is not None,
+                           f"mode={bg.mode} where={hin.CAPTURE_DIAG.get('where')} note={note[:120]}"))
+            ref = img
+            blanks: List[str] = []
+            min_px, sizes, stale = 1.0, set(), 0
+            t0 = time.perf_counter()
+            for i in range(n_captures):
+                if i % 10 == 0:                      # the session's real load: UIA walks alongside the captures
+                    try:
+                        g._walk_uia(hwnd)
+                    except Exception:
+                        pass
+                img, note = hin.capture_window(hwnd)
+                if img is None:
+                    blanks.append(f"#{i}:{note[:150]}")
+                    continue
+                d = hin.CAPTURE_DIAG
+                min_px = min(min_px, float(d.get("px") or 0.0))
+                sizes.add(img.size)
+                if ref is not None and img.tobytes() == ref.tobytes():
+                    stale += 1                        # informational: a parked app that never repaints is not a bug
+            dur = time.perf_counter() - t0
+            g1 = hin._gui_objects()
+            logged = [e for e in hin.CAPTURE_LOG if e.get("hwnd") == hwnd]
+            checks.append((f"no-blank-in-{n_captures}-captures", not blanks,
+                           f"blanks={len(blanks)} first={blanks[0] if blanks else '-'} "
+                           f"min_nonzero_pixel_fraction={min_px:.3f} sizes={sorted(sizes)} "
+                           f"CAPTURE_LOG_for_this_window={len(logged)}"))
+            checks.append(("gdi-user-budget-not-creeping", g0[0] >= 0 and (g1[0] - g0[0]) <= 60 and (g1[1] - g0[1]) <= 60,
+                           f"gdi {g0[0]}->{g1[0]} ({g1[0] - g0[0]:+d}), user {g0[1]}->{g1[1]} ({g1[1] - g0[1]:+d}); "
+                           f"the OS caps a process near 10k of each - the ceiling that would blind every later capture"))
+            checks.append(("captures-kept-the-window-own-content", bool(sizes) and min_px > 0.0,
+                           f"{n_captures - len(blanks)} images, sizes={sorted(sizes)}, identical-to-first={stale} "
+                           f"(a parked app legitimately stops repainting; only a blank is a defect)"))
+            checks.append(watch.check())
+            metrics.update(captures=n_captures, blanks=len(blanks), min_px=round(min_px, 4),
+                           gdi=f"{g0[0]}->{g1[0]}", user=f"{g0[1]}->{g1[1]}",
+                           secs=round(dur, 1), where=hin.CAPTURE_DIAG.get("where"))
+    finally:
+        _close_new_windows(before, "Notepad")
+    return TestOutcome(passed=all(ok for _n, ok, _d in checks), evidence=_fmt(checks, 260)[:3000], metrics=metrics)

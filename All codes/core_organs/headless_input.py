@@ -24,7 +24,7 @@ import logging
 import os
 import re
 import time
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger("hojaiga.headless_input")
 
@@ -79,6 +79,10 @@ if _IS_WINDOWS:
     _g32.DeleteObject.argtypes = [_H]
     _g32.DeleteDC.argtypes = [_H]
     _g32.GetDIBits.argtypes = [_H, _H, wt.UINT, wt.UINT, ctypes.c_void_p, ctypes.c_void_p, wt.UINT]
+    _g32.GetDIBits.restype = ctypes.c_int
+    _u32.GetGuiResources.argtypes = [_H, wt.UINT]
+    _u32.GetGuiResources.restype = wt.UINT
+    _k32.GetCurrentProcess.restype = _H
     _k32.GetCurrentThreadId.restype = wt.DWORD
     _dwm.DwmGetWindowAttribute.argtypes = [_H, wt.DWORD, ctypes.c_void_p, wt.DWORD]
 
@@ -655,28 +659,98 @@ def post_vk_chord(hwnd: int, vks: List[int], label: str = "") -> Tuple[bool, str
 # Capture (works for covered / partly off-screen windows; minimized reported honestly)
 # ---------------------------------------------------------------------------
 
+CAPTURE_DIAG: Dict[str, Any] = {}          # the Win32 truth of the most recent capture attempt
+CAPTURE_LOG: List[Dict[str, Any]] = []     # the recent blanks, oldest first (bounded)
+_CAPTURE_LOG_MAX = 30
+
+
+def _gui_objects() -> Tuple[int, int]:
+    """(GDI, USER) object counts of this process, -1 when the call is unavailable. Windows caps a
+    process at ~10k of each; a long unattended session that creeps to the cap stops being able to
+    make a device context, which is the one failure that would make EVERY capture come back blank."""
+    try:
+        proc = _k32.GetCurrentProcess()
+        return int(_u32.GetGuiResources(proc, 0)), int(_u32.GetGuiResources(proc, 1))
+    except Exception:  # noqa: BLE001
+        return -1, -1
+
+
+def _where_is_window(hwnd: int, r: "wt.RECT") -> str:
+    """Where the window sits: 'visible' (a person could see it), 'onscreen' (on a monitor, covered),
+    'parked' (off every monitor, how Hojaiga holds apps), 'min' or 'offscreen-zero' (no usable rect)."""
+    try:
+        from core_organs import background_window as bw
+        if _u32.IsIconic(hwnd):
+            return "min"
+        if r.right - r.left <= 1 or r.bottom - r.top <= 1:
+            return "offscreen-zero"
+        if not _u32.IsWindowVisible(hwnd):
+            return "not-visible"
+        if not bw._on_real_screen((r.left, r.top, r.right, r.bottom)):
+            return "parked"
+        return "visible" if bw.user_can_see(hwnd) else "onscreen"
+    except Exception:  # noqa: BLE001
+        return "?"
+
+
+def _capture_done(diag: Dict[str, Any], img, note: str):
+    diag["note"] = note
+    if img is None and not note.startswith("window-minimized"):
+        CAPTURE_LOG.append(dict(diag))
+        del CAPTURE_LOG[:-_CAPTURE_LOG_MAX]
+        logger.debug("[capture] blank %s", note)
+    return img, note
+
+
 def capture_window(hwnd: int):
     """Return (PIL.Image | None, reason). Uses PrintWindow(PW_RENDERFULLCONTENT) so the pixels
     are the window's OWN content even when other windows cover it or it is partly off-screen
     (a screen grab would capture whatever is on top instead). Minimized windows are not
-    rendered by Windows, so that case returns (None, 'window-minimized')."""
+    rendered by Windows, so that case returns (None, 'window-minimized').
+
+    A blank carries the Win32 truth in its note - [pw=PrintWindow returned, err=last error,
+    dib=rows read, obj=gdi/user objects, px=non-zero pixel %, where=onscreen/parked/min,
+    xaml=0/1] - because "the app never paints" and "this process can no longer capture"
+    look identical without it, and only the second one is a bug of ours (measured: identical
+    captures succeed in a fresh process and fail late in a long one). CAPTURE_DIAG holds the
+    last attempt, CAPTURE_LOG the recent blanks."""
+    diag = CAPTURE_DIAG           # one stable object: readers may hold it between captures
+    diag.clear()
+    diag.update({"hwnd": hwnd, "at": round(time.time(), 3)})
     if not (_IS_WINDOWS and is_alive(hwnd)):
-        return None, "window-gone"
+        return _capture_done(diag, None, "window-gone")
     if is_minimized(hwnd):
-        return None, "window-minimized"
+        diag["where"] = "min"
+        return _capture_done(diag, None, "window-minimized")
     try:
         from PIL import Image
         r = wt.RECT()
         _u32.GetWindowRect(hwnd, ctypes.byref(r))
         w, h = r.right - r.left, r.bottom - r.top
+        diag.update({"rect": f"{w}x{h}", "where": _where_is_window(hwnd, r)})
         if w <= 0 or h <= 0 or w * h > 8000 * 5000:
-            return None, "bad-window-size"
+            return _capture_done(diag, None, "bad-window-size")
         sdc = _u32.GetDC(None)
         mdc = _g32.CreateCompatibleDC(sdc)
         bmp = _g32.CreateCompatibleBitmap(sdc, w, h)
+        gdi, user = _gui_objects()
+        diag.update({"obj": f"{gdi}/{user}", "dc": int(bool(mdc)), "bmp": int(bool(bmp))})
+        if not mdc or not bmp:
+            # The quota answer, said out loud: a long-lived process that cannot even make a DC is
+            # out of GDI objects, and every later "the app did not paint" note would be a lie.
+            diag.update({"pw": None, "err": ctypes.get_last_error()})
+            if mdc:
+                _g32.DeleteDC(mdc)
+            if bmp:
+                _g32.DeleteObject(bmp)
+            _u32.ReleaseDC(None, sdc)
+            return _capture_done(diag, None, "capture-blank[pw=- err=%d dib=- obj=%s px=- where=%s "
+                                            "xaml=%d gdi-create-failed] (window did not render into PrintWindow)"
+                                % (diag["err"], diag["obj"], diag["where"], int(is_xaml_host(hwnd))))
         old = _g32.SelectObject(mdc, bmp)
         try:
             ok = _u32.PrintWindow(hwnd, mdc, 0x2)  # PW_RENDERFULLCONTENT
+            pw_err = ctypes.get_last_error()
 
             class BIH(ctypes.Structure):
                 _fields_ = [("biSize", wt.DWORD), ("biWidth", ctypes.c_long), ("biHeight", ctypes.c_long),
@@ -686,18 +760,28 @@ def capture_window(hwnd: int):
                             ("biClrImportant", wt.DWORD)]
             bih = BIH(ctypes.sizeof(BIH), w, -h, 1, 32, 0, 0, 0, 0, 0, 0)
             buf = (ctypes.c_ubyte * (w * h * 4))()
-            _g32.GetDIBits(mdc, bmp, 0, h, buf, ctypes.byref(bih), 0)
+            rows = _g32.GetDIBits(mdc, bmp, 0, h, buf, ctypes.byref(bih), 0)
         finally:
             _g32.SelectObject(mdc, old)
             _g32.DeleteObject(bmp)
             _g32.DeleteDC(mdc)
             _u32.ReleaseDC(None, sdc)
-        img = Image.frombuffer("RGBA", (w, h), bytes(buf), "raw", "BGRA", 0, 1).convert("RGB")
+        data = bytes(buf)
+        step = max(1, (w * h) // 6000) * 4
+        seen = data[::step]
+        nonzero = sum(1 for b in seen if b) / max(1, len(seen))
+        diag.update({"pw": int(ok), "err": pw_err, "dib": int(rows), "px": round(nonzero, 4)})
+        img = Image.frombuffer("RGBA", (w, h), data, "raw", "BGRA", 0, 1).convert("RGB")
         if not ok or img.getbbox() is None or not any(img.resize((8, 8)).getdata()):
-            return None, "capture-blank (window did not render into PrintWindow)"
-        return img, "ok"
+            return _capture_done(diag, None,
+                                 "capture-blank[pw=%d err=%d dib=%d obj=%s px=%.3f where=%s xaml=%d] "
+                                 "(window did not render into PrintWindow)"
+                                 % (int(ok), pw_err, rows, diag["obj"], nonzero, diag["where"],
+                                    int(is_xaml_host(hwnd))))
+        return _capture_done(diag, img, "ok")
     except Exception as exc:  # noqa: BLE001
-        return None, f"capture-error: {type(exc).__name__}: {exc}"
+        diag["exc"] = f"{type(exc).__name__}: {exc}"
+        return _capture_done(diag, None, f"capture-error: {type(exc).__name__}: {exc}")
 
 
 # ---------------------------------------------------------------------------

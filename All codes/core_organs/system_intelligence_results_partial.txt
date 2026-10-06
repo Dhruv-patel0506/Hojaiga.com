@@ -1,18 +1,9 @@
-Hojaiga System Intelligence Suite — 2026-10-05 16:16:14
+Hojaiga System Intelligence Suite — 2026-10-06 08:01:03
 
-[FAIL] LC2 [LIFECYCLE] LC2: the checkpoint chain on REAL apps - Notepad types and saves, Calculator computes, an irreversible delete is queued - against independent ground truth
-    evidence: file-saved-with-the-typed-words (independent read)=OK(hj_lc2_7d76c6.txt: 'lifecycle works'); calculator-shows-42 (independent read)=OK(display='Display is 42'); irreversible-delete-was-queued-not-run=OK(file survives=True status=ESCALATED); no-checkpoint-FAILed=OK(35 marks, failing: []); D3-gate-escalated=OK(D3.gate=ESCALATED); physical-pointer-untouched-and-no-guard-violations=FAIL(pointer (409, 610)->(1031, 537), guard violations+=0, largest 10 ms step=648px); total 108.1s; closed 4 window(s) we launched
-    duration: 111291.1 ms  metrics: {'seconds': 108.1, 'status': 'ESCALATED'}
-
-[PASS] DAY1 [AUTONOMY] DAY1: unattended task-list day: never stalls the queue, report matches ground truth
-    evidence: report done=2 failed=2 escalated=0 in 107s; self-report==ground-truth: True; every task accounted for: True; failed reasons=[('T3 no such skill', 'no template for this task'), ('T4 3D chair (no 3D app here)', "blocked at leaf 'seat'")]
-    duration: 118012.6 ms  metrics: {'done': 2, 'failed': 2, 'escalated': 0}
-
-[FAIL] KM1 [APPKNOW] KM1: mastery learns an app across runs, invisibly; the knowledge is true against an independent UIA walk
-    evidence: static facts before launch (toolkit + strategy)=OK; run 1 built a command map (79 commands)=OK; run 1 recorded state transitions (10)=OK; run 1 explored something ({'explored': 10, 'no_effect': 5, 'open': 51, 'unsafe': 3})=OK; run 2 continued and learned more (+52, explored 15 -> 23)=OK; independent UIA walk: 51 named controls, recall 1.0=OK; no physical input reached the OS (guard violations)=OK; the user's pointer did not move=FAIL; the app was closed afterwards=OK | missed=[]; 103s
-    duration: 103396.2 ms  metrics: {'checks': '8/9', 'run1_commands': 79, 'run2_commands': 125, 'transitions': 16, 'recall': 1.0}
+[FAIL] EYE1 [HEADLESS] EYE1: 300 headless captures of one parked window in THIS long-lived process never go blank and never grow the GDI/USER budget (the trust eyes must not flicker)
+    evidence: the test exceeded its per-test time limit (HOJAIGA_TEST_TIMEOUT_S): a hang is a FAIL, never a pass; thread stacks were written to scratch/hang_<id>.txt
+    duration: 20966.5 ms  metrics: {'hang': 'timeout', 'pointer': 'human-hand drift=2453px hw=317 inj=0', 'gdi_user_end': '1/7', 'proc': 'threads=33 handles=382 rss_mb=82', 'gdi_growth': '+0/+5'}
 
 
 RANKINGS
-1. Unattended task runs (templates + day report): 1/1 tests, score 70.0, avg 118012.6 ms
-2. Task lifecycle (A intake -> H report): 0/1 tests, score 0.0, avg 111291.1 ms
+1. Headless input (drag / off-screen capture): 0/1 tests, score 0.0, avg 20966.5 ms

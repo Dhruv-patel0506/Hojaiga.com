@@ -130,6 +130,7 @@ import enum
 import hashlib
 import json
 import logging
+import os
 import platform
 import struct
 import sys
@@ -589,52 +590,77 @@ class Win32Primitives:
 
     # ---- Capture ------------------------------------------------------------
     def capture_window_bitmap_bytes(self, hwnd: int) -> Tuple[int, int, bytes]:
-        """BitBlt-based capture. Returns (width, height, raw BGRA bytes)."""
+        """BitBlt-based capture. Returns (width, height, raw BGRA bytes), (0, 0, b"") on any failure.
+
+        Handle discipline is the point of the shape of this function: a process is capped at ~10,000
+        GDI objects, and a capped process cannot create a device context -- so ONE leaked handle here
+        is not a memory trinket, it is a step toward every later capture in the session coming back
+        blank and being reported as "the app did not render". Therefore: every handle is released in
+        `finally` (an exception between create and delete used to strand all three), the bitmap is
+        deselected before DeleteObject (a still-selected object cannot be deleted), and a NULL
+        creation returns honestly instead of painting on nothing."""
         if not IS_WINDOWS:
             return (0, 0, b"")
         rect = self.get_window_rect(hwnd)
         width = max(1, rect.right - rect.left)
         height = max(1, rect.bottom - rect.top)
 
-        hwnd_dc = user32.GetWindowDC(ctypes.c_void_p(hwnd))  # type: ignore
-        mem_dc = gdi32.CreateCompatibleDC(hwnd_dc)  # type: ignore
-        bitmap = gdi32.CreateCompatibleBitmap(hwnd_dc, width, height)  # type: ignore
-        gdi32.SelectObject(mem_dc, bitmap)  # type: ignore
+        hwnd_dc = mem_dc = bitmap = old_bmp = None
+        try:
+            hwnd_dc = user32.GetWindowDC(ctypes.c_void_p(hwnd))  # type: ignore
+            if not hwnd_dc:
+                return (0, 0, b"")
+            mem_dc = gdi32.CreateCompatibleDC(hwnd_dc)  # type: ignore
+            bitmap = gdi32.CreateCompatibleBitmap(hwnd_dc, width, height)  # type: ignore
+            if not mem_dc or not bitmap:
+                return (0, 0, b"")                 # out of GDI budget: say so, do not draw on nothing
+            old_bmp = gdi32.SelectObject(mem_dc, bitmap)  # type: ignore
 
-        PW_RENDERFULLCONTENT = 0x00000002
-        result = user32.PrintWindow(ctypes.c_void_p(hwnd), mem_dc, PW_RENDERFULLCONTENT)  # type: ignore
-        if not result:
-            SRCCOPY = 0x00CC0020
-            gdi32.BitBlt(mem_dc, 0, 0, width, height, hwnd_dc, 0, 0, SRCCOPY)  # type: ignore
+            PW_RENDERFULLCONTENT = 0x00000002
+            result = user32.PrintWindow(ctypes.c_void_p(hwnd), mem_dc, PW_RENDERFULLCONTENT)  # type: ignore
+            if not result:
+                SRCCOPY = 0x00CC0020
+                gdi32.BitBlt(mem_dc, 0, 0, width, height, hwnd_dc, 0, 0, SRCCOPY)  # type: ignore
 
-        buffer_size = width * height * 4
-        buf = ctypes.create_string_buffer(buffer_size)
+            buffer_size = width * height * 4
+            buf = ctypes.create_string_buffer(buffer_size)
 
-        class BITMAPINFOHEADER(ctypes.Structure):
-            _fields_ = [
-                ("biSize", ctypes.c_uint32), ("biWidth", ctypes.c_int32),
-                ("biHeight", ctypes.c_int32), ("biPlanes", ctypes.c_uint16),
-                ("biBitCount", ctypes.c_uint16), ("biCompression", ctypes.c_uint32),
-                ("biSizeImage", ctypes.c_uint32), ("biXPelsPerMeter", ctypes.c_int32),
-                ("biYPelsPerMeter", ctypes.c_int32), ("biClrUsed", ctypes.c_uint32),
-                ("biClrImportant", ctypes.c_uint32),
-            ]
+            class BITMAPINFOHEADER(ctypes.Structure):
+                _fields_ = [
+                    ("biSize", ctypes.c_uint32), ("biWidth", ctypes.c_int32),
+                    ("biHeight", ctypes.c_int32), ("biPlanes", ctypes.c_uint16),
+                    ("biBitCount", ctypes.c_uint16), ("biCompression", ctypes.c_uint32),
+                    ("biSizeImage", ctypes.c_uint32), ("biXPelsPerMeter", ctypes.c_int32),
+                    ("biYPelsPerMeter", ctypes.c_int32), ("biClrUsed", ctypes.c_uint32),
+                    ("biClrImportant", ctypes.c_uint32),
+                ]
 
-        bmi = BITMAPINFOHEADER()
-        bmi.biSize = ctypes.sizeof(BITMAPINFOHEADER)
-        bmi.biWidth = width
-        bmi.biHeight = -height
-        bmi.biPlanes = 1
-        bmi.biBitCount = 32
-        bmi.biCompression = 0
+            bmi = BITMAPINFOHEADER()
+            bmi.biSize = ctypes.sizeof(BITMAPINFOHEADER)
+            bmi.biWidth = width
+            bmi.biHeight = -height
+            bmi.biPlanes = 1
+            bmi.biBitCount = 32
+            bmi.biCompression = 0
 
-        gdi32.GetDIBits(mem_dc, bitmap, 0, height, buf, ctypes.byref(bmi), 0)  # type: ignore
-
-        gdi32.DeleteObject(bitmap)  # type: ignore
-        gdi32.DeleteDC(mem_dc)  # type: ignore
-        user32.ReleaseDC(ctypes.c_void_p(hwnd), hwnd_dc)  # type: ignore
-
-        return (width, height, buf.raw)
+            got = gdi32.GetDIBits(mem_dc, bitmap, 0, height, buf, ctypes.byref(bmi), 0)  # type: ignore
+            if not got:
+                return (0, 0, b"")
+            return (width, height, buf.raw)
+        except Exception:                          # a capture is never worth killing an organ
+            return (0, 0, b"")
+        finally:
+            if bitmap and old_bmp:                 # deselect first: a selected object cannot be deleted
+                try:
+                    gdi32.SelectObject(mem_dc, old_bmp)  # type: ignore
+                except Exception:  # noqa: BLE001
+                    pass
+            if bitmap:
+                gdi32.DeleteObject(bitmap)  # type: ignore
+            if mem_dc:
+                gdi32.DeleteDC(mem_dc)  # type: ignore
+            if hwnd_dc:
+                user32.ReleaseDC(ctypes.c_void_p(hwnd), hwnd_dc)  # type: ignore
 
 
 WIN32 = Win32Primitives()
@@ -1167,23 +1193,64 @@ class OCREngine:
         except ImportError:
             self.available = False
 
+    def _image_of(self, node: DAPNode, capture: CaptureEngine):
+        result = capture.capture(node, CaptureOptions(format="raw_bgra"))
+        if result.status != "SUCCESS" or not result.width or not result.height:
+            raise DAPError(DAPErrorCode.ERR_OCR_ENGINE_FAILURE, "Capture failed for OCR pass")
+        import base64
+        raw = base64.b64decode(result.payload_base64)
+        return self._Image.frombuffer("RGBA", (result.width, result.height), raw, "raw", "BGRA", 0, 1).convert("RGB")
+
+    def words(self, node: DAPNode, capture: CaptureEngine, min_conf: float = 30.0) -> List[dict]:
+        """Every recognised word WITH ITS BOX, in SCREEN coordinates (the captured window's own top-left plus the pixel offset): this is what
+        lets an OCR selector be ACTED on - a click lands on the word, not on 'somewhere in the window'. Words of a window that exposes no
+        UIA tree at all (a custom-drawn dialog, a canvas app) are still readable this way."""
+        if not self.available:
+            raise DAPError(DAPErrorCode.ERR_OCR_ENGINE_FAILURE, "OCR backend (pytesseract) not installed")
+        img = self._image_of(node, capture)
+        # small dialogs OCR better enlarged; the factor is undone below
+        k = 2 if max(img.size) < 900 else 1
+        big = img.resize((img.width * k, img.height * k)) if k > 1 else img
+        d = self._pytesseract.image_to_data(big, output_type=self._pytesseract.Output.DICT)
+        out: List[dict] = []
+        for i, txt in enumerate(d.get("text", [])):
+            t = (txt or "").strip()
+            try:
+                conf = float(d["conf"][i])
+            except (TypeError, ValueError):
+                conf = -1.0
+            if not t or conf < min_conf:
+                continue
+            x, y, w, h = (int(d[k_][i]) // k for k_ in ("left", "top", "width", "height"))
+            out.append({"text": t, "conf": conf, "block": int(d["block_num"][i]), "line": int(d["line_num"][i]),
+                        "left": node.bounds.left + x, "top": node.bounds.top + y,
+                        "right": node.bounds.left + x + w, "bottom": node.bounds.top + y + h})
+        return out
+
     def query(self, node: DAPNode, text_pattern: str, capture: CaptureEngine) -> List[DAPNode]:
         if not self.available:
             raise DAPError(DAPErrorCode.ERR_OCR_ENGINE_FAILURE,
                             "OCR backend (pytesseract) not installed")
-        result = capture.capture(node, CaptureOptions(format="raw_bgra"))
-        if result.status != "SUCCESS":
-            raise DAPError(DAPErrorCode.ERR_OCR_ENGINE_FAILURE, "Capture failed for OCR pass")
-        import base64
-        raw = base64.b64decode(result.payload_base64)
-        image = self._Image.frombuffer(
-            "RGBA", (result.width, result.height), raw, "raw", "BGRA", 0, 1)
+        image = self._image_of(node, capture)
         text = self._pytesseract.image_to_string(image)
         matches: List[DAPNode] = []
         if text_pattern.lower() in text.lower():
+            bounds = node.bounds
+            try:                       # narrow the match to the phrase's own box when the words can be located
+                want = text_pattern.lower().split()
+                ws = self.words(node, capture)
+                for i in range(len(ws) - len(want) + 1):
+                    if [w["text"].lower().strip(".,:;!?") for w in ws[i:i + len(want)]] == want:
+                        seg = ws[i:i + len(want)]
+                        bounds = Rect(left=min(w["left"] for w in seg), top=min(w["top"] for w in seg),
+                                      right=max(w["right"] for w in seg), bottom=max(w["bottom"] for w in seg),
+                                      scale_factor=node.bounds.scale_factor)
+                        break
+            except Exception:  # noqa: BLE001 - the phrase is still PRESENT; only its box is unknown
+                pass
             hit = DAPNode(
                 node_id=str(uuid.uuid4()), parent_node_id=node.node_id,
-                hwnd=node.hwnd, bounds=node.bounds, control_type="OCRMatch",
+                hwnd=node.hwnd, bounds=bounds, control_type="OCRMatch",
                 name=text_pattern, ocr_text=text[:512],
             )
             matches.append(hit)
@@ -1283,10 +1350,181 @@ class PopupSubsystem:
         return WIN32.post_message(node.hwnd, Win32Primitives.WM_CLOSE, 0, 0)
 
 
+# ==============================================================================
+# SECTION 11B - FILE-DIALOG RECOGNITION (one shared shape test, no vendor branch)
+# ==============================================================================
+# WHAT a file dialog is gets declared below as data; the functions only ever ask a window for its
+# SHAPE. No application name appears in any control-flow path, so the next family that draws its own
+# picker needs a line of data (or nothing at all, if its shape is honest) instead of a new branch.
+# Measured reason this exists (2026-10-05, a spreadsheet): recognition was "class is '#32770' AND the
+# title contains save/open" -- and that app's own picker is an UNTITLED window of a different class, so
+# the dialog opened, the loop never knew it existed, and the app sat modal behind it while the loop
+# clicked an empty screen and the pane looked blank.
+DIALOG_CLASS_CERTAIN = ("#32770",)              # the Win32 common dialog: an OS contract, certain
+DIALOG_NAME_FIELD_AIDS = ("1001",)              # IDFILENAME: a Win32 control id, locale-independent
+DIALOG_ACCEPT_AIDS = ("1",)                     # IDOK: the same contract, the accept button's control id
+# Window KINDS that are known to host a name box. These are OS/vendor window-class names, not app names:
+# they count as evidence for the shape test, never as an identity, and never skip the shape test.
+DIALOG_CLASS_RECOGNISED = ("NUIDialog",)
+DIALOG_TITLE_HINTS = ("save", "open", "export", "browse", "download", "load", "import")   # ordering hint
+DIALOG_ACCEPT_WORDS = ("save", "open", "ok", "export", "import", "select", "choose")     # what 'accept' is called
+DIALOG_NEVER_PRESS = ("cancel", "close", "back", "skip", "copy", "rename", "delete", "help",
+                      "more options")            # never the accept button of a save
+DIALOG_EDIT_ROLES = ("editcontrol", "comboboxcontrol")
+DIALOG_ACCEPT_ROLES = ("buttoncontrol", "hyperlinkcontrol", "splitbuttoncontrol")
+DIALOG_FSVIEW_ROLES = ("listcontrol", "treecontrol", "datagridcontrol", "tablecontrol")
+DIALOG_FSITEM_ROLES = ("listitemcontrol", "treeitemcontrol", "dataitemcontrol")
+
+# A route is a sequence of label patterns to press, one per hop, when a dialog will NOT take an
+# absolute path. It is DATA: a family that needs one gets a tuple here, not a new code path, and a
+# route that matches nothing in the app's own tree is skipped and the refusal is reported.
+DIALOG_PATH_ROUTES: Tuple[Tuple[str, ...], ...] = (("more options", "browse"),)
+
+
+def _window_class(hwnd: int) -> str:
+    try:
+        return hin._class_name(int(hwnd)) or ""
+    except Exception:  # noqa: BLE001
+        return ""
+
+
+def is_owned_top_level(hwnd: int) -> bool:
+    """True for a modal/auxiliary window, false for an application main frame (a frame owns nothing).
+    A locale- and vendor-neutral way to tell 'a dialog the app put up' from 'the app itself'."""
+    try:
+        GW_OWNER = 4
+        user32.GetWindow.restype = ctypes.c_void_p              # type: ignore
+        user32.GetWindow.argtypes = [ctypes.c_void_p, ctypes.c_uint]  # type: ignore
+        return bool(user32.GetWindow(ctypes.c_void_p(int(hwnd)), GW_OWNER))
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def file_dialog_shape(hwnd: int, nodes: Optional[List[Any]] = None,
+                      timeout_ms: int = 2500) -> Dict[str, Any]:
+    """Ask one window for the shape of a file dialog. Never raises: an unreadable window is simply not a
+    dialog, and the reason is returned so the caller can say it out loud instead of guessing.
+
+    certain   = the OS common-dialog class, or the tree carries the Win32 IDFILENAME control (aid 1001).
+    plausible = a window that looks like a name-and-accept picker. For a family we have never met that
+                means: an owned top-level (a modal, not the main frame), a SETTABLE name box, an enabled
+                accept button, and proof the box is about the file system (a file list/tree, or items
+                named like files). For a window kind listed in DIALOG_CLASS_RECOGNISED the name box and
+                the accept button are enough -- the class says what kind of window it is, the shape says
+                whether this one is holding a file name. That proof is what stops a Find/Replace or
+                Rename box from being filled with a path."""
+    out: Dict[str, Any] = {"hwnd": int(hwnd), "class": _window_class(hwnd), "certain": False,
+                           "plausible": False, "shape_ok": False, "name_edit": False,
+                           "name_settable": False, "accept": False, "fs_visible": False,
+                           "nodes": 0, "read": "no-uia"}
+    if nodes is None:
+        try:
+            from core_organs import fast_uia as _fu
+            nodes = _fu.snapshot(int(hwnd), timeout_ms=timeout_ms) or []
+        except Exception as exc:  # noqa: BLE001
+            out["read"] = f"uia-read-failed:{type(exc).__name__}"
+            return out
+    out["nodes"] = len(nodes or [])
+    out["read"] = "ok" if nodes else "empty-tree"
+    name_by_aid = name_loose = name_plain = accepts = fs_view = fs_items = 0
+    for n in nodes or []:
+        ctype = (getattr(n, "ctype", "") or "").lower()
+        aid = str(getattr(n, "aid", "") or "").strip()
+        nm = (getattr(n, "name", "") or "").strip().lower()
+        pats = tuple(getattr(n, "pats", ()) or ())
+        if ctype in DIALOG_EDIT_ROLES and not aid.startswith("System."):
+            name_plain += 1
+            if aid in DIALOG_NAME_FIELD_AIDS:
+                name_by_aid += 1
+            if "value" in pats or "text" in pats:
+                name_loose += 1
+        if (ctype in DIALOG_ACCEPT_ROLES and getattr(n, "enabled", True)
+                and "invoke" in pats and not any(w in nm for w in DIALOG_NEVER_PRESS)):
+            accepts += 1
+        if ctype in DIALOG_FSVIEW_ROLES:
+            fs_view += 1
+        if ctype in DIALOG_FSITEM_ROLES and looks_like_file_name(nm):
+            fs_items += 1
+    known_kind = out["class"] in DIALOG_CLASS_RECOGNISED
+    out["name_edit"] = bool(name_plain or name_by_aid)
+    out["name_settable"] = bool(name_loose or name_by_aid)
+    out["accept"] = bool(accepts)
+    out["fs_visible"] = bool(fs_view or fs_items)
+    out["certain"] = bool(out["name_edit"] and out["accept"]) and (
+        out["class"] in DIALOG_CLASS_CERTAIN or name_by_aid > 0)
+    out["plausible"] = (not out["certain"]) and bool(out["accept"]) and bool(
+        (known_kind and out["name_edit"])
+        or (out["name_settable"] and is_owned_top_level(hwnd) and out["fs_visible"]))
+    out["shape_ok"] = bool(out["certain"] or out["plausible"])
+    return out
+
+
+def looks_like_file_name(text: str) -> bool:
+    """'report.pdf' yes, 'Documents' no: a trailing 1-6 character extension. Shape only, locale-neutral."""
+    t = (text or "").strip()
+    if "." not in t or len(t) > 80:
+        return False
+    tail = t.rsplit(".", 1)[-1]
+    return bool(tail) and tail.isascii() and (tail.isalnum() or "_" in tail) and len(tail) <= 6
+
+
+def find_file_dialogs(owner_pid: int = 0, limit: int = 4, timeout_ms: int = 2500,
+                      title_hints_first: bool = True) -> List[Dict[str, Any]]:
+    """Every visible file dialog on the desktop, best first, each with its shape report attached.
+
+    Cost is bounded on purpose: the cheap filters (visible, same process, class hint or owned modal) run
+    on every window, and the UIA shape read -- the expensive part -- is spent on at most `limit` candidates
+    at at most `timeout_ms` each. `owner_pid` scopes it to the app being driven; a picker belonging to
+    anything else is never touched."""
+    found: List[Dict[str, Any]] = []
+    if not IS_WINDOWS:
+        return found
+    cand: List[int] = []
+
+    @ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
+    def _cb(hwnd, _l):
+        try:
+            if not user32.IsWindowVisible(ctypes.c_void_p(int(hwnd))):   # type: ignore
+                return True
+            cls = _window_class(hwnd)
+            pid = ctypes.c_uint(0)
+            user32.GetWindowThreadProcessId(ctypes.c_void_p(int(hwnd)), ctypes.byref(pid))  # type: ignore
+            if owner_pid and int(pid.value) != int(owner_pid):
+                return True
+            cheap_dialog = (cls in DIALOG_CLASS_CERTAIN or cls in DIALOG_CLASS_RECOGNISED)
+            if not (cheap_dialog or is_owned_top_level(int(hwnd))):
+                return True                                    # a main frame never hosts the picker
+            cand.append(int(hwnd))
+        except Exception:  # noqa: BLE001
+            pass
+        return True
+
+    user32.EnumWindows(_cb, 0)  # type: ignore
+    for hwnd in cand[:max(1, int(limit))]:
+        rep = file_dialog_shape(hwnd, timeout_ms=timeout_ms)
+        if rep["shape_ok"]:
+            rep["title_hint"] = any(w in (hin.safe_window_text(hwnd) or "").lower()
+                                    for w in DIALOG_TITLE_HINTS) if title_hints_first else False
+            found.append(rep)
+    found.sort(key=lambda r: (not r["certain"], not r.get("title_hint"), -r["nodes"]))
+    return found
+
+
 class NativeFilePicker:
     """
     Drives the OS-native Open/Save file dialog: directory scan, search,
     validation, selection, open, verify, and focus restoration.
+
+    Recognition is NOT done here: it asks the one shared shape test below
+    (`file_dialog_shape` / `find_file_dialogs`), so a dialog cannot be a file dialog to
+    one caller and not to another.
+
+    Proof is not optional in this class. It used to pick 'the first Edit under the dialog'
+    and write with WM_SETTEXT, which is exactly the two ways a save silently fails: the first
+    Edit is often a file-LIST CELL, and a programmatic text set does not raise the change events
+    an app uses to re-validate its accept button (measured in a spreadsheet's own picker: the box
+    showed the typed path while Save stayed disabled). So: find the box by its own identity, type
+    it character by character, and READ THE BOX BACK - and raise instead of claiming success.
     """
 
     def __init__(self, window_tree: WindowTree, interaction: InteractionPipeline,
@@ -1296,27 +1534,92 @@ class NativeFilePicker:
         self._popups = popups
 
     def locate_dialog(self) -> Optional[DAPNode]:
+        """Best-shaped file dialog, by SHAPE (the same test every other caller gets). A window whose
+        tree cannot be read is NOT accepted here: a blind class/title match is how a Find box gets
+        filled with a path. desktop_grounding keeps a separate bounded fallback for the unreadable
+        case, and it says out loud that the dialog was taken unverified."""
+        best = None
         for node in self._tree.nodes().values():
-            if node.class_name in ("#32770",) and (
-                "open" in node.name.lower() or "save" in node.name.lower()):
-                return node
-        return None
+            if not node.hwnd:
+                continue
+            rep = file_dialog_shape(int(node.hwnd))
+            if rep["shape_ok"] and (best is None or rep["nodes"] > best[1]["nodes"]):
+                best = (node, rep)
+        return best[0] if best else None
+
+    @staticmethod
+    def _box_is_name_worthy(n: Any, aid: str, cls: str) -> bool:
+        """Identity, not position: the Win32 name-field id first, then an editable control that is
+        not a file-list column cell. Never 'whatever the tree happened to list first'."""
+        ctype = (getattr(n, "ctype", "") or "").lower()
+        if ctype not in DIALOG_EDIT_ROLES and "edit" not in cls.lower():
+            return False
+        if aid.startswith("System."):
+            return False
+        if aid and any(a == aid for a in DIALOG_NAME_FIELD_AIDS):
+            return True
+        return True
+
+    def _find_name_box(self, dialog: DAPNode) -> Tuple[int, Any]:
+        """(hwnd, node) of the box a file name is typed into, preferring the dialog's OWN UIA tree."""
+        try:
+            from core_organs import fast_uia as _fu
+            for n in (_fu.snapshot(int(dialog.hwnd), timeout_ms=2500) or []):
+                aid = str(getattr(n, "aid", "") or "").strip()
+                if not self._box_is_name_worthy(n, aid, str(getattr(n, "cls", "") or "")):
+                    continue
+                h = 0
+                try:
+                    h = int(getattr(n, "ctrl", None) and n.ctrl.NativeWindowHandle or 0)
+                except Exception:  # noqa: BLE001
+                    h = 0
+                if h:
+                    return h, n
+        except Exception:  # noqa: BLE001
+            pass
+        for n in self._tree.nodes().values():           # Win32-only dialogs (the common one) land here
+            if n.parent_node_id != dialog.node_id:
+                continue
+            aid = str(n.automation_id or "").strip()
+            if self._box_is_name_worthy(n, aid, n.class_name) and n.hwnd:
+                return int(n.hwnd), n
+        return 0, None
 
     def select_path(self, dialog: DAPNode, path: str) -> ExecutionResult:
-        edit_targets = [n for n in self._tree.nodes().values()
-                        if n.parent_node_id == dialog.node_id and n.class_name == "Edit"]
-        if not edit_targets:
+        box, _node = self._find_name_box(dialog)
+        if not box:
             raise DAPError(DAPErrorCode.ERR_NODE_NOT_FOUND,
-                            "No filename Edit control found in file picker dialog")
-        return self._interaction.set_value(edit_targets[0], path)
+                            "No name box found in file picker dialog (never guessing the first edit)")
+        WIN32.send_message(box, 0x00B1, 0, -1)            # EM_SETSEL(0,-1): mark everything
+        WIN32.send_message(box, 0x0303, 0, 0)             # WM_CLEAR, so the app sees a real edit
+        ok, how = hin.post_text(box, path)
+        if not ok:
+            raise DAPError(DAPErrorCode.ERR_BACKGROUND_UNSUPPORTED, f"could not type into the name box: {how}")
+        time.sleep(0.35)
+        got = WIN32.get_control_text(box)                 # the proof: does the app agree the box holds this?
+        if os.path.basename(path).lower() not in (got or "").lower():
+            raise DAPError(DAPErrorCode.ERR_NODE_NOT_FOUND,
+                            f"name box did not take the value (reads '{got}')")
+        return ExecutionResult(status="SUCCESS", execution_time_ms=0.0,
+                               background_executed=True,
+                               node_state={"box": box, "read_back": got, "delivery": how})
 
     def confirm(self, dialog: DAPNode) -> ExecutionResult:
-        buttons = [n for n in self._tree.nodes().values()
-                   if n.parent_node_id == dialog.node_id and n.class_name == "Button"
-                   and n.name.lower() in ("open", "save", "ok")]
-        if not buttons:
+        """Press the dialog's accept control, chosen by IDENTITY (Win32 IDOK, or a caption the app
+        itself calls 'accept'), scoped to THIS dialog's process - never a button in some other window."""
+        want = tuple(str(a) for a in DIALOG_ACCEPT_AIDS)
+        cands = [n for n in self._tree.nodes().values()
+                 if n.parent_node_id == dialog.node_id
+                 and (n.class_name or "").lower() in ("button", "buttoncontrol")
+                 and n.is_enabled
+                 and not any(w in (n.name or "").lower() for w in DIALOG_NEVER_PRESS)]
+        pick = next((n for n in cands if str(n.automation_id or "").strip() in want), None) \
+            or next((n for n in cands if any((n.name or "").strip().lower().startswith(w)
+                                             for w in DIALOG_ACCEPT_WORDS)), None) \
+            or (cands[0] if cands else None)
+        if pick is None:
             raise DAPError(DAPErrorCode.ERR_NODE_NOT_FOUND, "No confirm button found")
-        return self._interaction.invoke(buttons[0])
+        return self._interaction.invoke(pick)
 
 
 # ==============================================================================

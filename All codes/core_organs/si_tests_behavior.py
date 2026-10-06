@@ -75,6 +75,25 @@ class LiveApp:
         self._bg = None
         self.launch_note = ""
 
+    def _await_window(self, before: "set[int]", seconds: float = 20.0) -> int:
+        end = time.time() + seconds
+        while time.time() < end:
+            time.sleep(0.4)
+            new = [h for h in _top_windows(self.cls) if h not in before]
+            if new:
+                return new[0]
+        return 0
+
+    def _ours_stale(self) -> int:
+        """A live window of this app's class that the OWNERSHIP registry says WE made (never the user's)."""
+        from core_organs import background_window as bw
+        for h in bw.ours_alive():
+            b = ctypes.create_unicode_buffer(256)
+            _u32.GetClassNameW(h, b, 256)
+            if self.cls in b.value.lower() and (_u32.IsWindowVisible(h) or _u32.IsIconic(h)):
+                return h
+        return 0
+
     def _stabilize(self, fg_before: int, seconds: float = 6.0) -> None:
         """Apps run their own startup (session restore re-opens tabs, restores the window and
         activates it AFTER our minimize). Harness hygiene: keep the window minimized until it has
@@ -94,16 +113,23 @@ class LiveApp:
         except Exception as exc:
             self.why = f"cannot launch {self.exe}: {exc}"
             return self
-        end = time.time() + 20
-        while time.time() < end:
-            time.sleep(0.4)
-            new = [h for h in _top_windows(self.cls) if h not in before]
-            if new:
-                self.hwnd = new[0]
-                break
+        self.hwnd = self._await_window(before)
+        if not self.hwnd:
+            # A single-instance app that refuses a second window is only a genuine ENV-BLOCK when some OTHER
+            # process owns the live window. If the live one is OURS (a test that died mid-run), that is a harness
+            # leak and self-healing is the honest move: close our own window, launch again, wait once more.
+            stale = self._ours_stale()
+            if stale:
+                from core_organs import universal_scan as us
+                if us.close_window(stale, timeout_s=6.0, discard_unsaved=True):
+                    self.launch_note = f"reclaimed our own leaked window {stale}; relaunched"
+                    self.hwnd = self._await_window(before)
         if not self.hwnd:
             self.why = "no new window appeared"
             return self
+        from core_organs import background_window as bw
+        bw.mark_ours(self.hwnd)                                  # this module created it: safe to park/close, and
+        # the suite's boundary reclaim can find it even if this test dies before __exit__
         _u32.ShowWindow(self.hwnd, 7)                            # minimize without activating (some apps ignore the launch flag)
         self._stabilize(fg_before)
         # readiness: wait until the UIA tree actually exposes controls (a loaded machine is slow)
@@ -871,6 +897,9 @@ def run_lm1(TestOutcome):
 
 # --------------------------------------------------------------------------- MIN1: never seen, never focused
 
+_gdi = ctypes.windll.gdi32
+
+
 class _ScreenMonitor:
     """Samples every ~20 ms: did the target app (or any of its windows) ever become the foreground
     window, and how many pixels of any of its windows were ever on a REAL monitor?"""
@@ -888,6 +917,16 @@ class _ScreenMonitor:
         self.fg_run_ms = 0.0
         self.max_fg_run_ms = 0.0
         self.samples = 0
+        self.who: Dict[str, int] = {}
+        self.phase = "start"
+        self.by_phase: Dict[str, float] = {}
+        import collections
+        self._dts = collections.deque(maxlen=101)
+        self._ep_start = None
+        self._fg_start = None
+        self.max_fg_raw_ms = 0.0
+        self._rgn = ctypes.windll.gdi32.CreateRectRgn(0, 0, 0, 0)       # ONE scratch region for GetWindowRgn (freed in stop(): no GDI leak)
+        self._own: Dict[int, Tuple[float, bool]] = {}
         self._stop = False
         self._target_cls = ""
         self._t = threading.Thread(target=self._run, daemon=True)
@@ -903,9 +942,33 @@ class _ScreenMonitor:
 
     def _ours(self, h: int) -> bool:
         """The target window itself, or a popup/dialog/flyout of the same process (different class).
-        Other main windows of the same app (same class) belong to someone else."""
+        Other main windows of the same app (same class) belong to someone else. Cached for 0.5 s per window: the answer is asked for every window
+        on every sample, and a monitor that burns the interpreter slows the very thing it is measuring."""
+        if h == self.hwnd:
+            return True
+        c = self._own.get(h)
+        now = time.perf_counter()
+        if c and now - c[0] < 0.5:
+            return c[1]
         from core_organs import background_window as bw
-        return h == self.hwnd or bw.holds_app_focus(h, self.hwnd, self.pid.value)
+        v = bool(bw.holds_app_focus(h, self.hwnd, self.pid.value))
+        self._own[h] = (now, v)
+        return v
+
+    def _period(self) -> float:
+        """The sampling period as it really was (median gap between quiet samples): the resolution of every number this monitor reports."""
+        d = sorted(self._dts)
+        return d[len(d) // 2] if d else 10.0
+
+    def _tids(self):
+        if time.perf_counter() - getattr(self, "_tids_at", -9) > 0.4:
+            self._tids_at = time.perf_counter()
+            try:
+                import psutil
+                self._tid_list = [t.id for t in psutil.Process(self.pid.value).threads()]
+            except Exception:
+                self._tid_list = []
+        return self._tid_list
 
     def _run(self):
         screens = self._screens()
@@ -916,11 +979,21 @@ class _ScreenMonitor:
                 now0 = time.perf_counter()
                 dfg = (now0 - getattr(self, "_lastfg", now0)) * 1000
                 self._lastfg = now0
+                from core_organs import background_window as _bwf
+                present = _bwf.user_idle_ms() <= _bwf.FOCUS_IDLE_MS                     # a person is at the keyboard / mouse right now
                 if self._ours(fg):
                     self.fg_hits += 1
-                    self.fg_run_ms += dfg
-                    self.max_fg_run_ms = max(self.max_fg_run_ms, self.fg_run_ms)
+                    if self._fg_start is None:
+                        self._fg_start = now0
+                    raw_run = (now0 - self._fg_start) * 1000 + self._period()
+                    self.max_fg_raw_ms = max(self.max_fg_raw_ms, raw_run)
+                    if present:                                                          # only a hold WHILE the user is present can misdirect their input
+                        self.fg_run_ms = raw_run
+                        self.max_fg_run_ms = max(self.max_fg_run_ms, self.fg_run_ms)
+                    else:
+                        self.fg_run_ms = 0.0
                 else:
+                    self._fg_start = None
                     self.fg_run_ms = 0.0
                 worst = 0
 
@@ -930,6 +1003,12 @@ class _ScreenMonitor:
                     p = ctypes.c_ulong()
                     _u32.GetWindowThreadProcessId(h, ctypes.byref(p))
                     if self._ours(h) and _u32.IsWindowVisible(h) and not _u32.IsIconic(h):
+                        if _gdi.GetWindowRgn(h, self._rgn) == 1:            # NULLREGION: a window with an empty region draws nothing anywhere
+                            return True
+                        if _u32.GetWindowLongW(h, -20) & 0x00080000:        # a LAYERED window at alpha 0 puts no pixel on any screen
+                            _al, _fl, _ck = ctypes.c_ubyte(255), wt.DWORD(0), wt.DWORD(0)
+                            if _u32.GetLayeredWindowAttributes(h, ctypes.byref(_ck), ctypes.byref(_al), ctypes.byref(_fl)) and (_fl.value & 2) and _al.value == 0:
+                                return True
                         r = wt.RECT()
                         _u32.GetWindowRect(h, ctypes.byref(r))
                         for sl, st, sr, sb in screens:
@@ -937,19 +1016,39 @@ class _ScreenMonitor:
                             hh = min(r.bottom, sb) - max(r.top, st)
                             if w > 0 and hh > 0:
                                 worst = max(worst, w * hh)
+                                if w * hh > 16:                    # WHO is on screen (a dialog of the app is not the app's main window)
+                                    tb = ctypes.create_unicode_buffer(60)
+                                    _u32.GetWindowTextW(h, tb, 60)
+                                    k = ("MAIN" if h == self.hwnd else "popup") + ":" + self._cls(h)[:22] + ":" + tb.value[:22]
+                                    self.who[k] = self.who.get(k, 0) + 1
                     return True
-                _u32.EnumWindows(cb, 0)
+                # Sampling resolution is the measurement: a full-desktop EnumWindows took ~85 ms per sample (a one-frame flash then READ as 85-170 ms).
+                # The app's own UI threads hold its windows and its flyouts: enumerating just those is ~100x cheaper (a few ms per sample).
+                tids = self._tids()
+                if tids:
+                    for _tid in tids:
+                        _u32.EnumThreadWindows(_tid, cb, 0)
+                else:
+                    _u32.EnumWindows(cb, 0)
                 now = time.perf_counter()
                 dt_ms = (now - getattr(self, "_last", now)) * 1000
                 self._last = now
                 self.samples += 1
                 self.max_px = max(self.max_px, worst)
+                period = self._period()
                 if worst > 16:
                     self.exposed_samples += 1
-                    self.run_ms += dt_ms
+                    # an EPISODE is first-sighting -> last-sighting (+ one sampling period), NOT the sum of raw sample gaps: a sample that was
+                    # starved of the interpreter for 150 ms must not turn a one-frame flash into 150 ms of exposure
+                    if self._ep_start is None:
+                        self._ep_start = now
+                    self.by_phase[self.phase] = round(self.by_phase.get(self.phase, 0.0) + min(dt_ms, 2 * period), 1)
+                    self.run_ms = (now - self._ep_start) * 1000 + period
                     self.max_run_ms = max(self.max_run_ms, self.run_ms)
                 else:
+                    self._ep_start = None
                     self.run_ms = 0.0
+                    self._dts.append(dt_ms)
             except Exception:
                 pass
             time.sleep(0.02)
@@ -961,6 +1060,10 @@ class _ScreenMonitor:
     def stop(self):
         self._stop = True
         self._t.join(timeout=2)
+        try:
+            ctypes.windll.gdi32.DeleteObject(self._rgn)
+        except Exception:
+            pass
 
 
 def run_min1(TestOutcome):
@@ -983,11 +1086,15 @@ def run_min1(TestOutcome):
                 fg0 = _u32.GetForegroundWindow()
                 mon = _ScreenMonitor(la.hwnd).start()
                 t0 = time.time()
+                mon.phase = "e0"
                 e0 = bm.crawl_e0(m, app, la.hwnd)
+                mon.phase = "layout"
                 lay = lm.map_layout(m, app, la.hwnd)
                 cand = next((c for c in m.commands(key, limit=500) if c["risk"] == "E1"
                              and "page setup" in c["name"].lower()), None)
+                mon.phase = "e1-probe"
                 probe = bm.probe_e1(m, app, la.hwnd, cand) if cand else {"skipped": "no page-setup in this app"}
+                mon.phase = "capture"
                 # OCR/vision precondition: PrintWindow only works on a non-minimized window
                 with bw.BackgroundSession(la.hwnd):
                     # a window restored a moment ago has not repainted yet: poll (bounded) like the product's rung does
@@ -997,6 +1104,7 @@ def run_min1(TestOutcome):
                         time.sleep(0.2)
                         img, why = hin.capture_window(la.hwnd)
                 tpl = {}
+                mon.phase = "template"
                 if app == "notepad":
                     m.load_pack_dir()
                     path = os.path.join(tempfile.gettempdir(), "hj_min1_" + uuid.uuid4().hex[:6] + ".txt")
@@ -1026,8 +1134,8 @@ def run_min1(TestOutcome):
                             f"(File@{f[0]['center_rel'] if f else None}), E1 probe effect={probe.get('effect_observed')} "
                             f"unwound={probe.get('unwound')}, capture={'ok' if img is not None else why}, "
                             + (f"template completed={tpl.get('completed')} truth={truth}, " if tpl else "")
-                            + f"| FOCUS: target-held-foreground longest={mon.max_fg_run_ms:.0f}ms ({mon.fg_hits}/{mon.samples} samples), brief-exposure-samples(>16px)={mon.exposed_samples} "
-                            f"longest-continuous-exposure={mon.max_run_ms:.0f}ms max-visible-px={mon.max_px} | ended minimized={still_min} placement-restored={restored} {dt:.0f}s"
+                            + f"| FOCUS: target-held-foreground while-user-present longest={mon.max_fg_run_ms:.0f}ms (raw incl. idle {mon.max_fg_raw_ms:.0f}ms; {mon.fg_hits}/{mon.samples} samples), brief-exposure-samples(>16px)={mon.exposed_samples} "
+                            f"longest-continuous-exposure={mon.max_run_ms:.0f}ms max-visible-px={mon.max_px} exposed-by={dict(sorted(mon.who.items(), key=lambda kv: -kv[1])[:4])} exposure-ms-by-phase={mon.by_phase} sampling-period~{mon._period():.0f}ms | ended minimized={still_min} placement-restored={restored} {dt:.0f}s"
                             + (f" | harness note: {la.launch_note}" if la.launch_note else ""))
                 if not ok:
                     fails.append(app)
