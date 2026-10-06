@@ -84,14 +84,31 @@ UNNAMED_OK_ROLES = ("edit", "pane", "datagrid", "table")
 # A grid exposes every cell as a DataItem (Excel: ~500 on the first screen). They are sampled, not enumerated, so
 # they cannot crowd the real controls out of the judge's shortlist; the totals are reported (never silently cut).
 GRID_CELL_CAP = int(os.environ.get("HOJAIGA_GRID_CELL_CAP", "120"))
+# The tree walk costs one COM round trip PER NODE VISITED. max_nodes only ever capped how many controls get
+# SURFACED, so a wide or pathological tree (a grid of thousands of cells, a host whose sibling enumeration never
+# ends) could spin there for minutes and grow the process to gigabytes. These two budgets cap the VISITING,
+# generic to any UIA app: the walk returns what it found inside the budget and says it stopped.
+UIA_WALK_BUDGET_S = float(os.environ.get("HOJAIGA_UIA_WALK_BUDGET_S", "6.0"))
+UIA_WALK_NODE_BUDGET = int(os.environ.get("HOJAIGA_UIA_WALK_NODE_BUDGET", "5000"))
+# The time budget never cuts a walk that has barely begun (a slow but normal tree must still be grounded), and a
+# single COM call can overrun it - so there is a hard extra stop, exactly like the deep scan's own rails.
+UIA_WALK_MIN_NODES = int(os.environ.get("HOJAIGA_UIA_WALK_MIN_NODES", "300"))
+UIA_WALK_HARD_EXTRA_S = float(os.environ.get("HOJAIGA_UIA_WALK_HARD_EXTRA_S", "2.0"))
+# Smallest share of the visible screen an empty edit box must cover to count as a surface that can hold a
+# document's text (a one-line address/name/search strip is not one). Geometry, so it travels with the window size.
+_CANVAS_MIN_FRACTION = float(os.environ.get("HOJAIGA_CANVAS_MIN_FRACTION", "0.05"))
 
 # Verbs the constrained judge is allowed to choose. Keeping this tiny is what
 # stops the 7B model from hallucinating tool calls (the old flailing failure).
 LEGAL_VERBS = ("click", "type", "key", "invoke", "scroll", "wait", "done")
+_POPUP_LOCK = threading.RLock()
 
 # A learned shortcut this confident is executed directly, skipping the LLM
 # judge entirely — this is the "pro muscle memory" path (Ctrl+S to save, etc.).
 PRO_SHORTCUT_CONF = float(os.environ.get("HOJAIGA_PRO_SHORTCUT_CONF", "0.70"))
+# 6.4: direct control (executing a remembered shortcut without the judge) needs this many VERIFIED successes - one lucky
+# trace once poisoned a step (a weak 'the UI changed' PASS on Ctrl+N turned into 'Ctrl+N does whatever the goal says')
+DIRECT_MIN_SUCCESSES = int(os.environ.get("HOJAIGA_DIRECT_MIN_SUCCESSES", "2"))
 
 # Destructive patterns are generic word cues, not per-app hardcodes.
 MAX_RELAUNCHES = int(os.environ.get("HOJAIGA_MAX_RELAUNCHES", "1"))     # G2: one relaunch per run, then fail with evidence
@@ -124,6 +141,73 @@ READY_RICH_ELEMENTS = 8        # a window with this many controls is a real UI, 
 # ---------------------------------------------------------------------------
 # Unified grounding contract (same mental model as the web side)
 # ---------------------------------------------------------------------------
+
+def _dialog_holds_name_box(hwnd: int) -> bool:
+    """True when a window's own UIA tree shows an editable box that is not a file-list cell (one bulk read).
+
+    Shape, not a label: the earlier version asked for the English words 'file name', so the same dialog in
+    another language was invisible to it. The window is only a *candidate* here; organ_24's shape test (which
+    also wants an accept button and filesystem evidence) is what decides."""
+    try:
+        from core_organs import fast_uia as _fu
+        for n in (_fu.snapshot(int(hwnd), timeout_ms=2500) or []):
+            if n.ctype in ("EditControl", "ComboBoxControl") and not str(n.aid or "").startswith("System."):
+                return True
+    except Exception:  # noqa: BLE001
+        pass
+    return False
+
+
+# What a "name box" IS, in UI terms, never what it is called. Two places in the loop used to ask the control
+# for the English words 'file name': the same picker in another language (or one whose label the app wrote
+# freely) was invisible to them and the goal's path went in as a bare base name. The caption survives here
+# only as ONE hint among three, never as the only gate.
+FILE_NAME_BOX_ROLES = ("edit", "document", "combobox", "richedit", "text")
+_NAME_BOX_CAPTION_HINT = re.compile(r"file ?name", re.I)
+
+# An edit control whose OWN name says it searches, filters, navigates or addresses is a TOOL, not the document:
+# a payload typed for 'write ... into the file' belongs in the surface that HOLDS content. Measured twice on a
+# spreadsheet - first into the cell-reference strip (named 'A1' by the row it shows), then into 'Search for a
+# file' - both times the run typed two characters, both times a UI change looked like progress, and the saved
+# workbook was empty. The words are UI conventions collected as data; the rule below still lets a goal that
+# NAMES the box ('type gmail.com in the address bar') win, because that goal's own tokens match its name.
+UTILITY_BOX_NAMES = ("search", "filter", "address", "goto", "go to", "find", "url", "name box",
+                     "navigation", "lookup", "jump")
+
+
+def _is_name_box_element(elem: Any, app_hwnd: int) -> bool:
+    """Is this grounded element the box a file name is typed into?"""
+    role = (getattr(elem, "role", "") or "").lower()
+    if role not in FILE_NAME_BOX_ROLES:
+        return False
+    if _NAME_BOX_CAPTION_HINT.search(str(getattr(elem, "name", "") or "")):
+        return True
+    try:
+        from core_organs import organ_24_dap as _dap
+        aids = tuple(str(a) for a in getattr(_dap, "DIALOG_NAME_FIELD_AIDS", ()))
+        aid = str(getattr(elem, "automation_id", "") or "")
+        if aid and any(a and a in aid for a in aids):      # Win32 IDFILENAME: locale-independent
+            return True
+        root = _root_of(int(getattr(elem, "hwnd", 0) or 0) or int(app_hwnd or 0))
+        if not root:
+            return False
+        rep = _dap.file_dialog_shape(root, timeout_ms=1500)
+        return bool(rep.get("name_edit")) and bool(rep.get("shape_ok"))
+    except Exception:  # noqa: BLE001
+        return False
+
+
+_ACCOUNT_NAME = re.compile(r"^[A-Z][\w'.-]+,\s+[A-Z][\w'.-]+$|^(?:sign|log)\s?(?:in|out)\b|^signed in as\b|^switch account|^(?:my )?account$|^manage (?:your )?(?:account|profile)", re.I)
+_ACCOUNT_GOAL = re.compile(r"\b(account|profile|sign|log ?(?:in|out)|user|switch)\b", re.I)
+
+
+def is_account_control(name: str, goal: str) -> bool:
+    """A control that names the signed-in PERSON or an account action ('Signed in as ...', 'Last, First', 'Sign out'): never a step toward a goal
+    that does not talk about accounts - pressing it opens the user's profile menu (measured: an Excel save goal expanded the user's name)."""
+    if _ACCOUNT_GOAL.search(goal or ""):
+        return False
+    return bool(_ACCOUNT_NAME.search((name or "").strip()))
+
 
 @dataclass
 class GroundedElement:
@@ -166,6 +250,15 @@ def _is_parked_offscreen(hwnd: int) -> bool:
 def _element_id(hwnd: int, role: str, name: str, bbox: Tuple[int, int, int, int]) -> str:
     raw = f"{hwnd}|{role}|{name.strip().lower()}|{bbox}"
     return "el_" + hashlib.md5(raw.encode("utf-8")).hexdigest()[:10]
+
+
+def _get_bridge():
+    """The knowledge bridge (unified command knowledge from scans + explorations). None when unavailable or disabled."""
+    try:
+        from core_organs import knowledge_bridge as _kb
+        return _kb.get_bridge() if _kb.ENABLED else None
+    except Exception:
+        return None
 
 
 def _get_intel():
@@ -303,18 +396,27 @@ class DesktopGrounding:
         _generic = {"microsoft", "windows", "app", "the", "for", "and", "of", "new"}
         hint_tokens = [w for w in re.findall(r"[a-z0-9\+\.#]+", hint) if w not in _generic and len(w) > 1] or ([token] if token else [])
         found: List[Tuple[int, int]] = []
+        hidden_pass = {"on": False}       # second pass: apps parked in the tray keep a HIDDEN top-level window whose UIA tree still answers
 
         @ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
         def _cb(hwnd, _lparam):
             if not user32.IsWindowVisible(hwnd):
-                return True
+                if not hidden_pass["on"]:
+                    return True
+                r_h = ctypes.wintypes.RECT() if hasattr(ctypes, "wintypes") else None
+                import ctypes.wintypes as _wth
+                r_h = _wth.RECT()
+                user32.GetWindowRect(hwnd, ctypes.byref(r_h))
+                if (r_h.right - r_h.left) < 200 or (r_h.bottom - r_h.top) < 150 or not hin.safe_window_text(int(hwnd)).strip():
+                    return True           # helper / hook / IME windows are hidden too: only a real sized, titled window counts
             title = hin.safe_window_text(int(hwnd)).lower()      # never blocks on a window whose thread does not pump messages
             cls_buf = ctypes.create_unicode_buffer(256)
             user32.GetClassNameW(hwnd, cls_buf, 256)
             cname = cls_buf.value.lower()
             # Skip infrastructure windows, same spirit as organ_01 filters.
             if cname in ("shell_traywnd", "progman", "workerw", "mintaskswnd",
-                         "shell_dock", "topmosttoplevelwindowclass"):
+                         "shell_dock", "topmosttoplevelwindowclass",
+                         "#32768"):           # a classic MENU window (the popup of a menu bar) is never the app's window; it was picked once after a menu crawl
                 return True
             # A UWP app's CoreWindow is its content host, not an app window: it cannot be minimized, parked or
             # closed on its own (its ApplicationFrameWindow is the real top level, and UIA on the frame already
@@ -327,14 +429,22 @@ class DesktopGrounding:
             proc = self._process_stem_cached(hwnd)
             # every distinctive word of the hint may name the app: 'visual studio code' is process 'code', title 'x - Visual
             # Studio Code' or nothing at all; matching only the FIRST word made a perfectly good window unfindable
-            hit = next((t for t in hint_tokens if t in proc), None) or next((t for t in hint_tokens if t in cname), None)                 or next((t for t in hint_tokens if t in title), None)
+            def _tin(t: str, hay: str) -> bool:
+                return (t in re.findall(r"[a-z0-9]+", hay)) if len(t) < 3 else (t in hay)
+            hit = next((t for t in hint_tokens if _tin(t, proc)), None) or next((t for t in hint_tokens if _tin(t, cname)), None)                 or next((t for t in hint_tokens if _tin(t, title)), None)
             if not hint_tokens or hit is None:
                 return True
+            if len(hint_tokens) > 1 and not any(_tin(t, proc) for t in hint_tokens) and not all(_tin(t, cname + " " + title) for t in hint_tokens):
+                return True      # a multi-word name that only SOME of its words reach through the class / title is another window ('HJ-TY1-Nothing' is not 'HJ-TY1-Alpha')
             if proc in self._BROWSER_PROCS and not hint_is_browser:
                 return True
-            if any(t in proc for t in hint_tokens):
+            blob = proc + " " + cname + " " + title
+            matched = sum(1 for t in hint_tokens if _tin(t, blob))            # a window that carries MORE of the hint's words is the better match
+            if title == hint:
+                score = 6                                                 # the window is literally titled what was asked for
+            elif any(_tin(t, proc) for t in hint_tokens):
                 score = 5
-            elif any(t in cname for t in hint_tokens):
+            elif any(_tin(t, cname) for t in hint_tokens):
                 score = 4
             elif title == hint or title.endswith(" - " + hint) or title.startswith(hint + " "):
                 score = 3
@@ -356,12 +466,15 @@ class DesktopGrounding:
                 w = h = 1000
             if not hin.is_minimized(hwnd) and (w < 120 or h < 80):
                 return True  # (minimized windows report a tiny parked rect; they are still real)
-            found.append((score * 10_000_000 + w * h, hwnd))
+            found.append((score * 1_000_000_000 + matched * 100_000_000 + w * h, hwnd))
             return True
 
         self._proc_cache = {}
         try:
             user32.EnumWindows(_cb, 0)
+            if not found:                     # nothing visible matches: look at hidden (tray-parked) windows of the app
+                hidden_pass["on"] = True
+                user32.EnumWindows(_cb, 0)
         except Exception as exc:
             logger.debug("[grounding] EnumWindows failed: %s", exc)
             return [] if all_candidates else None
@@ -404,12 +517,52 @@ class DesktopGrounding:
             return ""
         return hin.safe_window_text(int(hwnd))
 
+    def _ground_raw(self, hwnd: int, max_nodes: int = 1500) -> List[GroundedElement]:
+        """Grounded elements from ONE bulk read of the RAW UIA tree (fast_uia): actionable, named, enabled controls. Chromium / Electron / CEF
+        expose their whole DOM there (measured: 966 nodes, 179 invokable, in 0.4 s; the control-view walk found 8)."""
+        from core_organs import fast_uia as _fu
+        mini = hin.is_minimized(hwnd) or _is_parked_offscreen(hwnd) or not ctypes.windll.user32.IsWindowVisible(hwnd)
+        out: List[GroundedElement] = []
+        seen = set()
+        for n in (_fu.snapshot(hwnd, max_nodes=max_nodes, timeout_ms=8000) or []):
+            role = n.role
+            if role not in ACTIONABLE_ROLES or not (n.name or "").strip() or not n.enabled:
+                continue
+            if n.offscreen and not mini:
+                continue
+            if not mini and not (n.rect[2] > n.rect[0] and n.rect[3] > n.rect[1]):
+                continue
+            key = (n.name.strip().lower(), role, n.rect[0] // 6, n.rect[1] // 6)
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append(GroundedElement(id=_element_id(hwnd, role, n.name, n.rect), name=n.name.strip()[:120], role=role, bbox=n.rect,
+                                       tier="uia", confidence=0.85, hwnd=hwnd))
+        return out
+
     # ---- Tier 1: UIA ----
     def _walk_uia(self, root_hwnd: int, max_depth: int = 12, max_nodes: int = 900) -> List[GroundedElement]:
         if not HAS_UIA:
             return []
+        _t_walk = time.perf_counter()
         import uiautomation as auto
         elements: List[GroundedElement] = []
+        try:                                        # a frame that hosts a Chromium content window (WebView2 / CEF): its DOM tree is THERE
+            from core_organs import dap_actuator as _da
+            if _da.family_of(root_hwnd) == "chromium":
+                _content = _da.chromium_content_hwnd(root_hwnd)
+                if _content and _content != root_hwnd:
+                    root_hwnd = _content
+        except Exception:  # noqa: BLE001
+            pass
+        try:                                          # a Chromium DOM lives in the RAW UIA view: the per-node control-view walk sees only the title bar
+            from core_organs import dap_actuator as _da2
+            if _da2.family_of(root_hwnd) == "chromium":
+                _raw = self._ground_raw(root_hwnd, max_nodes=max(max_nodes, 1500))
+                if len(_raw) >= 3:
+                    return _raw
+        except Exception:  # noqa: BLE001
+            pass
         try:
             ctrl = auto.ControlFromHandle(root_hwnd)
         except Exception:
@@ -417,17 +570,30 @@ class DesktopGrounding:
         if ctrl is None:
             return []
         count = 0
+        visited = 0
+        stopped_by = ""
+        walk_errors = 0
+        first_error = ""
         cells_seen = cells_kept = 0
         # A minimized window reports every control as off-screen with bogus (-32000) rects, but
         # its UIA patterns still work. Keep them (addressable by pattern, not by coordinates).
         # A window PARKED off-screen (background_window) behaves the same for UWP/WinUI apps: they do not lay out
         # content that is entirely off every monitor, so their controls report IsOffscreen / empty rectangles
         # while Invoke / Value / Toggle patterns work. Treat it like minimized.
-        mini = hin.is_minimized(root_hwnd) or _is_parked_offscreen(root_hwnd)
+        mini = hin.is_minimized(root_hwnd) or _is_parked_offscreen(root_hwnd) or not ctypes.windll.user32.IsWindowVisible(root_hwnd)   # hidden (tray) windows report everything off-screen too
 
         def _visit(c, depth: int):
-            nonlocal count, cells_seen, cells_kept
-            if depth > max_depth or count > max_nodes:
+            nonlocal count, cells_seen, cells_kept, visited, stopped_by, walk_errors, first_error
+            if stopped_by or depth > max_depth or count > max_nodes:
+                return
+            visited += 1
+            if visited > UIA_WALK_NODE_BUDGET:
+                stopped_by = f"node-budget({UIA_WALK_NODE_BUDGET})"
+                return
+            el = time.perf_counter() - _t_walk
+            if (el > UIA_WALK_BUDGET_S and visited >= UIA_WALK_MIN_NODES) \
+                    or el > UIA_WALK_BUDGET_S + UIA_WALK_HARD_EXTRA_S:
+                stopped_by = f"time-budget({UIA_WALK_BUDGET_S:g}s)"
                 return
             try:
                 role = (c.ControlTypeName or "").lower().replace("control", "")
@@ -461,14 +627,36 @@ class DesktopGrounding:
                         confidence=0.9 if name else 0.55,
                         hwnd=root_hwnd, value=value))
                     count += 1
-                for child in c.GetChildren():
+                # ONE COM call at a time. Control.GetChildren() materialises the whole sibling list first, so a
+                # provider with a broken or cyclic sibling chain makes that single call never return: it grew the
+                # suite process to gigabytes inside one walk (measured, py-spy: GetNextSiblingControl).
+                child = c.GetFirstChildControl()
+                while child is not None:
                     _visit(child, depth + 1)
-            except Exception:
+                    if stopped_by:
+                        break
+                    child = child.GetNextSiblingControl()
+            except Exception as exc:
+                # A node that throws prunes its own subtree; the walk continues. It is COUNTED, never silent.
+                walk_errors += 1
+                first_error = first_error or f"{type(exc).__name__}: {str(exc)[:70]}"
                 return
 
         _visit(ctrl, 0)
         self.last_walk = {"grid_cells_seen": cells_seen, "grid_cells_surfaced": cells_kept,
-                          "grid_cells_sampled_out": max(0, cells_seen - cells_kept)}
+                          "grid_cells_sampled_out": max(0, cells_seen - cells_kept),
+                          "nodes_walked": visited, "surfaced": count,
+                          "time_budget_ms": int(UIA_WALK_BUDGET_S * 1000),
+                          "node_budget": UIA_WALK_NODE_BUDGET,
+                          "time_budget_hit": stopped_by.startswith("time"),
+                          "node_budget_hit": stopped_by.startswith("node"),
+                          "truncated": bool(stopped_by), "stopped_by": stopped_by,
+                          "node_errors": walk_errors, "first_error": first_error,
+                          "walk_ms": int((time.perf_counter() - _t_walk) * 1000)}
+        if stopped_by:
+            logging.getLogger("desktop_grounding").warning(
+                "UIA walk of %s stopped by %s after %d node(s) (%d surfaced) - returning the partial ground",
+                root_hwnd, stopped_by, visited, count)
         return elements
 
     # ---- Tier 2: Win32 children ----
@@ -768,14 +956,17 @@ class DesktopGrounding:
             if hit and key[1] and (time.monotonic() - hit[0]) <= VISION_CACHE_TTL_S:
                 report["vision_cache_hit"] = True
                 self._vision_ran = True
-                return list(hit[1])
+                return list(hit[1])           # same element objects: any captions the background job finished are already in them
             parser = self._get_vision_parser()
             if parser is None:
                 report.setdefault("tiers_skipped", []).append("vision:no-parser")
                 return []
             self._vision_calls += 1
             self._vision_ran = True
+            t_parse = time.time()
             elements = parser.parse_screenshot(path)
+            report["vision_parse_ms"] = int((time.time() - t_parse) * 1000)
+            report["vision_captions"] = "background" if getattr(parser, "caption_future", None) is not None else "none/sync"
             # parse_screenshot returns image-pixel bounds; the window PNG is a grab
             # of the window rect, so add the window origin to get SCREEN coords.
             ox = oy = 0
@@ -787,15 +978,29 @@ class DesktopGrounding:
             except Exception:
                 pass
             out: List[GroundedElement] = []
+            src_of: List[Tuple[GroundedElement, Any]] = []
             for e in elements:
                 b = e.bounds
                 screen_bbox = (b[0] + ox, b[1] + oy, b[2] + ox, b[3] + oy)
-                out.append(GroundedElement(
+                ge = GroundedElement(
                     id=_element_id(hwnd, e.role, e.text, screen_bbox),
-                    name=e.text or "vision", role=e.role, bbox=screen_bbox,
-                    tier="vision", confidence=float(e.confidence or 0.35), hwnd=hwnd))
+                    name=e.text or ("icon" if e.role != "text" else "vision"), role=e.role, bbox=screen_bbox,
+                    tier="vision", confidence=float(e.confidence or 0.35), hwnd=hwnd)
+                out.append(ge)
+                src_of.append((ge, e))
+            fut = getattr(parser, "caption_future", None)
+            if fut is not None:
+                def _fill(_f, _pairs=src_of):
+                    """Background captions finished: write the names into the SAME GroundedElement objects the cache holds."""
+                    try:
+                        for ge_, e_ in _pairs:
+                            if e_.text and ge_.name in ("icon", "vision"):
+                                ge_.name = e_.text
+                    except Exception:
+                        pass
+                fut.add_done_callback(_fill)
             if key[1]:
-                self._vision_cache[key] = (time.monotonic(), list(out))
+                self._vision_cache[key] = (time.monotonic(), out)           # the cache holds the live objects: captions land in them
                 if len(self._vision_cache) > 8:
                     self._vision_cache.pop(next(iter(self._vision_cache)))
             return out
@@ -1060,6 +1265,33 @@ class Snapshot:
         return hashlib.md5(("|".join(sorted(self.element_ids)) + self.title).encode("utf-8")).hexdigest()
 
 
+_TITLEBAR_NAMES = frozenset({"close", "minimize", "maximize", "restore", "restore down", "system", "system menu"})
+
+
+def _titlebar_buttons(elements, hwnd: int) -> set:
+    """ids (python id()) of the window's OWN title-bar buttons. 'Close' is not in the generic chrome list (an app has its own Close), so a title-bar Close is
+    recognised by WHERE it is: inside the window's title-bar band, or beside a 'titlebar' element when the tree gives no geometry. Pressing it for an
+    in-app goal closes the app (measured: a sign-in screen was 'completed' by pressing Close)."""
+    out = set()
+    try:
+        import ctypes.wintypes as _wt
+        r = _wt.RECT()
+        ctypes.windll.user32.GetWindowRect(hwnd, ctypes.byref(r))
+        names = {(e.name or "").strip().lower() for e in elements if (e.role or "").lower() not in ("window", "pane", "titlebar", "text", "image", "")}
+        has_bar = any((e.role or "").lower() == "titlebar" for e in elements) or bool(names & {"minimize", "maximize"})   # Close beside Minimize / Maximize IS the title bar
+        only_chrome = bool(names) and names <= _TITLEBAR_NAMES                                                              # nothing else is on screen at all
+        for e in elements:
+            if (e.name or "").strip().lower() not in _TITLEBAR_NAMES:
+                continue
+            b = e.bbox or (0, 0, 0, 0)
+            geometric = any(b) and (r.top - 4) <= b[1] <= (r.top + 48) and (b[3] - b[1]) <= 48
+            if geometric or only_chrome or (has_bar and not any(b)):
+                out.add(id(e))
+    except Exception:  # noqa: BLE001
+        pass
+    return out
+
+
 class DesktopVerifier:
     def snapshot(self, hwnd: int, elements: List[GroundedElement], text: str = "") -> Snapshot:
         snap = Snapshot(title=_quick_title(hwnd), element_ids=[e.id for e in elements], text=text)
@@ -1139,6 +1371,37 @@ class DesktopVerifier:
         ok = before.region_hash != after.region_hash
         return ok, "region pixel-delta " + ("detected" if ok else "none")
 
+    def _file_proof(self, p: str, since: Optional[float]) -> Tuple[bool, str]:
+        """Did the app WRITE this file, or was it just there?
+
+        `since` is the wall-clock moment the goal began (None keeps the old existence-only behaviour).
+        A save lands in the same second the goal can start, so 1 s of slack is allowed; nothing larger
+        is, because the whole point is refusing a stale file from a previous run."""
+        _end = time.time() + 3.0                      # bounded: apps write asynchronously
+        name = os.path.basename(p)
+        st = None
+        while True:
+            try:
+                st = os.stat(p)
+            except OSError:
+                st = None
+            if st is not None and (since is None or st.st_mtime >= float(since) - 1.0):
+                break
+            if time.time() >= _end:
+                break
+            time.sleep(0.25)
+        if st is None:
+            return False, f"file {name} MISSING"
+        if st.st_size <= 0:
+            return False, f"file {name} exists but is 0 bytes (nothing was written)"
+        if since is not None and st.st_mtime < float(since) - 1.0:
+            age = float(since) - st.st_mtime
+            return False, (f"file {name} was ALREADY on disk before this goal "
+                           f"(written {age:.0f}s earlier) — not proof we saved it")
+        return True, (f"file {name} written ({st.st_size} bytes"
+                      + (f", {time.time() - float(since):.1f}s after goal start" if since is not None
+                         else "") + ")")
+
     def check_expect(self, expect: Dict[str, Any], before: Snapshot,
                      after: Snapshot, elements_now: List[GroundedElement]) -> Tuple[bool, str]:
         """Evaluate a postcondition dict. Returns (ok, evidence)."""
@@ -1197,22 +1460,39 @@ class DesktopVerifier:
         if "file_created" in expect or "file_saved" in expect:
             target_path = expect.get("file_created") or expect.get("file_saved")
             p = os.path.abspath(str(target_path))
-            ok = os.path.exists(p)
-            _end = time.time() + 3.0          # bounded: apps (esp. packaged ones) write asynchronously
-            while not ok and time.time() < _end:
-                time.sleep(0.25)
-                ok = os.path.exists(p)
-            checks.append((ok, f"file {os.path.basename(p)} {'exists' if ok else 'MISSING'}"))
+            # "The file exists" is NOT the proof of "we made it". Measured 2026-10-05: an Excel run was
+            # reported as a success because e1.xlsx from an earlier, killed run was still sitting on disk —
+            # the loop had saved nothing. So when the caller says when the goal started
+            # (`file_fresh_since`), the file must have been WRITTEN after that moment, not merely be there.
+            ok, note = self._file_proof(p, expect.get("file_fresh_since"))
+            checks.append((ok, note))
             if ok and expect.get("file_format"):
                 fmt_ok, fmt_note = file_has_format(p, str(expect["file_format"]))
                 checks.append((fmt_ok, fmt_note))
+        if "file_text_contains" in expect:
+            # A file can be WRITTEN and still hold nothing: a workbook was measured saved to the exact path with
+            # an EMPTY sheet, because 'exists + has bytes' was the whole proof. The text the run was told to put
+            # in is checked inside the file itself.
+            tk, tnote = file_holds_text(p, str(expect["file_text_contains"]))
+            _nm = os.path.basename(p)
+            if tk is None:
+                checks.append((True, f"content of {_nm} not checkable ({tnote})"))
+            else:
+                checks.append((tk, f"content of {_nm}: {tnote}"))
         if "region_changed" in expect and bool(expect["region_changed"]):
             checks.append(self.pixels_changed(before, after))
         return all(c[0] for c in checks), "; ".join(c[1] for c in checks) or "no-expect"
 
+    _MAY_CLOSE_RE = re.compile(r"\b(close|exit|quit|dismiss|cancel|ok|accept|decline|done|apply|save|submit|discard|yes|no|finish|sign ?out|log ?out|shut)\b", re.I)
+
     def verdict(self, expect: Dict[str, Any], before: Snapshot, after: Snapshot,
-                elements_now: List[GroundedElement]) -> Tuple[str, str]:
+                elements_now: List[GroundedElement], goal: str = "") -> Tuple[str, str]:
         """PASS / NO_CHANGE / WRONG_STATE with evidence."""
+        if (goal and not expect and before.title and not after.title and not elements_now and not after.region_hash
+                and not self._MAY_CLOSE_RE.search(goal)):
+            # the default postcondition is 'something changed', and a window that is GONE has changed more than anything: pressing a title-bar Close on a
+            # sign-in screen passed 'open the Library tab' (measured). Closing the window is only progress for a goal that talks about closing / answering.
+            return "WRONG_STATE", f"the window disappeared: closing it is not progress toward '{goal[:50]}'"
         ok, evidence = self.check_expect(expect, before, after, elements_now)
         if ok:
             return "PASS", evidence
@@ -1227,6 +1507,30 @@ class DesktopVerifier:
 
 # Module-level verifier facade alias per Workstream 2
 desktop_verifier = DesktopVerifier()
+
+# Postconditions that a single step CANNOT honestly be graded by: they live outside the app's UI.
+# `file_fresh_since` travels WITH the file it timestamps (the moment the goal began): split it off and the
+# split below would see a leftover key, judge every intermediate step (clicking File) by "the file must be
+# written by now", and the WRONG_STATE would erode a command that was actually right.
+TERMINAL_EXPECT_KEYS = ("file_created", "file_saved", "file_format", "file_fresh_since", "file_text_contains")
+
+
+def split_terminal_expect(expect: Dict[str, Any]) -> Tuple[Dict[str, Any], Optional[Dict[str, Any]]]:
+    """Separate a goal's TERMINAL proof from what one step of the chain can be graded by.
+
+    'save the document as D:\\x\\poem.txt' has exactly one postcondition: the file on disk. Applied to every
+    step, clicking File - which correctly opened the menu - could only ever be WRONG_STATE, and that cost two
+    real things: the command was eroded in knowledge as a FAILURE, and the control was marked spent, so the
+    learned re-run could not re-select it and wandered (measured: E2E-1 run2 = 12 unrelated clicks).
+    A step is now graded by 'the UI moved toward the goal' and the GOAL advances only when the file is really
+    there. A postcondition that mixes UI and terminal parts is left whole - every part of it stays checked."""
+    term = {k: v for k, v in (expect or {}).items() if k in TERMINAL_EXPECT_KEYS}
+    if not term:
+        return dict(expect or {}), None
+    rest = {k: v for k, v in expect.items() if k not in TERMINAL_EXPECT_KEYS}
+    if rest:
+        return dict(expect), None
+    return {}, term
 
 
 def _quick_title(hwnd: int) -> str:
@@ -1266,6 +1570,14 @@ class ConstrainedJudge:
         return [(i, e) for _sc, i, e in cls.rank_scored(goal, elements, pro_hint)]
 
     @classmethod
+    def _conventional_menu(cls, g: str, elements: List["GroundedElement"]) -> str:
+        """The top-level menu a command conventionally lives under, when the command itself is NOT among the elements on screen ('' otherwise)."""
+        for menu, verbs in cls._MENU_CONVENTION.items():
+            if re.search(r"\b(?:" + "|".join(verbs) + r")\b", g) and not any((e.name or "").strip().lower() in verbs for e in elements):
+                return menu
+        return ""
+
+    @classmethod
     def rank_scored(cls, goal: str, elements: List[GroundedElement],
                     pro_hint: Optional[Dict[str, Any]] = None) -> List[Tuple[float, int, GroundedElement]]:
         """Goal-aware shortlist. Truncating to the first N by confidence/y hid the very
@@ -1273,11 +1585,14 @@ class ConstrainedJudge:
         Score = lexical overlap(goal, element name) + role affinity for the goal's intent
         + expert-hint match + the grounding confidence as a tie-break. Generic: no app names.
         """
-        g = re.sub(r"[a-z]:[\\/][^\s'<>|?*]+", " ", (goal or "").lower())  # a path's tokens are not UI words
-        gtoks = {t for t in re.findall(r"[a-z0-9]+", g) if t not in cls._STOP and len(t) > 1}
+        g = cls._PATH_TOKEN_RE.sub(" ", (goal or "").lower())  # a path's tokens are not UI words
+        gtoks = cls._goal_tokens(goal)
         save_as = bool(re.search(r"\bsave\b.{0,40}\bas\b", g)) or bool(re.search(r"\bsave as\b", g)) or (bool(re.search(r"\bsave\b", (goal or "").lower())) and bool(re.search(r"[a-z]:[\\/]", (goal or "").lower())))
         file_verb = bool(re.search(r"\b(save|open|export|import|print|close|exit)\b", g))
-        wants_text = bool(re.search(r"\b(" + "|".join(cls._TYPE_WORDS) + r")\b", g))
+        wants_text = cls._wants_text(goal)
+        has_path = bool(re.search(r"[a-z]:[\\/]", (goal or "").lower()))
+        # which top-level menu a command conventionally lives under, when the command itself is not among the elements on screen
+        menu_for_goal = cls._conventional_menu(g, elements)
         hint_segments = [x.strip().lower() for x in ((pro_hint or {}).get("menu_path") or "").split(">") if x.strip()]
         if not hint_segments and (pro_hint or {}).get("element_name"):
             hint_segments = [pro_hint["element_name"].strip().lower()]
@@ -1287,21 +1602,50 @@ class ConstrainedJudge:
         ext_m = re.search(r"[a-z]:[\\/][^'<>|?*\r\n]*?\.([a-z0-9]{2,5})(?![a-z0-9])", (goal or "").lower())
         fmt_words = set(cls._FORMAT_WORDS.get(ext_m.group(1), (ext_m.group(1),))) if ext_m else set()
         scored = []
+        # SURFACE, not label, is what a typed payload asks for. Measured on a spreadsheet: 'type 42 in cell A1'
+        # gave every edit the same role score and the tie-break (y-position, top first) picked the name/reference
+        # strip - so '42' went into the box that NAVIGATES cells instead of a cell, the workbook saved empty, and
+        # the goal still looked done because a UI change is a UI change. A bigger text surface is the document;
+        # a one-line strip is an address/reference/search box. Kept below the lexical score on purpose: a goal
+        # that NAMES a small box ('type gmail.com in the address bar') still wins.
+        max_text_area = max((abs(e.bbox[2] - e.bbox[0]) * abs(e.bbox[3] - e.bbox[1])
+                             for e in elements if e.role in cls._TEXT_ROLES), default=0)
         for i, e in enumerate(elements):
             name = (e.name or "").lower()
             ntoks = set(re.findall(r"[a-z0-9]+", name))
             score = 3.0 * len(gtoks & ntoks)
+            if name.strip() in cls._WINDOW_CHROME and not (gtoks & cls._CHROME_GOAL_WORDS):
+                score -= 60.0           # the window's own title-bar buttons are never a step toward an in-app goal (measured: an Office save
+                                        # goal looped Minimize / Restore forever, each a 'UI changed' pass)
             if fmt_words and e.role in ("menuitem", "listitem", "button") and (fmt_words & ntoks):
                 score += 25.0           # the requested format outranks any learned hint (a hint once taught "Save as project")
             score += 1.5 * sum(1 for t in gtoks if len(t) > 3 and t in name and t not in ntoks)
-            if save_as and e.role == "menuitem" and name.startswith("save as"):
-                score += 7.0   # an explicit target path/name means Save AS, not in-place Save
-            if save_as and e.role == "menuitem" and name == "save":
-                score -= 3.0
-            if file_verb and e.role == "menuitem" and name == "file":
-                score += 5.0   # universal UI convention: file operations live under the File menu
+            if save_as and e.role in ("menuitem", "listitem", "button", "tabitem", "treeitem") and name.startswith("save as"):
+                score += 7.0   # an explicit target path/name means Save AS, not in-place Save (a ribbon app lists it as a list item / button)
+            if save_as and e.role in ("menuitem", "listitem", "button", "tabitem", "treeitem") and name.startswith("save as ") \
+                    and not (set(name.split()[2:]) & gtoks) and not (fmt_words & ntoks):
+                score -= 3.0   # 'Save as project / template / copy' is a variant the goal did not ask for: plain 'Save as' wins
+            if save_as and e.role in ("menuitem", "listitem", "button", "tabitem", "treeitem") and name in ("new", "new window", "new tab", "new image", "clear", "exit"):
+                score -= 4.0   # a save goal is never advanced by a command that discards or replaces the document
+            if save_as and e.role in ("menuitem", "listitem", "button", "tabitem", "treeitem") and name in ("save", "autosave"):
+                score -= 4.0   # the in-place Save / quick-access Save button opens no 'as' flow (it opened a half-built pane that never loaded)
+            if file_verb and e.role in ("menuitem", "button", "tabitem") and name in cls._FILE_ENTRY_NAMES:
+                score += 5.0   # universal UI convention: file operations live under the File menu / File tab
+            if menu_for_goal and name == menu_for_goal and e.role in ("menuitem", "button", "tabitem", "splitbutton"):
+                score += 5.0   # standard menu convention: Paste / Copy / Undo live under Edit, Zoom under View ... (a command that is not on screen yet is behind its menu)
+            if has_path and file_verb and name.startswith("browse") and e.role in ("button", "hyperlink", "listitem", "tabitem", "splitbutton"):
+                score += 9.0   # 'Browse...' opens the OS file picker, which the file-dialog rung drives for real; an in-app 'File name' pane is fragile
             if wants_text and e.role in cls._TEXT_ROLES:
                 score += 4.0 + (1.0 if e.role in ("edit", "document") else 0.0)
+                if max_text_area > 0:
+                    area = abs(e.bbox[2] - e.bbox[0]) * abs(e.bbox[3] - e.bbox[1])
+                    score += 3.0 * (area / max_text_area)      # the document outranks a one-line strip
+            if cls._is_utility_strip(goal, e):
+                # A control whose OWN NAME says it is a search / filter / address / go-to strip is never the home
+                # for a payload the goal did not ask for by name. This is not only a typing concern: measured, a
+                # save goal put 'Microsoft search' at the top of the shortlist (9.4) because the demotion sat
+                # inside the typing branch, and the step was spent opening the app's web search.
+                score -= 8.0
             if hint_name and hint_name in name:
                 score += 3.0
             # Follow the expert's menu path ('File > Save As'): a segment that exactly names this
@@ -1317,12 +1661,51 @@ class ConstrainedJudge:
         scored.sort(key=lambda t: (-t[0], -t[1], t[2]))
         return [(sc, i, e) for sc, _y, i, e in scored]
 
+    # UI convention (not an app): the top-level menu a command usually lives under
+    _MENU_CONVENTION = {
+        "edit": ("cut", "copy", "paste", "undo", "redo", "select all", "find", "replace", "clear"),
+        "view": ("zoom", "full screen", "fullscreen", "gridlines", "ruler", "status bar"),
+        "insert": ("insert", "add picture", "add image"),
+        "format": ("font", "bold", "italic", "underline", "word wrap", "align"),
+    }
+    _WINDOW_CHROME = frozenset({"minimize", "maximize", "restore", "restore down", "system", "system menu", "min", "max"})
+    _CHROME_GOAL_WORDS = frozenset({"minimize", "maximize", "restore", "minimise", "maximise", "window", "resize", "fullscreen"})
     _DECISIVE_TEXT_MARGIN = 2.5
     _DECISIVE_PATH_MARGIN = 4.0
 
     @classmethod
     def _wants_text(cls, goal: str) -> bool:
-        return bool(re.search(r"\b(" + "|".join(cls._TYPE_WORDS) + r")\b", (goal or "").lower()))
+        gl = (goal or "").lower()
+        # 'paste the image from the clipboard' is the app's PASTE COMMAND, not text to type: 'paste' means typing only when a literal payload
+        # is given in quotes ("paste 'hello' into the box")
+        if re.match(r"^\s*(?:please\s+)?paste\b", gl) and not re.search(r"[\"“'].+[\"”']", gl):
+            gl = re.sub(r"\bpaste\b", " ", gl, count=1)
+        return bool(re.search(r"\b(" + "|".join(cls._TYPE_WORDS) + r")\b", gl))
+
+    _PATH_TOKEN_RE = re.compile(r"[a-z]:[\\/][^\s'<>|?*]+")
+
+    @classmethod
+    def _goal_tokens(cls, goal: str) -> frozenset:
+        """The words a goal really asks for. A file path is a LOCATION, not a label: its tokens are dropped so a
+        control is never called a match because the goal happened to contain 'new' or 'tmp'."""
+        g = cls._PATH_TOKEN_RE.sub(" ", (goal or "").lower())
+        return frozenset(t for t in re.findall(r"[a-z0-9]+", g) if t not in cls._STOP and len(t) > 1)
+
+    @classmethod
+    def _is_utility_strip(cls, goal: str, e: "GroundedElement") -> bool:
+        """True for a search / filter / address / go-to strip that the goal does not NAME. The control's own label
+        says what it exists for, so it is never a step toward any other goal: clicking one opens the app's web
+        search (measured twice in one save run, at rank 1.4 of 261 - the judge picked it anyway)."""
+        gtoks = cls._goal_tokens(goal)
+        if not gtoks:
+            return False
+        name = (e.name or "").lower()
+        return not (gtoks & set(re.findall(r"[a-z0-9]+", name))) and any(u in name for u in UTILITY_BOX_NAMES)
+
+    # UI convention, not app knowledge: the entry that opens the file surface, and the control that opens the
+    # operating-system picker. Both are labels the accessibility tree of many apps carry; a new label is a table edit.
+    _FILE_ENTRY_NAMES = frozenset({"file", "file tab", "file menu"})
+    _PICKER_ROUTE_WORDS = ("browse",)
 
     _CLICK_ROLES = ("button", "menuitem", "tabitem", "listitem", "hyperlink", "checkbox", "radiobutton",
                     "splitbutton", "dropdownbutton", "treeitem")
@@ -1351,12 +1734,33 @@ class ConstrainedJudge:
         hits = [c for c in scored if c[2].role in cls._CLICK_ROLES and cls._norm_label(c[2].name) == obj]
         return hits[0] if hits else None
 
+    # The payload is read from the goal's own words ONLY when the goal also says WHERE it goes ('... in cell A1').
+    # That is the shape of a machine-checkable instruction; 'type the current date' names no place and its "payload"
+    # is something the model must generate, so it keeps going through the composer below.
+    _OWN_WORD_RE = re.compile(r"^(?:my|your|his|her|its|our|their|the|this|that|some|any)\b", re.I)
+
+    def _literal_payload(self, goal: str) -> str:
+        lit = literal_typed_text(goal or "")
+        if not lit or _LOCATION_TAIL_RE.search(goal or "") is None:
+            return ""
+        if self._OWN_WORD_RE.match(lit.strip()):
+            return ""                      # 'type my password into the form' asks for a value, not these words
+        return lit
+
     def _compose_text(self, goal: str) -> str:
         """Small LLM call used ONLY to author the text for a typing goal (the element was chosen
-        deterministically). A quoted string in the goal wins without any LLM call."""
+        deterministically). A quoted string in the goal wins without any LLM call.
+
+        A goal that already SPELLS OUT its payload ('type 42 in cell A1') is answered from its own words, by the
+        same literal reader the postconditions use, and no model is called at all. Measured reason: the model was
+        busy behind the vision tier, this call timed out to '' twice in one run, '' cancels the decisive pick, and
+        the judge then aimed '42' at 'Formula Bar' - a one-line strip - instead of the cell the goal named."""
         m = re.search(r"[\"'“]([^\"'”]{2,300})[\"'”]", goal or "")
         if m:
             return m.group(1)
+        literal = self._literal_payload(goal)
+        if literal:
+            return literal
         payload = {"model": JUDGE_MODEL, "stream": False,
                    "messages": [{"role": "user", "content":
                                  "Return ONLY the exact text to type for this instruction, with no "
@@ -1419,7 +1823,10 @@ class ConstrainedJudge:
                       != (top[2].name or "").strip().lower()), 0.0)
         margin = top[0] - rival
         g = (goal or "").lower()
-        if re.search(r"\b(" + "|".join(self._TYPE_WORDS) + r")\b", g) and any(e.role == "datagrid" for e in elements):
+        # Cells are their own addressable surface; the grid container is sometimes not exposed (a virtualized
+        # view, a provider that hands out the items only). Requiring the container's exact role string used to
+        # cancel this branch on a screen that DID offer the named cell, and the payload went to an edit strip.
+        if re.search(r"\b(" + "|".join(self._TYPE_WORDS) + r")\b", g):
             cell = self._cell_target(goal, elements)
             if cell is not None:
                 text = self._compose_text(goal)
@@ -1436,6 +1843,31 @@ class ConstrainedJudge:
                     return {"choice": texty[0][1], "verb": "type", "text": text,
                             "why": "decisive: editable control", "element_index": texty[0][1],
                             "element": texty[0][2].as_dict(), "decisive": True}
+        conv = self._conventional_menu(re.sub(r"[a-z]:[\\/][^\s'<>|?*]+", " ", g), elements)
+        if conv and (top[2].name or "").strip().lower() == conv and margin >= 2.0 and top[2].role in ("menuitem", "button", "tabitem", "splitbutton"):
+            return {"choice": top[1], "verb": "click", "text": "", "why": f"decisive: '{conv}' is the conventional menu of this command",
+                    "element_index": top[1], "element": top[2].as_dict(), "decisive": True}
+        if (re.search(r"\bsave\b", g) and re.search(r"[a-z]:[\\/]", g) and (top[2].name or "").strip().lower().startswith("save as")
+                and margin >= 2.0 and top[0] >= 9.0 and top[2].role in ("menuitem", "button", "listitem", "tabitem")):
+            return {"choice": top[1], "verb": "click", "text": "", "why": "decisive: 'Save as' for a goal that names a target path",
+                    "element_index": top[1], "element": top[2].as_dict(), "decisive": True}
+        # A goal that names a FILE LOCATION can only advance through the two entries that hold it, and both are UI
+        # conventions rather than app knowledge. Measured on a spreadsheet save run: the shortlist put the file entry
+        # first both times, the 7B judge clicked the app's web-search box instead, and the goal took 9 steps where the
+        # identical run took 5. Evidence this strong is not a judgement call.
+        entry = (top[2].name or "").strip().lower()
+        asks_location = bool(re.search(r"\b(save|open|export|import|print|close)\b", g)) \
+            and bool(re.search(r"[a-z]:[\\/]", g))
+        if (asks_location and top[2].role in ("menuitem", "button", "tabitem", "splitbutton")
+                and entry in self._FILE_ENTRY_NAMES and margin >= 2.0):
+            return {"choice": top[1], "verb": "click", "text": "",
+                    "why": "decisive: file commands live behind the app's file entry",
+                    "element_index": top[1], "element": top[2].as_dict(), "decisive": True}
+        if (asks_location and top[2].role in self._CLICK_ROLES
+                and any(entry.startswith(w) for w in self._PICKER_ROUTE_WORDS) and margin >= 2.0):
+            return {"choice": top[1], "verb": "click", "text": "",
+                    "why": "decisive: the picker route is the only control that takes a full location",
+                    "element_index": top[1], "element": top[2].as_dict(), "decisive": True}
         if top[0] >= 10.0 and margin >= 4.0 and top[2].role in ("menuitem", "button", "tabitem", "listitem",
                                                                   "hyperlink", "checkbox", "radiobutton"):
             return {"choice": top[1], "verb": "click", "text": "", "why": "decisive: overwhelming match",
@@ -1524,6 +1956,18 @@ class ConstrainedJudge:
                 decision["coerced"] = "type->click: goal has no typing intent and the target is not editable"
             if idx < 0 or idx >= len(picks) or verb not in LEGAL_VERBS:
                 return {"invalid": True, "raw": decision}
+            # A control the shortlist DEMOTED because its own label says what it is for (search / address / go-to) and
+            # the goal never names it: the model does not get the last word on that, or every save run burns steps
+            # opening the app's web search. Take the control the ranking already put first, and say why in the trace.
+            if (idx != 0 and self._is_utility_strip(goal, picks[idx])
+                    and not self._is_utility_strip(goal, picks[0])
+                    and picks[0].role in self._CLICK_ROLES
+                    and (verb in ("click", "invoke", "select", "expand", "toggle")
+                         or (verb == "type" and not self._wants_text(goal)))):
+                decision["coerced"] = (f"'{picks[idx].name[:30]}' is a utility strip the goal does not name; "
+                                       f"took the top-ranked '{picks[0].name[:30]}'")
+                idx = 0
+                decision["verb"] = verb = "click"
             # element_index always refers to the ORIGINAL grounded list (callers index into it)
             decision.update({"element": picks[idx].as_dict(), "element_index": orig_index[idx]})
             return decision
@@ -1535,6 +1979,19 @@ class ConstrainedJudge:
 # ---------------------------------------------------------------------------
 # Action primitives: UIA patterns -> PostMessage -> physical input (cursor-clip aware)
 # ---------------------------------------------------------------------------
+
+def _pattern_of(target, pattern_name: str):
+    """A control's TYPED pattern getter is missing on some UIA wrapper classes (a PaneControl has no
+    GetExpandCollapsePattern), which does not mean the element lacks the pattern - ask UIA for the pattern id
+    instead. Measured: a collapsed submenu on such a wrapper never expanded, and the click fell through to a
+    default action that changed nothing, spending a step per retry."""
+    try:
+        return getattr(target, pattern_name)()
+    except AttributeError:
+        import uiautomation as _ua
+        pid = getattr(_ua.PatternId, pattern_name[3:], None)
+        return target.GetPattern(pid) if pid else None
+
 
 def _uia_act(elem: GroundedElement, verb: str, text: str):
     """UIA pattern delivery. Returns (result|None, native_hwnd). Runs on _UIA_EXEC's thread."""
@@ -1579,12 +2036,9 @@ def _uia_act(elem: GroundedElement, verb: str, text: str):
                     # LegacyIAccessible's default action "succeeds" without opening it, so the format items never appear.
                     # Expand it for real.
                     try:
-                        _ec = target.GetExpandCollapsePattern()
+                        _ec = _pattern_of(target, "GetExpandCollapsePattern")
                         if _ec is not None and int(_ec.ExpandCollapseState) == 0:
-                            try:
-                                _inv = target.GetInvokePattern()
-                            except Exception:
-                                _inv = None
+                            _inv = _pattern_of(target, "GetInvokePattern")
                             if _inv is None:
                                 _ec.Expand()
                                 return True, "uia-expand"
@@ -1601,14 +2055,7 @@ def _uia_act(elem: GroundedElement, verb: str, text: str):
                         _order.insert(1, _order.pop(2))
                     for pattern_name, attempts in _order:
                         try:
-                            try:
-                                pat = getattr(target, pattern_name)()
-                            except AttributeError:
-                                # the wrapper class (e.g. PaneControl) has no typed getter, but the
-                                # underlying element may still support the pattern: ask UIA directly
-                                import uiautomation as _ua
-                                pid = getattr(_ua.PatternId, pattern_name[3:], None)
-                                pat = target.GetPattern(pid) if pid else None
+                            pat = _pattern_of(target, pattern_name)
                             if pat is None:
                                 continue
                             {"invoke": lambda: pat.Invoke(),
@@ -1661,6 +2108,16 @@ def _root_of(hwnd: int) -> int:
 
 
 def _act_on_element(elem: GroundedElement, verb: str, text: str = "") -> Tuple[bool, str]:
+    """Every action leaves through the DAP actuation backbone (dap_actuator): the element is described neutrally, the app FAMILY picks the
+    ordered providers (UIA patterns / Chromium / WinUI / window messages / parked pixel click), the first that delivers wins, and the
+    per-provider trace is kept. `HOJAIGA_LEGACY_ACT=1` runs the previous in-line ladder (kept for parity checks)."""
+    if os.environ.get("HOJAIGA_LEGACY_ACT") == "1":
+        return _act_on_element_legacy(elem, verb, text)
+    from core_organs import dap_actuator
+    return dap_actuator.get_actuator().act(elem, verb, text)
+
+
+def _act_on_element_legacy(elem: GroundedElement, verb: str, text: str = "") -> Tuple[bool, str]:
     """Deliver one action to ``elem`` WITHOUT touching the physical pointer or keyboard and
     without changing which window is in front. Ladder: window messages to the exact HWND for
     typing (append at the caret), UIA pattern otherwise, then the other rung. When nothing can
@@ -1856,8 +2313,13 @@ class DesktopAutonomyLoop:
         # per goal: controls that were pressed and CHANGED the screen without completing the goal (WRONG_STATE) - a menu
         # or submenu that is now open. Pressing the same control again cannot advance the goal; its children can.
         self._opened_not_done: Dict[str, set] = {}
+        self._pending_clicks: Dict[str, Dict[str, int]] = {}   # goal -> control -> clicks that 'passed' while the goal's terminal proof was still missing
         self.escalation_shots: List[Dict[str, str]] = []
         self._relaunches = 0
+        # A typing task needs a document on screen; when the instance loses it mid-run the prepare step may run again,
+        # a bounded number of times per run (see _canvas_needed / the in-goal canvas recovery).
+        self._canvas_needed = False
+        self._canvas_prep_left = 0
         self._dap = None
         # Windows kept parked off-screen for the current run (hwnd -> BackgroundSession), apps WE started, run nesting
         self._held: Dict[int, Any] = {}
@@ -1866,6 +2328,8 @@ class DesktopAutonomyLoop:
         self._last_window_mode = "not-needed"
         # W8 app-intelligence organ (None => run on perception alone)
         self.intel = _get_intel()
+        # behavior-model knowledge (unified commands, routes, transitions); None => the loop runs without it
+        self.bridge = _get_bridge()
 
     @property
     def dap_core(self):
@@ -1880,9 +2344,11 @@ class DesktopAutonomyLoop:
         try:
             from core_organs import popup_policy as _pp
             targets = _pp.blocking_dialogs(owner_hwnd) or [owner_hwnd]
+            last_note = ""
             for h in targets[:2]:
                 img, note = hin.capture_window(h)
                 if img is None:
+                    last_note = note
                     continue
                 folder = os.path.join(r"D:\new_automation\data", "escalations")
                 os.makedirs(folder, exist_ok=True)
@@ -1890,6 +2356,10 @@ class DesktopAutonomyLoop:
                 img.save(path, format="PNG")
                 self.escalation_shots.append({"path": path, "why": why[:120], "title": hin.safe_window_text(h)[:60]})
                 return path
+            # Nothing captured: the human still gets the record, with the Win32 reason, instead of silence.
+            self.escalation_shots.append({"path": "", "why": why[:120],
+                                          "title": hin.safe_window_text(owner_hwnd)[:60],
+                                          "capture": (last_note or "no-dialog-window-found")[:160]})
         except Exception as exc:
             logger.debug("[escalate] screenshot failed: %s", exc)
         return ""
@@ -1904,11 +2374,12 @@ class DesktopAutonomyLoop:
         hwnd = self.grounding.find_window(app_hint)
         if hwnd:
             try:
-                pp.TASK.paths = tuple(getattr(self, "_task_paths", ()))
-                pp.TASK.allow_destructive = bool(getattr(self, "_allow_destructive", False))
-                pp.TASK.mode = mode
-                res = pp.clear_blockers(hwnd, mode=mode, task_paths=getattr(self, "_task_paths", ()),
-                                        allow_destructive=getattr(self, "_allow_destructive", False))
+                with _POPUP_LOCK:                   # TASK is process-global state: set + use as one unit (parallel children)
+                    pp.TASK.paths = tuple(getattr(self, "_task_paths", ()))
+                    pp.TASK.allow_destructive = bool(getattr(self, "_allow_destructive", False))
+                    pp.TASK.mode = mode
+                    res = pp.clear_blockers(hwnd, mode=mode, task_paths=getattr(self, "_task_paths", ()),
+                                            allow_destructive=getattr(self, "_allow_destructive", False))
                 handled.extend(res["handled"])
                 if res["need_human"]:
                     self.awaiting_human = True
@@ -1985,9 +2456,15 @@ class DesktopAutonomyLoop:
             from concurrent.futures import ThreadPoolExecutor
             _UIA_EXEC = ThreadPoolExecutor(max_workers=1, thread_name_prefix="uia-act", initializer=_uia_thread_init)
         try:
-            return _UIA_EXEC.submit(self._handle_native_file_dialog_impl, path, confirm_words,
-                                    owner_hwnd).result(timeout=25)
+            ok, note = _UIA_EXEC.submit(self._handle_native_file_dialog_impl, path,
+                                        confirm_words, owner_hwnd).result(timeout=25)
+            # what the recognizer could NOT settle inside the dialog (a name box that may refuse a path) goes
+            # into the step evidence, so a run says it rather than leaving the reader to infer it
+            side_note = getattr(self, "_file_dialog_note", "") or ""
+            self._file_dialog_note = ""
+            return ok, (f"{note} | {side_note}" if side_note else note)
         except Exception as exc:
+            self._file_dialog_note = ""
             return False, f"file-dialog worker failed: {type(exc).__name__}: {exc}"
 
     def _handle_native_file_dialog_impl(self, path: str, confirm_words: Tuple[str, ...] =
@@ -2004,34 +2481,174 @@ class DesktopAutonomyLoop:
                 dlg_proc = (self.grounding._process_stem_cached(int(getattr(dlg, "hwnd", 0) or 0))
                             if dlg is not None and want_proc else "")
                 if dlg and not (want_proc and dlg_proc != want_proc):
-                    dap.file_picker.select_path(dlg, path)
-                    dap.file_picker.confirm(dlg)
-                    return True, f"organ_24 file-picker selected '{path}'"
+                    # success is only claimed after the box was READ BACK and the accept result came back
+                    # SUCCESS; anything else drops to the shape recognizer below, which does the same job
+                    # with UIA and reports its own reason. An ERROR result used to be returned as True.
+                    dap.file_picker.select_path(dlg, path)      # raises unless the box read the value back
+                    res = dap.file_picker.confirm(dlg)
+                    status = str(getattr(res, "status", "") or "")
+                    if status == "SUCCESS":
+                        return True, f"organ_24 file-picker selected '{path}'"
+                    note = str(((getattr(res, "error", None) or {}).get("message") if isinstance(getattr(res, "error", None), dict) else getattr(res, "error", "")) or "accept did not report SUCCESS")
+                    logger.info("[file-picker] organ_24 rung not claimed: %s (falling through to the shape recognizer)", note)
         except Exception as exc:
-            logger.debug("[file-picker] organ_24 note: %s", exc)
+            logger.info("[file-picker] organ_24 rung not claimed: %s: %s (falling through to the shape recognizer)",
+                        type(exc).__name__, exc)
 
+        # ONE recognizer for the whole system (organ_24 SECTION 11B). It asks a window for its SHAPE - a name
+        # box, an enabled accept button, evidence it is about the file system - instead of matching a vendor's
+        # window-class name in a branch, so a family that draws its picker differently is still seen. Measured
+        # here: an UNTITLED dialog of a non-common class held the entire save, every step answered
+        # 'no-file-dialog-visible', and the app sat modal behind a screen the loop kept clicking.
+        try:
+            from core_organs import organ_24_dap as _dap_mod
+        except Exception:  # noqa: BLE001
+            _dap_mod = None
+        owner_pid = 0
+        if owner_hwnd:
+            try:
+                owner_pid = int(hin.window_pid(int(owner_hwnd)) or 0)
+            except Exception:  # noqa: BLE001
+                owner_pid = 0
         user32 = ctypes.windll.user32
         target = None
+        target_shape: Dict[str, Any] = {}
         foreign: List[str] = []
 
-        @ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
-        def _cb(hwnd, _l):
-            nonlocal target
-            cls_buf = ctypes.create_unicode_buffer(256)
-            user32.GetClassNameW(hwnd, cls_buf, 256)
-            if cls_buf.value == "#32770" and user32.IsWindowVisible(hwnd):
-                t = _quick_title(hwnd).lower()
-                if any(w in t for w in ("save", "open", "export", "browse")):
-                    if want_proc:
-                        proc = self.grounding._process_stem_cached(hwnd)
-                        if proc != want_proc:
-                            # Somebody else's picker: never type a path into it, never click Save.
-                            foreign.append(f"'{_quick_title(hwnd)}'({proc or 'unknown-proc'})")
-                            return True
-                    target = hwnd
-            return True
+        def _adopt(reps: List[Dict[str, Any]]) -> None:
+            nonlocal target, target_shape
+            for rep in reps:
+                h = int(rep.get("hwnd") or 0)
+                if not h or h == int(owner_hwnd or 0):
+                    continue
+                if want_proc:
+                    proc = self.grounding._process_stem_cached(h)
+                    if proc != want_proc:
+                        # Somebody else's picker: never type a path into it, never click Save.
+                        foreign.append(f"'{_quick_title(h)}'({proc or 'unknown-proc'})")
+                        continue
+                target, target_shape = h, rep
+                return
 
-        user32.EnumWindows(_cb, 0)
+        if _dap_mod is not None:
+            try:
+                _adopt(_dap_mod.find_file_dialogs(owner_pid=owner_pid, limit=6))
+            except Exception as exc:  # noqa: BLE001
+                logger.debug("[file-dialog] shape scan failed: %s", exc)
+
+        if target is None:
+            # Fallback kept on purpose: a dialog whose UIA tree could not be read (timeout, or UIA off) is
+            # still a dialog by window kind, and losing it used to be silent. Class kinds come from the same
+            # data table, so this path cannot drift from the recognizer above.
+            _kinds = tuple(getattr(_dap_mod, "DIALOG_CLASS_CERTAIN", ("#32770", "NUIDialog"))) + tuple(
+                getattr(_dap_mod, "DIALOG_CLASS_RECOGNISED", ())) if _dap_mod else ("#32770", "NUIDialog")
+            _hints = tuple(getattr(_dap_mod, "DIALOG_TITLE_HINTS", ("save", "open"))) if _dap_mod else ("save", "open")
+
+            @ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
+            def _cb(hwnd, _l):
+                nonlocal target
+                if target is not None or not user32.IsWindowVisible(hwnd):
+                    return True
+                cls_buf = ctypes.create_unicode_buffer(256)
+                user32.GetClassNameW(hwnd, cls_buf, 256)
+                if cls_buf.value not in _kinds:
+                    return True
+                t = _quick_title(hwnd).lower()
+                # a titled dialog of a known kind is taken on the hint; an UNTITLED one has to show its
+                # name box, otherwise every pane of that class would look like a save dialog
+                if not any(w in t for w in _hints) and not _dialog_holds_name_box(int(hwnd)):
+                    return True
+                if want_proc:
+                    proc = self.grounding._process_stem_cached(hwnd)
+                    if proc != want_proc:
+                        foreign.append(f"'{_quick_title(hwnd)}'({proc or 'unknown-proc'})")
+                        return True
+                target = hwnd
+                return True
+
+            user32.EnumWindows(_cb, 0)
+
+        # Only a Win32 common dialog is KNOWN to take an absolute path: its IDFILENAME edit is a path box by
+        # OS contract. Any other shape may refuse one (measured: with 'D:\...\file.xlsx' in its name box the
+        # accept button stayed DISABLED however long we waited, while a bare name kept it live). So ask the
+        # app, through its own controls, for the full picker - walking routes that are DATA, never a
+        # hard-coded road per family - and if nothing answers, SAY so instead of clicking an empty screen.
+        def _full_picker() -> Dict[str, Any]:
+            """Cheap first (window kind + process), then one bounded shape read to confirm it takes a path."""
+            if _dap_mod is None:
+                return {}
+            probe: Dict[str, Any] = {}
+            listed = tuple(getattr(_dap_mod, "DIALOG_CLASS_CERTAIN", ("#32770",)))
+
+            @ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
+            def _f(h2, _l2):
+                if probe:
+                    return True
+                h = int(h2)
+                if h == int(target or 0):
+                    return True
+                if hin._class_name(h) in listed and user32.IsWindowVisible(h2):
+                    if not want_proc or self.grounding._process_stem_cached(h) == want_proc:
+                        probe.update({"hwnd": h, "certain": True})
+                return True
+
+            user32.EnumWindows(_f, 0)
+            return probe
+
+        if (target and path and target_shape and re.match(r"^[A-Za-z]:[\\/]", path)
+                and not target_shape.get("certain")):
+            try:
+                from core_organs import fast_uia as _fu
+                from core_organs import organ_48_app_behavior_model as _bmx
+
+                def _press(root_hwnd: int, pattern: str, wait_s: float) -> bool:
+                    """Press whatever control this app CALLS the next hop, by prefix. Not found is an answer,
+                    not a reason to poke: it returns False and the route moves on."""
+                    end = time.time() + wait_s
+                    while time.time() < end:
+                        for n in (_fu.snapshot(int(root_hwnd), timeout_ms=3000) or []):
+                            if (n.name and n.name.lower().startswith(pattern)
+                                    and n.ctype in ("ButtonControl", "HyperlinkControl", "SplitButtonControl")
+                                    and "invoke" in n.pats and n.enabled):
+                                return bool(_bmx.invoke_node_safely(n)[0])
+                        time.sleep(0.4)
+                    return False
+
+                routes = tuple(getattr(_dap_mod, "DIALOG_PATH_ROUTES", ()))
+                t_end = time.time() + 12.0
+                for route in routes:
+                    if _full_picker() or time.time() >= t_end:
+                        break
+                    for hop, pattern in enumerate(route):
+                        # hop 0 lives in the dialog, the hops after it in the pane the previous one opened.
+                        # A hop that is not there YET is normal (Office's Save As page renders empty for
+                        # seconds while it asks for places), so look again instead of giving up the route.
+                        root = int(target) if hop == 0 else int(owner_hwnd or _root_of(int(target)))
+                        t_hop = min(t_end, time.time() + 5.0)
+                        pressed = False
+                        while time.time() < t_hop and not _full_picker():
+                            if pressed:
+                                time.sleep(0.6)              # wait for the surface the press opened
+                                continue
+                            pressed = _press(root, pattern, 1.5)
+                            if not pressed:
+                                time.sleep(0.7)
+                    cd = _full_picker()
+                    if cd:
+                        cd = dict(cd, **(_dap_mod.file_dialog_shape(int(cd["hwnd"]), timeout_ms=2000) or {}))
+                        target, target_shape = int(cd["hwnd"]), cd
+                        logger.info("[file-dialog] name-only dialog -> route %s -> full picker %s", route, cd["hwnd"])
+                        break
+                if not target_shape.get("certain"):
+                    # Say what was actually found rather than pretending the path will go in: the box before
+                    # the loop takes a NAME, and a full path may be refused by it. The driver still tries it
+                    # (some name boxes do accept one) and the file postcondition, not this note, judges.
+                    self._file_dialog_note = (f"dialog {target} ({target_shape.get('class') or 'unknown-kind'}) "
+                                              f"offers a name box; no control in its own tree opened the full "
+                                              f"picker (routes tried: {len(routes)})")
+                    logger.info("[file-dialog] %s", self._file_dialog_note)
+            except Exception as exc:  # noqa: BLE001
+                logger.debug("[file-dialog] path-route failed: %s", exc)
         if not target:
             if foreign:
                 return False, (f"file-dialog belongs to another app, not the target "
@@ -2039,6 +2656,7 @@ class DesktopAutonomyLoop:
             return False, "no-file-dialog-visible"
         if HAS_UIA:
             import uiautomation as auto
+            stage = "read the dialog's control tree"
             try:
                 ctrl = auto.ControlFromHandle(target)
                 edits, buttons = [], []
@@ -2058,17 +2676,28 @@ class DesktopAutonomyLoop:
                 def _aid(c) -> str:
                     return (getattr(c, "AutomationId", "") or "").strip()
 
-                # The filename box is the Edit with AutomationId 1001 / name 'File name'. The
-                # first Edit in the tree is usually a file-LIST CELL ('System.ItemNameDisplay'),
-                # and writing the path into that silently does nothing.
-                fname = next((c for c in edits if _aid(c) == "1001"), None)                     or next((c for c in edits if "file name" in (c.Name or "").lower()
-                             and not _aid(c).startswith("System.")), None)                     or next((c for c in edits if not _aid(c).startswith("System.")
-                             and not (c.Name or "").lower() in ("name", "date modified", "type", "size")), None)
+                def _field_ok(c, ids_attr: str, hint) -> bool:
+                    """Data table first (a Win32 control id is locale-independent), the caption hint second,
+                    and 'not a file-list column cell' as the floor. No English word is ever the only gate."""
+                    ids = tuple(str(a) for a in getattr(_dap_mod, ids_attr, ()) or ()) if _dap_mod else ()
+                    a = _aid(c)
+                    if any(i and i == a for i in ids):
+                        return True
+                    if a.startswith("System."):                       # a column cell, never the name box
+                        return False
+                    return bool(hint and hint.search((c.Name or "") or ""))
+
+                # The filename box is the Edit carrying the Win32 name-field id (or a name-box caption, or a
+                # plain edit that is not a file-list column). The first Edit in the tree is usually a
+                # file-LIST CELL ('System.ItemNameDisplay'), and writing the path into that silently does nothing.
+                fname = next((c for c in edits if _field_ok(c, "DIALOG_NAME_FIELD_AIDS", _NAME_BOX_CAPTION_HINT)), None) \
+                    or next((c for c in edits if not _aid(c).startswith("System.")), None)
                 if fname is None:
                     return False, "file-dialog: filename field not found"
                 # Type it the way the dialog expects (real EN_CHANGE events), headless: select-all,
                 # clear, then one WM_CHAR per character to the edit's own HWND. A programmatic
                 # SetValue/WM_SETTEXT changes the visible text but Save keeps the old default name.
+                stage = "write the file-name field"
                 eh = int(getattr(fname, "NativeWindowHandle", 0) or 0)
                 if eh:
                     _res = ctypes.c_size_t(0)
@@ -2095,14 +2724,129 @@ class DesktopAutonomyLoop:
                         time.sleep(0.15)
                         if not hin.is_alive(target) or not hin._u32.IsWindowVisible(target):
                             return True, "file-dialog name set + Enter posted to the filename edit"
-                confirm = next((b for b in buttons if _aid(b) == "1"), None)                     or next((b for b in buttons if (b.Name or "").strip().lower() in confirm_words), None)                     or next((b for b in buttons if any(w == (b.Name or "").strip().lower() for w in confirm_words)), None)
+                stage = "choose the dialog's accept control"
+                accept_ids = tuple(str(a) for a in getattr(_dap_mod, "DIALOG_ACCEPT_AIDS", ("1",)) or ()) if _dap_mod else ("1",)
+                _never = tuple(getattr(_dap_mod, "DIALOG_NEVER_PRESS", ()) or ()) if _dap_mod else ()
+                confirm = next((b for b in buttons if _aid(b) in accept_ids), None) \
+                    or next((b for b in buttons
+                             if (b.Name or "").strip().lower() in confirm_words
+                             and not any(b.Name.strip().lower().startswith(n) for n in _never)), None) \
+                    or next((b for b in buttons if any(w == (b.Name or "").strip().lower() for w in confirm_words)), None)
                 if confirm is None:
                     return False, "file-dialog: confirm button not found"
+                stage = "press the dialog's accept control"
                 confirm.GetInvokePattern().Invoke()
                 return True, f"file-dialog name set + clicked '{(confirm.Name or '').strip()}'"
             except Exception as exc:
-                return False, f"file-dialog uia failed: {exc}"
+                # Name the window and the stage. A bare COM number ('-2147220992') said nothing about WHERE the
+                # picker broke, so eight failures in a row could not be told apart from one kind. Measured: it is
+                # the tree read of a dialog stacked behind another modal dialog that throws, not the name field.
+                ident = f"{hin._class_name(target) or 'no-class'}"
+                title = hin.safe_window_text(target)
+                if title:
+                    ident += f" '{title[:40]}'"
+                return False, (f"file-dialog uia failed while trying to {stage} on dialog {target} ({ident}): "
+                               f"{type(exc).__name__}: {str(exc)[:90]}")
         return False, "no-uia-for-dialog"
+
+    # ---- stuck goal -> WIDEN PERCEPTION (a stuck goal means the loop is not seeing what it needs, not that it should poke harder) ----
+    _COMMIT_VERBS = ("save", "open", "export", "import", "print", "apply", "ok", "submit", "send", "create", "add", "confirm", "done", "finish")
+
+    def _goal_is_stuck(self, goal: str) -> bool:
+        pend = sum((self._pending_clicks.get(goal) or {}).values())
+        return pend >= 2 or self._goal_fails.get(goal, 0) >= 2 or len(self._opened_not_done.get(goal) or ()) >= 2
+
+    def _widen_perception(self, hwnd: int, goal: str, elements: List[GroundedElement], ladder: Dict[str, Any]) -> List[GroundedElement]:
+        """Two steps of a goal went by without the goal moving: more of the same controls would only repeat that. Look WIDER, cheapest first:
+        (1) the RAW UIA view (one bulk read): Office / WinUI panes expose their commit buttons as non-'control' elements that the control-view
+            walk never lists; (2) the pixel tiers aimed at the control the goal's own verb implies ('save ... as X' -> the Save control): OCR,
+            then the local Qwen2.5-VL locator. Everything found is added to the grounded list with its tier named; the verifier still judges
+            whatever gets pressed. Reported in ladder['stuck_widen'] so a stuck run says what it tried to see."""
+        rep: Dict[str, Any] = {"raw_added": 0, "pixel": "not needed"}
+        # PATIENCE first: a surface that opened but is still LOADING (measured: Office's Save As pane stays an empty page for seconds while it
+        # asks the network for places) looks exactly like a screen with nothing to press. Poll the bulk tree, bounded, for it to grow.
+        try:
+            from core_organs import fast_uia as _fw
+            t_w = time.time()
+            _spent = getattr(self, "_patience_spent", {})
+            _left = max(0.0, 12.0 - _spent.get(goal, 0.0))          # at most 12 s of waiting per goal, however often it stalls
+            base_n = len(_fw.snapshot(hwnd, timeout_ms=5000) or [])
+            while time.time() - t_w < min(5.0, _left):
+                time.sleep(1.0)
+                now_n = len(_fw.snapshot(hwnd, timeout_ms=5000) or [])
+                if now_n >= base_n + 6:
+                    rep["waited_s"] = round(time.time() - t_w, 1)
+                    rep["grew"] = now_n - base_n
+                    fresh = self.grounding._walk_uia(hwnd)
+                    if fresh:
+                        elements = fresh
+                    break
+            else:
+                rep["waited_s"] = round(time.time() - t_w, 1)
+                rep["grew"] = 0
+            _spent[goal] = _spent.get(goal, 0.0) + (time.time() - t_w)
+            self._patience_spent = _spent
+        except Exception as exc:  # noqa: BLE001
+            rep["wait_error"] = f"{type(exc).__name__}"
+        have = {((e.name or "").strip().lower(), e.role, round(e.bbox[0] / 6), round(e.bbox[1] / 6)) for e in elements}
+        mini = hin.is_minimized(hwnd) or _is_parked_offscreen(hwnd)
+        added: List[GroundedElement] = []
+        # only controls that NAME something the goal is about: the raw view also lists every hidden duplicate behind an open pane (measured: +95
+        # elements, and the judge then oscillated between 'File Tab' and a hidden 'Backstage view')
+        g_clean = re.sub(r"[a-z]:[\\/][^\s'<>|?*]+", " ", (goal or "").lower())
+        about = {t for t in re.findall(r"[a-z0-9]+", g_clean) if t not in ConstrainedJudge._STOP and len(t) > 2}
+        if re.search(r"[a-z]:[\\/]", (goal or "").lower()) and re.search(r"\b(save|open|export|import)\b", g_clean):
+            about |= {"browse", "pc", "computer", "folder"}      # a goal that names a path is answered through the OS file picker ('Browse...')
+        try:
+            from core_organs import fast_uia as _fu
+            for n in (_fu.snapshot(hwnd, timeout_ms=6000) or []):
+                role = n.role
+                if role not in ACTIONABLE_ROLES or not (n.name or "").strip() or not n.enabled or (n.offscreen and not mini):
+                    continue
+                if not (about & set(re.findall(r"[a-z0-9]+", n.name.lower()))):
+                    continue
+                if not mini and not (n.rect[2] > n.rect[0] and n.rect[3] > n.rect[1]):
+                    continue
+                key = (n.name.strip().lower(), role, round(n.rect[0] / 6), round(n.rect[1] / 6))
+                if key in have:
+                    continue
+                have.add(key)
+                added.append(GroundedElement(id=_element_id(hwnd, role, n.name, n.rect), name=n.name.strip(), role=role, bbox=n.rect,
+                                             tier="uia", confidence=0.8, hwnd=hwnd))
+            rep["raw_added"] = len(added)
+        except Exception as exc:  # noqa: BLE001
+            rep["raw_error"] = f"{type(exc).__name__}: {str(exc)[:60]}"
+        first = re.match(r"\s*(?:please\s+)?([a-z]+)", (goal or "").lower())
+        target = first.group(1) if first and first.group(1) in self._COMMIT_VERBS else ""
+        has_target = bool(target) and any(target == (e.name or "").strip().lower() and e.role in ("button", "splitbutton", "menuitem")
+                                          for e in list(elements) + added)
+        if target and not has_target:
+            try:                                         # the verb's control is still not on the list: look at the PIXELS
+                px: List[GroundedElement] = []
+                if HAS_PYTESSERACT and HAS_PIL:
+                    px = [e for e in self.grounding._walk_ocr(hwnd) if target in (e.name or "").lower()]
+                    rep["pixel"] = f"ocr found {len(px)}"
+                if not px:
+                    r2: Dict[str, Any] = {}
+                    px = self.grounding._qwen_locate(hwnd, target, r2)
+                    rep["pixel"] = f"qwen-vl locate '{target}': {len(px)} hit(s)" + (f" {r2.get('tiers_skipped')}" if r2.get("tiers_skipped") else "")
+                added.extend(px)
+            except Exception as exc:  # noqa: BLE001
+                rep["pixel"] = f"failed: {type(exc).__name__}: {str(exc)[:60]}"
+        ladder["stuck_widen"] = rep
+        try:                       # a picture of what the loop is stuck ON (the same evidence a human gets when it escalates)
+            _n_shots = getattr(self, "_stuck_shots", {})
+            if _n_shots.get(goal, 0) < 8:
+                _n_shots[goal] = _n_shots.get(goal, 0) + 1
+                self._stuck_shots = _n_shots
+                from core_organs import task_lifecycle as _tl
+                shot = _tl.capture_evidence("", f"stuck: {goal[:60]}", hwnd=hwnd)
+                rep["screenshot"] = shot.get("path") or shot.get("note")
+        except Exception:  # noqa: BLE001
+            pass
+        if rep["raw_added"] or added:
+            logger.info("[stuck] goal %r: widened perception (+%d element(s)): %s", (goal or "")[:50], len(added), rep)
+        return list(elements) + added
 
     # ---- W8: consult app intelligence (the "pro knowledge" layer) ----
     def _consult_intel(self, app_hint: str, goal: str) -> Optional[Dict[str, Any]]:
@@ -2130,7 +2874,8 @@ class DesktopAutonomyLoop:
         # Only a genuinely-verified shortcut may skip the judge. An unverified
         # archetype guess must never take direct control of the machine.
         if (top.shortcut and top.source == "learned"
-                and top.confidence >= PRO_SHORTCUT_CONF and not top.destructive):
+                and top.confidence >= PRO_SHORTCUT_CONF and not top.destructive
+                and getattr(top, "successes", DIRECT_MIN_SUCCESSES) >= DIRECT_MIN_SUCCESSES):
             return {"kind": "shortcut", "shortcut": top.shortcut,
                     "confidence": top.confidence, "source": top.source,
                     "step_id": top.step_id, "goal": goal, "kb_route": kb_route}
@@ -2220,6 +2965,17 @@ class DesktopAutonomyLoop:
 
         # Crash / "Not Responding" detection: relaunch via organ_40 and resume
         if hwnd and self.is_app_crashed_or_hung(hwnd):
+            try:                                                           # B2: one stat before any relaunch
+                from core_organs import organ_48_app_behavior_model as _bm2
+                _exe = _bm2._exe_of_hwnd(hwnd)
+            except Exception:
+                _exe = ""
+            if _exe and not os.path.isfile(_exe):
+                self._launch_note = f"executable missing ({_exe}); not relaunching"
+                logger.warning("[autonomy] %s", self._launch_note)
+                entry = StepTrace(goal, "-", "-", "WRONG_STATE", "relaunch", self._launch_note, ladder["tiers_ran"])
+                self.trace.append(entry)
+                return self._step_result(entry, elements=[])
             logger.warning("[autonomy] App %s (hwnd=%s) is hung/crashed. Relaunching...", app_hint, hwnd)
             self.capsule_cb("working", f"Relaunching {app_hint} (not responding)")
             try:
@@ -2237,10 +2993,55 @@ class DesktopAutonomyLoop:
             self.trace.append(entry)
             return self._step_result(entry, elements=[])
 
+        # A TYPING goal needs a surface to hold its payload. The instance can lose it mid-run (it dies, the fresh one
+        # opens on its own start screen), and the run-start prepare step has already been spent. Measured: after such
+        # a loss the loop typed into a launcher's search field and clicked 'Backstage view'. Bounded retries, and only
+        # for goals that ask for text: pressing a create-document control during a SAVE goal would discard the very
+        # unsaved work the goal is trying to keep.
+        if (self._canvas_needed and self._canvas_prep_left > 0
+                and re.match(r"^\s*(?:type|write|enter|input)\b", goal or "", re.I)
+                and self._writable_surface(elements)[0] == 0):
+            self._canvas_prep_left -= 1
+            try:
+                prep_note = self._ensure_blank_document(app_hint)
+            except Exception as prep_exc:
+                prep_note = f"canvas recovery failed ({type(prep_exc).__name__})"
+            logger.info("[autonomy] canvas recovery inside goal: %s", prep_note)
+            self.trace.append(StepTrace(goal, "(prepare)", "check", "PASS", "hygiene", prep_note, ladder["tiers_ran"]))
+            hwnd, elements, ladder = self._wait_for_ready(app_hint)
+            if not elements:
+                entry = StepTrace(goal, "-", "-", "WRONG_STATE", "ground",
+                                  f"no elements after canvas recovery; ladder={ladder}", ladder["tiers_ran"])
+                self.trace.append(entry)
+                return self._step_result(entry, elements=[])
+
+        if hwnd and self._goal_is_stuck(goal):
+            elements = self._widen_perception(hwnd, goal, elements, ladder)
         before = self.verifier.snapshot(hwnd, elements)
         if not expect:
             before.names = self._all_names(hwnd)      # the default postcondition also compares every UIA name
             before.modes = list(getattr(self, "_last_modes", []))
+        elif self.bridge is not None:                 # 3.2/3.3: the state a transition starts from (names + mode indicators)
+            before.names = self._all_names(hwnd)
+            before.modes = list(getattr(self, "_last_modes", []))
+
+        step_expect, goal_terminal = split_terminal_expect(expect)
+
+        def _grade(after_els: List[GroundedElement]) -> Tuple[str, str, Optional[bool]]:
+            """Judge the STEP by what the step can prove, and ask separately whether the goal's TERMINAL
+            condition (a file on disk) now holds. The terminal truth outranks a step verdict in both
+            directions: a step that produced the file is never a non-PASS, and a step that only moved the
+            UI does not complete the goal (the caller advances on goal_done, not on a moved pixel)."""
+            snap = self._snap(hwnd, after_els, step_expect)
+            v, ev = self.verifier.verdict(step_expect, before, snap, after_els, goal=goal)
+            if goal_terminal is None:
+                return v, ev, None
+            t_ok, t_ev = self.verifier.check_expect(goal_terminal, before, snap, after_els)
+            if t_ok:
+                v, ev = "PASS", (ev if v == "PASS" else f"{ev} | goal terminal condition met ({t_ev})")
+            elif v == "PASS":
+                ev = f"{ev} | goal still pending ({t_ev})"
+            return v, ev, bool(t_ok)
 
         # ---- Native file dialog rung: a goal naming an absolute path + a visible
         # Save/Open dialog is resolved deterministically (type path, confirm), not by the LLM.
@@ -2251,15 +3052,14 @@ class DesktopAutonomyLoop:
             if fd_ok:
                 time.sleep(0.6)
                 after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
-                verdict, evidence = self.verifier.verdict(
-                    expect, before, self._snap(hwnd, after_elements, expect), after_elements)
+                verdict, evidence, goal_done = _grade(after_elements)
                 self._history.append(f"file-dialog {path_m.group(0)} -> {verdict}")
                 entry = StepTrace(goal, "file-dialog", "file-dialog", verdict, "native-file-dialog",
                                   f"{fd_note}; {evidence}", ladder["tiers_ran"])
                 self.trace.append(entry)
                 self._write_checkpoint(entry)
                 self.capsule_cb("working", f"[{app_hint}] file dialog -> {verdict}")
-                return self._step_result(entry, elements=after_elements)
+                return self._step_result(entry, elements=after_elements, goal_done=goal_done)
 
         # ---- W8 PRO PATH: a confidently-learned shortcut beats the LLM ----
         pro = self._consult_intel(app_hint, goal)
@@ -2275,6 +3075,25 @@ class DesktopAutonomyLoop:
         # not reachable (menus often live in a popup host the UIA tree cannot see), so try the
         # expert hint's keyboard route ONCE. Non-destructive only, focus proven, and the result
         # is still judged by the postcondition (an unverified guess never counts as success).
+        # ---- K: unified command knowledge learned by scans/explorations (statically from the program file, live from
+        # menus, explored surfaces, tested conventions). A VERIFIED command (>= 2 successes, postcondition, not E2) runs
+        # directly; anything less only ranks the judge's shortlist.
+        kb = None
+        if self.bridge is not None:
+            kb = self.bridge.consult(app_hint, goal, wants_text=self.judge._wants_text(goal))
+            if kb is not None:
+                direct, why = self.bridge.direct_ok(kb, goal)
+                logger.info("[knowledge] goal=%r -> %r score=%.1f sources=%s direct=%s (%s)", goal[:40], kb["name"], kb["score"],
+                            kb["sources"], direct, why)
+                if direct and (pro is None or pro.get("kind") != "shortcut"):
+                    return self._run_kb_route(kb, goal, app_hint, hwnd, before, expect, elements, ladder)
+                acc, acc_why = self.bridge.accelerator_ok(kb, goal)
+                if acc and (pro is None or pro.get("kind") != "shortcut") and self._goal_fails.get(goal, 0) < 2:
+                    logger.info("[knowledge] declared accelerator attempt: %s", acc_why)
+                    return self._run_kb_route(kb, goal, app_hint, hwnd, before, expect, elements, ladder, only="key",
+                                              tag="knowledge:accelerator")
+                if pro is None or pro.get("source") not in ("learned",):
+                    pro = self.bridge.as_hint(kb)
         kb_key = (pro.get("shortcut") or pro.get("kb_route") or "") if pro is not None else ""
         kb_recovery = (pro is not None and pro["kind"] == "element" and bool(kb_key)
                        and self._goal_fails.get(goal, 0) >= 4
@@ -2288,12 +3107,13 @@ class DesktopAutonomyLoop:
             ok, method = _send_shortcut(pro["shortcut"], hwnd)
             time.sleep(0.8)  # let a dialog/menu open before verifying
             after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
-            verdict, evidence = self.verifier.verdict(
-                expect, before, self._snap(hwnd, after_elements, expect), after_elements)
+            verdict, evidence, goal_done = _grade(after_elements)
             if verdict != "PASS" and hin.is_xaml_host(_root_of(hwnd)):
                 evidence += " [XAML/WinUI host: posted keys are not delivered to XAML input - the shortcut cannot work headless; use the element route]"
                 method += "+xaml-ignores-posted-keys"
             self._reinforce(app_hint, goal, pro, verdict)
+            self._record_knowledge(app_hint, goal, kb=None, verb="key", target=pro.get("shortcut", ""), effector="key", verdict=verdict,
+                                   before=before, expect=expect, hwnd=hwnd, evidence=evidence)
             self._goal_fails[goal] = 0 if verdict == "PASS" else self._goal_fails.get(goal, 0) + 1
             self._history.append(f"shortcut {pro['shortcut']} -> {verdict}")
             entry = StepTrace(goal, f"shortcut:{pro['shortcut']}", "shortcut", verdict,
@@ -2302,22 +3122,40 @@ class DesktopAutonomyLoop:
             self._write_checkpoint(entry)
             if verdict == "PASS":
                 self.capsule_cb("working", f"[{app_hint}] Verified: shortcut executed")
-            return self._step_result(entry, elements=after_elements)
+            return self._step_result(entry, elements=after_elements, goal_done=goal_done)
 
         spent = set(self._opened_not_done.get(goal) or set())
+        # a control pressed twice with a 'UI changed' pass while the goal's terminal proof (the file) is still missing is not advancing the goal:
+        # stop offering it (measured: an Office save goal pressed the toolbar 'Save' 11 times; each press 'passed' as a weak UI change)
+        spent |= {n for n, c in (self._pending_clicks.get(goal) or {}).items() if c >= 2}
+        # a menu / dropdown that is ALREADY OPEN is not pressed again (that closes it): its items are on screen. Measured: with 'File' open the hint
+        # bonus kept 'File' on top and the loop toggled it shut, then pressed 'New' on a document holding the picture it had just pasted.
+        try:
+            spent |= {str(m).split("|", 1)[0] for m in (before.modes or []) if str(m).endswith("|expanded")}
+        except Exception:  # noqa: BLE001
+            pass
         if re.search(r"\b(?:save|export)\b", goal or "", re.I) and not re.search(r"\b(?:close|exit|quit|discard|don'?t)\b", goal or "", re.I):
             # a goal that SAVES is never advanced by closing the document or app (an unsaved sheet was once closed
             # with "Don't Save" four steps into a save-as); those controls are not offered to the judge for it
             spent |= {"close", "exit", "quit", "don't save", "do not save", "discard", "discard changes"}
-        offered = [e for e in elements if (e.name or "").strip().lower() not in spent] or elements
+        # an ACCOUNT control (a person's name, Sign in / Sign out / Switch account) is never a step toward an in-app goal that does not talk about
+        # accounts: pressing it opens the user's profile menu (measured: an Excel save goal expanded the signed-in user's name)
+        _chrome_ok = bool(self.judge._goal_tokens(goal) & self.judge._CHROME_GOAL_WORDS) or bool(DesktopVerifier._MAY_CLOSE_RE.search(goal or ""))
+        _bar = _titlebar_buttons(elements, hwnd)
+        _not_chrome = lambda e: _chrome_ok or ((e.name or "").strip().lower() not in self.judge._WINDOW_CHROME and id(e) not in _bar)
+        offered = [e for e in elements if (e.name or "").strip().lower() not in spent and _not_chrome(e)
+                   and not (e.role in ("menuitem", "button", "listitem", "splitbutton") and is_account_control(e.name, goal))]             or [e for e in elements if _not_chrome(e)]       # never fall back to the window's own title-bar buttons: with only chrome on screen there is NOTHING to press
         if logger.isEnabledFor(logging.INFO):
             try:
                 _top = [(round(sc, 1), e.name[:20], e.role) for sc, _i, e in self.judge.rank_scored(goal, offered, pro)[:5]]
                 logger.info("[judge] goal=%r offered=%d avoided=%s top=%s", goal[:50], len(offered), sorted(spent)[:4], _top)
             except Exception:
                 pass
-        decision = self.judge.decide(goal, offered, app_hint=app_hint, history=self._history,
-                                     pro_hint=pro)
+        if not offered:                                     # only window chrome (or nothing) is on screen: not a decision the judge may be asked to make
+            decision = {"invalid": True, "raw": "", "why": "nothing but the window's title-bar buttons is on screen: no control to press for this goal"}
+        else:
+            decision = self.judge.decide(goal, offered, app_hint=app_hint, history=self._history,
+                                         pro_hint=pro)
         if decision and not decision.get("invalid") and offered is not elements:
             try:                                    # element_index must keep referring to the FULL grounded list
                 decision["element_index"] = elements.index(offered[int(decision["element_index"])])
@@ -2340,20 +3178,26 @@ class DesktopAutonomyLoop:
         elem = elements[decision["element_index"]]
         verb = decision["verb"]
         text = str(decision.get("text", ""))
-        if verb == "type" and text and "text_contains" not in expect:
+        if verb == "type" and text and "text_contains" not in step_expect:
             # A typed payload is verified by CONTENT, not by a hash: the text the judge actually
             # delivered becomes the postcondition, so a keystroke that landed cannot be called
             # NO_CHANGE (which used to make the ladder type it again) and text that went into the
             # wrong control cannot be called PASS (a path once went into 'Save as type:' and still
             # 'verified' because the dialog's pixels moved).
-            expect = dict(expect, text_contains=text)
+            step_expect = dict(step_expect, text_contains=text)
 
         if verb == "done":
-            entry = StepTrace(goal, elem.name, "done", "PASS", "judge", "declared-done",
-                              ladder["tiers_ran"])
+            # A declared-done is never accepted on the declaration alone when the goal has a terminal proof:
+            # the file either exists or the step is graded WRONG_STATE with the reason.
+            d_snap = self._snap(hwnd, elements, step_expect)
+            d_ok, d_ev = (True, "no terminal condition") if goal_terminal is None else \
+                self.verifier.check_expect(goal_terminal, before, d_snap, elements)
+            verdict = "PASS" if d_ok else "WRONG_STATE"
+            entry = StepTrace(goal, elem.name, "done", verdict, "judge",
+                              f"declared-done; terminal check: {d_ev}", ladder["tiers_ran"])
             self.trace.append(entry)
-            self.capsule_cb("working", f"[{app_hint}] Verified: goal completed")
-            return self._step_result(entry)
+            self.capsule_cb("working", f"[{app_hint}] {'Verified' if d_ok else 'declared-done but goal not met'}")
+            return self._step_result(entry, elements=elements, goal_done=bool(d_ok))
 
         # Blast radius guard: destructive element names need explicit opt-in.
         if any(cue in (elem.name or "").lower() for cue in DESTRUCTIVE_CUES) \
@@ -2365,7 +3209,7 @@ class DesktopAutonomyLoop:
             self.trace.append(entry)
             return self._step_result(entry)
 
-        if verb == "type" and path_m and re.search(r"file ?name", elem.name or "", re.I):
+        if verb == "type" and path_m and _is_name_box_element(elem, hwnd):
             text = path_m.group(0)             # the goal's own path, verbatim (a model typed just the file's base name)
         self._typed_into = elem if verb == "type" else None
         self.capsule_cb("working", f"[{app_hint}] {verb} '{elem.name[:30]}'")
@@ -2376,6 +3220,17 @@ class DesktopAutonomyLoop:
             except Exception:
                 pass
 
+        if self.bridge is not None and verb in ("click", "invoke", "key", "shortcut"):
+            gate = self.bridge.precheck(app_hint, elem.name, hwnd, self.grounding)
+            if gate is not None and not gate["ok"]:             # 3.2: never fire a command whose mode precondition is unmet
+                self._history.append(f"{verb} '{elem.name}' refused: {gate['why'][:60]}")
+                entry = StepTrace(goal, elem.name, verb, "WRONG_STATE", "precondition", gate["why"], ladder["tiers_ran"])
+                self.trace.append(entry)
+                self._write_checkpoint(entry)
+                self.capsule_cb("working", f"[{app_hint}] '{elem.name[:24]}' needs another mode first")
+                return self._step_result(entry, elements=elements)
+            if gate is not None and gate["repaired"]:
+                self._history.append(f"mode repaired via {gate['repaired']} before '{elem.name}'")
         ok, method = _act_on_element(elem, verb, text)
         if not ok:
             # Delivery itself failed, so nothing that the UI does afterwards may be read as success.
@@ -2397,9 +3252,7 @@ class DesktopAutonomyLoop:
 
         # Verification step
         after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
-        verdict, evidence = self.verifier.verdict(expect, before,
-                                                  self._snap(hwnd, after_elements, expect),
-                                                  after_elements)
+        verdict, evidence, goal_done = _grade(after_elements)
 
         # NO_CHANGE retry ladder through organ_24 RecoveryEngine sequence:
         # wait/reinvoke -> PostMessage -> physical click
@@ -2408,8 +3261,7 @@ class DesktopAutonomyLoop:
             time.sleep(0.3)
             _act_on_element(elem, "invoke" if verb == "click" else verb, text)
             after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
-            after_re = self._snap(hwnd, after_elements, expect)
-            verdict, evidence = self.verifier.verdict(expect, before, after_re, after_elements)
+            verdict, evidence, goal_done = _grade(after_elements)
             method += "+retry-invoke"
 
             # 2. If still NO_CHANGE, try PostMessage
@@ -2417,8 +3269,7 @@ class DesktopAutonomyLoop:
                 _postmessage_action(elem, verb, text)
                 time.sleep(0.2)
                 after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
-                after_pm = self._snap(hwnd, after_elements, expect)
-                verdict, evidence = self.verifier.verdict(expect, before, after_pm, after_elements)
+                verdict, evidence, goal_done = _grade(after_elements)
                 method += "+retry-postmessage"
 
             # 3. If still NO_CHANGE, post a coordinate click to the exact window (headless)
@@ -2427,8 +3278,7 @@ class DesktopAutonomyLoop:
                 hin.post_click(_root_of(elem.hwnd or hwnd), cx, cy)
                 time.sleep(0.25)
                 after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
-                after2 = self._snap(hwnd, after_elements, expect)
-                verdict, evidence = self.verifier.verdict(expect, before, after2, after_elements)
+                verdict, evidence, goal_done = _grade(after_elements)
                 method += "+retry-postclick"
 
         # A posted KEY into a XAML/WinUI host is not delivered by that UI stack: say so (and keep the verdict honest)
@@ -2438,6 +3288,48 @@ class DesktopAutonomyLoop:
             method += "+xaml-ignores-posted-keys"
             self._history.append(f"{verb} ignored by a XAML host")
 
+        # A FILE NAME box (a Save As pane drawn inside the app, not a dialog window) that now holds the goal's path is COMMITTED the way a
+        # person commits it: Enter in that very control. The dialog rung does this for real dialogs; Office's backstage has no dialog.
+        if (verb == "type" and verdict == "PASS" and goal_done is False and path_m
+                and _is_name_box_element(elem, hwnd) and "text has '" in (evidence or "")):
+            try:
+                _loc = _uia_dispatch(elem, "locate", "")
+                _nat = int(_loc[1]) if _loc else 0
+                # the pane's own COMMIT button first (a UIA Invoke is delivered by the control itself), Enter in the field otherwise
+                # The commit button is looked up in the RAW UIA view (one bulk read): Office's pane exposes it as a non-'control' element, so the
+                # ground list (control view) does not carry it - the left-hand 'Save' LIST ITEM is the only 'Save' it sees.
+                _ok_e, _note_e = False, "no-commit-control"
+                try:
+                    from core_organs import fast_uia as _fu
+                    from core_organs import organ_48_app_behavior_model as _bmx
+                    from core_organs import organ_24_dap as _dap_c
+                    _snap = _fu.snapshot(_root_of(elem.hwnd) or hwnd, timeout_ms=6000) or []
+                    # the accept button by the SAME data tables the dialog rung uses (words and kinds live in data, not here)
+                    _accept_words = tuple(getattr(_dap_c, "DIALOG_ACCEPT_WORDS", ("save", "ok")))
+                    _never_press = tuple(getattr(_dap_c, "DIALOG_NEVER_PRESS", ("cancel", "close")))
+                    _accept_kinds = tuple(k.lower() for k in getattr(_dap_c, "DIALOG_ACCEPT_ROLES", ("buttoncontrol",)))
+                    _btn = next((n for n in _snap if str(n.ctype or "").lower() in _accept_kinds
+                                 and any((n.name or "").strip().lower().startswith(w) for w in _accept_words)
+                                 and not any(v in (n.name or "").lower() for v in _never_press)
+                                 and "invoke" in n.pats and n.enabled), None)
+                    logger.info("[commit] raw view of hwnd %s: %d nodes, commit button %s%s", _root_of(elem.hwnd), len(_snap), "found" if _btn is not None else "NOT found",
+                                "" if _btn is not None else "; buttons=" + str([(n.name[:18], n.pats[:2], n.enabled) for n in _snap if n.ctype == "ButtonControl" and n.name][:14]))
+                    if _btn is not None:
+                        _ok_e, _how_e = _bmx.invoke_node_safely(_btn)
+                        _note_e = f"invoked '{_btn.name}' ({_how_e})"
+                except Exception as _exc2:  # noqa: BLE001
+                    logger.info("[commit] raw-view commit lookup failed: %s: %s", type(_exc2).__name__, _exc2)
+                if not _ok_e and (_nat or elem.hwnd):
+                    _ok_e, _note_e = hin.post_key_combo(_nat or elem.hwnd, "enter")
+                if _ok_e:
+                    time.sleep(1.2)
+                    after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
+                    verdict, evidence, goal_done = _grade(after_elements)
+                    evidence += f" | committed from '{elem.name}': {_note_e}"
+                    method += "+commit"
+            except Exception as _exc:  # noqa: BLE001
+                logger.debug("[commit] enter-commit skipped: %s", _exc)
+
         # On WRONG_STATE, triage popups first to dismiss unexpected roadblocks, then re-check
         if verdict == "WRONG_STATE":
             popup_notes = self._triage_popups(app_hint)
@@ -2445,8 +3337,7 @@ class DesktopAutonomyLoop:
                 evidence += " | cleared: " + "; ".join(popup_notes)
                 time.sleep(0.2)
                 after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
-                after_pop = self._snap(hwnd, after_elements, expect)
-                verdict, evidence = self.verifier.verdict(expect, before, after_pop, after_elements)
+                verdict, evidence, goal_done = _grade(after_elements)
 
         if verdict == "PASS":
             popup_notes = self._triage_popups(app_hint)
@@ -2458,15 +3349,40 @@ class DesktopAutonomyLoop:
 
         # Reinforce the app-intelligence organ with the verified (or failed)
         # outcome, so the next run against this app gets a stronger honest prior.
-        self._reinforce(app_hint, goal, {"kind": "element", "verb": verb,
-                        "element_name": elem.name, "element_role": elem.role}, verdict)
+        # A step that only 'changed the UI' while the goal's TERMINAL proof (the file) is still missing has proved nothing about the goal: it is not
+        # taught as the way to do it (measured: 'File > New' reached confidence 0.97 for "save the document as ..." that way, then drove the
+        # judge to press New on a canvas holding the user's drawing). The goal's steps are reinforced when the goal is proven done.
+        # Likewise a PASS whose ONLY evidence is 'some names changed' with NO pixel moving and no mode change (default postcondition) is the signature of a
+        # blank / hidden / closing window, not of a command that worked: it is not taught (a sign-in screen's title-bar Close reached 0.97 that way).
+        _blank_pass = (verdict == "PASS" and not step_expect and goal_done is None and "below tolerance" in (evidence or "") and "modes +" not in (evidence or ""))
+        if not (verdict == "PASS" and goal_done is False) and not _blank_pass:
+            self._reinforce(app_hint, goal, {"kind": "element", "verb": verb,
+                            "element_name": elem.name, "element_role": elem.role}, verdict)
+        if verdict == "PASS" and goal_done:
+            _seen_steps = set()
+            for _st in self.trace:
+                if _st.goal == goal and _st.verdict == "PASS" and _st.verb in ("click", "type", "invoke") and _st.element not in _seen_steps                         and _st.element != (elem.name or ""):
+                    _seen_steps.add(_st.element)
+                    self._reinforce(app_hint, goal, {"kind": "element", "verb": _st.verb, "element_name": _st.element, "element_role": ""}, "PASS")
+        self._record_knowledge(app_hint, goal, kb=kb, verb=verb, target=elem.name, effector=method, verdict=verdict,
+                               before=before, expect=step_expect, hwnd=hwnd, evidence=evidence)
 
         self._goal_fails[goal] = 0 if verdict == "PASS" else self._goal_fails.get(goal, 0) + 1
+        if verb in ("click", "invoke") and verdict == "PASS" and goal_done is False:
+            _pc = self._pending_clicks.setdefault(goal, {})
+            _nm = (elem.name or "").strip().lower()
+            _pc[_nm] = _pc.get(_nm, 0) + 1
+        elif verdict == "PASS" and goal_done:
+            self._pending_clicks.pop(goal, None)
         if verdict == "WRONG_STATE" and verb in ("click", "invoke"):
             self._opened_not_done.setdefault(goal, set()).add((elem.name or "").strip().lower())
         elif verdict == "WRONG_STATE" and verb == "type" and "text has '" in (evidence or ""):
             # The text IS in that control (the goal's other conditions - the file, the dialog - are what is missing):
             # typing it there again appends a duplicate (a filename box once read 401 chars of the same path).
+            self._opened_not_done.setdefault(goal, set()).add((elem.name or "").strip().lower())
+        elif verb == "type" and verdict == "PASS" and goal_done is False and "text has '" in (evidence or ""):
+            # the control now HOLDS the text but the goal's terminal proof (the saved file) is still missing: the next move is to COMMIT it
+            # (Save / Enter), not to type it again (measured: an Office backstage 'File name' box was typed five times, 210 chars)
             self._opened_not_done.setdefault(goal, set()).add((elem.name or "").strip().lower())
         elif verdict == "PASS":
             self._opened_not_done.pop(goal, None)
@@ -2474,7 +3390,69 @@ class DesktopAutonomyLoop:
         entry = StepTrace(goal, elem.name, verb, verdict, method, evidence, ladder["tiers_ran"])
         self.trace.append(entry)
         self._write_checkpoint(entry)
-        return self._step_result(entry, elements=after_elements)
+        return self._step_result(entry, elements=after_elements, goal_done=goal_done)
+
+    def _run_kb_route(self, kb: Dict[str, Any], goal: str, app_hint: str, hwnd: int, before: "Snapshot",
+                      expect: Dict[str, Any], elements: List[GroundedElement], ladder: Dict[str, Any],
+                      only: str = "", tag: str = "knowledge:direct") -> Dict[str, Any]:
+        """Execute a VERIFIED unified command through its best route, then let the postcondition verifier judge it.
+        A failure erodes the command (it stops qualifying for direct control) and the next step falls back to the judge."""
+        self.capsule_cb("working", f"[{app_hint}] {kb['name']} (verified x{kb['successes']})")
+        gate = self.bridge.precheck(app_hint, kb["name"], hwnd, self.grounding)
+        if gate is not None and not gate["ok"]:
+            entry = StepTrace(goal, kb["name"], "kb-route", "WRONG_STATE", "precondition", gate["why"] + f" [{tag} blocked]", ladder["tiers_ran"])
+            self.trace.append(entry)
+            self._write_checkpoint(entry)
+            return self._step_result(entry, elements=elements)
+        ok, eff, note = self.bridge.execute(kb, hwnd, self.grounding, only=only)
+        if ok:
+            self._settle(hwnd)
+        after_elements = self.grounding._walk_uia(hwnd) if HAS_UIA else self.grounding._walk_win32(hwnd)
+        # Same split as the judge path: a verified command that opens a menu is graded on the UI it moved,
+        # and the goal's out-of-UI proof (the file) is asked separately - otherwise direct control would
+        # erode its own best command on every intermediate step.
+        step_expect, goal_terminal = split_terminal_expect(expect)
+        snap = self._snap(hwnd, after_elements, step_expect)
+        goal_done: Optional[bool] = None
+        if ok:
+            verdict, evidence = self.verifier.verdict(step_expect, before, snap, after_elements, goal=goal)
+        else:
+            verdict, evidence = "NO_CHANGE", f"route not delivered ({note})"
+        if goal_terminal is not None:
+            t_ok, t_ev = self.verifier.check_expect(goal_terminal, before, snap, after_elements)
+            goal_done = bool(t_ok)
+            if t_ok and verdict != "PASS":
+                verdict, evidence = "PASS", f"{evidence} | goal terminal condition met ({t_ev})"
+            elif verdict == "PASS":
+                evidence = f"{evidence} | goal still pending ({t_ev})"
+        self._record_knowledge(app_hint, goal, kb=kb, verb="invoke", target=kb["name"], effector=eff, verdict=verdict,
+                               before=before, expect=expect, hwnd=hwnd, evidence=evidence)
+        self._goal_fails[goal] = 0 if verdict == "PASS" else self._goal_fails.get(goal, 0) + 1
+        self._history.append(f"knowledge {kb['name']} via {eff} -> {verdict}")
+        entry = StepTrace(goal, kb["name"], "kb-route", verdict, eff, evidence + f" [{tag}]", ladder["tiers_ran"])
+        self.trace.append(entry)
+        self._write_checkpoint(entry)
+        return self._step_result(entry, elements=after_elements, goal_done=goal_done)
+
+    def _record_knowledge(self, app_hint: str, goal: str, *, kb: Optional[Dict[str, Any]], verb: str, target: str,
+                          effector: str, verdict: str, before: "Snapshot", expect: Dict[str, Any], hwnd: int,
+                          evidence: str) -> None:
+        """3.3: every verified step becomes behavior knowledge: the command is reinforced/eroded, the effector outcome is
+        recorded and the (state, action, effector) -> (state', evidence) transition is written. Never raises."""
+        if self.bridge is None:
+            return
+        try:
+            if kb is not None:
+                from core_organs import command_registry as _cr
+                if _cr.canon(target) not in {_cr.canon(n) for n in kb["names"]}:
+                    kb = None                          # the judge chose something else: do not credit the hinted command
+            after_names = self._all_names(hwnd) if verdict == "PASS" else []
+            b = self.bridge.observe_light(hwnd, before.title, list(before.names or []), list(before.modes or []))
+            a = self.bridge.observe_light(hwnd, _quick_title(hwnd), after_names, list(getattr(self, "_last_modes", []))) if verdict == "PASS" else None
+            self.bridge.record(app_hint, goal, verb=verb, target=target, effector=effector, verdict=verdict,
+                               before_state=b, after_state=a, evidence=evidence, kb=kb, strong=bool(expect))
+        except Exception as exc:
+            logger.debug("[knowledge] record failed: %s", exc)
 
     def _control_text(self, elements: List[GroundedElement]) -> str:
         """Longest readable text among the editable controls (UIA value/text pattern)."""
@@ -2528,6 +3506,8 @@ class DesktopAutonomyLoop:
                         modes.append(f"{nm}|selected")
                     if n.expand_state == 1:
                         modes.append(f"{nm}|expanded")
+                    if getattr(n, "toggle_state", -1) == 1:
+                        modes.append(f"{nm}|checked")
         except Exception as exc:
             logger.debug("[verify] name read failed: %s", exc)
         self._last_modes = modes
@@ -2554,6 +3534,17 @@ class DesktopAutonomyLoop:
             polls += 1
             stable = stable + 1 if cur == last else 0
             last = cur
+        # a menu reported EXPANDED whose flyout window has not appeared yet is still opening (XAML flyouts render a beat after the pattern call):
+        # 'stable' was reached on the old tree. Wait, bounded, for the flyout - grounding now would offer the menu again instead of its items.
+        try:
+            from core_organs import fast_uia as _fu
+            if any(n.ctype == "MenuItemControl" and n.expand_state == 1 for n in (_fu.snapshot(hwnd, timeout_ms=3000) or [])) and not hin.popup_windows(hwnd):
+                t_end = time.time() + 3.0
+                while time.time() < t_end and not hin.popup_windows(hwnd):
+                    time.sleep(0.25)
+                time.sleep(0.3)
+        except Exception:  # noqa: BLE001
+            pass
         return polls
 
     def resume_session(self, session_id: str, app_hint: str = "") -> Optional[Dict[str, Any]]:
@@ -2677,6 +3668,11 @@ class DesktopAutonomyLoop:
         report["ready_wait_s"] = round(time.time() - t0, 2)
         if extended:
             report["ready_deadline_extended_s"] = round(extended, 1)
+        # An unready app ENDS the run at step zero, so the reason has to be in the log, not only in the returned
+        # dict (a measured run died exactly this way: 42.8 s, zero steps, and the log said nothing about why).
+        logger.info("[ready] %s: hwnd=%s elements=%d wait=%.1fs extended=%.1fs threshold=%d reason=%s tiers=%s",
+                    app_hint or "?", hwnd or 0, len(elements or []), report["ready_wait_s"], extended,
+                    READY_RICH_ELEMENTS, report.get("reason", ""), report.get("tiers_ran", ""))
         return hwnd, elements, report
 
     def run(self, goals: List[str], app_hint: str, max_steps_per_goal: int = 4,
@@ -2694,6 +3690,15 @@ class DesktopAutonomyLoop:
             if self._run_depth == 0:
                 self._release_held()
 
+    def _content_author_goal(self, goals: List[str], gi: int, want: str) -> int:
+        """Index of the earlier goal that was supposed to PUT this content on screen (the one whose literal is
+        `want`); the last earlier goal when none names it. Pure bookkeeping for the honest failure message -
+        it never chooses an action, so no app or format knowledge lives here."""
+        for k in range(gi):
+            if literal_typed_text(goals[k]) == want:
+                return k
+        return max(0, gi - 1)
+
     def _run_impl(self, goals: List[str], app_hint: str, max_steps_per_goal: int,
                   allow_destructive: bool,
                   expect_map: Optional[Dict[int, Dict[str, Any]]], max_tier: int) -> Dict[str, Any]:
@@ -2704,6 +3709,7 @@ class DesktopAutonomyLoop:
         self._goal_fails = {}
         self._shortcut_tried = set()
         self._opened_not_done = {}
+        self._pending_clicks = {}
         self.escalation_shots = []
         self._relaunches = 0
         self.invalid_streak = 0
@@ -2733,7 +3739,9 @@ class DesktopAutonomyLoop:
                     "trace": [t.as_dict() for t in self.trace]}
         results = []
         fresh_note = ""
-        if (app_hint or "").lower() in self._launched_apps and any(re.match(r"^\s*(?:type|write|enter|input)\b", g or "", re.I) for g in goals):
+        self._canvas_needed = self._canvas_expected(goals, app_hint)
+        self._canvas_prep_left = 2 if self._canvas_needed else 0
+        if self._canvas_needed:
             try:
                 fresh_note = self._ensure_blank_document(app_hint)
             except Exception as exc:
@@ -2742,12 +3750,27 @@ class DesktopAutonomyLoop:
                 self.trace.append(StepTrace("(prepare) blank document", "-", "check", "PASS", "hygiene", fresh_note, []))
         for gi, goal in enumerate(goals):
             advanced = False
+            content_notes = 0                        # times this goal's file exists but its CONTENT is missing
             self.grounding.reset_vision_budget()
             asserted = assertion_text(goal)
             goal_expect = expect_map.get(gi) or (derive_expectation(goal) if asserted is None else None)
+            if goal_expect and ("file_created" in goal_expect or "file_saved" in goal_expect):
+                # Stamp WHEN this goal started, so its proof is "the app wrote the file after this moment"
+                # and not "a file of that name happens to be on the disk": a stale e1.xlsx from an earlier,
+                # killed run made a task that had saved nothing report as a success (measured 2026-10-05).
+                # A copy, so no wall-clock value is ever carried into distilled knowledge.
+                goal_expect = dict(goal_expect)
+                goal_expect.setdefault("file_fresh_since", time.time())
+                # ...and the file must hold what this run was told to write, not merely be a file: 'type 42 in
+                # cell A1' followed by 'save as <path>' was measured completing on an EMPTY sheet.
+                if "file_text_contains" not in goal_expect:
+                    _lit = next((t for t in (literal_typed_text(gg) for gg in goals[:gi + 1]) if t), "")
+                    if _lit:
+                        goal_expect["file_text_contains"] = _lit
             # Saving to a named file through a rich app (Office's backstage: File > Save As > type > name > Save) honestly
-            # needs more than the few steps a menu click does; the file's existence is what ends the goal, not the budget.
-            steps_here = max_steps_per_goal + (6 if "file_created" in (goal_expect or {}) else 0)
+            # needs more than the few steps a menu click does; the WRITE is what ends the goal, not the budget.
+            _terminal_file = bool(goal_expect and (("file_created" in goal_expect) or ("file_saved" in goal_expect)))
+            steps_here = max_steps_per_goal + (6 if _terminal_file else 0)
             for _ in range(steps_here):
                 if asserted is not None:
                     res = self._assert_step(goal, app_hint, asserted, max_tier)
@@ -2755,9 +3778,31 @@ class DesktopAutonomyLoop:
                     res = self.step(goal, app_hint, expect=goal_expect,
                                     allow_destructive=allow_destructive, max_tier=max_tier)
                 results.append(res)
-                if res["verdict"] == "PASS" or self.awaiting_human:
+                # A step PASSes the STEP; the goal is done only when its own terminal proof holds (the file
+                # exists). Advancing on an intermediate PASS made 'save as' look complete after one menu click.
+                if self.awaiting_human or (res["verdict"] == "PASS" and res.get("goal_done", True)):
                     advanced = True
                     break
+                # The file is ON THE DISK but does not hold the text this run was told to write: the save flow is
+                # proven working, so replaying it only burns steps on a goal that can no longer be met by saving.
+                # Name the earlier authorship goal as the block and stop, so the run reports WHY with evidence.
+                if (_terminal_file and res["verdict"] == "PASS" and not res.get("goal_done", True)
+                        and goal_expect.get("file_text_contains")):
+                    _p = str(goal_expect.get("file_created") or goal_expect.get("file_saved") or "")
+                    _got, _why = file_holds_text(_p, str(goal_expect["file_text_contains"]))
+                    if _p and _got is False:
+                        content_notes += 1
+                        if content_notes >= 2:
+                            ai = self._content_author_goal(goals, gi, str(goal_expect["file_text_contains"]))
+                            note = (f"the file was written and holds no '{goal_expect['file_text_contains']}': "
+                                    f"the save flow is done, the unsatisfied goal is {ai + 1}/{len(goals)} "
+                                    f"({goals[ai][:60]!r}) where that content should have been authored -> failing here "
+                                    f"instead of re-saving ({_why})")
+                            logger.info("[autonomy] %s", note)
+                            self.trace.append(StepTrace(goal, "-", "diagnose", "WRONG_STATE", "verifier", note, []))
+                            return {"completed": False, "blocked_at_goal": ai, "steps": len(results),
+                                    "content_missing": str(goal_expect["file_text_contains"]),
+                                    "trace": [t.as_dict() for t in self.trace]}
                 # G2: the app's window is GONE mid-run (it crashed / was closed under us). Relaunch it ONCE, wait for it
                 # to be groundable and carry on with the SAME goal (earlier goals stay done); a second loss is a failure
                 # with evidence, never a loop of relaunches.
@@ -2770,6 +3815,15 @@ class DesktopAutonomyLoop:
                                 self._launched_apps.add((app_hint or "").lower())
                             self._wait_for_ready(app_hint)
                             note = f"app window vanished: relaunched once (launched={launched}); resuming goal {gi + 1}/{len(goals)}"
+                            # A fresh instance opens where it opens (its start screen, a restored file), NOT on the
+                            # canvas the earlier goals used. Whatever survived the loss is gone; the least the loop
+                            # can do is put a writable surface back on screen instead of driving a save goal against
+                            # a launcher and clicking its search box.
+                            if self._canvas_expected(goals, app_hint):
+                                try:
+                                    note += "; canvas re-prepared: " + (self._ensure_blank_document(app_hint) or "unchanged")
+                                except Exception as exc2:
+                                    note += f"; canvas re-preparation failed ({type(exc2).__name__})"
                         except Exception as exc:
                             note = f"app window vanished: relaunch failed ({type(exc).__name__}: {exc})"
                         self.trace.append(StepTrace(goal, "-", "relaunch", "NO_CHANGE", "crash-recovery", note, []))
@@ -2794,6 +3848,12 @@ class DesktopAutonomyLoop:
         return os.path.join(CHECKPOINT_DIR, f"{self.session_id}.json")
 
     def _write_checkpoint(self, entry: StepTrace) -> None:
+        try:                                    # every step's verdict AND its evidence reach the log (a bare 'WRONG_STATE' is undiagnosable)
+            d = entry.as_dict()
+            logger.info("[step] %s '%s' via %s -> %s | %s", d.get("verb"), str(d.get("element"))[:30], str(d.get("method"))[:60],
+                        d.get("verdict"), str(d.get("evidence"))[:260])
+        except Exception:
+            pass
         try:
             payload = {"session_id": self.session_id, "steps": len(self.trace),
                        "last": entry.as_dict(),
@@ -2870,16 +3930,81 @@ class DesktopAutonomyLoop:
             return ""
 
     _NEW_DOC_RE = re.compile(r"^(?:add )?new (?:tab|document|file)$|^new tab$", re.I)
+    # What "make me a document I can write into" is CALLED, as UI vocabulary collected from the families seen on
+    # this host - never keyed on an app's name. Measured: an office suite's start screen offers a list item whose
+    # own label begins 'Blank'; a text editor offers 'New tab'; a browser offers 'New window'. The rule below
+    # presses whichever of these the running app actually shows, and then checks that a surface appeared.
+    _NEW_DOC_WORDS = ("blank", "new file", "new document", "new tab", "new window", "new image",
+                      "create new", "create document", "empty", "untitled")
+    _NEW_DOC_ROLES = ("listitem", "button", "splitbutton", "hyperlink", "menuitem", "tabitem")
+
+    def _writable_surface(self, els: List[GroundedElement]) -> Tuple[int, str]:
+        """How many things on this screen could HOLD typed content, and what the loop makes of that.
+
+        A grid cell (addressable by its own reference) or an editable surface that is not a tool strip. Measured
+        with the app still on its start screen: neither existed, the payload went into 'Search for a file', the
+        UI changed so every step 'passed', and the saved document was empty.
+
+        An edit box only counts when it occupies a real part of the screen. Measured on the same start screen: it
+        lists an unnamed one-line edit of 98x23 px (a navigate-by-name strip), and counting it as a canvas made the
+        loop decide a document was already open - so it never pressed the app's own create-a-document control and
+        the payload had nowhere to go. The test is geometry in the screen's own units, never an app's name."""
+        cells = [e for e in els if e.role == "dataitem"
+                 and re.fullmatch(r"[A-Za-z]{1,3}[1-9]\d{0,5}", (e.name or "").strip())]
+        if cells:
+            return len(cells), "grid"
+        docs = [e for e in els if e.role in ("document", "datagrid", "table")]
+        if docs:
+            return len(docs), "document surface"
+        boxes = [e for e in els if e.role in ConstrainedJudge._TEXT_ROLES
+                 and not any(u in (e.name or "").lower() for u in UTILITY_BOX_NAMES)]
+        if boxes:
+            left = min(e.bbox[0] for e in els)
+            top = min(e.bbox[1] for e in els)
+            span_w = max(e.bbox[2] for e in els) - left
+            span_h = max(e.bbox[3] for e in els) - top
+            span = max(1, span_w * span_h)
+            boxes = [e for e in boxes
+                     if abs(e.bbox[2] - e.bbox[0]) * abs(e.bbox[3] - e.bbox[1]) >= _CANVAS_MIN_FRACTION * span]
+        return (len(boxes), "edit box") if boxes else (0, "nothing")
+
+    def _canvas_expected(self, goals: List[str], app_hint: str) -> bool:
+        """True when this task asks for content to be typed AND the instance is one WE started, so the loop owns the
+        document on screen. Never prepared on an app the user left open, and never for a task that types nothing."""
+        return ((app_hint or "").lower() in self._launched_apps
+                and any(re.match(r"^\s*(?:type|write|enter|input)\b", g or "", re.I) for g in goals))
 
     def _ensure_blank_document(self, app_hint: str) -> str:
-        """An instance WE just launched may reopen the previous session's unsaved document (Notepad restores tabs), and a
-        'type X ... save as Y' task would then save the old text with X. When the editor already holds text and the app
-        offers a 'New tab / New document' button, open a blank one first (non-destructive: the old tab stays). Never
-        clears anything. Returns a note ('' when there was nothing to do)."""
+        """Prepare a typing task's canvas, non-destructively, in the two ways apps block it.
+
+        (a) The instance WE launched reopened last session's unsaved document (Notepad restores tabs): a
+            'type X then save as Y' task would save the old text with X. Press the app's own new-document
+            control when it has one.
+        (b) The instance opened on a START SCREEN with no document at all, so there is nothing to type into.
+            Press whatever control the app itself labels as creating one (see _NEW_DOC_WORDS) and PROVE a
+            writable surface appeared - the run then says so instead of typing into a search strip.
+        Returns a note ('' when there was nothing to do)."""
         self._hold_hidden(app_hint)          # the window is held parked for the whole run, like every other step
         hwnd, els, _rep = self.grounding.ground(app_hint, max_tier=2)
         if not hwnd or not els:
             return ""
+        n_surface, kind = self._writable_surface(els)
+        if n_surface == 0:                   # (b): no canvas on screen at all
+            maker = next((e for e in els if e.role in self._NEW_DOC_ROLES
+                          and any(w in (e.name or "").lower() for w in self._NEW_DOC_WORDS)), None)
+            if maker is None:
+                return (f"the screen offers nothing that can hold text ({len(els)} controls, no "
+                        f"{ConstrainedJudge._TEXT_ROLES}) and names no control that would create one: a typed payload "
+                        "here would land in a tool strip, so it is not typed")
+            ok, how = _act_on_element(maker, "click", "")
+            time.sleep(1.2)
+            self._settle(hwnd)
+            _h2, els2, _r2 = self.grounding.ground(app_hint, max_tier=2)
+            n2, kind2 = self._writable_surface(els2 or [])
+            return (f"opened a document first: the start screen held no writable surface, pressed "
+                    f"'{maker.name}' ({maker.role}) via {how} -> "
+                    + (f"{n2} addressable {kind2} now on screen" if n2 else
+                       "still no writable surface: the press did not create a document"))
         before = self._control_text(els)
         if not before.strip():
             return ""
@@ -2918,11 +4043,15 @@ class DesktopAutonomyLoop:
         self.capsule_cb("working", f"[{app_hint}] expect '{text[:30]}' -> {verdict}")
         return self._step_result(entry, elements=elements)
 
-    def _step_result(self, entry: StepTrace, elements: List[GroundedElement] = None) -> Dict[str, Any]:
-        return {"verdict": entry.verdict, "element": entry.element, "verb": entry.verb,
-                "method": entry.method, "evidence": entry.evidence,
-                "tiers_ran": entry.tiers, "awaiting_human": self.awaiting_human,
-                "seen_elements": len(elements or []), "session": self.session_id}
+    def _step_result(self, entry: StepTrace, elements: List[GroundedElement] = None,
+                     goal_done: Optional[bool] = None) -> Dict[str, Any]:
+        out = {"verdict": entry.verdict, "element": entry.element, "verb": entry.verb,
+               "method": entry.method, "evidence": entry.evidence,
+               "tiers_ran": entry.tiers, "awaiting_human": self.awaiting_human,
+               "seen_elements": len(elements or []), "session": self.session_id}
+        if goal_done is not None:
+            out["goal_done"] = goal_done      # the GOAL's own truth, when it has a terminal condition
+        return out
 
 
 _WEBAPP_WATCHER = None
@@ -2951,6 +4080,64 @@ def file_has_format(path: str, ext: str) -> Tuple[bool, str]:
     return ok, (f"is a real .{ext}" if ok else f"NOT a .{ext} (starts {head[:6]!r})")
 
 
+# Extensions whose content is readable as text, and containers whose text lives inside compressed members.
+# Data, not a per-app rule: the format decides the reader, and an unknown format is reported as "not
+# checkable" rather than being handed a free pass.
+PLAIN_TEXT_EXTS = ("txt", "md", "log", "csv", "tsv", "json", "xml", "html", "htm", "ini", "cfg", "conf",
+                   "py", "js", "css", "yaml", "yml", "srt", "vtt", "rtf", "bat", "ps1")
+CONTAINER_TEXT_EXTS = ("xlsx", "xlsm", "xlsb", "docx", "pptx", "odt", "ods", "odp", "epub", "zip")
+# the OOXML/OpenDocument tags that hold a VALUE or a TEXT run - a cell's number, a paragraph's words
+_TEXT_LEAF_RE = re.compile(r"<(?:[A-Za-z_]+:)?(?:v|t)(?:\s[^>]*)?>([^<]+)<", re.S)
+
+
+def file_holds_text(path: str, want: str) -> Tuple[Optional[bool], str]:
+    """(ok, note) - or (None, why the check could not run): does the WRITTEN file contain ``want``?
+
+    'The file exists and has bytes' is not the whole truth: measured 2026-10-05, a workbook was saved to the
+    exact path it was given and its only sheet was empty, and the goal still read DONE. The text the run was
+    told to put in is now looked for INSIDE the file - plain bytes for a text format, the value/text leaves of
+    each compressed member for the document containers."""
+    import zipfile
+    want = (want or "").strip()
+    if not want:
+        return None, "nothing to look for"
+    ext = (path.rsplit(".", 1)[-1].lower() if "." in os.path.basename(path) else "")
+    leaves: List[str] = []
+    try:
+        if ext in CONTAINER_TEXT_EXTS or zipfile.is_zipfile(path):
+            with zipfile.ZipFile(path) as z:
+                for info in z.infolist()[:400]:
+                    if info.file_size > 4_000_000:
+                        continue
+                    try:
+                        blob = z.read(info).decode("utf-8", "ignore")
+                    except Exception:  # noqa: BLE001
+                        continue
+                    leaves += [t.strip() for t in _TEXT_LEAF_RE.findall(blob) if t.strip()]
+            if not leaves:
+                # A document format with NO text or value anywhere is not "unreadable", it is EMPTY - which is
+                # exactly the case that must not pass (the measured workbook had bytes and an empty sheet).
+                if ext in CONTAINER_TEXT_EXTS:
+                    return False, f"the .{ext} holds no text or value at all (an empty document)"
+                return None, f"no text leaves readable in a .{ext}"
+        elif ext in PLAIN_TEXT_EXTS:
+            with open(path, "rb") as fh:
+                leaves = [fh.read(4_000_000).decode("utf-8", "ignore")]
+        else:
+            return None, f".{ext or '?'} has no text form to read"
+    except (OSError, ValueError) as exc:
+        return None, f"unreadable ({type(exc).__name__})"
+    norm = lambda s: re.sub(r"\s+", " ", s).strip().lower()
+    target = norm(want)
+    hit = any(target == norm(l) or (len(target) > 2 and target in norm(l)) for l in leaves)
+    if not hit and len(target) > 2:
+        # a phrase can be split across runs (a .docx 'text run' is a formatting span, not a sentence), so the
+        # pieces are also searched as one stream
+        hit = target in " ".join(norm(l) for l in leaves)
+    return hit, (f"'{want[:24]}' {'IS' if hit else 'is NOT'} inside "
+                 f"({len(leaves)} text piece(s), {sum(len(l) for l in leaves)} chars)")
+
+
 _GOAL_PATH_RE = re.compile(r"[A-Za-z]:[\\/](?:[^\\/:*?\"<>|\r\n;]+[\\/])*[^\\/:*?\"<>|\r\n;]*?\.[A-Za-z0-9]{1,6}(?![A-Za-z0-9])")
 _ASSERT_GOAL_RE = re.compile(r"^\s*(?:expect|verify|check|assert|ensure|confirm)\b[:\s,]*(?:that\s+)?(.+?)\s*$", re.I)
 
@@ -2958,7 +4145,17 @@ _ASSERT_GOAL_RE = re.compile(r"^\s*(?:expect|verify|check|assert|ensure|confirm)
 _TYPE_LITERAL_RE = re.compile(r"""^\s*(?:type|enter|input|write)\s+(?:in\s+)?(?:the\s+)?(?:text\s+|number\s+|value\s+)?(.+?)\s*$""", re.I)
 _NOT_LITERAL = frozenset({"a", "an", "some", "something", "about", "poem", "haiku", "sentence", "paragraph", "story", "message",
                           "letter", "note", "essay", "email", "text", "anything", "whatever", "random", "short", "long", "just",
-                          "into", "in", "on", "to", "of", "for"})
+                          "into", "in", "on", "to", "of", "for",
+                          # pronouns are not the user's words: 'type it in the box' asks for no literal, and
+                          # letting 'it' stand as one would grade any control that happens to contain those
+                          # two letters as satisfied
+                          "it", "this", "that", "these", "those", "them", "something", "everything", "nothing"})
+# 'type 42 IN CELL A1': the words after the literal say WHERE, not WHAT. Cutting the place off is what gives
+# the goal a postcondition at all -- measured, a spreadsheet run completed 'type 42 in cell A1' by clicking a
+# ribbon tab, because the whole phrase (the 'in' inside it) was read as 'needs composing' and graded as 'the
+# UI moved'. Location tails are ordinary English prepositions, so this is a shape rule, not a word list per app.
+_LOCATION_TAIL_RE = re.compile(r"\s+(?:in|into|onto|on|at|inside|within|to)\s+(?:the\s+|a\s+|an\s+|this\s+|that\s+|your\s+|my\s+)?"
+                               r"[\w.'-]+(?:\s+[\w.'-]+){0,3}\s*$", re.I)
 
 
 def literal_typed_text(goal: str) -> Optional[str]:
@@ -2971,6 +4168,9 @@ def literal_typed_text(goal: str) -> Optional[str]:
     q = re.fullmatch(r"[\"'\u201c](.+)[\"'\u201d]", body)
     if q:
         return q.group(1)
+    stripped = _LOCATION_TAIL_RE.sub("", body).strip()
+    if stripped and stripped != body:
+        body = stripped                      # the place it named stays out of the postcondition: '42', not '42 in cell A1'
     words = re.findall(r"\S+", body)
     if not words or len(words) > 5 or re.search(r"[A-Za-z]:[\\/]", body):
         return None
@@ -3025,7 +4225,7 @@ def split_goals(goals: str) -> List[str]:
 
 def operate_app(app_name: str, goals, allow_destructive: bool = False,
                 capsule_cb=None, cursor_cb=None, max_steps_per_goal: int = 5,
-                expect_map: Optional[Dict[int, Dict[str, Any]]] = None) -> Dict[str, Any]:
+                expect_map: Optional[Dict[int, Dict[str, Any]]] = None, isolated: bool = False) -> Dict[str, Any]:
     """The whole 'leave the bot working' flow in one callable (the CrewAI
     operate_desktop_tool delegates here, and the E2E suite calls it directly):
 
@@ -3038,13 +4238,27 @@ def operate_app(app_name: str, goals, allow_destructive: bool = False,
     if not goal_list:
         return {"completed": False, "steps": 0, "trace": [], "goals": [],
                 "error": "no goals provided"}
-    loop = get_loop(capsule_cb=capsule_cb, cursor_cb=cursor_cb)
+    # isolated=True: this call gets its OWN loop (own trace / history / goal state / cursor callback). A child cursor of a parallel run needs
+    # that: the shared singleton carries per-call state, so two concurrent calls on it would read each other's trace.
+    loop = DesktopAutonomyLoop(capsule_cb=capsule_cb, cursor_cb=cursor_cb) if isolated else get_loop(capsule_cb=capsule_cb, cursor_cb=cursor_cb)
     loop.trace = []  # one trace per operate_app call (the loop is a shared singleton)
     loop.awaiting_human = False
     loop._launch_note = ""
     launched = _launch_if_missing(loop, app_name, capsule_cb)
     if launched:
         loop._launched_apps.add((app_name or "").lower())
+        try:        # an Office-style app opens on a START / backstage screen with no document: take its own 'Blank ...' tile (our instance only)
+            from core_organs import universal_scan as _us
+            _h0 = loop.grounding.find_window(app_name) or 0
+            if _h0:
+                from core_organs import background_window as _bwx
+                with _bwx.BackgroundSession(_h0):          # a minimized Office window exposes no tiles: the read needs it parked off-screen
+                    time.sleep(0.8)
+                    _ss = _us.leave_start_screen(_h0, timeout_s=8.0)
+                if _ss and _ss.get("start_screen") and _ss.get("tile"):
+                    loop._launch_note = (loop._launch_note + "; " if loop._launch_note else "") + f"start screen left via '{_ss.get('tile')}'"
+        except Exception as _exc:  # noqa: BLE001
+            logger.debug("[operate] start-screen step skipped: %s", _exc)
     # No fixed sleep after the launch: run() starts with _wait_for_ready (bounded, growing waits, polling the live
     # control tree), which is what a slow starter (Steam's splash chain, Office, packaged apps) actually needs.
     # A minimized window is held parked off-screen by the loop for the whole run (laid out, never on a monitor,
@@ -3106,12 +4320,43 @@ def _launch_if_missing(loop: "DesktopAutonomyLoop", app_name: str, capsule_cb=No
                 return True          # it was started but showed no window yet: poll for it, never start a second copy
         except Exception as exc:
             logger.debug("[operate_app] hidden launch unavailable: %s", exc)
+        # B2: the fuzzy resolver maps a nonsense name onto a REAL app (it once launched Excel for an invented name). Only a
+        # resolution that actually names what was asked may launch; otherwise report it and stop - no retry, no guess.
+        ok_res, why = _fallback_resolution_ok(app_name)
+        if not ok_res:
+            loop._launch_note = (getattr(loop, "_launch_note", "") + f" | no installed app resolves to '{app_name}': {why}; nothing launched").strip(" |")
+            logger.warning("[operate_app] %s", loop._launch_note)
+            return False
         from core_organs.organ_40_app_launcher import resolve_and_launch
         resolve_and_launch(app_name)
         return True
     except Exception as exc:
         logger.debug("[operate_app] auto-launch note: %s", exc)
         return False
+
+
+def _fallback_resolution_ok(app_name: str) -> Tuple[bool, str]:
+    """True when SOME installed program faithfully answers to `app_name`: a program/package/App-Paths resolution
+    (static_knowledge.exe_for) or the organ_40 catalog's pick sharing a distinctive word with the request."""
+    try:
+        from core_organs import static_knowledge as sk
+        if sk.exe_for(app_name):
+            return True, "resolved to an installed program"
+    except Exception:
+        pass
+    try:
+        from core_organs.organ_40_app_launcher import AppCatalog, VerbAliasEngine, plan_task_app
+        catalog = AppCatalog()
+        catalog.ensure_scanned()
+        plan = plan_task_app(app_name, catalog=catalog, engine=VerbAliasEngine(catalog, None))
+        target = (plan.get("target_app") or "") if plan.get("action") == "launch_app" else ""
+        want = {w for w in re.findall(r"[a-z0-9]+", (app_name or "").lower()) if len(w) > 2}
+        got = {w for w in re.findall(r"[a-z0-9]+", target.lower()) if len(w) > 2}
+        if want & got:
+            return True, f"catalog resolved to '{target}'"
+        return False, f"the catalog's pick '{target or 'nothing'}' shares no word with the request"
+    except Exception as exc:
+        return False, f"resolver unavailable ({type(exc).__name__})"
 
 
 def prepare_app(app_name: str, capsule_cb=None, cursor_cb=None) -> Dict[str, Any]:
