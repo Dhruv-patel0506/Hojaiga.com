@@ -469,13 +469,17 @@ def run_b2n(TestOutcome):
 # ============================================================================================================== PURE1
 
 _PHYS_ATTRS = {"SetCursorPos", "mouse_event", "keybd_event", "SendInput"}
+# The UIA library's own control methods: every one of them drives the REAL pointer to the control's rectangle and
+# presses the REAL button (Control.Click(simulateMove=False) only skips the smooth move, not the click). The
+# process-wide guard refuses them, so a caller that used one reported an activation that never happened.
+_UIA_PHYSICAL_CALLS = {"Click", "DoubleClick", "RightClick", "MiddleClick", "HoldClick", "MoveCursorToInnerPos", "Tap"}
 _PAG_CALLS = {"click", "moveTo", "press", "hotkey", "write", "typewrite", "keyDown", "keyUp", "mouseDown", "mouseUp", "drag", "dragTo", "scroll",
               "doubleClick", "rightClick", "moveRel", "tripleClick", "middleClick", "hscroll", "vscroll"}
 
 
 def run_pure1(TestOutcome):
     """PURE1: no first-party source file reaches for a physical-input API (SetCursorPos / mouse_event / keybd_event / SendInput /
-    pyautogui actions). Read from the AST, so comments and docstrings cannot hide or fake it; the only exceptions are the test files
+    pyautogui actions / a UIA control's own Click()). Read from the AST, so comments and docstrings cannot hide or fake it; the only exceptions are the test files
     that call those APIs on purpose to prove the process-wide guard REFUSES them. 1.1: the code paths were deleted, not skipped"""
     from core_organs import headless_input as hin
     here = os.path.dirname(os.path.abspath(__file__))
@@ -499,6 +503,8 @@ def run_pure1(TestOutcome):
                 if isinstance(n, ast.Attribute):
                     if n.attr in _PHYS_ATTRS or (n.attr in _PAG_CALLS and isinstance(n.value, ast.Name) and n.value.id in ("pyautogui", "pag", "pg")):
                         hits.setdefault(f, []).append(f"{n.lineno}:{n.attr}")
+                elif isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr in _UIA_PHYSICAL_CALLS:
+                    hits.setdefault(f, []).append(f"{n.func.lineno}:{n.func.attr}()")
     n0 = len(hin.VIOLATIONS)
     try:
         ctypes.windll.user32.SetCursorPos(5, 5)                 # a third-party-style call: the guard must refuse it

@@ -1358,10 +1358,14 @@ def _check_for_popups():
                             except Exception:
                                 pass
                             try:
-                                child.Click()
-                                logger.info(f"[POPUP] Clicked '{child.Name}' on dialog '{title}'")
-                                dismissed = True
-                                break
+                                # NOT child.Click(): UIA's Click() moves the real cursor and presses the real
+                                # mouse, and the input guard refuses it while this loop reads the dialog as
+                                # dismissed. A posted message to the button's own window is the honest version.
+                                from core_organs.organ_30_app_scanner import headless_control_click
+                                if headless_control_click(child, hwnd):
+                                    logger.info(f"[POPUP] Posted-click '{child.Name}' on dialog '{title}'")
+                                    dismissed = True
+                                    break
                             except Exception:
                                 pass
             except Exception as uia_err:

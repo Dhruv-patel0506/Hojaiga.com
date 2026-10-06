@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import concurrent.futures
 import ctypes
+import ctypes.wintypes  # POINT() is built by the posted-click helpers below
 import hashlib
 import json
 import logging
@@ -1278,16 +1279,18 @@ def uia_activate(ctrl, fallback_coords: Optional[Tuple[int, int]] = None, target
     except Exception:
         pass
 
-    # 5. UIA ctrl.Click(simulateMove=False)
+    # 5. No pattern answered: post the click to the control's OWN window.
+    #    (UIA's own Control.Click() moves the physical cursor and presses the physical mouse even with
+    #    simulateMove=False - the input guard refuses it, and a refused click used to come back as "activated".)
     try:
-        if hasattr(ctrl, "Click"):
-            ctrl.Click(simulateMove=False)
+        if headless_control_click(ctrl, target_hwnd):
             time.sleep(0.2)
             return True
     except Exception:
         pass
 
-    # 6. Fallback to physical click
+    # 6. Last resort: posted message to whatever window sits at the control's own coordinates. Never re-enters
+    #    this ladder (the old physical_click(ctrl) call could repeat steps 1-6 on the same control).
     if CAN_INJECT_INPUT:
         if fallback_coords:
             cx, cy = fallback_coords
@@ -1297,7 +1300,11 @@ def uia_activate(ctrl, fallback_coords: Optional[Tuple[int, int]] = None, target
                 cx, cy = center_of(box)
             else:
                 return False
-        return physical_click(cx, cy, ctrl)
+        h = int(ctypes.windll.user32.WindowFromPoint(ctypes.wintypes.POINT(int(cx), int(cy))) or 0) or int(target_hwnd or 0)
+        if not h:
+            logger.debug("uia_activate: no window at (%d,%d) - refusing to guess an activation", cx, cy)
+            return False
+        return virtual_click(h, cx, cy)
 
     return False
 
@@ -1338,6 +1345,23 @@ def virtual_click(hwnd: int, x: int, y: int, ctrl=None, settle: float = 0.15) ->
 def MAKELPARAM(lo: int, hi: int) -> int:
     """Pack two 16-bit values into a 32-bit lParam."""
     return (hi << 16) | (lo & 0xFFFF)
+
+
+def headless_control_click(ctrl, owner_hwnd: int = 0) -> bool:
+    """Activate a UIA control by POSTED message to its own window, at its rectangle centre.
+
+    UIA's Control.Click()/DoubleClick() move the real cursor and press the real mouse button; the input guard
+    refuses those calls, and the refusal used to be reported to the caller as a successful activation. A control
+    that takes neither a pattern nor a posted click is reported as NOT activated, which is the honest answer."""
+    try:
+        box = safe_bounding_rect(ctrl)
+        hwnd = int(getattr(ctrl, "NativeWindowHandle", 0) or 0) or int(owner_hwnd or 0)
+        if not box or not hwnd:
+            return False
+        cx, cy = center_of(box)
+        return virtual_click(hwnd, cx, cy)
+    except Exception:
+        return False
 
 
 def physical_click(x: int, y: int, ctrl=None, settle: float = 0.15) -> bool:
@@ -1455,7 +1479,7 @@ def bypass_office_start_screen(hwnd: int, app_name: str = "Excel") -> None:
                                 if pat:
                                     pat.Invoke()
                                 else:
-                                    item.Click()
+                                    headless_control_click(item, hwnd)
                                 time.sleep(2.0)
                                 break
             except Exception as e:
@@ -3362,7 +3386,7 @@ def ensure_app_running(app_identifier: str, exe_path: Optional[str] = None) -> O
                                 if pat:
                                     pat.Invoke()
                                 else:
-                                    btn.Click()
+                                    headless_control_click(btn, getattr(win, "NativeWindowHandle", 0))
                                 time.sleep(1.0)
                                 break
                     elif norm_id in wname or norm_id in wcls:

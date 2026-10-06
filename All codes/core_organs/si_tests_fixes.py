@@ -1079,6 +1079,15 @@ def _names_in(hwnd: int) -> List[str]:
         return [(n.name or "") for n in (fast_uia.snapshot(hwnd, timeout_ms=5000) or []) if n.name]
 
 
+def _display_values(text: str) -> List[float]:
+    """Every NUMBER a calculator display line states ('Display is 42', 'Display is -7.0421845...').
+
+    A ground truth read as a SUBSTRING is not a ground truth: a run that ended on -7.04218457151810888857...
+    contained '42' and was graded correct. The value has to be parsed and compared."""
+    import re
+    return [float(m) for m in re.findall(r"-?\d+(?:\.\d+)?", (text or "").replace(",", ""))]
+
+
 def run_lf2(TestOutcome):
     """LF2: a REAL two-app task (Notepad then Calculator) runs both apps through the verified loop with the physical pointer untouched"""
     from core_organs import loop_first as lf
@@ -1111,7 +1120,9 @@ def run_lf2(TestOutcome):
         checks.append(("ground-truth-readable", False, f"{type(exc).__name__}: {exc}"))
     checks.append(("notepad-holds-the-typed-words (independent read)", "loop first works" in note_truth.lower(),
                    f"document={note_truth[:60]!r}"))
-    checks.append(("calculator-shows-42 (independent read)", "42" in calc_truth, f"display={calc_truth[:60]!r}"))
+    got_values = _display_values(calc_truth)
+    checks.append(("calculator-shows-42 (independent read)", any(abs(v - 42.0) < 1e-9 for v in got_values),
+                   f"display={calc_truth[:60]!r} parsed={got_values[:4]}"))
     checks.append(("handles-persisted-for-later-stages",
                    bool(lf.handle_for("notepad")) and bool(lf.handle_for("calculator")),
                    f"notepad={lf.handle_for('notepad')} calculator={lf.handle_for('calculator')}"))

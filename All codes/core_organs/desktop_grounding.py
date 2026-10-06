@@ -84,6 +84,12 @@ UNNAMED_OK_ROLES = ("edit", "pane", "datagrid", "table")
 # A grid exposes every cell as a DataItem (Excel: ~500 on the first screen). They are sampled, not enumerated, so
 # they cannot crowd the real controls out of the judge's shortlist; the totals are reported (never silently cut).
 GRID_CELL_CAP = int(os.environ.get("HOJAIGA_GRID_CELL_CAP", "120"))
+# The tree walk costs one COM round trip PER NODE VISITED. max_nodes only ever capped how many controls get
+# SURFACED, so a wide or pathological tree (a grid of thousands of cells, a host whose sibling enumeration never
+# ends) could spin there for minutes and grow the process to gigabytes. These two budgets cap the VISITING,
+# generic to any UIA app: the walk returns what it found inside the budget and says it stopped.
+UIA_WALK_BUDGET_S = float(os.environ.get("HOJAIGA_UIA_WALK_BUDGET_S", "6.0"))
+UIA_WALK_NODE_BUDGET = int(os.environ.get("HOJAIGA_UIA_WALK_NODE_BUDGET", "5000"))
 # Smallest share of the visible screen an empty edit box must cover to count as a surface that can hold a
 # document's text (a one-line address/name/search strip is not one). Geometry, so it travels with the window size.
 _CANVAS_MIN_FRACTION = float(os.environ.get("HOJAIGA_CANVAS_MIN_FRACTION", "0.05"))
@@ -534,6 +540,7 @@ class DesktopGrounding:
     def _walk_uia(self, root_hwnd: int, max_depth: int = 12, max_nodes: int = 900) -> List[GroundedElement]:
         if not HAS_UIA:
             return []
+        _t_walk = time.perf_counter()
         import uiautomation as auto
         elements: List[GroundedElement] = []
         try:                                        # a frame that hosts a Chromium content window (WebView2 / CEF): its DOM tree is THERE
@@ -559,6 +566,9 @@ class DesktopGrounding:
         if ctrl is None:
             return []
         count = 0
+        visited = 0
+        deadline = time.perf_counter() + UIA_WALK_BUDGET_S
+        stopped_by = ""
         cells_seen = cells_kept = 0
         # A minimized window reports every control as off-screen with bogus (-32000) rects, but
         # its UIA patterns still work. Keep them (addressable by pattern, not by coordinates).
@@ -568,8 +578,15 @@ class DesktopGrounding:
         mini = hin.is_minimized(root_hwnd) or _is_parked_offscreen(root_hwnd) or not ctypes.windll.user32.IsWindowVisible(root_hwnd)   # hidden (tray) windows report everything off-screen too
 
         def _visit(c, depth: int):
-            nonlocal count, cells_seen, cells_kept
-            if depth > max_depth or count > max_nodes:
+            nonlocal count, cells_seen, cells_kept, visited, stopped_by
+            if stopped_by or depth > max_depth or count > max_nodes:
+                return
+            visited += 1
+            if visited > UIA_WALK_NODE_BUDGET:
+                stopped_by = f"node-budget({UIA_WALK_NODE_BUDGET})"
+                return
+            if time.perf_counter() > deadline:
+                stopped_by = f"time-budget({UIA_WALK_BUDGET_S:g}s)"
                 return
             try:
                 role = (c.ControlTypeName or "").lower().replace("control", "")
@@ -610,7 +627,14 @@ class DesktopGrounding:
 
         _visit(ctrl, 0)
         self.last_walk = {"grid_cells_seen": cells_seen, "grid_cells_surfaced": cells_kept,
-                          "grid_cells_sampled_out": max(0, cells_seen - cells_kept)}
+                          "grid_cells_sampled_out": max(0, cells_seen - cells_kept),
+                          "nodes_visited": visited, "surfaced": count,
+                          "stopped_by": stopped_by,
+                          "walk_s": round(time.perf_counter() - _t_walk, 2)}
+        if stopped_by:
+            logging.getLogger("desktop_grounding").warning(
+                "UIA walk of %s stopped by %s after %d node(s) (%d surfaced) - returning the partial ground",
+                root_hwnd, stopped_by, visited, count)
         return elements
 
     # ---- Tier 2: Win32 children ----
