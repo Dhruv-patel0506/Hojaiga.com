@@ -95,6 +95,18 @@ class RefinementAction:
     new_step_ids: List[str] = field(default_factory=list)
     confidence: float = 0.5
 
+    def to_dict(self) -> Dict[str, Any]:
+        # `trigger` may be a RefinementTrigger enum or a plain str; normalise so history/logging
+        # never raises (the generate_refinement success path calls this to record the action).
+        trig = getattr(self.trigger, "value", self.trigger)
+        return {
+            "trigger": trig,
+            "description": self.description,
+            "suggested_changes": list(self.suggested_changes or []),
+            "new_step_ids": list(self.new_step_ids or []),
+            "confidence": self.confidence,
+        }
+
 
 class ProgressiveRefinementEngine:
     """

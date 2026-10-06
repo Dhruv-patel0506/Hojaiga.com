@@ -4873,6 +4873,17 @@ class CrewAIEngine:
         failure_reason = ""
         task_description = task_instructions  # rich prompt with Organ 36 compiled phases; enhanced on retry
 
+        # [7] ITERATIVE-QUALITY LEDGER: the loop below is the planner (corrective chain + organ_38
+        # dynamic refinement) and popup_policy is the popup engine; this ledger makes the goal's
+        # postconditions MEASURABLE per attempt, so "each attempt better" is reported as numbers and
+        # a bound exhausted without them met is reported NOT_DONE - never a quiet fake success.
+        try:
+            from core_organs import quality_loop as _ql_mod
+            _q_ledger = _ql_mod.AttemptLedger(command, 1)
+        except Exception as _ql_err:
+            _q_ledger = None
+            logger.debug("[quality] ledger unavailable (retry behaves exactly as before): %s", _ql_err)
+
         for attempt in range(1, MAX_RETRIES + 1):
             logger.info(f"[CrewAI] === ATTEMPT {attempt}/{MAX_RETRIES} for task {task_id} ===")
             if attempt > 1:
@@ -5026,7 +5037,13 @@ class CrewAIEngine:
                     result_str = f"FAILURE: Task was for '{single_target}', but actions were performed on other windows."
 
             # --- CHECK IF THIS ATTEMPT SUCCEEDED ---
-            if not result_str.startswith("FAILURE:"):
+            _q_met = 0 if result_str.startswith("FAILURE:") else 1
+            if _q_ledger is not None:
+                try:
+                    _q_ledger.record(attempt, _q_met, failure_reason if _q_met == 0 else "all postconditions met")
+                except Exception:
+                    pass
+            if _q_met:
                 logger.info(f"[CrewAI] Attempt {attempt} SUCCEEDED")
                 break
 
@@ -5359,11 +5376,26 @@ class CrewAIEngine:
             pass
 
         notify_crewai_activity("idle", "CrewAI task complete")
+        # [7] honest iterative-quality self-report: per-attempt postcondition scores + whether the
+        # goal's postcondition was MET at the bound (NOT_DONE on exhaustion is already the FAILED
+        # status; the trajectory is what makes 'each attempt measurably better' verifiable).
+        _q_report = None
+        if _q_ledger is not None:
+            try:
+                _q_report = _q_ledger.report()
+                _q_report["final_verdict"] = (
+                    "NOT_DONE" if _hallucination_detected and str(_q_report.get("final", "")).startswith("NOT_MET")
+                    else _q_report.get("final", ""))
+                logger.info("[quality] task %s trajectory: %s", task_id, str(_q_report.get("scores"))[:80])
+            except Exception as _q_err:
+                logger.debug("[quality] ledger report skipped: %s", _q_err)
+                _q_report = None
         return {
             "task_id": task_id,
             "status": "SUCCESS" if not _hallucination_detected else "FAILED",
             "crew_output": result_str,
             "attempts": attempt,
+            "quality_report": _q_report,
             "failure_history": failure_reason[:500] if _hallucination_detected else None,
             "session_actions": list(_current_session_actions),
             "engine": "crewai"
