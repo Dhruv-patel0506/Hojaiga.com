@@ -90,6 +90,10 @@ GRID_CELL_CAP = int(os.environ.get("HOJAIGA_GRID_CELL_CAP", "120"))
 # generic to any UIA app: the walk returns what it found inside the budget and says it stopped.
 UIA_WALK_BUDGET_S = float(os.environ.get("HOJAIGA_UIA_WALK_BUDGET_S", "6.0"))
 UIA_WALK_NODE_BUDGET = int(os.environ.get("HOJAIGA_UIA_WALK_NODE_BUDGET", "5000"))
+# The time budget never cuts a walk that has barely begun (a slow but normal tree must still be grounded), and a
+# single COM call can overrun it - so there is a hard extra stop, exactly like the deep scan's own rails.
+UIA_WALK_MIN_NODES = int(os.environ.get("HOJAIGA_UIA_WALK_MIN_NODES", "300"))
+UIA_WALK_HARD_EXTRA_S = float(os.environ.get("HOJAIGA_UIA_WALK_HARD_EXTRA_S", "2.0"))
 # Smallest share of the visible screen an empty edit box must cover to count as a surface that can hold a
 # document's text (a one-line address/name/search strip is not one). Geometry, so it travels with the window size.
 _CANVAS_MIN_FRACTION = float(os.environ.get("HOJAIGA_CANVAS_MIN_FRACTION", "0.05"))
@@ -567,8 +571,9 @@ class DesktopGrounding:
             return []
         count = 0
         visited = 0
-        deadline = time.perf_counter() + UIA_WALK_BUDGET_S
         stopped_by = ""
+        walk_errors = 0
+        first_error = ""
         cells_seen = cells_kept = 0
         # A minimized window reports every control as off-screen with bogus (-32000) rects, but
         # its UIA patterns still work. Keep them (addressable by pattern, not by coordinates).
@@ -578,14 +583,16 @@ class DesktopGrounding:
         mini = hin.is_minimized(root_hwnd) or _is_parked_offscreen(root_hwnd) or not ctypes.windll.user32.IsWindowVisible(root_hwnd)   # hidden (tray) windows report everything off-screen too
 
         def _visit(c, depth: int):
-            nonlocal count, cells_seen, cells_kept, visited, stopped_by
+            nonlocal count, cells_seen, cells_kept, visited, stopped_by, walk_errors, first_error
             if stopped_by or depth > max_depth or count > max_nodes:
                 return
             visited += 1
             if visited > UIA_WALK_NODE_BUDGET:
                 stopped_by = f"node-budget({UIA_WALK_NODE_BUDGET})"
                 return
-            if time.perf_counter() > deadline:
+            el = time.perf_counter() - _t_walk
+            if (el > UIA_WALK_BUDGET_S and visited >= UIA_WALK_MIN_NODES) \
+                    or el > UIA_WALK_BUDGET_S + UIA_WALK_HARD_EXTRA_S:
                 stopped_by = f"time-budget({UIA_WALK_BUDGET_S:g}s)"
                 return
             try:
@@ -620,17 +627,32 @@ class DesktopGrounding:
                         confidence=0.9 if name else 0.55,
                         hwnd=root_hwnd, value=value))
                     count += 1
-                for child in c.GetChildren():
+                # ONE COM call at a time. Control.GetChildren() materialises the whole sibling list first, so a
+                # provider with a broken or cyclic sibling chain makes that single call never return: it grew the
+                # suite process to gigabytes inside one walk (measured, py-spy: GetNextSiblingControl).
+                child = c.GetFirstChildControl()
+                while child is not None:
                     _visit(child, depth + 1)
-            except Exception:
+                    if stopped_by:
+                        break
+                    child = child.GetNextSiblingControl()
+            except Exception as exc:
+                # A node that throws prunes its own subtree; the walk continues. It is COUNTED, never silent.
+                walk_errors += 1
+                first_error = first_error or f"{type(exc).__name__}: {str(exc)[:70]}"
                 return
 
         _visit(ctrl, 0)
         self.last_walk = {"grid_cells_seen": cells_seen, "grid_cells_surfaced": cells_kept,
                           "grid_cells_sampled_out": max(0, cells_seen - cells_kept),
-                          "nodes_visited": visited, "surfaced": count,
-                          "stopped_by": stopped_by,
-                          "walk_s": round(time.perf_counter() - _t_walk, 2)}
+                          "nodes_walked": visited, "surfaced": count,
+                          "time_budget_ms": int(UIA_WALK_BUDGET_S * 1000),
+                          "node_budget": UIA_WALK_NODE_BUDGET,
+                          "time_budget_hit": stopped_by.startswith("time"),
+                          "node_budget_hit": stopped_by.startswith("node"),
+                          "truncated": bool(stopped_by), "stopped_by": stopped_by,
+                          "node_errors": walk_errors, "first_error": first_error,
+                          "walk_ms": int((time.perf_counter() - _t_walk) * 1000)}
         if stopped_by:
             logging.getLogger("desktop_grounding").warning(
                 "UIA walk of %s stopped by %s after %d node(s) (%d surfaced) - returning the partial ground",
