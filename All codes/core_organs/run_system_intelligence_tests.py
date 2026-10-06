@@ -1249,6 +1249,11 @@ def test_pro1_behavior() -> TestOutcome:
     from core_organs import si_tests_behavior
     return si_tests_behavior.run_pro1(TestOutcome)
 
+def test_rst1_behavior() -> TestOutcome:
+    """RST1 (#6): the RESTORE-APP-UI-TO-ORIGINAL-STATE law - our dialogs closed, pre-existing ones refused, edit+save survives, abort path held to the same bar, unobserved windows get an honest 'not-observed'"""
+    from core_organs import si_tests_behavior
+    return si_tests_behavior.run_rst1(TestOutcome)
+
 def test_h1_organ_import_health() -> TestOutcome:
     """H1: Every core organ module imports cleanly with its main symbol present"""
     import importlib
@@ -1522,12 +1527,26 @@ def test_sk1_recipe_distillation() -> TestOutcome:
         loop.trace = [StepTrace("only one", "x", "click", "PASS", "m", "e", ["uia"])]
         ok_thin, note_thin = loop.distill_recipe("nothing", "notepad")
         refuses = (not ok_thin) and "not enough" in note_thin.lower()
-        passed = bool(ok) and refuses and recall_hit
+
+        # A recipe is a hint about the CONTROLS OF ONE APP. Two apps' save goals read as similar text, so recalling
+        # on goal similarity alone replayed an Excel backstage walk inside Calculator (measured 2026-10-06) - every
+        # step after that named a control the window does not have, and the run ended NO_CHANGE / HITL.
+        loop.trace = [
+            StepTrace("type 42 in cell A1", "Cell A1", "type", "PASS", "uia-value", "cell-has", ["uia"]),
+            StepTrace("save the workbook", "Browse", "click", "PASS", "uia-invoke", "file-created", ["win32"]),
+        ]
+        ok_x, _note_x = loop.distill_recipe("save the workbook as D:\\tmp\\hj_x.xlsx", "excel")
+        cross = DesktopAutonomyLoop.recall_recipe("save the workbook as D:\\tmp\\hj_x.xlsx", "calculator")
+        own = DesktopAutonomyLoop.recall_recipe("save the workbook as D:\\tmp\\hj_x.xlsx", "excel")
+        app_scoped = bool(ok_x) and "SKILL[excel]" in (own or "") and not cross
+        passed = bool(ok) and refuses and recall_hit and app_scoped
         return TestOutcome(
             passed=passed,
             evidence=f"2-PASS trace -> distill={ok} ({note}); recall_hit={recall_hit}; 1-PASS trace -> "
-                     f"refused={not ok_thin} ({note_thin})",
-            metrics={"distilled": bool(ok), "thin_refused": refuses, "recall_hit": recall_hit},
+                     f"refused={not ok_thin} ({note_thin}); app-scoped recall={app_scoped} "
+                     f"(excel->calculator recalled {bool(cross)}, excel->excel recalled={'yes' if own else 'no'})",
+            metrics={"distilled": bool(ok), "thin_refused": refuses, "recall_hit": recall_hit,
+                     "app_scoped": app_scoped},
         )
     finally:
         if prev is None:
@@ -2200,7 +2219,7 @@ def test_e2e1_notepad_haiku_save() -> TestOutcome:
         # resurrect later). Only when we launched it.
         _close_our_notepad()
     (r1, f1, t1), (r2, f2, t2) = results
-    shown = lambda r: [(st["verb"], st["element"][:18], st["verdict"]) for st in r.get("trace", [])]  # noqa: E731
+    shown = si_trace_shown   # (verb, element, verdict), plus (method, evidence) on any row that did not pass
     c1, c2 = bool(r1.get("completed")) and f1, bool(r2.get("completed")) and f2
     recipe = r1.get("recipe", "")
     pointer_ok = si_pointer() == pointer0
@@ -2224,6 +2243,21 @@ def si_pointer():
     p = _wt.POINT()
     ctypes.windll.user32.GetCursorPos(ctypes.byref(p))
     return (p.x, p.y)
+
+
+def si_trace_shown(r: Dict[str, Any]) -> List[tuple]:
+    """A run's trace, compact - and a row that did NOT pass carries its method and evidence.
+
+    E2E-1 has been reporting 'run2 wandered' for days, and (verb, element, verdict) alone cannot tell a wrong
+    click apart from a judge that refused to choose anything at all: the two look identical and need completely
+    different fixes. Passing rows stay short so the line still fits a screen."""
+    rows: List[tuple] = []
+    for st in r.get("trace", []) or []:
+        row = (st["verb"], st["element"][:18], st["verdict"])
+        if st["verdict"] != "PASS":
+            row += (st.get("method", ""), str(st.get("evidence", ""))[:90])
+        rows.append(row)
+    return rows
 
 
 def _close_our_app(g, app: str) -> None:
@@ -2285,7 +2319,7 @@ def test_xls1_spreadsheet_cell_and_full_path_save() -> TestOutcome:
     finally:
         _close_our_app(g, "excel")
     (r1, f1, h1, _t1), (r2, f2, h2, _t2) = results
-    shown = lambda r: [(st["verb"], st["element"][:18], st["verdict"]) for st in r.get("trace", [])]  # noqa: E731
+    shown = si_trace_shown   # (verb, element, verdict), plus (method, evidence) on any row that did not pass
     ok1 = bool(r1.get("completed")) and f1 and h1[0] is True
     ok2 = bool(r2.get("completed")) and f2 and h2[0] is True
     pointer_ok = si_pointer() == pointer0
@@ -2482,6 +2516,7 @@ def main() -> int:
         ("MIN1", "BACKGROUND", test_min1_behavior),
         ("CAP2", "BACKGROUND", test_cap2_behavior),
         ("PRO1", "BEHAVIOR", test_pro1_behavior),
+        ("RST1", "BACKGROUND", test_rst1_behavior),
         ("PIX1", "BACKGROUND", test_pix1_behavior),
         ("SC1", "SCANKNOW", test_sc1_behavior),
         ("LM1", "SCANKNOW", test_lm1_behavior),

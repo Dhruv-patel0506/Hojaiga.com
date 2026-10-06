@@ -449,6 +449,35 @@ def _window_state_word(hwnd: int) -> str:
         return "unknown"
 
 
+def _law_observe(hwnd: int) -> None:
+    """RESTORE-STATE LAW, first sight: record the user's UI exactly as it is before we touch this
+    window. Never touches the window; a keeper failure must never break the task flow."""
+    try:
+        from core_organs import state_keeper as _sk
+        _sk.observe(int(hwnd or 0))
+    except Exception as _lk_err:
+        logger.debug("[LAW] observe skipped hwnd=%s: %s", hwnd, _lk_err)
+
+
+def _law_close_sessions() -> dict:
+    """RESTORE-STATE LAW, end of task (success OR abort): unwind OUR side effects on every window we
+    observed (dialogs we opened, menus, scroll, show-state, focus). Self-reporting; never raises."""
+    try:
+        from core_organs import state_keeper as _sk
+        reports = _sk.close_sessions() or {}
+    except Exception as _lk_err:
+        logger.warning("[LAW][RESTORE] unwind unavailable: %s", _lk_err)
+        return {}
+    for _h, _rep in reports.items():
+        logger.info("[LAW][RESTORE] hwnd=%s status=%s matches_pre=%s restored=%s residual=%s degraded=%s",
+                    _h, _rep.get("status"), _rep.get("matches_pre_state"),
+                    str(_rep.get("restored"))[:160], str(_rep.get("residual"))[:120],
+                    str(_rep.get("degraded"))[:160])
+    if reports:
+        logger.info("[LAW][RESTORE] %s window(s) unwound this task", len(reports))
+    return reports
+
+
 def _remember_previous_app(new_app_name: str) -> None:
     """Multi-app tasks: keep the app being replaced as the 'previous' target (Switch To App can swap back)."""
     if _last_launched_app.get("hwnd") and _last_launched_app.get("app_name") != new_app_name:
@@ -1605,6 +1634,7 @@ def _track_launched_app(app_name: str):
                 # it off-screen for the call, see _canvas_session), a visible one is left alone. Never restore, maximize,
                 # re-centre or foreground it.
                 logger.info(f"[TRACK] '{title}' hwnd={hwnd} is {_window_state_word(hwnd)}; left where it is")
+                _law_observe(hwnd)   # first sight: the law records the user's state before any tool acts
                 return  # Found and tracked, done
     except Exception as e:
         logger.debug(f"[TRACK] Failed to track app: {e}")
@@ -1800,6 +1830,7 @@ if _HAS_CREWAI:
                 _record_session_action("LAUNCH_OR_FOCUS", resolved_app,
                                        f"tracked existing hwnd={_already_hwnd} ({_window_state_word(_already_hwnd)}; left where it is, not raised)")
                 logger.info(f"[LAUNCH] '{resolved_app}' already open (hwnd={_already_hwnd})")
+                _law_observe(_already_hwnd)   # user's window: snapshot its pre-state before we touch it
 
                 # Dynamic Session Hygiene for Tabbed Apps (Notepad, browser):
                 # If already open and has existing content, open a fresh new tab unless user explicitly asked to resume
@@ -1937,6 +1968,7 @@ if _HAS_CREWAI:
                         f"NOT counted as launched.")
             _record_session_action("LAUNCH_NEW", resolved_app,
                                    f"opened '{exe_path}' hwnd={launched_hwnd} via {how} ({_window_state_word(launched_hwnd)}, never raised)")
+            _law_observe(launched_hwnd)   # THE launch choke point: every window opened by a task is recorded before any tool acts
             try:
                 if organ_ml is not None:
                     organ_ml.feed_action(
@@ -2052,6 +2084,7 @@ if _HAS_CREWAI:
         _last_launched_app["title"] = best_title
         _last_launched_app["app_name"] = best_title
         _record_session_action("SWITCH_APP", target, f"now tracking hwnd={best_hwnd} title='{best_title}' ({_window_state_word(best_hwnd)}; not raised, restored or focused)")
+        _law_observe(best_hwnd)   # first contact with this window via a switch: the law records the user's state now
         return f"Switched to '{best_title}' ({_window_state_word(best_hwnd)}; window not raised - tools reach it in the background)."
 
     def _click_button_body(button_name: str, **kwargs) -> str:
@@ -4238,6 +4271,15 @@ class CrewAIEngine:
             logger.debug("[CrewAI][organ_31] monitor start skipped (boot unaffected): %s", _vhm_boot_err)
 
     def execute_task(self, command: str, task_id: str) -> Dict[str, Any]:
+        """RESTORE-STATE LAW wrapper: no matter how the crew run ends - success, FAILURE verdict,
+        or a raise mid-body - every window observed this task is unwound back to the user's
+        pre-state in the finally (whatever WE opened gets closed; user data is never reverted)."""
+        try:
+            return self._execute_task_inner(command, task_id)
+        finally:
+            _law_close_sessions()
+
+    def _execute_task_inner(self, command: str, task_id: str) -> Dict[str, Any]:
         """Execute a user command using a specialized, autonomous CrewAI Multi-Agent crew."""
         if not self.is_available():
             raise RuntimeError("CrewAI is not available or could not initialize local LLM.")

@@ -386,3 +386,99 @@ class PaintedDialog:
         if self.hwnd and user32.IsWindow(self.hwnd):
             user32.PostMessageW(self.hwnd, WM_CLOSE, 0, 0)
         self._thread.join(timeout=2)
+
+
+WM_APP_CREATE_POPUP = 0x8001
+WS_POPUP = 0x00080000
+
+
+class FrameWithPopups:
+    """A real Win32 FRAME plus top-level helper windows of a DIFFERENT class - exactly what
+    headless_input.popup_windows() calls a popup. Exists so the RESTORE-STATE law can prove the one
+    discrimination that matters, deterministically and without any real user's data: a dialog that was
+    already there when we started must SURVIVE, a dialog WE opened must not. Everything sits off-screen
+    at (-32000,-32000) so the user never sees it; windows are created on the pump thread (the thread
+    that owns them) via a posted WM_APP request."""
+
+    def __init__(self, title: str = "HJ-StateLaw-Frame"):
+        self.title = title
+        self.hwnd: Optional[int] = None
+        self._popups: Dict[int, int] = {}
+        self._next_idx = 0
+        self._ready = threading.Event()
+        self._thread = threading.Thread(target=self._run, daemon=True, name="FrameWithPopups")
+        stamp = int(time.time() * 1000) % 10_000_000
+        self._frame_cls = f"HJLawFrame_{stamp}"
+        self._popup_cls = f"HJLawPopup_{stamp}"      # 'popup' in the class name: a real popup to the scanner
+        self._proc = None
+        self._popup_proc = None
+
+    def _frame_proc(self, hwnd, msg, wparam, lparam):
+        if msg == WM_APP_CREATE_POPUP:
+            hinst = kernel32.GetModuleHandleW(None)
+            h = user32.CreateWindowExW(0, self._popup_cls, f"HJLawPopup-{int(wparam)}", WS_POPUP | WS_VISIBLE,
+                                      -32000, -32000, 220, 120, hwnd, None, hinst, None)
+            if h:
+                self._popups[int(wparam)] = int(h)
+            return 0
+        if msg == WM_DESTROY:
+            user32.PostQuitMessage(0)
+            return 0
+        return user32.DefWindowProcW(hwnd, msg, wparam, lparam)
+
+    def _popup_handler(self, hwnd, msg, wparam, lparam):
+        # DefWindowProc alone: WM_CLOSE destroys it, which is the whole point of the unwind ladder
+        return user32.DefWindowProcW(hwnd, msg, wparam, lparam)
+
+    def _run(self):
+        self._proc = WNDPROC(self._frame_proc)
+        self._popup_proc = WNDPROC(self._popup_handler)  # keep a reference alive; do NOT re-wrap the attr
+        hinst = kernel32.GetModuleHandleW(None)
+        for cls, proc, brush in ((self._frame_cls, self._proc, 6), (self._popup_cls, self._popup_proc, 4)):
+            wc = _WNDCLASSW()
+            wc.lpfnWndProc = proc
+            wc.hInstance = hinst
+            wc.lpszClassName = cls
+            wc.hbrBackground = brush
+            user32.RegisterClassW(ctypes.byref(wc))
+        self.hwnd = user32.CreateWindowExW(0, self._frame_cls, self.title, WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+                                          -32000, -32000, 420, 260, None, None, hinst, None)
+        self._ready.set()
+        msg = wt.MSG()
+        while user32.GetMessageW(ctypes.byref(msg), None, 0, 0) > 0:
+            user32.TranslateMessage(ctypes.byref(msg))
+            user32.DispatchMessageW(ctypes.byref(msg))
+
+    def start(self) -> "FrameWithPopups":
+        self._thread.start()
+        self._ready.wait(5)
+        time.sleep(0.3)
+        return self
+
+    def open_popup(self) -> int:
+        """Ask the pump thread to create one more popup owned by the frame; returns its popup index."""
+        idx = self._next_idx
+        self._next_idx += 1
+        user32.PostMessageW(self.hwnd, WM_APP_CREATE_POPUP, idx, 0)
+        end = time.time() + 2.0
+        while time.time() < end and idx not in self._popups:
+            time.sleep(0.05)
+        return idx
+
+    def popup_hwnd(self, idx: int) -> int:
+        return int(self._popups.get(idx) or 0)
+
+    def alive(self, idx: int) -> bool:
+        h = self.popup_hwnd(idx)
+        return bool(h) and bool(user32.IsWindow(h))
+
+    def visible_popups(self) -> list[int]:
+        return [h for h in self._popups.values() if user32.IsWindow(h) and user32.IsWindowVisible(h)]
+
+    def stop(self):
+        for h in list(self._popups.values()):
+            if user32.IsWindow(h):
+                user32.PostMessageW(h, WM_CLOSE, 0, 0)
+        if self.hwnd and user32.IsWindow(self.hwnd):
+            user32.PostMessageW(self.hwnd, WM_CLOSE, 0, 0)
+        self._thread.join(timeout=2)

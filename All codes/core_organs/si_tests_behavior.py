@@ -1268,3 +1268,183 @@ def run_pro1(TestOutcome):
     finally:
         m.close()
         _rm_db(db)
+
+
+# --------------------------------------------------------------------------- RST1: restore-state law
+
+def _open_file_menu(hwnd: int) -> Dict[str, Any]:
+    """Open the app's own File/menu entry through UIA patterns only (headless: expand, else invoke).
+    Returns what WE created, so the law is judged on a side effect the test genuinely caused."""
+    from core_organs import fast_uia
+    rows = fast_uia.snapshot(hwnd, timeout_ms=6000) or []
+    for n in rows:
+        if (n.name or "").strip().lower() in ("file", "menu", "main menu"):
+            if "expand" in (n.pats or []):
+                try:
+                    n.ctrl.GetExpandCollapsePattern().Expand()
+                    time.sleep(0.7)
+                    return {"attempted": True, "via": "expand", "label": n.name}
+                except Exception:
+                    pass
+            if "invoke" in (n.pats or []):
+                try:
+                    n.ctrl.GetInvokePattern().Invoke()
+                    time.sleep(0.7)
+                    return {"attempted": True, "via": "invoke", "label": n.name}
+                except Exception:
+                    pass
+    return {"attempted": False, "via": None, "label": None}
+
+
+def run_rst1(TestOutcome):
+    """RST1 (#6): the RESTORE-APP-UI-TO-ORIGINAL-STATE law - after an edit+save the app is returned to the
+    interface the user left, not reset and not left mid-flight. Proves all four faces: OUR dialogs get closed,
+    PRE-EXISTING dialogs are refused (left untouched), a mid-run ABORT is held to the same bar, and a window
+    that was never observed gets an honest 'not-observed', never a guessed restore. Real app: fresh minimized
+    Notepad edits + saves a file (the change survives) and the File menu WE opened is put back."""
+    from core_organs import state_keeper as sk
+    from core_organs import si_test_support as sup
+    bm = _bm()
+    t0 = time.time()
+    rows, checks = [], {}
+    saved_ok = content_after = False
+    sk.reset()                                   # deterministic registry, whatever ran before
+    fx_a = fx_c = None
+    our_idx = base_c = -1
+    db = _tmpdb()
+    m = None
+    path = ""
+    try:
+        # ---- Phase A: ownership discrimination on a real (fixture) window: ours close, the user's refuse
+        fx_a = sup.FrameWithPopups().start()
+        base_idx = fx_a.open_popup()              # the user's dialog: existed BEFORE first sight
+        time.sleep(0.25)
+        pre_a = sk.observe(fx_a.hwnd)
+        ours = [fx_a.open_popup(), fx_a.open_popup()]   # dialogs WE opened after first sight
+        time.sleep(0.3)
+        rep_a = sk.restore(fx_a.hwnd)
+        checks["A: closed BOTH dialogs we opened after the snapshot"] = all(not fx_a.alive(i) for i in ours)
+        checks["A: LEFT the pre-existing dialog untouched (refused, never closed)"] = fx_a.alive(base_idx)
+        checks["A: report says the frame matches its pre-state"] = \
+            rep_a.get("status") == "restored" and rep_a.get("matches_pre_state") is True
+        rows.append(f"A(fixtures): base={base_idx} survived, ours={ours} closed, status={rep_a.get('status')}, "
+                    f"refused={len(rep_a.get('refused') or [])}, base_popups={len(pre_a.get('popups') or [])}")
+        fx_a.stop()
+
+        # ---- Phase B: real app edit+save; saved content SURVIVES, our UI side effects get unwound
+        # (Win11 Notepad sometimes consolidates/destroys a second, test-owned window mid-run: the APP ended
+        # our session's window - the law says 'window-gone' honestly instead of faking it. Retried once, then
+        # reported ENV-BLOCKED, never PASS, never silently swallowed.)
+        m = bm.BehaviorModel(db)
+        m.load_pack_dir()
+        rep_b = {"status": "no-attempt"}
+        for b_try in (1, 2):
+            with LiveApp("notepad", park=False) as la:
+                if not la.ok:
+                    return TestOutcome(passed=False, env_blocked=True, evidence=f"notepad: {la.why}")
+                hwnd = la.hwnd
+                pre_b = sk.observe(hwnd)              # the law records the user's state at first sight
+                path = os.path.join(tempfile.gettempdir(), "hj_rst1_" + uuid.uuid4().hex[:6] + ".txt")
+                text = "rst1-" + uuid.uuid4().hex[:5]
+                tpl = bm.TemplateRunner(m).run("notepad", "write text and save as file",
+                                              {"text": text, "path": path},
+                                              hwnd_fn=lambda h=hwnd: h if _u32.IsWindow(h) else 0)
+                saved_ok = bool(tpl.get("completed")) and os.path.exists(path) and \
+                    text in open(path, encoding="utf-8", errors="replace").read()
+                opened = _open_file_menu(hwnd)        # a side effect WE caused on the real app
+                mid = sk.snapshot(hwnd)
+                mid_new = sk.diff(pre_b, mid)["new_popups"]
+                rep_b = sk.restore(hwnd)              # the law: unwind ours, keep the user's, save survives
+                if rep_b.get("status") == "window-gone":
+                    rows.append(f"B(attempt {b_try}): window-gone - {str(rep_b.get('note'))[:80]}")
+                    continue
+                post_b = sk.snapshot(hwnd)
+                d_after = sk.diff(pre_b, post_b)
+                content_after = os.path.exists(path) and \
+                    text in open(path, encoding="utf-8", errors="replace").read()
+                still_min = bool(_u32.IsIconic(hwnd))
+                pos_ok = post_b.get("placement") == pre_b.get("placement")
+                checks["B: the edit+save happened (intended change real, on disk)"] = saved_ok
+                checks["B: saved content SURVIVED the unwind (law never reverts user data)"] = content_after
+                checks["B: the File menu WE opened is gone (no new popups/expanded nodes remain)"] = \
+                    bool(opened["attempted"]) and not d_after["new_popups"] and not d_after["expanded_new"]
+                checks["B: post-run UI matches the user's pre-run state (report: restored + matches_pre)"] = \
+                    rep_b.get("status") == "restored" and rep_b.get("matches_pre_state") is True
+                checks["B: window left exactly where the user had it (still minimized, placement intact)"] = \
+                    bool(pre_b.get("iconic")) and still_min and pos_ok
+                rows.append(f"B(notepad,try{b_try}): tpl={tpl.get('completed')} our_menu={opened['via']}:{opened['label']} "
+                            f"menu_popups_at_mid={len(mid_new)} closed_to_baseline="
+                            f"{rep_b.get('restored', {}).get('popups_closed_to_baseline')} "
+                            f"menus_collapsed={rep_b.get('restored', {}).get('menus_collapsed')} "
+                            f"tab={rep_b.get('restored', {}).get('active_tab') or rep_b.get('restored', {}).get('active_tab_renamed_by_saved_change')} "
+                            f"status={rep_b.get('status')} matches={rep_b.get('matches_pre_state')} "
+                            f"residual={dict(rep_b.get('residual') or {})} "
+                            f"focus_final={dict(rep_b.get('focus_final') or {})} "
+                            f"min={still_min} pos={pos_ok} degraded={str(rep_b.get('degraded'))[:200]}")
+                break
+        if rep_b.get("status") == "window-gone":
+            return TestOutcome(passed=False, env_blocked=True,
+                               evidence="B: notepad destroyed our test window twice mid-run (app consolidation, "
+                                        "not the law): " + " | ".join(rows),
+                               metrics={"phases": "A(env-early-exit)", "seconds": round(time.time() - t0, 1)})
+
+        # ---- Phase C: the ABORT path is held to the same bar (with preserve(): body raises mid-run)
+        fx_c = sup.FrameWithPopups(title="HJ-StateLaw-Abort").start()
+        base_c = fx_c.open_popup()                 # pre-existing at first sight (inside preserve)
+        keeper_box = []
+        raised = False
+        try:
+            with sk.preserve(fx_c.hwnd) as keeper:
+                keeper_box.append(keeper)
+                our_idx = fx_c.open_popup()        # what WE opened before dying mid-run
+                time.sleep(0.3)
+                raise RuntimeError("injected mid-run failure")
+        except RuntimeError:
+            raised = True
+        krep = keeper_box[0]["report"] if keeper_box else {}
+        checks["C: the body's exception propagated (law never swallows failures)"] = raised
+        checks["C: on ABORT our popup was still closed and the user's left alive"] = \
+            (not fx_c.alive(our_idx)) and fx_c.alive(base_c)
+        checks["C: abort report flagged itself aborted AND still reached restored/matches"] = \
+            bool(krep.get("aborted")) and krep.get("status") == "restored" and \
+            krep.get("matches_pre_state") is True
+        rows.append(f"C(abort): propagated={raised} ours_closed={not fx_c.alive(our_idx)} "
+                    f"base_alive={fx_c.alive(base_c)} report={krep.get('status')}/aborted={krep.get('aborted')}")
+
+        # ---- Phase D: never-observed window gets an honest refusal, never a guessed restore
+        rep_d = sk.restore(fx_c.hwnd)               # session was dropped by C's restore -> unobserved
+        checks["D: an unobserved window gets honest 'not-observed' (no state guessed)"] = \
+            rep_d.get("status") == "not-observed"
+        rows.append(f"D(no-snapshot): status={rep_d.get('status')} note={str(rep_d.get('note'))[:60]}")
+        fx_c.stop()
+
+        passed = all(checks.values())
+        ev = "; ".join(f"{k}={'OK' if v else 'FAIL'}" for k, v in checks.items()) + " | " + " || ".join(rows)
+        return TestOutcome(passed=passed, evidence=ev[:2400],
+                           metrics={"phases": "A/B/C/D",
+                                    "checks": f"{sum(1 for v in checks.values() if v)}/{len(checks)}",
+                                    "notepad_saved": saved_ok,
+                                    "seconds": round(time.time() - t0, 1)})
+    finally:
+        try:
+            sk.close_sessions()                     # any session left behind by a mid-test raise gets the law too
+        except Exception:
+            pass
+        sk.reset()
+        for fx in (fx_a, fx_c):
+            try:
+                if fx:
+                    fx.stop()
+            except Exception:
+                pass
+        if m is not None:
+            try:
+                m.close()
+            except Exception:
+                pass
+        _rm_db(db)
+        try:
+            if path and os.path.exists(path):
+                os.remove(path)
+        except Exception:
+            pass
