@@ -1,0 +1,34 @@
+Hojaiga System Intelligence & Reliability Suite
+================================================================================
+[pointer preflight] pointer (1740, 623)->(1740, 623) cause=still (guard calls=0, hardware events=0, injected events=0, fastest step=0px at 0.0px/ms, hook=on)  -> quiet
+[vision gate] up=True started=False (already running)
+
+================================================================================
+TEST MIN1 [BACKGROUND]: MIN1: a MINIMIZED app is scanned + operated without ever being shown or focused, at full quality
+================================================================================
+[FAIL] 137.92s — notepad: mode=parked E0=36 cmds, layout=160 controls (File@[0.0355, 0.0948]), E1 probe effect=True unwound=True, capture=ok, template completed=True truth=True, | FOCUS: target-held-foreground longest=55659ms (1380/1380 samples), brief-exposure-samples(>16px)=7 longest-continuous-exposure=21ms max-visible-px=215130 exposed-by={'popup:Microsoft.UI.Content.P:Pop-upHost': 7} exposure-ms-by-phase={'e0': 74.4, 'layout': 108.4} sampling-period~22ms | ended minimized=True placement-restored=True 56s | harness note: app took focus at startup (returned); app un-minimized itself during startup (re-minimized) || paint: mode=parked E0=41 cmds, layout=417 controls (File@[0.026, 0.073]), E1 probe effect=True unwound=True, capture=ok, | FOCUS: target-held-foreground longest=22ms (12/950 samples), brief-exposure-samples(>16px)=15 longest-continuous-exposure=42ms max-visible-px=204771 exposed-by={'popup:Microsoft.UI.Content.P:Pop-upHost': 15} exposure-ms-by-phase={'e0': 306.8, 'layout': 155.3, 'e1-probe': 66.6} sampling-period~22ms | ended minimized=True placement-restored=True 70s || FAILED: ['notepad']
+        apps = 2
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 1/7
+        proc = threads=28 handles=431 rss_mb=133
+        gdi_growth = +0/+5
+
+================================================================================
+SUMMARY — 0/1 PASS, 1 FAIL in 140.1s
+================================================================================
+[FAIL] MIN1 MIN1: a MINIMIZED app is scanned + operated without ever b 137919.7 ms
+
+================================================================================
+GDI OBJECT BUDGET (cap 10000) — end-of-test count / growth
+================================================================================
+  curve: MIN1:1(+0)
+  no test grew the GDI budget - the process released everything it allocated
+
+================================================================================
+RECONCILED SUBSYSTEM RANKINGS (70% pass-rate, 30% latency; B=env-blocked, neutral)
+================================================================================
+ #  SUBSYSTEM                                      TESTS   SCORE    AVG MS
+ 1  Background operation (minimized, never shown/focused)           0/1    0.0  137919.7
+
+Full log written: D:\new_automation\All codes\core_organs\system_intelligence_results_partial.txt
+[vision gate] vision(Qwen2.5-VL-7B :8081) server=up calls=0 found=0 errors=0 avg=0ms by_fn={} log=data\vision_log.jsonl

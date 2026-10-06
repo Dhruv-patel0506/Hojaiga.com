@@ -1,0 +1,47 @@
+Hojaiga System Intelligence & Reliability Suite
+================================================================================
+[pointer preflight] pointer (1740, 623)->(1740, 623) cause=still (guard calls=0, hardware events=0, injected events=0, fastest step=0px at 0.0px/ms, hook=on)  -> quiet
+[vision gate] up=True started=False (already running)
+
+================================================================================
+TEST MIN1 [BACKGROUND]: MIN1: a MINIMIZED app is scanned + operated without ever being shown or focused, at full quality
+================================================================================
+[FAIL] 411.46s — notepad: mode=parked E0=36 cmds, layout=160 controls (File@[0.0355, 0.0948]), E1 probe effect=True unwound=True, capture=ok, template completed=True truth=True, | FOCUS: target-held-foreground longest=68112ms (2821/2821 samples), brief-exposure-samples(>16px)=13 longest-continuous-exposure=22ms max-visible-px=215130 exposed-by={'popup:Microsoft.UI.Content.P:Pop-upHost': 13} exposure-ms-by-phase={'e0': 109.2, 'layout': 76.3, 'template': 14.8} sampling-period~10ms | ended minimized=True placement-restored=True 68s | harness note: app took focus at startup (returned); app un-minimized itself during startup (re-minimized) || paint: mode=parked E0=41 cmds, layout=417 controls (File@[0.026, 0.073]), E1 probe effect=True unwound=True, capture=ok, | FOCUS: target-held-foreground longest=269ms (23/11830 samples), brief-exposure-samples(>16px)=33 longest-continuous-exposure=74ms max-visible-px=182819 exposed-by={'popup:Microsoft.UI.Content.P:Pop-upHost': 33} exposure-ms-by-phase={'e0': 166.1, 'layout': 261.3, 'e1-probe': 38.9} sampling-period~9ms | ended minimized=True placement-restored=True 331s || FAILED: ['notepad', 'paint']
+        apps = 2
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 1/8
+        proc = threads=28 handles=431 rss_mb=134
+        gdi_growth = +0/+6
+
+================================================================================
+TEST PIX1 [BACKGROUND]: PIX1: a parked app's flyouts never reach the screen's pixels (composed-desktop frames during a menu crawl equal the baseline)
+================================================================================
+[PASS] 32.10s — the crawl really opened menus (the thing under test happened)=OK; the screen was sampled densely enough to mean something (>= 40 frames)=OK; no sampled frame of the composed desktop differs from the baseline=OK | frames=267 gap~93ms noise=5px differing=0 max=6px conceal=True
+        checks = 3/3
+        frames = 267
+        differing = 0
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 1/8
+        proc = threads=28 handles=429 rss_mb=141
+        gdi_growth = +0/+3
+
+================================================================================
+SUMMARY — 1/2 PASS, 1 FAIL in 446.4s
+================================================================================
+[FAIL] MIN1 MIN1: a MINIMIZED app is scanned + operated without ever b 411462.4 ms
+[PASS] PIX1 PIX1: a parked app's flyouts never reach the screen's pixe  32100.9 ms
+
+================================================================================
+GDI OBJECT BUDGET (cap 10000) — end-of-test count / growth
+================================================================================
+  curve: MIN1:1(+0) PIX1:1(+0)
+  no test grew the GDI budget - the process released everything it allocated
+
+================================================================================
+RECONCILED SUBSYSTEM RANKINGS (70% pass-rate, 30% latency; B=env-blocked, neutral)
+================================================================================
+ #  SUBSYSTEM                                      TESTS   SCORE    AVG MS
+ 1  Background operation (minimized, never shown/focused)           1/2   35.0  221781.7
+
+Full log written: D:\new_automation\All codes\core_organs\system_intelligence_results_partial.txt
+[vision gate] vision(Qwen2.5-VL-7B :8081) server=up calls=0 found=0 errors=0 avg=0ms by_fn={} log=data\vision_log.jsonl

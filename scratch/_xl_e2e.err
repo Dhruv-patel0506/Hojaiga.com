@@ -1,0 +1,28 @@
+{"timestamp":"2026-10-05 21:22:13,914","logger":"organ_04_knowledge","level":"INFO","message":"kernel_initializing"}
+{"timestamp":"2026-10-05 21:22:13,928","logger":"organ_04_knowledge","level":"INFO","message":"state_transition"}
+{"timestamp":"2026-10-05 21:22:13,931","logger":"organ_04_knowledge","level":"INFO","message":"kernel_ready"}
+{"timestamp":"2026-10-05 21:22:13,934","logger":"organ_04_knowledge","level":"INFO","message":"ipc_named_pipe_mode_selected"}
+{"timestamp":"2026-10-05 21:22:13,937","logger":"organ_04_knowledge","level":"INFO","message":"organ_04_knowledge_started"}
+{"timestamp":"2026-10-05 21:22:13,974","logger":"organ_04_knowledge","level":"INFO","message":"kernel_shutdown"}
+{"timestamp":"2026-10-05 21:22:13,976","logger":"organ_04_knowledge","level":"INFO","message":"organ_04_knowledge_stopped"}
+2026-10-05 21:22:14,417 [INFO] [autonomy] excel hwnd=32506608 held parked off-screen
+2026-10-05 21:22:34,865 [INFO] [OmniParserScanner] Initialized successfully from local repo
+2026-10-05 21:22:34,872 [WARNING] Neither CUDA nor MPS are available - defaulting to CPU. Note: This module is much faster with a GPU.
+D:\new_automation\hojaiga_env\Lib\site-packages\torch\ao\nn\quantized\dynamic\modules\rnn.py:162: UserWarning: torch.quantize_per_tensor, torch.quantize_per_channel and other quantized tensor creation functions that produce tensors with dtype torch.quint8, torch.qint8, and torch.qint32 are deprecated and will be removed in a future PyTorch release. Please see https://github.com/pytorch/pytorch/issues/184982 for more information. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\aten\src\ATen\quantized\Quantizer.cpp:116.)
+  w_ih = torch.quantize_per_tensor(
+D:\new_automation\hojaiga_env\Lib\site-packages\torch\utils\data\dataloader.py:759: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+  super().__init__(loader)
+2026-10-05 21:22:44,296 [INFO] [OmniParserScanner] Parsed 2 elements
+2026-10-05 21:22:44,299 [INFO] [vision-warmup] {'warmed': True, 'ms': 44359}
+2026-10-05 21:22:53,373 [INFO] [judge] goal='type 42 in cell A1' offered=263 avoided=[] top=[(5.5, 'Microsoft search', 'edit'), (5.5, 'Font', 'edit'), (5.5, 'Font Size', 'edit'), (5.5, 'Number Format', 'edit'), (5.5, 'Formula Bar', 'edit')]
+2026-10-05 21:23:24,656 [INFO] [judge] goal='type 42 in cell A1' offered=263 avoided=[] top=[(5.5, 'Microsoft search', 'edit'), (5.5, 'Font', 'edit'), (5.5, 'Font Size', 'edit'), (5.5, 'Number Format', 'edit'), (5.5, 'Formula Bar', 'edit')]
+2026-10-05 21:24:26,279 [INFO] [step] type 'A1' via uia-SetValue -> PASS | text has '42' [read 2 chars]
+2026-10-05 21:24:34,632 [INFO] [autonomy] file-dialog rung: ok=False note=no-file-dialog-visible
+2026-10-05 21:24:34,649 [INFO] [judge] goal='save the workbook as D:\\new_automation\\_excel_e2e_' offered=261 avoided=['close', 'discard', 'discard changes', 'do not save'] top=[(5.5, 'File Tab', 'button'), (0.5, 'Ribbon', 'pane'), (0.5, '\u202aBook1\u202c  -  Excel', 'button'), (0.5, 'Type to search and u', 'menuitem'), (0.5, 'Customize Quick Acce', 'menuitem')]
+2026-10-05 21:24:46,808 [INFO] [step] click 'File Tab' via uia-invoke -> WRONG_STATE | file pro_1791215519.xlsx MISSING
+2026-10-05 21:24:47,402 [INFO] [autonomy] file-dialog rung: ok=False note=no-file-dialog-visible
+2026-10-05 21:24:47,406 [INFO] [judge] goal='save the workbook as D:\\new_automation\\_excel_e2e_' offered=55 avoided=['close', 'discard', 'discard changes', 'do not save'] top=[(10.4, 'Save As', 'listitem'), (3.5, 'Blank workbook', 'listitem'), (1.9, 'More workbooks', 'hyperlink'), (0.5, 'Help', 'button'), (0.5, 'Back', 'listitem')]
+2026-10-05 21:24:54,012 [INFO] [step] click 'Save As' via uia-select -> WRONG_STATE | file pro_1791215519.xlsx MISSING
+2026-10-05 21:25:05,321 [INFO] [autonomy] file-dialog rung: ok=False note=no-file-dialog-visible
+2026-10-05 21:25:05,324 [INFO] [judge] goal='save the workbook as D:\\new_automation\\_excel_e2e_' offered=45 avoided=['close', 'discard', 'discard changes', 'do not save'] top=[(9.4, 'Browse', 'button'), (3.5, 'Save as type', 'combobox'), (0.5, 'Help', 'button'), (0.5, 'Back', 'listitem'), (0.5, 'Backstage view', 'pane')]
+2026-10-05 21:25:07,086 [INFO] [step] click 'Save as type' via UNDELIVERABLE: window gone -> NO_CHANGE | action not delivered -> never a PASS regardless of UI diff

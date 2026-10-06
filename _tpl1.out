@@ -1,0 +1,31 @@
+Hojaiga System Intelligence & Reliability Suite
+================================================================================
+[pointer preflight] pointer (1251, 594)->(1251, 594) cause=still (guard calls=0, hardware events=0, injected events=0, fastest step=0px at 0.0px/ms, hook=on)  -> quiet
+
+================================================================================
+TEST TPL1 [AUTONOMY]: TPL1: a task decomposed from DATA templates runs verified leaf-by-leaf on two unrelated apps
+================================================================================
+[PASS] 69.88s — notepad: completed=True truth=True 24.81s leaves=[('type_text', 'PASS', 1), ('open_save_as', 'PASS', 2), ('save_to_path', 'PASS', 1), ('verify_content', 'PASS', 1)] | paint: completed=True truth=True 29.14s leaves=[('open_save_as', 'PASS', 2), ('save_to_path', 'PASS', 1)] | verify-only leaf acted=NO | unmatched task matched=False | templates promoted to learned by verified runs: 2
+        apps = 2
+        pointer = human-hand drift=383px hw=119 inj=0
+        gdi_user_end = 1/7
+        gdi_growth = +0/+6
+
+================================================================================
+SUMMARY — 1/1 PASS in 72.1s
+================================================================================
+[PASS] TPL1 TPL1: a task decomposed from DATA templates runs verified   69880.5 ms
+
+================================================================================
+GDI OBJECT BUDGET (cap 10000) — end-of-test count / growth
+================================================================================
+  curve: TPL1:1(+0)
+  no test grew the GDI budget - the process released everything it allocated
+
+================================================================================
+RECONCILED SUBSYSTEM RANKINGS (70% pass-rate, 30% latency; B=env-blocked, neutral)
+================================================================================
+ #  SUBSYSTEM                                      TESTS   SCORE    AVG MS
+ 1  Unattended task runs (templates + day report)           1/1   70.0   69880.5
+
+Full log written: D:\new_automation\All codes\core_organs\system_intelligence_results_partial.txt

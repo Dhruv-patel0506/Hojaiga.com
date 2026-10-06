@@ -1,0 +1,83 @@
+{"timestamp":"2026-10-05 23:58:56,433","logger":"organ_04_knowledge","level":"INFO","message":"kernel_initializing"}
+{"timestamp":"2026-10-05 23:58:56,439","logger":"organ_04_knowledge","level":"INFO","message":"state_transition"}
+{"timestamp":"2026-10-05 23:58:56,441","logger":"organ_04_knowledge","level":"INFO","message":"kernel_ready"}
+{"timestamp":"2026-10-05 23:58:56,443","logger":"organ_04_knowledge","level":"INFO","message":"ipc_named_pipe_mode_selected"}
+{"timestamp":"2026-10-05 23:58:56,445","logger":"organ_04_knowledge","level":"INFO","message":"organ_04_knowledge_started"}
+{"timestamp":"2026-10-05 23:58:56,502","logger":"organ_04_knowledge","level":"INFO","message":"kernel_shutdown"}
+{"timestamp":"2026-10-05 23:58:56,504","logger":"organ_04_knowledge","level":"INFO","message":"organ_04_knowledge_stopped"}
+2026-10-05 23:58:56,919 [INFO] [autonomy] excel hwnd=20120326 held parked off-screen
+2026-10-05 23:59:00,597 [INFO] [ready] excel: hwnd=20120326 elements=263 wait=4.0s extended=0.0s threshold=8 reason= tiers=['uia']
+2026-10-05 23:59:17,717 [INFO] [OmniParserScanner] Initialized successfully from local repo
+2026-10-05 23:59:17,724 [WARNING] Neither CUDA nor MPS are available - defaulting to CPU. Note: This module is much faster with a GPU.
+D:\new_automation\hojaiga_env\Lib\site-packages\torch\ao\nn\quantized\dynamic\modules\rnn.py:162: UserWarning: torch.quantize_per_tensor, torch.quantize_per_channel and other quantized tensor creation functions that produce tensors with dtype torch.quint8, torch.qint8, and torch.qint32 are deprecated and will be removed in a future PyTorch release. Please see https://github.com/pytorch/pytorch/issues/184982 for more information. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\aten\src\ATen\quantized\Quantizer.cpp:116.)
+  w_ih = torch.quantize_per_tensor(
+D:\new_automation\hojaiga_env\Lib\site-packages\torch\utils\data\dataloader.py:759: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+  super().__init__(loader)
+2026-10-05 23:59:26,771 [INFO] [OmniParserScanner] Parsed 2 elements
+2026-10-05 23:59:26,774 [INFO] [vision-warmup] {'warmed': True, 'ms': 42445}
+2026-10-05 23:59:30,871 [INFO] [judge] goal='type 42 in cell A1' offered=262 avoided=['ribbon tabs'] top=[(8.4, 'Formula Bar', 'edit'), (8.3, 'edit', 'edit'), (5.6, 'Font', 'edit'), (5.6, 'Number Format', 'edit'), (5.5, 'Font Size', 'edit')]
+2026-10-06 00:00:12,411 [INFO] [step] type 'Formula Bar' via append:postmessage-wm_char->XLMAIN (2 chars) -> WRONG_STATE | text MISSING '42' [read 12 chars]
+2026-10-06 00:00:18,539 [INFO] [judge] goal='type 42 in cell A1' offered=222 avoided=['ribbon tabs'] top=[(8.6, 'Edit Cell', 'edit'), (8.4, 'Formula Bar', 'edit'), (8.3, 'edit', 'edit'), (5.6, 'Font', 'edit'), (5.5, 'Font Size', 'edit')]
+2026-10-06 00:00:43,766 [INFO] [step] type 'A1' via uia-SetValue -> PASS | text has '42' [read 2 chars]
+2026-10-06 00:00:52,190 [INFO] [autonomy] file-dialog rung: ok=False note=no-file-dialog-visible
+2026-10-06 00:00:52,197 [INFO] [judge] goal='save the workbook as D:\\new_automation\\_e2e_tmp\\hj' offered=220 avoided=['close', 'discard', 'discard changes', 'do not save'] top=[(5.5, 'File Tab', 'button'), (0.5, 'Ribbon', 'pane'), (0.5, '\u202aBook1\u202c  -  Excel', 'button'), (0.5, 'Type to search and u', 'menuitem'), (0.5, 'Customize Quick Acce', 'menuitem')]
+2026-10-06 00:01:05,577 [INFO] [step] click 'File Tab' via uia-invoke -> PASS | ui-changed; region pixel-delta 0.923 of cells via printwindow detected; names +33/-588; modes +['hide or show region|checked']/-['a1|selected', 'normal|checked', 'ribbon tabs|expanded'] | goal still pending (file hj_xls1.xlsx MISSING; content of hj_xls1.xlsx n
+2026-10-06 00:01:06,460 [INFO] [autonomy] file-dialog rung: ok=False note=file-dialog belongs to another app, not the target ('Save as'(notepad)) -> not touched
+2026-10-06 00:01:06,464 [INFO] [judge] goal='save the workbook as D:\\new_automation\\_e2e_tmp\\hj' offered=55 avoided=['close', 'discard', 'discard changes', 'do not save'] top=[(10.4, 'Save As', 'listitem'), (3.5, 'Blank workbook', 'listitem'), (1.9, 'More workbooks', 'hyperlink'), (0.5, 'Help', 'button'), (0.5, 'Back', 'listitem')]
+2026-10-06 00:01:13,560 [INFO] [step] click 'Save As' via uia-select -> PASS | ui-changed; region pixel-delta 0.337 of cells via printwindow detected; names +27/-31; modes +['onedrive - university of tennessee|selected', 'save as|selected']/-['hide or show region|checked', 'home|selected'] | goal still pending (file hj_xls1.xlsx MISSING;
+2026-10-06 00:01:22,155 [INFO] [stuck] goal 'save the workbook as D:\\new_automation\\_e2e_tmp\\hj': widened perception (+3 element(s)): {'raw_added': 0, 'pixel': 'ocr found 3', 'waited_s': 5.3, 'grew': 0, 'screenshot': 'D:\\new_automation\\data\\escalations\\esc_1791225081_20120326.png'}
+2026-10-06 00:01:22,688 [INFO] [autonomy] file-dialog rung: ok=False note=no-file-dialog-visible
+2026-10-06 00:01:22,694 [INFO] [judge] goal='save the workbook as D:\\new_automation\\_e2e_tmp\\hj' offered=50 avoided=['close', 'discard', 'discard changes', 'do not save'] top=[(10.4, 'Save As', 'listitem'), (9.4, 'Browse', 'button'), (3.5, 'Save', 'text'), (3.5, 'save', 'text'), (3.5, 'Save As', 'group')]
+2026-10-06 00:01:42,391 [INFO] [popup] 'Save As' -> expected_keep via gate in 30 ms
+2026-10-06 00:01:48,608 [INFO] [step] click 'Browse' via uia-invoke -> PASS | ui-changed; region pixel-delta 0.013 of cells via printwindow below tolerance; names +138/-0; modes +['desktop (onedrive)|expanded', 'dhruv - personal (onedrive)|expanded', 'documents (onedrive)|selected']/-[] | goal still pending (file hj_xls1.xlsx MISSING; c
+2026-10-06 00:01:52,217 [INFO] [popup] '' -> owned-by-task via escalate in 3291 ms
+2026-10-06 00:02:19,577 [INFO] [autonomy] file-dialog rung: ok=True note=file-dialog name set + Enter posted to the filename edit
+2026-10-06 00:02:26,964 [INFO] [step] file-dialog 'file-dialog' via native-file-dialog -> PASS | file-dialog name set + Enter posted to the filename edit; ui-changed; region pixel-delta 0.878 of cells via printwindow detected; names +587/-165; modes +['a1|selected', 'bottom align|checked', 'home|selected']/-['desktop (onedrive)|expanded', 'dhruv - persona
+{"timestamp":"2026-10-06 00:02:27,597","logger":"organ_04_knowledge","level":"INFO","message":"kernel_initializing"}
+2026-10-06 00:02:27,597 [INFO] kernel_initializing
+{"timestamp":"2026-10-06 00:02:27,604","logger":"organ_04_knowledge","level":"INFO","message":"state_transition"}
+2026-10-06 00:02:27,604 [INFO] state_transition
+{"timestamp":"2026-10-06 00:02:27,606","logger":"organ_04_knowledge","level":"INFO","message":"kernel_ready"}
+2026-10-06 00:02:27,606 [INFO] kernel_ready
+{"timestamp":"2026-10-06 00:02:27,608","logger":"organ_04_knowledge","level":"INFO","message":"ipc_named_pipe_mode_selected"}
+2026-10-06 00:02:27,608 [INFO] ipc_named_pipe_mode_selected
+{"timestamp":"2026-10-06 00:02:27,609","logger":"organ_04_knowledge","level":"INFO","message":"organ_04_knowledge_started"}
+2026-10-06 00:02:27,609 [INFO] organ_04_knowledge_started
+{"timestamp":"2026-10-06 00:02:27,628","logger":"organ_04_knowledge","level":"INFO","message":"event_emitted"}
+2026-10-06 00:02:27,628 [INFO] event_emitted
+{"timestamp":"2026-10-06 00:02:27,649","logger":"organ_04_knowledge","level":"INFO","message":"kernel_shutdown"}
+2026-10-06 00:02:27,649 [INFO] kernel_shutdown
+{"timestamp":"2026-10-06 00:02:27,652","logger":"organ_04_knowledge","level":"INFO","message":"organ_04_knowledge_stopped"}
+2026-10-06 00:02:27,652 [INFO] organ_04_knowledge_stopped
+{"timestamp":"2026-10-06 00:02:45,923","logger":"organ_04_knowledge","level":"INFO","message":"kernel_initializing"}
+2026-10-06 00:02:45,923 [INFO] kernel_initializing
+{"timestamp":"2026-10-06 00:02:45,934","logger":"organ_04_knowledge","level":"INFO","message":"state_transition"}
+2026-10-06 00:02:45,934 [INFO] state_transition
+{"timestamp":"2026-10-06 00:02:45,936","logger":"organ_04_knowledge","level":"INFO","message":"kernel_ready"}
+2026-10-06 00:02:45,936 [INFO] kernel_ready
+{"timestamp":"2026-10-06 00:02:45,938","logger":"organ_04_knowledge","level":"INFO","message":"ipc_named_pipe_mode_selected"}
+2026-10-06 00:02:45,938 [INFO] ipc_named_pipe_mode_selected
+{"timestamp":"2026-10-06 00:02:45,940","logger":"organ_04_knowledge","level":"INFO","message":"organ_04_knowledge_started"}
+2026-10-06 00:02:45,940 [INFO] organ_04_knowledge_started
+{"timestamp":"2026-10-06 00:02:45,956","logger":"organ_04_knowledge","level":"INFO","message":"kernel_shutdown"}
+2026-10-06 00:02:45,956 [INFO] kernel_shutdown
+{"timestamp":"2026-10-06 00:02:45,958","logger":"organ_04_knowledge","level":"INFO","message":"organ_04_knowledge_stopped"}
+2026-10-06 00:02:45,958 [INFO] organ_04_knowledge_stopped
+2026-10-06 00:02:45,961 [INFO] [learn] recalled recipe for excel: SKILL[excel] goal='type 42 in cell A1 / save the workbook as D:\new_automation\_e2e_tmp\hj_xls1.xlsx': CHECK on '-' (hygiene) to achieve: (prepare) blank docume
+2026-10-06 00:02:46,209 [INFO] [autonomy] excel hwnd=22087194 held parked off-screen
+2026-10-06 00:02:49,369 [INFO] [ready] excel: hwnd=22087194 elements=264 wait=3.4s extended=0.0s threshold=8 reason= tiers=['uia']
+2026-10-06 00:03:15,772 [INFO] [judge] goal='type 42 in cell A1' offered=263 avoided=['ribbon tabs'] top=[(8.4, 'Formula Bar', 'edit'), (8.3, 'edit', 'edit'), (5.6, 'Font', 'edit'), (5.6, 'Number Format', 'edit'), (5.5, 'Font Size', 'edit')]
+2026-10-06 00:04:24,593 [INFO] [step] type 'A1' via uia-SetValue -> PASS | text has '42' [read 2 chars]
+2026-10-06 00:04:46,116 [INFO] [autonomy] file-dialog rung: ok=False note=no-file-dialog-visible
+2026-10-06 00:04:46,120 [INFO] [judge] goal='save the workbook as D:\\new_automation\\_e2e_tmp\\hj' offered=258 avoided=['close', 'discard', 'discard changes', 'do not save'] top=[(9.4, 'Microsoft search', 'edit'), (5.5, 'File Tab', 'button'), (0.5, 'Ribbon', 'pane'), (0.5, '\u202aBook1\u202c  -  Excel', 'button'), (0.5, 'Type to search and u', 'menuitem')]
+2026-10-06 00:04:48,188 [INFO] [step] click 'File Tab' via UNDELIVERABLE: window gone -> NO_CHANGE | action not delivered -> never a PASS regardless of UI diff
+2026-10-06 00:04:58,961 [INFO] [autonomy] excel hwnd=6229006 held parked off-screen
+2026-10-06 00:04:59,284 [INFO] [ready] excel: hwnd=6229006 elements=54 wait=0.5s extended=0.0s threshold=8 reason= tiers=['uia']
+2026-10-06 00:04:59,809 [INFO] [autonomy] file-dialog rung: ok=False note=no-file-dialog-visible
+2026-10-06 00:04:59,812 [INFO] [judge] goal='save the workbook as D:\\new_automation\\_e2e_tmp\\hj' offered=50 avoided=['close', 'discard', 'discard changes', 'do not save'] top=[(3.5, 'Blank workbook', 'listitem'), (1.9, 'More workbooks', 'hyperlink'), (0.5, 'Help', 'button'), (0.5, 'Home', 'listitem'), (0.5, 'Backstage view', 'pane')]
+2026-10-06 00:05:18,448 [INFO] [step] click 'Backstage view' via postmessage-click->NetUIHWND@(672,535) -> PASS | ui-changed; region pixel-delta 0.891 of cells via printwindow detected; names +594/-27; modes +['a1|selected', 'bottom align|checked', 'normal|checked']/-['hide or show region|checked'] | goal still pending (file hj_xls2.xlsx MISSING; content of hj_xls2.xlsx n
+2026-10-06 00:05:23,945 [INFO] [autonomy] file-dialog rung: ok=False note=no-file-dialog-visible
+2026-10-06 00:05:23,956 [INFO] [judge] goal='save the workbook as D:\\new_automation\\_e2e_tmp\\hj' offered=259 avoided=['close', 'discard', 'discard changes', 'do not save'] top=[(9.4, 'Microsoft search', 'edit'), (5.5, 'File Tab', 'button'), (0.5, 'Ribbon', 'pane'), (0.5, 'Type to search and u', 'menuitem'), (0.5, 'Customize Quick Acce', 'menuitem')]
+2026-10-06 00:05:43,054 [INFO] [step] click 'Microsoft search' via uia-do-default (after expand-first:AttributeError) -> PASS | ui-changed; region pixel-delta 0.000 of cells via printwindow below tolerance | goal still pending (file hj_xls2.xlsx MISSING; content of hj_xls2.xlsx not checkable (unreadable (FileNotFoundError)))
+2026-10-06 00:06:02,101 [INFO] [autonomy] file-dialog rung: ok=False note=no-file-dialog-visible
+2026-10-06 00:06:02,118 [INFO] [judge] goal='save the workbook as D:\\new_automation\\_e2e_tmp\\hj' offered=260 avoided=['close', 'discard', 'discard changes', 'do not save'] top=[(9.4, 'Microsoft search', 'edit'), (5.5, 'File Tab', 'button'), (1.9, '\u202ahj_xls1\u202c  -  Saved ', 'menuitem'), (0.5, 'Ribbon', 'pane'), (0.5, 'Type to search and u', 'menuitem')]

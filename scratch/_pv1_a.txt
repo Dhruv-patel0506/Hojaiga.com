@@ -1,0 +1,102 @@
+Hojaiga System Intelligence & Reliability Suite
+================================================================================
+[pointer preflight] pointer (1740, 623)->(1740, 623) cause=still (guard calls=0, hardware events=0, injected events=0, fastest step=0px at 0.0px/ms, hook=on)  -> quiet
+[vision gate] up=True started=False (already running)
+
+================================================================================
+TEST PIX1 [BACKGROUND]: PIX1: a parked app's flyouts never reach the screen's pixels (composed-desktop frames during a menu crawl equal the baseline)
+================================================================================
+[PASS] 27.65s — the crawl really opened menus (the thing under test happened)=OK; the screen was sampled densely enough to mean something (>= 40 frames)=OK; no sampled frame of the composed desktop differs from the baseline=OK | frames=195 gap~102ms noise=0px differing=0 max=8px conceal=True
+        checks = 3/3
+        frames = 195
+        differing = 0
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 2/6
+        proc = threads=32 handles=408 rss_mb=84
+        gdi_growth = +1/+4
+
+================================================================================
+TEST POP2 [POPUP]: POP2: start-up questions are answered by meaning (body button, never the title-bar X), SmartScreen is escalated, look-alike commands do not match
+================================================================================
+[PASS] 0.25s — the Safe/Normal Mode question is answered with a BODY button, not the title-bar X=OK; SmartScreen 'Run anyway' is a security decision: escalated (category permission)=OK; 'Launch Anyway' proceeds, it does not cancel (cancel would quit the app)=OK; a dialog whose only button is Close still gets answered=OK; 'save as' does not match 'Mark all as read' on the word 'as'=OK; no quick answer for 'save as' is invented from a label that shares one word=OK; a real 'Save' is still the quick answer for 'save'=OK; an API name read from a binary is never offered as the way to 'bold'=OK; an abbreviation finds the program (vscode -> visual studio code)=OK; an abbreviation does not match unrelated names=OK
+        checks = 10/10
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 2/6
+        proc = threads=32 handles=407 rss_mb=86
+        gdi_growth = +0/+3
+
+================================================================================
+TEST CHR1 [POPUP]: CHR1: title-bar buttons are never offered / taught for an in-app goal, and a vanished window is not a pass
+================================================================================
+[PASS] 0.22s — all three title-bar buttons + System are recognised when nothing else is on screen=OK; an in-app 'Close' beside real controls is NOT treated as chrome=OK; a window whose ONLY control is Close offers nothing (it is the title bar)=OK; a step that makes the window vanish is WRONG_STATE for an unrelated goal=OK; ...but not for a goal that says close=OK; a title-bar Close is never learned for an in-app goal=OK; a real control is still learned=OK; Close is learned when the goal is to close=OK; exactly two steps were stored=OK
+        checks = 9/9
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 2/6
+        proc = threads=32 handles=409 rss_mb=86
+        gdi_growth = +0/+3
+
+================================================================================
+TEST PV1 [POPUP]: PV1: a popup that exposes nothing is read via DAP capture+OCR and answered by the role policy; an elevation prompt in disguise is escalated
+================================================================================
+[PASS] 6.39s — the dialog really exposes nothing (no Win32 push buttons)=OK; OCR through the DAP reader found both painted buttons by their captions=OK; the message was read too (so escalation cues work)=OK; the DAP 'ocr' selector returns a BOX on the 'Not now' button, not the whole window=OK; the safe button was pressed (Not now), through the role policy=OK; the 'Allow access' button was never pressed=OK; the answer was a POSTED click read by OCR (no pointer, no keyboard)=OK; the same disguise around an elevation prompt is ESCALATED, not answered=OK | eyes: capture=SUCCESS 560x300 ink=335/2400 ocr_words=14 gdi/user=(11, 24); novel: action=ignore(ocr-click) tier=T1 393 ms buttons=['allow access', 'not now']; uac: action=need_human tier=escalate note='elevation/credential prompt: never auto-accepted'
+        checks = 8/8
+        novel_ms = 393.0
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 11/8
+        proc = threads=33 handles=433 rss_mb=132
+        gdi_growth = +9/+5
+
+================================================================================
+TEST ACT1 [HEADLESS]: ACT1: every action leaves through the DAP actuation backbone (family -> ordered providers, trace, registered providers, no physical rung)
+================================================================================
+[PASS] 1.53s — _act_on_element routed into the DAP actuator=OK; a classic button click was delivered (BN_CLICKED arrived)=OK; the winning provider is recorded in the trace=OK; typing appends through the text provider (two goals, one document)=OK; family is decided from the window class: classic vs chromium=OK; a Chromium page control with no pattern is reported INEFFECTIVE by its provider (not a silent success)=OK; a registered provider is asked first for its family=OK; an action nothing can deliver is UNDELIVERABLE=OK; there is no physical-input provider and the guard saw nothing=OK | click trace=['message-click'] type trace=['text-append'] chromium trace=['chromium'] stats={'message-click': {'delivered': 1, 'failed': 0}, 'text-append': {'delivered': 2, 'failed': 0}, 'chromium': {'delivered': 0, 'failed': 1}, 'act1-probe': {'delivered': 1, 'failed': 0}}
+        checks = 9/9
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 13/9
+        proc = threads=34 handles=440 rss_mb=133
+        gdi_growth = +2/+4
+
+================================================================================
+TEST EYE1 [HEADLESS]: EYE1: 300 headless captures of one parked window in THIS long-lived process never go blank and never grow the GDI/USER budget (the trust eyes must not flicker)
+================================================================================
+[PASS] 33.92s — parked-window-paints-at-all=OK(mode=parked where=parked note=ok); no-blank-in-300-captures=OK(blanks=0 first=- min_nonzero_pixel_fraction=1.000 sizes=[(1100, 760)] CAPTURE_LOG_for_this_window=0); gdi-user-budget-not-creeping=OK(gdi 13->13 (+0), user 10->12 (+2); the OS caps a process near 10k of each - the ceiling that would blind every later capture); captures-kept-the-window-own-content=OK(300 images, sizes=[(1100, 760)], identical-to-first=300 (a parked app legitimately stops repainting; only a blank is a defect)); physical-pointer-untouched-and-no-guard-violations=OK(pointer (1740, 623)->(1740, 623), guard violations+=0, largest 10 ms step=0px)
+        captures = 300
+        blanks = 0
+        min_px = 1.0
+        gdi = 13->13
+        user = 10->12
+        secs = 24.2
+        where = parked
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 13/9
+        proc = threads=33 handles=436 rss_mb=134
+        gdi_growth = +0/+3
+
+================================================================================
+SUMMARY — 6/6 PASS in 72.4s
+================================================================================
+[PASS] PIX1 PIX1: a parked app's flyouts never reach the screen's pixe  27645.5 ms
+[PASS] POP2 POP2: start-up questions are answered by meaning (body but    252.0 ms
+[PASS] CHR1 CHR1: title-bar buttons are never offered / taught for an     222.6 ms
+[PASS] PV1 PV1: a popup that exposes nothing is read via DAP capture+   6388.9 ms
+[PASS] ACT1 ACT1: every action leaves through the DAP actuation backbo   1533.9 ms
+[PASS] EYE1 EYE1: 300 headless captures of one parked window in THIS l  33920.6 ms
+
+================================================================================
+GDI OBJECT BUDGET (cap 10000) — end-of-test count / growth
+================================================================================
+  curve: PIX1:2(+1) POP2:2(+0) CHR1:2(+0) PV1:11(+9) ACT1:13(+2) EYE1:13(+0)
+    PV1 consumed     9 handles (process at 11)
+   ACT1 consumed     2 handles (process at 13)
+   PIX1 consumed     1 handles (process at 2)
+
+================================================================================
+RECONCILED SUBSYSTEM RANKINGS (70% pass-rate, 30% latency; B=env-blocked, neutral)
+================================================================================
+ #  SUBSYSTEM                                      TESTS   SCORE    AVG MS
+ 1  Popup handler (organ_29)                         3/3   93.1    2287.8
+ 2  Background operation (minimized, never shown/focused)           1/1   70.0   27645.5
+ 3  Headless input (drag / off-screen capture)           2/2   70.0   17727.2
+
+Full log written: D:\new_automation\All codes\core_organs\system_intelligence_results_partial.txt
+[vision gate] vision(Qwen2.5-VL-7B :8081) server=up calls=0 found=0 errors=0 avg=0ms by_fn={} log=data\vision_log.jsonl

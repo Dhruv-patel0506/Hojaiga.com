@@ -1,0 +1,511 @@
+Hojaiga System Intelligence & Reliability Suite
+================================================================================
+GDI trace ON: outstanding handles reported after the run
+
+================================================================================
+TEST B1 [BRAIN]: B1: Brain compiler parses 10 differently-phrased natural tasks
+================================================================================
+[PASS] 0.41s — 11/12 natural phrasings routed to the right agent family; deep LinkedIn flow: 5 checkpoints -> 15 granular tasks [OK]; intent vocabulary=5 distinct | misses: 'calculate the monthly totals in the spre' spec data_processing != desktop_automation (intent='perform the requested task')
+        routing_accuracy = 11/12
+        linkedin_checkpoints = 5
+        linkedin_granular_tasks = 15
+        gdi_user_end = 1/1
+        gdi_growth = +0/+0
+
+================================================================================
+TEST B2 [BRAIN]: B2: Organ-01 router classifies intent/nature/confidence on raw text (no LLM needed)
+================================================================================
+[PASS] 0.20s — 7/7 total; design-covered natures (analytical/creative/unknown) 5/5 correct; operational verbs routed 2/2 ('open chrome'/'click send' -> OPERATIONAL); empty-task guard=ON
+        nature_accuracy = 7/7
+        operational_routed = 2/2
+        gdi_user_end = 1/1
+        gdi_growth = +0/+0
+
+================================================================================
+TEST B3 [BRAIN]: B3: enhanced_brain_compiler specialty routing (the 'open excel'->web fix)
+================================================================================
+[PASS] 0.00s — 6/6 specialty routes correct | 'open excel'->desktop_automationOK; 'open notepad and type hell'->desktop_automationOK; 'launch obs studio and reco'->desktop_automationOK; 'calculate the sum of this '->data_processingOK; 'open gmail and send an ema'->web_automationOK; 'browse a website for hotel'->web_automationOK
+        specialty_accuracy = 6/6
+        gdi_user_end = 1/1
+        gdi_growth = +0/+0
+
+================================================================================
+TEST P1 [POPUP]: P1: Organ-29 enumerates live windows and classifies modal vs in-window popups
+================================================================================
+[PASS] 0.30s — 8 visible windows enumerated, 0 classic modal HWNDs, 0 in-window modals found on foreground window ('Claude')
+        windows_seen = 8
+        classic_modals = 0
+        in_window_modals = 0
+        gdi_user_end = 1/2
+        gdi_growth = +0/+1
+
+================================================================================
+TEST P2 [POPUP]: P2: Organ-29 mitigation engine resolves synthetic + live popups (dry-run safe)
+================================================================================
+[DB] Connected OK
+[DB] Call OK
+[DB] Connected OK
+[DB] Call OK
+[DB] Connected OK
+[DB] Call OK
+[PASS] 1.40s — 3/3 popup types produced a mitigation decision; live mitigation=DRY-RUN | 'Save changes before closing?'->need_human (753.7ms) ; 'Microsoft Store Update'->dismiss (414.3ms) ; 'Allow notifications?'->key:escape (231.0ms)
+        decisions_made = 3
+        modes_tested = 3
+        gdi_user_end = 1/2
+        gdi_growth = +0/+0
+
+================================================================================
+TEST S1 [SCANNER]: S1: Organ-30 deep scan — how deep and how much it learns (target-aware)
+================================================================================
+[PASS] 1.78s — scanned 1 target(s); best='<foreground>': 754 nodes walked, depth 40/64, 107 actionable controls, 0 menu items, 101 elements learned in 1.76s
+        nodes_walked = 754
+        depth_seen = 40
+        depth_cap = 64
+        actionable_controls = 107
+        elements_learned = 101
+        scan_seconds = 1.765
+        targets_tried = 1
+        gdi_user_end = 1/3
+        gdi_growth = +0/+1
+
+================================================================================
+TEST S2 [SCANNER]: S2: Organ-41 continuous scanner — real cycles, change detection, budget behaviour
+================================================================================
+[FAIL] 6.30s — 5 cycles (incl. real notepad spawn/kill mutation), avg 662 ms/cycle (min 508 max 840), 0 change-detections (expected >=2), peak elements 120
+        avg_cycle_ms = 661.9
+        min_cycle_ms = 508.5
+        max_cycle_ms = 840.5
+        change_detections = 0
+        peak_elements = 120
+        gdi_user_end = 1/4
+        gdi_growth = +0/+1
+
+================================================================================
+TEST M1 [MOUSE]: M1: virtual-mouse-only input - physical pointer untouched; headless delivery to minimized/covered windows
+================================================================================
+[PASS] 5.14s — A normal-window PostMessage click=True; B MINIMIZED window UIA-invoke=True (uia-invoke, state=minimized); C COVERED window click landed on the covered button only=True; D posted Ctrl+Shift+S arrived WITH modifiers=True (saw [(True, True)]); WM_CHAR text=True; E physical pointer untouched=True ((1198, 800)->(1198, 800)), guard violations during actions=0; F input guard refused a legacy SetCursorPos=True; sprite painted 953 px (painted=True)
+        A_postmessage_click = True
+        B_uia_landed = True
+        C_covered_click_landed = True
+        D_combo_mods_arrived = True
+        E_pointer_untouched = True
+        F_guard_refused_legacy_call = True
+        sprite_changed_pixels = 953
+        gdi_user_end = 86/15
+        gdi_growth = +85/+11
+
+================================================================================
+TEST L1 [LAUNCHER]: L1: Dynamic app resolution on 12 NEW phrasings not in the original 23-case matrix
+================================================================================
+[PASS] 0.03s — 12/12 new phrasings routed correctly @ 2.184 ms/task | 'calculate seventeen times nine'->calculatorOK; 'sketch a sunset with a brush'->paintOK; 'take a screenshot of this mess'->snipping toolOK; 'play my downloaded music'->windows media playerOK; 'set an alarm for six am'->google chromeOK; 'draw a diagram of the system'->paintOK; 'write text in notepad for later'->notepadOK; 'rename my files in downloads'->file explorerOK; 'browse hotel deals online'->google chromeOK; 'send an email to my brother'->mailOK; 'check my outlook inbox'->mailOK; 'cook me a three course dinner'->google chromeOK
+        matrix_accuracy = 12/12
+        resolve_ms_per_task = 2.184
+        gdi_user_end = 87/15
+        gdi_growth = +5/+0
+
+================================================================================
+TEST L2 [LAUNCHER]: L2: launcher action semantics on the 4 designer cases (dry-run, no OS input)
+================================================================================
+[PASS] 0.00s — 5/5 launcher-semantic checks pass | (a) open gmail -> browser_web/type_bar=False | (b) open obs studio -> src=alias target='obs studio' action=launch_app | (c) 'record ...' -> src=alias target='obs studio' | (d) open blender -> src=named target='blender' action=not_found | (d2) open photoshop -> src=named target='photoshop'
+        semantic_checks = 5/5
+        gdi_user_end = 83/15
+        gdi_growth = +0/+0
+
+================================================================================
+TEST R1 [MEMORY]: R1: Memory organ working store, fetch throughput, TTL expiry
+================================================================================
+[PASS] 1.45s — 200/200 keys round-tripped; store 42 ms (0.210 ms/op), fetch 0 ms (0.001 ms/op); TTL alive=True, expired=True
+        store_ms_per_op = 0.2101
+        fetch_ms_per_op = 0.001
+        keys_round_tripped = 200
+        gdi_user_end = 130/15
+        gdi_growth = +47/+0
+
+================================================================================
+TEST R2 [MEMORY]: R2: Memory session rooms, conversational history, snapshot persistence
+================================================================================
+[PASS] 0.15s — room 9f77a2e2: 3 messages replayed, snapshot id=1791205166_423ab
+        messages_replayed = 3
+        gdi_user_end = 133/15
+        gdi_growth = +7/+0
+
+================================================================================
+TEST K1 [KNOWLEDGE]: K1: Knowledge organ ingests prose documents and retrieves them by meaning
+================================================================================
+[PASS] 0.13s — 3 chunks ingested in 18 ms; 2/2 paraphrased queries returned the SEMANTICALLY correct doc; capability 'launch_app' -> 0 provider(s) | 'how do we handle the sql server ' -> top='SSMS error dialogs' score=0.138675 RELEVANT; 'which app needs pixel coordinate' -> top='Paint canvas behaviour' score=0.072739 RELEVANT
+        chunks_ingested = 3
+        semantic_queries_hit = 2/2
+        gdi_user_end = 132/15
+        gdi_growth = +3/+0
+
+================================================================================
+TEST K2 [KNOWLEDGE]: K2: How easily/fast the system parses knowledge — 50 ingest+search round trips
+================================================================================
+[PASS] 0.44s — 50 ingest+search round trips: avg 6.42 ms, p50 5.44 ms, p95 13.39 ms
+        kg_roundtrip_avg_ms = 6.417
+        kg_roundtrip_p95_ms = 13.389
+        gdi_user_end = 144/15
+        gdi_growth = +7/+0
+
+================================================================================
+TEST D1 [DATABASE]: D1: DAP batch-store 200 element profiles, then read them back from the DB
+================================================================================
+[DB] Connected OK
+[DB] Call OK
+[DB] Connected OK
+[DB] Call OK
+[DB] Connected OK
+[DB] Call OK
+[PASS] 2.25s — 200/200 profiles written in 335 ms (1.67 ms/element); 200 read back
+        written = 200
+        read_back = 200
+        ms_per_element = 1.674
+        gdi_user_end = 203/15
+        gdi_growth = +55/+0
+
+================================================================================
+TEST D2 [DATABASE]: D2: Popup-resolution cache + session cookie persistence round-trip
+================================================================================
+[DB] Connected OK
+[DB] Call OK
+[DB] Connected OK
+[DB] Call OK
+[DB] Connected OK
+[DB] Call OK
+[DB] Connected OK
+[DB] Call OK
+[DB] Connected OK
+[DB] Call OK
+[DB] Connected OK
+[DB] Call OK
+[DB] Connected OK
+[DB] Call OK
+[DB] Connected OK
+[DB] Call OK
+[PASS] 0.08s — modal resolution read-back=OK; cookies=OK
+        gdi_user_end = 208/15
+        gdi_growth = +5/+0
+
+================================================================================
+TEST G1 [GROUNDING]: G1: desktop_grounding perceives a real app AND reports tiers honestly
+================================================================================
+Omniparser initialized!!!
+
+0: 480x1280 3 icons, 728.0ms
+Speed: 5.9ms preprocess, 728.0ms inference, 2.1ms postprocess per image at shape (1, 3, 480, 1280)
+len(filtered_boxes): 2 -1
+time to get parsed content: 1.621246337890625e-05
+[PASS] 65.82s — notepad grounded to 49 elements via tiers ['uia', 'uia@offscreen', 'ocr', 'vision']; target-hunt escalated=True; skipped=[]; honesty-integrity=OK (torch=True, ocr=True, uia=True)
+        elements = 49
+        tiers_ran = uia,uia@offscreen,ocr,vision
+        escalated = True
+        integrity = True
+        gdi_user_end = 1773/15
+        gdi_growth = +1563/+0
+
+================================================================================
+TEST V1 [VERIFY]: V1: DesktopVerifier emits PASS / NO_CHANGE / WRONG_STATE on live + synthetic state
+================================================================================
+[PASS] 0.00s — 7/7 verdict transitions correct: change->PASS ; same->NO_CHANGE ; expect-met->PASS ; wrong->WRONG_STATE ; title->PASS ; disappeared->PASS ; file_created->PASS
+        verdict_checks = 7/7
+        gdi_user_end = 1769/15
+        gdi_growth = -1/+0
+
+================================================================================
+TEST P3 [POPUP]: P3: organ_29 Tier-3 gatekeeper is hard-capped so a dead LLM can't stall the loop
+================================================================================
+[DB] Connected OK
+[DB] Call OK
+[DB] Connected OK
+[DB] Call OK
+[PASS] 3.10s — Tier-3 cap=5.0s (must be <=5s): OK; unresolvable modal resolved in 3.10s -> action='dismiss'; no multi-30s stall: OK
+        tier3_cap_s = 5.0
+        resolve_s = 3.1
+        fell_through = True
+        gdi_user_end = 1858/15
+        gdi_growth = +89/+0
+
+================================================================================
+TEST PL1 [POPUP]: PL1: organ_29 Tier-2.5 lexical intent resolves known categories instantly,
+escalates elevation/destructive to human, and never clicks/blind-types in test
+================================================================================
+[DB] Connected OK
+[DB] Call OK
+[DB] Connected OK
+[DB] Call OK
+[DB] Connected OK
+[DB] Call OK
+[DB] Connected OK
+[DB] Call OK
+[PASS] 0.93s — 8/8 lexical checks: uac->('key:escape', True) ; destructive->('key:escape', True) ; crash->('key:escape', False) ; msgbox->('key:enter', False) ; ambiguous->None ; cookie live-resolved in 0.47s via key:escape ; uac->need_human, pressed=0 (must be 0) ; repeat hit cache in 0.45s replay=['key:escape']
+        checks = 8/8
+        first_resolve_s = 0.47
+        gdi_user_end = 1886/15
+        gdi_growth = +26/+0
+
+================================================================================
+TEST SK1 [SKILL]: SK1: loop distills verified steps into a reusable organ_04 skill recipe and recalls it
+================================================================================
+[PASS] 0.09s — 2-PASS trace -> distill=True (recipe ingested to organ_04 (2 verified steps)); recall_hit=True; 1-PASS trace -> refused=True (not enough verified steps to distill)
+        distilled = True
+        thin_refused = True
+        recall_hit = True
+        gdi_user_end = 1889/15
+        gdi_growth = +1/+0
+
+================================================================================
+TEST CP1 [CHECKPOINT]: CP1: loop persists a resumable checkpoint after each verified step and resumes
+================================================================================
+[PASS] 0.01s — checkpoint round-trip: last-verdict-recovered=True, steps=1, unknown-session->None=True, resume_session=True
+        recovered = True
+        unknown_absent = True
+        resumed = True
+        gdi_user_end = 1887/15
+        gdi_growth = -4/+0
+
+================================================================================
+TEST TG1 [TASKGRAPH]: TG1: 'I'm busy, model a 3D chair from scratch' compiles to skip-ReAct native graph
+================================================================================
+[ENV-BLOCKED] 5.14s — graph skip_react=False mode=react_fallback kind= save= steps=0 reason='construct intent but no 3d suite installed'; bpy_recipe=OK; calculator_kept_react=True
+        mode = react_fallback
+        steps = 0
+        vision_tier = 2
+        gdi_user_end = 2031/15
+        gdi_growth = +141/+0
+
+================================================================================
+TEST W6 [HYGIENE]: W6: _derive_web_url resolves brand destinations without the goto.com verb alias bug
+================================================================================
+[CREWAI] ScrapeGraphAI integration loaded OK
+[PASS] 12.58s — 6/6 hygiene checks: go to gmail -> https://www.gmail.com; goto gmail -> https://www.gmail.com; open browser and check gmail -> https://www.gmail.com; browse hotel deals -> https://www.google.com; explicit -> https://news.ycombinator.com/item?id=1; is_site(goto)=False, is_site(gmail)=True
+        checks = 6/6
+        gdi_user_end = 2325/15
+        gdi_growth = +298/+0
+
+================================================================================
+TEST W8 [INTELLIGENCE]: W8: organ_47 turns verified outcomes into pro shortcuts — and never trusts a guess
+================================================================================
+[PASS] 0.28s — archetype-route=OK; guess-never-learned=OK; verified-ctrl+s-trusted=OK(conf 0.85); climbs-to-cap=OK(0.85->0.97); failure-erodes=OK(0.85->0.60)
+        checks = 5/5
+        learned_confidence = 0.97
+        gdi_user_end = 2333/15
+        gdi_growth = +12/+0
+
+================================================================================
+TEST H1 [HEALTH]: H1: Every core organ module imports cleanly with its main symbol present
+================================================================================
+[PASS] 0.37s — 40/40 organs import clean (371 ms cold-import sweep)
+        organs_healthy = 40/40
+        gdi_user_end = 2339/15
+        gdi_growth = +10/+0
+
+================================================================================
+TEST G2 [GROUNDING]: G2: vision tier is budgeted per goal, cached per window signature, and per-tier ms is reported - with the REAL OmniParser, instrumented
+================================================================================
+
+0: 800x1280 6 icons, 1001.3ms
+Speed: 8.7ms preprocess, 1001.3ms inference, 8.4ms postprocess per image at shape (1, 3, 800, 1280)
+len(filtered_boxes): 7 2
+time to get parsed content: 1.33514404296875e-05
+
+0: 800x1280 6 icons, 1302.1ms
+Speed: 14.1ms preprocess, 1302.1ms inference, 2.4ms postprocess per image at shape (1, 3, 800, 1280)
+len(filtered_boxes): 7 2
+time to get parsed content: 1.5974044799804688e-05
+
+0: 800x1280 6 icons, 1101.3ms
+Speed: 10.1ms preprocess, 1101.3ms inference, 1.4ms postprocess per image at shape (1, 3, 800, 1280)
+len(filtered_boxes): 7 2
+time to get parsed content: 1.8596649169921875e-05
+
+0: 800x1280 6 icons, 1250.9ms
+Speed: 8.6ms preprocess, 1250.9ms inference, 2.1ms postprocess per image at shape (1, 3, 800, 1280)
+len(filtered_boxes): 7 2
+time to get parsed content: 1.9550323486328125e-05
+[PASS] 14.46s — REAL OmniParser (warm, waited 0 ms for the warmup thread): first ground ran vision 1x, parse 1738.6 ms; 2nd identical window cache_hit=True (30.6 ms vs 1765.6 ms miss, x57); budget 2/goal enforced=True (ran 2 of 3 attempts); refill-on-new-goal=True; all 4 real parses (ms)=[1738.6, 2058.3, 1841.2, 1887.8]; measured per-tier ms (miss)={'uia': 71.2, 'ocr': 262.6, 'vision': 1765.6}
+        cache_hit = True
+        budget_enforced = True
+        refilled = True
+        real_parse_ms = [1738.6, 2058.3, 1841.2, 1887.8]
+        tier_ms_miss = {'uia': 71.2, 'ocr': 262.6, 'vision': 1765.6}
+        tier_ms_hit = 30.6
+        gdi_user_end = 2698/16
+        gdi_growth = +357/+1
+
+================================================================================
+TEST OM1 [VISION]: OM1: real OmniParser warmup (easyocr download happens once) + blank image = 0 elements, no ERROR
+================================================================================
+
+0: 480x1280 3 icons, 805.0ms
+Speed: 8.2ms preprocess, 805.0ms inference, 3.0ms postprocess per image at shape (1, 3, 480, 1280)
+len(filtered_boxes): 2 -1
+time to get parsed content: 1.2874603271484375e-05
+
+0: 800x1280 (no detections), 1182.6ms
+Speed: 13.3ms preprocess, 1182.6ms inference, 0.9ms postprocess per image at shape (1, 3, 800, 1280)
+no ocr bbox!!!
+len(filtered_boxes): 0 -1
+time to get parsed content: 5.9604644775390625e-06
+[PASS] 3.59s — warmup 1101 ms (warmed=True); blank 640x400 PNG -> 0 elements in 2483 ms; ERROR-level logs=0 []
+        warmup_ms = 1101
+        blank_parse_ms = 2483
+        error_logs = 0
+        gdi_user_end = 2789/16
+        gdi_growth = +87/+0
+
+================================================================================
+TEST PL2 [POPUP]: PL2: dynamic-title popups hit the class+button fingerprint cache; real DB round-trips it
+================================================================================
+[DB] Connected OK
+[DB] Call OK
+[DB] Connected OK
+[DB] Call OK
+[PASS] 0.43s — normalize->'installer error # (attempt #)', fp-stable=True, distinct-for-other-class/title=True; different-title popup resolved via fingerprint cache in 4 ms -> key:escape; exact-title lookup alone would have MISSED (the pre-fix behaviour); real-db fingerprint round-trip=OK
+        fingerprint_resolve_ms = 3.5
+        gdi_user_end = 2801/16
+        gdi_growth = +16/+0
+
+================================================================================
+TEST W9 [HYGIENE]: W9: the compiled WEB.NAVIGATE step (what pre-navigation uses) never carries goto.com
+================================================================================
+{"ts":"2026-10-05 18:31:16,478","module":"organ_36_workflow_compiler","level":"INFO","msg":{"timestamp": 1791205276, "level": "INFO", "module": "WorkflowCompilerKernel", "message": "Organ 36 initialized", "metadata": {"organVersion": "1.0.0", "irVersion": "1.0.0"}}}
+{"ts":"2026-10-05 18:31:16,488","module":"organ_36_workflow_compiler","level":"INFO","msg":{"timestamp": 1791205276, "level": "INFO", "module": "CompilerCore", "message": "Cache hit", "metadata": {"compilationId": "b272e2ce-b6dc-448c-a9f3-fae07fdefd12", "sourceHash": "1374a9d0def6ae30b2a0cc743fb58b0cd981691f091004fa8f58292df3b8ffa6"}}}
+{"ts":"2026-10-05 18:31:16,503","module":"organ_36_workflow_compiler","level":"INFO","msg":{"timestamp": 1791205276, "level": "INFO", "module": "WorkflowCompilerKernel", "message": "Organ 36 initialized", "metadata": {"organVersion": "1.0.0", "irVersion": "1.0.0"}}}
+{"ts":"2026-10-05 18:31:16,506","module":"organ_36_workflow_compiler","level":"INFO","msg":{"timestamp": 1791205276, "level": "INFO", "module": "CompilerCore", "message": "Cache hit", "metadata": {"compilationId": "c3165b99-de29-45aa-9b5c-facd51f6517b", "sourceHash": "2fc565617c7a5cb3e18a14430d659d2ed8044b9fbc9a87d2f7d668694b9f2a21"}}}
+{"ts":"2026-10-05 18:31:16,511","module":"organ_36_workflow_compiler","level":"INFO","msg":{"timestamp": 1791205276, "level": "INFO", "module": "WorkflowCompilerKernel", "message": "Organ 36 initialized", "metadata": {"organVersion": "1.0.0", "irVersion": "1.0.0"}}}
+{"ts":"2026-10-05 18:31:16,518","module":"organ_36_workflow_compiler","level":"INFO","msg":{"timestamp": 1791205276, "level": "INFO", "module": "CompilerCore", "message": "Cache hit", "metadata": {"compilationId": "7ddc6d59-0ff6-40d2-a0fd-e8ff63ef84ea", "sourceHash": "f54eb4c6415d0d41b47703f498ccf4d7935013f41588022ea2be4796dc0955df"}}}
+{"ts":"2026-10-05 18:31:16,524","module":"organ_36_workflow_compiler","level":"INFO","msg":{"timestamp": 1791205276, "level": "INFO", "module": "WorkflowCompilerKernel", "message": "Organ 36 initialized", "metadata": {"organVersion": "1.0.0", "irVersion": "1.0.0"}}}
+{"ts":"2026-10-05 18:31:16,529","module":"organ_36_workflow_compiler","level":"INFO","msg":{"timestamp": 1791205276, "level": "INFO", "module": "CompilerCore", "message": "Cache hit", "metadata": {"compilationId": "8b9dcd60-4423-43b4-b60a-46bf40c00b8f", "sourceHash": "b9e3537efddef13aa85ac7743ef59be8bb6f2d81e0b004ced3d02e217e5a2fa1"}}}
+[PASS] 0.06s — 4/4 compiled nav URLs correct: 'go to gmail and check my inbox' -> https://www.gmail.com; 'goto gmail' -> https://www.gmail.com; 'open chrome and go to gmail.com' -> https://gmail.com; 'navigate to figma' -> https://www.figma.com
+        correct = 4/4
+        gdi_user_end = 2801/16
+        gdi_growth = +2/+0
+
+================================================================================
+TEST J1 [GROUNDING]: J1: judge shortlist is goal-aware (text area / 'Save as' reach the 8-slot window, indices map back)
+================================================================================
+[PASS] 0.00s — pre-fix first-8 shortlist was blind to the targets=True; type-goal top pick='Text editor'; save-goal top pick='Save as'; original-index mapping intact=True; absolute path extracted from goal=True; popup triage spares Save/Open pickers & escalates overwrite-confirm=True
+        type_top = Text editor
+        save_top = Save as
+        gdi_user_end = 2803/16
+        gdi_growth = +0/+0
+
+================================================================================
+TEST PP1 [POPUP]: PP1: popup policy reads REAL dialogs, answers non-destructively, escalates elevation/overwrite, headless
+================================================================================
+[PASS] 8.01s — overwrite-not-ours -> No: OK (returned=7, human=False); save-changes -> Cancel: OK (returned=2, human=False); error -> OK: OK (returned=1, human=False); UAC-like -> human, stays open: OK (returned=2, human=True); task's own target exists -> human: OK (returned=2, human=True); physical pointer untouched=True; guard violations=0
+        cases = 5
+        pointer_untouched = True
+        gdi_user_end = 2984/17
+        gdi_growth = +185/+1
+
+================================================================================
+TEST LF1 [ROUTING]: LF1: the product routes detected desktop apps through the verified loop IN ORDER, stops at a human gate, and is switchable
+================================================================================
+{"ts":"2026-10-05 18:31:24,576","module":"organ_36_workflow_compiler","level":"INFO","msg":{"timestamp": 1791205284, "level": "INFO", "module": "WorkflowCompilerKernel", "message": "Organ 36 initialized", "metadata": {"organVersion": "1.0.0", "irVersion": "1.0.0"}}}
+{"ts":"2026-10-05 18:31:24,583","module":"organ_36_workflow_compiler","level":"INFO","msg":{"timestamp": 1791205284, "level": "INFO", "module": "CompilerCore", "message": "Cache hit", "metadata": {"compilationId": "072c2bce-a963-4b8b-8b41-8205452ce933", "sourceHash": "2f458d9466ec2bcfaa1a4d0ca19ff80248129f00908b72089a08978ed0f51399"}}}
+{"ts":"2026-10-05 18:31:24,696","module":"organ_36_workflow_compiler","level":"INFO","msg":{"timestamp": 1791205284, "level": "INFO", "module": "WorkflowCompilerKernel", "message": "Organ 36 initialized", "metadata": {"organVersion": "1.0.0", "irVersion": "1.0.0"}}}
+{"ts":"2026-10-05 18:31:24,703","module":"organ_36_workflow_compiler","level":"INFO","msg":{"timestamp": 1791205284, "level": "INFO", "module": "CompilerCore", "message": "Cache hit", "metadata": {"compilationId": "4e8686ab-ddd8-495c-be35-0a2a53b5f350", "sourceHash": "2f458d9466ec2bcfaa1a4d0ca19ff80248129f00908b72089a08978ed0f51399"}}}
+[PASS] 15.12s — flag-default-on-and-0-disables=OK(default_on=True off=False ran_when_off=False calls=[]); compiler-positions-drive-per-app-goals=OK(spans=[('notepad', 5), ('calculator', 45)] -> notepad:['type "hello world"'] | calculator:['press Seven', 'press Multiply by', 'press Eight', 'press Equals']); save-path-gets-file-postcondition=OK(goals=['type "notes"', 'save as C:\\tmp\\lf1.txt'] expect={1: {'file_created': 'C:\\tmp\\lf1.txt'}}); canvas-drawing-is-delegated-not-faked=OK(paint=['draw a circle'] notepad=['type "done"']); sequence-in-compiled-order-with-persisted-handles=OK(order=['notepad', 'calculator'] handles=(1001,1002) expect2={3: {'name_visible': '56'}}); human-gate-stops-the-sequence=OK(ran=['notepad'] notified=[('input_needed', 'Agent needs your input - notepad: a dialog or an ambiguous choice needs you')]); execute_task-halts-with-NEEDS_INPUT-before-the-crew-exists=OK(status=NEEDS_INPUT crew_built=False attempts=0); flag-0-leaves-the-crew-path-untouched=OK(result=None evidence=''); evidence-is-honest-about-weak-and-undone=OK(weak calculator presses flagged; unrun goals marked NOT DONE; human stop stated)
+        checks = 9/9
+        gdi_user_end = 3319/17
+        gdi_growth = +332/+0
+
+================================================================================
+TEST LF2 [ROUTING]: LF2: a REAL two-app task (Notepad then Calculator) runs both apps through the verified loop with the physical pointer untouched
+================================================================================
+{"ts":"2026-10-05 18:31:39,793","module":"organ_36_workflow_compiler","level":"INFO","msg":{"timestamp": 1791205299, "level": "INFO", "module": "WorkflowCompilerKernel", "message": "Organ 36 initialized", "metadata": {"organVersion": "1.0.0", "irVersion": "1.0.0"}}}
+{"ts":"2026-10-05 18:31:39,798","module":"organ_36_workflow_compiler","level":"INFO","msg":{"timestamp": 1791205299, "level": "INFO", "module": "CompilerCore", "message": "Cache hit", "metadata": {"compilationId": "7f3e3880-b631-40d6-bc1a-c3c7ebbf4d48", "sourceHash": "c5c5461c50c1295004153614049294ce55de8f739a6c6a2a65e34338bf9679d2"}}}
+[PASS] 40.93s — both-apps-ran-in-order=OK(runs=[('notepad', 'COMPLETED', 1), ('calculator', 'COMPLETED', 4)]); notepad-holds-the-typed-words (independent read)=OK(document='loop first works'); calculator-shows-42 (independent read)=OK(display='Display is 42'); handles-persisted-for-later-stages=OK(notepad=40897290 calculator=4197114); completed-or-honestly-blocked=OK(statuses=['COMPLETED', 'COMPLETED']); physical-pointer-untouched-and-no-guard-violations=OK(pointer (335, 880)->(335, 880), guard violations+=0, largest 10 ms step=0px); total 35.8s; closed 2 window(s) we launched
+        seconds = 35.8
+        windows_closed = 2
+        statuses = COMPLETED,COMPLETED
+        gdi_user_end = 4206/17
+        gdi_growth = +887/+0
+
+================================================================================
+SUMMARY — 32/34 PASS, 1 ENV-BLOCKED, 1 FAIL in 191.8s
+================================================================================
+[PASS]  B1 B1: Brain compiler parses 10 differently-phrased natural t    414.6 ms
+[PASS]  B2 B2: Organ-01 router classifies intent/nature/confidence on    203.0 ms
+[PASS]  B3 B3: enhanced_brain_compiler specialty routing (the 'open e      0.1 ms
+[PASS]  P1 P1: Organ-29 enumerates live windows and classifies modal     300.0 ms
+[PASS]  P2 P2: Organ-29 mitigation engine resolves synthetic + live p   1400.1 ms
+[PASS]  S1 S1: Organ-30 deep scan — how deep and how much it learns (   1783.1 ms
+[FAIL]  S2 S2: Organ-41 continuous scanner — real cycles, change dete   6296.2 ms
+[PASS]  M1 M1: virtual-mouse-only input - physical pointer untouched;   5138.6 ms
+[PASS]  L1 L1: Dynamic app resolution on 12 NEW phrasings not in the      27.4 ms
+[PASS]  L2 L2: launcher action semantics on the 4 designer cases (dry      4.1 ms
+[PASS]  R1 R1: Memory organ working store, fetch throughput, TTL expi   1445.1 ms
+[PASS]  R2 R2: Memory session rooms, conversational history, snapshot    146.4 ms
+[PASS]  K1 K1: Knowledge organ ingests prose documents and retrieves     133.1 ms
+[PASS]  K2 K2: How easily/fast the system parses knowledge — 50 inges    438.9 ms
+[PASS]  D1 D1: DAP batch-store 200 element profiles, then read them b   2250.9 ms
+[PASS]  D2 D2: Popup-resolution cache + session cookie persistence ro     83.9 ms
+[PASS]  G1 G1: desktop_grounding perceives a real app AND reports tie  65815.7 ms
+[PASS]  V1 V1: DesktopVerifier emits PASS / NO_CHANGE / WRONG_STATE o      3.3 ms
+[PASS]  P3 P3: organ_29 Tier-3 gatekeeper is hard-capped so a dead LL   3103.6 ms
+[PASS] PL1 PL1: organ_29 Tier-2.5 lexical intent resolves known categ    926.6 ms
+[PASS] SK1 SK1: loop distills verified steps into a reusable organ_04     87.0 ms
+[PASS] CP1 CP1: loop persists a resumable checkpoint after each verif     13.5 ms
+[ENV-BLOCKED] TG1 TG1: 'I'm busy, model a 3D chair from scratch' compiles to   5140.4 ms
+[PASS]  W6 W6: _derive_web_url resolves brand destinations without th  12576.7 ms
+[PASS]  W8 W8: organ_47 turns verified outcomes into pro shortcuts —     284.6 ms
+[PASS]  H1 H1: Every core organ module imports cleanly with its main     370.9 ms
+[PASS]  G2 G2: vision tier is budgeted per goal, cached per window si  14460.0 ms
+[PASS] OM1 OM1: real OmniParser warmup (easyocr download happens once   3592.6 ms
+[PASS] PL2 PL2: dynamic-title popups hit the class+button fingerprint    426.7 ms
+[PASS]  W9 W9: the compiled WEB.NAVIGATE step (what pre-navigation us     59.8 ms
+[PASS]  J1 J1: judge shortlist is goal-aware (text area / 'Save as' r      3.3 ms
+[PASS] PP1 PP1: popup policy reads REAL dialogs, answers non-destruct   8007.6 ms
+[PASS] LF1 LF1: the product routes detected desktop apps through the   15115.6 ms
+[PASS] LF2 LF2: a REAL two-app task (Notepad then Calculator) runs bo  40933.9 ms
+
+================================================================================
+GDI OBJECT BUDGET (cap 10000) — end-of-test count / growth
+================================================================================
+  curve: B1:1(+0) B2:1(+0) B3:1(+0) P1:1(+0) P2:1(+0) S1:1(+0) S2:1(+0) M1:86(+85) L1:87(+5) L2:83(+0) R1:130(+47) R2:133(+7) K1:132(+3) K2:144(+7) D1:203(+55) D2:208(+5) G1:1773(+1563) V1:1769(-1) P3:1858(+89) PL1:1886(+26) SK1:1889(+1) CP1:1887(-4) TG1:2031(+141) W6:2325(+298) W8:2333(+12) H1:2339(+10) G2:2698(+357) OM1:2789(+87) PL2:2801(+16) W9:2801(+2) J1:2803(+0) PP1:2984(+185) LF1:3319(+332) LF2:4206(+887)
+     G1 consumed  1563 handles (process at 1773)
+    LF2 consumed   887 handles (process at 4206)
+     G2 consumed   357 handles (process at 2698)
+    LF1 consumed   332 handles (process at 3319)
+     W6 consumed   298 handles (process at 2325)
+    PP1 consumed   185 handles (process at 2984)
+    TG1 consumed   141 handles (process at 2031)
+     P3 consumed    89 handles (process at 1858)
+    OM1 consumed    87 handles (process at 2789)
+     M1 consumed    85 handles (process at 86)
+     D1 consumed    55 handles (process at 203)
+     R1 consumed    47 handles (process at 130)
+GDI TRACE: 892919 allocations seen, 4188 handles still live (wrapped threads: 56)
+   4154 live  gdi32.CreateFontW            threads=1  visual_cursor.py:756 <- visual_cursor.py:627 <- visual_cursor.py:945 <- gdi_budget_trace.py:190
+     24 live  gdi32.CreateFontW            threads=1  visual_cursor.py:756 <- visual_cursor.py:380 <- visual_cursor.py:637 <- visual_cursor.py:945
+      7 live  user32.GetDC                 threads=1  visual_cursor.py:566 <- visual_cursor.py:945 <- gdi_budget_trace.py:190 <- threading.py:995
+      1 live  gdi32.CreateSolidBrush       threads=1  visual_cursor.py:529 <- visual_cursor.py:858 <- gdi_budget_trace.py:190 <- threading.py:995
+      1 live  gdi32.CreatePen              threads=1  visual_cursor.py:531 <- visual_cursor.py:858 <- gdi_budget_trace.py:190 <- threading.py:995
+      1 live  gdi32.CreatePen              threads=1  visual_cursor.py:530 <- visual_cursor.py:858 <- gdi_budget_trace.py:190 <- threading.py:995
+
+================================================================================
+RECONCILED SUBSYSTEM RANKINGS (70% pass-rate, 30% latency; B=env-blocked, neutral)
+================================================================================
+ #  SUBSYSTEM                                      TESTS   SCORE    AVG MS
+ 1  App resolution (organ_40)                        2/2  100.0      15.7
+ 2  Desktop verification loop (W2)                   1/1  100.0       3.3
+ 3  Checkpoint / resume (W5)                         1/1  100.0      13.5
+ 4  Recipe distillation (W5)                         1/1   99.7      87.0
+ 5  Brain (compile + route + nature)                 3/3   99.4     205.9
+ 6  Knowledge organ (organ_04)                       2/2   99.1     286.0
+ 7  App-intelligence organ (organ_47)                1/1   99.1     284.6
+ 8  System import health                             1/1   98.9     370.9
+ 9  Memory organ (organ_03)                          2/2   97.6     795.7
+10  Database (batch + caches)                        2/2   96.5    1167.4
+11  Popup handler (organ_29)                         6/6   92.9    2360.8
+12  Vision tier (OmniParser)                         1/1   89.2    3592.6
+13  Virtual mouse                                    1/1   84.6    5138.6
+14  Task graph compiler (skip-ReAct) (env-only) 0/1 (+1B ENV)   84.6    5140.4
+15  Web URL hygiene (W6)                             2/2   81.0    6318.2
+16  Desktop grounding ladder (W1)                    3/3   70.0   26759.7
+17  Product routing (verified loop first)            2/2   70.0   28024.7
+18  Scanning (deep + continuous)                     1/2   52.9    4039.7
+
+Full log written: D:\new_automation\All codes\core_organs\system_intelligence_results_partial.txt

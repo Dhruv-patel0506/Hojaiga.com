@@ -1,0 +1,187 @@
+Hojaiga System Intelligence & Reliability Suite
+================================================================================
+[pointer preflight] pointer (1884, 18)->(1884, 18) cause=still (guard calls=0, hardware events=0, injected events=0, fastest step=0px at 0.0px/ms, hook=on)  -> quiet
+[vision gate] up=True started=False (already running)
+
+================================================================================
+TEST KP1 [APPKNOW]: KP1: the PE resource reader agrees with Windows' own menu loader; static knowledge of a real classic program is complete and honest
+================================================================================
+[FAIL] 1.74s — windows-oracle(60 menus, 0 mismatches)=OK; regedit commands>=20 (29)=OK; every wm_command has its numeric ID=OK; accelerators joined by command ID=OK; MFC-style prompts joined (28/29)=OK; context menus found statically=OK; toolkit: native Win32, not a sibling-file false positive=OK; shared system dir is not scanned for siblings=OK; elevation request known (HITL)=OK; static harvest fast (1607 ms < 1500)=FAIL; no false help text where string IDs merely collide with command IDs=OK; pe_info seeks (a 75 MB exe in 1 ms, 65 imports)=OK
+        checks = 11/12
+        menus_compared = 60
+        static_ms = 1607
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 1/5
+        proc = threads=29 handles=291 rss_mb=66
+        gdi_growth = +0/+3
+
+================================================================================
+TEST KP2 [APPKNOW]: KP2: shipped data sources (toolkit files, asar package.json, keymaps, manifests, settings) are found by SHAPE and ingested at catalog trust
+================================================================================
+[PASS] 0.56s — toolkits by file shape (electron+chromium+qt)=OK; electron package.json read out of app.asar=OK; manifest 'contributes' commands + category=OK; contributes keybinding joined to its command=OK; keybindings.json parsed=OK; settings toggles found (2 booleans, no values stored)=OK; shipped command lists are DEMOTED hints (archetype trust, origin preload:*), never learned or catalog (P2-J)=OK; facts stored with a source=OK; toolkit strategy says UIA after-wake=OK | toolkits=['electron', 'chromium', 'qt'], commands=4, ingested=4
+        checks = 9/9
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 1/5
+        proc = threads=29 handles=291 rss_mb=67
+        gdi_growth = +0/+3
+
+================================================================================
+TEST KS1 [APPKNOW]: KS1: one command map per app: sources merge + corroborate, E2 stays out, routes follow how the app takes input, frontier persists
+================================================================================
+[PASS] 0.29s — three sources of one command merge into ONE entry=OK; sources listed=OK; shortcut agreement counted=OK; help text + mnemonic chain kept from the static row=OK; lookup ranks it first=OK; destructive command never offered for a save goal=OK; chord embedded in a label is extracted=OK; same-row sources are both kept (provenance) and earlier help survives=OK; native toolkit: WM_COMMAND id is route #1=OK; keys proven not delivered: no key route=OK; keys proven delivered: key route first=OK; explored frontier node stays closed on a re-scan=OK; a new app version reopens the frontier=OK; state variable values accumulate=OK; dossier lists its own gaps=OK | 5 unified from 6 rows; gaps=6
+        checks = 15/15
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 1/5
+        proc = threads=29 handles=291 rss_mb=69
+        gdi_growth = +0/+3
+
+================================================================================
+TEST KB1 [APPKNOW]: KB1: direct control needs >= 2 verified successes (6.4); the bridge and organ_47 obey the same gate
+================================================================================
+[PASS] 0.83s — bridge: 1 verified success is NOT direct control=OK; bridge: 2 verified successes + postcondition + full coverage IS=OK; bridge: destructive class (E2) is never direct=OK; bridge: no machine-checkable postcondition is never direct=OK; bridge: label covering only part of the goal is not direct=OK; bridge: failures outweighing successes revoke it=OK; bridge: a typing goal is not a command goal=OK; 4.2: accelerator declared by 2 sources + proven key delivery = a verified ATTEMPT=OK; 4.2: an accelerator from one source only is not=OK; 4.2: keys not delivered on this app: no accelerator rung=OK; organ_47: successes counts verified PASSes (1 then 2)=OK; organ_47: a failure takes one verification away=OK; loop: ONE pass of a learned shortcut stays a judge hint=OK; loop: TWO passes allow the direct shortcut=OK; migration: an old PASS row keeps one verification, not two=OK
+        checks = 15/15
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 1/5
+        proc = threads=29 handles=298 rss_mb=70
+        gdi_growth = +0/+3
+
+================================================================================
+TEST INF1 [APPKNOW]: INF1: what an app IS is inferred from evidence, not its name; thin evidence stays unclassified
+================================================================================
+[PASS] 0.06s — text editor from labels + .txt/.log=OK; calculator is not a media player=OK; browser from .html + tabs/bookmarks=OK; media player from audio/video types + transport words=OK; raster editor from image types + tools=OK; spreadsheet-like labels + types -> office=OK; one keyword is not enough=OK; no evidence stays unclassified=OK; shared file verbs + one .nfo type is not a text editor=OK; 'Open Navigation' is not 'open a file'=OK; an embedded chord is not part of the label=OK | editor=text_editor calc=calculator browser=browser player=media_player
+        checks = 11/11
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 1/5
+        proc = threads=29 handles=298 rss_mb=70
+        gdi_growth = +0/+3
+
+================================================================================
+TEST B2N [APPKNOW]: B2N: an invented app name fails at launch with a reason and launches nothing else
+================================================================================
+[operate_app] not in the Start menu catalog | no installed app resolves to 'zzqx frobnicator pro 77e884': the catalog's pick 'nothing' shares no word with the request; nothing launched
+[PASS] 0.71s — invented name: nothing launched=OK; invented name: the fuzzy resolver was never invoked=OK; reported with a reason=OK; no retry storm (answered in < 20 s)=OK; a real app still resolves=OK | 0.4s; note="not in the Start menu catalog | no installed app resolves to 'zzqx frobnicator pro 77e884'"
+        checks = 5/5
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 1/5
+        proc = threads=29 handles=299 rss_mb=71
+        gdi_growth = +0/+3
+
+================================================================================
+TEST PURE1 [APPKNOW]: PURE1: no first-party source reaches for a physical-input API (AST scan); the guard still refuses a physical call
+================================================================================
+[INPUT-GUARD] physical input REFUSED: user32.SetCursorPos from headless_input.py:817 <- si_tests_knowledge.py:504 <- run_system_intelligence_tests.py:1161 <- run_system_intelligence_tests.py:188 (use headless_input)
+[PASS] 5.99s — no physical-input API in 151 first-party source files=OK; the process-wide guard still refuses a physical call=OK; no environment opt-out exists any more=OK
+        checks = 3/3
+        files_scanned = 151
+        pointer = ours-guard drift=0px hw=0 inj=0
+        gdi_user_end = 1/5
+        proc = threads=29 handles=297 rss_mb=83
+        gdi_growth = +0/+3
+
+================================================================================
+TEST PTR1 [APPKNOW]: PTR1: the pointer sentinel names who moved the mouse (human / foreign = ABORTED-ENV, this code = FAIL)
+================================================================================
+[PASS] 0.62s — no movement is classified 'still'=OK; hardware events = human-hand=OK; injected events from another process = foreign=OK; a move with no event and no guard call = unattributed=OK; a guard-recorded physical call = ours-guard=OK; pointer-only failure + human hand -> ABORTED-ENV=OK; KM1-style evidence (no parentheses) is recognised=OK; pointer failure + injected foreign mover -> ABORTED-ENV=OK; a pointer failure caused by THIS code stays a FAIL=OK; a pointer failure next to a real failure is never hidden=OK; the live low-level hook installed=OK; an unmoved pointer in the live probe reports no guard call=OK | live probe: pointer (1884, 18)->(1884, 18) cause=still (guard calls=0, hardware events=0, injected events=0, fastest step=0px at 0.0px/ms, hook=on)
+        checks = 12/12
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 1/5
+        proc = threads=29 handles=297 rss_mb=83
+        gdi_growth = +0/+3
+
+================================================================================
+TEST ES2 [CHECKPOINTS]: ES2: every need-human record carries a real screenshot of what the agent saw (visible and minimized windows)
+================================================================================
+[PASS] 2.97s — the gate queued the irreversible step and kept the safe one=OK; the queue row carries a screenshot path=OK; that file is a real PNG (decodes, non-zero, not one flat colour)=OK; the row also records its size and what was captured=OK; a MINIMIZED window is captured too=OK; the minimized window went back to minimized=OK; an app that is gone gives an honest empty record, never a fake file=OK | shot=esc_1791248615_7343700.png 3137 bytes; minimized=ok 6723 bytes; gone='the app window was already gone when the evidence was captured'
+        checks = 7/7
+        png_bytes = 3137
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 13/6
+        proc = threads=29 handles=318 rss_mb=90
+        gdi_growth = +12/+4
+
+================================================================================
+TEST PRE1 [APPKNOW]: PRE1: shipped command lists are preloaded as DEMOTED hints and promoted only by a live verified probe
+================================================================================
+[PASS] 4.10s — operator registry read (60 operators)=OK; request-list JSON read (60 requests)=OK; plugin request-name table read (32 names; the lone identifier is not an API)=OK; >= 50 commands preloaded from shipped sources=OK; EVERY preloaded command is demoted (archetype, opaque, origin preload:*)=OK; a preloaded command is hint-only before evidence=OK; a verified probe promotes exactly the matching command to learned=OK; a command nobody probed stays demoted=OK; words of a request name read as a label ('StartRecord' -> 'Start Record')=OK; the real install's shipped manifests give >= 50 demoted commands (518 preloaded from 20 source file(s) in 1.03s)=OK | formats={'protocol-json': 60, 'api-strings': 32, 'operator-registry': 60}; real=518 preloaded from 20 source file(s) in 1.03s
+        checks = 10/10
+        fixture_commands = 152
+        real_commands = 518
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 13/6
+        proc = threads=29 handles=318 rss_mb=90
+        gdi_growth = +0/+3
+
+================================================================================
+TEST CAP1 [APPKNOW]: CAP1: a capability summary (what it is, how to drive it, a verified task per exercised surface) is written from data in about a second
+================================================================================
+[PASS] 0.28s — the summary was produced from data in under a second=OK; it says what the app is (description + archetype)=OK; it lists the capabilities=OK; every menu is a surface with its command count=OK; a surface with a probe-verified task names it=OK; a dialog seen open live is a verified surface=OK; a surface nobody exercised says so (no invented task)=OK; coverage is reported honestly (3 of 5 surfaces verified)=OK; how to drive it comes from the stored strategy=OK | 9 ms; coverage={'surfaces': 5, 'with_verified_task': 3, 'note': 'a surface with no verified task has only been READ, not exercised: run mastery (know(target, live=True)) to verify more'}
+        checks = 9/9
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 13/6
+        proc = threads=29 handles=318 rss_mb=90
+        gdi_growth = +0/+3
+
+================================================================================
+TEST POP2 [POPUP]: POP2: start-up questions are answered by meaning (body button, never the title-bar X), SmartScreen is escalated, look-alike commands do not match
+================================================================================
+[PASS] 0.48s — the Safe/Normal Mode question is answered with a BODY button, not the title-bar X=OK; SmartScreen 'Run anyway' is a security decision: escalated (category permission)=OK; 'Launch Anyway' proceeds, it does not cancel (cancel would quit the app)=OK; a dialog whose only button is Close still gets answered=OK; 'save as' does not match 'Mark all as read' on the word 'as'=OK; no quick answer for 'save as' is invented from a label that shares one word=OK; a real 'Save' is still the quick answer for 'save'=OK; an API name read from a binary is never offered as the way to 'bold'=OK; an abbreviation finds the program (vscode -> visual studio code)=OK; an abbreviation does not match unrelated names=OK
+        checks = 10/10
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 13/7
+        proc = threads=29 handles=322 rss_mb=90
+        gdi_growth = +0/+4
+
+================================================================================
+TEST CHR1 [POPUP]: CHR1: title-bar buttons are never offered / taught for an in-app goal, and a vanished window is not a pass
+================================================================================
+[PASS] 0.20s — all three title-bar buttons + System are recognised when nothing else is on screen=OK; an in-app 'Close' beside real controls is NOT treated as chrome=OK; a window whose ONLY control is Close offers nothing (it is the title bar)=OK; a step that makes the window vanish is WRONG_STATE for an unrelated goal=OK; ...but not for a goal that says close=OK; a title-bar Close is never learned for an in-app goal=OK; a real control is still learned=OK; Close is learned when the goal is to close=OK; exactly two steps were stored=OK
+        checks = 9/9
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 13/7
+        proc = threads=29 handles=323 rss_mb=90
+        gdi_growth = +0/+3
+
+================================================================================
+TEST PV1 [POPUP]: PV1: a popup that exposes nothing is read via DAP capture+OCR and answered by the role policy; an elevation prompt in disguise is escalated
+================================================================================
+[PASS] 6.67s — the dialog really exposes nothing (no Win32 push buttons)=OK; OCR through the DAP reader found both painted buttons by their captions=OK; the message was read too (so escalation cues work)=OK; the DAP 'ocr' selector returns a BOX on the 'Not now' button, not the whole window=OK; the safe button was pressed (Not now), through the role policy=OK; the 'Allow access' button was never pressed=OK; the answer was a POSTED click read by OCR (no pointer, no keyboard)=OK; the same disguise around an elevation prompt is ESCALATED, not answered=OK | eyes: capture=SUCCESS 560x300 ink=335/2400 ocr_words=14 gdi/user=(13, 24); novel: action=ignore(ocr-click) tier=T1 356 ms buttons=['allow access', 'not now']; uac: action=need_human tier=escalate note='elevation/credential prompt: never auto-accepted'
+        checks = 8/8
+        novel_ms = 356.0
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 13/8
+        proc = threads=32 handles=409 rss_mb=135
+        gdi_growth = +0/+4
+
+================================================================================
+SUMMARY — 13/14 PASS, 1 FAIL in 28.3s
+================================================================================
+[FAIL] KP1 KP1: the PE resource reader agrees with Windows' own menu    1744.7 ms
+[PASS] KP2 KP2: shipped data sources (toolkit files, asar package.jso    561.0 ms
+[PASS] KS1 KS1: one command map per app: sources merge + corroborate,    285.1 ms
+[PASS] KB1 KB1: direct control needs >= 2 verified successes (6.4); t    828.2 ms
+[PASS] INF1 INF1: what an app IS is inferred from evidence, not its na     60.4 ms
+[PASS] B2N B2N: an invented app name fails at launch with a reason an    707.5 ms
+[PASS] PURE1 PURE1: no first-party source reaches for a physical-input    5988.6 ms
+[PASS] PTR1 PTR1: the pointer sentinel names who moved the mouse (huma    616.4 ms
+[PASS] ES2 ES2: every need-human record carries a real screenshot of    2969.5 ms
+[PASS] PRE1 PRE1: shipped command lists are preloaded as DEMOTED hints   4098.2 ms
+[PASS] CAP1 CAP1: a capability summary (what it is, how to drive it, a    275.5 ms
+[PASS] POP2 POP2: start-up questions are answered by meaning (body but    482.2 ms
+[PASS] CHR1 CHR1: title-bar buttons are never offered / taught for an     195.5 ms
+[PASS] PV1 PV1: a popup that exposes nothing is read via DAP capture+   6671.6 ms
+
+================================================================================
+GDI OBJECT BUDGET (cap 10000) — end-of-test count / growth
+================================================================================
+  curve: KP1:1(+0) KP2:1(+0) KS1:1(+0) KB1:1(+0) INF1:1(+0) B2N:1(+0) PURE1:1(+0) PTR1:1(+0) ES2:13(+12) PRE1:13(+0) CAP1:13(+0) POP2:13(+0) CHR1:13(+0) PV1:13(+0)
+    ES2 consumed    12 handles (process at 13)
+
+================================================================================
+RECONCILED SUBSYSTEM RANKINGS (70% pass-rate, 30% latency; B=env-blocked, neutral)
+================================================================================
+ #  SUBSYSTEM                                      TESTS   SCORE    AVG MS
+ 1  Popup handler (organ_29)                         3/3   92.7    2449.7
+ 2  Lifecycle checkpoints (escalation, launch, modes, template, crash)           1/1   91.1    2969.5
+
+Full log written: D:\new_automation\All codes\core_organs\system_intelligence_results_partial.txt
+[vision gate] vision(Qwen2.5-VL-7B :8081) server=up calls=0 found=0 errors=0 avg=0ms by_fn={} log=data\vision_log.jsonl
