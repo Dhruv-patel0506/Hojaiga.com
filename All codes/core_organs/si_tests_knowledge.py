@@ -1456,6 +1456,21 @@ def run_pv1(TestOutcome):
     try:
         if not (novel.hwnd and uac.hwnd):
             return TestOutcome(passed=False, env_blocked=True, evidence="could not create the painted fixture windows")
+        # the fixture paints on ITS OWN thread: in a long process that thread can be late. Make it paint, then wait (bounded) until its pixels exist -
+        # a capture of a window that has not painted yet is the fixture's fault, not the visual rung's
+        def _painted(h) -> int:
+            try:
+                im = dap.OCREngine()._image_of(dap.Win32Provider().build_node(h, None), dap.CaptureEngine())
+                return sum(1 for v in im.convert("L").resize((60, 40)).getdata() if v < 200)
+            except Exception:  # noqa: BLE001
+                return 0
+        for _d in (novel, uac):
+            hin._u32.RedrawWindow(_d.hwnd, None, None, 0x0001 | 0x0004 | 0x0100 | 0x0080)       # INVALIDATE | ERASE | UPDATENOW | ALLCHILDREN
+        _end = time.time() + 8.0
+        while time.time() < _end and (_painted(novel.hwnd) < 100 or _painted(uac.hwnd) < 100):
+            time.sleep(0.4)
+        if _painted(novel.hwnd) < 100 or _painted(uac.hwnd) < 100:
+            return TestOutcome(passed=False, env_blocked=True, evidence="the painted fixture dialogs did not paint (their own thread never ran WM_PAINT within 8 s in this process): the visual rung cannot be judged (environment)")
         native_btns, _t = hin.native_dialog_parts(novel.hwnd)
         info = pp.inspect_dialog(novel.hwnd)
         names = [b[0].lower() for b in info.buttons]
@@ -1464,7 +1479,14 @@ def run_pv1(TestOutcome):
             _cap = dap.CaptureEngine().capture(_node, dap.CaptureOptions(format="raw_bgra"))
             _w = dap.OCREngine().words(_node, dap.CaptureEngine())
             _gui = (hin._u32.GetGuiResources(hin._k32.GetCurrentProcess(), 0), hin._u32.GetGuiResources(hin._k32.GetCurrentProcess(), 1))
-            diag = f"eyes: capture={_cap.status} {_cap.width}x{_cap.height} ocr_words={len(_w)} gdi/user={_gui}"
+            _img = dap.OCREngine()._image_of(_node, dap.CaptureEngine())
+            _ink = sum(1 for v in _img.convert("L").resize((60, 40)).getdata() if v < 200)       # dark pixels: 0 = a blank (white) capture
+            if not _w:
+                try:
+                    _img.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "scratch", "pv1_eyes_fail.png"))
+                except Exception:  # noqa: BLE001
+                    pass
+            diag = f"eyes: capture={_cap.status} {_cap.width}x{_cap.height} ink={_ink}/2400 ocr_words={len(_w)} gdi/user={_gui}"
         except Exception as _exc:  # noqa: BLE001
             diag = f"eyes: {type(_exc).__name__}: {str(_exc)[:100]}"
         # DAP selector: ocr:'Not now' must come back with a BOX inside that button

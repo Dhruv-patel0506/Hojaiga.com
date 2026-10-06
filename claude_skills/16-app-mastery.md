@@ -125,3 +125,25 @@ root causes). Crash relaunch (4.3) was already proven live by G2L and passes.
 Open / not proven: Paint draw end-to-end (the paste goal needed a canvas-change postcondition and the run was disturbed by another suite);
 Steam not exercised; Discord/WhatsApp (tray-parked Chromium) accept ValuePattern writes but the page applies them seconds later; GDI leak not
 reproduced after one occurrence; E2E-1 passes but is slow (patience waits).
+
+## 6. Added overnight 2026-10-06 (complex apps: OBS, VS Code, Zoom, Discord/WhatsApp read-only, YouTube)
+
+What was measured (fresh behaviour DB per app, `mastery_bench.py`; Discord/WhatsApp were READ only - no typing, no probing, the user's own windows):
+- **OBS Studio**: recall of resting controls 0.5 -> 0.955, 4 -> 44 controls, menu-path precision 1.0 (65 paths), once its "Crash Detected - Run in Safe Mode / Run in
+  Normal Mode" start-up question was answered (it had been scanned AS the application). `popup_policy.looks_like_dialog` + `choose_button` (body buttons first).
+- **VS Code (Electron)**: 2057 commands, 11 transitions; `master()` failed with "window not found after the scan" until it used the window the scan LAUNCHED
+  (the typed name "vscode" never matched the title "Visual Studio Code"). `resolve_app` now handles abbreviations (`_abbrev_match`).
+- **Zoom**: 2380 "commands" were the client's INTERNAL class library (Get/Set names) read as an API; `MAX_API_NAMES = 500` rejects it, API-derived entries
+  rank below controls and are never a quick answer.
+- **Discord**: static harvest by NAME found nothing (versioned install folder); retried by WINDOW: Electron/Chromium, 121 static + 53 live commands.
+  A contact's name ("Open conversation with <name>") reached the knowledge DB: `redact` now covers person-bearing labels, list/tree ITEMS are not commands.
+- **YouTube / web** (`universal_scan.scan(url)`, own headless Chrome, no profile): home 34 controls in 6.9 s, watch page 251 in 18.4 s, results 141 in 11.9 s;
+  Excalidraw (canvas app) 36 controls, "canvas-interior:needs-ocr-or-vision" is reported, not hidden.
+- **Steam**: sign-in screen (credentials) -> escalate; CEF exposes only its title bar through UIA (4 nodes), OCR reads the text. The loop pressed the
+  title-bar Close and "passed" `open the Library tab` and LEARNED it at 0.97 (CHR1 fixes it: title-bar buttons are never offered / taught, a vanished window
+  is WRONG_STATE, a blank "names changed" pass is not reinforced).
+
+Root cause of the old "in-suite degradation" and DAY1: the popup guard gave the foreground back to the user the moment a parked WinUI app took it when its
+flyout opened; that DEACTIVATES the window and the flyout closes (`empty-menu:File`). A Paint menu crawl returned 13-41 commands (35% of runs degraded);
+with the hand-back off: 41/41 in 4 of 4 runs and ~30% faster. Policy now (`FOCUS_IDLE_MS`, `user_idle_ms`): while nobody has touched the keyboard or mouse
+for 1.5 s the app may hold the foreground; the instant a person does, it is handed back, and always at session end (`restore_focus`).

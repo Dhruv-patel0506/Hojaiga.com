@@ -46,6 +46,7 @@ logger = logging.getLogger("hojaiga.background_window")
 
 _IS_WINDOWS = os.name == "nt"
 _u32 = ctypes.windll.user32 if _IS_WINDOWS else None
+_g32 = ctypes.windll.gdi32 if _IS_WINDOWS else None
 
 SW_SHOWNOACTIVATE = 4
 SW_SHOWMINNOACTIVE = 7
@@ -369,6 +370,23 @@ def target_popups(target: int, visible_only: bool = True) -> List[int]:
     return out
 
 
+FOCUS_IDLE_MS = int(os.environ.get("HOJAIGA_FOCUS_IDLE_MS", "1500"))     # the user counts as PRESENT if they touched the keyboard / mouse this recently
+
+
+def user_idle_ms() -> int:
+    """Milliseconds since the last REAL input event (GetLastInputInfo): a read-only question, nothing is sent."""
+    try:
+        class _LII(ctypes.Structure):
+            _fields_ = [("cbSize", ctypes.c_uint), ("dwTime", ctypes.c_uint)]
+        li = _LII()
+        li.cbSize = ctypes.sizeof(_LII)
+        if ctypes.windll.user32.GetLastInputInfo(ctypes.byref(li)):
+            return int((ctypes.windll.kernel32.GetTickCount() - li.dwTime) & 0xFFFFFFFF)
+    except Exception:
+        pass
+    return 0                                                  # unknown: assume the user IS there (the safe answer)
+
+
 CONCEAL_FLYOUTS = os.environ.get("HOJAIGA_CONCEAL_FLYOUTS", "1") != "0"
 NOACTIVATE_PARKED = os.environ.get("HOJAIGA_PARK_NOACTIVATE", "0") == "1"
 
@@ -389,6 +407,7 @@ class _PopupGuard(threading.Thread):
         self.moved = 0
         self.hook_hits = 0
         self.refocused = 0
+        self.fg_deferred = 0
         self._concealed: Dict[int, bool] = {}           # popup hwnd -> did WE add WS_EX_LAYERED (so it can be put back)
         _ensure_tracker()
         mark_automation_pid(self.pid)
@@ -406,29 +425,27 @@ class _PopupGuard(threading.Thread):
         self.main_cls = c.value
 
     def _conceal(self, h: int) -> None:
-        """A flyout ANIMATES open and its framework re-places it on the screen on every frame, so moving it leaves it visible for the length
-        of the animation (measured 130-260 ms), and a common dialog opens at its default place before it is moved. Fully transparent from its first
-        frame it cannot be seen wherever it is, and UI Automation, posted messages and PrintWindow still reach it. Everything concealed is put
-        back by _reveal when the session ends."""
+        """A flyout ANIMATES open and its framework re-places it on the screen on every frame, so moving it leaves it visible for the length of
+        the animation (measured 130-260 ms), and a common dialog opens at its default place before it is moved. The window is given an EMPTY REGION:
+        nothing of it is ever drawn on any screen, wherever it is, while it stays a normal, laid-out, composed window that UI Automation, posted
+        messages and PrintWindow still read. (Layered alpha 0 AND alpha 2 were tried first: both made the framework stop realizing the flyout's items and
+        a Paint menu crawl fell from 41 commands to 10-13.) Everything concealed is put back by _reveal when the session ends."""
         if not CONCEAL_FLYOUTS or h in self._concealed:
             return
         try:
-            ex = _u32.GetWindowLongW(h, -20)
-            added = not (ex & 0x00080000)
-            if added:
-                _u32.SetWindowLongW(h, -20, ex | 0x00080000)                   # WS_EX_LAYERED
-            _u32.SetLayeredWindowAttributes(h, 0, 0, 2)                         # LWA_ALPHA, alpha 0
-            self._concealed[h] = added
+            rgn = _g32.CreateRectRgn(0, 0, 0, 0)
+            if rgn and _u32.SetWindowRgn(h, rgn, False):          # on success the WINDOW owns the region; on failure it is ours to free (no GDI leak)
+                self._concealed[h] = True
+            elif rgn:
+                _g32.DeleteObject(rgn)
         except Exception:
             pass
 
     def _reveal(self) -> None:
-        for h, added in list(self._concealed.items()):
+        for h in list(self._concealed):
             try:
                 if _u32.IsWindow(h):
-                    _u32.SetLayeredWindowAttributes(h, 0, 255, 2)
-                    if added:
-                        _u32.SetWindowLongW(h, -20, _u32.GetWindowLongW(h, -20) & ~0x00080000)
+                    _u32.SetWindowRgn(h, None, True)
             except Exception:
                 pass
         self._concealed.clear()
@@ -529,6 +546,8 @@ class _PopupGuard(threading.Thread):
         the app's window and its input-site window become foreground and may never give it back.
         Remember the last window that belongs to someone else (the user's) and put focus straight
         back the moment the target's process takes it."""
+        if os.environ.get("HOJAIGA_NO_FOCUS_HOLD") == "1":      # diagnostic switch: does giving focus back close the app's flyouts?
+            return
         fg = _u32.GetForegroundWindow()
         if not fg:
             return
@@ -537,6 +556,13 @@ class _PopupGuard(threading.Thread):
         # ours = the target window itself, or a popup/dialog/helper of its process. ANOTHER main window
         # of the same app (same class) is the user's own work and is never fought over.
         ours = fg == self.hwnd or holds_app_focus(fg, self.hwnd, self.pid)
+        if ours and user_idle_ms() > FOCUS_IDLE_MS:
+            # Nobody is at the keyboard: a WinUI app that takes the foreground when its flyout opens misdirects no keystroke, and giving the foreground
+            # back deactivates the window, which dismisses the very menu being read (measured: a Paint menu crawl returned 13-28 commands instead of 41,
+            # File came back EMPTY; with the hand-back off: 41 of 41, four runs of four, and 30% faster). The hand-back is immediate the moment a person
+            # touches the keyboard or mouse, and always happens when the session ends.
+            self.fg_deferred += 1
+            return
         if ours:
             tgt = self.user_fg or _last_user_fg
             if not (tgt and _u32.IsWindow(tgt) and not _u32.IsIconic(tgt) and _pid(tgt) != self.pid):
@@ -553,6 +579,17 @@ class _PopupGuard(threading.Thread):
                     self.refocused += 1
         else:
             self.user_fg = fg
+
+    def restore_focus(self) -> None:
+        """Session end: if the app still holds the foreground (the idle policy let it), give it back to what the user had."""
+        fg = _u32.GetForegroundWindow()
+        if not fg or not (fg == self.hwnd or holds_app_focus(fg, self.hwnd, self.pid)):
+            return
+        tgt = self.user_fg or _last_user_fg
+        if not (tgt and _u32.IsWindow(tgt) and not _u32.IsIconic(tgt) and _pid(tgt) != self.pid):
+            tgt = next_user_window(self.pid) or int(_u32.FindWindowW("Shell_TrayWnd", None) or 0)
+        if tgt:
+            self._give_focus(tgt, fg)
 
     def halt(self) -> None:
         self._halt.set()
@@ -789,6 +826,10 @@ def exit(hwnd: int) -> bool:                            # noqa: A001 - mirrors e
                     stuck = 0
                     _u32.ShowWindow(hwnd, SW_SHOWMINNOACTIVE)
         if p.guard is not None:
+            try:
+                p.guard.restore_focus()
+            except Exception:
+                pass
             time.sleep(0.05)
             p.guard.halt()
             p.guard.join(timeout=1.0)
