@@ -1221,6 +1221,7 @@ test_pv1_behavior = _kn("run_pv1", "PV1: a popup that exposes nothing is read vi
 test_rank1_behavior = _kn("run_rank1", "RANK1: element ranking encodes what a person does (no window chrome / accounts, File -> Save As -> Browse, conventional menus, paste is a command)")
 test_paint1_behavior = _kn("run_paint1", "PAINT1: a drawing from DATA is drawn in WinUI Paint with zero physical input (clipboard -> Paste -> save -> pixel proof)")
 test_par1_behavior = _kn("run_par1", "PAR1: two independent apps run in parallel, one child virtual cursor each, each verified on disk")
+test_lc2ia_behavior = _kn("run_lc2ia", "LC2-IA: two DISJOINT cursors drive ONE app at the same time (region ownership enforced, both effects pixel-verified, concurrent overlap measured); same-child pairs degrade honestly to serialized")
 test_act1_behavior = _kn("run_act1", "ACT1: every action leaves through the DAP actuation backbone (family -> ordered providers, trace, registered providers, no physical rung)")
 test_km1_behavior = _kn("run_km1", "KM1: mastery learns an app across runs, invisibly; the knowledge is true against an independent UIA walk")
 test_kc1_behavior = _kn("run_kc1", "KC1: a context menu is discovered headless, read, closed again; a dropdown is expanded and collapsed; the app is left as found")
@@ -2450,6 +2451,7 @@ def main() -> int:
         ("LF2", "ROUTING", test_lf2_loop_first_two_apps_live),
         ("OFF1", "HEADLESS", test_off1_offscreen_capture_rung),
         ("DR1", "HEADLESS", test_dr1_headless_drag),
+        ("LC2-IA", "HEADLESS", test_lc2ia_behavior),
         ("CN1", "HEADLESS", test_cn1_desktop_connector_headless),
         ("TY1", "HEADLESS", test_ty1_headless_launch_switch_type),
         ("ANY1", "ANYAPP", test_any1_any_app_discovery),
