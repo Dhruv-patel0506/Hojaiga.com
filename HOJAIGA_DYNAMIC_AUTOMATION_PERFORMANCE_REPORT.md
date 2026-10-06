@@ -254,7 +254,7 @@ Score = **0.7 × pass-rate + 0.3 × speed-score** (speed-score = `100 − min(av
 
 We booted the bat's exact dependencies (Ollama :11434 with `qwen2.5:7b`/`qwen2.5vl:3b`, llama.cpp vision :8081 with the Qwen2.5-VL-7B GGUF, Gatekeeper :11435) and dispatched a genuinely random multi-app task through the bat's own command path (`test_hojaiga_real_task.py --engine crewai --command …`).
 
-**Task:** *"Open Excel, create spreadsheet, copy data, send via Gmail to dhruv15.dpatel@gmail.com"*
+**Task:** *"Open Excel, create spreadsheet, copy data, send via Gmail to REDACTED_EMAIL"*
 
 **Latency (measured):** dispatch → clean exit **349.7 s (~5 m 50 s)**. Breakdown: boot + Chrome-CDP launch + brain compile ≈ 51 s (22:59:26→23:00:17 compile); one full CrewAI crew attempt ≈ 297 s — dominated entirely by local 7B ReAct turns and 7B-vision `visually_inspect_screen` calls (a single vision inspection took 23:01:28→23:04:37 ≈ 3 m). Decision/routing overhead itself stayed sub-second; the wall-clock is inference-bound, not orchestration-bound.
 
