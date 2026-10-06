@@ -109,3 +109,15 @@ API_KEY_INTEGRATION_COMPLETE.md
 # secret store - never committed
 config/secure_keys.json
 config/.api_keys_encrypted
+
+# runtime state / learned knowledge / cookies - recreated dynamically, never committed
+*.db
+*.sqlite
+*.sqlite.bak
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite-journal
+*.db-journal
+*.snap.tmp
+**/snapshots/LATEST
+ssms_*_export.json
