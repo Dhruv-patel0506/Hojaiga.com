@@ -115,6 +115,11 @@ _ALIASES = {
              "word processor", "write document", "microsoft word", "text document",
              "open word", "edit document", "create document"],
     
+    # Presentations
+    "powerpoint": ["powerpoint", "power point", "ppt", "presentation",
+                   "slide deck", "slides", "open powerpoint",
+                   "create presentation", "microsoft powerpoint"],
+    
     # Media Playback
     "windows media player": ["play video", "play music", "media player",
                              "watch video", "video player", "music player",
