@@ -235,6 +235,7 @@ class GroundedElement:
     automation_id: str = ""
     value: str = ""
     enabled: bool = True
+    rel: Optional[Tuple[float, float, float, float]] = None   # bbox normalized to the window rect (survives moves/reflow); pixel tiers set it
 
     @property
     def center(self) -> Tuple[int, int]:
@@ -264,6 +265,38 @@ def _is_parked_offscreen(hwnd: int) -> bool:
 def _element_id(hwnd: int, role: str, name: str, bbox: Tuple[int, int, int, int]) -> str:
     raw = f"{hwnd}|{role}|{name.strip().lower()}|{bbox}"
     return "el_" + hashlib.md5(raw.encode("utf-8")).hexdigest()[:10]
+
+
+def _window_rect(hwnd: int) -> Tuple[int, int, int, int]:
+    """Current window rect (l, t, r, b); (0,0,0,0) if unreadable."""
+    try:
+        import ctypes.wintypes as wt
+        rr = wt.RECT()
+        ctypes.windll.user32.GetWindowRect(hwnd, ctypes.byref(rr))
+        return (rr.left, rr.top, rr.right, rr.bottom)
+    except Exception:  # noqa: BLE001
+        return (0, 0, 0, 0)
+
+
+def _rel_of_window(bbox: Tuple[int, int, int, int], hwnd: int) -> Optional[Tuple[float, float, float, float]]:
+    """Normalize a screen bbox to the window rect (0..1), so a pixel-found target survives a move/reflow.
+    None when the window rect is unreadable or degenerate."""
+    win = _window_rect(hwnd)
+    w, h = win[2] - win[0], win[3] - win[1]
+    if w <= 0 or h <= 0:
+        return None
+    return (round((bbox[0] - win[0]) / w, 4), round((bbox[1] - win[1]) / h, 4),
+            round((bbox[2] - win[0]) / w, 4), round((bbox[3] - win[1]) / h, 4))
+
+
+def _abs_from_rel(rel: Tuple[float, float, float, float], hwnd: int) -> Optional[Tuple[int, int, int, int]]:
+    """Map stored normalized coords back to the window's CURRENT screen rect. None if the window is gone."""
+    win = _window_rect(hwnd)
+    w, h = win[2] - win[0], win[3] - win[1]
+    if w <= 0 or h <= 0:
+        return None
+    return (int(win[0] + rel[0] * w), int(win[1] + rel[1] * h),
+            int(win[0] + rel[2] * w), int(win[1] + rel[3] * h))
 
 
 def _get_bridge():
@@ -828,7 +861,8 @@ class DesktopGrounding:
                     out.append(GroundedElement(
                         id=_element_id(hwnd, "text", text, bbox),
                         name=text, role="text", bbox=bbox, tier="ocr",
-                        confidence=conf / 100.0, hwnd=hwnd))
+                        confidence=conf / 100.0, hwnd=hwnd,
+                        rel=_rel_of_window(bbox, hwnd)))
             return out
         except Exception as exc:
             logger.debug("[grounding] OCR pass failed: %s", exc)
@@ -1024,7 +1058,8 @@ class DesktopGrounding:
                 ge = GroundedElement(
                     id=_element_id(hwnd, e.role, e.text, screen_bbox),
                     name=e.text or ("icon" if e.role != "text" else "vision"), role=e.role, bbox=screen_bbox,
-                    tier="vision", confidence=float(e.confidence or 0.35), hwnd=hwnd)
+                    tier="vision", confidence=float(e.confidence or 0.35), hwnd=hwnd,
+                    rel=_rel_of_window(screen_bbox, hwnd))
                 out.append(ge)
                 src_of.append((ge, e))
             fut = getattr(parser, "caption_future", None)
@@ -1928,9 +1963,15 @@ class ConstrainedJudge:
                 if text:
                     return {"choice": cell[0], "verb": "type", "text": text, "why": "decisive: spreadsheet cell",
                             "element_index": cell[0], "element": cell[1].as_dict(), "decisive": True}
-        if re.search(r"\b(" + "|".join(self._TYPE_WORDS) + r")\b", g):
+        if self._wants_text(goal):
             # Typing goal: only an editable control can receive text, so the candidate set IS the
             # editable controls (a tab/label/button that merely shares a word must never win).
+            # This branch used to test the raw _TYPE_WORDS regex on the goal. 'paste' IS a type-word, so
+            # "paste the image from the clipboard" arrived here, Paint's Zoom box was the only editable
+            # control on screen, and the run typed the 34-character GOAL SENTENCE into the zoom field - seven
+            # steps in a row, at a moment when the ranking had already put the menu item 'Paste' first.
+            # _wants_text is the authority that exists to tell a typing goal from a command that happens to be
+            # spelled like one (its own comment cites this exact sentence); the decisive path must consult it.
             texty = [c for c in scored if c[2].role in self._TEXT_ROLES]
             if texty and (len(texty) == 1 or texty[0][0] - texty[1][0] >= 1.0):
                 text = self._compose_text(goal)
@@ -2049,6 +2090,22 @@ class ConstrainedJudge:
                 # The postcondition verifier still decides whether the click achieved anything.
                 decision["verb"] = verb = "click"
                 decision["coerced"] = "type->click: goal has no typing intent and the target is not editable"
+            if 0 <= idx < len(picks) and verb == "type" and not self._wants_text(goal):
+                # The same rule for an EDITABLE target: a `type` whose goal never asked for text is not typing,
+                # whatever role the element has. Measured 2026-10-06 (PAINT1): the ranking put the menu item
+                # 'Paste' first at 12.4, and the model answered by typing the 34-CHARACTER GOAL SENTENCE into
+                # Paint's 'Zoom' edit box - the same step six times, because the guard above only fires on a
+                # NON-editable target and an ordinary edit slipped through. Take the element the DATA-driven
+                # ranking already put first; the postcondition verifier still decides if it achieved anything.
+                if picks[0].role in self._CLICK_ROLES:
+                    decision["coerced"] = (f"type->click on top-ranked '{picks[0].name[:30]}': the goal asks for "
+                                           f"no text, so 'type' would have typed the goal sentence itself")
+                    idx = 0
+                    decision["verb"] = verb = "click"
+                # If nothing on the shortlist is clickable there is nothing better to do than leave the model's
+                # own answer alone. This guard exists to stop a goal sentence being typed into a stray edit box;
+                # it must not become a NEW way to reject a step that used to run (f8 showed two unrelated apps
+                # going BLOCKED right after a change here, so the rejection path was removed rather than trusted).
             if idx < 0 or idx >= len(picks) or verb not in LEGAL_VERBS:
                 return {"invalid": True, "raw": decision}
             # A control the shortlist DEMOTED because its own label says what it is for (search / address / go-to) and
@@ -2180,6 +2237,58 @@ def _uia_thread_init():
         _a.UIAutomationInitializerInThread().__enter__()
     except Exception:
         pass
+
+
+def reveal_by_scrolling(hwnd: int, *, to_bottom: bool = True, timeout_s: float = 14.0) -> bool:
+    """Module-level scroll-reveal (used by the stuck-goal widening AND by fast_scan's map): drive every
+    vertically-scrollable container of this window to its end through UIA's ScrollPattern - the only
+    delivery that works on XAML/WinUI/Chromium - forcing the layout manager to materialise virtualized
+    items (a NavigationView footer, a long list). Containers are chosen by the PRESENCE of the pattern,
+    never by an app's control name: generic. `to_bottom=False` scrolls them back to the top, so a caller
+    that revealed, re-read and merged can leave the app exactly as found (UI-restoration law).
+    Returns whether at least one container moved."""
+    global _UIA_EXEC
+    if _UIA_EXEC is None:
+        from concurrent.futures import ThreadPoolExecutor
+        _UIA_EXEC = ThreadPoolExecutor(max_workers=1, thread_name_prefix="uia-act", initializer=_uia_thread_init)
+
+    def work():
+        import uiautomation as auto
+        try:
+            root = auto.ControlFromHandle(hwnd)
+        except Exception:
+            return False
+        NoScroll = -1.0                            # -1 = leave the horizontal position alone
+        target = 100.0 if to_bottom else 0.0
+        stack, seen, moved, containers = [root], 0, False, 0
+        while stack and seen < 800 and containers < 12:    # bounded fan-out
+            c = stack.pop(); seen += 1
+            try:
+                stack.extend(c.GetChildren())
+            except Exception:
+                pass
+            try:
+                p = c.GetScrollPattern()
+            except Exception:
+                p = None
+            if p is None:
+                continue
+            containers += 1
+            try:
+                if getattr(p, "VerticallyScrollable", False):
+                    p.SetScrollPercent(NoScroll, target)
+                    moved = True
+            except Exception:
+                pass
+        return moved
+    try:
+        ok = bool(_UIA_EXEC.submit(work).result(timeout=timeout_s))
+    except Exception as exc:  # noqa: BLE001
+        logger.debug("[reveal] scroll-reveal failed: %s", exc)
+        return False
+    if ok:
+        time.sleep(0.5)                            # let the layout pass build the now-visible items
+    return ok
 
 
 def _uia_dispatch(elem: GroundedElement, verb: str, text: str):
@@ -2851,55 +2960,50 @@ class DesktopAutonomyLoop:
         pend = sum((self._pending_clicks.get(goal) or {}).values())
         return pend >= 2 or self._goal_fails.get(goal, 0) >= 2 or len(self._opened_not_done.get(goal) or ()) >= 2
 
-    def _reveal_by_scrolling(self, hwnd: int) -> bool:
-        """Scroll a host's content down a bounded number of notches through UIA's ScrollPattern - the one
-        delivery path that works on a XAML/WinUI window (a posted wheel is dropped there). This exists for
-        virtualized lists: a NavigationView footer item ('About') is not in the visual tree until it is
-        scrolled into view, so no amount of re-reading finds it until something scrolls. The FIRST vertically
-        scrollable container is used (found generically by pattern, never by an app's control name). Returns
-        True if a scroll actually moved. The caller re-walks afterward, so any newly realized item is picked
-        up by the existing grounding (which already reads the raw view for these hosts)."""
-        if _UIA_EXEC is None:
-            from concurrent.futures import ThreadPoolExecutor
-            globals()["_UIA_EXEC"] = ThreadPoolExecutor(max_workers=1, thread_name_prefix="uia-act", initializer=_uia_thread_init)
-
-        def work():
-            import uiautomation as auto
-            try:
-                root = auto.ControlFromHandle(hwnd)
-            except Exception:
-                return False
-            NoAmount, LargeIncrement = 2, 4
-            stack, seen, pat = [root], 0, None
-            while stack and seen < 600:
-                c = stack.pop(); seen += 1
-                try:
-                    p = c.GetScrollPattern()
-                except Exception:
-                    p = None
-                if p is not None and getattr(p, "VerticallyScrollable", False):
-                    pat = p
-                    break
-                try:
-                    stack.extend(c.GetChildren())
-                except Exception:
-                    pass
-            if pat is None:
-                return False
-            moved = False
-            for _ in range(6):                     # bounded: a footer lives within a few large notches
-                try:
-                    pat.Scroll(NoAmount, LargeIncrement)
-                    moved = True
-                except Exception:
-                    break
-                time.sleep(0.35)
-            return moved
+    def _realize_and_relook(self, hwnd: int, goal: str, elements, ladder) -> List[GroundedElement]:
+        """Nothing actionable was perceived. On a virtualizing host (XAML/WinUI/UWP, and Chromium behind a
+        wall) that is almost always because the content was never MATERIALIZED - not because the app has no
+        controls (measured 2026-10-07: 'add 21 and 21' on Calculator judged 'invalid' three times because the
+        parked window had laid out no buttons, then burned straight to HITL). Before handing the judge nothing,
+        force a realization and look again: the 1-px sliver makes a parked UWP/WinUI app lay its content out
+        (the same invisible nudge the actuation session already relies on), re-walk the tree, then widen. This
+        is keyed by structure, never by an app name, so it lifts EVERY virtualizing app at once. Returns the
+        freshest element list (the same object if genuinely nothing changed)."""
         try:
-            return bool(_UIA_EXEC.submit(work).result(timeout=12))
-        except Exception as exc:  # noqa: BLE001
-            logger.debug("[stuck] scroll-reveal failed: %s", exc)
-            return False
+            from core_organs import background_window as bw
+            bw.sliver(int(hwnd))                             # invisible; makes a parked UWP/WinUI window lay out
+        except Exception:  # noqa: BLE001
+            pass
+        time.sleep(0.4)
+        fresh = elements
+        if HAS_UIA:
+            try:
+                walked = self.grounding._walk_uia(hwnd) or []
+                if walked:
+                    fresh = walked
+            except Exception:  # noqa: BLE001
+                pass
+        try:
+            widened = self._widen_perception(hwnd, goal, fresh, ladder)
+            if widened:
+                fresh = widened
+        except Exception:  # noqa: BLE001
+            pass
+        return fresh
+
+    def _reveal_by_scrolling(self, hwnd: int) -> bool:
+        """Scroll a host's content through UIA's ScrollPattern - the one delivery path that works on a
+        XAML/WinUI window (a posted wheel is dropped there). This exists for virtualized lists: a NavigationView
+        footer item ('About') is not in the visual tree until it is scrolled into view, so no amount of re-reading
+        finds it until something scrolls. The technique mirrors organ_50_layout_map: SetScrollPercent to the
+        BOTTOM, which forces the layout manager to materialise items below the fold.
+
+        Measured defect this removes: scrolling only the FIRST scrollable container lands on the outer window
+        frame, not the navigation list, so the footer never realised. Every vertically-scrollable container is
+        now driven to its end (bounded count), then left there so the caller's re-walk sees the realised items.
+        The container is chosen by the PRESENCE of a vertical ScrollPattern, never by an app's control name -
+        generic."""
+        return reveal_by_scrolling(hwnd)
 
     def _widen_perception(self, hwnd: int, goal: str, elements: List[GroundedElement], ladder: Dict[str, Any]) -> List[GroundedElement]:
         """Two steps of a goal went by without the goal moving: more of the same controls would only repeat that. Look WIDER, cheapest first:
@@ -3314,7 +3418,22 @@ class DesktopAutonomyLoop:
                 logger.info("[judge] goal=%r offered=%d avoided=%s top=%s", goal[:50], len(offered), sorted(spent)[:4], _top)
             except Exception:
                 pass
-        if not offered:                                     # only window chrome (or nothing) is on screen: not a decision the judge may be asked to make
+        if not offered:
+            # Nothing actionable yet. On a virtualizing host (XAML/WinUI/UWP, Chromium walls) that usually
+            # means the content was never materialized, NOT that the app has none - so force a realization
+            # and look again before handing the judge nothing. Generic: keyed by structure, never app name.
+            elements = self._realize_and_relook(hwnd, goal, elements, ladder)
+            # The re-walk returned BRAND-NEW element objects: recompute the chrome guard against them. A
+            # title-bar button's identity was carried in the OLD objects' ids, so with the stale set the fresh
+            # 'Minimize Calculator' passed the filter and the judge pressed it - minimizing the target and
+            # killing every later step (measured 2026-10-07, a decomposed six-press calculation self-minimized
+            # on its third step). Re-deriving the bar here is what keeps the never-touch-the-window-chrome rule.
+            _bar = _titlebar_buttons(elements, hwnd)
+            _not_chrome = lambda e: _chrome_ok or ((e.name or "").strip().lower() not in self.judge._WINDOW_CHROME and id(e) not in _bar)
+            offered = [e for e in elements if (e.name or "").strip().lower() not in spent and _not_chrome(e)
+                       and not (e.role in ("menuitem", "button", "listitem", "splitbutton") and is_account_control(e.name, goal))] \
+                      or [e for e in elements if _not_chrome(e)]
+        if not offered:                                     # still only chrome (or nothing): not a decision the judge may be asked to make
             decision = {"invalid": True, "raw": "", "why": "nothing but the window's title-bar buttons is on screen: no control to press for this goal"}
         else:
             decision = self.judge.decide(goal, offered, app_hint=app_hint, history=self._history,
@@ -3757,6 +3876,11 @@ class DesktopAutonomyLoop:
             self._last_window_mode = sess.mode or "failed"
             if sess.mode == "parked":
                 self._held[hwnd] = sess
+                # A window parked ENTIRELY off every monitor is not laid out by UWP/WinUI apps, and a flyout
+                # inside it is never realized - so a background run could not reach any command that lives in a
+                # menu (measured: Paint 'Edit' -> Paste exists 0.8 s after the sliver, and never while fully
+                # parked). An ACTUATION run needs this for its whole life, not just for one layout read.
+                sess.lay_out()
                 logger.info("[autonomy] %s hwnd=%s held parked off-screen", app_hint, hwnd)
             else:
                 sess.__exit__(None, None, None)
@@ -3925,6 +4049,16 @@ class DesktopAutonomyLoop:
             return {"completed": False, "blocked_at_goal": 0, "steps": 0,
                     "awaiting_human": True, "ready_reason": reason,
                     "trace": [t.as_dict() for t in self.trace]}
+        # A compound instruction ('add 21 and 21') is broken into atomic, individually-verified presses NOW,
+        # against the controls the readiness pass just laid out - before any word of it can be matched to a
+        # stray button. Skipped when the caller passed a positional expect_map (its keys would shift); an
+        # un-groundable goal is left exactly as it was. Generic - goal_planner reads the words, never an app.
+        if not expect_map:
+            _expanded, _plan_note = expand_compound_goals(goals, _relts)
+            if _plan_note:
+                goals = _expanded
+                self._launch_note = (self._launch_note + "; " if self._launch_note else "") + "decomposed: " + _plan_note[:280]
+                logger.info("[plan] %s", _plan_note[:280])
         results = []
         fresh_note = ""
         self._canvas_needed = self._canvas_expected(goals, app_hint)
@@ -4093,7 +4227,7 @@ class DesktopAutonomyLoop:
 
     @staticmethod
     def recall_recipe(goal: str, app_name: str) -> str:
-        """Retrieve learned recipe text for a similar goal (empty when none)."""
+        """Retrieve learned recipe text for a similar goal, from THIS app only (empty when none)."""
         try:
             from core_organs.organ_04_knowledge import KnowledgeOrgan, QueryDispatcher
             root = os.environ.get("HOJAIGA_KNOWLEDGE_ROOT",
@@ -4107,10 +4241,20 @@ class DesktopAutonomyLoop:
                     {"text": f"SKILL {app_name} {goal}", "limit": 3})
                 await organ.stop()
                 matches = res.get("matches", []) if isinstance(res, dict) else []
+                want = (app_name or "").strip().lower()
                 for h in matches:
                     content = (h.get("snippet") or h.get("content") or h.get("chunk") or h.get("text") or "") if isinstance(h, dict) else str(h)
-                    if content.startswith("SKILL["):
-                        return content
+                    if not content.startswith("SKILL[") or "]" not in content:
+                        continue
+                    # The recipe carries the app it was distilled IN. Goals across apps read as similar text ('save the
+                    # workbook as C:\..\hj_xls2.xlsx' and 'save the file as C:\..\hj_lc2.txt'): matching on the goal alone
+                    # replayed an Excel backstage walk inside Calculator (measured 2026-10-06), and its steps name
+                    # controls that do not exist there. A hint about another app is not a hint.
+                    got = content[content.index("[") + 1:content.index("]")].strip().lower()
+                    if want and got and got != want:
+                        logger.info("[learn] recalled recipe for '%s' rejected: it belongs to '%s'", want, got)
+                        continue
+                    return content
                 return ""
             return asyncio.run(_flow())
         except Exception as exc:
@@ -4411,6 +4555,35 @@ def split_goals(goals: str) -> List[str]:
     return [g.strip() for g in re.split(r"[\n;]+|(?<=[a-z]),\s", goals or "") if g and g.strip()]
 
 
+def expand_compound_goals(goal_list: List[str], elements: List["GroundedElement"]) -> Tuple[List[str], str]:
+    """Split any COMPOUND instruction ('add 21 and 21', 'click File then click Save') into atomic,
+    individually-verifiable sub-goals grounded in the controls THIS app actually shows on screen, so the
+    one-action-per-step loop can drive it (a multi-action sentence otherwise has no single valid pick and the
+    judge burns its three strikes to human-in-the-loop - or, worse, a word like 'add' matches a stray 'Memory
+    add' button and a weak postcondition calls it done). Generic: goal_planner reads the instruction's own
+    words and matches the result to real control labels; a goal that cannot be fully grounded is returned
+    exactly as it was, so decomposition can only ever match the old behaviour, never regress or fake a step.
+    Called with the elements the loop has ALREADY laid out (post-readiness), so it never races the launch.
+    Returns (possibly-expanded goals, a note for the trace)."""
+    try:
+        from core_organs import goal_planner
+    except Exception:  # noqa: BLE001
+        return goal_list, ""
+    if not any(goal_planner.is_compound(g) for g in goal_list):
+        return goal_list, ""
+    _clicky = ConstrainedJudge._CLICK_ROLES
+    labels = [e.name for e in (elements or []) if e.role in _clicky and (e.name or "").strip()]
+    if not labels:
+        return goal_list, ""
+    out, notes = [], []
+    for g in goal_list:
+        exp = goal_planner.expand(g, labels)
+        if len(exp) > 1:
+            notes.append(f"'{g[:40]}' -> " + " THEN ".join(exp))
+        out.extend(exp)
+    return (out or goal_list), "; ".join(notes)
+
+
 def operate_app(app_name: str, goals, allow_destructive: bool = False,
                 capsule_cb=None, cursor_cb=None, max_steps_per_goal: int = 5,
                 expect_map: Optional[Dict[int, Dict[str, Any]]] = None, isolated: bool = False) -> Dict[str, Any]:
@@ -4452,9 +4625,31 @@ def operate_app(app_name: str, goals, allow_destructive: bool = False,
     # A minimized window is held parked off-screen by the loop for the whole run (laid out, never on a monitor,
     # focus untouched) and put back exactly as it was; a window the user can see is left exactly where it is.
     loop._last_window_mode = "not-needed"
+    # Jarvis honest substrate: PREFETCH what this app already remembers about this exact goal. A past plan is
+    # surfaced as a soft hint (the judge/verifier still decide every step); repeated past failures shift the
+    # tone to cautious. It never touches a verdict - it only says, truthfully, "I have done/failed this here".
+    _task_key = " / ".join(goal_list)
+    _outcome_hint = ""
+    try:
+        from core_organs import outcome_ledger as _ledger
+        _pf = _ledger.prefetch(app_name, _task_key)
+        if _pf.get("seen"):
+            if _pf.get("hint"):
+                _outcome_hint = _pf["hint"]
+            if _pf.get("caution"):
+                loop._launch_note = (loop._launch_note + "; " if loop._launch_note else "") + f"[memory] {_pf['caution']}"
+                try:
+                    capsule_cb("thinking", f"[{app_name}] {_pf['caution']}")
+                except Exception:  # noqa: BLE001
+                    pass
+            logger.info("[memory] %s / '%s': %s pass / %s fail (tone=%s)", app_name, _task_key[:40],
+                        _pf.get("successes"), _pf.get("failures"), _pf.get("tone"))
+    except Exception as _pf_exc:  # noqa: BLE001
+        logger.debug("[memory] prefetch skipped: %s", _pf_exc)
     result = loop.run(goal_list, app_name, max_steps_per_goal=max_steps_per_goal,
                       allow_destructive=allow_destructive, expect_map=expect_map)
     result["window_mode"] = loop._last_window_mode
+    result["memory_hint"] = _outcome_hint
     try:
         if result.get("completed"):
             ok, note = loop.distill_recipe(" / ".join(goal_list), app_name)
@@ -4468,6 +4663,23 @@ def operate_app(app_name: str, goals, allow_destructive: bool = False,
     result.update(goals=goal_list, launched=launched, hwnd=hwnd, launch_note=getattr(loop, "_launch_note", ""),
                   window_title=loop.grounding.window_title(hwnd) if hwnd else "",
                   elapsed_s=round(time.perf_counter() - t0, 2))
+    # RECORD the whole-task outcome (success AND failure) so the next run's prefetch is honest about it.
+    # Placed AFTER result.update: launch_note / elapsed_s only carry their final values there.
+    try:
+        from core_organs import outcome_ledger as _ledger2
+        _ok = bool(result.get("completed"))
+        _blk = ""
+        if not _ok:
+            _bi = result.get("blocked_at_goal")
+            _tail = (result.get("trace") or [])
+            _why = (_tail[-1].get("evidence") if isinstance(_tail[-1], dict) else getattr(_tail[-1], "evidence", "")) if _tail else ""
+            _blk = f"goal #{(_bi if _bi is not None else '?')}: {(_why or 'incomplete')[:120]}"
+        _ledger2.record(app_name, _task_key, ok=_ok,
+                        note=(result.get("launch_note") or "") if _ok else _blk,
+                        steps=int(result.get("steps") or 0),
+                        elapsed_s=float(result.get("elapsed_s") or 0))
+    except Exception as _rec_exc:  # noqa: BLE001
+        logger.debug("[memory] record skipped: %s", _rec_exc)
     return result
 
 
