@@ -422,6 +422,24 @@ class MessageClickProvider(Provider):
         return hin.post_click(ctx.root, cx, cy)
 
 
+class PixelRegroundProvider(Provider):
+    """A pixel-found element (OCR / vision, tier 'ocr'/'vision') in a NON-minimized window: the cached rect can be
+    stale after a reflow, so the target is RE-GROUNDED (live OCR re-match, else the window-relative rect mapped onto
+    the CURRENT window rect) and the posted click is verified by pixel change. A stale, ungroundable rect REFUSES -
+    it is never clicked blindly (no fake pass)."""
+    name = "pixel-reground"
+
+    def applies(self, ctx):
+        return (ctx.verb == "click" and bool(ctx.root)
+                and getattr(ctx.elem, "tier", "") in ("ocr", "vision")
+                and not hin.is_minimized(ctx.root))
+
+    def act(self, ctx):
+        from core_organs import ocr_ground
+        rel = getattr(ctx.elem, "rel", None)
+        return ocr_ground.pixel_click(ctx.root, getattr(ctx.elem, "name", "") or "", rel)
+
+
 class ParkedPixelProvider(Provider):
     """A pixel-found element (OCR / vision) in a MINIMIZED window: its screen coordinates only mean something while the window is laid out, so
     the click is delivered while the window is parked off-screen (the rect the capture used), then it is re-minimized. Never a visible restore."""
@@ -463,11 +481,11 @@ CELL_CONFIRM_KEY = "enter"
 
 # family -> ordered provider names. DATA: a new family or a new order is a table edit, not code in the loop.
 LADDERS: Dict[str, List[str]] = {
-    "win32":    ["key", "scroll", "text-append", "cell-edit", "uia-pattern", "parked-pixel", "message-click", "text-post"],
-    "winui":    ["key", "uia-scroll", "scroll", "text-append", "cell-edit", "uia-pattern", "parked-pixel", "message-click", "text-post"],
+    "win32":    ["key", "scroll", "text-append", "cell-edit", "uia-pattern", "parked-pixel", "pixel-reground", "message-click", "text-post"],
+    "winui":    ["key", "uia-scroll", "scroll", "text-append", "cell-edit", "uia-pattern", "parked-pixel", "pixel-reground", "message-click", "text-post"],
     # a Chromium page has no per-element HWND: posted characters / clicks into the frame are never meaningful there, and after a SetValue that the
     # page applies late they DOUBLE the text (measured on a tray-parked app). The chain ends at the page's own patterns, honestly.
-    "chromium": ["key", "uia-scroll", "scroll", "chromium", "parked-pixel"],
+    "chromium": ["key", "uia-scroll", "scroll", "chromium", "parked-pixel", "pixel-reground"],
 }
 
 
@@ -475,7 +493,7 @@ class DAPActuator:
     def __init__(self) -> None:
         self.providers: Dict[str, Provider] = {p.name: p for p in
                                                (KeyProvider(), ScrollProvider(), UIAScrollProvider(), TextAppendProvider(), CellEditProvider(), UIAPatternProvider(), ChromiumProvider(),
-                                                ParkedPixelProvider(), MessageClickProvider(), TextPostProvider())}
+                                                ParkedPixelProvider(), PixelRegroundProvider(), MessageClickProvider(), TextPostProvider())}
         self.last_trace: List[Dict[str, Any]] = []
         self.stats: Dict[str, Dict[str, int]] = {}
         self._lock = threading.Lock()
@@ -520,7 +538,7 @@ class DAPActuator:
                 self.last_trace = trace
                 return r
             last_fail = r
-            if name in ("text-post", "message-click", "parked-pixel") and verb in ("click", "type"):
+            if name in ("text-post", "message-click", "parked-pixel", "pixel-reground") and verb in ("click", "type"):
                 break                                               # the last honest answer of a message rung is final
         self.last_trace = trace
         if last_fail is not None:

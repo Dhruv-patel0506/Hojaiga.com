@@ -298,6 +298,29 @@ def top_level_titles(visible_only: bool = True) -> List[Tuple[int, str]]:
     return out
 
 
+def user_main_windows(app_sub: str = "") -> List[Tuple[int, str]]:
+    """[(hwnd, title)] for windows a PERSON is actually using: titled, SHOWN or MINIMIZED, and not a window this
+    process created itself. Pass `app_sub` to keep only matches of its title or window class.
+
+    Measured 2026-10-06: KC1 and PAINT1 were both ENV-BLOCKED as "the user's Notepad/Paint window is open; not
+    touched" while the only thing on the desktop matching those words was `GDI+ Window (Notepad.exe)` /
+    `GDI+ Window (mspaint.exe)` - hidden (neither IsWindowVisible nor IsIconic) GDI+ hook windows that every GDI+
+    app creates and that a person can never see, use or close. Enumerating with visible_only=False therefore
+    blocked tests on a phantom for the whole run. A live process with no window is not "the user's window" either,
+    which is why this must never be answered by a process-name check.
+    """
+    from core_organs import background_window as bw
+    sub = (app_sub or "").lower()
+    out: List[Tuple[int, str]] = []
+    for h, t in top_level_titles(True):
+        if bw.is_ours(h):                                    # ours = a harness leak to reclaim, not the user's
+            continue
+        if sub and sub not in t.lower() and sub not in _class_name(h).lower():
+            continue
+        out.append((h, t))
+    return out
+
+
 BM_CLICK = 0x00F5
 GWL_STYLE = -16
 # BS_PUSHBUTTON, BS_DEFPUSHBUTTON, BS_COMMANDLINK, BS_DEFCOMMANDLINK: the button kinds that ANSWER a dialog (check

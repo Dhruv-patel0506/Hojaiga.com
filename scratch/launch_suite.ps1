@@ -10,8 +10,13 @@ param(
 $env:PYTHONPATH = 'D:\new_automation;D:\new_automation\All codes'
 $env:HOJAIGA_TEST_TIMEOUT_S = $TimeoutS
 
+# 'ALL' runs every registered test: --only writes a _partial results file, and the owed proof is a
+# complete run of the whole suite appended to the normal log.
+$argList = @('-X', 'utf8', '-u', 'run_system_intelligence_tests.py', '--e2e')
+if ($TestIds -ne 'ALL') { $argList += @('--only', $TestIds) }
+
 $proc = Start-Process -FilePath 'D:\new_automation\hojaiga_env\Scripts\python.exe' `
-    -ArgumentList @('-X', 'utf8', '-u', 'run_system_intelligence_tests.py', '--e2e', '--only', $TestIds) `
+    -ArgumentList $argList `
     -WorkingDirectory 'D:\new_automation\All codes\core_organs' `
     -NoNewWindow `
     -RedirectStandardOutput "D:\new_automation\_$Tag.out" `

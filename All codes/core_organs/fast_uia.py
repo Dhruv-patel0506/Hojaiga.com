@@ -47,19 +47,41 @@ P_ACCESSKEY = 30007
 P_TOGGLE_STATE = 30086          # ToggleToggleState: 0 off, 1 on, 2 indeterminate
 
 _cache_request = None
+_cheap_request = None
+_timeout_supported: Optional[bool] = None    # None = not probed yet; False = this build has no IUIAutomation6
 _DEFAULT_TIMEOUT_MS = int(__import__("os").environ.get("HOJAIGA_UIA_TIMEOUT_MS", "12000"))
+# The cheap rung's property set: only what decides the SHAPE of the tree. Everything else (help text, accelerator,
+# pattern availability, expand/toggle/select state) costs provider work per node and is not what a first-contact
+# depth/count measurement needs.
+CHEAP_PROPS = (P_RECT, P_CTYPE, P_NAME, P_AID, P_CLASS)
 
 
-def _set_timeout(ms: int) -> None:
+def _set_timeout(ms: int) -> bool:
     """Cap how long ONE UIA transaction may take (IUIAutomation6, Windows 10+). Without it a single
-    slow provider (a print-preview control inside a Win32 dialog took 65 s) stalls the whole scan."""
+    slow provider (a print-preview control inside a Win32 dialog took 65 s) stalls the whole scan.
+
+    RETURNS whether the cap is actually in force, and that answer matters: MEASURED 2026-10-06 on this machine
+    `QueryInterface(IUIAutomation6)` raises COMError 'No such interface supported', so on this build this function
+    is a NO-OP - every `timeout_ms=` a caller passes (dialogs use 3000, universal_scan's ready loop 6000) buys
+    nothing, and the only real rail is the caller's own wall clock. That is why a scan told to finish in 10 s
+    measured 94 s while honestly printing stopped='budget': the phases waited on constants (a 12 s menu wait,
+    a 20 s start-screen wait, a 30 s E1 budget) that no one had derived from the budget."""
+    global _timeout_supported
     try:
         iua, core, _ = _client()
         iua6 = iua.QueryInterface(core.IUIAutomation6)
         iua6.TransactionTimeout = int(ms)
         iua6.ConnectionTimeout = min(int(ms), 4000)
-    except Exception:
-        pass
+        if _timeout_supported is not True:
+            logger.info("[fast_uia] UIA transaction timeout IS in force (IUIAutomation6 available)")
+        _timeout_supported = True
+        return True
+    except Exception as exc:
+        if _timeout_supported is not False:
+            logger.warning("[fast_uia] no UIA transaction timeout on this build (%s): timeout_ms does not bound "
+                           "a call, only the caller's wall clock does", type(exc).__name__)
+        _timeout_supported = False
+        return False
 
 
 def _client():
@@ -68,8 +90,28 @@ def _client():
     return cl.IUIAutomation, cl.UIAutomationCore, ua
 
 
-def _request():
-    global _cache_request
+def _request(cheap: bool = False):
+    """The cached UIA cache request. `cheap=True` builds the FALLBACK rung: the control view (which hides the
+    panes/groups/custom containers the raw view walks) and only the properties that decide the tree's shape.
+    One slow provider can make the full raw-view build cost more than the scan's whole budget - the cheap rung is
+    what lets a scan still answer 'how deep and how rich is this window' inside the time it was given."""
+    global _cache_request, _cheap_request
+    if cheap:
+        if _cheap_request is None:
+            iua, core, _ = _client()
+            cr = iua.CreateCacheRequest()
+            for pid in CHEAP_PROPS:
+                try:
+                    cr.AddProperty(pid)
+                except Exception:
+                    continue
+            cr.TreeScope = core.TreeScope_Subtree
+            try:
+                cr.TreeFilter = iua.ControlViewCondition
+            except Exception:
+                cr.TreeFilter = iua.RawViewCondition
+            _cheap_request = cr
+        return _cheap_request
     if _cache_request is None:
         iua, core, _ = _client()
         cr = iua.CreateCacheRequest()
@@ -176,19 +218,22 @@ def _flatten(cached_root, max_nodes: int) -> List[Node]:
     return nodes
 
 
-def snapshot(hwnd: int, max_nodes: int = 20000, timeout_ms: Optional[int] = None) -> Optional[List[Node]]:
+def snapshot(hwnd: int, max_nodes: int = 20000, timeout_ms: Optional[int] = None,
+             cheap: bool = False) -> Optional[List[Node]]:
     """Whole-window subtree in one call, bounded by `timeout_ms` (default 12 s; pass ~3000 for
-    dialogs and popups). None on any failure or timeout (caller falls back / reports skipped)."""
+    dialogs and popups). None on any failure or timeout (caller falls back / reports skipped).
+    `cheap=True` asks for the control-view rung (see `_request`) - fewer nodes and far less provider work, so a
+    caller that is running to a time budget can still get an honest tree after the full rung timed out."""
     try:
         iua, _, _ = _client()
         _set_timeout(timeout_ms or _DEFAULT_TIMEOUT_MS)
         try:
-            root = iua.ElementFromHandleBuildCache(hwnd, _request())
+            root = iua.ElementFromHandleBuildCache(hwnd, _request(cheap))
             return _flatten(root, max_nodes)
         finally:
             _set_timeout(_DEFAULT_TIMEOUT_MS)
     except Exception as exc:
-        logger.debug("[fast_uia] snapshot(%s) failed: %s", hwnd, exc)
+        logger.debug("[fast_uia] snapshot(%s, cheap=%s) failed: %s", hwnd, cheap, exc)
         return None
 
 

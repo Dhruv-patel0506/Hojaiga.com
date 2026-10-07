@@ -410,6 +410,35 @@ def _record_session_action(action_type: str, app: str, details: str = ""):
     _current_session_actions.append(entry)
     logger.info(f"[SESSION_ACTION] {entry}")
 
+
+def _xrun_record_operate_result(app_name: str, result: Dict[str, Any]):
+    """Cross-run learning attach: feed the VERIFIED operate_app trace into AppKnowledgeManager
+    so organ_knowledge_manager.record_action_success/failure (previously dead code) actually
+    accumulates per-app action reliability across runs. The manager only persists against a
+    profile that already exists (deep-scan save_knowledge), so this is a pure add on learned
+    apps and a no-op elsewhere. Guard-wrapped and toggled off with HOJAIGA_XRUN_RECORD=0 - a
+    recording problem can NEVER alter the actuation result the caller already produced."""
+    if os.environ.get("HOJAIGA_XRUN_RECORD", "1") == "0":
+        return
+    try:
+        from core_organs.organ_knowledge_manager import AppKnowledgeManager
+        km = AppKnowledgeManager.get_instance()
+        success_verdicts = {"ok", "success", "succeeded", "done", "verified", "true", "pass", "passed"}
+        fail_markers = ("fail", "error", "denied", "timeout", "unable", "blocked", "refused", "not-visible")
+        for t in (result.get("trace") or []):
+            verb = str(t.get("verb", "")).strip()
+            element = str(t.get("element", "")).strip()
+            verdict = str(t.get("verdict", "")).lower()
+            if not verb:
+                continue
+            if verdict in success_verdicts:
+                km.record_action_success(app_name, verb, element)
+            elif any(m in verdict for m in fail_markers):
+                km.record_action_failure(app_name, verb, element, verdict)
+    except Exception as _xr:  # noqa: BLE001 - never alter actuation on a recording hiccup
+        logger.debug(f"[XRUN] cross-run record skipped: {type(_xr).__name__}: {_xr}")
+
+
 def _canvas_session(hwnd: int):
     """Hold a background_window session on a MINIMIZED drawing target for the duration of one drawing call: the
     window is restored OFF-SCREEN (laid out, never on a monitor, never activated) and put back minimized after.
@@ -941,6 +970,48 @@ def _is_site_like_target(alias: str) -> bool:
     return " " not in a and a.replace(".", "").isalpha() and a not in non_destinations
 
 
+def _organ36_backup_compile(command: str) -> Optional[Dict[str, Any]]:
+    """organ_36 enhancement backup: when the primary organ_36_workflow_compiler kernel
+    fails outright, fall back to the standalone EnhancedTaskCompiler (checkpoint-based)
+    so the task still gets a usable sequential plan instead of a bare success:False.
+
+    Additive + guard-wrapped, toggled off with HOJAIGA_COMPILE_BACKUP=0. Returns a dict in
+    the same contract shape the caller expects, or None when the backup is itself unavailable
+    (the caller then returns today's success:False unchanged - a run can NEVER be broken by this)."""
+    try:
+        from core_organs.organ_36_enhanced_compiler import compile_enhanced_task
+        plan = compile_enhanced_task(command)
+        steps: list = []
+        n = 1
+        for cp in getattr(plan, "checkpoints", []) or []:
+            steps.append({
+                "id": f"backup_{n}_{getattr(cp, 'id', n)}",
+                "type": "TASK",
+                "capability": "DESKTOP.GENERAL_EXECUTION",
+                "parameters": {
+                    "command": command,
+                    "checkpoint": getattr(cp, "name", ""),
+                    "description": getattr(cp, "description", ""),
+                },
+            })
+            n += 1
+        if not steps:
+            return None
+        logger.info(f"[ORGAN_36][backup] EnhancedTaskCompiler produced {len(steps)} checkpoint steps")
+        return {
+            "success": True,
+            "steps": steps,
+            "expression": "",
+            "detected_apps": [],
+            "app_spans": [],
+            "web_targets": [],
+            "source": "organ36_backup",
+        }
+    except Exception as be:  # noqa: BLE001 - backup failure must never be fatal
+        logger.warning(f"[ORGAN_36][backup] enhanced compiler unavailable: {type(be).__name__}: {be}")
+        return None
+
+
 def _compile_task_with_organ36(command: str) -> Dict[str, Any]:
     """Compile raw user command into structured sequential phases dynamically using Organ 36 Workflow Compiler."""
     try:
@@ -1101,6 +1172,13 @@ def _compile_task_with_organ36(command: str) -> Dict[str, Any]:
         }
     except Exception as e:
         logger.warning(f"[ORGAN_36] Compilation note: {e}")
+        # Primary workflow compiler failed outright -> try the organ_36 enhanced backup
+        # before conceding. Toggled off with HOJAIGA_COMPILE_BACKUP=0; a backup that also
+        # fails just falls through to today's honest success:False (never a fake plan).
+        if os.environ.get("HOJAIGA_COMPILE_BACKUP", "1") != "0":
+            _bk = _organ36_backup_compile(command)
+            if _bk:
+                return _bk
         return {"success": False, "steps": [], "expression": "", "detected_apps": [], "app_spans": []}
 
 
@@ -2777,6 +2855,7 @@ if _HAS_CREWAI:
             # shared with the E2E suite (so the suite proves exactly what this tool runs).
             result = operate_app(app_name, goals, allow_destructive=allow_destructive,
                                  capsule_cb=_capsule, cursor_cb=_cursor)
+            _xrun_record_operate_result(app_name, result)  # cross-run learning attach (HOJAIGA_XRUN_RECORD)
             lines = []
             for t in result.get("trace", [])[-12:]:
                 lines.append(f"  {t['verb']:>9} '{t['element'][:30]}' -> {t['verdict']} ({t['method']})")
@@ -4005,6 +4084,39 @@ if _HAS_CREWAI:
             if notes:
                 output_lines.append(f"AUTOMATION NOTES: {notes}")
 
+            # CAPABILITY CARD (tiered scan, the any-app contract): what is MEASURED about this app right
+            # now — surface, map, learned routes, blind spots and the honest verdict. Never a promise:
+            # the verdict is computed from stored rows by capability_card, and every action still needs
+            # its own verified postcondition.
+            card = result.get("capability") or {}
+            if card and not card.get("error"):
+                try:
+                    kn = card.get("knowledge") or {}
+                    mp = card.get("map") or {}
+                    surf = card.get("surface") or {}
+                    learn = card.get("learn") or {}
+                    output_lines.append("")
+                    output_lines.append("CAPABILITY CARD (measured, not promised):")
+                    output_lines.append(f"  VERDICT: {card.get('verdict')} | surface: {surf.get('surface', 'unknown')} "
+                                        f"| posted-mouse: {surf.get('posted_mouse_expectation', 'unknown')} "
+                                        f"| learning: {learn.get('status', 'none')}")
+                    output_lines.append(f"  KNOWN: {kn.get('commands', 0)} commands ({kn.get('commands_learned', 0)} learned), "
+                                        f"{kn.get('regions', 0)} regions, {kn.get('transitions', 0)} transitions; "
+                                        f"map: {mp.get('nodes', '?')} nodes ({mp.get('walk_rung', '?')})"
+                                        + (f", +{mp.get('revealed')} revealed by scroll" if mp.get("revealed") else ""))
+                    learned_rows = [r for r in (card.get("can_do") or []) if r.get("trust") == "learned"][:8]
+                    for r in learned_rows:
+                        route = r.get("route") or r.get("key") or r.get("verb", "invoke")
+                        effect = r.get("opens") or r.get("effect") or ""
+                        output_lines.append(f"  CAN DO (learned): '{r.get('name')}' via {route} {effect}".rstrip())
+                    for b in (card.get("blind") or [])[:3]:
+                        output_lines.append(f"  BLIND: {b.get('what')} — {str(b.get('why', ''))[:90]}; fallback: {str(b.get('fallback', ''))[:70]}")
+                    for uq in (card.get("unknowns") or [])[:2]:
+                        output_lines.append(f"  UNKNOWN: {uq}")
+                    output_lines.append("  Act on VERIFIED commands first; unknowns must be verified by postcondition as you go.")
+                except Exception as card_err:  # noqa: BLE001
+                    logger.debug(f"[SCAN] capability card render failed: {card_err}")
+
             # Add directive for LLM to use exact names from scan
             output_lines.append("")
             output_lines.append("=" * 60)
@@ -4411,6 +4523,28 @@ class CrewAIEngine:
                 "engine": "crewai",
                 "loop_first": loop_first_result.as_dict(),
             }
+
+        # ---- C.2 honest speed: a goal the VERIFIED autonomy loop just COMPLETED (every step judged by a
+        # postcondition verifier, not a language model) is worth remembering, so the next identical goal is a
+        # zero-LLM replay. We cache ONLY a clean, fully-mapped click/press trace whose every step PASSED
+        # (brain_router.plan_from_verified_trace returns None on anything ambiguous - type/launch/scroll/unverified)
+        # so a cached plan can NEVER turn a future run into an unverified fake pass; a stale plan simply declines
+        # on replay and falls back to the 7B. Fail-safe: a cache hiccup must never alter the run. ----
+        try:
+            if (loop_first_result is not None and loop_first_result.all_completed and not is_multi_app
+                    and len(detected_apps) == 1 and not (is_draw_task or is_teaching_task or is_lead_task)
+                    and os.environ.get("HOJAIGA_BRAIN_ROUTER", "1") != "0"):
+                from core_organs import brain_router as _brc, organ_48_app_behavior_model as _bmc
+                _run0 = (loop_first_result.runs or [None])[0]
+                _trace = ((_run0.result or {}).get("trace") if _run0 is not None else None) or []
+                _plan = _brc.plan_from_verified_trace(_trace)
+                if _plan:
+                    _ckey = _bmc._app_key(detected_apps[0])
+                    _bmc.get_model().store_plan(_ckey, _brc.fingerprint(command), command, _plan, verified=True)
+                    logger.info("[C.2] cached a verified replayable plan for '%s' (%d steps) - a repeat is now zero-LLM",
+                                command[:60], len(_plan))
+        except Exception as _cp_err:  # noqa: BLE001 - harvesting a cache must never change a real run
+            logger.debug("[C.2] plan-cache harvest skipped (run unaffected): %s", _cp_err)
 
         # Instantiate Autonomous Agents — dynamically tailored tools to fit local context limits comfortably
         if is_draw_task:
@@ -4884,7 +5018,55 @@ class CrewAIEngine:
             _q_ledger = None
             logger.debug("[quality] ledger unavailable (retry behaves exactly as before): %s", _ql_err)
 
+        # ---- BRAIN ROUTER (plan section C): before ANY 7B step, try the cheap rails. A goal that matches a
+        # LEARNED route in the capability card, or a previously VERIFIED plan, is replayed through the SAME
+        # tools with zero big-model calls; everything else falls through to the CrewAI loop untouched. It only
+        # engages when it can PROVE the answer and a failed replay is handed back to the 7B (never faked). ----
+        _router_handled = False
+        if os.environ.get("HOJAIGA_BRAIN_ROUTER", "1") != "0":
+            try:
+                from core_organs import brain_router as _br, capability_card as _cc
+                from core_organs import organ_48_app_behavior_model as _bmr
+                _rapp = ((detected_apps[0] if detected_apps else "")
+                         or _last_launched_app.get("app_name", "") or "")
+                if _rapp and not is_multi_app and not is_draw_task and not is_teaching_task and not is_lead_task:
+                    _rkey = _bmr._app_key(_rapp)
+                    _rmodel = _bmr.get_model()
+                    _rcard = _cc.build_card(_rapp, int(_last_launched_app.get("hwnd") or 0), model=_rmodel)
+                    _rtools = {
+                        "click_button_by_name": click_button_by_name_tool,
+                        "press_key": press_key_tool,
+                        "type_text": type_text_tool,
+                        "switch_to_app": switch_to_app_tool,
+                        "visual_click": visual_click_tool,
+                    }
+                    _fp = _br.fast_path(command, app_key=_rkey, model=_rmodel, card=_rcard, tools=_rtools)
+                    if _fp.get("handled"):
+                        _router_handled = True
+                        for _st in _fp.get("steps") or []:
+                            _record_session_action(_st.get("tool", "ACTION").upper(), _rapp, _st.get("obs", "")[:200])
+                        # HONEST BASIS: brain_router.replay hard-declines any step the actuator reports as
+                        # error/refused/undeliverable/ineffective/no-effect, so a handled fast path means every
+                        # step self-reported a real EFFECT (the actuator's own postcondition). It is NOT an
+                        # independent judge re-confirming the goal, so the wording says exactly what was verified
+                        # rather than claiming "all postconditions met".
+                        result_str = (f"SUCCESS (Fast path / {_fp.get('tier')}): replayed verified app knowledge with "
+                                      f"{int(_fp.get('brain_calls') or 0)} big-model calls; every step reported an effect "
+                                      f"(actuator postcondition; not an independent goal re-judgement). "
+                                      + "; ".join(f"{s['tool']}:{s['obs'][:120]}" for s in (_fp.get('steps') or [])))
+                        logger.info("[BRAIN ROUTER] handled '%s' via %s (%s big-model calls) - CrewAI skipped",
+                                    command[:60], _fp.get("tier"), _fp.get("brain_calls"))
+                        if _q_ledger is not None:
+                            try:
+                                _q_ledger.record(1, 1, f"fast path ({_fp.get('tier')}): every step reported an effect; not independently goal-judged")
+                            except Exception:
+                                pass
+            except Exception as _br_err:  # noqa: BLE001 - the router must never break a run; fall through to the 7B
+                logger.debug("[BRAIN ROUTER] fast path skipped (falls through to CrewAI unchanged): %s", _br_err)
+
         for attempt in range(1, MAX_RETRIES + 1):
+            if _router_handled:
+                break                                               # zero 7B calls; result_str already set honestly
             logger.info(f"[CrewAI] === ATTEMPT {attempt}/{MAX_RETRIES} for task {task_id} ===")
             if attempt > 1:
                 logger.info(f"[CrewAI] Retry context: {failure_reason[:200]}")

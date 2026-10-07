@@ -62,6 +62,12 @@ CLI_HARVEST_TIMEOUT_S = float(os.environ.get("HOJAIGA_CLI_HARVEST_TIMEOUT_S", "2
 # scanner observes BEFORE and AFTER every probe, so an unbounded observation is what turns a bounded probe
 # count into an unbounded scan.
 OBSERVE_BUDGET_S = float(os.environ.get("HOJAIGA_OBSERVE_BUDGET_S", "8"))
+# An effect is not instantaneous. Apps build a Save As box on their own schedule (measured 2026-10-06: the
+# dialog a packaged Notepad had just been asked for appeared 2-3 s later), and a postcondition read the moment
+# the act returns says "nothing happened" about something already on its way. The step gets a bounded window
+# to SHOW its effect; when the window closes with nothing observed, that is the honest FAIL.
+POST_PATIENCE_S = float(os.environ.get("HOJAIGA_POST_PATIENCE_S", "5"))
+POST_RECHECK_S = 0.6
 
 TRUST_RANK = {"learned": 4, "catalog": 3, "archetype": 2, "distilled": 1}
 PACK_MAX_TRUST = {"catalog", "archetype", "distilled"}      # packs can never self-declare learned
@@ -106,6 +112,12 @@ CREATE TABLE IF NOT EXISTS bm_queue (
 CREATE TABLE IF NOT EXISTS bm_audit (
     aid INTEGER PRIMARY KEY AUTOINCREMENT, ts REAL, run_id TEXT, app_key TEXT,
     kind TEXT, subject TEXT, decision TEXT, reason TEXT, evidence TEXT);
+CREATE TABLE IF NOT EXISTS bm_learn_state (
+    app_key TEXT PRIMARY KEY, version_hash TEXT, status TEXT,
+    started_ts REAL, updated_ts REAL, budget_s REAL, stats_json TEXT);
+CREATE TABLE IF NOT EXISTS bm_plans (
+    app_key TEXT, fingerprint TEXT, goal TEXT, plan_json TEXT,
+    verified INTEGER, hits INTEGER, ts REAL, PRIMARY KEY (app_key, fingerprint));
 """
 
 
@@ -933,6 +945,57 @@ class BehaviorModel:
     def regions(self, app_key: str) -> List[Dict[str, Any]]:
         return [dict(r) for r in self._conn.execute(
             "SELECT region_id, title, via, n_elements FROM bm_ui_regions WHERE app_key=? ORDER BY ts DESC", (app_key,))]
+
+    # ---- background learning state (scan_learner): pending | learning | complete | partial | failed:<why> ----
+    def set_learn_state(self, app_key: str, version_hash: str, status: str, *,
+                        budget_s: float = 0.0, stats: Optional[Dict[str, Any]] = None) -> None:
+        """Upsert the learning state for one app. `started_ts` survives updates (first write wins);
+        an empty version_hash keeps the stored one (so mid-run updates don't blank it)."""
+        now = time.time()
+        row = self._conn.execute("SELECT started_ts, version_hash FROM bm_learn_state WHERE app_key=?",
+                                 (app_key,)).fetchone()
+        started = row["started_ts"] if row and status != "pending" else now
+        vh = version_hash or (row["version_hash"] if row else "")
+        self._conn.execute(
+            "INSERT OR REPLACE INTO bm_learn_state(app_key, version_hash, status, started_ts, updated_ts, budget_s, stats_json)"
+            " VALUES (?,?,?,?,?,?,?)",
+            (app_key, vh, status, started, now, budget_s, json.dumps(stats or {})[:6000]))
+        self._conn.commit()
+
+    def get_learn_state(self, app_key: str) -> Optional[Dict[str, Any]]:
+        row = self._conn.execute("SELECT * FROM bm_learn_state WHERE app_key=?", (app_key,)).fetchone()
+        return dict(row) if row else None
+
+    # ---- plan cache (brain_router): (app_key, goal fingerprint) -> verified tool-call sequence ----
+    def store_plan(self, app_key: str, fingerprint: str, goal: str, plan: List[Dict[str, Any]],
+                   *, verified: bool) -> None:
+        """Persist a goal->plan under its fingerprint. A plan is stored whether verified or not, but a
+        lookup only REPLAYS a verified one; re-storing a verified plan on a hit keeps it fresh and counts hits."""
+        now = time.time()
+        row = self._conn.execute(
+            "SELECT verified, hits FROM bm_plans WHERE app_key=? AND fingerprint=?",
+            (app_key, fingerprint)).fetchone()
+        hits = (int(row["hits"]) if row else 0) + 1
+        # once verified, stays verified; a newer verification overwrites an unverified draft
+        keep = bool(verified or (row and row["verified"]))
+        self._conn.execute(
+            "INSERT OR REPLACE INTO bm_plans(app_key, fingerprint, goal, plan_json, verified, hits, ts)"
+            " VALUES (?,?,?,?,?,?,?)",
+            (app_key, fingerprint, (goal or "")[:300], json.dumps(plan or [])[:8000], int(keep), hits, now))
+        self._conn.commit()
+
+    def lookup_plan(self, app_key: str, fingerprint: str) -> Optional[Dict[str, Any]]:
+        """A stored, VERIFIED plan for this fingerprint, or None. Unverified drafts are never replayed."""
+        row = self._conn.execute(
+            "SELECT * FROM bm_plans WHERE app_key=? AND fingerprint=? AND verified=1",
+            (app_key, fingerprint)).fetchone()
+        if not row:
+            return None
+        try:
+            plan = json.loads(row["plan_json"] or "[]")
+        except Exception:  # noqa: BLE001
+            return None
+        return {"goal": row["goal"], "plan": plan, "hits": row["hits"], "ts": row["ts"]}
 
     # ---- state machine: modes + transitions --------------------------------------
     def modes(self, app_key: str) -> Dict[str, List[dict]]:
@@ -2368,8 +2431,17 @@ class EffectorLadder:
             ok, note = self.loop.handle_native_file_dialog(str(action.get("path", "")),
                                                             owner_hwnd=int(hwnd or 0))
             return bool(ok), "file_dialog", note
-        order = [e for e in self.model.effector_order(app_key, verb, self.DEFAULTS.get(verb, ["key"]))
-                 if e not in avoid] or list(self.DEFAULTS.get(verb, ["key"]))
+        base = self.model.effector_order(app_key, verb, self.DEFAULTS.get(verb, ["key"]))
+        order = [e for e in base if e not in avoid]
+        if not order and avoid:
+            # Rotation ate the probed list. A structural probe may legitimately drop the Win32 rungs for a XAML
+            # host, and then the step's next attempt filtered out the one effector that is left - so the ladder
+            # re-ran THE EFFECTOR THAT HAD JUST DONE NOTHING, three times in a row (measured 2026-10-06: a chord
+            # step spent attempts 1/2/3 all on 'key', while DEFAULTS already promised 'menu_command', the rung that
+            # looks the chord up in E0 knowledge and invokes the app's own menu item). Widen back to the defaults
+            # MINUS what already failed; only when even that is exhausted repeat an effector.
+            order = [e for e in self.DEFAULTS.get(verb, ["key"]) if e not in avoid] \
+                or list(self.DEFAULTS.get(verb, ["key"]))
         # per-control capability probe (#5): a STRUCTURAL read (framework child classes, HMENU,
         # native-tree reach) informs the tier order - native tree first, pixel geometry last - and
         # if the whole ladder runs dry the WALL it records says so with the full trail, never a pass.
@@ -2723,6 +2795,28 @@ class TemplateRunner:
             last = sig
             time.sleep(0.1)
 
+    def _judge(self, post: List[Dict[str, Any]], before, hwnd: int, params: Dict[str, Any],
+               key: str, tpl: TemplateMatch) -> Tuple[Any, float, "ObservedState"]:
+        """Evaluate a postcondition with PATIENCE: re-perceive until it holds or the window closes.
+
+        The verdict is not softened by the wait - it is the same assertion, just read again - and the time paid
+        is written into the evidence, so a log shows whether a step passed instantly or after 2 s of waiting.
+        A step whose effect never arrives still FAILS, only after being given its chance."""
+        t0 = time.time()
+        waited = 0.0
+        while True:
+            after = observe(hwnd, grounding=self.g, want_ocr=needs_ocr(post),
+                            want_region=needs_region(post))
+            after.mode = self.model.current_mode([key, tpl.app_key], after)
+            ev = evaluate(post, before, after, params)
+            waited = time.time() - t0
+            if ev.verdict != "FAIL" or waited >= POST_PATIENCE_S:
+                break
+            time.sleep(min(POST_RECHECK_S, max(0.05, POST_PATIENCE_S - waited)))
+        if waited > 1.0:
+            ev.evidence = list(ev.evidence) + [f"effect window: {waited:.1f}s"]
+        return ev, waited, after
+
     def run_leaf(self, app_name: str, hwnd_fn: Callable[[], int], tpl: TemplateMatch,
                  step: Dict[str, Any], params: Dict[str, Any], *, run_id: str,
                  allow_destructive: bool = False) -> LeafResult:
@@ -2745,12 +2839,25 @@ class TemplateRunner:
         retries = int(s.get("retries", 2))
         avoid: set = set()
         t_leaf = time.time()
+        start_popups: List[int] = []
         for attempt in range(1 + retries):
             res.attempts = attempt + 1
             hwnd = hwnd_fn()
             if not hwnd:
                 res.evidence = "app window not found"
                 continue
+            if attempt:
+                # A retry must begin where the leaf began. An attempt that opened its dialog and then failed on
+                # something else leaves that dialog on screen, and the NEXT attempt's `before` state already
+                # contains it - so window_opened diffs to nothing and the step can never pass: the retry poisons
+                # itself (observed 2026-10-06). Closing what this leaf added is also the constitution's unwind.
+                try:
+                    if [w for w in _popups(hwnd) if w not in start_popups]:
+                        _close_new_windows(hwnd, start_popups)
+                except Exception:  # noqa: BLE001 - an unwind failure must not stop the retry itself
+                    pass
+            else:
+                start_popups = list(_popups(hwnd))
             pre = s.get("pre") or []
             st = observe(hwnd, grounding=self.g, want_ocr=needs_ocr(pre) or needs_ocr(post),
                          want_region=needs_region(post))
@@ -2796,10 +2903,7 @@ class TemplateRunner:
                     break
                 self._settle(hwnd)
             else:
-                after = observe(hwnd, grounding=self.g, want_ocr=needs_ocr(post),
-                                want_region=needs_region(post))
-                after.mode = self.model.current_mode([key, tpl.app_key], after)
-                ev = evaluate(post, before, after, params)
+                ev, _waited, after = self._judge(post, before, hwnd, params, key, tpl)
                 res.effectors = did
                 res.evidence = ev.text()
                 effect_seen = ev.verdict == "PASS"

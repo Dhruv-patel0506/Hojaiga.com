@@ -1,0 +1,13 @@
+Hojaiga System Intelligence Suite — 2026-10-06 13:59:11
+
+[FAIL] TPL1 [AUTONOMY] TPL1: a task decomposed from DATA templates runs verified leaf-by-leaf on two unrelated apps
+    evidence: NameError: name 'after' is not defined
+    duration: 6574.8 ms  metrics: {'gdi_user_end': '1/9', 'gdi_growth': '+0/+7'}
+
+[FAIL] DAY1 [AUTONOMY] DAY1: unattended task-list day: never stalls the queue, report matches ground truth
+    evidence: report done=0 failed=4 escalated=0 in 24s; self-report==ground-truth: True; every task accounted for: True; failed reasons=[('T1 write note', "NameError: name 'after' is not defined"), ('T2 save drawing', "NameError: name 'after' is not defined"), ('T3 no such skill', 'no template for this task'), ('T4 3D chair (no 3D app here)', "blocked at leaf 'seat'")]
+    duration: 33543.4 ms  metrics: {'done': 0, 'failed': 4, 'escalated': 0, 'pointer': 'still drift=0px hw=0 inj=0', 'gdi_user_end': '5/9', 'proc': 'threads=32 handles=409 rss_mb=89', 'gdi_growth': '+4/+5'}
+
+
+RANKINGS
+1. Unattended task runs (templates + day report): 0/2 tests, score 0.0, avg 20059.1 ms

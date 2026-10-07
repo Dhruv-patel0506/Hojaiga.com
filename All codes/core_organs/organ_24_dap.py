@@ -124,6 +124,10 @@ r"""
 
 import asyncio
 from core_organs import headless_input as hin  # input guard + headless delivery
+try:
+    from core_organs import cef_devtools as CEF      # the Chromium/CEF route (backlog 2.4)
+except Exception:  # pragma: no cover - the provider degrades to "not reachable", never to a guess
+    CEF = None                                        # type: ignore
 import ctypes
 import dataclasses
 import enum
@@ -325,6 +329,12 @@ class DAPNode:
 
     vision_confidence: float = 0.0
     ocr_text: str = ""
+
+    # A Chromium page element: the DOM node this entry stands for. Page elements have no HWND of their own, so
+    # the box the PAGE reported (CSS px of its layout viewport) and its index in that snapshot are what an
+    # action needs -- see ChromiumDevToolsProvider.
+    dom_index: int = -1
+    css_center: Tuple[float, float] = (0.0, 0.0)
 
     def as_dict(self) -> dict:
         d = dataclasses.asdict(self)
@@ -821,6 +831,177 @@ class JavaAccessBridgeProvider(ProviderInterface):
         raise DAPError(DAPErrorCode.ERR_BACKGROUND_UNSUPPORTED, "Java Access Bridge not bundled")
 
 
+class ChromiumDevToolsProvider(ProviderInterface):
+    """Chromium / CEF / Electron / WebView2 pages, driven through the app's OWN DevTools endpoint (backlog 2.4).
+
+    A web page inside a desktop app is the one surface the HWND ladder cannot reach: it has no child windows, its
+    accessibility tree exists only after somebody asks for it, and a GPU-composited page can come back BLANK from a
+    GDI PrintWindow (the failure that gets mis-reported as "the app did not render"). The endpoint answers all of
+    it from inside the app: every usable element with the box the page itself reports, a click or keystroke
+    delivered THROUGH THE APP'S OWN INPUT PIPELINE -- so the physical pointer and keyboard are never touched and the
+    window never needs the foreground -- and a screenshot of what the compositor really drew.
+
+    Reach is honest and structural: an endpoint exists only when the app was started with a debugging port, so an
+    app without one gets no fake success here; it falls back to the UIA rung and then to OCR. Nothing consults an
+    application name: the test is a class name plus a loopback socket owned by that window's own process."""
+
+    name = "Chromium-CDP"
+    _CHROMIUM_CLASSES = ("chrome_widgetwin", "cefbrowserwindow", "chrome_render_widget_host_view")
+    _port_cache: Dict[int, Tuple[float, int]] = {}        # pid -> (checked_at, port)  0 = "no endpoint"
+    _sessions: Dict[int, Any] = {}                        # pid -> live DevTools session
+    PORT_TTL_S = 10.0
+
+    # -- reachability -------------------------------------------------------------
+    def looks_chromium(self, class_name: str) -> bool:
+        c = (class_name or "").lower()
+        return any(c.startswith(p) for p in self._CHROMIUM_CLASSES)
+
+    def port_for(self, pid: int) -> int:
+        """The DevTools port this process (or a child of it) serves; cached BOTH ways for PORT_TTL_S because
+        `resolve` runs for every window the tree walks."""
+        if not pid:
+            return 0
+        now = time.time()
+        hit = self._port_cache.get(pid)
+        if hit and now - hit[0] < self.PORT_TTL_S:
+            return hit[1]
+        port = 0
+        try:
+            from core_organs import cef_devtools
+            port = cef_devtools.devtools_port(pid)
+        except Exception:  # noqa: BLE001 - unreachability is an answer, not a crash
+            port = 0
+        self._port_cache[pid] = (now, port)
+        return port
+
+    def handles(self, class_name: str, hwnd: int) -> bool:
+        """This provider is asked for a window only when it is a Chromium surface AND its process serves a port.
+        The cheap class test runs first so ordinary Win32 windows never pay for a socket lookup. A DOM node keeps
+        the page's own CSS class in `class_name`, so fall back to what the HWND really is -- routing has to follow
+        the window, not whatever string the element happened to carry."""
+        c = class_name if self.looks_chromium(class_name) else WIN32.get_class_name(hwnd)
+        if not self.looks_chromium(c):
+            return False
+        return self.port_for(WIN32.get_process_thread(hwnd)[1]) > 0
+
+    def supports_hwnd(self, hwnd: int) -> bool:
+        return self.handles(WIN32.get_class_name(hwnd), hwnd)
+
+    # -- sessions -----------------------------------------------------------------
+    def session(self, hwnd: int):
+        """A live CDP session for this window's process, reconnecting once when the old socket died."""
+        pid = WIN32.get_process_thread(hwnd)[1]
+        if not pid:
+            return None
+        try:
+            from core_organs import cef_devtools
+        except Exception:  # noqa: BLE001
+            return None
+        sess = self._sessions.get(pid)
+        if sess is not None:
+            # Health check on the ONE channel that matters: can the page still answer? A socket the app closed
+            # during a reload stays 'open' and every later action would then fail as 'INEFFECTIVE'.
+            if sess.evaluate("1")[0]:
+                return sess
+            try:
+                sess.close()
+            except Exception:  # noqa: BLE001
+                pass
+            self._sessions.pop(pid, None)
+        port = self.port_for(pid)
+        if not port:
+            return None
+        try:
+            sess = cef_devtools.DevTools.attach(pid, timeout=6.0, hint_port=port)
+        except Exception:  # noqa: BLE001
+            return None
+        if sess:
+            self._sessions[pid] = sess
+        return sess
+
+    @classmethod
+    def close_all(cls) -> None:
+        for pid, sess in list(cls._sessions.items()):
+            try:
+                sess.close()
+            except Exception:  # noqa: BLE001
+                pass
+            cls._sessions.pop(pid, None)
+
+    # -- ProviderInterface --------------------------------------------------------
+    def build_node(self, hwnd: int, parent_id: Optional[str]) -> DAPNode:
+        base = Win32Provider().build_node(hwnd, parent_id)
+        base.framework_type = self.name
+        return base
+
+    def page_nodes(self, hwnd: int, parent_id: Optional[str] = None) -> List[DAPNode]:
+        """Every usable element of the page, as nodes whose bounds are SCREEN bounds (the page's CSS box mapped
+        through the window's own client rect) and which carry the DOM index the action needs."""
+        sess = self.session(hwnd)
+        if not sess:
+            return []
+        from core_organs import cef_devtools
+        snap = cef_devtools.page_elements(sess)
+        els = snap.get("elements") or []
+        if not els:
+            return []
+        m = cef_devtools.viewport_screen_map(hwnd, float(snap.get("vw") or 0), float(snap.get("vh") or 0))
+        nodes: List[DAPNode] = []
+        for e in els:
+            x0, y0 = cef_devtools.to_screen((e["x"] - e["w"] / 2, e["y"] - e["h"] / 2), m)
+            x1, y1 = cef_devtools.to_screen((e["x"] + e["w"] / 2, e["y"] + e["h"] / 2), m)
+            nodes.append(DAPNode(
+                node_id=str(uuid.uuid4()), parent_node_id=parent_id, hwnd=hwnd,
+                process_id=WIN32.get_process_thread(hwnd)[1], thread_id=WIN32.get_process_thread(hwnd)[0],
+                framework_type=self.name, bounds=Rect(x0, y0, x1, y1),
+                control_type=e.get("role") or e.get("tag") or "Element",
+                name=e.get("name") or "", class_name=e.get("cls") or "",
+                automation_id=e.get("id") or "", dom_index=int(e.get("idx", -1)),
+                css_center=(float(e["x"]), float(e["y"])),
+                ocr_text="", supports_background=True,
+            ))
+        return nodes
+
+    def invoke(self, node: DAPNode) -> bool:
+        """A click the APP delivers at the element's own box: no cursor moves, no foreground needed."""
+        if CEF is None:
+            raise DAPError(DAPErrorCode.ERR_BACKGROUND_UNSUPPORTED, "cef_devtools unavailable")
+        if node.dom_index < 0:
+            raise DAPError(DAPErrorCode.ERR_BACKGROUND_UNSUPPORTED,
+                            "Chromium node without a DOM index: re-enumerate the page")
+        sess = self.session(node.hwnd)
+        if not sess:
+            raise DAPError(DAPErrorCode.ERR_BACKGROUND_UNSUPPORTED, "DevTools endpoint closed")
+        return CEF.click_at(sess, node.css_center[0], node.css_center[1])
+
+    def set_value(self, node: DAPNode, text: str) -> bool:
+        if CEF is None:
+            raise DAPError(DAPErrorCode.ERR_BACKGROUND_UNSUPPORTED, "cef_devtools unavailable")
+        sess = self.session(node.hwnd)
+        if not sess:
+            raise DAPError(DAPErrorCode.ERR_BACKGROUND_UNSUPPORTED, "DevTools endpoint closed")
+        ok, _note = CEF.write_into(sess, {"idx": node.dom_index, "x": node.css_center[0],
+                                          "y": node.css_center[1]}, text)
+        return ok
+
+    def read_value(self, node: DAPNode) -> str:
+        if CEF is None:
+            return ""
+        sess = self.session(node.hwnd)
+        if not sess:
+            return ""
+        val = CEF.read_index(sess, node.dom_index)
+        return val or ""
+
+    def page_screenshot(self, hwnd: int) -> bytes:
+        """PNG bytes of what the page compositor drew -- the answer to a blank GDI capture, and it costs no GDI
+        handle at all. b"" when the app serves no endpoint (never a black square passed off as a render)."""
+        if CEF is None:
+            return b""
+        sess = self.session(hwnd)
+        return CEF.screenshot_png(sess) if sess else b""
+
+
 class ProviderRegistry:
     """Selects the correct provider driver for a given HWND / framework hint."""
 
@@ -828,11 +1009,17 @@ class ProviderRegistry:
         self.uia = UIAProvider()
         self.java = JavaAccessBridgeProvider()
         self.win32 = Win32Provider()
+        self.cef = ChromiumDevToolsProvider()
 
     def resolve(self, hwnd: int, class_name: str = "") -> ProviderInterface:
         java_classes = ("SunAwtFrame", "SunAwtDialog")
         if class_name in java_classes and self.java.enabled:
             return self.java
+        # A Chromium content window whose OWN process serves a DevTools endpoint is driven from inside the page;
+        # the class test keeps this off the hot path of every ordinary window, and the endpoint test (cached per
+        # process) is what actually decides. No application name is consulted at either step.
+        if self.cef.handles(class_name, hwnd):
+            return self.cef
         if self.uia.enabled:
             return self.uia
         return self.win32
@@ -896,6 +1083,16 @@ class WindowTree:
         if node:
             node.is_offscreen = True
             node.is_enabled = False
+
+    def add_page_nodes(self, nodes: List[DAPNode]) -> None:
+        """Register a Chromium page's DOM nodes so an action can resolve them by nodeId.
+
+        They share the FRAME's HWND, so the hwnd index deliberately keeps pointing at the frame: a lookup by hwnd
+        that started returning one arbitrary button would be a lie about the window."""
+        for n in nodes:
+            self._nodes[n.node_id] = n
+            if n.parent_node_id and n.parent_node_id in self._nodes:
+                self._nodes[n.parent_node_id].child_node_ids.append(n.node_id)
 
     def re_attach(self, node_id: str) -> Optional[DAPNode]:
         node = self._nodes.get(node_id)
@@ -2289,6 +2486,33 @@ class DAPRuntimeCore:
         self.window_tree.rescan(include_child_windows, process_filter)
         await self.state.transition(RuntimeState.READY)
         return [n.as_dict() for n in self.window_tree.nodes().values()]
+
+    # ---- Page.* domain: Chromium / CEF / Electron surfaces (backlog 2.4) ----------
+    async def page_enumerate(self, target: NodeTarget) -> List[dict]:
+        """Every usable element INSIDE a Chromium page, as addressable nodes.
+
+        A page has no HWNDs, so the window walk stops at its content widget and everything below it is invisible to
+        the native tree. This asks the page itself. An empty list is honest and means one of two things: the window
+        is not a Chromium surface, or its app was not started with a debugging endpoint -- in both cases the UIA and
+        OCR rungs are the routes, not this one."""
+        self._require_ready()
+        node = self.query_engine.resolve(target)
+        await self.state.transition(RuntimeState.SCANNING)
+        try:
+            nodes = self.providers.cef.page_nodes(node.hwnd, parent_id=node.node_id)
+        finally:
+            await self.state.transition(RuntimeState.READY)
+        self.window_tree.add_page_nodes(nodes)
+        return [n.as_dict() for n in nodes]
+
+    async def page_pixels(self, target: NodeTarget) -> dict:
+        """The page's own rendered pixels (PNG bytes) from the app's compositor rather than a GDI PrintWindow --
+        the rung that cannot come back 'blank' for a GPU-composited surface, and it spends no GDI handle."""
+        self._require_ready()
+        node = self.query_engine.resolve(target)
+        png = self.providers.cef.page_screenshot(node.hwnd)
+        return {"hwnd": node.hwnd, "bytes": len(png), "png": png,
+                "reason": "" if png else self.providers.cef.name + ": no DevTools endpoint for this process"}
 
     async def window_focus(self, target: NodeTarget) -> dict:
         self._require_ready()

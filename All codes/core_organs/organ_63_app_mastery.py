@@ -1142,9 +1142,14 @@ def _hung(hwnd: int) -> bool:
 
 
 def explore(model, app_name: str, hwnd: int, *, run_id: str = "", budget_s: float = 60.0, max_probes: int = 80,
-            pristine: bool = True, kinds: Optional[List[str]] = None, inside_tab_probes: int = 8) -> Dict[str, Any]:
+            pristine: bool = True, kinds: Optional[List[str]] = None, inside_tab_probes: int = 8,
+            gate: Optional[Callable[[], bool]] = None) -> Dict[str, Any]:
     """Open frontier surfaces, most informative first, until the budget (extended while probes keep yielding), the
-    probe cap, or exhaustion. Returns per-probe results + stop reason."""
+    probe cap, or exhaustion. Returns per-probe results + stop reason.
+    `gate` (optional): a cooperative pause hook called before EACH probe. It returns True to proceed, or False to
+    stop politely (the persisted frontier makes the run resumable). The background learner passes one so probing
+    pauses the moment a human takes over the machine - probes are invisible, but a delivered key must never race
+    the user's own typing. None (every direct/legacy caller) behaves exactly as before."""
     from core_organs import organ_48_app_behavior_model as bm
     key = bm._app_key(app_name)
     prober = Prober(model, key, hwnd, pristine=pristine, run_id=run_id)
@@ -1178,6 +1183,8 @@ def explore(model, app_name: str, hwnd: int, *, run_id: str = "", budget_s: floa
         fresh = [r for r in ks.frontier_open(model, key, limit=500) if r["fid"] not in rows_before and r["kind"] in ("opener", "expander", "toggle")]
         for rr in sorted(fresh, key=lambda x: -x["info_gain"])[:inside_tab_probes]:
             if budget.reason_to_stop() or bad_unwind.get(rr["kind"], 0) >= 2:
+                break
+            if gate is not None and not gate():               # same cooperative pause between in-tab probes
                 break
             res = prober.run(rr)
             _record(rr, res)
@@ -1229,6 +1236,9 @@ def explore(model, app_name: str, hwnd: int, *, run_id: str = "", budget_s: floa
                 rr_.fid, rr_.kind = row["fid"], row["kind"]
                 return rr_
             return prober.run(row)
+        if gate is not None and not gate():                    # cooperative pause: a human took the machine mid-run
+            stop = "user-active"                               #   -> stop politely now; the frontier persists, resumable
+            break
         finished, r = _bounded(_go, PROBE_DEADLINE_S)
         if not finished or isinstance(r, BaseException):
             hung = _hung(hwnd)
@@ -1344,9 +1354,12 @@ def _static_phase(model, app_name: str, hwnd: int) -> Dict[str, Any]:
 
 def master(target: str, *, model=None, budget_s: float = 90.0, runs: int = 1, fresh: bool = True,
            deepen: bool = True, conventions: bool = True, close_if_launched: bool = True, on_window=None,
-           allow_visible: bool = False, kinds: Optional[List[str]] = None, e1_actions: int = 0) -> Dict[str, Any]:
+           allow_visible: bool = False, kinds: Optional[List[str]] = None, e1_actions: int = 0,
+           gate: Optional[Callable[[], bool]] = None) -> Dict[str, Any]:
     """Learn `target` (an app name) as completely as the budget allows. Safe to call again: each call continues from the
-    persisted frontier and reports what THIS run added. Returns {'runs': [...], 'known': measure(...), 'converged': bool}."""
+    persisted frontier and reports what THIS run added. Returns {'runs': [...], 'known': measure(...), 'converged': bool}.
+    `gate` is forwarded to explore(): a cooperative pause hook the background learner uses to stop probing when a human
+    takes over the machine (see explore()). None keeps the original behavior for direct/callers."""
     from core_organs import universal_scan as us
     from core_organs import organ_48_app_behavior_model as bm
     from core_organs import background_window as bw
@@ -1434,7 +1447,7 @@ def master(target: str, *, model=None, budget_s: float = 90.0, runs: int = 1, fr
                     if kinds is None and exe_live and not hosted and (exe_live.startswith(sysroot + os.sep) or os.sep + "systemapps" + os.sep in exe_live):
                         explore_kinds = ["tab", "opener", "context", "expander"]          # OS component: never press its toggles / buttons
                         rep["read_only_scope"] = "program lives in the Windows directory: tabs, dialogs, dropdowns and context menus only"
-                    rep["explore"] = explore(model, target, hwnd, run_id=run_id, budget_s=budget_s, pristine=pristine, kinds=explore_kinds)
+                    rep["explore"] = explore(model, target, hwnd, run_id=run_id, budget_s=budget_s, pristine=pristine, kinds=explore_kinds, gate=gate)
                     rep["phases"]["explore_s"] = round(time.time() - t, 1)
                     if rep["explore"].get("app_unresponsive"):
                         rep["app_hung"] = True

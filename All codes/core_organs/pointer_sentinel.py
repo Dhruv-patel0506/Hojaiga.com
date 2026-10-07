@@ -24,8 +24,9 @@ classify() then names the cause:
     still           it did not move at all                                                              -> clean
 
 ABORTED-ENV is not a pass and not a code failure: the assertion could not be evaluated honestly on a machine somebody
-is using. `abort_if_env_only()` converts a failed outcome when EVERY failing check is the pointer check, or when the
-physical-input count says a person was at the keyboard while the test ran (see ENV_HW_EVENTS_MIN).
+is using. `abort_if_env_only()` converts a failed outcome when EVERY failing check is the pointer check (low floor:
+ENV_HW_EVENTS_MIN), or when a hand is demonstrably working in the session (high floor: ENV_CONTAMINATION_MIN events /
+ENV_CONTAMINATION_KEYS keystrokes) so that no assertion, goal checks included, is measurable.
 """
 
 from __future__ import annotations
@@ -41,14 +42,36 @@ from typing import Any, Dict, List, Optional, Tuple
 _IS_WINDOWS = hasattr(ctypes, "windll")
 WH_MOUSE_LL = 14
 WH_KEYBOARD_LL = 13
-LLMHF_INJECTED = 0x01
-LLMHF_LOWER_IL_INJECTED = 0x02
+# Win32 defines LLMHF_INJECTED as 0x00000010 and LLMHF_LOWER_IL_INJECTED as 0x00000002 (MSLLHOOKSTRUCT.flags).
+# This module used 0x01 for the first one. 0x01 is not a flag in that struct at all, so an INJECTED event failed the
+# test, fell through to the physical counter, and our own automation's pointer moves were booked as a human hand:
+# measured 2026-10-06, PIX1 aborted with "451 physical input events, 0 synthetic" while an independent read-only
+# hook on the untouched machine saw 0 events in 12 s and the cursor and desktop were both frozen; PAR1's mover
+# covered 145 px in 6 ms (25.46 px/ms), which a hand does not do. The wrong bit also made `injected` stick at 0,
+# which is what made every one of those aborts look like the user was on the machine.
+LLMHF_INJECTED = 0x00000010
+LLMHF_LOWER_IL_INJECTED = 0x00000002
 WM_QUIT = 0x0012
+
+
+def event_is_injected(flags: int) -> bool:
+    """Does a low-level hook `flags` field mark this event as synthetic? The hook's counting rule, extracted so a
+    test can assert the bit values against the SDK instead of only the classification built on top of them."""
+    return bool(flags & (LLMHF_INJECTED | LLMHF_LOWER_IL_INJECTED))
 
 # How much physical input counts as "somebody is using this machine" rather than one stray event. A person moving a
 # mouse generates hundreds of events per second (measured: 831 during one spreadsheet run); a single sneeze on the
 # desk is not enough to excuse a failure, so the floor is a number, not a feeling.
 ENV_HW_EVENTS_MIN = int(os.environ.get("HOJAIGA_ENV_HW_EVENTS_MIN", "8"))
+
+# A SECOND, much higher floor. The first one only excuses the assertion about the pointer. Stopping a whole run from
+# being graded is different: a failing GOAL check is evidence about the code, and at 8 events a brush of the mouse
+# would hide it (measured 2026-10-06: PTR1's own case - a real failure next to a pointer failure with 37 events -
+# was being reported as ENV-BLOCKED). Past this floor a hand is demonstrably working IN the session (hundreds of
+# moves plus keystrokes, i.e. it can click into the window under test and type there), so nothing the test asserts
+# is measurable and the run is reported as ABORTED-ENV with the checks it could not settle.
+ENV_CONTAMINATION_MIN = int(os.environ.get("HOJAIGA_ENV_CONTAMINATION_MIN", "200"))
+ENV_CONTAMINATION_KEYS = int(os.environ.get("HOJAIGA_ENV_CONTAMINATION_KEYS", "20"))
 
 
 def _cursor() -> Tuple[int, int]:
@@ -115,7 +138,7 @@ class Sentinel:
                 if n_code >= 0:
                     st = ctypes.cast(l_param, ctypes.POINTER(struct_cls)).contents
                     # every event of the device counts, moves included; the injected bits say physical or synthetic
-                    if st.flags & (LLMHF_INJECTED | LLMHF_LOWER_IL_INJECTED):
+                    if event_is_injected(st.flags):
                         if kind == "keyboard":
                             self.injected_keys += 1
                         else:
@@ -239,9 +262,10 @@ def abort_if_env_only(evidence: str, rep: Dict[str, Any]) -> Optional[str]:
     if fails and all(any(w in f for w in _POINTER_CHECK_WORDS) for f in fails):
         return (f"ABORTED-ENV (not a code failure): the pointer assertion cannot be evaluated while it is being moved by something "
                 f"else. {describe(rep)}")
-    physical = int(rep.get("hardware_events", 0) or 0) + int(rep.get("hardware_keys", 0) or 0)
-    if physical >= ENV_HW_EVENTS_MIN:
-        return (f"ABORTED-ENV (not a code failure): somebody was using this machine while the test ran ({physical} physical "
+    physical = int(rep.get("hardware_events", 0) or 0)
+    keys = int(rep.get("hardware_keys", 0) or 0)
+    if physical >= ENV_CONTAMINATION_MIN or keys >= ENV_CONTAMINATION_KEYS:
+        return (f"ABORTED-ENV (not a code failure): somebody was using this machine while the test ran ({physical + keys} physical "
                 f"input events, {rep.get('injected_events', 0)} synthetic) -> its outcome is not measurable. "
                 f"Unsettled checks: {', '.join(fails[:6]) or 'the run itself'}. {describe(rep)}")
     return None

@@ -4,7 +4,7 @@ FULLY DYNAMIC - Works with ANY app in ANY window state
 ADVANCED INTERACTIONS: Menus, dropdowns, dialogs, shortcuts, context menus, drag-and-drop
 """
 
-import pyautogui
+import pyautogui  # PASSIVE uses only in this file (screenshot/size); input goes through headless_input
 import time
 import pyttsx3
 import keyboard
@@ -21,6 +21,25 @@ from io import BytesIO
 import re
 import subprocess
 import os
+
+# INPUT WALL (product law): the physical mouse/keyboard are never moved. Every action in this teacher
+# is delivered as POSTED window messages to the window being taught, through core_organs.headless_input.
+# If that layer cannot be imported or no target window is known, actions REFUSE with a visible reason -
+# there is no physical-input fallback. (pyautogui remains only for passive screenshot()/size().)
+def _load_headless_input():
+    try:
+        from core_organs import headless_input as hin
+        return hin
+    except Exception:
+        import sys
+        for p in (r"D:\new_automation\All codes", r"D:\new_automation"):
+            if p not in sys.path:
+                sys.path.insert(0, p)
+        try:
+            from core_organs import headless_input as hin
+            return hin
+        except Exception:
+            return None
 
 class InteractiveAppTeacher:
     def __init__(self):
@@ -194,19 +213,51 @@ Focus on: top menu bar, toolbar buttons, sidebar items, and main action buttons.
 
         return abs_x, abs_y
 
+    def _post(self, action: str, *args, **kwargs) -> Tuple[bool, str]:
+        """THE one door for input: post a headless action to the window being taught.
+        Returns (ok, note); refuses (never falls back to physical input) when the headless
+        layer is unavailable or no target window is known."""
+        hin = _load_headless_input()
+        if hin is None:
+            return False, "REFUSED: core_organs.headless_input not importable (no physical-input fallback)"
+        hwnd = int(self.current_window or 0)
+        if not hwnd:
+            return False, "REFUSED: no target window resolved yet (pick/focus a window first)"
+        fn = getattr(hin, action, None)
+        if fn is None:
+            return False, f"REFUSED: unknown headless action '{action}'"
+        try:
+            return fn(hwnd, *args, **kwargs)
+        except Exception as exc:
+            return False, f"FAILED: {action}: {type(exc).__name__}: {str(exc)[:100]}"
+
+    def _window_center(self) -> Tuple[int, int]:
+        if self.window_bounds:
+            return (int(self.window_bounds['left'] + self.window_bounds['width'] / 2),
+                    int(self.window_bounds['top'] + self.window_bounds['height'] / 2))
+        cx, cy = 0, 0
+        try:
+            import ctypes
+            u = ctypes.windll.user32
+            cx, cy = u.GetSystemMetrics(0) // 2, u.GetSystemMetrics(1) // 2
+        except Exception:
+            pass
+        return cx, cy
+
     def click_at(self, x: int, y: int, text: str = ""):
-        """Click at specific coordinates and announce"""
+        """Click at specific coordinates and announce (posted messages; physical cursor never moves)"""
         print(f"[CLICKING]: {text} at ({x}, {y})")
-        pyautogui.moveTo(x, y, duration=0.3)
-        pyautogui.click()
+        ok, note = self._post('post_click', x, y)
+        print(f"[INPUT] {'delivered' if ok else 'NOT delivered'}: {note}")
         if text:
             self.speak(f"Clicking {text}")
         time.sleep(1.5)
 
     def type_text(self, text: str, announce: bool = True):
-        """Type text into the active field"""
+        """Type text into the active field (posted WM_CHAR/EM_REPLACESEL to the target window)"""
         print(f"[TYPING]: {text}")
-        pyautogui.write(text, interval=0.05)
+        ok, note = self._post('post_text', text)
+        print(f"[INPUT] {'delivered' if ok else 'NOT delivered'}: {note}")
         if announce:
             self.speak(f"Typing {text}")
         time.sleep(0.5)
@@ -214,8 +265,8 @@ Focus on: top menu bar, toolbar buttons, sidebar items, and main action buttons.
     def right_click_at(self, x: int, y: int, text: str = ""):
         """Right-click at specific coordinates"""
         print(f"[RIGHT-CLICKING]: {text} at ({x}, {y})")
-        pyautogui.moveTo(x, y, duration=0.3)
-        pyautogui.rightClick()
+        ok, note = self._post('post_click', x, y, right=True)
+        print(f"[INPUT] {'delivered' if ok else 'NOT delivered'}: {note}")
         if text:
             self.speak(f"Right-clicking {text}")
         time.sleep(1.5)
@@ -223,27 +274,26 @@ Focus on: top menu bar, toolbar buttons, sidebar items, and main action buttons.
     def double_click_at(self, x: int, y: int, text: str = ""):
         """Double-click at specific coordinates"""
         print(f"[DOUBLE-CLICKING]: {text} at ({x}, {y})")
-        pyautogui.moveTo(x, y, duration=0.3)
-        pyautogui.doubleClick()
+        ok, note = self._post('post_click', x, y, double=True)
+        print(f"[INPUT] {'delivered' if ok else 'NOT delivered'}: {note}")
         if text:
             self.speak(f"Double-clicking {text}")
         time.sleep(1.5)
 
     def drag_from_to(self, start_x: int, start_y: int, end_x: int, end_y: int, text: str = ""):
-        """Drag from one point to another"""
+        """Drag from one point to another (posted move/down/move/up sequence)"""
         print(f"[DRAGGING]: {text} from ({start_x}, {start_y}) to ({end_x}, {end_y})")
-        pyautogui.moveTo(start_x, start_y, duration=0.3)
-        pyautogui.mouseDown()
-        pyautogui.moveTo(end_x, end_y, duration=0.5)
-        pyautogui.mouseUp()
+        ok, note = self._post('post_drag', start_x, start_y, end_x, end_y, duration_s=0.8)
+        print(f"[INPUT] {'delivered' if ok else 'NOT delivered'}: {note}")
         if text:
             self.speak(f"Dragging {text}")
         time.sleep(1.5)
 
     def press_hotkey(self, hotkey: str, text: str = ""):
-        """Press a keyboard shortcut"""
+        """Press a keyboard shortcut (posted key messages to the target window)"""
         print(f"[PRESSING HOTKEY]: {hotkey}")
-        pyautogui.hotkey(*hotkey.split('+'))
+        ok, note = self._post('post_key_combo', hotkey)
+        print(f"[INPUT] {'delivered' if ok else 'NOT delivered'}: {note}")
         if text:
             self.speak(f"Pressing {text}")
         time.sleep(1)
@@ -251,15 +301,18 @@ Focus on: top menu bar, toolbar buttons, sidebar items, and main action buttons.
     def press_key(self, key: str, text: str = ""):
         """Press a single key"""
         print(f"[PRESSING KEY]: {key}")
-        pyautogui.press(key)
+        ok, note = self._post('post_key_combo', key)
+        print(f"[INPUT] {'delivered' if ok else 'NOT delivered'}: {note}")
         if text:
             self.speak(f"Pressing {text}")
         time.sleep(0.5)
 
     def scroll(self, clicks: int, text: str = ""):
-        """Scroll the mouse wheel"""
+        """Scroll the mouse wheel over the window (posted WM_MOUSEWHEEL; positive up, negative down)"""
         print(f"[SCROLLING]: {clicks} clicks")
-        pyautogui.scroll(clicks)
+        cx, cy = self._window_center()
+        ok, note = self._post('post_scroll', cx, cy, int(clicks))
+        print(f"[INPUT] {'delivered' if ok else 'NOT delivered'}: {note}")
         if text:
             self.speak(f"Scrolling {text}")
         time.sleep(0.5)
@@ -548,7 +601,7 @@ Focus on: top menu bar, toolbar buttons, sidebar items, and main action buttons.
 
         # Try to go back or close menus
         self.speak("Going back to continue teaching.")
-        pyautogui.press('escape')
+        self.press_key('escape', "Dismiss")
         time.sleep(1)
 
         # Record as discovered
@@ -612,7 +665,7 @@ Focus on: top menu bar, toolbar buttons, sidebar items, and main action buttons.
             time.sleep(1)
 
             # Try to go back
-            pyautogui.press('escape')
+            self.press_key('escape')
             time.sleep(0.5)
 
     def _teach_element(self, element: Dict):
@@ -647,7 +700,7 @@ Focus on: top menu bar, toolbar buttons, sidebar items, and main action buttons.
             time.sleep(1)
 
             # Try to go back
-            pyautogui.press('escape')
+            self.press_key('escape')
             time.sleep(0.5)
 
     def stop_teaching(self):

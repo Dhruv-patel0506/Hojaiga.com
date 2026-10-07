@@ -8,7 +8,7 @@ healthy because its import line exists.
 
 Services probed over HTTP (same endpoints the organs themselves use):
   * ollama            :11434  /api/tags
-  * vision-7B         :8081   /health          (llama.cpp Qwen2.5-VL-7B)
+  * vision-QwenVL     :8081   /health + /props   (llama.cpp Qwen VL tier; model name read live)
   * gatekeeper        :11435  /api/tags        (proxy passthrough to Ollama)
 
 Organs probed with a cheap functional check (import + the symbol the CrewAI flow
@@ -80,13 +80,25 @@ def check_services() -> list:
         rows.append(("SERVICE", "ollama :11434", DEGRADED, f"HTTP {code}"))
 
     vis_base = os.environ.get("HOJAIGA_VISION_PRECISION_ENDPOINT", "http://127.0.0.1:8081").rstrip("/")
+    vis_port = vis_base.rsplit(":", 1)[-1]
     code, body = _get(vis_base + "/health")
+    # Honest label: ask llama-server WHICH model it actually loaded (/props model_path), so this
+    # line reads Qwen3-VL-8B after the upgrade and Qwen2.5-VL-7B before it - the probe reports
+    # what the .bat left running, never a hard-coded name that could mis-report the boot.
+    vname = "vision llama.cpp"
+    try:
+        with urllib.request.urlopen(vis_base + "/props", timeout=3.0) as _pr:
+            _mp = str(json.loads(_pr.read(65536).decode("utf-8", "replace")).get("model_path") or "")
+        if _mp:
+            vname = "vision " + os.path.basename(_mp).replace(".gguf", "")
+    except Exception:                                       # noqa: BLE001 - /props is optional
+        pass
     if code == 200:
-        rows.append(("SERVICE", f"vision Qwen2.5-VL-7B :{vis_base.rsplit(':', 1)[-1]}", READY, "llama-server healthy"))
+        rows.append(("SERVICE", f"{vname} :{vis_port}", READY, "llama-server healthy"))
     elif code is None:
-        rows.append(("SERVICE", "vision 7B llama.cpp :8081", ABSENT, body))
+        rows.append(("SERVICE", f"vision llama.cpp :{vis_port}", ABSENT, body))
     else:
-        rows.append(("SERVICE", "vision 7B llama.cpp :8081", DEGRADED, f"HTTP {code}"))
+        rows.append(("SERVICE", f"vision llama.cpp :{vis_port}", DEGRADED, f"HTTP {code}"))
 
     gk = os.environ.get("HOJAIGA_GATEKEEPER_URL", "http://127.0.0.1:11435")
     # the gatekeeper is the branded proxy: clients pass the organ-side validation header
@@ -155,7 +167,7 @@ def _check_organ_31(service_rows: list) -> tuple:
         return DEGRADED, f"engine not instantiable: {type(exc).__name__}: {exc}"
     seven_b_up = any("vision" in r[1] and r[2] == READY for r in service_rows)
     if seven_b_up:
-        return READY, "grounding ready, 7B (:8081) preferred tier live"
+        return READY, "grounding ready, precision tier (:8081) live"
     return DEGRADED, "grounding ready but :8081 down -> falls back to the Ollama 3B eye (honest degrade)"
 
 

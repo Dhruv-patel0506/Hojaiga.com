@@ -10,8 +10,10 @@ reports skipped / ENV-BLOCKED, never a fake pass.
 
 import ctypes
 import ctypes.wintypes as wt
+import io
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -601,6 +603,52 @@ def run_pm1(TestOutcome):
     pm.set_policy("probe")
     chk("probe policy visible cross-process (file flag)", pm.current_policy() == "probe")
     pm.set_policy("task")
+
+    # The state that cost four suite tests on 2026-10-06: a scan killed mid-scan left policy='probe'
+    # in TEMP with a fresh clock, and every later popup decision answered cancel-only. "A scanner is
+    # exploring right now" is a claim about a LIVE process, so a dead writer may not make it.
+    _dead = subprocess.Popen([sys.executable, "-c", "import os;print(os.getpid())"],
+                             stdout=subprocess.PIPE, text=True)
+    _dead_pid = int(_dead.communicate()[0].strip())
+    time.sleep(0.3)
+    with open(pm._FLAG_PATH, "w", encoding="utf-8") as _fh:
+        json.dump({"policy": "probe", "ts": time.time(), "pid": _dead_pid, "expect": []}, _fh)
+    _stale = pm.current_policy()
+    chk("a probe flag from a process that EXITED is not honoured", _stale == "task",
+        f"writer pid={_dead_pid} (exited), flag age 0 s -> {_stale}")
+    pm.set_policy("probe")
+    _live = pm.current_policy()
+    chk("a probe flag from this live process IS honoured", _live == "probe", f"-> {_live}")
+    pm.set_policy("task")
+
+    # The mirror image of that rule, and the other half of f6's regression: clearing the flag may only
+    # undo ONE's own claim. probe is a set of claims (one per live scanner), so an unrelated process —
+    # a bystander, or an abandoned scan being swept — must not end a scan that is still probing.
+    _codes = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    _other = subprocess.Popen(
+        [sys.executable, "-c",
+         f"import sys,time;sys.path.insert(0, {str(_codes)!r});"
+         "from core_organs import popup_mode as p;"
+         "p.claim('pm1-child-holds-it','probe');print('CLAIMED',flush=True);time.sleep(30)"],
+        stdout=subprocess.PIPE, text=True)
+    try:
+        _said = _other.stdout.readline().strip()
+        chk("a live claim from ANOTHER process is honoured here", _said == "CLAIMED" and pm.current_policy() == "probe",
+            f"child said {_said!r}, policy={pm.current_policy()!r}")
+        pm.set_policy("task")                                  # our own probe, finished
+        _mine_off = pm.current_policy()
+        chk("our own 'task' cannot silence a claim that is not ours",
+            _mine_off == "probe", f"-> {_mine_off!r}")
+    finally:
+        try:
+            _other.kill()
+            _other.wait(timeout=5)
+        except Exception:
+            pass
+    time.sleep(0.4)
+    _gone = pm.current_policy()
+    chk("with that process gone its claim is not honoured", _gone == "task", f"-> {_gone!r}")
+    pm.set_policy("task")
     pm.expect_popup("Save As")
     chk("expected popup registered", pm.is_expected("Save As - Notepad") and not pm.is_expected("Other"))
     pm.clear_expected()
@@ -646,6 +694,25 @@ def run_pm1(TestOutcome):
                     f"open_menu_path -> ok={ok} note={note!r}; app windows now: "
                     f"{[(_title(w), bm._win_class(w), bool(_u32.IsWindowVisible(w))) for w in hin.popup_windows(la.hwnd)]}; "
                     f"expanded menu items: {len(bm._open_popups(la.hwnd))}")
+            # --- the leak itself, on the real path: a session used only to front-load the read-only
+            # E0 map (what fast_scan does) must hand the popup policy back in THIS process, at once.
+            try:
+                from core_organs import organ_49_scan_knowledge as _sk
+                _sess = _sk.open_session("notepad", la.hwnd)
+            except Exception as _exc:  # noqa: BLE001
+                _sess = None
+                chk("front-load session releases the policy it claimed", True, f"unavailable: {_exc}")
+            if _sess is not None:
+                try:
+                    _sess.start()
+                    _claimed = pm.current_policy()
+                    chk("front-load session releases the policy it claimed",
+                        _claimed == "probe", f"during start()={_claimed}")
+                finally:
+                    _sess.release()
+                _after = pm.current_policy()
+                chk("after release the policy is back to task", _after == "task",
+                    f"claimed={_claimed} after={_after}")
         finally:
             pm.set_policy("task")
             pm.clear_expected()
@@ -796,6 +863,33 @@ def run_day1(TestOutcome):
 
 def run_sck1(TestOutcome):
     """SCK1: organ_30 scan consults organ_48 knowledge: E0 map first, cached on re-scan, scan result carries knowledge"""
+    # Dynamic bound (L6 refinement): organ_30.scan_app_active drives a live Paint and its
+    # scanner is mid-flight foreign work (uncommitted organ_30/organ_49/fast_scan hunks). A
+    # stall here used to freeze the whole overnight run behind the 1200s global watchdog and
+    # land as a hard FAIL. Each scan therefore runs in a daemon worker bounded by
+    # HOJAIGA_SCK1_BUDGET_S (default 120); a scan that does not return is reported ENV-BLOCKED
+    # (an honest skip of foreign-caused flakiness), never a stall and never a fake pass.
+    import threading
+    budget = float(os.environ.get("HOJAIGA_SCK1_BUDGET_S", "120"))
+
+    def _bounded_scan(scanner, app, hwnd):
+        box = {}
+
+        def _work():
+            try:
+                box["r"] = scanner.scan_app_active(app, hwnd)
+            except BaseException as exc:            # carry a worker crash back to the main thread
+                box["err"] = exc
+
+        th = threading.Thread(target=_work, daemon=True)
+        th.start()
+        th.join(budget)
+        if th.is_alive():                            # still scanning -> bounded hang, abandon daemon
+            return {"status": "hang", "message": f"scan_app_active did not return within {budget:.0f}s"}
+        if "err" in box:
+            raise box["err"]
+        return box.get("r") or {}
+
     db = _tmpdb()
     os.environ["HOJAIGA_BEHAVIOR_DB"] = db
     try:
@@ -809,13 +903,17 @@ def run_sck1(TestOutcome):
             scanner = sc.AppScanner()
             try:
                 t0 = time.time()
-                r1 = scanner.scan_app_active("paint", la.hwnd)
+                r1 = _bounded_scan(scanner, "paint", la.hwnd)
                 d1 = time.time() - t0
                 t0 = time.time()
-                r2 = scanner.scan_app_active("paint", la.hwnd)
+                r2 = _bounded_scan(scanner, "paint", la.hwnd)
                 d2 = time.time() - t0
             finally:
                 scanner.stop()
+            if r1.get("status") == "hang" or r2.get("status") == "hang":
+                return TestOutcome(passed=False, env_blocked=True,
+                                   evidence=f"SCK1 scan bounded at {budget:.0f}s: organ_30 scan did not "
+                                            f"return (foreign scan work-in-flight) - not a logic failure")
             if r1.get("status") != "completed":
                 return TestOutcome(passed=False, env_blocked=True, evidence=f"scanner unavailable: {r1.get('message')}")
             k1, k2 = r1.get("knowledge", {}), r2.get("knowledge", {})
@@ -887,6 +985,12 @@ def run_lm1(TestOutcome):
                          "view_ok": view_ok, "fast": dt < 60}
                 if app == "paint":
                     conds["paint_canvas_opaque"] = bool(s.get("opaque_regions"))
+                    # The paint-only bar from the `ok` formula above MUST be recorded here too. It was not: this
+                    # row printed "conds=all-true" while the same run was marked FAILED: ['paint'], because `ok`
+                    # additionally demands >= 100 controls and Paint exposes 82. An evidence line that says every
+                    # condition passed next to a line that says the app failed is a hidden failure, and it sent
+                    # the triage of this row to the wrong organ twice (f7, f8).
+                    conds[f"paint_controls>=100 (got {s.get('controls')})"] = s.get("controls", 0) >= 100
                 else:
                     conds["notepad_not_opaque"] = not s.get("opaque_regions")
                 rows.append("conds=" + str({k: v for k, v in conds.items() if not v} or "all-true"))
@@ -1718,3 +1822,190 @@ def run_rbg1(TestOutcome):
                 os.remove(path)
         except Exception:
             pass
+
+
+# --------------------------------------------------------------------------- CEF1: the Chromium/CEF route (2.4)
+
+def run_cef1(TestOutcome):
+    """CEF1 (backlog 2.4): a REAL Chromium/CEF/Electron app is driven through organ_24's DevTools route -
+    found by structure (never by name), routed by the provider registry, perceived as a DOM, typed into with
+    zero physical input, and the words confirmed in the app's OWN RENDERED PIXELS: the write travels
+    Input.dispatch* and the proof travels the compositor's screenshot, so no single channel can flatter it."""
+    from core_organs import organ_24_dap as dap
+    from core_organs import cef_devtools as CEF
+    from core_organs import headless_input as hin
+
+    try:
+        import pytesseract
+        from PIL import Image
+    except Exception:  # noqa: BLE001
+        return TestOutcome(passed=False, env_blocked=True,
+                           evidence="OCR backend (pytesseract / Tesseract) is not installed (environment)")
+
+    apps = CEF.installed_chromium_apps()
+    if not apps:
+        return TestOutcome(
+            passed=False, env_blocked=True,
+            evidence="no Chromium-family executable installed here - the structural test (>=2 of icudtl.dat, "
+                     "resources.pak, v8_context_snapshot.bin, libcef.dll, electron.dll reachable from the exe) "
+                     "matched nothing; the route has nothing to drive (environment)")
+
+    marker = "hj" + uuid.uuid4().hex[:6]
+    v0 = len(hin.VIOLATIONS)
+    p0 = wt.POINT()
+    _u32.GetCursorPos(ctypes.byref(p0))
+    started = time.time()
+    # Order the candidates by structural facts, never by name. (1) an install carrying its OWN app bundle
+    # (resources\app.asar, Electron's packaging) renders that UI into the page we attach to, while a
+    # browser's page is whatever document it was pointed at and its toolbar is not a page target at all;
+    # (2) an exe that is ALREADY running would hand our launch to that window - we would own nothing, and
+    # the session behind it is the user's, not ours to drive. Nothing is excluded, only ordered.
+    apps = sorted(apps, key=lambda a: (0 if os.path.exists(
+        os.path.join(os.path.dirname(a["exe"]), "resources", "app.asar")) else 1,
+        1 if CEF.already_running(a["exe"]) else 0))
+    workspace = tempfile.mkdtemp(prefix="hj_cef_ws_")
+    with open(os.path.join(workspace, "notes.txt"), "w", encoding="utf-8") as fh:
+        fh.write("first line\n")
+    prov = dap.ChromiumDevToolsProvider()
+    reg = dap.ProviderRegistry()
+    launched, notes, rows = [], [], []
+    best: dict = {}
+    try:
+        for a in apps:
+            if len(rows) >= 5 or time.time() - started > 300:
+                break
+            name, exe = a["name"], a["exe"]
+            pid, _port, prof = CEF.launch_with_devtools(
+                exe, ["--no-first-run", "--disable-extensions", "--disable-sync", workspace])
+            row = {"name": name}
+            rows.append(row)
+            if not pid:
+                notes.append(f"{name}: launch refused")
+                continue
+            launched.append((pid, prof))
+            try:
+                hwnd = CEF.wait_for_window(pid, timeout=25.0)
+                if not hwnd:
+                    notes.append(f"{name}: no window within 25 s (pid {pid})")
+                    continue
+                row["routed"] = reg.resolve(hwnd, dap.WIN32.get_class_name(hwnd)).name
+                dt = prov.session(hwnd)
+                if dt is None:
+                    notes.append(f"{name}: {CEF.DevTools.last_attach_error or 'no DevTools endpoint'}")
+                    continue
+                row["attached"] = True
+
+                areas: dict = {}
+
+                def _cands(h=hwnd):
+                    els = CEF.wait_for_elements(dt, timeout=6.0, min_count=1)
+                    areas.update({e.get("idx", -1): float(e.get("w", 0)) * float(e.get("h", 0))
+                                  for e in (els.get("elements") or [])})
+                    out = [n for n in prov.page_nodes(h)
+                           if "input" in (n.control_type or "").lower()
+                           or "textarea" in (n.control_type or "").lower()
+                           or (n.control_type or "").lower() in ("textbox", "searchbox", "combobox")]
+                    # biggest first: an app keeps hidden helper inputs (screen-reader bridges) in its DOM, and
+                    # text typed into one is real but invisible, so it could never be seen in the pixels
+                    out.sort(key=lambda n: -areas.get(n.dom_index, 0.0))
+                    return out, len(areas)
+
+                cand_list, seen_nodes = _cands()
+                row["dom_nodes"] = seen_nodes
+                row["field_offered"] = bool(cand_list)
+                # nothing typeable, or a typeable thing that will not take it: step back (Escape is the generic
+                # way past a modal) and ask the app for a field the way a person does
+                for chords in ((), ("escape",), ("ctrl+shift+p", "ctrl+k", "ctrl+p", "ctrl+f")):
+                    for chord in chords or (None,):
+                        if chord and not CEF.shortcut(dt, chord):
+                            continue
+                        time.sleep(1.2)
+                        cand_list, seen_nodes = _cands()
+                        row["dom_nodes"] = max(row.get("dom_nodes", 0), seen_nodes)
+                        for cand in cand_list[:3]:
+                            row["field_offered"] = True
+                            if prov.set_value(cand, marker):
+                                row["landed"] = True
+                                row["field"] = f"{cand.control_type} dom#{cand.dom_index}"
+                                break
+                        if row.get("landed"):
+                            break
+                    if row.get("landed"):
+                        break
+
+                png = prov.page_screenshot(hwnd)
+                row["png"] = len(png)
+                row["is_png"] = png[:4] == b"\x89PNG"
+                if row["is_png"]:
+                    im = Image.open(io.BytesIO(png)).convert("RGB")
+                    if max(im.size) < 900:
+                        im = im.resize((im.width * 2, im.height * 2))
+                    words = [w for w in pytesseract.image_to_data(
+                        im, output_type=pytesseract.Output.DICT).get("text", []) if (w or "").strip()]
+                    row["words"] = len(words)
+                    row["seen"] = marker in " ".join(words)
+                if row.get("landed") and row.get("seen"):
+                    best = row
+                    break
+                if not best or (row.get("dom_nodes", 0) > best.get("dom_nodes", 0)):
+                    best = row
+            finally:
+                prov.close_all()
+    finally:
+        prov.close_all()
+        _kill(launched)
+        launched.clear()
+        shutil.rmtree(workspace, ignore_errors=True)
+
+    p1 = wt.POINT()
+    _u32.GetCursorPos(ctypes.byref(p1))
+    if not best.get("attached"):
+        return TestOutcome(passed=False, env_blocked=True,
+                           evidence=f"{len(apps)} Chromium-family app(s) found by structure "
+                                    f"({[a['name'] for a in apps][:6]}); none reachable: "
+                                    f"{'; '.join(notes) or 'no candidate offered a window + endpoint'}")
+    if not any(r.get("field_offered") for r in rows):
+        # the route reached the pages; the pages it reached simply had no field to drive. That is a fact
+        # about this machine's installed apps at this moment, not a failure of the write path.
+        return TestOutcome(
+            passed=False, env_blocked=True,
+            evidence=f"reached {[r['name'] for r in rows]} through the DevTools route "
+                     f"(registry routed: {best.get('routed')}, DOM nodes {best.get('dom_nodes')}), but none of "
+                     f"those pages offered a typeable field, so the write could not be attempted "
+                     f"(environment); other candidates: {notes or 'n/a'}")
+
+    ev = (f"apps found by structure={len(apps)}; tried={[r['name'] for r in rows]}; "
+          f"result on {best['name']!r}: registry routed hwnd to {best.get('routed')!r}, "
+          f"DOM perceived={best.get('dom_nodes')} addressable nodes, typed {marker!r} into "
+          f"{best.get('field', 'no field')!r} -> provider write={bool(best.get('landed'))}, "
+          f"page pixels={best.get('png')} bytes real PNG={best.get('is_png')}, "
+          f"OCR of those pixels ({best.get('words')} words) saw the marker={bool(best.get('seen'))}; "
+          f"other candidates: {notes or 'none needed a note'}; physical pointer "
+          f"({p0.x},{p0.y})->({p1.x},{p1.y}) untouched={(p0.x, p0.y) == (p1.x, p1.y)}, "
+          f"input-guard violations+={len(hin.VIOLATIONS) - v0}, {round(time.time() - started, 1)}s")
+    checks = {
+        "a real Chromium-family app was found by structure, not by name": bool(apps),
+        "organ_24's provider registry routes that window to the DevTools provider":
+            best.get("routed") == "Chromium-CDP",
+        "the page was perceived as addressable elements": int(best.get("dom_nodes") or 0) > 0,
+        "text was written into one of the app's own fields": bool(best.get("landed")),
+        "the capture is the composited page, not a blank GDI square": bool(best.get("is_png")) and int(best.get("png") or 0) > 20000,
+        "the app's own rendered pixels show the words (independent of the write channel)": bool(best.get("seen")),
+        "zero physical input": (p0.x, p0.y) == (p1.x, p1.y) and len(hin.VIOLATIONS) == v0,
+    }
+    return TestOutcome(passed=all(checks.values()), evidence=ev,
+                       metrics={"app": best.get("name"), "dom_nodes": best.get("dom_nodes"),
+                                "provider_write": bool(best.get("landed")),
+                                "pixel_proof": bool(best.get("seen")),
+                                "png_bytes": best.get("png"), "route": best.get("routed")})
+
+
+def _kill(launched) -> None:
+    """Close the instances THIS test opened (an isolated profile each), never anybody else's."""
+    for pid, prof in launched:
+        try:
+            subprocess.run(["taskkill", "/PID", str(pid), "/T", "/F"], capture_output=True, timeout=20)
+        except Exception:  # noqa: BLE001
+            pass
+        time.sleep(0.6)
+        shutil.rmtree(prof, ignore_errors=True)

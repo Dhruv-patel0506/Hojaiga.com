@@ -426,10 +426,13 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
                  e1_actions: int = 3, close_if_launched: bool = True, on_window=None,
                  allow_visible: bool = False, force: bool = False, fresh: bool = False,
                  fast: bool = False, e0_budget_s: Optional[float] = None,
-                 hwnd_hint: int = 0) -> Dict[str, Any]:
+                 ready_budget_s: float = 0.0, hwnd_hint: int = 0) -> Dict[str, Any]:
     """`fast=True` is the first-contact profile (P1-G): readiness polled at 150-200 ms instead of 400 ms, the start-screen wait capped at
     4 s, the menu crawl held to `e0_budget_s`, no E1 probing (the caller continues exploration later, cumulatively). Same pipeline, same
-    knowledge written; only the waits and the exploration budget change."""
+    knowledge written; only the waits and the exploration budget change.
+    `ready_budget_s` > 0 bounds the readiness waits (first-children + tree-stop-growing) to that slice of the caller's scan
+    budget, so a slow/huge app can no longer silently burn the historical 20s + 15s and blow any time contract. 0 (default,
+    every legacy caller) keeps the old 20/15 caps exactly - the bound is opt-in, never a regression."""
     from core_organs import desktop_grounding as dg
     from core_organs import organ_48_app_behavior_model as bm
     from core_organs import organ_50_layout_map as lm
@@ -498,8 +501,12 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
             # readiness: a freshly started or Chromium app exposes its tree late (bounded growing wait)
             t = time.time()
             n, delay = 0, (0.15 if fast else 0.4)
+            # bound the readiness waits from the caller's scan budget when given one; else the historical 20s + 15s
+            _rb = float(ready_budget_s or 0.0)
+            first_children_cap = (_rb * 0.6) if _rb > 0 else 20.0
+            grow_stabilize_cap = (_rb * 0.4) if _rb > 0 else 15.0
             import uiautomation as auto
-            while time.time() - t < 20:
+            while time.time() - t < first_children_cap:
                 try:
                     n = len(auto.ControlFromHandle(hwnd).GetChildren())
                 except Exception:
@@ -512,28 +519,36 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
             # then: wait until the tree STOPS GROWING. UWP/WinUI/Office apps resume and populate for a second
             # or two after being un-minimized; mapping at the first moment something exists saw 3 controls
             from core_organs import fast_uia
-            last, steady, grow_end = -1, 0, time.time() + 15.0
-            while time.time() < grow_end and steady < 2:
-                snap = fast_uia.snapshot(hwnd, timeout_ms=6000)
-                cnt = len(snap) if snap else 0
-                steady = steady + 1 if (cnt == last and cnt > 2) else 0
-                last = cnt
+            _RICH = 1200                          # dynamic real-time guard: a tree this large is obviously present and
+            last, steady, grow_end = -1, 0, time.time() + grow_stabilize_cap   #   already populating fast - proving
+            while time.time() < grow_end and steady < 2:                       #   "settled" with more FULL snapshots is
+                snap = fast_uia.snapshot(hwnd, timeout_ms=6000)                 #   pure cost on a huge app, so stop once
+                cnt = len(snap) if snap else 0                                  #   rich. (On a build without IUIAutomation6
+                steady = steady + 1 if (cnt == last and cnt > 2) else 0         #   a single snapshot is not time-interruptible,
+                last = cnt                                                      #   so limiting HOW MANY we take is the lever.)
+                if last >= _RICH:
+                    break
                 if steady < 2:
                     time.sleep(_poll)
             rep["tree_nodes_when_ready"] = last
             # LAID OUT? A parked UWP/WinUI app may expose controls with EMPTY rectangles (it does not lay
-            # out content that is entirely off-screen). Detect that and apply the 1-pixel sliver.
-            snap = fast_uia.snapshot(hwnd, timeout_ms=6000) or []
-            named = [n for n in snap if n.name and (set(n.pats) & {"invoke", "toggle", "select", "expand"})]
-            laid = sum(1 for n in named if (n.rect[2] > n.rect[0] and n.rect[3] > n.rect[1]))
-            rep["laid_out_fraction"] = round(laid / len(named), 2) if named else None
-            if named and len(named) >= 8 and laid / len(named) < 0.3 and sess.mode == "parked":
-                if bw.sliver(hwnd):
-                    time.sleep(1.2)
-                    snap = fast_uia.snapshot(hwnd, timeout_ms=6000) or []
-                    named = [n for n in snap if n.name and (set(n.pats) & {"invoke", "toggle", "select", "expand"})]
-                    laid = sum(1 for n in named if (n.rect[2] > n.rect[0] and n.rect[3] > n.rect[1]))
-                    rep["layout_fix"] = f"sliver applied: laid-out fraction {rep['laid_out_fraction']} -> {round(laid / max(len(named), 1), 2)}"
+            # out content that is entirely off-screen). Detect that and apply the 1-pixel sliver. This ONLY matters
+            # for a sparse parked UI; a rich tree is already laid out, and re-snapshotting it is the dominant cost.
+            if last >= _RICH:
+                rep["laid_out_fraction"] = None
+                rep["layout_fix"] = f"skipped the laid-out/sliver re-check: the tree is already rich ({last} nodes)"
+            else:
+                snap = fast_uia.snapshot(hwnd, timeout_ms=6000) or []
+                named = [n for n in snap if n.name and (set(n.pats) & {"invoke", "toggle", "select", "expand"})]
+                laid = sum(1 for n in named if (n.rect[2] > n.rect[0] and n.rect[3] > n.rect[1]))
+                rep["laid_out_fraction"] = round(laid / len(named), 2) if named else None
+                if named and len(named) >= 8 and laid / len(named) < 0.3 and sess.mode == "parked":
+                    if bw.sliver(hwnd):
+                        time.sleep(1.2)
+                        snap = fast_uia.snapshot(hwnd, timeout_ms=6000) or []
+                        named = [n for n in snap if n.name and (set(n.pats) & {"invoke", "toggle", "select", "expand"})]
+                        laid = sum(1 for n in named if (n.rect[2] > n.rect[0] and n.rect[3] > n.rect[1]))
+                        rep["layout_fix"] = f"sliver applied: laid-out fraction {rep['laid_out_fraction']} -> {round(laid / max(len(named), 1), 2)}"
             rep["phases"]["ready_s"] = round(time.time() - t, 2)
             if not polite:
                 try:

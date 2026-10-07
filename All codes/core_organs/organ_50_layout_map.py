@@ -598,6 +598,70 @@ def save_layout(model, app_key: str, mapper: LayoutMapper, version_hash: str = "
     return len(mapper.controls)
 
 
+def save_pixels(model, app_key: str, win: Tuple[int, int, int, int],
+                elements: List[Dict[str, Any]], *, via: str = "ocr", version_hash: str = "") -> int:
+    """Persist pixel-tier (OCR / vision) findings as ADDRESSABLE layout rows, keyed by a stable
+    pixel id, so a tree-blind app can be acted on between scans without re-running the (slow) engine.
+    Coordinates are stored BOTH absolute (as seen now) and window-relative (survives a move). These
+    rows carry NO UIA patterns - they are pixel targets the actuator re-grounds before clicking.
+    Replaces only the pixel rows of this app; structural UIA rows are never touched."""
+    model._conn.executescript(LAYOUT_SCHEMA)
+    model._conn.execute(
+        "DELETE FROM bm_layout WHERE app_key=? AND region_kind='pixel'", (app_key,))
+    now = time.time()
+    n = 0
+    for e in elements:
+        name = (e.get("name") or "").strip()
+        if not name:
+            continue
+        _b = [int(v) for v in (list(e.get("bbox") or [0, 0, 0, 0]) + [0, 0, 0, 0])[:4]]
+        bbox: Tuple[int, int, int, int] = (_b[0], _b[1], _b[2], _b[3])
+        rel = _rel(bbox, win) if win[2] > win[0] and win[3] > win[1] else (0.0, 0.0, 0.0, 0.0)
+        cid = _hash("pixel", via, name.lower(), int(rel[0] * 100), int(rel[1] * 100))
+        try:
+            model._conn.execute(
+                "INSERT OR REPLACE INTO bm_layout VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                (cid, app_key, "pixel", "pixel", via, e.get("role", "") or via, name[:200],
+                 "", "", *bbox, *rel, 1, 0, "", "", via, version_hash, now))
+            n += 1
+        except Exception:  # noqa: BLE001
+            continue
+    model._conn.commit()
+    return n
+
+
+def pixel_rows(model, app_key: str, via: str = "") -> List[Dict[str, Any]]:
+    """The persisted pixel targets of an app: name, role, window-relative rect, via (ocr/vision)."""
+    try:
+        model._conn.executescript(LAYOUT_SCHEMA)
+        if via:
+            rows = model._conn.execute(
+                "SELECT name, role, rx0, ry0, rx1, ry1, x0, y0, x1, y1, via FROM bm_layout "
+                "WHERE app_key=? AND region_kind='pixel' AND via=?", (app_key, via)).fetchall()
+        else:
+            rows = model._conn.execute(
+                "SELECT name, role, rx0, ry0, rx1, ry1, x0, y0, x1, y1, via FROM bm_layout "
+                "WHERE app_key=? AND region_kind='pixel'", (app_key,)).fetchall()
+    except Exception:  # noqa: BLE001
+        return []
+    return [{"name": r["name"], "role": r["role"], "rel": (r["rx0"], r["ry0"], r["rx1"], r["ry1"]),
+             "bbox": (r["x0"], r["y0"], r["x1"], r["y1"]), "via": r["via"]} for r in rows]
+
+
+def count_pixels(model, app_key: str) -> Dict[str, int]:
+    out = {"ocr": 0, "vision": 0, "pixel": 0}
+    try:
+        model._conn.executescript(LAYOUT_SCHEMA)
+        for r in model._conn.execute(
+                "SELECT via, COUNT(*) n FROM bm_layout WHERE app_key=? AND region_kind='pixel' GROUP BY via",
+                (app_key,)).fetchall():
+            out[r["via"]] = r["n"]
+            out["pixel"] += r["n"]
+    except Exception:  # noqa: BLE001
+        pass
+    return out
+
+
 def layout_cached(model, app_key: str, version_hash: str) -> Optional[Dict[str, Any]]:
     try:
         model._conn.executescript(LAYOUT_SCHEMA)

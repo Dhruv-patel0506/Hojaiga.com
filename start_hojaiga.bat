@@ -31,17 +31,34 @@ if %ERRORLEVEL% EQU 0 (
 :: [2/6] Start llama.cpp Vision Server (Port 8081)
 :: ------------------------------------------------------------
 echo.
-echo [2/6] Starting llama.cpp Vision Server (Qwen2.5-VL-7B)...
+echo [2/6] Starting llama.cpp Vision Server (Qwen3-VL-8B, auto-fallback to Qwen2.5-VL-7B)...
 tasklist /FI "IMAGENAME eq llama-server.exe" 2>NUL | find /I "llama-server.exe" >NUL
 if %ERRORLEVEL% EQU 0 (
     echo   [OK] llama-server already running.
-) else (
-    echo   [..] Starting llama-server on port 8081...
-    start /min "" "C:\Users\dhruv\AppData\Local\Microsoft\WinGet\Packages\ggml.llamacpp_Microsoft.Winget.Source_8wekyb3d8bbwe\llama-server.exe" --model "D:\new_automation\models\Qwen_Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf" --mmproj "D:\new_automation\models\mmproj-Qwen_Qwen2.5-VL-7B-Instruct-f16.gguf" --port 8081 --ctx-size 4096 -ngl 24 -t 8 -tb 8 -fa on -np 1 --host 0.0.0.0
-    echo   [..] Waiting for vision server to load model...
-    ping -n 35 127.0.0.1 >nul
-    echo   [OK] Vision server started on port 8081.
+    goto :vision_ready
 )
+:: Fail-safe model auto-select: prefer the smarter Qwen3-VL-8B (extra layers spill to the
+:: 32GB RAM on this 6GB-VRAM box); keep booting today's Qwen2.5-VL-7B until it is downloaded
+:: via models\download_qwen3_vl_8b.ps1 - boot NEVER breaks on a missing upgrade file.
+:: HOJAIGA_VISION_GGUF / HOJAIGA_VISION_MMPROJ / HOJAIGA_VISION_NGL override these defaults.
+set "VISION_GGUF=%HOJAIGA_VISION_GGUF%"
+set "VISION_MMPROJ=%HOJAIGA_VISION_MMPROJ%"
+set "VISION_NGL=%HOJAIGA_VISION_NGL%"
+if "%VISION_GGUF%"=="" set "VISION_GGUF=D:\new_automation\models\Qwen3-VL-8B-Instruct-Q4_K_M.gguf"
+if "%VISION_MMPROJ%"=="" set "VISION_MMPROJ=D:\new_automation\models\mmproj-Qwen3-VL-8B-Instruct-f16.gguf"
+if "%VISION_NGL%"=="" set "VISION_NGL=12"
+if not exist "%VISION_GGUF%" (
+    echo   [FALLBACK] Qwen3-VL-8B GGUF not found - booting Qwen2.5-VL-7B instead ^(run models\download_qwen3_vl_8b.ps1 to upgrade^)
+    set "VISION_GGUF=D:\new_automation\models\Qwen_Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf"
+    set "VISION_MMPROJ=D:\new_automation\models\mmproj-Qwen_Qwen2.5-VL-7B-Instruct-f16.gguf"
+    set "VISION_NGL=24"
+)
+echo   [..] Starting llama-server on port 8081: %VISION_GGUF% -ngl %VISION_NGL%
+start /min "" "C:\Users\dhruv\AppData\Local\Microsoft\WinGet\Packages\ggml.llamacpp_Microsoft.Winget.Source_8wekyb3d8bbwe\llama-server.exe" --model "%VISION_GGUF%" --mmproj "%VISION_MMPROJ%" --port 8081 --ctx-size 4096 -ngl %VISION_NGL% -t 8 -tb 8 -fa on -np 1 --host 0.0.0.0
+echo   [..] Waiting for vision server to load model...
+ping -n 35 127.0.0.1 >nul
+echo   [OK] Vision server started on port 8081.
+:vision_ready
 
 :: ------------------------------------------------------------
 :: [3/6] Configure Environment for CrewAI Swarm and Vision
@@ -122,7 +139,7 @@ echo   CREWAI ORCHESTRATION ENGINE ATTACHED
 echo ============================================================
 echo   Ollama Endpoint:     http://127.0.0.1:11434
 echo   Gatekeeper Proxy:    http://127.0.0.1:11435
-echo   Active Swarm Engine: CrewAI ReAct (Qwen2.5-VL-7B via llama.cpp)
+echo   Active Swarm Engine: CrewAI ReAct (Qwen VL llama.cpp :8081 - Qwen3-VL-8B, 7B fallback)
 echo   Execution Terminal:  Attached (Live Output)
 echo ============================================================
 echo.

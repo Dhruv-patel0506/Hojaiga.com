@@ -1,5 +1,8 @@
 """
-qwen_vl_scanner.py -- EXPERIMENTAL vision tier backed by the local Qwen2.5-VL-7B llama.cpp server.
+qwen_vl_scanner.py -- EXPERIMENTAL vision tier backed by the local Qwen-VL llama.cpp precision
+server (:8081). The loaded weights are auto-selected by start_hojaiga.bat: Qwen3-VL-8B once
+downloaded, else the current Qwen2.5-VL-7B (server-agnostic OpenAI endpoint, so this client
+works with either). The payload "model" label is ignored by a single-model llama-server.
 
 Gated: only used when HOJAIGA_QWEN_VL=1. OmniParser stays the primary vision tier unless
 benchmark_vision.py shows this one measurably wins on the same screens.
@@ -47,7 +50,7 @@ def parse_image(img) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
     send.convert("RGB").save(buf, format="JPEG", quality=85)
     b64 = base64.b64encode(buf.getvalue()).decode("ascii")
     payload = {
-        "model": "qwen2.5-vl", "temperature": 0.0, "max_tokens": 1500,
+        "model": "qwen3-vl", "temperature": 0.0, "max_tokens": 1500,
         "messages": [{"role": "user", "content": [
             {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + b64}},
             {"type": "text", "text": _PROMPT}]}],

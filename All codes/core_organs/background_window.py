@@ -987,6 +987,26 @@ class BackgroundSession:
     def mode(self) -> str:
         return self.state.get("mode", "")
 
+    def lay_out(self, settle_s: float = 1.2) -> bool:
+        """Nudge a PARKED window so one pixel is on screen, for the whole session, so the app keeps laying it out.
+
+        UWP/WinUI apps do not lay out content that is entirely off every monitor, and the consequence is not
+        cosmetic: a menu or flyout is never realized, so any command that lives inside one is unreachable in
+        background mode. Measured 2026-10-06 on Paint, same window, same call, two states:
+          parked at (-24000,-24000)  -> Invoke on 'Edit' produced NO 'Paste' item at all (3 s, 64 nodes);
+          parked + this 1-px sliver  -> the SAME Invoke exposed 'Paste' as an actionable MenuItemControl in 0.8 s.
+        Note both states report NON-EMPTY rectangles, so the empty-rect test universal_scan uses to decide this
+        would NOT have caught it - hence the unconditional nudge rather than a heuristic.
+        Returns True if the sliver was applied."""
+        if self.mode != "parked":
+            return False
+        ok = sliver(self.hwnd)
+        if ok:
+            time.sleep(settle_s)
+            logger.info("[background_window] hwnd=%s parked: 1-px sliver applied so the app keeps laying it out",
+                        self.hwnd)
+        return ok
+
 
 def _atexit() -> None:
     with _lock:

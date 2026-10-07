@@ -48,7 +48,7 @@ def _users_window(app: str) -> str:
         return ""
     sys.path[:0] = [r"D:\new_automation\All codes", r"D:\new_automation"]
     from core_organs import headless_input as hin
-    for h, t in hin.top_level_titles(visible_only=False):
+    for h, t in hin.top_level_titles(visible_only=True):        # shown or minimized = a window a person can be using
         if hin._class_name(h) == cls:
             return t
     return ""

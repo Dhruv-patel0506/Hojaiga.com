@@ -2499,6 +2499,11 @@ class AppScanner:
         ksess = None
         try:
             from core_organs import organ_49_scan_knowledge as _sk
+            # A scan that raised its way out of this process earlier never reached finish(), and the
+            # cancel-only popup policy + parked window it claimed are still answering for the world.
+            # Sweeping here (a point where no session of ours can be mid-probe) is what makes that leak
+            # impossible to inherit; releasing at garbage-collection time was tried and lands mid-scan.
+            _sk.release_stale()
             ksess = _sk.open_session(app_name, target_hwnd)
             if ksess is not None:
                 e0 = ksess.start()

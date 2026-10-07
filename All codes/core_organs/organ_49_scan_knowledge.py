@@ -52,6 +52,51 @@ class ProbeDecision:
     cmd_id: str = ""
 
 
+# Sessions that are open RIGHT NOW in this process. A scan owns its session and releases it; this
+# registry exists for the scan that raised its way out and never got there, because the state it
+# claimed (cancel-only popup policy + a parked window) belongs to the WORLD, not to the dead frame.
+# Releasing at garbage-collection time was tried and is wrong: __del__ fires at an arbitrary moment,
+# so an old scan's cleanup can un-park a window and drop the policy in the middle of an unrelated
+# scan that is still exploring. Measured 2026-10-06 (f6): four scan-path tests degraded together,
+# each with a window from some other, finished scan suddenly on screen. Sweeping from a KNOWN safe
+# point - the start of the next scan, the end of a test - is the same cleanup with a time you can
+# reason about.
+_OPEN: List["ScanKnowledgeSession"] = []
+_OPEN_LOCK = threading.Lock()
+
+# Longest a session may stay open before a sweep calls it abandoned. A full active probe is budgeted
+# at PROBE_MAX_S, so anything past that plus a generous margin is not a live scan any more.
+ORPHAN_AFTER_S = float(os.environ.get("HOJAIGA_SCAN_SESSION_ORPHAN_S", str(PROBE_MAX_S + 420)))
+
+
+def open_sessions() -> int:
+    with _OPEN_LOCK:
+        return len([s for s in _OPEN if s._is_open])
+
+
+def release_stale(max_age_s: Optional[float] = None, why: str = "swept before the next scan") -> int:
+    """Release every session this process abandoned: its scan thread is gone, or it has outlived any
+    honest scan. Returns how many. Called from safe points (a scan about to start, a test boundary),
+    never from a finalizer. `max_age_s=0` means "anything still open is abandoned" - correct at a test
+    boundary, where the scan that opened it has already returned."""
+    now = time.time()
+    age_limit = ORPHAN_AFTER_S if max_age_s is None else float(max_age_s)
+    with _OPEN_LOCK:
+        doomed = [s for s in _OPEN
+                  if s._is_open and (s._thr is None or not s._thr.is_alive()
+                                     or (now - s._opened_at) > age_limit)]
+    for s in doomed:
+        try:
+            s.released_because = why
+            s.release()
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("[scan-knowledge] stale release failed: %s", exc)
+    if doomed:
+        logger.warning("[scan-knowledge] released %d abandoned scan session(s): %s",
+                       len(doomed), "; ".join(f"{s.key}/{s.hwnd}" for s in doomed))
+    return len(doomed)
+
+
 class ScanKnowledgeSession:
     def __init__(self, app_name: str, hwnd: int, model=None, grounding=None):
         from core_organs import organ_48_app_behavior_model as bm
@@ -72,13 +117,29 @@ class ScanKnowledgeSession:
         self._pack_thread: Optional[threading.Thread] = None
         self._menu_cache: Dict[str, List[Dict[str, Any]]] = {}
         self._bg = None
+        # ownership of the WORLD-state this session claims in start(): who opened it, when, and whether
+        # it is still open. Only these three facts let a safe-point sweep tell an abandoned scan from a
+        # live one (see _OPEN).
+        self._is_open = False
+        self._thr: Optional[threading.Thread] = None
+        self._opened_at = 0.0
+        self._claim = ""
+        self.released_because = ""
 
     # ---- 1. front-load read-only knowledge ------------------------------------------------
     def start(self) -> Dict[str, Any]:
         bm = self.bm
+        self._thr = threading.current_thread()
+        self._opened_at = time.time()
+        self._is_open = True
+        with _OPEN_LOCK:
+            _OPEN.append(self)
         try:
             from core_organs import popup_mode
-            popup_mode.set_policy("probe")                  # cancel-only dialogs while we explore
+            # OUR claim on "a scanner is exploring right now", not a global write: another live scan's
+            # claim stays true when this one is released, and this one's release cannot be answered for
+            # by a stray writer.
+            self._claim = popup_mode.claim(f"scan:{self.key}:{id(self)}", "scan session")
         except Exception:
             pass
         # whole-scan background session: a minimized app is parked off-screen (never shown, never
@@ -171,6 +232,7 @@ class ScanKnowledgeSession:
 
     def policy(self, item: Dict[str, Any]) -> ProbeDecision:
         bm = self.bm
+        self._keepalive()
         name = item.get("name") or ""
         risk = bm.classify_risk(name)
         cmd = self.model.command_by_name(self.key, name)
@@ -186,9 +248,22 @@ class ScanKnowledgeSession:
             return ProbeDecision("skip_known", cmd["risk"], "verified in this app version", cmd["cmd_id"])
         return ProbeDecision("probe", risk, "unknown or unverified", cmd["cmd_id"] if cmd else "")
 
+    def _keepalive(self) -> None:
+        """A full active probe can run past the policy TTL: refresh while we are genuinely exploring."""
+        if not self._claim:
+            return
+        try:
+            from core_organs import popup_mode
+            popup_mode.heartbeat(self._claim)
+        except Exception:
+            pass
+
     # ---- 3. observation -> knowledge ----------------------------------------------------------
     def light_state(self):
-        return self.bm.observe(self.hwnd, grounding=self.g, max_nodes=350)
+        # deep=False: this runs before and after EVERY probe, and everything compared below is names,
+        # windows and title — all of which organ_48 gets from one cached bulk snapshot. Walking the tree
+        # per probe was the scan's largest single cost and bought nothing this path can see.
+        return self.bm.observe(self.hwnd, grounding=self.g, max_nodes=350, deep=False)
 
     def record_probe(self, item: Dict[str, Any], before, effect: str, new_controls: int = 0,
                      dialog_elements: Optional[List[Dict[str, Any]]] = None,
@@ -249,10 +324,23 @@ class ScanKnowledgeSession:
             self.stats["stopped"] = why
         return why
 
-    def finish(self) -> Dict[str, Any]:
+    def release(self) -> None:
+        """Undo what start() did to the WORLD: the popup policy returns to task-time and the parked
+        window returns to where it was. Nothing here touches our stats - it is safe to call early.
+
+        A caller that only front-loads the read-only E0 map (fast_scan) must call this, or its
+        cancel-only popup policy keeps answering every later dialog until the TTL runs out - and it
+        keeps the window parked. Measured 2026-10-06: that leak decided four suite tests at once.
+        """
+        self._is_open = False
+        with _OPEN_LOCK:
+            if self in _OPEN:
+                _OPEN.remove(self)
         try:
             from core_organs import popup_mode
-            popup_mode.set_policy("task")
+            if self._claim:
+                popup_mode.unclaim(self._claim)             # only OURS; a sibling scan keeps probe
+                self._claim = ""
         except Exception:
             pass
         if self._bg is not None:
@@ -261,6 +349,9 @@ class ScanKnowledgeSession:
             except Exception:
                 pass
             self._bg = None
+
+    def finish(self) -> Dict[str, Any]:
+        self.release()
         if self._pack_thread is not None:
             self._pack_thread.join(timeout=3.0)
             if self._pack_thread.is_alive():

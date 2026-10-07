@@ -308,7 +308,8 @@ class _PAINTSTRUCT(ctypes.Structure):
 class PaintedDialog:
     """An owner-less top-level window that exposes NOTHING: no child controls, no UIA children - its message and its two 'buttons' are
     drawn with GDI, and it answers WM_LBUTTONDOWN by hit-testing its own rectangles. The only way to read or press it is to look at it.
-    `result` records which button was pressed ('' while open); `clicks` counts every click that reached it."""
+    `result` records which button was pressed ('' while open); `clicks` counts every click that reached it;
+    `paints` / `hdc_null` / `font_null` say whether it really painted, so a blank capture names its own cause."""
 
     def __init__(self, title: str, lines, buttons, x: int = 420, y: int = 260, sysmenu: bool = True):
         self.title, self.lines, self.buttons = title, list(lines), list(buttons)     # buttons: [(caption, (l, t, r, b) in client coords)]
@@ -316,6 +317,10 @@ class PaintedDialog:
         self._sysmenu = sysmenu          # False: a title bar with NO close box - the painted buttons are the only way out
         self.result = ""
         self.clicks = 0
+        self.paints = 0            # WM_PAINT calls this window actually handled
+        self.hdc_null = 0          # BeginPaint returned NULL: this process is out of GDI objects (P0-B)
+        self.font_null = 0         # CreateFontW returned NULL: the same story one layer down
+        self._proc = None          # the WNDPROC callback kept alive for the window's lifetime (set in _run)
         self.hwnd: Optional[int] = None
         self._ready = threading.Event()
         self._thread = threading.Thread(target=self._run, daemon=True, name="PaintedDialog")
@@ -325,17 +330,28 @@ class PaintedDialog:
         if msg == WM_PAINT:
             ps = _PAINTSTRUCT()
             hdc = user32.BeginPaint(hwnd, ctypes.byref(ps))
+            # Count what actually happened, so "the fixture never painted" can be TOLD APART from "the fixture
+            # painted onto nothing". A NULL BeginPaint hdc is GDI exhaustion (P0-B: a long suite process runs out
+            # of GDI objects and every later capture comes back blank); paints==0 means the thread never ran the
+            # handler at all. Measured 2026-10-06 in-suite: ink=0/0 of 2400 with no way to say which of the two it was.
+            self.paints += 1
+            if not hdc:
+                self.hdc_null += 1
+                return 0
             font = gdi32.CreateFontW(-26, 0, 0, 0, 400, 0, 0, 0, 0, 0, 0, 5, 0, "Arial")
-            old = gdi32.SelectObject(hdc, font)
-            gdi32.SetBkMode(hdc, 1)
-            gdi32.SetTextColor(hdc, 0)
-            for i, text in enumerate(self.lines):
-                gdi32.TextOutW(hdc, 24, 24 + i * 40, text, len(text))
-            for cap, (l, t, r, b) in self.buttons:
-                gdi32.Rectangle(hdc, l, t, r, b)
-                gdi32.TextOutW(hdc, l + 18, t + 12, cap, len(cap))
-            gdi32.SelectObject(hdc, old)
-            gdi32.DeleteObject(font)
+            if not font:
+                self.font_null += 1
+            else:
+                old = gdi32.SelectObject(hdc, font)
+                gdi32.SetBkMode(hdc, 1)
+                gdi32.SetTextColor(hdc, 0)
+                for i, text in enumerate(self.lines):
+                    gdi32.TextOutW(hdc, 24, 24 + i * 40, text, len(text))
+                for cap, (l, t, r, b) in self.buttons:
+                    gdi32.Rectangle(hdc, l, t, r, b)
+                    gdi32.TextOutW(hdc, l + 18, t + 12, cap, len(cap))
+                gdi32.SelectObject(hdc, old)
+                gdi32.DeleteObject(font)
             user32.EndPaint(hwnd, ctypes.byref(ps))
             return 0
         if msg == WM_LBUTTONDOWN:

@@ -8,7 +8,12 @@ What lands within the budget (and is persisted to the behavior DB exactly like a
     thread while the app starts, so its cost is hidden behind the launch;
   * the control tree (one bulk UIA read), the menu tree (Win32 HMENU read first, then the UIA expand/collapse crawl, both under a
     time budget), the layout map (regions + controls with window-relative positions);
-  * NO probing (that is exploration, `master()`, cumulative and resumable).
+  * NO probing during the budget (that is exploration): the map is returned first and the BEHAVIOR half
+    continues in the background (scan_learner -> organ_63's cumulative, resumable frontier), so
+    `rep["learn"]` says what is being learned and `rep["capability"]` is the capability card of what is
+    known right now (surface, map, can-do graph, blind spots, honest verdict);
+  * virtualized content (XAML footers, long lists) is part of the returned map: every vertical
+    ScrollPattern container is scrolled to its end, re-read and merged, then scrolled back (REVEAL).
 Vision enrichment is the slow part (OmniParser on CPU: 80-260 s). It runs AFTER the structure is returned, in a daemon thread, and only
 when the UIA tree is sparse (a canvas / Chromium app): `rep["vision"]` says 'not needed', 'scheduled' or why not, and
 `wait_for_vision(rep, timeout)` collects the result. It never blocks the caller and never claims results it does not have.
@@ -23,8 +28,32 @@ import uuid
 from typing import Any, Dict, List, Optional, Tuple
 
 SPARSE_NODES = 25            # a UIA tree smaller than this is "sparse": the visible content is probably not in it
+# Tiered scan rails (the any-app contract): REVEAL folds virtualized content (scroll to the end of every
+# ScrollPattern container, re-read, merge, restore) into the returned map; LEARN hands the behavior half to
+# scan_learner's background job so the report still lands within the budget. Both degrade honestly: a
+# failure is recorded in the report, never hidden. Opt outs: HOJAIGA_SCAN_REVEAL=0, HOJAIGA_SCAN_LEARN=0.
+REVEAL = os.environ.get("HOJAIGA_SCAN_REVEAL", "1") != "0"
 _VISION: Dict[str, Dict[str, Any]] = {}      # job id -> {"state": scheduled|running|done|failed|cancelled, ...}
 _GEN = {"n": 0}                               # generation: a newer enrichment cancels the older one's write-back
+
+
+def _merge_rows(base: List[Dict[str, Any]], more: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], int]:
+    """Union two bulk snapshots (top + scroll-revealed bottom) keyed by what a node IS, not by its
+    snapshot-local idx: (parent-name, ctype, name, aid, rect). Rows from `more` that survive the dedupe
+    are the materialized virtualized content; the count is what a report calls extra_nodes."""
+    def _key(r):
+        return (r.get("ctype"), r.get("name"), r.get("aid"), tuple(r.get("rect") or []))
+    seen = {_key(r) for r in base}
+    extra = 0
+    merged = list(base)
+    for r in more or []:
+        k = _key(r)
+        if k in seen:
+            continue
+        seen.add(k)
+        extra += 1
+        merged.append(r)
+    return merged, extra
 
 
 def _static_job(name: str, model, out: Dict[str, Any]) -> None:
@@ -60,7 +89,29 @@ def _vision_job(job: str, gen: int, png: str, model, key: str) -> None:
         rows = [{"name": getattr(e, "name", "") or getattr(e, "text", "") or "", "type": getattr(e, "role", "") or "icon"} for e in els]
         rows = [r for r in rows if r["name"]]
         model.record_region(key, "vision:enrichment", rows[:400], via="fast_scan:vision")
-        st.update({"state": "done", "elements": len(els), "named": len(rows), "seconds": round(time.time() - t, 1)})
+        # PERSIST the boxes as ADDRESSABLE pixel rows (organ_50, via='ocr') so a tree-blind app can be
+        # acted on later without re-running the (80-260 s) engine. Coords are stored normalized to the
+        # captured image, so the actuator maps them onto the window's CURRENT rect and re-grounds before
+        # clicking (a stale rect never produces a fake pass). This is what the capability card counts as
+        # pixel grounding and what the OCR-GROUND test targets.
+        grounded = 0
+        try:
+            from PIL import Image as _Img
+            from core_organs import organ_50_layout_map as o50
+            with _Img.open(png) as _im:
+                iw, ih = _im.size
+            px = []
+            for e in els:
+                nm = (getattr(e, "name", "") or getattr(e, "text", "") or "").strip()
+                b = getattr(e, "bounds", None)
+                if not nm or not b or list(b)[2] <= list(b)[0] or list(b)[3] <= list(b)[1]:
+                    continue
+                px.append({"name": nm, "role": getattr(e, "role", "") or "icon", "bbox": [int(v) for v in list(b)[:4]]})
+            grounded = o50.save_pixels(model, key, (0, 0, iw, ih), px, via="ocr")
+        except Exception as exc:  # noqa: BLE001
+            st["ground_err"] = f"{type(exc).__name__}: {str(exc)[:80]}"
+        st.update({"state": "done", "elements": len(els), "named": len(rows), "grounded": grounded,
+                   "seconds": round(time.time() - t, 1)})
     except Exception as exc:  # noqa: BLE001
         st.update({"state": "failed", "why": f"{type(exc).__name__}: {str(exc)[:120]}"})
     finally:
@@ -80,15 +131,36 @@ def wait_for_vision(rep: Dict[str, Any], timeout_s: float = 0.0) -> Dict[str, An
     return dict(_VISION[job])
 
 
-def _snapshot_rows(hwnd: int) -> List[Dict[str, Any]]:
+def _snapshot_rows(hwnd: int, timeout_ms: Optional[int] = None, cheap: bool = False) -> List[Dict[str, Any]]:
     """Bulk UIA snapshot as plain JSON-safe rows (call INSIDE a BackgroundSession for a parked window).
-    Node objects never leave this function: reports stay serializable."""
+    Node objects never leave this function: reports stay serializable.
+    `timeout_ms` bounds the ONE UIA transaction so the caller's time budget is honoured - leaving it out means
+    fast_uia's 12 s default, which is LONGER than the 10 s budget S1 scans with, and that is exactly how a scan
+    that was told to stop at 10 s measured 15-23 s (measured 2026-10-06: 2776 nodes, 15.2 s, three runs running)."""
     from core_organs import fast_uia
-    nodes = fast_uia.snapshot(hwnd) or []
+    nodes = fast_uia.snapshot(hwnd, timeout_ms=timeout_ms, cheap=cheap) or []
     return [{"idx": n.idx, "parent": n.parent, "depth": n.depth, "ctype": n.ctype, "name": n.name,
              "aid": n.aid, "cls": n.cls, "rect": list(n.rect), "enabled": bool(n.enabled),
              "offscreen": bool(n.offscreen), "accel": n.accel, "help": (n.help or "")[:120],
              "pats": list(n.pats)} for n in nodes]
+
+
+def _walk_rows(hwnd: int, left_s: float) -> Tuple[List[Dict[str, Any]], str]:
+    """The tree walk, run TO THE BUDGET that is actually left: the full raw-view tree first, then the cheap
+    control-view rung with whatever time remains. Returns (rows, rung) where rung is 'raw-view',
+    'control-view' or 'timed-out' - so a report can say how it got its numbers instead of implying the app
+    was slow. A window that cannot answer in its slice is reported as timed out, not silently walked for
+    twice the budget."""
+    slice_ms = int(max(1200.0, min(max(0.0, left_s), 12.0) * 1000))
+    rows = _snapshot_rows(hwnd, timeout_ms=slice_ms)
+    if rows:
+        return rows, "raw-view"
+    left2 = max(0.0, left_s - slice_ms / 1000.0)
+    if left2 > 0.5:
+        rows = _snapshot_rows(hwnd, timeout_ms=int(max(1000.0, left2 * 1000.0)), cheap=True)
+        if rows:
+            return rows, "control-view"
+    return [], "timed-out"
 
 
 def deep_scan(target: str, model=None, *, budget_s: float = 10.0, vision: bool = True, close_if_launched: bool = True,
@@ -103,15 +175,26 @@ def deep_scan(target: str, model=None, *, budget_s: float = 10.0, vision: bool =
     model = model or bm.get_model()
     key = bm._app_key(target)
     t0 = time.time()
+    # ---- DYNAMIC SCAN BUDGET (the any-app time contract, made robust for complex apps) --------------------
+    # A simple window must come back fast; a big or slow app is GRANTED proportionally MORE time, bounded by a
+    # hard max, so the old one-size 10s no longer truncates real apps into an empty/"over budget" map. Readiness
+    # (the runaway cost - historically 20s + 15s hardcodes inside universal_scan) is capped to a slice of this
+    # budget. `within_budget` is measured against the EFFECTIVE budget and the report states base/effective and
+    # whether it was extended - honestly, never a hidden overrun. Knobs: HOJAIGA_SCAN_BUDGET_BASE_S/_MAX_S/_READY_FRAC.
+    _base = max(float(budget_s), float(os.environ.get("HOJAIGA_SCAN_BUDGET_BASE_S", "15")))
+    _hardmax = max(_base, float(os.environ.get("HOJAIGA_SCAN_BUDGET_MAX_S", "30")))
+    budget = min(_base, _hardmax)
+    _rfrac = min(0.8, max(0.2, float(os.environ.get("HOJAIGA_SCAN_BUDGET_READY_FRAC", "0.55"))))
+    ready_budget = max(2.5, min(budget * _rfrac, budget - 2.0))
     st: Dict[str, Any] = {}
     th = threading.Thread(target=_static_job, args=(target, model, st), daemon=True, name="fast-scan-static")
     th.start()                                                       # hidden behind the launch + readiness wait
-    e0_budget = max(1.5, budget_s * 0.25)
+    e0_budget = max(1.5, budget * 0.25)
     # the vision capture needs the window while it is still open; do it through the scan's own `on_window` hook is too early (not laid out),
     # so close_if_launched is deferred and the capture happens right after the structure is read
     rep = us.scan_desktop(target, model, deepen=False, e1_actions=0, close_if_launched=False, fresh=fresh, fast=True,
-                          e0_budget_s=e0_budget, hwnd_hint=target_hwnd or 0, force=force)
-    th.join(timeout=max(0.0, budget_s - (time.time() - t0)) + 2.0)
+                          e0_budget_s=e0_budget, ready_budget_s=ready_budget, hwnd_hint=target_hwnd or 0, force=force)
+    th.join(timeout=max(0.0, budget - (time.time() - t0)) + 2.0)
     rep["static"] = st.get("static", {"ok": False, "error": "static harvest did not finish"})
     rep["phases"]["static_s(parallel)"] = st.get("static_s")
     hwnd = int(target_hwnd or 0) or int(rep.get("hwnd") or 0)          # the scan's own window; never re-resolved by name (could hit the user's)
@@ -126,68 +209,142 @@ def deep_scan(target: str, model=None, *, budget_s: float = 10.0, vision: bool =
     # trust; menu tree + accelerators; skip_known de-dup). open_session returns None when organ_48/UIA are
     # unavailable -> the scan runs exactly as before. NO probing here (that stays cumulative in master()).
     rep["knowledge_e0"] = {"available": False}
+    _ks = None
     if hwnd:
         try:
             from core_organs import organ_49_scan_knowledge as _sk
+            _sk.release_stale()                    # an earlier scan in THIS process may have died mid-run
             _ks = _sk.open_session(target, hwnd)
             if _ks is not None:
                 _e0 = _ks.start() or {}
                 rep["knowledge_e0"] = {"available": True, **{k: v for k, v in _e0.items() if k != "methods"}}
         except Exception:  # noqa: BLE001
             rep["knowledge_e0"] = {"available": False, "why": "organ_49 open_session/start failed (degraded: scan unaffected)"}
-    nodes = rep.get("tree_nodes_when_ready") or 0
-    lay = rep.get("layout") or {}
-    rep["tree"] = {"nodes": nodes, "controls_mapped": lay.get("controls"), "regions": lay.get("regions"), "sections": len(rep.get("sections") or [])}
-    cmds = model.commands(key, limit=5000)
-    menu_cmds = [c for c in cmds if (c.get("menu_path") or "").count(">") >= 0 and (c.get("origin") or "").startswith(("e0:", "static:"))]
-    rep["menus"] = {"commands": len(menu_cmds), "with_path": sum(1 for c in menu_cmds if ">" in (c.get("menu_path") or "")),
-                    "methods": [m.get("method") for m in (rep.get("e0", {}).get("methods") or [])]}
-    # ---- final pass, ONE background session: tree measurement (when asked) + async vision enrichment.
-    # A parked window virtualizes its content tree away outside its session, so both must share it.
-    rep["vision"] = {"state": "skipped"}
-    rep["_measure_rows"] = None
-    want_capture = False
-    if not vision:
-        rep["vision"] = {"state": "disabled by the caller"}
-    elif nodes >= SPARSE_NODES:
-        rep["vision"] = {"state": "not needed", "why": f"the UIA tree is rich ({nodes} nodes): vision would only repeat it"}
-    elif not hwnd:
-        rep["vision"] = {"state": "skipped", "why": "no window to capture"}
-    else:
-        want_capture = True
-    if (measure_tree or want_capture) and hwnd:
+    try:                                                    # whatever happens below, the session is released
+        nodes = rep.get("tree_nodes_when_ready") or 0
+        # complex app -> GRANT proportionally more structure/reveal time (bounded by the hard max), so a big tree
+        # is read fully instead of being truncated by a budget sized for a trivial window. Reported honestly.
+        if nodes >= SPARSE_NODES and budget < _hardmax:
+            _ext = min(_hardmax, budget + max(3.0, budget * 0.5))
+            rep["budget_extended"] = {"from": round(budget, 1), "to": round(_ext, 1), "why": f"complex app: {nodes} nodes"}
+            budget = _ext
+        rep["budget_s_effective"] = round(budget, 1)
+        lay = rep.get("layout") or {}
+        rep["tree"] = {"nodes": nodes, "controls_mapped": lay.get("controls"), "regions": lay.get("regions"), "sections": len(rep.get("sections") or [])}
+        cmds = model.commands(key, limit=5000)
+        menu_cmds = [c for c in cmds if (c.get("menu_path") or "").count(">") >= 0 and (c.get("origin") or "").startswith(("e0:", "static:"))]
+        rep["menus"] = {"commands": len(menu_cmds), "with_path": sum(1 for c in menu_cmds if ">" in (c.get("menu_path") or "")),
+                        "methods": [m.get("method") for m in (rep.get("e0", {}).get("methods") or [])]}
+        # ---- final pass, ONE background session: tree measurement (when asked) + async vision enrichment.
+        # A parked window virtualizes its content tree away outside its session, so both must share it.
+        rep["vision"] = {"state": "skipped"}
+        rep["_measure_rows"] = None
+        want_capture = False
+        if not vision:
+            rep["vision"] = {"state": "disabled by the caller"}
+        elif nodes >= SPARSE_NODES:
+            rep["vision"] = {"state": "not needed", "why": f"the UIA tree is rich ({nodes} nodes): vision would only repeat it"}
+        elif not hwnd:
+            rep["vision"] = {"state": "skipped", "why": "no window to capture"}
+        else:
+            want_capture = True
+        if (measure_tree or want_capture or REVEAL) and hwnd:
+            try:
+                from core_organs import headless_input as hin
+                from core_organs import background_window as bw
+                img, note = None, ""
+                rows = None
+                with bw.BackgroundSession(hwnd):
+                    if measure_tree or REVEAL:
+                        tm = time.time()
+                        rows, rung = _walk_rows(hwnd, budget - (time.time() - t0))
+                        rep.setdefault("phases", {})["measure_ms"] = int((time.time() - tm) * 1000)
+                        if measure_tree:
+                            rep["_measure_rows"], rep["walk_rung"] = rows, rung
+                    # ---- scroll-reveal merge (tiered map): force every vertical ScrollPattern container to
+                    # its end so XAML/uia virtualized items (footer, long lists) materialize, re-read, merge
+                    # the new nodes into the map, and SCROLL BACK - the app is left exactly as found. Only
+                    # when the budget can still carry it; a miss is recorded, never hidden. The reveal is HARD-
+                    # BOUNDED to a slice of what is left (each UIA trip is capped), so it can NEVER push the
+                    # instant map past its budget - the ≤budget_s guarantee is the contract's first promise.
+                    if REVEAL and rows is not None:
+                        left = budget - (time.time() - t0)
+                        if left > 4.5:                       # need room for reveal + re-read + restore + reserve
+                            try:
+                                from core_organs import desktop_grounding as dg
+                                avail = left - 1.6           # reserve for the downstream capture/report
+                                rev_to = max(0.6, min(2.2, avail / 3.0))   # each UIA trip bounded; restore re-checked
+                                moved = dg.reveal_by_scrolling(hwnd, timeout_s=rev_to)
+                                rep["reveal"] = {"moved": bool(moved)}
+                                if moved:
+                                    rows2 = _snapshot_rows(hwnd, timeout_ms=int(max(600.0, min(rev_to, (budget - (time.time() - t0) - 1.2)) * 1000.0)))
+                                    merged, extra = _merge_rows(rows, rows2)
+                                    left2 = budget - (time.time() - t0)
+                                    if left2 > 0.8:          # still restore, but only within what remains
+                                        dg.reveal_by_scrolling(hwnd, to_bottom=False, timeout_s=max(0.5, min(rev_to, left2 - 0.5)))
+                                    rep["reveal"] = {"moved": True, "extra_nodes": extra,
+                                                     "snapshot_nodes": len(rows2), "reveal_timeout_s": round(rev_to, 2)}
+                                    if measure_tree:
+                                        rep["_measure_rows"] = merged
+                                        rep["tree"] = {**(rep.get("tree") or {}), "nodes_revealed": extra}
+                            except Exception as exc:  # noqa: BLE001
+                                rep["reveal"] = {"moved": False, "why": f"{type(exc).__name__}: {str(exc)[:120]}"}
+                        else:
+                            rep["reveal"] = {"moved": False,
+                                             "why": "no budget left at reveal (%.1fs left)" % max(0.0, left)}
+                    if want_capture:
+                        time.sleep(0.5)
+                        img, note = hin.capture_window(hwnd)
+                if not want_capture:
+                    pass                                   # measurement only; vision state already reported above
+                elif img is None:
+                    rep["vision"] = {"state": "skipped", "why": f"capture failed ({note})"}
+                else:
+                    png = os.path.join(os.environ.get("TEMP", "."), f"hj_fs_{uuid.uuid4().hex[:8]}.png")
+                    img.save(png, format="PNG")
+                    _GEN["n"] += 1
+                    job = f"v{_GEN['n']}"
+                    _VISION[job] = {"state": "scheduled", "app": key}
+                    threading.Thread(target=_vision_job, args=(job, _GEN["n"], png, model, key), daemon=True, name="fast-scan-vision").start()
+                    rep["vision"] = {"state": "scheduled", "job": job, "why": f"sparse UIA tree ({nodes} nodes): OmniParser runs in the background"}
+            except Exception as exc:  # noqa: BLE001
+                rep["vision"] = {"state": "skipped", "why": f"{type(exc).__name__}: {str(exc)[:100]}"}
+        if rep.get("launch", {}).get("launched") and close_if_launched and hwnd:
+            from core_organs import background_window as bw2
+            rep["closed"] = bool(bw2.is_ours(hwnd)) and us.close_window(hwnd)   # only a window THIS process launched can be closed by us
+        # ---- tiered scan (the any-app contract): the BEHAVIOR half continues in the background, and
+        # this report carries the capability card of what is known RIGHT NOW. Only when a window is
+        # actually left on the machine: an app the scan launched and closed has nothing to learn now
+        # (its next open re-scans and queues the learner then). Both degrade honestly into the report.
+        if hwnd and not rep.get("closed"):
+            try:
+                from core_organs import scan_learner
+                rep["learn"] = scan_learner.learn_in_background(target, hwnd, model=model)
+            except Exception as exc:  # noqa: BLE001
+                rep["learn"] = {"started": False, "status": "error",
+                                "why": f"{type(exc).__name__}: {str(exc)[:120]}"}
         try:
-            from core_organs import headless_input as hin
-            from core_organs import background_window as bw
-            img, note = None, ""
-            with bw.BackgroundSession(hwnd):
-                if measure_tree:
-                    tm = time.time()
-                    rep["_measure_rows"] = _snapshot_rows(hwnd)
-                    rep.setdefault("phases", {})["measure_ms"] = int((time.time() - tm) * 1000)
-                if want_capture:
-                    time.sleep(0.5)
-                    img, note = hin.capture_window(hwnd)
-            if not want_capture:
-                pass                                   # measurement only; vision state already reported above
-            elif img is None:
-                rep["vision"] = {"state": "skipped", "why": f"capture failed ({note})"}
-            else:
-                png = os.path.join(os.environ.get("TEMP", "."), f"hj_fs_{uuid.uuid4().hex[:8]}.png")
-                img.save(png, format="PNG")
-                _GEN["n"] += 1
-                job = f"v{_GEN['n']}"
-                _VISION[job] = {"state": "scheduled", "app": key}
-                threading.Thread(target=_vision_job, args=(job, _GEN["n"], png, model, key), daemon=True, name="fast-scan-vision").start()
-                rep["vision"] = {"state": "scheduled", "job": job, "why": f"sparse UIA tree ({nodes} nodes): OmniParser runs in the background"}
+            from core_organs import capability_card
+            rep["capability"] = capability_card.build_card(target, hwnd, model=model, scan=rep)
         except Exception as exc:  # noqa: BLE001
-            rep["vision"] = {"state": "skipped", "why": f"{type(exc).__name__}: {str(exc)[:100]}"}
-    if rep.get("launch", {}).get("launched") and close_if_launched and hwnd:
-        from core_organs import background_window as bw2
-        rep["closed"] = bool(bw2.is_ours(hwnd)) and us.close_window(hwnd)   # only a window THIS process launched can be closed by us
-    rep["seconds"] = round(time.time() - t0, 2)
-    rep["within_budget"] = rep["seconds"] <= budget_s
-    return rep
+            rep["capability"] = {"error": f"{type(exc).__name__}: {str(exc)[:120]}"}
+        rep["seconds"] = round(time.time() - t0, 2)
+        # within_budget is honest against the EFFECTIVE (dynamic) budget the scan actually honoured, which is the
+        # caller's ask OR the complexity-extended allowance - never a silently-larger number.
+        rep["within_budget"] = rep["seconds"] <= budget + 0.15
+        return rep
+    finally:
+        # Released at the END of the scan, not the end of the E0 map: start() parked the window, and the
+        # measure/capture pass below still works inside that park (sessions ref-count). Releasing it
+        # early made every later phase park the window a second time - and left whatever the scan was
+        # walking visible for the rest of the run. Measured 2026-10-06: the walk went 4.6 s -> 15-23 s
+        # and minimized-window tests started reporting their own window on screen. This IS the release
+        # the popup leak needed; it just belongs here, once, on every path out.
+        if _ks is not None:
+            try:
+                _ks.release()
+            except Exception:  # noqa: BLE001
+                pass
 
 
 # ---------------------------------------------------------------- legacy-shape adapter
@@ -251,20 +408,23 @@ def deep_scan_legacy_shape(target: str, target_hwnd: int = 0, *, budget_s: float
     # (a parked/off-screen window virtualizes its content tree away outside a session — Explorer shows 8 nodes there,
     # 460 inside). Fallback: take one here if the scan never got to measure (transient COM errors retried once).
     rows = rep.pop("_measure_rows", None) or []
+    rung = rep.pop("walk_rung", None) or ("raw-view" if rows else "")
     walk_ms = int((rep.get("phases") or {}).get("measure_ms") or 0)
     capped = len(rows) >= 20000
     if not rows and hwnd:
         from core_organs import background_window as bw
         t = _t.perf_counter()
+        # whatever the scan itself has not already spent - never fast_uia's 12 s default on top of it
+        left = max(0.5, float(budget_s) - float(rep.get("seconds") or 0.0))
         for _attempt in range(2):
             try:
                 with bw.BackgroundSession(hwnd):
-                    rows = _snapshot_rows(hwnd)
+                    rows, rung = _walk_rows(hwnd, left)
             except Exception:  # noqa: BLE001
                 try:
-                    rows = _snapshot_rows(hwnd)
+                    rows, rung = _walk_rows(hwnd, left)
                 except Exception:  # noqa: BLE001
-                    rows = []
+                    rows, rung = [], "walk-failed"
             if rows:
                 break
             _t.sleep(0.3)
@@ -288,6 +448,10 @@ def deep_scan_legacy_shape(target: str, target_hwnd: int = 0, *, budget_s: float
     else:
         app_interaction, guide = "MIXED_APP", "Mixed controls; choose per element from the scan list."
     stopped_by = rep.get("error") or (rep.get("e0") or {}).get("stopped") or "scan-complete"
+    if not rows and rung in ("timed-out", "walk-failed"):
+        # The rail that stopped us was OUR budget, not the app: say which, so an over-budget read is never
+        # mistaken for "this window has no tree".
+        stopped_by = f"uia-walk-{rung} (budget {int(float(budget_s))}s)"
     out = dict(rep)                                                            # keep seconds/within_budget/static/tree/menus/vision/phases
     out.update({
         "app_name": rep.get("window_title") or target,
@@ -308,7 +472,9 @@ def deep_scan_legacy_shape(target: str, target_hwnd: int = 0, *, budget_s: float
             "max_depth_seen": max((r["depth"] for r in rows), default=0),
             # honest: the bulk snapshot has NO depth cap; its only rail is the node ceiling
             "walk_max_depth": 0,
-            "walk_style": "bulk cached UIA snapshot (fast_uia); no depth cap, node cap 20000",
+            "walk_style": "bulk cached UIA snapshot (fast_uia); no depth cap, node cap 20000, one transaction "
+                          "bounded by the budget that is left (raw view first, control view as the cheap rung)",
+            "walk_rung": rung,                    # raw-view | control-view | timed-out | walk-failed
             "depth_hit_cap": False,
             "time_budget_ms": int(budget_s * 1000),
             "time_budget_hit": not out.get("within_budget", False),

@@ -71,6 +71,20 @@ from typing import Dict, Any, Optional
 
 logger = logging.getLogger("hojaiga.organ37.llm_gateway")
 
+# MODULE-LEVEL call ledger: every LLMGateway() instance shares it, so a caller (or a test) can prove that a
+# decision path made ZERO big-model calls. 'brain' = the 7B execute_inference rung; 'small' = the 1-3B
+# execute_small_inference rung. reset_call_counts()/call_counts() are the assertions the NO-LLM-PATH test uses.
+_CALLS = {"brain": 0, "small": 0}
+
+
+def call_counts() -> dict:
+    return dict(_CALLS)
+
+
+def reset_call_counts() -> None:
+    _CALLS["brain"] = 0
+    _CALLS["small"] = 0
+
 class LLMGatewayError(Exception):
     pass
 
@@ -513,7 +527,7 @@ class LLMGateway:
     def execute_inference(self, system: str, prompt: str, temperature: float = 0.3, timeout: float = 120.0) -> str:
         """Route to local Ollama models with graceful fallback to free tiers.
         Auto-heals: if Gatekeeper is dead, refreshes it and retries."""
-        
+        _CALLS["brain"] += 1
         # Auto-bootstrap on first call
         if not self._booted:
             self.bootstrap()
@@ -559,6 +573,7 @@ class LLMGateway:
         Uses qwen2.5vl:3b (3GB) — handles text+vision, fast, fits alongside main brain.
         Falls back to main brain (qwen2.5:7b) only if qwen fails.
         """
+        _CALLS["small"] += 1
         try:
             return self._call_ollama_model(self.small_model, system, prompt, temperature, timeout)
         except Exception as exc:

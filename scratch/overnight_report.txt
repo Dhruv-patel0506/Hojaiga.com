@@ -1,0 +1,44 @@
+00:27:14  
+==============================================================================
+00:27:14  OVERNIGHT HOJAIGA TEST START  2026-10-07 00:27:14
+00:27:14  ==============================================================================
+00:27:15  PHASE 1  app-ladder (perception/brain/vision)  qwen-vl=up
+00:27:15  -- Visual Studio Code
+00:28:27    Visual Studio Code           hard   score=60.7 nodes=19 act=6 depth=9 scan=323ms vision_needed=True trunc=False
+      ladder: 5 elements (uia 5; by tier {'uia': 5}) per-tier ms {'uia': 62.7, 'ocr': 71.6, 'vision': 86.8} in 0.3s; ready after 3.02s
+      cleanup: window closed; stopped 14 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1731ms/decision (n=3)
+      vision[Qwen2.5-VL-7B locate]: hit 0/2 26490ms/locate 
+00:28:27  -- WhatsApp
+00:28:30    WhatsApp                     hard   score=32.1 nodes=7 act=4 depth=3 scan=28ms vision_needed=True trunc=False
+      ladder: 4 elements (uia 4; by tier {'uia': 4}) per-tier ms {'uia': 17.7, 'ocr': 31.4, 'vision': 76.7} in 0.2s; ready after 0.97s
+      brain[qwen2.5:7b]: valid=100% correct=100% 1661ms/decision (n=1)
+      vision[Qwen2.5-VL-7B locate]: capture-blank[pw=1 err=0 dib=1038 obj=4/3 px=0.000 where=not-visible xaml=1] (window did not render into PrintWindow)
+00:28:30  -- Settings
+00:29:40    Settings                     medium score=35.3 nodes=220 act=57 depth=10 scan=480ms vision_needed=False trunc=False
+      ladder: 4 elements (uia 4; by tier {'uia': 4}) per-tier ms {'uia': 586.4, 'ocr': 85.2, 'vision': 223.5} in 1.5s; ready after 3.74s
+      cleanup: window closed; stopped 0 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1401ms/decision (n=3)
+      vision[Qwen2.5-VL-7B locate]: hit 2/2 24372ms/locate 
+00:29:40  -- Microsoft Teams (PWA)
+00:30:08    Microsoft Teams (PWA)        medium score=50.7 nodes=191 act=29 depth=9 scan=1218ms vision_needed=False trunc=True
+      ladder: 0 elements (uia 0; by tier {}) per-tier ms {} in 0.1s; ready after 12.8s
+      cleanup: window closed; stopped 17 process(es) of its own family
+      brain[qwen2.5:7b]: valid=100% correct=100% 1840ms/decision (n=3)
+      vision[Qwen2.5-VL-7B locate]: window-minimized
+00:30:08  -- web tier (Chrome temporary agent, CDP :9222)
+00:30:24    registry: [('https://www.linkedin.com', 'hard', 0), ('https://www.youtube.com', 'hard', 0), ('https://accounts.google.com', 'hard', 7), ('https://mail.google.com', 'medium', 0)] new=[] poll=4.0s
+00:30:24  PHASE 2  actuation (real headless clicks + postcondition, bounded, reversible)
+00:30:24  -- operate_app('Settings', ['open the About page'], max_steps=4)
+00:31:28     completed=False steps=4 launched=True recipe=None window='Settings' elapsed=63.45s
+00:31:28       step 0: {'goal': 'open the About page', 'element': 'pane', 'verb': 'click', 'verdict': 'NO_CHANGE', 'method': 'postmessage-click->Windows.UI.Core.CoreWindow@(640,520)+r
+00:31:28       step 1: {'goal': 'open the About page', 'element': 'pane', 'verb': 'click', 'verdict': 'NO_CHANGE', 'method': 'postmessage-click->Windows.UI.Core.CoreWindow@(640,520)+r
+00:31:28       step 2: {'goal': 'open the About page', 'element': 'pane', 'verb': 'click', 'verdict': 'NO_CHANGE', 'method': 'postmessage-click->Windows.UI.Core.CoreWindow@(640,520)+r
+00:31:28       step 3: {'goal': 'open the About page', 'element': 'pane', 'verb': 'click', 'verdict': 'NO_CHANGE', 'method': 'postmessage-click->Windows.UI.Core.CoreWindow@(640,520)+r
+00:31:28     cleanup: closed the instance we started
+00:31:28  -- operate_app('Visual Studio Code', ['open the File menu'], max_steps=4)
+00:31:52     completed=True steps=1 launched=True recipe='not enough verified steps to distill' window='Welcome - Visual Studio Code' elapsed=24.57s
+00:31:52       step 0: {'goal': 'open the File menu', 'element': 'Open in Agents Window (Ctrl+Shift+A)', 'verb': 'click', 'verdict': 'PASS', 'method': 'chromium-raw-invoke', 'evidence
+00:31:53     cleanup: closed the instance we started
+00:31:53  OVERNIGHT HOJAIGA TEST DONE  total 279s
+00:31:53  ==============================================================================
