@@ -3823,8 +3823,15 @@ if _HAS_CREWAI:
                 from core_organs.organ_40_app_launcher import AppCatalog, VerbAliasEngine
                 _catalog = AppCatalog()
                 _alias_engine = VerbAliasEngine(_catalog)
-                resolved_name = _alias_engine.resolve(resolved_name)
-                logger.info(f"[SCAN] Resolved '{app_name}' -> '{resolved_name}'")
+                _desired, _src = _alias_engine.resolve_detailed(resolved_name)
+                if _src == "default":
+                    # Nothing concrete matched. app_name is a NAME, not a task verb,
+                    # so trust the literal ("blender" stays "blender"; scanning must
+                    # never be hijacked to the browser default the way task routing is).
+                    logger.info(f"[SCAN] Resolved '{app_name}' -> '{resolved_name}' (literal, no alias)")
+                else:
+                    resolved_name = _desired
+                    logger.info(f"[SCAN] Resolved '{app_name}' -> '{resolved_name}' ({_src})")
             except Exception:
                 pass
 

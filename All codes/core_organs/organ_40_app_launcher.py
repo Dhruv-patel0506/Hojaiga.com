@@ -64,7 +64,18 @@ _ALIASES = {
                       "gmail", "gmail account", "open gmail", "gmail web",
                       "check gmail", "gmail inbox", "gmail spam", "delete gmail",
                       "remove spam", "gmail emails", "webmail", "web mail",
-                      "mail.google.com", "google mail"],
+                      "mail.google.com", "google mail",
+                      # Popular web apps (no meaningful desktop twin on this host;
+                      # anything genuinely installed is handled by the host-inventory
+                      # tier, and ANY bare domain is covered by the domain tier).
+                      "youtube", "chatgpt", "claude", "gemini", "perplexity",
+                      "netflix", "amazon", "flipkart", "ebay", "paypal",
+                      "wikipedia", "reddit", "linkedin", "instagram", "facebook",
+                      "whatsapp", "telegram", "twitch", "spotify", "medium",
+                      "stackoverflow", "github", "gitlab", "coursera", "udemy",
+                      "khan academy", "canva", "figma",
+                      "google docs", "google sheets", "google slides",
+                      "google keep", "google calendar", "google photos"],
     
     # Text Editing
     "notepad": ["note", "notes", "text file", "write text", "document", "txt",
@@ -307,6 +318,14 @@ class AppCatalog:
         return rows
 
     # ── lookup ────────────────────────────────────────────────────────────
+    def all_names(self) -> list[str]:
+        """Every app name learned from this host (Start Menu + winget)."""
+        try:
+            with sqlite3.connect(self.db) as c:
+                return [r[0] for r in c.execute("SELECT name FROM app_catalog")]
+        except Exception:
+            return []
+
     def ensure_scanned(self) -> None:
         """Scan the host once if the catalog is empty (lazy first use)."""
         try:
@@ -496,19 +515,78 @@ class VerbAliasEngine:
         
         return None
 
+    # A dotted name with a real TLD is a website no catalog can improve on:
+    # this single rule covers EVERY domain without enumerating any.
+    _DOMAIN_RE = re.compile(
+        r"\b[a-z0-9][a-z0-9-]{0,62}\.(com|net|org|io|ai|co|dev|app|cloud|gg|me|tv|"
+        r"xyz|info|biz|site|online|store|tech|edu|gov|uk|in|de|fr|jp|ca|au|us)\b")
+
+    def _host_inventory_match(self, task_text: str) -> Optional[str]:
+        """App-NAME tier against the host's OWN installed-app inventory (Start Menu
+        + winget, cached by AppCatalog). This is the general answer to 'add every
+        app': the machine's live list IS the universe of scannable/launchable apps,
+        and it refreshes itself - no dictionary can enumerate the world.
+        Conservative matching (a wrong hit would launch/scan the wrong program):
+          * every core word of the query (generic/launch/filler words dropped) must
+            appear as a WHOLE token in a catalog name; the name may carry up to 3
+            extra tokens (version/edition suffixes);
+          * ties prefer the closest name (fewest extra tokens), then shortest;
+          * returns the user's core word ('powerpoint'), NOT the versioned display
+            name - window titles contain the former.
+        """
+        if os.environ.get("HOJAIGA_HOST_TIER", "1") == "0":
+            return None
+        t = (task_text or "").lower().strip()
+        words = re.findall(r"[a-z0-9]+", t)
+        core = [w for w in words if len(w) >= 2
+                and w not in AppCatalog._GENERIC_TOKENS
+                and w not in _LAUNCH_HINT_WORDS
+                and w not in _NAME_FILLER_WORDS]
+        if not core or len(words) > 5:
+            return None
+        try:
+            self.catalog.ensure_scanned()
+            names = self.catalog.all_names()
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("host inventory tier skipped: %s", exc)
+            return None
+        best = None
+        for n in names:
+            toks = re.findall(r"[a-z0-9]+", (n or "").lower())
+            if not toks or not all(w in toks for w in core):
+                continue
+            extra = len(set(toks) - set(core))
+            if extra > 3:
+                continue
+            cand = (extra, len(n), n)
+            if best is None or cand < best:
+                best = cand
+        if not best:
+            return None
+        resolved = " ".join(core)
+        logger.info("VerbAlias: host-inventory match: '%s' -> '%s' (catalog: %r)",
+                    task_text, resolved, best[2])
+        return resolved
+
     def resolve(self, task_text: str) -> str:
         """Return the desired app NAME for a task (not yet validated as installed)."""
         return self.resolve_detailed(task_text)[0]
 
     def resolve_detailed(self, task_text: str):
         """Return (desired_app_name, source) where source is one of
-        'alias' / 'word' / 'semantic' / 'llm' / 'default'.
+        'alias' / 'word' / 'semantic' / 'installed' / 'llm' / 'default'.
 
         'default' means NOTHING concrete matched (so the caller may still try the
         dynamic app-NAME tier). Crucially a web cue like 'gmail' matches Tier 1
         -> ('google chrome', 'alias'), which lets the planner tell a genuine web
         task apart from an unknown desktop app that merely lacks an alias."""
         t = (task_text or "").lower().strip()
+
+        # Tier 0: a literal domain is a website, full stop - browser. This is the
+        # "every website" answer: one pattern, no enumeration, works for any TLD.
+        if self._DOMAIN_RE.search(t):
+            logger.info("VerbAlias: domain cue: '%s' -> browser", t)
+            return DEFAULT_APP, "alias"
 
         # Tier 1: Exact phrase match (fastest)
         for verb, app in VERB_TO_APP.items():
@@ -536,6 +614,13 @@ class VerbAliasEngine:
         if semantic_match:
             logger.info("VerbAlias: semantic match: '%s' -> '%s'", t, semantic_match)
             return semantic_match, "semantic"
+
+        # Tier 3.5: host installed-app inventory. Every app actually present on
+        # this machine resolves by name here - the general "every app" tier that
+        # removes the need to enumerate the world in _ALIASES.
+        inv = self._host_inventory_match(t)
+        if inv:
+            return inv, "installed"
 
         # Tier 4: Small-LLM intent detection for phrases not in the dictionary.
         if self.gateway:
