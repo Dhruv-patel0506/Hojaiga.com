@@ -517,7 +517,15 @@ class LayoutMapper:
         self.budget.credit(n_static)
         self.stats["static_controls"] = n_static
         if deepen:
-            for phase in (self._deepen_tabs, self._deepen_dropdowns, self._deepen_trees, self._deepen_scroll):
+            # `deepen` is a tri-state: True runs every reversible phase (the cumulative explorer);
+            # "ribbon" runs ONLY the ribbon-revealing phases (select each ribbon tab + open its galleries),
+            # which is the cheap, high-value slice the first-contact scan needs so a ribbon app is not
+            # reduced to the single active tab. Trees/scroll (folders, long lists) stay for the full pass.
+            _RIBBON = (self._deepen_tabs, self._deepen_dropdowns)
+            _FULL = (self._deepen_tabs, self._deepen_dropdowns, self._deepen_trees, self._deepen_scroll)
+            _phases = _RIBBON if deepen == "ribbon" else _FULL
+            self.stats["deepen_mode"] = "ribbon" if deepen == "ribbon" else "full"
+            for phase in _phases:
                 try:
                     phase(root)
                 except Exception as exc:
@@ -557,7 +565,7 @@ CREATE TABLE IF NOT EXISTS bm_layout (
     ctrl_id TEXT, app_key TEXT, region_id TEXT, region_kind TEXT, region_name TEXT, role TEXT, name TEXT,
     automation_id TEXT, cls TEXT, x0 INTEGER, y0 INTEGER, x1 INTEGER, y1 INTEGER,
     rx0 REAL, ry0 REAL, rx1 REAL, ry1 REAL, enabled INTEGER, offscreen INTEGER, patterns TEXT,
-    path TEXT, via TEXT, version_hash TEXT, ts REAL, PRIMARY KEY (app_key, ctrl_id));
+    path TEXT, via TEXT, version_hash TEXT, ts REAL, help TEXT, accel TEXT, PRIMARY KEY (app_key, ctrl_id));
 CREATE INDEX IF NOT EXISTS bm_layout_name ON bm_layout(app_key, name);
 CREATE TABLE IF NOT EXISTS bm_layout_regions (
     region_id TEXT, app_key TEXT, kind TEXT, name TEXT, rx0 REAL, ry0 REAL, rx1 REAL, ry1 REAL,
@@ -565,8 +573,25 @@ CREATE TABLE IF NOT EXISTS bm_layout_regions (
 """
 
 
+def _ensure_layout_cols(model) -> None:
+    """Fresh DBs get help/accel from LAYOUT_SCHEMA; an EXISTING bm_layout does not. Add the columns
+    in place (a no-op once present) so the tooltip/accelerator a ribbon button exposes can be persisted
+    without forcing every user to drop their knowledge DB."""
+    try:
+        have = {r[1] for r in model._conn.execute("PRAGMA table_info(bm_layout)").fetchall()}
+    except Exception:
+        return
+    for col in ("help", "accel"):
+        if col not in have:
+            try:
+                model._conn.execute(f"ALTER TABLE bm_layout ADD COLUMN {col} TEXT")
+            except Exception:
+                pass
+
+
 def save_layout(model, app_key: str, mapper: LayoutMapper, version_hash: str = "") -> int:
     model._conn.executescript(LAYOUT_SCHEMA)
+    _ensure_layout_cols(model)
     prev = model._conn.execute("SELECT version_hash FROM bm_layout_regions WHERE app_key=? LIMIT 1", (app_key,)).fetchone()
     deepened = any(c.get("via", "static") != "static" for c in mapper.controls)
     if prev and prev["version_hash"] == version_hash and not deepened:
@@ -585,10 +610,13 @@ def save_layout(model, app_key: str, mapper: LayoutMapper, version_hash: str = "
         rg = rname.get(c["region_id"], {})
         c = dict(c, name=_redact(c["name"]), path=" > ".join(_redact(x.strip()) for x in (c["path"] or "").split(">")) if c.get("path") else c.get("path", ""))
         model._conn.execute(
-            "INSERT OR REPLACE INTO bm_layout VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "INSERT OR REPLACE INTO bm_layout (ctrl_id, app_key, region_id, region_kind, region_name, role, name,"
+            " automation_id, cls, x0, y0, x1, y1, rx0, ry0, rx1, ry1, enabled, offscreen, patterns, path, via,"
+            " version_hash, ts, help, accel) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (c["ctrl_id"], app_key, c["region_id"], rg.get("kind", ""), _redact(rg.get("name", "")), c["role"], c["name"],
              c["automation_id"], c["cls"], *c["bbox"], *c["rel"], int(c["enabled"]), int(c["offscreen"]),
-             ",".join(c["patterns"]), c["path"], c["via"], version_hash, now))
+             ",".join(c["patterns"]), c["path"], c["via"], version_hash, now,
+             _redact(c.get("help", "") or ""), c.get("accel", "") or ""))
     for r in mapper.regions.values():
         rel = _rel(tuple(r["bbox"]), mapper.win)
         model._conn.execute("INSERT OR REPLACE INTO bm_layout_regions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
@@ -699,12 +727,22 @@ def where(model, app_key: str, name: str, role: str = "") -> List[Dict[str, Any]
     return sorted(out, key=lambda x: -x["score"])
 
 
-def map_layout(model, app_name: str, hwnd: int, *, deepen: bool = True, version_hash: str = "") -> Dict[str, Any]:
-    """Map + persist in one call. Same code path for every app."""
+def map_layout(model, app_name: str, hwnd: int, *, deepen: bool = True, version_hash: str = "",
+               ribbon_budget_s: float = 0.0) -> Dict[str, Any]:
+    """Map + persist in one call. Same code path for every app. `deepen="ribbon"` runs only the
+    reversible tab/gallery reveal, bounded to `ribbon_budget_s` (falls back to the mapper default when
+    0) so a ribbon app's first contact stays a bounded extra slice instead of the 150s full explorer."""
     key = model_key(app_name)
     from core_organs import organ_48_app_behavior_model as _bm
+    _budget = None
+    if deepen == "ribbon" and ribbon_budget_s and ribbon_budget_s > 0:
+        try:
+            _budget = _bm.DiscoveryBudget(base_s=float(ribbon_budget_s), extend_s=0.0,
+                                          max_s=float(ribbon_budget_s), patience=999)
+        except Exception:
+            _budget = None
     with _bm._bg(hwnd) as bg:                           # a minimized window has no layout: park it off-screen
-        mapper = LayoutMapper(hwnd, app_name)
+        mapper = LayoutMapper(hwnd, app_name, budget=_budget)
         summary = mapper.map(deepen=deepen)
         summary["window_mode"] = getattr(bg, "mode", "") or "visible"
     if "error" in summary:
@@ -768,9 +806,10 @@ def layout_to_commands(model, app_key: str) -> int:
     unverified `catalog` knowledge with a graded risk; nothing is executed."""
     bm = __import__("core_organs.organ_48_app_behavior_model", fromlist=["x"])
     model._conn.executescript(LAYOUT_SCHEMA)
+    _ensure_layout_cols(model)
     n = 0
     rows = model._conn.execute(
-        "SELECT name, role, automation_id, patterns, path, via, region_kind, region_name FROM bm_layout "
+        "SELECT name, role, automation_id, patterns, path, via, region_kind, region_name, help, accel FROM bm_layout "
         "WHERE app_key=? AND name<>'' AND enabled=1", (app_key,)).fetchall()
     for r in rows:
         pats = (r["patterns"] or "")
@@ -781,9 +820,16 @@ def layout_to_commands(model, app_key: str) -> int:
         via = r["via"] or "static"
         prefix = via.split(":", 1)[1] if ":" in via else (r["region_name"] or r["region_kind"])
         path = f"{prefix} > {r['name']}"[:200]
-        model.upsert_command(app_key, {"name": r["name"], "goal": r["name"], "verb": "invoke", "menu_path": path,
+        # the tooltip a ribbon button exposes IS what it does: carry it as the command's goal (so
+        # semantic lookup matches 'make text bold' to the Bold button) and as provenance evidence, and
+        # keep its keyboard accelerator so the agent can act without clicking the ribbon at all.
+        _help = (r["help"] or "").strip()
+        _accel = (r["accel"] or "").strip()
+        model.upsert_command(app_key, {"name": r["name"], "goal": _help or r["name"], "verb": "invoke", "menu_path": path,
                                        "automation_id": r["automation_id"] or "",
+                                       "shortcut": _accel,
                                        "risk": bm.classify_risk(r["name"], path),
+                                       "evidence": _help,
                                        "post": [{"kind": "ui_changed"}]},
                              source="catalog", origin="layout")
         n += 1

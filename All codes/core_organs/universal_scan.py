@@ -422,11 +422,12 @@ def leave_start_screen(hwnd: int, timeout_s: float = 20.0) -> Dict[str, Any]:
 
 # ------------------------------------------------------------------ desktop pipeline
 
-def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = True,
+def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: Any = True,
                  e1_actions: int = 3, close_if_launched: bool = True, on_window=None,
                  allow_visible: bool = False, force: bool = False, fresh: bool = False,
                  fast: bool = False, e0_budget_s: Optional[float] = None,
-                 ready_budget_s: float = 0.0, hwnd_hint: int = 0) -> Dict[str, Any]:
+                 ready_budget_s: float = 0.0, hwnd_hint: int = 0,
+                 ribbon_budget_s: float = 0.0) -> Dict[str, Any]:
     """`fast=True` is the first-contact profile (P1-G): readiness polled at 150-200 ms instead of 400 ms, the start-screen wait capped at
     4 s, the menu crawl held to `e0_budget_s`, no E1 probing (the caller continues exploration later, cumulatively). Same pipeline, same
     knowledge written; only the waits and the exploration budget change.
@@ -567,7 +568,7 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
                              "skipped": [s for m in e0["methods"] for s in m["skipped"]][:6]}
             rep["phases"]["e0_menus_s"] = round(time.time() - t, 2)
             t = time.time()
-            do_deepen = deepen and not polite and not layout_cached
+            do_deepen = deepen if (deepen and not polite and not layout_cached) else False
             if layout_cached and not force:
                 # WARM START (same law as e0): the layout for this exact version is already mapped — reuse it,
                 # do not rebuild. Re-walking a cached Explorer layout cost ~6 s of every scan (measured 2026-10-06)
@@ -581,10 +582,11 @@ def scan_desktop(name: str, model=None, *, launch: bool = True, deepen: bool = T
                        "region_kinds": None, "deepen": False, "opaque_regions": None,
                        "skipped": "warm start: layout cached for this version"}
             else:
-                lay = lm.map_layout(model, name, hwnd, deepen=do_deepen, version_hash=vh)
+                lay = lm.map_layout(model, name, hwnd, deepen=do_deepen, version_hash=vh,
+                                    ribbon_budget_s=ribbon_budget_s)
             rep["phases"]["layout_s"] = round(time.time() - t, 2)
-            rep["layout"] = {k: lay.get(k) for k in ("controls", "regions", "region_kinds", "deepen", "opaque_regions",
-                                                     "skipped", "elapsed_s")}
+            rep["layout"] = {k: lay.get(k) for k in ("controls", "regions", "region_kinds", "deepen", "deepen_mode",
+                                                     "opaque_regions", "skipped", "elapsed_s")}
             rep["layout"]["cached"] = bool(lay.get("cached"))
             rep["sections"] = lay.get("sections", [])[:40]
             try:

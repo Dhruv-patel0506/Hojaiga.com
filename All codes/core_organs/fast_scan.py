@@ -190,9 +190,18 @@ def deep_scan(target: str, model=None, *, budget_s: float = 10.0, vision: bool =
     th = threading.Thread(target=_static_job, args=(target, model, st), daemon=True, name="fast-scan-static")
     th.start()                                                       # hidden behind the launch + readiness wait
     e0_budget = max(1.5, budget * 0.25)
+    # ---- RIBBON REVEAL (the any-app fix): a ribbon app materializes ONLY the active tab's buttons in the
+    # UIA tree, so a plain snapshot (deepen=False) saw the tab LABELS but none of the other tabs' buttons.
+    # Ask the scan for a reversible "ribbon" pass (select each tab + open its galleries, restore). It is a
+    # cheap no-op on apps with no ribbon (organ_50 finds no tab galleries), bounded to its own budget, and
+    # fully reversible/headless (UIA SelectionItem, no cursor). Toggle OFF: HOJAIGA_SCAN_RIBBON=0.
+    _ribbon = os.environ.get("HOJAIGA_SCAN_RIBBON", "1") != "0"
+    _rbud = float(os.environ.get("HOJAIGA_RIBBON_BUDGET_S", "30"))
     # the vision capture needs the window while it is still open; do it through the scan's own `on_window` hook is too early (not laid out),
     # so close_if_launched is deferred and the capture happens right after the structure is read
-    rep = us.scan_desktop(target, model, deepen=False, e1_actions=0, close_if_launched=False, fresh=fresh, fast=True,
+    rep = us.scan_desktop(target, model, deepen=("ribbon" if _ribbon else False),
+                          ribbon_budget_s=(_rbud if _ribbon else 0.0),
+                          e1_actions=0, close_if_launched=False, fresh=fresh, fast=True,
                           e0_budget_s=e0_budget, ready_budget_s=ready_budget, hwnd_hint=target_hwnd or 0, force=force)
     th.join(timeout=max(0.0, budget - (time.time() - t0)) + 2.0)
     rep["static"] = st.get("static", {"ok": False, "error": "static harvest did not finish"})
@@ -328,6 +337,18 @@ def deep_scan(target: str, model=None, *, budget_s: float = 10.0, vision: bool =
             rep["capability"] = capability_card.build_card(target, hwnd, model=model, scan=rep)
         except Exception as exc:  # noqa: BLE001
             rep["capability"] = {"error": f"{type(exc).__name__}: {str(exc)[:120]}"}
+        # ---- honest budget: a ribbon app that got its tabs revealed legitimately takes longer than a
+        # one-pane window. Fold the measured ribbon cost into the EFFECTIVE budget (never hide an overrun),
+        # so `within_budget` stays truthful and the ≤budget_s guarantee is only bent by a named, opt-out knob.
+        _layd = rep.get("layout") or {}
+        _dpn = _layd.get("deepen") or {}
+        _tabs = int(_dpn.get("tabs_visited") or 0) if isinstance(_dpn, dict) else 0
+        if _tabs:
+            _allow = max(budget, _hardmax, budget + float(_layd.get("elapsed_s") or 0.0))
+            if _allow > budget:
+                rep["budget_extended"] = {**(rep.get("budget_extended") or {}), "to": round(_allow, 1),
+                                          "why": f"ribbon reveal: {_tabs} tab(s) worth of buttons (HOJAIGA_SCAN_RIBBON, {_rbud:g}s bound)"}
+                budget = _allow
         rep["seconds"] = round(time.time() - t0, 2)
         # within_budget is honest against the EFFECTIVE (dynamic) budget the scan actually honoured, which is the
         # caller's ask OR the complexity-extended allowance - never a silently-larger number.
@@ -382,6 +403,42 @@ def _ui_elements_from_snapshot(rows) -> Tuple[List[Dict[str, Any]], int]:
             el["coords"] = {"x": (x0 + x1) // 2, "y": (y0 + y1) // 2, "box": [x0, y0, x1, y1]}
         els.append(el)
     return els, controls
+
+
+def _ribbon_from_layout(model, key: str) -> Tuple[List[str], Dict[str, Any]]:
+    """Rebuild the ribbon summary the legacy caller expects from the PERSISTED layout (organ_50), so it
+    reflects every ribbon tab the reveal opened - not just the one that happened to be active. `tabs` are
+    the tab headers; `groups` maps each revealed group to the tab that shows it and its operable buttons.
+    Honest: with HOJAIGA_SCAN_RIBBON=0 no 'tab:' rows exist and only the active tab's buttons are known."""
+    tabs: List[str] = []
+    groups: Dict[str, Any] = {}
+    try:
+        rows = model._conn.execute(
+            "SELECT name, role, via, region_name, patterns FROM bm_layout WHERE app_key=? AND name<>''",
+            (key,)).fetchall()
+    except Exception:  # noqa: BLE001
+        return tabs, groups
+    for r in rows:
+        role = r["role"] or ""
+        via = r["via"] or ""
+        name = (r["name"] or "").strip()
+        if not name:
+            continue
+        if role == "tabitem":
+            if name not in tabs:
+                tabs.append(name)
+        elif via.startswith("tab:"):
+            tab = via.split(":", 1)[1]
+            pats = r["patterns"] or ""
+            if not any(p in pats for p in ("invoke", "toggle", "select", "expand")):
+                continue
+            if role in ("scrollbar", "thumb", "titlebar"):
+                continue
+            grp = (r["region_name"] or "").strip() or tab
+            d = groups.setdefault(grp, {"tab": tab, "controls": []})
+            if name not in d["controls"]:
+                d["controls"].append(name)
+    return tabs, groups
 
 
 def deep_scan_legacy_shape(target: str, target_hwnd: int = 0, *, budget_s: float = 10.0,
@@ -452,6 +509,7 @@ def deep_scan_legacy_shape(target: str, target_hwnd: int = 0, *, budget_s: float
         # The rail that stopped us was OUR budget, not the app: say which, so an over-budget read is never
         # mistaken for "this window has no tree".
         stopped_by = f"uia-walk-{rung} (budget {int(float(budget_s))}s)"
+    ribbon_tabs, ribbon_groups = _ribbon_from_layout(model, key)   # from the PERSISTED layout: every tab the reveal opened
     out = dict(rep)                                                            # keep seconds/within_budget/static/tree/menus/vision/phases
     out.update({
         "app_name": rep.get("window_title") or target,
@@ -460,7 +518,7 @@ def deep_scan_legacy_shape(target: str, target_hwnd: int = 0, *, budget_s: float
         "interaction_guide": guide,
         "current_state": rep.get("window_title") or "",
         "ui_elements": ui_elements,
-        "ribbon_tabs": [], "ribbon_groups": {}, "canvases": [], "menu_headers": sorted({(c.get("menu_path") or "").split(">")[0] for c in menu_cmds if c.get("menu_path")}),
+        "ribbon_tabs": ribbon_tabs, "ribbon_groups": ribbon_groups, "canvases": [], "menu_headers": sorted({(c.get("menu_path") or "").split(">")[0] for c in menu_cmds if c.get("menu_path")}),
         "blocking_elements": [], "suggested_first_action": "", "automation_notes": "",
         "vlm_description": "",
         "total_controls": n_controls,
