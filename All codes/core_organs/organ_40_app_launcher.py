@@ -645,6 +645,12 @@ class AppLauncher:
         cmd = [
             exe_path,
             "--remote-debugging-port=9222",
+            # Any DevTools websocket consumer must be able to attach to the Chrome the LAUNCHER starts,
+            # not only the one organ_19 starts for itself. Modern Chrome 403s a websocket that carries an
+            # Origin header unless this is set; organ_19 already passes it (line ~1040) and its own
+            # consumers use suppress_origin, but a third tool / a future caller need not know that trick.
+            # Matching organ_19 keeps the two launch paths interchangeable. Generic - not app-specific.
+            "--remote-allow-origins=*",
             f"--user-data-dir={iso_dir}",
             "--profile-directory=Default",
             "--no-first-run",

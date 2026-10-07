@@ -410,6 +410,14 @@ class MessageClickProvider(Provider):
         return ctx.verb == "click" and bool(ctx.root)
 
     def act(self, ctx):
+        # A XAML/WinUI host (Windows.UI.Core.CoreWindow) routes input through the XAML stack and DROPS
+        # posted mouse messages, so a coordinate click into it does nothing. The UIA-pattern rung already had
+        # its turn ahead of us in the ladder; if a UIA-found element still reaches here on a XAML host,
+        # reporting post_click's 'message sent' as delivery is a FAKE success (the verifier then sees NO_CHANGE
+        # and re-presses the same dead control). Answer honestly by declining the rung - the chain ends in
+        # UNDELIVERABLE, exactly as the 'XAML ignores posted keys' guard does for shortcuts.
+        if ctx.verb == "click" and getattr(ctx.elem, "tier", "") == "uia" and ctx.family == "winui":
+            return None
         cx, cy = ctx.elem.center
         return hin.post_click(ctx.root, cx, cy)
 

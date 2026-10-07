@@ -197,10 +197,12 @@ def _bezier_derivative(t: float, p0: float, p1: float, p2: float, p3: float) -> 
 class CursorShape:
     """Simple flat triangle cursor (Clicky-style) with rotation animation for buffering."""
 
-    # Simple right-pointing isosceles triangle — same shape/size as the Clicky
-    # background indicator (~54px wide x 60px tall). Tip sits at the origin (0,0)
-    # so the drawn point stays exactly on the logical cursor hotspot.
-    TRIANGLE_VERTICES = [(-54.0, -30.0), (-54.0, 30.0), (0.0, 0.0)]
+    # Simple right-pointing isosceles triangle (Clicky-style). Halved to ~27px wide x
+    # 30px tall (was ~54x60): at the old size the sprite read as a large block rather than a
+    # pointer and obscured the very target it sat on. The tip stays at the origin (0,0), so the
+    # drawn point remains exactly on the logical cursor hotspot and click/interact accuracy is
+    # unchanged (actuation is headless post_click, never driven by the sprite's pixels).
+    TRIANGLE_VERTICES = [(-27.0, -15.0), (-27.0, 15.0), (0.0, 0.0)]
     COLOR = 0x00E8731A  # Bright blue (BGR format: B=E8,G=73,R=1A)
     OUTLINE_COLOR = 0x00FFFFFF  # Legacy (kept for compatibility; no longer stroked)
 

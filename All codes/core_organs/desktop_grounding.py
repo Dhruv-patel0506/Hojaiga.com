@@ -576,9 +576,10 @@ class DesktopGrounding:
                     root_hwnd = _content
         except Exception:  # noqa: BLE001
             pass
-        try:                                          # a Chromium DOM lives in the RAW UIA view: the per-node control-view walk sees only the title bar
-            from core_organs import dap_actuator as _da2
-            if _da2.family_of(root_hwnd) == "chromium":
+        try:                                          # a Chromium DOM / a XAML-WinUI visual tree lives in the RAW UIA view: the per-node control-view
+            from core_organs import dap_actuator as _da2   # walk sees only the title bar (measured: Chromium 966 raw vs 8 control; a parked UWP app 4
+            _fam = _da2.family_of(root_hwnd)                # chrome controls in the control view vs its whole navigation in the raw view). Read the RAW
+            if _fam == "chromium" or _fam == "winui" or hin.is_xaml_host(root_hwnd):   # view for these host families too, or the agent only ever sees chrome.
                 _raw = self._ground_raw(root_hwnd, max_nodes=max(max_nodes, 1500))
                 if len(_raw) >= 3:
                     return _raw
@@ -1313,13 +1314,30 @@ def _titlebar_buttons(elements, hwnd: int) -> set:
     out = set()
     try:
         import ctypes.wintypes as _wt
+        import re as _re
         r = _wt.RECT()
         ctypes.windll.user32.GetWindowRect(hwnd, ctypes.byref(r))
+        title = (hin.safe_window_text(int(hwnd)) or "").strip().lower()
+        _CAPTION_VERBS = ("minimize", "maximize", "restore", "close", "min", "max")
+
+        def _is_caption(nm: str) -> bool:
+            # Bare 'Minimize' / 'Close', OR the UWP / WPF style '<verb> <window title>' ('Minimize Settings').
+            # The trailing word is matched against the window's OWN title, so this stays generic (no app table).
+            # Pressing 'Minimize Settings' for an in-app goal only shrinks the window - it is chrome, never a step.
+            if nm in _TITLEBAR_NAMES:
+                return True
+            m = _re.match(r"^(%s)\b(?:\s+(.+))?$" % "|".join(_CAPTION_VERBS), nm)
+            if not m:
+                return False
+            tail = (m.group(2) or "").strip()
+            if not tail:
+                return True
+            return bool(title) and (tail == title or tail in title or title in tail)
         names = {(e.name or "").strip().lower() for e in elements if (e.role or "").lower() not in ("window", "pane", "titlebar", "text", "image", "")}
-        has_bar = any((e.role or "").lower() == "titlebar" for e in elements) or bool(names & {"minimize", "maximize"})   # Close beside Minimize / Maximize IS the title bar
-        only_chrome = bool(names) and names <= _TITLEBAR_NAMES                                                              # nothing else is on screen at all
+        has_bar = any((e.role or "").lower() == "titlebar" for e in elements) or any(_is_caption(n) for n in names)   # Close beside Minimize / Maximize IS the title bar
+        only_chrome = bool(names) and all(_is_caption(n) for n in names)                                             # nothing else is on screen at all
         for e in elements:
-            if (e.name or "").strip().lower() not in _TITLEBAR_NAMES:
+            if not _is_caption((e.name or "").strip().lower()):
                 continue
             b = e.bbox or (0, 0, 0, 0)
             geometric = any(b) and (r.top - 4) <= b[1] <= (r.top + 48) and (b[3] - b[1]) <= 48
@@ -1523,6 +1541,33 @@ class DesktopVerifier:
 
     _MAY_CLOSE_RE = re.compile(r"\b(close|exit|quit|dismiss|cancel|ok|accept|decline|done|apply|save|submit|discard|yes|no|finish|sign ?out|log ?out|shut)\b", re.I)
 
+    # A goal that asks to REACH a named PLACE. Deliberately narrow so it only fires on the bug class it was
+    # made for (a navigation that lands on the wrong screen) and never on 'open the File menu' or 'open
+    # <app>' (those are proved by the change itself, not by a named destination screen). It demands a
+    # SURFACE word ('page', 'tab', 'screen', ...) so the destination is an explicit, named place.
+    _NAV_GOAL_RE = re.compile(
+        r"\b(?:open|go\s+to|goto|navigate\s+to|switch\s+to|jump\s+to|show|reveal)\b\s+(?:the\s+|your\s+|a\s+)?(.+?)\s+"
+        r"\b(page|tab|screen|section|panel|view)\b",
+        re.I)
+    # Words describing the ACTION or the generic surface, never the destination itself. Stripped from the
+    # captured phrase so 'open the About page' demands 'about', not 'open'/'page'. Generic UI vocabulary
+    # only - no app names, no screen names - so this stays universal.
+    _NAV_STOP = frozenset({
+        "open", "go", "to", "goto", "navigate", "switch", "jump", "show", "reveal", "the", "a", "an",
+        "page", "tab", "screen", "section", "panel", "view", "window", "menu", "settings", "options",
+        "and", "then", "it", "its", "this", "that", "in", "on", "of", "for", "with", "my", "please",
+    })
+
+    def _nav_destination(self, goal: str) -> List[str]:
+        """The destination words a navigation goal demands, [] if this is not a 'reach a named place' goal."""
+        if not goal:
+            return []
+        m = self._NAV_GOAL_RE.search(goal)
+        if not m:
+            return []
+        toks = [t for t in re.findall(r"[a-z0-9]+", m.group(1).lower()) if t not in self._NAV_STOP and len(t) > 1]
+        return toks
+
     def verdict(self, expect: Dict[str, Any], before: Snapshot, after: Snapshot,
                 elements_now: List[GroundedElement], goal: str = "") -> Tuple[str, str]:
         """PASS / NO_CHANGE / WRONG_STATE with evidence."""
@@ -1533,6 +1578,18 @@ class DesktopVerifier:
             return "WRONG_STATE", f"the window disappeared: closing it is not progress toward '{goal[:50]}'"
         ok, evidence = self.check_expect(expect, before, after, elements_now)
         if ok:
+            # A navigation goal whose ONLY proof is 'the UI moved' is not done until the destination it named is
+            # actually on screen. Measured on a UWP app: 'open the About page' clicked the account button, the
+            # window genuinely changed (pixel-delta .3, +73 names), and the old lax postcondition PASSed it as
+            # About while the app had opened Accounts. The destination word is read from the goal itself and
+            # matched against the new screen's own UIA names/modes - generic, no per-app screen table.
+            if not expect:
+                dest = self._nav_destination(goal)
+                if dest:
+                    hay = " ".join((after.names or []) + (after.modes or []))
+                    if not any(d in hay for d in dest):
+                        return "WRONG_STATE", (f"ui-changed but not at the named destination {dest}: "
+                                               f"'{goal[:40]}' - the destination word is absent from the new screen")
             return "PASS", evidence
         pixel_moved, _ = self.pixels_changed(before, after)
         structurally_dead = before.signature() == after.signature() and not pixel_moved
@@ -2794,6 +2851,56 @@ class DesktopAutonomyLoop:
         pend = sum((self._pending_clicks.get(goal) or {}).values())
         return pend >= 2 or self._goal_fails.get(goal, 0) >= 2 or len(self._opened_not_done.get(goal) or ()) >= 2
 
+    def _reveal_by_scrolling(self, hwnd: int) -> bool:
+        """Scroll a host's content down a bounded number of notches through UIA's ScrollPattern - the one
+        delivery path that works on a XAML/WinUI window (a posted wheel is dropped there). This exists for
+        virtualized lists: a NavigationView footer item ('About') is not in the visual tree until it is
+        scrolled into view, so no amount of re-reading finds it until something scrolls. The FIRST vertically
+        scrollable container is used (found generically by pattern, never by an app's control name). Returns
+        True if a scroll actually moved. The caller re-walks afterward, so any newly realized item is picked
+        up by the existing grounding (which already reads the raw view for these hosts)."""
+        if _UIA_EXEC is None:
+            from concurrent.futures import ThreadPoolExecutor
+            globals()["_UIA_EXEC"] = ThreadPoolExecutor(max_workers=1, thread_name_prefix="uia-act", initializer=_uia_thread_init)
+
+        def work():
+            import uiautomation as auto
+            try:
+                root = auto.ControlFromHandle(hwnd)
+            except Exception:
+                return False
+            NoAmount, LargeIncrement = 2, 4
+            stack, seen, pat = [root], 0, None
+            while stack and seen < 600:
+                c = stack.pop(); seen += 1
+                try:
+                    p = c.GetScrollPattern()
+                except Exception:
+                    p = None
+                if p is not None and getattr(p, "VerticallyScrollable", False):
+                    pat = p
+                    break
+                try:
+                    stack.extend(c.GetChildren())
+                except Exception:
+                    pass
+            if pat is None:
+                return False
+            moved = False
+            for _ in range(6):                     # bounded: a footer lives within a few large notches
+                try:
+                    pat.Scroll(NoAmount, LargeIncrement)
+                    moved = True
+                except Exception:
+                    break
+                time.sleep(0.35)
+            return moved
+        try:
+            return bool(_UIA_EXEC.submit(work).result(timeout=12))
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("[stuck] scroll-reveal failed: %s", exc)
+            return False
+
     def _widen_perception(self, hwnd: int, goal: str, elements: List[GroundedElement], ladder: Dict[str, Any]) -> List[GroundedElement]:
         """Two steps of a goal went by without the goal moving: more of the same controls would only repeat that. Look WIDER, cheapest first:
         (1) the RAW UIA view (one bulk read): Office / WinUI panes expose their commit buttons as non-'control' elements that the control-view
@@ -2837,23 +2944,41 @@ class DesktopAutonomyLoop:
             about |= {"browse", "pc", "computer", "folder"}      # a goal that names a path is answered through the OS file picker ('Browse...')
         try:
             from core_organs import fast_uia as _fu
-            for n in (_fu.snapshot(hwnd, timeout_ms=6000) or []):
-                role = n.role
-                if role not in ACTIONABLE_ROLES or not (n.name or "").strip() or not n.enabled or (n.offscreen and not mini):
-                    continue
-                if not (about & set(re.findall(r"[a-z0-9]+", n.name.lower()))):
-                    continue
-                if not mini and not (n.rect[2] > n.rect[0] and n.rect[3] > n.rect[1]):
-                    continue
-                key = (n.name.strip().lower(), role, round(n.rect[0] / 6), round(n.rect[1] / 6))
-                if key in have:
-                    continue
-                have.add(key)
-                added.append(GroundedElement(id=_element_id(hwnd, role, n.name, n.rect), name=n.name.strip(), role=role, bbox=n.rect,
-                                             tier="uia", confidence=0.8, hwnd=hwnd))
+
+            def _scan_raw_into(dst: List[GroundedElement]) -> None:
+                for n in (_fu.snapshot(hwnd, timeout_ms=6000) or []):
+                    role = n.role
+                    if role not in ACTIONABLE_ROLES or not (n.name or "").strip() or not n.enabled or (n.offscreen and not mini):
+                        continue
+                    if not (about & set(re.findall(r"[a-z0-9]+", n.name.lower()))):
+                        continue
+                    if not mini and not (n.rect[2] > n.rect[0] and n.rect[3] > n.rect[1]):
+                        continue
+                    key = (n.name.strip().lower(), role, round(n.rect[0] / 6), round(n.rect[1] / 6))
+                    if key in have:
+                        continue
+                    have.add(key)
+                    dst.append(GroundedElement(id=_element_id(hwnd, role, n.name, n.rect), name=n.name.strip(), role=role, bbox=n.rect,
+                                               tier="uia", confidence=0.8, hwnd=hwnd))
+            _scan_raw_into(added)
             rep["raw_added"] = len(added)
         except Exception as exc:  # noqa: BLE001
             rep["raw_error"] = f"{type(exc).__name__}: {str(exc)[:60]}"
+            _scan_raw_into = None       # the import that drives it failed; the scroll step must not try to call it
+        # A virtualized surface (a UWP NavigationView footer, a long list) builds its items only when they
+        # scroll into view - the raw view above cannot name a control the visual tree has not made yet. When
+        # none of the goal's own words surfaced at all, scroll once through the pattern XAML honours and read
+        # again. Generic: it reacts to an ABSENT word the goal asked for, not to any particular app or item.
+        if about and _scan_raw_into:
+            seen_words = {t for e in (list(elements) + added) for t in re.findall(r"[a-z0-9]+", (e.name or "").lower())}
+            if not (about & seen_words):
+                try:
+                    if self._reveal_by_scrolling(hwnd):
+                        _before = len(added)
+                        _scan_raw_into(added)
+                        rep["scrolled_reveal"] = len(added) - _before
+                except Exception as exc:  # noqa: BLE001
+                    rep["scroll_error"] = f"{type(exc).__name__}: {str(exc)[:60]}"
         first = re.match(r"\s*(?:please\s+)?([a-z]+)", (goal or "").lower())
         target = first.group(1) if first and first.group(1) in self._COMMIT_VERBS else ""
         has_target = bool(target) and any(target == (e.name or "").strip().lower() and e.role in ("button", "splitbutton", "menuitem")
@@ -3693,7 +3818,15 @@ class DesktopAutonomyLoop:
             stable = 0 if (last_sig is not None and sig != last_sig) else stable + 1
             last_sig, last_cpu = sig, cpu
             if hwnd and elements and stable >= 1:
-                break
+                # A XAML/WinUI host lays its content out lazily: a tree that is only title-bar chrome
+                # plus a bare pane is NOT a ready UI, it is the pre-realization shell every UWP app shows
+                # before its controls materialize (measured: Settings parked off-screen returned 4 chrome
+                # elements, then 59 a few seconds later). Acting on that shell is how a click landed on an
+                # empty pane; so keep waiting for real content until the hard cap.
+                if hin.is_xaml_host(_root_of(hwnd)) and not self._xaml_has_content(elements) and time.time() < hard:
+                    deadline = max(deadline, min(hard, time.time() + READY_GRACE_S))
+                else:
+                    break
             if time.time() >= deadline:
                 break
             self.capsule_cb("working", f"Waiting for {app_hint} to be ready")
@@ -3712,6 +3845,23 @@ class DesktopAutonomyLoop:
                     app_hint or "?", hwnd or 0, len(elements or []), report["ready_wait_s"], extended,
                     READY_RICH_ELEMENTS, report.get("reason", ""), report.get("tiers_ran", ""))
         return hwnd, elements, report
+
+    @staticmethod
+    def _xaml_has_content(elements) -> bool:
+        """True once a XAML/WinUI host has exposed REAL content: any NAMED control that is not window
+        chrome and not a pure container. The pre-realization shell offers only 'Minimize/Maximize/Close
+        <app>' plus an unnamed pane, which this rejects - so readiness waits for the UI to materialize
+        instead of pressing an empty pane. Generic (no app names); structural roles only."""
+        for e in (elements or []):
+            nm = (e.name or "").strip().lower()
+            if not nm:
+                continue
+            if nm.startswith(("minimize ", "maximize ", "close ", "restore ", "show desktop")):
+                continue
+            if (e.role or "").lower() in ("pane", "window", "group", "titlebar", "custom", "separator", "image"):
+                continue
+            return True
+        return False
 
     def run(self, goals: List[str], app_hint: str, max_steps_per_goal: int = 4,
             allow_destructive: bool = False,
