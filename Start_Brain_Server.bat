@@ -36,9 +36,17 @@ echo.
 echo Starting Ngrok... (Keep both windows open!)
 echo.
 
-:: Authenticate Ngrok instantly using the Environment Variable approach
-set NGROK_AUTHTOKEN=3I0gQkLMtTojKsLPYDDffqxfQCa_5523Pxh29Sw1j79ghrwjj
+:: The Ngrok auth token is a SECRET and must never be committed in this file.
+:: Put it in your environment (PowerShell):  setx NGROK_AUTHTOKEN "your-token"   (then restart the shell)
+if "%NGROK_AUTHTOKEN%"=="" (
+    echo [ERROR] NGROK_AUTHTOKEN is not set in the environment.
+    echo         Set it once:  setx NGROK_AUTHTOKEN "your-token"   (restart this shell after)
+    echo         Skipping ngrok tunnel - the Gatekeeper still runs locally on 11435.
+    goto :localonly
+)
+set "NGROK_AUTHTOKEN=%NGROK_AUTHTOKEN%"
 
 :: Start ngrok to forward to the Gatekeeper port (11435) instead of Ollama directly
 ngrok http 11435 --host-header="localhost:11435"
+:localonly
 pause

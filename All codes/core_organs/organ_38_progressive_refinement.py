@@ -120,6 +120,17 @@ class ProgressiveRefinementEngine:
         self.model = model
         self.refinement_history: List[Dict[str, Any]] = []
         self.max_refinements = 5
+        # A cold/slow local model must not STALL the loop. The read timeout is generous (a 7B can
+        # take a while to warm up) and env-overridable; the connect timeout stays short (a dead
+        # server is known in a second). Consecutive timeouts trip a circuit breaker so the engine
+        # degrades to its deterministic refinement instead of hanging on the LLM every single step.
+        import os as _os
+        self.connect_timeout_s = float(_os.environ.get("HOJAIGA_REFINE_CONNECT_S", "3"))
+        self.read_timeout_s = float(_os.environ.get("HOJAIGA_REFINE_READ_S", "60"))
+        self._consecutive_timeouts = 0
+        self._circuit_open_until = 0.0
+        self._max_timeouts_before_open = int(_os.environ.get("HOJAIGA_REFINE_MAX_TIMEOUTS", "2"))
+        self._circuit_cooldown_s = float(_os.environ.get("HOJAIGA_REFINE_COOLDOWN_S", "120"))
         
     def should_refine(self, feedback: ExecutionFeedback, current_plan: Dict[str, Any]) -> bool:
         """
@@ -173,6 +184,14 @@ class ProgressiveRefinementEngine:
                     suggested_changes=["Proceed with current plan despite issues"],
                     confidence=0.3
                 )
+            
+            # Circuit breaker: if the local model has timed out repeatedly, stop waiting on it and
+            # refine deterministically. The loop keeps making progress instead of hanging every step.
+            if self._circuit_is_open():
+                logger.info("[Refinement Engine] LLM circuit open - using deterministic refinement (no wait)")
+                fb = self._fallback_refinement(feedback)
+                fb.description = f"{fb.description} (LLM circuit open; degraded to deterministic path)"
+                return fb
             
             # Build LLM prompt for refinement analysis
             prompt = self._build_refinement_prompt(feedback, current_plan, context)
@@ -253,10 +272,35 @@ Respond ONLY with valid JSON."""
             "options": {"temperature": 0.3}
         }
         
-        response = requests.post(self.ollama_url, json=payload, timeout=30)
-        response.raise_for_status()
-        
+        # A short connect timeout (dead server known fast) + a generous, env-tunable read timeout
+        # (a cold 7B model). On timeout the circuit-breaker counts it and eventually opens, so the
+        # engine stops hanging the loop; the caller falls back to the deterministic refinement.
+        try:
+            response = requests.post(self.ollama_url, json=payload,
+                                     timeout=(self.connect_timeout_s, self.read_timeout_s))
+            response.raise_for_status()
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            self._note_timeout()
+            raise
+        self._consecutive_timeouts = 0            # healthy reply closes the breaker
         return response.json().get("message", {}).get("content", "")
+
+    def _note_timeout(self) -> None:
+        """Record a model timeout; open the circuit once too many happen back-to-back."""
+        self._consecutive_timeouts += 1
+        if self._consecutive_timeouts >= self._max_timeouts_before_open:
+            self._circuit_open_until = time.time() + self._circuit_cooldown_s
+            logger.warning(
+                f"[Refinement Engine] {self._consecutive_timeouts} model timeouts in a row - "
+                f"opening LLM circuit for {self._circuit_cooldown_s:.0f}s; refinements go deterministic meanwhile")
+
+    def _circuit_is_open(self) -> bool:
+        """True while the breaker is still tripped. A half-open probe is allowed the moment the
+        cooldown lapses, so a recovered model is picked back up automatically."""
+        if time.time() >= self._circuit_open_until:
+            return False
+        return True
+
     
     def _parse_refinement_response(self, response: str) -> RefinementAction:
         """Parse the LLM response into a refinement action."""

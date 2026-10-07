@@ -141,6 +141,36 @@ def order_routes(order: List[str], profile: Dict[str, Any], verb: str) -> Tuple[
     return order, rationale
 
 
+def support_verdict(hwnd: int) -> Dict[str, Any]:
+    """The EXPLICIT supported-app boundary, read structurally (framework markers + native-tree reach,
+    never an app name). Returns {support: 'full'|'limited'|'wall', surface, reason}. 'plug-in ready'
+    means predictable, not omnipotent: say up front how far this window will actually go.
+
+      full    - native controls the ladder reaches reliably (classic Win32; a live UIA tree).
+      limited - the app is VISIBLE and invokable through UIA patterns but rejects posted input and
+                can hide virtualized/off-screen items (XAML/WinUI/UWP): works, with caveats.
+      wall    - a rendered canvas that exposes no operable tree (DirectX/GL, opaque): honest WALL,
+                no actuation claimed."""
+    p = probe(hwnd)
+    surface, nat, flags = p["surface"], p["native_tree"]["reachable"], p["flags"]
+    if surface == "directx/opaque" or (flags["d3d_opaque"] and not nat):
+        support, reason = "wall", (f"'{surface}' renders to a canvas with no operable tree; pixels "
+                                   "alone would act blind - report the wall, do not fake it")
+    elif surface in ("xaml/winui",) or (flags["xaml_island"] and nat):
+        support, reason = "limited", ("XAML/WinUI is seen through the raw UIA tree and acts via Invoke/"
+                                      "Select patterns, but rejects posted mouse and may virtualize "
+                                      "pinned/off-screen items")
+    elif surface == "chromium/cef":
+        support, reason = "full", "Chromium/CEF is driven over CDP (DOM), the reliable route for web UI"
+    elif surface == "classic-win32" or nat:
+        support, reason = "full", "native controls are reachable (UIA patterns / WM_COMMAND / menus)"
+    else:
+        support, reason = "limited", (f"surface '{surface}' with no confirmed native tree yet - try the "
+                                      "ladder and report honestly if it walls")
+    return {"hwnd": int(hwnd), "support": support, "surface": surface,
+            "native_tree_reachable": nat, "reason": reason}
+
+
 def wall_note(profile: Dict[str, Any], order: List[str], trail: List[str]) -> str:
     """The honest end-of-ladder sentence: what was tried, what the surface is, and that NOTHING
     was claimed. Produced only when the whole ladder ran dry - the caller must not translate it

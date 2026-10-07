@@ -1,50 +1,47 @@
 @echo off
-title Hojaiga OS - Environment Boot
+title Hojaiga OS - Boot & Preflight
+setlocal
+
+set "ROOT=D:\new_automation"
+set "PY=%ROOT%\hojaiga_env\Scripts\python.exe"
+set "PYTHONPATH=%ROOT%\All codes"
+
 echo.
-echo ============================================
-echo   HOJAIGA OS — Booting Environment
-echo ============================================
+echo  ============================================
+echo    HOJAIGA OS - Boot + Preflight
+echo  ============================================
 echo.
 
-:: Set Python path
-set PYTHONPATH=D:\new_automation\All codes
-
-:: Kill any stale Chrome/Python from previous runs
-echo [1/4] Cleaning stale processes...
-taskkill /F /IM chrome.exe >nul 2>&1
-taskkill /F /IM python.exe >nul 2>&1
-timeout /t 2 /nobreak >nul
-
-:: Clear stale lockfiles
-echo [2/4] Clearing lockfiles...
-del /q "D:\new_automation\var\hojaiga\organ19\profiles\permanent_profile\lockfile" >nul 2>&1
-del /q "D:\new_automation\var\hojaiga\organ19\profiles\permanent_profile\DevToolsActivePort" >nul 2>&1
-
-:: Verify Ollama is running
-echo [3/4] Checking Ollama...
-curl -s http://127.0.0.1:11434/api/tags >nul 2>&1
-if %errorlevel% neq 0 (
-    echo   WARNING: Ollama not responding on port 11434
-    echo   Start Ollama manually before running tasks.
-) else (
-    echo   Ollama OK
+if not exist "%PY%" (
+    echo  [FAIL] Hojaiga venv python not found at "%PY%"
+    echo         Create it first:  python -m venv hojaiga_env
+    exit /b 1
 )
 
-:: Verify SSMS database
-echo [4/4] Checking database...
-echo   Database: DHRUV_PATEL\SQLEXPRESS / hojaiga_knowledge
+REM Non-destructive: we NO LONGER kill all chrome.exe/python.exe (that closed your own
+REM browser and any other running work). Isolated automation Chrome uses its own profile
+REM and port; leave the rest of the machine alone.
+
+echo  Running readiness preflight (never fakes a green)...
+echo.
+"%PY%" "%ROOT%\hojaiga_preflight.py"
+set "PREFLIGHT=%ERRORLEVEL%"
 echo.
 
-echo ============================================
-echo   Environment Ready
-echo ============================================
+if not "%PREFLIGHT%"=="0" (
+    echo  Stopping: the preflight reported NO-GO. Fix the [FAIL] lines above, then run boot again.
+    echo  (If Ollama is the issue: start it with "ollama serve" in another window.)
+    exit /b 1
+)
+
+echo  ============================================
+echo    Environment ready.
+echo  ============================================
 echo.
-echo   To run a task, execute:
-echo   python "D:\new_automation\test_hojaiga_real_task.py" --command "YOUR TASK HERE"
+echo    Run a task:
+echo      "%PY%" "%ROOT%\test_hojaiga_real_task.py" --command "YOUR TASK HERE"
 echo.
-echo   Example — Lead generation:
-echo   python "D:\new_automation\test_hojaiga_real_task.py" --command "find coffee shops in austin tx and make a list in excel"
+echo    Or launch the avatar / holographic teaching engine:
+echo      call "%ROOT%\launch_hojaiga_avatar.bat"
 echo.
-echo   Example — App learning:
-echo   python "D:\new_automation\test_hojaiga_real_task.py" --command "open calculator"
-echo.
+endlocal
