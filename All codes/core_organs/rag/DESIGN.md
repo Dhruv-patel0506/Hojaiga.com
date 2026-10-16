@@ -675,3 +675,35 @@ The embedder in tests is a deterministic hashing embedder (`embed.HashEmbedder`,
 - NetworkX is a view; SQLite is truth (§5.2).
 - Text embedder: nomic-embed-text on CPU via Ollama, as the project already does.
 - SSMS: optional sink only, not in Checkpoint 2.
+
+---
+
+## 17. As built (Checkpoint 2 implementation, Sonnet, 2026-10-16) -- where the code differs from sections 1-16, and why
+
+Everything below was found by measuring on this machine (lancedb 0.30, sqlite 3.50, RTX 3050 box, no GPU use). Sections 1-16 remain the intent; this section is the truth where they disagree.
+
+| # | Design said | Built | Why (measured) |
+|---|---|---|---|
+| 1 | Lexical leg = LanceDB FTS | **SQLite FTS5** (`text.db`, `rag/textindex.py`): contentless `tf_<table>` + `ti_<table>` payload, app as an indexed token (`app : <id> AND text : (...)`), porter stemming, AND-first then rarest-terms OR cascade | lancedb 0.30 FTS ignores rows written after the index was built for any term the index already knows (a fresh row was invisible to a query that contained a known word), and costs 45-80 ms at 5k rows. FTS5 is transactional with the write. `textindex.ensure_consistent` heals from Lance if the two ever disagree. |
+| 2 | Counters (`n_ok`, `n_fail`, `consecutive_fail`, `ok_runs`, promotion/demotion) in the Lance rows | **`learn.db`** (`fast_stats`, `proc_stats`, `playbook_stats`), overlaid on read; Lance rows are immutable after ingest | Rewriting a row on every observation is slow and (see 1) made it invisible to text search. This is also what section 1.8 (append observations, derive aggregates) required. The Lance `n_ok`/`n_fail` columns are the ingest-time seed, added to the learned counts. |
+| 3 | Generation counters in `graph.db` | **`cache.db:gens`**, scopes `graph:<app>`, `fast:<app>`, `proc:<app>`, `recovery:<app>`, `lexicon:<app>` | one place for every invalidation |
+| 4 | BITMAP scalar index on `app_key` | **none** | with `merge_insert`, a BITMAP index made filtered reads return empty ~1 run in 3. The app filter is a column scan; cost scales with the app's rows, which is the quantity that matters. |
+| 5 | k alternatives by Yen's algorithm | k **distinct goal edges**, each with its cheapest approach (Dijkstra) | alternatives that differ only in an intermediate hop add no information to a tutor or an executor |
+| 6 | IVF_PQ built inline at 100k rows | **explicit `tools.build_ann` / `tools.maintain`**, threshold **20k** rows per table; `status().degraded` carries `ann_recommended:<table>` until built | flat vector scan = ~3.3 us/row (164 ms/query at 50k x 768-d, one app); IVF_PQ build = 112 s for 50k rows, so it cannot run in an interactive ingest. With the index: ~35 ms/query. |
+| 7 | Budgets: hybrid S3 <= 60 ms at <=200k chunks/app | **Per app**: flat <= ~15k chunks (typical 40 ms at 5k), ANN beyond; test ceiling 80 ms (design 60) because OS noise flakes 60 ms 1 run in 3; retrieve() typical ~52 ms, ceiling 150 | measured (RG10, best of 3 rounds, every query distinct) |
+| 8 | Probe budgets | **soft**: optional probes (rewrite, supporting passages) are skipped once the budget is spent; essential probes (procedures, borrow) always run | a cold first query overran 150 ms and skipped the borrow fallback |
+| 9 | Router cache key = (app, state, goal tokens, ...) | key = **the whole normalised text** | the first version dropped single-digit tokens: "cube of size 3" and "size 4" shared a cached answer (RG13 now pins this) |
+| 10 | Script candidates only for tier 3 | scripts compete whenever the goal is a **creation, carries a number/quoted value, or the app is tier 3** | "create a cube of size 3" resolved to the UI command "Add Cube" and never considered the parametrised template |
+| 11 | `export_pack` ships verified fast paths | ships every **non-LLM hotkey / chord / wm_command / menu_accel** (trust capped at `learned` on import, `verified` reset) | otherwise an edge node loses the catalog hotkeys its own registry would also give it, and answers differ (RG11) |
+| 12 | State description includes the dialog title | `describe_landmarks`: window kind + **sorted structural landmark names**, no titles | a main window's title is the document name (content); makes the description reproducible from a pack |
+| 13 | Recovery plan steps are executable routes | non-click playbook actions (`perceive`, `localize`, `replan`, `wait`, `retry_once`, ...) are steps with `route="meta"` and the action in `args` | they are instructions to the executor, not input events |
+| 14 | `Rag` single embedder | `Storage(embedder=...)`; vectors zero-padded to `config.VEC_DIM=768`; an embedder wider than that is refused by `reembed` (`dimension_too_large`) | a fixed-size Lance vector column; widening needs a migration |
+
+### Tests added beyond section 14
+RG12 (icon vault: dHash path, collision guard, UIA-over-VLM, misses as gaps), RG13 (intents, tiers, cache + invalidation, numbers in the key, degraded embedder), RG14 (30 rounds of interleaved writes/reads: guards index staleness), RG15 (self_doc, explore targets, adapters). RG1-RG11 as specified. All offline; temp roots; `HashEmbedder`.
+
+### Not done (deliberately), in priority order
+1. **Wire-ins (section 15 step 10).** The executor must call `rag.observe(Outcome(...))` after every step; the teacher/Professor must call `rag.retrieve(Query(...))`; `manual_rag.ManualIndex.search/retrieve` should delegate to Sub-RAG 3 (`tools.import_manuals` already moves its chunks in). These files carry other sessions' uncommitted changes, so editing them here would have mixed two changes; each wire-in must keep the old path as a fallback when `rag.status().ok` is false.
+2. **The default LLM rewriter** (`rag/adapters/llm_rewrite.py`) is written but not attached: `Rag(rewriter=...)` is opt-in until the brain/gatekeeper API is confirmed.
+3. **Live data.** Nothing here has seen a live window, a real transcript corpus, or the SSD. The E: drive was not mounted; the storage root falls back (and says so). Checkpoint 3 (harvesters) will be the first real ingest.
+4. **Open numbers**: the 200k-chunks/app point is extrapolated, not measured (50k measured).
