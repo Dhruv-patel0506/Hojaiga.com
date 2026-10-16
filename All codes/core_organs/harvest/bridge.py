@@ -2,12 +2,13 @@
 harvest.bridge -- harvested data -> the federated RAG (rag/). Idempotent: ids are content hashes, so re-running changes nothing.
 
     ingest_transcripts(rag, root)   transcripts_json/*.json (+ sheet 2 for titles) -> Sub-RAG 3 chunks and procedures, grounded against the app's Lexicon
-    ingest_hotkeys(rag, rows)       sheet 3 / JSONL -> Sub-RAG 4 hotkey / chord_seq rows (trust by source: seed -> seed, web_table -> web, llm -> llm; never verified)
+    ingest_hotkeys(rag, rows)       sheet 3 / JSONL -> Sub-RAG 4 hotkey / chord_seq rows (trust by source: seed -> seed, web_table -> web, llm -> llm; never verified); seed / web actions also
+                                    register low-trust commands in the Lexicon, model-written ones never do
     ingest_macros(rag, rows)        sheet 4 / JSONL -> Sub-RAG 4 script / com / cli rows with a params schema inferred from the template's {slots}; sandbox = scripting_route
     ingest_all(rag, root)           everything under <root>, in that order, returning one report
 
 Table names in the RAG are knowledge_chunks / procedures / fast_paths (not the brief's workflow_knowledge / fast_execution): one schema serves every source.
-A hotkey row only gets a command_id when the app's Lexicon already knows the action (no invented commands); otherwise it is still stored, matched by its task text.
+A hotkey row gets a command_id when the app's Lexicon knows the action, or registers it (seed / published-table rows only); model-written rows are stored matched by their task text alone.
 """
 from __future__ import annotations
 
@@ -68,6 +69,13 @@ def ingest_hotkeys(rag, rows: Iterable[Dict[str, Any]]) -> Dict[str, int]:
             kind, payload = norm_keys(shortcut)
             hit = rag.lex.best(app, action)
             src = str(r.get("source") or "seed")
+            created = False
+            if not hit and src in ("seed", "web_table", "keymap_file"):
+                # a published shortcut table IS a list of the application's commands: register the action (low trust, so a learned/catalog name always outranks it) so spoken steps can ground to it.
+                # Model-written rows never create commands.
+                cid = rag.lex.add_command(app, action, source="hotkey_table", trust=SOURCE_TRUST.get(src, "seed"))
+                hit, created = rag.lex.best(app, action), True
+                out["commands_created"] = out.get("commands_created", 0) + 1
             rec = {"app_key": app, "kind": kind, "command_id": hit.command_id if hit else "", "task_pattern": action, "payload": payload, "source": src, "trust": SOURCE_TRUST.get(src, "seed"),
                    "verified": False, "context": str(r.get("category") or ""), "params_schema_json": infer_schema(payload)}
             recs.append(rec)
@@ -147,7 +155,9 @@ def ingest_all(rag, root: str = "") -> Dict[str, Any]:
         rows = _jsonl(root)
         hot = [r for r in rows if r.get("rag_sub_table") == "sub_rag4_hotkeys"]
         mac = [r for r in rows if r.get("rag_sub_table") == "sub_rag4_superhuman_macros"]
-    report = {"transcripts": ingest_transcripts(rag, root), "hotkeys": ingest_hotkeys(rag, hot), "macros": ingest_macros(rag, mac)}
+    # hotkeys and macros first: they register the commands that spoken steps in the transcripts then ground to
+    report = {"hotkeys": ingest_hotkeys(rag, hot), "macros": ingest_macros(rag, mac)}
+    report["transcripts"] = ingest_transcripts(rag, root)
     try:
         from core_organs.rag import tools
         report["maintain"] = tools.maintain(rag, ann=False)           # the ANN build is minutes long: an explicit step (rag.tools.build_ann)

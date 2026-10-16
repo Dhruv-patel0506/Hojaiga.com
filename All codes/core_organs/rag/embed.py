@@ -80,12 +80,17 @@ class OllamaEmbedder(Embedder):
         try:
             import requests
             pre = self._PREFIX.get(mode, "")
-            r = requests.post(self.url + "/api/embed", json={"model": self.model, "input": [pre + (t or "")[:1500] for t in texts], "options": {"num_gpu": 0}}, timeout=30)
+            # keep_alive: Ollama unloads an idle model after 5 minutes and the next call pays ~1 s to reload it; a query embedding is on the hot path, so the model stays resident.
+            # A QUERY embedding gets a short wall-clock cap (the lexical leg still answers if it is missed); documents (ingest) can take their time.
+            r = requests.post(self.url + "/api/embed", json={"model": self.model, "input": [pre + (t or "")[:1500] for t in texts], "options": {"num_gpu": 0}, "keep_alive": "30m"},
+                              timeout=C.QUERY_EMBED_TIMEOUT_S if mode == "query" else 30)
             e = r.json().get("embeddings") if r.status_code == 200 else None
             if e and len(e) == len(texts):
                 return e
-        except Exception:
-            pass
+        except Exception as exc:
+            # a TIMEOUT usually means the model was cold (it is loading now): retry soon. Anything else means the service is not there: back off.
+            self._down_until = time.time() + (5.0 if "Timeout" in type(exc).__name__ else self.cooldown_s)
+            return None
         self._down_until = time.time() + self.cooldown_s          # circuit breaker: do not hammer a service that is not there
         return None
 

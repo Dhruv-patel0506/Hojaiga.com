@@ -83,6 +83,61 @@ def allowed_by_robots(url: str, net: Net) -> bool:
     return bool(rp and rp.can_fetch(UA, url))
 
 
+_MODS = {"ctrl", "control", "alt", "shift", "win", "windows", "cmd", "command", "option", "opt", "altgr", "fn", "meta"}
+_NAMED = {"enter", "return", "esc", "escape", "tab", "space", "spacebar", "home", "end", "pgup", "pgdn", "pageup", "pagedown", "page", "up", "down", "left", "right", "del", "delete", "backspace", "bksp",
+          "insert", "ins", "capslock", "prtsc", "printscreen", "pause", "numlock", "scrolllock", "menu", "plus", "minus", "equals", "comma", "period", "slash", "backslash", "click", "scroll", "wheel"}
+_ARROWS = set("\u2191\u2193\u2190\u2192")
+
+
+def _is_key_token(tok: str) -> bool:
+    t = tok.strip().lower()
+    return bool(t) and (t in _MODS or t in _NAMED or bool(re.fullmatch(r"f([1-9]|1\d|2[0-4])", t)) or (len(t) == 1 and (t.isalnum() or t in ",./;'[]\\`-=<>?!@#$%^&*()_~" or t in _ARROWS)))
+
+
+def _is_special(tok: str) -> bool:
+    t = tok.strip().lower()
+    return t in _MODS or t in _NAMED or bool(re.fullmatch(r"f([1-9]|1\d|2[0-4])", t)) or t in _ARROWS
+
+
+def is_key_combo(text: str) -> bool:
+    """'Ctrl + Shift + D', 'F12', 'Alt + 1', 'Ctrl + \u2191': tokens joined by '+' (or spaces), every one a modifier, named key, F-key or single character, at least one token."""
+    s = re.sub(r"\s+", " ", (text or "").strip())
+    if not s or len(s) > 45:
+        return False
+    toks = [t for t in re.split(r"\s*\+\s*|\s+", s) if t]
+    return bool(toks) and all(_is_key_token(t) for t in toks) and (len(toks) > 1 or len(toks[0]) > 1 or toks[0].isalpha() or toks[0].isdigit())
+
+
+def parse_shortcut_table(table) -> List[Dict[str, str]]:
+    """[{shortcut, action}] from one HTML table, whatever its column layout (votes | keys | action | ... or keys | action): the key-combo column is found by CONTENT, the action is the longest
+    descriptive cell. Mnemonic underlines (<u>m</u>emory) are joined, not split into 'm emory'. Rows without both are dropped, never guessed."""
+    out = []
+    for row in table.find_all("tr"):
+        for br in row.find_all("br"):
+            br.replace_with(" ")
+        cells = [re.sub(r"\s+", " ", c.get_text("", strip=False)).strip() for c in row.find_all(["td", "th"])]
+        cands = [c for c in cells if is_key_combo(c)]
+        # rank: a combo with a modifier / named key / F-key beats a bare character; a bare number (a votes column) is the last resort
+        cands.sort(key=lambda c: (not any(_is_special(t) for t in re.split(r"\s*\+\s*|\s+", c) if t), c.strip().isdigit() or bool(re.fullmatch(r"-?\d+", c.strip()))))
+        keys = cands[0] if cands else None
+        if keys is not None and re.fullmatch(r"-?\d+", keys.strip()) and len([c for c in cells if c]) >= 3:
+            continue                                                  # a bare number in a 3+ cell row is the votes column, and the real key was a glyph we do not recognise: drop, never guess
+        if keys is None:
+            continue
+        desc = [c for c in cells if c and c != keys and re.search(r"[A-Za-z]{2,}", c) and not is_key_combo(c)]
+        if not desc:
+            continue
+        action = max(desc, key=len)
+        if len(action) < 4 or action.lower() in ("shortcut", "action", "description", "command"):
+            continue
+        # alternatives: separated by 'or' or '/', or run together ("Ctrl + ↑ Shift + D" = Ctrl+↑ and Shift+D): a modifier that follows a finished combo without a '+' starts a new one
+        parts = re.split(r"\s+or\s+|\s*/\s*|(?<![+\s])\s+(?=(?:ctrl|alt|shift|win|cmd|option)\b)", keys, flags=re.I)
+        for alt in [a.strip() for a in parts if a and a.strip()] or [keys]:
+            if is_key_combo(alt):
+                out.append({"shortcut": alt, "action": action})
+    return out
+
+
 def scrape_public_shortcuts(app_name: str, net: Net, max_rows: int = 400, delay_s: float = 1.0) -> List[Dict[str, Any]]:
     from bs4 import BeautifulSoup
     slug = re.sub(r"[^a-z0-9]+", "-", app_name.lower()).strip("-")
@@ -96,12 +151,10 @@ def scrape_public_shortcuts(app_name: str, net: Net, max_rows: int = 400, delay_
             continue
         soup = BeautifulSoup(raw, "lxml")
         for table in soup.find_all("table"):
-            for row in table.find_all("tr"):
-                cols = [c.get_text(" ", strip=True) for c in row.find_all(["td", "th"])]
-                if len(cols) >= 2 and cols[0].lower() not in ("shortcut", "key", "command", "windows", "keys") and 1 <= len(cols[0]) <= 45 and len(cols[1]) > 3:
-                    out.append({"app_name": app_name, "shortcut": cols[0], "action": cols[1], "category": "Scraped_Web_Table", "source": "web_table", "source_url": url})
-                    if len(out) >= max_rows:
-                        return out
+            for r in parse_shortcut_table(table):
+                out.append({"app_name": app_name, "shortcut": r["shortcut"], "action": r["action"], "category": "Scraped_Web_Table", "source": "web_table", "source_url": url})
+                if len(out) >= max_rows:
+                    return out
         if out:
             break
     return out
@@ -186,7 +239,10 @@ def run_hotkeys_and_macros_harvester(app_names: Optional[List[str]] = None, max_
         path = workbook_path(root)
         existing = pd.read_excel(path, sheet_name=None) if os.path.isfile(path) else {}
         sheets = dict(existing)
-        sheets[SHEET_HOTKEYS] = _merge(existing.get(SHEET_HOTKEYS), pd.DataFrame(hotkeys), ["app_name", "shortcut"])
+        old_hot = existing.get(SHEET_HOTKEYS)
+        if old_hot is not None and len(old_hot) and "source" in old_hot.columns:
+            old_hot = old_hot[~((old_hot["source"] == "web_table") & old_hot["app_name"].isin(app_names[:max_apps]))]
+        sheets[SHEET_HOTKEYS] = _merge(old_hot, pd.DataFrame(hotkeys), ["app_name", "shortcut"])
         sheets[SHEET_MACROS] = _merge(existing.get(SHEET_MACROS), pd.DataFrame(macros), ["app_name", "task_pattern"])
         _save(path, sheets)
         out["workbook"] = path

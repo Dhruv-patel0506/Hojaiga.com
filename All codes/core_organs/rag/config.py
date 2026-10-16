@@ -49,9 +49,15 @@ BORROW_MIN_CHUNKS = 3
 BORROW_CONFIDENCE_MULT = 0.5
 VERSION_OTHER_MULT = 0.8
 CACHE_TTL_S = 3600
+ROUTER_VERSION = 3                # part of every router-cache key: BUMP IT whenever routing/fusion/planning logic changes, so a cached answer from older logic can never be served
 EMBED_CACHE_MAX = 50000
-LLM_REWRITE_TIMEOUT_S = 4.0
-WEAK_RECALL_SCORE = 0.02           # top fused RRF score below this counts as weak recall
+LLM_REWRITE_TIMEOUT_S = 4.0        # a WALL-CLOCK cap (the call runs in a worker; the router stops waiting at this point and answers without the rewrite)
+QUERY_EMBED_TIMEOUT_S = 2.0        # a cold Ollama reload can take ~1 s; beyond this the vector leg is skipped for that query
+# Weak recall = no passage was found by BOTH the lexical and the vector leg. A raw reciprocal-rank score of one leg's best hit is 1/(RRF_K+1) = 0.016; a passage both legs return scores >= ~0.03.
+# (The first version thresholded the score AFTER multiplying by quality and trust, which on real auto-captions is always tiny: the model was called on almost every query.)
+WEAK_RECALL_SCORE = 0.025
+# a question about KEYS ("what is the shortcut for ...") is answered best by the hotkey rows: their evidence is weighted up
+SHORTCUT_QUERY_BOOST = 2.5
 
 # ---- retrieval --------------------------------------------------------------------------------------------------------------------------------------
 IVF_PQ_MIN_ROWS = 20_000          # a flat vector scan costs ~3 us/row (measured: 160 ms at 50k x 768-d); past this size the ANN index (tools.build_ann) is what keeps a query under budget

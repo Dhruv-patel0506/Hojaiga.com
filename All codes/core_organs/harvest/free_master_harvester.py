@@ -116,6 +116,12 @@ def _yt_transcript(video_id: str, languages: List[str]) -> List[Dict[str, Any]]:
         name = type(exc).__name__
         if "Block" in name or "TooMany" in name or "RequestBlocked" in name:
             raise PermissionError(name)
+        if name == "NoTranscriptFound":                       # captions exist, just not in the languages asked for: say which, so the person can choose (translate, or skip)
+            try:
+                other = [t.language_code for t in Y.YouTubeTranscriptApi().list(video_id)]
+            except Exception:
+                other = []
+            raise TranscriptUnavailable("other:" + ",".join(other) if other else name)
         raise TranscriptUnavailable(name)
 
 
@@ -190,7 +196,8 @@ def fetch_transcript(net: Net, root: str, app_key: str, video_id: str, languages
     except PermissionError as exc:
         return {"status": f"Blocked:{exc}", "segments": 0, "path": ""}
     except TranscriptUnavailable as exc:
-        return {"status": "No_Subtitles", "segments": 0, "path": "", "why": str(exc)}
+        why = str(exc)
+        return {"status": ("Other_Language:" + why[6:]) if why.startswith("other:") else "No_Subtitles", "segments": 0, "path": "", "why": why}
     except Exception as exc:
         return {"status": f"Error:{type(exc).__name__}", "segments": 0, "path": ""}
     if not segs:
@@ -204,7 +211,7 @@ def fetch_transcript(net: Net, root: str, app_key: str, video_id: str, languages
 
 # ---- the run --------------------------------------------------------------------------------------------------------------------------------------------
 def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, net: Optional[Net] = None, root: str = "", delay_s: float = 1.0, app_limit: int = 1000,
-                  queries=("{app} full tutorial for beginners step by step", "{app} shortcuts tips and tricks workflow"), only_apps: Optional[List[str]] = None,
+                  queries=("{app} full tutorial for beginners step by step english", "{app} shortcuts tips and tricks workflow english"), only_apps: Optional[List[str]] = None,
                   write_workbook: bool = True, stop_on_block: bool = True) -> Dict[str, Any]:
     """Harvest one batch: apps[start : start+max_apps]. Returns a report. Safe to re-run: finished apps are skipped, transcripts are cached, sheets are merged."""
     net = net or Net()
@@ -222,7 +229,7 @@ def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, ne
         apps = [a for a in apps if a["app_name"].lower() in want or a["app_key"] in want]
     batch = apps[start:start + max_apps]
     video_rows: List[Dict[str, Any]] = []
-    stats = {"apps_processed": 0, "apps_skipped_done": 0, "videos": 0, "downloaded": 0, "cached": 0, "no_subtitles": 0, "blocked": 0, "errors": 0}
+    stats = {"apps_processed": 0, "apps_skipped_done": 0, "videos": 0, "downloaded": 0, "cached": 0, "no_subtitles": 0, "other_language": 0, "blocked": 0, "errors": 0}
     blocked = False
     for app in batch:
         if app["app_key"] in state["done_apps"]:
@@ -240,7 +247,8 @@ def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, ne
             t = fetch_transcript(net, root, app["app_key"], v["id"])
             st = t["status"]
             stats["videos"] += 1
-            stats["downloaded" if st == "Downloaded" else "cached" if st == "Cached" else "no_subtitles" if st == "No_Subtitles" else "blocked" if st.startswith("Blocked") else "errors"] += 1
+            stats["downloaded" if st == "Downloaded" else "cached" if st == "Cached" else "no_subtitles" if st == "No_Subtitles" else "other_language" if st.startswith("Other_Language") else
+                  "blocked" if st.startswith("Blocked") else "errors"] += 1
             video_rows.append({"app_name": app["app_name"], "app_key": app["app_key"], "video_id": v["id"], "title": v["title"], "url": f"https://www.youtube.com/watch?v={v['id']}",
                                "duration_sec": v.get("duration", 0), "view_count": v.get("view_count", 0), "channel": v.get("uploader", ""), "transcript_status": st,
                                "transcript_segments": t["segments"], "local_json_path": os.path.relpath(t["path"], root).replace("\\", "/") if t["path"] else ""})

@@ -272,3 +272,29 @@ class FastPaths:
         n = lt.drop_app(self.st, "fast_paths", app_key)
         self.st.bump(f"fast:{app_key}")
         return n
+
+
+# ---- spoken / typed key chords in a question ('what does ctrl plus h do') ------------------------------------------------------------------------------
+_CHORD_Q = re.compile(r"(?<![\w+])((?:ctrl|control|alt|shift|win|windows|cmd)(?:\s*(?:\+|plus)\s*(?:ctrl|control|alt|shift|win|windows|f\d{1,2}|enter|esc|escape|tab|space|home|end|del|delete|backspace|pgup|pgdn|up|down|left|right|[a-z0-9]))+)(?![\w])", re.I)
+_CHORD_WORDS = {"control": "ctrl", "windows": "win", "escape": "esc", "delete": "del"}
+
+
+def spoken_chords(text: str) -> List[str]:
+    """Normalised chords found in a question: 'what does Ctrl plus H do' -> ['ctrl+h']; 'press control + shift + esc' -> ['ctrl+shift+esc']."""
+    out = []
+    for m in _CHORD_Q.finditer(text or ""):
+        parts = [p.strip().lower() for p in re.split(r"\s*(?:\+|\bplus\b)\s*", m.group(1)) if p.strip()]
+        norm = "+".join(_CHORD_WORDS.get(p, p) for p in parts)
+        if norm not in out:
+            out.append(norm)
+    return out
+
+
+def _by_chord(self, app_key: str, chord: str, limit: int = 5) -> List[Evidence]:
+    """The vault rows whose key payload IS this chord (exact), for 'what does ctrl+h do'."""
+    rows = self._overlay(lt.fetch(self.st, "fast_paths", lt.where_app(app_key, f"payload = {lt.q(chord)}"), 50))
+    rows.sort(key=lambda r: (-(1 if (r["verified"] or r["trust"] in DIRECT_TRUST) else 0), -_reliability(r)))
+    return [self._evidence(r, "", None, 1.0) for r in rows[:limit]]
+
+
+FastPaths.by_chord = _by_chord

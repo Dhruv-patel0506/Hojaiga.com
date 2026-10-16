@@ -13,13 +13,14 @@ import hashlib
 import json
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Callable, Dict, FrozenSet, Iterable, List, Optional, Sequence, Set, Tuple
 
 from . import config as C
 from . import lt
 from . import storage as ST
 from . import statekey as SK
-from .fastpaths import FastPaths, KIND_ROUTE
+from .fastpaths import FastPaths, KIND_ROUTE, spoken_chords
 from .graph import Graph, GraphPath
 from .icons import Icons
 from .lexicon import Lexicon, Match, canon, surface, toks
@@ -43,6 +44,7 @@ _EXPLAIN = re.compile(r"^\s*(?:why|explain|what(?:'s| is| are| does)|difference|
 _DO_HOW = re.compile(r"^\s*(?:how (?:do|can|to|would)|how do i|can you|could you|please|i want to|i need to|help me)\b", re.I)
 _DO_VERB = re.compile(r"^\s*(?:create|make|add|insert|open|save|export|import|delete|remove|build|draw|set|turn|toggle|apply|run|start|stop|close|rename|duplicate|copy|paste|move|rotate|scale|extrude|bevel|type|enter|select|click|press|switch|render|generate|model|resize|crop|zoom)\b", re.I)
 _PARAMS = re.compile(r"\d|[\"'\u201c\u2018]")
+_KEYS_Q = re.compile(r"\b(shortcut|shortcuts|hotkey|hotkeys|keyboard|key combination|key combo|keystroke|keybinding|key binding|chord)\b", re.I)
 _CREATION = re.compile(r"\b(create|build|make|generate|model|draw|design|render|produce|automate|batch)\b", re.I)
 
 
@@ -115,6 +117,9 @@ def finish_plan(steps: List[PlanStep], origin: str, q: Query, grounded: Optional
     plan = Plan(steps, round(p, 4), round(cost, 1), round(g / len(steps), 3) if steps else 0.0, human, origin, 0.0, note)
     plan.utility = round(utility(plan, q.mode), 4)
     return plan
+
+
+_LLM_POOL = ThreadPoolExecutor(max_workers=1, thread_name_prefix="rag-llm")
 
 
 class Rag:
@@ -260,7 +265,7 @@ class Router:
         key = ""
         if app and q.popup is None and not q.failure and q.crop is None and q.region is None:
             key = hashlib.sha1("|".join([app, state_id or "", re.sub(r"\s+", " ", q.text.strip().lower()), intent, q.mode, ",".join(sorted(q.allow_categories)), q.app_version,
-                                         self._gens(app)]).encode()).hexdigest()
+                                         self._gens(app), str(C.ROUTER_VERSION)]).encode()).hexdigest()
             row = self.st.sql("cache").one("SELECT v, ts FROM router_cache WHERE k=?", (key,))
             if row and time.time() - row["ts"] < C.CACHE_TTL_S:
                 out = retrieval_from_dict(json.loads(row["v"]), q)
@@ -437,6 +442,8 @@ class Router:
         if not good() and cmds:
             plans += self._probe(ret.trace, "routes", self._plans_for_commands, q, app, tier, state_id, ctx, [m.command_id for m in cmds], default=[])
         # 4. a procedure (guide / transcript / crawl doc) for the goal
+        procs: List[Evidence] = []
+        chunks: List[Evidence] = []
         if not good():
             procs = self._probe(ret.trace, "procedures", r.proc.find_procedures, app, goal, q.app_version, 3, default=[])
             for ev in procs[:2]:
@@ -456,8 +463,10 @@ class Router:
                     pl = self._plan_from_steps(q, app, tier, state_id, ctx, steps, "procedure+graph", ev.citation)
                     if pl:
                         plans.append(pl)
-        # 5. weak recall: one capped, cached rewrite
-        if not good() and not any(p.grounded_ratio >= 0.6 for p in plans) and q.allow_llm_rewrite and r.rewriter:
+        # 5. weak recall (NOT "no plan is grounded" -- without a scanned UI every plan is a probe): nothing resolved to a command AND no passage/procedure was found by both retrieval legs.
+        #    One capped, cached rewrite.
+        found_strong = bool(cmds) or any(e.score >= C.WEAK_RECALL_SCORE for e in procs) or any(e.payload.get("rrf", 0.0) >= C.WEAK_RECALL_SCORE for e in chunks)
+        if not good() and not found_strong and q.allow_llm_rewrite and r.rewriter:
             alts = self._rewrite(app, goal, ret)
             for alt in alts[:2]:
                 m2 = r.lex.resolve(app, alt, live)
@@ -492,7 +501,15 @@ class Router:
         if row:
             ret.trace.append({"probe": "llm_rewrite", "ms": 0.0, "hits": 0, "why": "cached"})
             return json.loads(row["v"])
-        out = self._probe(ret.trace, "llm_rewrite", self.r.rewriter, app, goal, default=[]) or []
+        # a WALL-CLOCK cap: the model call runs in a worker and the router stops waiting at LLM_REWRITE_TIMEOUT_S (the worker is abandoned, not killed; its answer is discarded)
+        fut = _LLM_POOL.submit(self.r.rewriter, app, goal)
+        t0 = time.perf_counter()
+        try:
+            out = fut.result(timeout=C.LLM_REWRITE_TIMEOUT_S) or []
+            why = ""
+        except Exception as exc:
+            out, why = [], ("timeout" if type(exc).__name__ in ("TimeoutError", "Timeout") else f"error:{type(exc).__name__}")
+        ret.trace.append({"probe": "llm_rewrite", "ms": round((time.perf_counter() - t0) * 1000, 2), "hits": len(out), "why": why})
         out = [str(x) for x in out][:2]
         if out:
             self.st.sql("cache").execute("INSERT OR REPLACE INTO rewrite_cache(k,v,ts) VALUES(?,?,?)", (key, json.dumps(out), time.time()))
@@ -523,11 +540,11 @@ class Router:
 
     # ---- EXPLAIN ------------------------------------------------------------------------------------------------------------------------------------
     @staticmethod
-    def _fuse(lists: Sequence[Sequence[Evidence]]) -> List[Evidence]:
+    def _fuse(lists: Sequence[Sequence[Evidence]], mult: Optional[Sequence[float]] = None) -> List[Evidence]:
         scored: Dict[Tuple[str, str], Tuple[float, Evidence]] = {}
-        for lst in lists:
+        for li, lst in enumerate(lists):
             for rank, e in enumerate(lst):
-                w = C.TRUST_W.get(e.trust, 0.4) * max(0.05, e.confidence) / (C.RRF_K + rank + 1) * C.RRF_K
+                w = C.TRUST_W.get(e.trust, 0.4) * max(0.05, e.confidence) / (C.RRF_K + rank + 1) * C.RRF_K * (mult[li] if mult else 1.0)
                 k = (e.sub_rag, e.citation or e.text[:40])
                 if k in scored:
                     scored[k] = (scored[k][0] + w, scored[k][1])
@@ -557,12 +574,16 @@ class Router:
             ret.evidence += self._probe(ret.trace, "procedures_global", self._global_chunks, q.text, default=[])
             ret.gaps.append("app_unknown")
             return
+        chords = spoken_chords(q.text)
+        keyq = bool(_KEYS_Q.search(q.text)) or bool(chords)           # a question about keys is answered best by the hotkey rows
         chunks = self._probe(ret.trace, "procedures", r.proc.query, app, q.text, q.app_version, live, 4, default=[])
-        fast = [e for e in self._probe(ret.trace, "fast_goal", r.fast.by_goal, app, q.text, ctx, 2, default=[])]
+        fast = [e for e in self._probe(ret.trace, "fast_goal", r.fast.by_goal, app, q.text, ctx, 4 if keyq else 2, default=[])]
+        exact = [e for ch in chords for e in self._probe(ret.trace, "chord", r.fast.by_chord, app, ch, default=[])]        # 'what does ctrl plus h do': the rows whose keys ARE ctrl+h come first
         matches = self._probe(ret.trace, "lexicon", r.lex.resolve, app, q.text, live, default=[])
         where, _ = self._where_evidence(q, app, tier, state_id, [m.command_id for m in self._greedy_commands(matches, q.text)])
-        # weak recall -> one capped rewrite
-        if (not chunks or chunks[0].score < C.WEAK_RECALL_SCORE) and q.allow_llm_rewrite and r.rewriter and not self._over(t0, q):
+        # weak recall -> one capped rewrite. Weak = nothing was found by BOTH retrieval legs (raw reciprocal-rank score), no exact chord hit, no command resolved.
+        strong = bool(exact) or bool(where) or any(e.payload.get("rrf", 0.0) >= C.WEAK_RECALL_SCORE for e in chunks) or any(e.score >= C.WEAK_RECALL_SCORE for e in fast)
+        if not strong and q.allow_llm_rewrite and r.rewriter and not self._over(t0, q):
             for alt in self._rewrite(app, q.text, ret)[:2]:
                 chunks += r.proc.query(app, alt, q.app_version, live, 2)
         if not chunks:
@@ -572,6 +593,12 @@ class Router:
                     e.confidence *= C.BORROW_CONFIDENCE_MULT
                     chunks.append(e)
                     ret.gaps.append(f"borrowed_from:{sib}")
+        fused = self._fuse([chunks, fast, where], [1.0, C.SHORTCUT_QUERY_BOOST if keyq else 1.0, 1.0])
+        have = {e.citation for e in exact}
+        ret.evidence += (exact + [e for e in fused if e.citation not in have])[:6]
+        if not ret.evidence:
+            ret.gaps.append("nothing_known")
+        return
         ret.evidence += self._fuse([chunks, fast, where])[:6]
         if not ret.evidence:
             ret.gaps.append("nothing_known")
@@ -604,6 +631,13 @@ class Router:
                 ret.evidence += self._probe(ret.trace, "fast_cmd", r.fast.by_command, app, cmd, ctx, 2, default=[])
         ret.evidence += self._probe(ret.trace, "ui_states", lambda: [Evidence("graph", app, "state", s["description"], [], {"state_id": s["state_id"]}, "learned", 0.5, 0.0, "allow", f"graph:{s['state_id']}", "", s["score"])
                                                                    for s in r.graph.find_states(app, q.text, 3)], default=[])
+        if not ret.evidence and not ret.plans:
+            # nothing scanned yet (no states, no paths): answer from what IS known -- the hotkey rows and passages that mention it -- and say the map is missing
+            known = self._fuse([self._probe(ret.trace, "fast_goal", r.fast.by_goal, app, q.text, ctx, 4, default=[]),
+                                self._probe(ret.trace, "procedures", r.proc.query, app, q.text, q.app_version, live, 3, default=[])])
+            ret.evidence += known[:4]
+            if known:
+                ret.gaps.append("answered_from_text_not_from_a_ui_map")
 
     # ---- IDENTIFY -----------------------------------------------------------------------------------------------------------------------------------
     def _region_control(self, q: Query) -> Optional[str]:

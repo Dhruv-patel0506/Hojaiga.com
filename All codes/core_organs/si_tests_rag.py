@@ -19,6 +19,7 @@ nothing needs Ollama, the SSD, a live window or the GPU. Registered into the Pro
   RG15  tools + adapters: self_doc from graph paths, explore targets, registry/keymap/skill/workflow adapters
   RG16  integration hooks: executor reports teach the RAG, manual_rag falls back to it per app, switch-off is total
   RG17  storage fallback end to end; the LLM rewriter (weak recall only, cached, silent when the model is down)
+  RG18  regressions from the first REAL store: weak recall = retrieval disagreement, wall-clock LLM cap, chords + shortcut questions, cache versioning, LOCATE without a map
 """
 
 from __future__ import annotations
@@ -863,8 +864,92 @@ def run_rg17() -> "TestOutcome":
     return _verdict(checks, f"calls={len(calls)} fallback_tables={tables}")
 
 
+def run_rg18() -> "TestOutcome":
+    """RG18: regressions found on the first REAL harvested store -- weak recall is judged on retrieval agreement, the LLM cap is wall-clock, chords and shortcut questions, cache versioning, LOCATE without a map"""
+    import types as _t
+    from core_organs.rag import config as C, embed as E
+    from core_organs.rag.adapters.llm_rewrite import rewriter
+    from core_organs.rag.fastpaths import spoken_chords
+    from core_organs.rag.types import Query
+    calls = []
+
+    def slow(app, goal):
+        calls.append(goal)
+        time.sleep(1.0)
+        return ["insert picture"]
+
+    def quick(app, goal):
+        calls.append(goal)
+        return ["clear memory"]
+    transcript = [{"text": "now press the memory clear button to wipe the stored value", "start": 0, "duration": 4}, {"text": "you can also recall the value from memory with the recall button", "start": 5, "duration": 4}]
+    with _Env(rewriter=quick) as R:
+        R.proc.ingest_transcript("calc", transcript, "vid", "Calculator memory")
+        R.fast.upsert([{"app_key": "calc", "kind": "hotkey", "task_pattern": "Clear memory", "payload": "ctrl+l", "source": "web_table", "trust": "web"},
+                       {"app_key": "calc", "kind": "hotkey", "task_pattern": "Turn calculation history on or off", "payload": "ctrl+h", "source": "web_table", "trust": "web"},
+                       {"app_key": "calc", "kind": "hotkey", "task_pattern": "Recall from memory", "payload": "ctrl+r", "source": "web_table", "trust": "web"}])
+        n0 = len(calls)
+        strong = R.retrieve(Query(text="how do I clear the stored value from memory", app_key="calc", mode="tutor"))
+        n_strong = len(calls) - n0
+        weak = R.retrieve(Query(text="zorblax quuxify flimflam", app_key="calc", mode="tutor"))
+        n_weak = len(calls) - n0 - n_strong
+        key_q = R.retrieve(Query(text="what is the shortcut for clearing memory", app_key="calc", mode="tutor"))
+        chord_q = R.retrieve(Query(text="what does ctrl plus h do", app_key="calc", mode="tutor"))
+        nokey_q = R.retrieve(Query(text="what does the memory clear button do", app_key="calc", mode="tutor"))
+        # cache: identical -> hit; a router-logic version bump -> miss
+        a1 = R.retrieve(Query(text="what is the shortcut for clearing memory", app_key="calc", mode="tutor"))
+        old_v = C.ROUTER_VERSION
+        C.ROUTER_VERSION = old_v + 1
+        a2 = R.retrieve(Query(text="what is the shortcut for clearing memory", app_key="calc", mode="tutor"))
+        C.ROUTER_VERSION = old_v
+        # LOCATE with no scanned map
+        loc = R.retrieve(Query(text="where is the calculation history", app_key="calc", mode="tutor"))
+    # the wall-clock cap
+    old_t = C.LLM_REWRITE_TIMEOUT_S
+    C.LLM_REWRITE_TIMEOUT_S = 0.25
+    try:
+        with _Env(rewriter=slow) as R2:
+            R2.proc.ingest_transcript("calc", transcript, "vid", "Calculator memory")
+            t = time.perf_counter()
+            capped = R2.retrieve(Query(text="zorblax quuxify flimflam", app_key="calc", mode="tutor"))
+            capped_s = time.perf_counter() - t
+    finally:
+        C.LLM_REWRITE_TIMEOUT_S = old_t
+    # the embedder: keep_alive is requested, a query gets the short cap, a timeout backs off briefly (not 30 s)
+    import requests
+    sent = {}
+
+    class Boom(Exception):
+        pass
+
+    def fake_post(url, json=None, timeout=None):
+        sent.update(json=json, timeout=timeout)
+        raise requests.exceptions.Timeout("cold model")
+    orig = requests.post
+    requests.post = fake_post
+    try:
+        oe = E.OllamaEmbedder(url="http://127.0.0.1:1")
+        got = oe.embed(["clear memory"], "query")
+        backoff = oe._down_until - time.time()
+    finally:
+        requests.post = orig
+    checks = {"strong_recall_does_not_call_the_model": n_strong == 0 and bool(strong.evidence),
+              "weak_recall_calls_it_once": n_weak == 1,
+              "shortcut_question_puts_the_hotkey_row_first": key_q.evidence[0].sub_rag == "fast" and key_q.evidence[0].payload["payload"] == "ctrl+l",
+              "spoken_chord_finds_the_exact_row_first": chord_q.evidence[0].payload["payload"] == "ctrl+h" and chord_q.evidence[0].text == "Turn calculation history on or off",
+              "chord_parsing": spoken_chords("what does Ctrl plus H do") == ["ctrl+h"] and spoken_chords("press control + shift + esc") == ["ctrl+shift+esc"] and spoken_chords("a plus b makes c") == []
+                               and spoken_chords("hit alt+f4 now") == ["alt+f4"],
+              "a_non_key_question_is_not_forced_to_hotkeys": not (nokey_q.evidence and nokey_q.evidence[0].sub_rag == "fast" and nokey_q.evidence[0].score > 0.5 and nokey_q.evidence[0].payload["payload"] == "ctrl+h"),
+              "identical_question_is_cached": a1.trace[0]["probe"] == "cache",
+              "a_router_version_bump_invalidates_the_cache": a2.trace[0]["probe"] != "cache",
+              "llm_cap_is_wall_clock": capped_s < 0.9 and any(t["probe"] == "llm_rewrite" and t["why"] == "timeout" for t in capped.trace),
+              "locate_without_a_map_answers_from_text_and_says_so": bool(loc.evidence) and "answered_from_text_not_from_a_ui_map" in loc.gaps,
+              "query_embedding_keeps_model_warm_with_a_short_cap": sent.get("json", {}).get("keep_alive") == "30m" and sent.get("timeout") == C.QUERY_EMBED_TIMEOUT_S and got is None,
+              "a_timeout_backs_off_briefly": 3.0 < backoff <= 5.5}
+    return _verdict(checks, f"capped_in={capped_s:.2f}s weak_calls={n_weak} key_first={key_q.evidence[0].text if key_q.evidence else None} backoff={backoff:.1f}s")
+
+
 TESTS = [("RG1", run_rg1), ("RG2", run_rg2), ("RG3", run_rg3), ("RG4", run_rg4), ("RG5", run_rg5), ("RG6", run_rg6), ("RG7", run_rg7), ("RG8", run_rg8), ("RG9", run_rg9), ("RG10", run_rg10),
-         ("RG11", run_rg11), ("RG12", run_rg12), ("RG13", run_rg13), ("RG14", run_rg14), ("RG15", run_rg15), ("RG16", run_rg16), ("RG17", run_rg17)]
+         ("RG11", run_rg11), ("RG12", run_rg12), ("RG13", run_rg13), ("RG14", run_rg14), ("RG15", run_rg15), ("RG16", run_rg16), ("RG17", run_rg17), ("RG18", run_rg18)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]

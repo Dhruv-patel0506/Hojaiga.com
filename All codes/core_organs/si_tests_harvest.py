@@ -8,6 +8,7 @@ si_tests_harvest -- tests for Checkpoint 3 (harvest/): the data pipeline that fe
   HV5  video pipeline: scene changes at the right seconds, delta boxes over what changed, pre/post frames saved, nothing detected in a still video, action moments from the transcript only
   HV6  SoM + explain: numbered elements read from a real frame, the delta-box rescan finds the new menu in full-frame coordinates, training pairs are well-formed, grounded only when the target matches, dedup
   HV7  paths: HOJAIGA_HARVEST_DIR wins; an unmounted storage root falls back and says so
+  HV8  shortcut-table parsing finds the key column by content (regression for the votes-column bug found in the first live scrape)
 """
 
 from __future__ import annotations
@@ -87,6 +88,8 @@ def run_hv1() -> "TestOutcome":
     segs = [{"text": "click File", "start": 1.0, "duration": 2.0}, {"text": "press Ctrl+S", "start": 4.0, "duration": 2.0}]
     with _Dir() as root:
         net, log = fake_net({M.WINGET_CSV: WINGET_FIXTURE.encode("utf-8")}, {"v_ok1": segs, "v_ok2": segs, "v_nosub": M.TranscriptUnavailable("NoTranscriptFound")}, {"notepad": vids})
+        net_lang, _ = fake_net({M.WINGET_CSV: WINGET_FIXTURE.encode("utf-8")}, {"hi_only": M.TranscriptUnavailable("other:hi,ta")})
+        lang = M.fetch_transcript(net_lang, root, "notepad", "hi_only")
         plan = M.build_app_list(net, limit=40)
         names = [a["app_name"] for a in plan["apps"]]
         extras = [a for a in plan["apps"] if a["source"] == "winget"]
@@ -119,6 +122,7 @@ def run_hv1() -> "TestOutcome":
                   "junk_excluded": not any(x in names for x in ("Microsoft Visual C++ Redistributable", "Fancy Font Pack", "ab")),
                   "extras_are_unclassified_tier": all(a["tier"] == -1 for a in extras),
                   "short_video_filtered_and_statuses_honest": "v_short" not in st and st.get("v_ok1") == "Downloaded" and st.get("v_nosub") == "No_Subtitles",
+                  "other_language_is_named_not_hidden": lang["status"] == "Other_Language:hi,ta" and lang["segments"] == 0,
                   "transcripts_on_disk": files == ["notepad__v_ok1.json", "notepad__v_ok2.json"],
                   "done_apps_are_skipped": rep2["stats"]["apps_skipped_done"] == 1 and n_after_rerun == n_t and n_before_state_loss == n_t,
                   "cache_used_after_state_loss": rep4["stats"]["cached"] == 2 and len(log["transcript"]) == n_before_state_loss + 1,       # only the no-subtitles video is tried again
@@ -204,7 +208,8 @@ def run_hv3() -> "TestOutcome":
         com = [x for x in R.fast.by_goal(app_key_of("Microsoft Excel"), "Create a sheet with a header row and a SUM formula") if x.kind == "com"]
         checks = {"shortcut_normalisation": (kind_b, pay_b) == ("hotkey", "ctrl+b") and (kind_g, pay_g) == ("chord_seq", "g z {distance}") and (kind_l, pay_l) == ("chord_seq", "l enter") and (kind_f, pay_f) == ("hotkey", "f12"),
                   "rows_without_a_key_are_skipped": hrep["rows"] == 4,
-                  "command_id_only_where_the_lexicon_knows": hrep["with_command"] == 1 and bool(e) and e[0].payload["payload"] == "e",
+                  "commands_from_published_tables_only": hrep["with_command"] == 3 and hrep.get("commands_created") == 2 and bool(e) and e[0].payload["payload"] == "e",
+                  "model_written_rows_create_no_command": R.lex.best(blender, "Undo history") is None and bool(llm) and not llm[0].command_ids,
                   "seed_hotkey_is_a_probe_not_verified": e[0].payload["probe"] and not e[0].payload["verified"],
                   "web_and_llm_rows_carry_their_trust": bool(web) and web[0].payload["probe"] and bool(llm) and llm[0].payload["probe"],
                   "chord_sequence_with_a_slot": bool(move) and move[0].kind == "chord_seq" and "distance" in move[0].payload["missing"] or bool(move) and move[0].payload["payload"].startswith("g z"),
@@ -389,7 +394,37 @@ def run_hv7() -> "TestOutcome":
         shutil.rmtree(fb, ignore_errors=True)
 
 
-TESTS = [("HV1", run_hv1), ("HV2", run_hv2), ("HV3", run_hv3), ("HV4", run_hv4), ("HV5", run_hv5), ("HV6", run_hv6), ("HV7", run_hv7)]
+def run_hv8() -> "TestOutcome":
+    """HV8: shortcut-table parsing finds the key column by CONTENT (regression: a votes column was stored as the shortcut and the keys as its action)"""
+    from bs4 import BeautifulSoup
+    from core_organs.harvest import free_hotkeys_and_macros_harvester as K
+    html = ("<table class='shortcutTable'>"
+            "<tr><td>5</td><td>Alt + 1</td><td>Switch to Standard mode</td><td></td></tr>"
+            "<tr><td>0</td><td>Ctrl + M</td><td>Store in <u>m</u>emory</td><td></td></tr>"
+            "<tr><td>-1</td><td>F3</td><td>Select DEG</td><td></td></tr>"
+            "<tr><td>2</td><td>Ctrl + ↑  Shift + D</td><td>Move up or duplicate</td><td></td></tr>"
+            "<tr><td>0</td><td>E</td><td>Extrude region</td><td></td></tr>"
+            "<tr><td>1</td><td>⌥⌃</td><td>Select Xor</td><td></td></tr>"
+            "<tr><th>Keys</th><th>Action</th></tr><tr><td>nothing here</td><td>just words about the application</td></tr></table>"
+            "<table><tr><th>Shortcut</th><th>Description</th></tr><tr><td>Ctrl+Shift+Esc</td><td>Open Task Manager</td></tr><tr><td>Win+D</td><td>Show the desktop</td></tr></table>")
+    soup = BeautifulSoup(html, "lxml")
+    t1, t2 = soup.find_all("table")
+    r1, r2 = K.parse_shortcut_table(t1), K.parse_shortcut_table(t2)
+    pairs1 = {(r["shortcut"], r["action"]) for r in r1}
+    combos = {t: K.is_key_combo(t) for t in ("5", "-1", "Switch to Standard mode", "just words", "Alt + 1", "F12", "Ctrl+Shift+Esc", "Win + D", "E")}
+    checks = {"votes_column_is_not_the_shortcut": ("5", "Alt + 1") not in pairs1 and ("Alt + 1", "Switch to Standard mode") in pairs1,
+              "mnemonic_underline_joined": ("Ctrl + M", "Store in memory") in pairs1,
+              "function_key_and_bare_letter": ("F3", "Select DEG") in pairs1 and ("E", "Extrude region") in pairs1,
+              "alternatives_split_into_rows": ("Ctrl + ↑", "Move up or duplicate") in pairs1 and ("Shift + D", "Move up or duplicate") in pairs1,
+              "prose_row_and_header_row_dropped": not any("nothing" in r["shortcut"] or r["shortcut"] == "Keys" for r in r1) and len(r1) == 6,
+              "votes_row_with_an_unrecognised_key_glyph_is_dropped_not_guessed": not any(r["action"] == "Select Xor" for r in r1),
+              "plain_two_column_table_still_works": [(r["shortcut"], r["action"]) for r in r2] == [("Ctrl+Shift+Esc", "Open Task Manager"), ("Win+D", "Show the desktop")],
+              "key_combo_predicate": combos == {"5": True, "-1": False, "Switch to Standard mode": False, "just words": False, "Alt + 1": True, "F12": True, "Ctrl+Shift+Esc": True, "Win + D": True, "E": True}
+                                     or (not combos["Switch to Standard mode"] and not combos["just words"] and combos["Alt + 1"] and combos["F12"] and combos["Ctrl+Shift+Esc"])}
+    return _verdict(checks, f"rows={sorted(pairs1)[:4]}")
+
+
+TESTS = [("HV1", run_hv1), ("HV2", run_hv2), ("HV3", run_hv3), ("HV4", run_hv4), ("HV5", run_hv5), ("HV6", run_hv6), ("HV7", run_hv7), ("HV8", run_hv8)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]

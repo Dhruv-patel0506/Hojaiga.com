@@ -267,7 +267,7 @@ class Procedures:
         for score, r in out[:k]:
             ev.append(Evidence("procedure", r["app_key"], "chunk", r["text"], list(r.get("mentions") or []),
                                {"chunk_id": r["chunk_id"], "heading_path": r["heading_path"], "steps": json.loads(r["steps_json"] or "[]"), "procedure_id": r["procedure_id"],
-                                "unresolved": list(r.get("unresolved") or []), "source_kind": r["source_kind"]},
+                                "unresolved": list(r.get("unresolved") or []), "source_kind": r["source_kind"], "rrf": r["_rrf"]},
                                r["trust"], float(r["quality"]), 0.0, "allow", r["source_ref"], "", score))
         return ev
 
