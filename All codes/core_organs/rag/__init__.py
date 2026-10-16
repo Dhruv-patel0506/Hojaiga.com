@@ -10,6 +10,7 @@ get_rag() is the process-wide Rag; tests build their own Rag(Storage(tmp_root)).
 """
 from __future__ import annotations
 
+import os
 import threading
 from typing import Any, Optional
 
@@ -25,7 +26,14 @@ def get_rag() -> Rag:
     global _RAG
     with _LOCK:
         if _RAG is None:
-            _RAG = Rag()
+            rewriter = None
+            if os.environ.get("HOJAIGA_RAG_REWRITE", "on").lower() not in ("off", "0", "false", "no"):
+                try:
+                    from .adapters.llm_rewrite import rewriter as _rw
+                    rewriter = _rw()                       # weak-recall fallback only (DESIGN 7.6); costs nothing while the model is down
+                except Exception:
+                    rewriter = None
+            _RAG = Rag(rewriter=rewriter)
         return _RAG
 
 

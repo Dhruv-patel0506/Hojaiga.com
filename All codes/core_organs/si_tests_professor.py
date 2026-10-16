@@ -3253,6 +3253,16 @@ try:                                                                            
 except Exception:                                                                          # noqa: BLE001
     pass
 LIVE = [("PL1", run_pl1), ("PL2", run_pl2), ("PL3", run_pl3), ("PL4", run_pl4), ("PL5", run_pl5), ("PL6", run_pl6), ("PV1", run_pv1), ("PV2", run_pv2), ("PL7", run_pl7), ("PL8", run_pl8), ("PL9", run_pl9), ("PL10", run_pl10), ("PL11", run_pl11), ("PL12", run_pl12), ("PL13", run_pl13), ("PL14", run_pl14)]
+try:                                                                                       # the shared click blocklist (Checkpoint 0): Delete/Format/Reset/Uninstall/Purchase ...
+    from si_tests_safety import TESTS as _SAFETY_TESTS
+    OFFLINE = OFFLINE + _SAFETY_TESTS
+except Exception:                                                                          # noqa: BLE001
+    pass
+try:                                                                                       # the federated multi-RAG (rag/): five sub-RAGs, router, packs; all offline, temp roots only
+    from si_tests_rag import TESTS as _RAG_TESTS
+    OFFLINE = OFFLINE + _RAG_TESTS
+except Exception:                                                                          # noqa: BLE001
+    pass
 
 
 def main(live: bool = False, only: Optional[List[str]] = None) -> int:

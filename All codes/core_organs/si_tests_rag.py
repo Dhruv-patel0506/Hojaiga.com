@@ -17,6 +17,8 @@ nothing needs Ollama, the SSD, a live window or the GPU. Registered into the Pro
   RG13  router: intent rules, tier inference, cache hit + invalidation on write, unknown app reported, embedder-down degrades without raising
   RG14  stress: interleaved upserts and filtered/FTS/vector reads give the same answer 30 times (guards LanceDB index-staleness regressions)
   RG15  tools + adapters: self_doc from graph paths, explore targets, registry/keymap/skill/workflow adapters
+  RG16  integration hooks: executor reports teach the RAG, manual_rag falls back to it per app, switch-off is total
+  RG17  storage fallback end to end; the LLM rewriter (weak recall only, cached, silent when the model is down)
 """
 
 from __future__ import annotations
@@ -711,8 +713,158 @@ def run_rg15() -> "TestOutcome":
         return _verdict(checks, f"doc={doc['sentences']} targets={targets[:3]} wf={wf}")
 
 
+class _Tmp:
+    """A process-wide RAG (rag.get_rag) pointed at a temp root, restoring the environment afterwards."""
+
+    def __init__(self, **env):
+        self.env = dict(AI_STORAGE_ROOT=tempfile.mkdtemp(prefix="rag_h_"), HOJAIGA_RAG_EMBEDDER="hash", HOJAIGA_RAG_REWRITE="off", HOJAIGA_RAG="on")
+        self.env.update(env)
+        self.old = {}
+
+    def __enter__(self):
+        from core_organs import rag
+        for k, v in self.env.items():
+            self.old[k] = os.environ.get(k)
+            os.environ[k] = v
+        rag.reset_rag()
+        return rag
+
+    def __exit__(self, *a):
+        from core_organs import rag
+        rag.reset_rag()
+        for k, v in self.old.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+        shutil.rmtree(self.env["AI_STORAGE_ROOT"], ignore_errors=True)
+
+
+def run_rg16() -> "TestOutcome":
+    """RG16: integration hooks -- executor reports teach the RAG, manual_rag falls back to it per app, switch-off is total, nothing raises"""
+    from types import SimpleNamespace as NS
+    from core_organs.rag import hooks
+    from core_organs.rag.types import Query
+    mk_step = lambda i, verb, safety="safe", kind="verb": NS(index=i, verb=verb, goal=verb, kind=kind, safety=safety)
+    mk_res = lambda i, verb, status, route="", verified=None: NS(index=i, verb=verb, status=status, route=route, verified=verified, expected="", effect="", ms=40)
+    with _Tmp() as rag:
+        # nothing ingested yet: asking must not create a store
+        root = os.environ["AI_STORAGE_ROOT"]
+        empty_before = hooks.prompt_lines("how do I bold", "word")
+        no_store = not os.path.exists(os.path.join(root, "rag", "meta.json"))
+        R = rag.get_rag()
+        R.lex.add_command("word", "Bold")
+        R.fast.upsert([{"app_key": "word", "kind": "hotkey", "command_id": "word:bold", "task_pattern": "bold", "payload": "ctrl+b", "trust": "catalog"}])
+        steps = [mk_step(1, "Bold"), mk_step(2, "Italic"), mk_step(3, "Underline"), mk_step(4, "Delete All", safety="unsafe"), mk_step(5, "Save"), mk_step(6, "Strikethrough")]
+        results = [mk_res(1, "Bold", "done", "shortcut:Ctrl+B", True), mk_res(2, "Italic", "no_effect", "shortcut:Ctrl+I"), mk_res(3, "Underline", "done", "control:Underline", False),
+                   mk_res(4, "Delete All", "needs_human"), mk_res(5, "Save", "dry_run"), mk_res(6, "Strikethrough", "done", "shortcut:Ctrl+5", True)]
+        rep = NS(dry_run=False, steps=steps, results=results)
+        n = hooks.observe_report("word", rep)
+        n_dry = hooks.observe_report("word", NS(dry_run=True, steps=steps, results=results))
+        n_none = hooks.observe_report("word", None)
+        outs = R.st.sql("telemetry").rows("SELECT command_id, route, ok, failure_code FROM outcomes ORDER BY id")
+        bold = R.fast.by_command("word", "word:bold")[0]
+        learned, not_learned = R.lex.best("word", "Strikethrough"), R.lex.best("word", "Italic")
+        # prompt_lines: per-app partition
+        R.proc.ingest_document("word", "# Formatting\nSelect the text and click the Bold button to make it bold.\n", "doc://word", "manual")
+        blk, ps = hooks.prompt_lines("how do I make text bold", "word")
+        other, _ = hooks.prompt_lines("how do I make text bold", "excel")
+        # manual_rag.prompt_block falls back to the RAG for an app the manual index does not know
+        from core_organs.professor.knowledge import manual_rag as MR
+        saved = MR.index
+        MR.index = lambda: None
+        try:
+            mblk, mps = MR.prompt_block("how do I make text bold", "word", None)
+        finally:
+            MR.index = saved
+        os.environ["HOJAIGA_RAG"] = "off"
+        off = (hooks.observe_report("word", rep), hooks.prompt_lines("how do I make text bold", "word"))
+        os.environ["HOJAIGA_RAG"] = "on"
+        checks = {"empty_store_is_not_created_by_a_read": empty_before == ("", []) and no_store,
+                  "only_attempted_steps_reported": n == 4 and n_dry == 0 and n_none == 0 and len(outs) == 4,
+                  "success_failure_and_unverified_recorded": [(o["command_id"], o["ok"]) for o in outs] == [("word:bold", 1), ("word:italic", 0), ("word:underline", 0), ("word:strikethrough", 1)],
+                  "failure_code_kept": outs[1]["failure_code"] == "no_effect",
+                  "hotkey_credited_to_the_vault_row": bold.confidence > 0.6 and R.fast.get(bold.payload["fast_id"])["n_ok"] >= 1,
+                  "executed_verb_becomes_a_known_command": learned is not None and learned.command_id == "word:strikethrough" and not_learned is None,
+                  "prompt_lines_cites_the_apps_own_text": "MANUAL EXCERPTS" in blk and bool(ps) and "Bold" in blk,
+                  "other_app_gets_nothing": other == "",
+                  "manual_rag_falls_back_to_the_rag": "MANUAL EXCERPTS" in mblk and bool(mps) and mps[0].via == "rag",
+                  "switch_off_is_total": off == (0, ("", []))}
+        return _verdict(checks, f"outcomes={[(o['command_id'], o['ok']) for o in outs]}")
+
+
+def run_rg17() -> "TestOutcome":
+    """RG17: storage fallback end to end, and the LLM rewriter (weak recall only, capped, cached, absent model = no effect)"""
+    from types import SimpleNamespace as NS
+    from core_organs.rag import embed as E, storage as ST
+    from core_organs.rag.adapters.llm_rewrite import rewriter
+    from core_organs.rag.router import Rag
+    from core_organs.rag.types import Query
+    # 1. an unmounted configured root: the whole stack opens on the fallback, every table, and says so
+    fb = tempfile.mkdtemp(prefix="rag_fb_")
+    old_env, old_def = os.environ.get("AI_STORAGE_ROOT"), ST.DEFAULT_ROOT
+    miss = _free_drive()
+    try:
+        os.environ["AI_STORAGE_ROOT"] = miss
+        ST.DEFAULT_ROOT = fb
+        st = ST.Storage(None, E.HashEmbedder())
+        R = Rag(st, icons=True)
+        R.lex.add_command("app", "Save")
+        R.fast.upsert([{"app_key": "app", "kind": "hotkey", "command_id": "app:save", "task_pattern": "save", "payload": "ctrl+s", "trust": "learned"}])
+        R.proc.ingest_document("app", "# Files\nClick the Save button to save.\n", "d", "manual")
+        R.rec.seed()
+        r = R.retrieve(Query(text="save", app_key="app", mode="auto"))
+        under = os.path.normcase(st.root).startswith(os.path.normcase(fb))
+        tables = {t: st.count(t) for t in ("knowledge_chunks", "fast_paths", "error_playbooks")}
+        deg = R.status().degraded
+        R.close()
+    finally:
+        ST.DEFAULT_ROOT = old_def
+        if old_env is None:
+            os.environ.pop("AI_STORAGE_ROOT", None)
+        else:
+            os.environ["AI_STORAGE_ROOT"] = old_env
+        shutil.rmtree(fb, ignore_errors=True)
+    # 2. the rewriter
+    calls = []
+
+    class FakeBrain:
+        def __init__(self, up=True, text="insert picture\nadd image"):
+            self.up, self.text = up, text
+
+        def available(self):
+            return self.up
+
+        def generate(self, system, user, **kw):
+            calls.append(kw)
+            return NS(ok=bool(self.text), text=self.text)
+    down = rewriter(FakeBrain(up=False))("word", "put an image in")
+    up = rewriter(FakeBrain())("word", "put an image in")
+    with _Env(rewriter=rewriter(FakeBrain())) as R2:
+        R2.lex.add_command("word", "Insert Picture")
+        R2.fast.upsert([{"app_key": "word", "kind": "hotkey", "command_id": "word:insert picture", "task_pattern": "insert picture", "payload": "alt+n+p", "trust": "learned"}])
+        n0 = len(calls)
+        weak = R2.retrieve(Query(text="put an image in", app_key="word", mode="auto"))
+        again = R2.retrieve(Query(text="put an image in", app_key="word", mode="auto"))
+        strong = R2.retrieve(Query(text="insert picture", app_key="word", mode="auto"))
+        n_after_strong = len(calls)
+        llm_used = any(t["probe"] == "llm_rewrite" for t in weak.trace)
+    with _Env(rewriter=rewriter(FakeBrain(up=False))) as R3:
+        R3.lex.add_command("word", "Insert Picture")
+        nm = R3.retrieve(Query(text="put an image in", app_key="word", mode="auto"))
+    checks = {"unmounted_root_falls_back_for_every_store": under and all(v >= 1 for v in tables.values()) and bool(r.plans),
+              "fallback_is_reported_not_silent": any(d.startswith("storage_root_missing:") for d in deg),
+              "rewriter_silent_when_model_down": down == [],
+              "rewriter_returns_two_queries": up == ["insert picture", "add image"] and all(c.get("timeout") == 4.0 and c.get("temperature") == 0.0 for c in calls),
+              "weak_recall_uses_the_rewrite_and_finds_a_plan": llm_used and bool(weak.plans) and weak.plans[0].steps[0].command_id == "word:insert picture",
+              "rewrite_is_cached_so_the_model_is_called_once": len(calls) - n0 == 1 or (len(calls) - n0 == 2 and again.trace[0]["probe"] == "cache"),
+              "strong_recall_never_calls_the_model": n_after_strong == len(calls) and not any(t["probe"] == "llm_rewrite" for t in strong.trace),
+              "no_model_means_a_gap_not_a_crash": not nm.plans and "no_plan_found" in nm.gaps}
+    return _verdict(checks, f"calls={len(calls)} fallback_tables={tables}")
+
+
 TESTS = [("RG1", run_rg1), ("RG2", run_rg2), ("RG3", run_rg3), ("RG4", run_rg4), ("RG5", run_rg5), ("RG6", run_rg6), ("RG7", run_rg7), ("RG8", run_rg8), ("RG9", run_rg9), ("RG10", run_rg10),
-         ("RG11", run_rg11), ("RG12", run_rg12), ("RG13", run_rg13), ("RG14", run_rg14), ("RG15", run_rg15)]
+         ("RG11", run_rg11), ("RG12", run_rg12), ("RG13", run_rg13), ("RG14", run_rg14), ("RG15", run_rg15), ("RG16", run_rg16), ("RG17", run_rg17)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]

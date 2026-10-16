@@ -1639,3 +1639,8 @@ def milestone_checker(vlm: Any) -> Callable[[Step, Any, Any], Optional[bool]]:
         except Exception:
             return None
     return check
+        try:                                                     # report what was attempted to the federated RAG (routes learn reliability); never raises, off with HOJAIGA_RAG=off
+            from core_organs.rag import hooks as _rag_hooks
+            _rag_hooks.observe_report(self.app_key, rep)
+        except Exception:
+            pass
