@@ -140,17 +140,37 @@ def action_moments(segments: Sequence[Dict[str, Any]], pad_s: float = 2.0, merge
     return [{"t0": round(a, 2), "t1": round(b, 2), "text": " ".join(t)} for a, b, t in spans]
 
 
+class VideoUnavailable(Exception):
+    """The video itself is gone / private / region-locked: a permanent property of THAT video, not a sign that the address is blocked."""
+
+
+_UNAVAILABLE = ("not available", "unavailable", "private video", "has been removed", "sign in to confirm", "members-only", "copyright", "terminated")
+
+
 def download_section(video_id: str, t0: float, t1: float, out_dir: str, max_height: int = 720) -> str:
-    """Download ONLY [t0, t1] of a video (yt-dlp sections; needs ffmpeg). Returns the file path. Explicit use only: this is a network download."""
+    """Download ONLY [t0, t1] of a video (yt-dlp sections; needs ffmpeg). Returns the file path. Explicit use only: this is a network download.
+    H.264 is preferred: YouTube's default 720p here is AV1, and ffmpeg's software AV1 decode crashed intermittently (Windows memory-pattern exit code) while OCR ran at the same time.
+    A failed cut is retried once WITHOUT forced re-encoding (cuts at the nearest keyframe: a little longer, but a stream copy); a video that is gone raises VideoUnavailable."""
     import yt_dlp
     from yt_dlp.utils import download_range_func
     os.makedirs(out_dir, exist_ok=True)
     tmpl = os.path.join(out_dir, f"{video_id}_{int(t0)}-{int(t1)}.%(ext)s")
-    opts = {"quiet": True, "no_warnings": True, "format": f"bestvideo[height<={max_height}][ext=mp4]/best[height<={max_height}][ext=mp4]/best[height<={max_height}]", "outtmpl": tmpl,
-            "download_ranges": download_range_func(None, [(t0, t1)]), "force_keyframes_at_cuts": True, "noplaylist": True, "socket_timeout": 30}
-    with yt_dlp.YoutubeDL(opts) as ydl:
-        info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=True)
-        return ydl.prepare_filename(info)
+    fmt = (f"bestvideo[height<={max_height}][vcodec^=avc1][ext=mp4]/best[height<={max_height}][vcodec^=avc1][ext=mp4]/"
+           f"bestvideo[height<={max_height}][ext=mp4]/best[height<={max_height}][ext=mp4]/best[height<={max_height}]")
+    last: Optional[Exception] = None
+    for force in (True, False):
+        opts = {"quiet": True, "no_warnings": True, "format": fmt, "outtmpl": tmpl, "download_ranges": download_range_func(None, [(t0, t1)]), "force_keyframes_at_cuts": force,
+                "noplaylist": True, "socket_timeout": 30}
+        try:
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=True)
+                return ydl.prepare_filename(info)
+        except Exception as exc:
+            msg = str(exc).lower()
+            if any(k in msg for k in _UNAVAILABLE):
+                raise VideoUnavailable(str(exc)[:160])
+            last = exc
+    raise last
 
 
 def transcribe_audio(path: str, model_size: str = "base.en") -> List[Dict[str, Any]]:

@@ -9,6 +9,9 @@ si_tests_harvest -- tests for Checkpoint 3 (harvest/): the data pipeline that fe
   HV6  SoM + explain: numbered elements read from a real frame, the delta-box rescan finds the new menu in full-frame coordinates, training pairs are well-formed, grounded only when the target matches, dedup
   HV7  paths: HOJAIGA_HARVEST_DIR wins; an unmounted storage root falls back and says so
   HV8  shortcut-table parsing finds the key column by content (regression for the votes-column bug found in the first live scrape)
+  HV10 clips -> pairs batch driver: planning across videos, resumable, stops on failure streak / time budget, prunes unused frames, dataset report
+  HV11 UI-frame gate: verdict parsing, cache, unverified fallback; no pair from a frame that is not a software UI
+  HV12 step extraction on the phrasings that broke the first real run
   HV9  data-quality gates found on real footage: off-topic videos quarantined, loose verbs are not UI actions, audit + purge, one instruction labels one change
 """
 
@@ -362,7 +365,9 @@ def run_hv6() -> "TestOutcome":
                   "transcript_went_to_the_rag_too": rep.get("rag_chunks", 0) >= 1 and R.st.count("knowledge_chunks") >= 1,
                   "match_exact_label": VE.match_element(fake, "file")["id"] == 7,
                   "match_contained_words": VE.match_element(fake, "Save As")["id"] == 8,
-                  "no_match_is_none_not_a_guess": VE.match_element(fake, "Quit") is None and VE.match_element(fake, "") is None}
+                  "no_match_is_none_not_a_guess": VE.match_element(fake, "Quit") is None and VE.match_element(fake, "") is None,
+                  "a_label_that_is_only_part_of_the_spoken_target_does_not_match": VE.match_element({"elements": [{"id": 3, "label": "File", "role": "text", "box": [0, 0, 1, 1]}]}, "share file") is None,
+                  "the_target_inside_a_longer_label_matches": VE.match_element({"elements": [{"id": 4, "label": "Save As...", "role": "text", "box": [0, 0, 1, 1]}]}, "save")["id"] == 4}
         return _verdict(checks, f"som={len(som['elements'])} labels={labels[:6]} seconds={som['seconds']} pairs={rep['pairs']}")
 
 
@@ -475,6 +480,10 @@ def run_hv9() -> "TestOutcome":
     said = [{"text": "now click the File menu", "start": 2.5, "duration": 1.0}]
     with _Dir() as root, _Env() as R2:
         rep2 = VE.explain_video(R2, "calc", "vidX", said, kf, out_jsonl=os.path.join(root, "p.jsonl"), root=root, som_fn=som, scan_delta=False, ingest=False)
+    said_after = [{"text": "now click the File menu", "start": 2.0, "duration": 1.0}, {"text": "then press Ctrl+S", "start": 3.5, "duration": 1.0}]
+    with _Dir() as root3, _Env() as R3:
+        VE.explain_video(R3, "calc", "vidJ", said_after, [kf[0]], out_jsonl=os.path.join(root3, "j.jsonl"), root=root3, som_fn=som, scan_delta=False, ingest=False)
+        j = [json.loads(l) for l in open(os.path.join(root3, "j.jsonl"), encoding="utf-8")]
     junk = VE.clean_labels([{"label": l} for l in ("McC", "|||", "a", "Calculator", "calculator", "Programmer", "x1", "Date calculation", "ynVerter", "")])
     checks = {"title_naming_the_app_is_on_topic": on("Windows Calculator", "Secrets of The Windows Calculator") and on("MS Paint", "Intro to Paint for kids"),
               "generic_title_is_off_topic": not on("Windows Calculator", "15 Amazing Shortcuts You Aren't Using") and not on("Windows Calculator", "Stop Using Your Mouse"),
@@ -489,11 +498,181 @@ def run_hv9() -> "TestOutcome":
               "audit_keeps_the_good_video": any(e.citation.startswith("v_good") for e in kept_q),
               "text_and_vector_indexes_stay_in_sync": synced,
               "one_instruction_labels_one_change": rep2["pairs"] == 1 and rep2["step_already_used"] == 1 and rep2["no_step_nearby"] == 1,
+              "an_instruction_said_after_the_change_is_never_preferred_over_the_one_before": len(j) == 1 and json.loads(j[0]["messages"][2]["content"][0]["text"])[0]["action"] == "click",
               "ocr_debris_is_not_shown_as_what_appeared": junk == ["Calculator", "Programmer", "Date calculation"]}
     return _verdict(checks, f"statuses={st} dry={[o['video_id'] for o in dry['off_topic']]} purged={fixed['removed_chunks']} pairs={rep2['pairs']} junk_out={junk}")
 
 
-TESTS = [("HV1", run_hv1), ("HV2", run_hv2), ("HV3", run_hv3), ("HV4", run_hv4), ("HV5", run_hv5), ("HV6", run_hv6), ("HV7", run_hv7), ("HV8", run_hv8), ("HV9", run_hv9)]
+def run_hv10() -> "TestOutcome":
+    """HV10: the clips -> pairs batch driver: plans clips across videos, resumable, stops on a download-failure streak and on the time budget, prunes unused frames, reports dataset worth"""
+    try:
+        import cv2  # noqa: F401
+        from core_organs.harvest import pairs_batch as PB
+    except Exception as exc:
+        return TestOutcome(False, f"ENV-BLOCKED: {exc}")
+    said = lambda base: [{"text": "welcome to this tutorial everybody", "start": base - 20.0, "duration": 3.0}, {"text": "now click the File menu", "start": base + 1.5, "duration": 2.0},
+                         {"text": "and then it just does its thing", "start": base + 6.0, "duration": 2.0}]
+    som = lambda image, region=None: {"elements": [{"id": 1, "label": "File", "role": "text", "box": [0, 0, 5, 5]}, {"id": 2, "label": "Open", "role": "text", "box": [0, 10, 5, 5]}], "seconds": 0.0,
+                                      "size": [640, 360], "tiers_used": [], "tiers_skipped": []}
+    made = []
+
+    def good_download(vid, t0, t1, out_dir):
+        os.makedirs(out_dir, exist_ok=True)
+        p = os.path.join(out_dir, f"{vid}_{int(t0)}-{int(t1)}.mp4")
+        _synthetic_video(p)
+        made.append(p)
+        return p
+
+    def boom(vid, t0, t1, out_dir):
+        raise RuntimeError("HTTP Error 429: Too Many Requests")
+    with _Dir() as root:
+        os.makedirs(os.path.join(root, "transcripts_json"))
+        os.makedirs(os.path.join(root, "transcripts_json", "_off_topic"))
+        for app, vid, base in (("alpha", "vidA", 100.0), ("beta", "vidB", 200.0), ("alpha", "vidC", 300.0)):
+            json.dump(said(base), open(os.path.join(root, "transcripts_json", f"{app}__{vid}.json"), "w"))
+        json.dump(said(50.0), open(os.path.join(root, "transcripts_json", "_off_topic", "gamma__vidD.json"), "w"))
+        plan = PB.plan_clips(root)
+        only_beta = PB.plan_clips(root, apps=["beta"])
+        rep = PB.run_pairs_batch(None, root, max_clips=10, delay_s=0, download=good_download, som_fn=som, gate=None, min_elements=1)
+        jl = [json.loads(l) for l in open(os.path.join(root, "training", "ui_training_dataset.jsonl"), encoding="utf-8")]
+        again = PB.run_pairs_batch(None, root, max_clips=10, delay_s=0, download=good_download, som_fn=som, gate=None, min_elements=1)
+        n_made_after_rerun = len(made)
+        frames_left = [f for d, _, fs in os.walk(os.path.join(root, "frames")) for f in fs]
+        referenced = {os.path.basename(m["meta"]["pre"]) for m in jl} | {os.path.basename(m["meta"]["post"]) for m in jl if m["meta"].get("post")}
+        state = json.load(open(os.path.join(root, "training", "pairs_state.json")))
+        report = PB.dataset_report(root)                           # these pairs were made with gate=None: NOT verified as UI, so not usable for training
+        report_unchecked_ok = PB.dataset_report(root, require_ui=False)
+    with _Dir() as root2:
+        os.makedirs(os.path.join(root2, "transcripts_json"))
+        for i in range(6):
+            json.dump(said(100.0 + 100 * i), open(os.path.join(root2, "transcripts_json", f"app{i}__vid{i}.json"), "w"))
+        calls = []
+
+        def counting_boom(*a):
+            calls.append(a)
+            return boom(*a)
+        rep_fail = PB.run_pairs_batch(None, root2, max_clips=6, delay_s=0, download=counting_boom, som_fn=som, max_fail_streak=3, gate=None, min_elements=1)
+        rep_budget = PB.run_pairs_batch(None, root2, max_clips=6, budget_s=0.0, delay_s=0, download=good_download, som_fn=som, gate=None, min_elements=1)
+    checks = {"plan_covers_every_on_topic_video_and_skips_the_quarantine": sorted({c["app"] for c in plan}) == ["alpha", "beta"] and len(plan) == 3 and not any(c["app"] == "gamma" for c in plan),
+              "plan_can_be_limited_to_apps": [c["app"] for c in only_beta] == ["beta"],
+              "clips_are_short": all(c["t1"] - c["t0"] <= 12.0 for c in plan),
+              "downloads_and_makes_pairs": rep["downloaded"] == 3 and rep["pairs"] >= 3 and rep["grounded"] >= 3 and len(jl) == rep["pairs"],
+              "pairs_split_across_apps": set(rep["by_app"]) == {"alpha", "beta"},
+              "rerun_does_nothing_new": again["attempted"] == 0 and again["pairs"] == 0 and n_made_after_rerun == 3 and again["already_done"] == 3,
+              "state_records_every_clip": len(state["clips"]) == 3 and all(v["status"].startswith("done") for v in state["clips"].values()),
+              "unused_frames_pruned": rep["frames_pruned"] >= 1 and set(frames_left) <= referenced,
+              "stops_on_a_failure_streak_without_retrying": rep_fail["download_failed"] == 3 and len(calls) == 3 and "in a row" in rep_fail["stopped"],
+              "failures_are_remembered_not_retried_forever": rep_fail["attempted"] == 3,
+              "stops_on_the_time_budget_without_fetching": rep_budget["stopped"] == "time budget spent" and rep_budget["pairs"] == 0 and len(made) == n_made_after_rerun,
+              "dataset_report_refuses_to_count_unverified_frames": report["usable_for_training"] == 0 and report["frames_not_verified_as_ui"] == len(jl) and report["invalid"] == len(jl),
+              "dataset_report_counts_them_when_asked": report_unchecked_ok["usable_for_training"] == len(jl) and report_unchecked_ok["by_action"].get("click") == len(jl)
+                                                         and report_unchecked_ok["fraction_of_min"] == round(len(jl) / 200, 2)}
+    return _verdict(checks, f"plan={len(plan)} pairs={rep['pairs']} pruned={rep['frames_pruned']} report={ {k: report_unchecked_ok[k] for k in ('usable_for_training', 'videos')} }")
+
+
+def run_hv11() -> "TestOutcome":
+    """HV11: the UI-frame gate -- verdict parsing, cache, unverified fallback, and no pair is made from a frame that is not a software UI"""
+    import base64
+    import io as _io
+    from PIL import Image
+    from core_organs.harvest import video_explain as VE
+    from core_organs.harvest.frame_gate import UIFrameGate
+    from si_tests_rag import _Env
+    calls = []
+
+    def fake_post(url, body, timeout):
+        calls.append(body["model"])
+        im = Image.open(_io.BytesIO(base64.b64decode(body["messages"][0]["images"][0]))).convert("L")
+        mean = sum(im.getdata()) / (im.size[0] * im.size[1])
+        return {"message": {"content": "YES" if mean > 150 else ("MAYBE" if mean < 40 else "no.")}}
+    with _Dir() as root:
+        light, mid, dark = (os.path.join(root, n) for n in ("light.jpg", "mid.jpg", "dark.jpg"))
+        Image.new("RGB", (400, 300), (230, 230, 230)).save(light)
+        Image.new("RGB", (400, 300), (90, 90, 90)).save(mid)
+        Image.new("RGB", (400, 300), (10, 10, 10)).save(dark)
+        gate = UIFrameGate(url="http://x", cache_path=os.path.join(root, "gate.json"), post=fake_post)
+        v_ui, _ = gate.check(light)
+        v_no, _ = gate.check(mid)
+        v_unparse, why_unparse = gate.check(dark)
+        n_before = len(calls)
+        v_again, why_again = gate.check(light)
+        calls_after_again = len(calls)
+        gate2 = UIFrameGate(url="http://x", cache_path=os.path.join(root, "gate.json"), post=fake_post)               # a new process reads the persisted cache
+        v_persist, why_persist = gate2.check(mid)
+        down_calls = []
+
+        def down_post(url, body, timeout):
+            down_calls.append(1)
+            raise ConnectionError("no ollama")
+        gate3 = UIFrameGate(url="http://x", cache_path="", post=down_post)
+        d1 = gate3.check(light)
+        d2 = gate3.check(mid)
+        down_after = len(down_calls)
+        bad_path = gate.check(os.path.join(root, "nope.jpg"))
+        # explain_video: the instruction waits for a change that actually shows the interface
+        for n, shade in (("a_pre", 230), ("a_post", 230), ("b_pre", 10 + 80), ("b_post", 230), ("c_pre", 230), ("c_post", 230)):
+            Image.new("RGB", (300, 200), (shade,) * 3).save(os.path.join(root, f"{n}.jpg"))
+        P = lambda n: os.path.join(root, n + ".jpg")
+        evs = [{"t": 3.0, "pre": P("b_pre"), "post": P("b_post"), "bbox": [0, 0, 5, 5]}, {"t": 4.0, "pre": P("c_pre"), "post": P("c_post"), "bbox": [0, 0, 5, 5]}]
+        som = lambda image, region=None: {"elements": [{"id": 1, "label": "File", "role": "text", "box": [0, 0, 5, 5]}], "seconds": 0.0, "size": [300, 200], "tiers_used": [], "tiers_skipped": []}
+        said = [{"text": "now click the File menu", "start": 2.0, "duration": 1.0}]
+        g = UIFrameGate(url="http://x", cache_path="", post=fake_post)
+        with _Env() as R:
+            rep = VE.explain_video(R, "app", "vidG", said, evs, out_jsonl=os.path.join(root, "g.jsonl"), root=root, som_fn=som, scan_delta=False, ingest=False, gate=g)
+            rows = [json.loads(l) for l in open(os.path.join(root, "g.jsonl"), encoding="utf-8")]
+            h = UIFrameGate(url="http://x", cache_path="", post=down_post)
+            rep_down = VE.explain_video(R, "app", "vidH", said, evs, out_jsonl=os.path.join(root, "h.jsonl"), root=root, som_fn=som, scan_delta=False, ingest=False, gate=h)
+            rep_none = VE.explain_video(R, "app", "vidI", said, evs, out_jsonl=os.path.join(root, "i.jsonl"), root=root, som_fn=som, scan_delta=False, ingest=False, gate=None)
+            none_rows = [json.loads(l) for l in open(os.path.join(root, "i.jsonl"), encoding="utf-8")]
+    checks = {"yes_means_ui_no_means_not": v_ui is True and v_no is False,
+              "an_unparseable_answer_is_unverified_not_a_guess": v_unparse is None and "unparseable" in why_unparse,
+              "a_frame_is_judged_once": v_again is True and why_again == "cached" and calls_after_again == n_before,
+              "the_cache_survives_a_restart": v_persist is False and why_persist == "cached",
+              "an_unreachable_model_is_unverified_and_backs_off": d1[0] is None and d2[0] is None and down_after == 1 and "backing off" in d2[1],
+              "an_unreadable_image_is_rejected": bad_path[0] is False,
+              "the_non_ui_change_makes_no_pair_and_the_step_waits": rep["not_ui_frame"] == 1 and rep["pairs"] == 1 and rows[0]["meta"]["t"] == 4.0 and rows[0]["meta"]["ui_frames"] is True,
+              "an_unreachable_model_makes_no_pairs": rep_down["pairs"] == 0 and rep_down["unverified_frame"] >= 1,
+              "gate_none_records_unchecked": rep_none["pairs"] == 1 and none_rows[0]["meta"]["ui_frames"] is None}
+    return _verdict(checks, f"calls={len(calls)} rep={ {k: rep[k] for k in ('pairs', 'not_ui_frame', 'unverified_frame')} }")
+
+
+def run_hv12() -> "TestOutcome":
+    """HV12: step extraction on the phrasings that broke the first real run"""
+    from core_organs.harvest import video_explain as VE
+    from core_organs.rag.procedures import extract_steps
+    cases = {"click the file menu click save as": [("click", "file"), ("click", "save as")],
+             "You'll just wanna tap tools and then short link.": [("tap", "tools")],
+             "just press enter and that person will get your message": [("press", "enter")],
+             "to hit the m key in order to mute the VLC application": [("hit", "m key")],
+             "click save to lock in your schedule": [("click", "save")],
+             "select the cell and click Insert": [("select", "cell"), ("click", "Insert")],
+             "press Ctrl+S to save": [("press", "Ctrl+S")],
+             "okay now you press the Escape key to close it": [("press", "Escape key")],
+             "all you need to do is click Save": [("click", "Save")],
+             "so we gonna go to Preferences": [("go to", "Preferences")],
+             "and that is the type of channel": [],
+             "the type of channel it was in here": []}
+    got = {t: [(s["verb"], s["target"]) for s in extract_steps(t)] for t in cases}
+    concrete = {"click two more": False, "type of channel": False, "select this option": False, "press the": False, "click Save": True, "press Ctrl+S": True, "open Settings": True}
+    cc = {}
+    for t in concrete:
+        st = extract_steps(t)
+        cc[t] = VE.is_concrete(st[0]) if st else False
+    segs = [{"text": "okay now you press the", "start": 10.0, "duration": 1.5}, {"text": "Escape key to close it.", "start": 11.6, "duration": 1.5}, {"text": "and that is it.", "start": 13.5, "duration": 1.0},
+            {"text": "click Save", "start": 20.0, "duration": 1.0}, {"text": "much later", "start": 40.0, "duration": 1.0}]
+    ut = VE.utterances(segs)
+    checks = {"every_phrasing_extracts_exactly_what_was_asked": got == cases,
+              "concreteness": cc == concrete,
+              "caption_lines_are_rejoined_into_utterances": ut[0]["text"] == "okay now you press the Escape key to close it." and len(ut) >= 3,
+              "a_rejoined_utterance_yields_the_step_its_halves_could_not": [(s["verb"], s["target"]) for s in extract_steps(ut[0]["text"])] == [("press", "Escape key")]
+                                                                           and [s for s in extract_steps("okay now you press the") if VE.is_concrete(s)] == [],
+              "sentence_end_stops_the_join": ut[1]["text"].startswith("and that is it.") and "click Save" not in ut[1]["text"],
+              "steps_before_uses_utterances": any(s["target"] == "Escape key" for s in VE.steps_before(segs, 13.0))}
+    bad = {t: (got[t], cases[t]) for t in cases if got[t] != cases[t]}
+    return _verdict(checks, f"mismatches={bad}")
+
+
+TESTS = [("HV1", run_hv1), ("HV2", run_hv2), ("HV3", run_hv3), ("HV4", run_hv4), ("HV5", run_hv5), ("HV6", run_hv6), ("HV7", run_hv7), ("HV8", run_hv8), ("HV9", run_hv9), ("HV10", run_hv10), ("HV11", run_hv11), ("HV12", run_hv12)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]

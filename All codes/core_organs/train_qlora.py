@@ -95,6 +95,7 @@ class TrainConfig:
     max_pixels: int = 448 * 448                            # images are resized to at most this many pixels (-> about max_pixels/1024 visual tokens at 32 px per token)
     seed: int = 3407
     grounded_only: bool = True
+    require_ui_gate: bool = True                           # pairs whose frames were not verified as a software UI (meta.ui_frames) are rejected
     eval_frac: float = 0.1
     min_examples: int = 200
     quantize_embeddings: bool = False
@@ -246,9 +247,11 @@ def load_pairs(jsonl: str, grounded_only: bool = True) -> Tuple[List[Dict[str, A
     return rows, stats
 
 
-def validate_pair(rec: Dict[str, Any], root: str) -> List[str]:
+def validate_pair(rec: Dict[str, Any], root: str, require_ui: bool = True) -> List[str]:
     """Problems that would make a pair useless or harmful for training ([] = fine)."""
     probs = []
+    if require_ui and rec.get("meta", {}).get("ui_frames") is not True:
+        probs.append("frames not verified as a software UI (a talking head labelled 'click profile' teaches the model to click faces)")
     msgs = rec.get("messages") or []
     if [m.get("role") for m in msgs] != ["system", "user", "assistant"]:
         return ["roles must be system, user, assistant"]
@@ -308,7 +311,7 @@ def prepare(cfg: TrainConfig, jsonl: str = "", root: str = "", out_dir: str = ""
     rows, st = load_pairs(jsonl, cfg.grounded_only)
     good, rejected, too_long = [], [], 0
     for r in rows:
-        p = validate_pair(r, root)
+        p = validate_pair(r, root, cfg.require_ui_gate)
         if p:
             rejected.append({"pair_id": r.get("meta", {}).get("pair_id"), "problems": p})
             continue
@@ -581,11 +584,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     ap.add_argument("--jsonl", default="")
     ap.add_argument("--run", default="")
     ap.add_argument("--all-pairs", action="store_true", help="include ungrounded pairs (not recommended)")
+    ap.add_argument("--allow-unchecked-frames", action="store_true", help="include pairs whose frames were not verified as a software UI (not recommended)")
     ap.add_argument("--min-examples", type=int, default=200)
     ap.add_argument("--vision", action="store_true", help="also LoRA the vision tower")
     ap.add_argument("--force", action="store_true")
     a = ap.parse_args(argv)
-    cfg = TrainConfig(model=a.model, backend=a.backend, max_seq_length=a.seq, lora_r=a.rank, lora_alpha=a.rank, max_steps=a.steps, grounded_only=not a.all_pairs, min_examples=a.min_examples, finetune_vision=a.vision)
+    cfg = TrainConfig(model=a.model, backend=a.backend, max_seq_length=a.seq, lora_r=a.rank, lora_alpha=a.rank, max_steps=a.steps, grounded_only=not a.all_pairs, require_ui_gate=not a.allow_unchecked_frames, min_examples=a.min_examples, finetune_vision=a.vision)
     if a.cmd == "preflight":
         out = preflight(cfg)
     elif a.cmd == "prepare":

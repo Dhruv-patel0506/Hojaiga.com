@@ -26,7 +26,7 @@ from .types import Evidence, Outcome, UpsertReport
 _VERBS = ("click", "double-click", "double click", "right-click", "right click", "press", "hit", "select", "choose", "open", "go to", "navigate to", "type", "enter", "drag", "drop",
           "hold", "use", "add", "create", "set", "turn on", "turn off", "toggle", "check", "uncheck", "scroll", "apply", "save", "export", "import", "tap", "pick", "insert", "switch to",
           "expand", "collapse", "extrude", "bevel", "move", "rotate", "scale", "draw", "run", "start", "stop", "close", "delete", "remove", "rename", "duplicate", "copy", "paste")
-_VERB_RX = re.compile(r"^(?:(?:now|then|next|first|finally|also|and|so|just|go ahead and|you(?:'ll| will| can| need to)?|we(?:'ll| will| can)?|let's|please)\s+)*(" + "|".join(sorted((re.escape(v) for v in _VERBS), key=len, reverse=True)) + r")\b\s*(.*)$", re.I)
+_VERB_RX = re.compile(r"^(?:(?:all you (?:need|have|want) to do is|what you (?:need|want) to do is|the (?:first|next) thing (?:you do )?is|okay|ok|alright|all right|right|well|now|then|next|first|second|third|finally|also|and|so|just|go ahead and|you(?:'ll| will| can| need to| should| want to| have to| might)?|we(?:'ll| will| can| need to| should)?|let's|please|gonna|going to|wanna|need to|want to|can|will|should|must|to|simply|basically|actually)\s+){0,6}("+ "|".join(sorted((re.escape(v) for v in _VERBS), key=len, reverse=True)) + r")\b\s*(.*)$", re.I)
 _CHORD = re.compile(r"\b((?:ctrl|control|alt|shift|win|cmd)(?:\s*\+\s*(?:ctrl|alt|shift|[a-z0-9]|f\d{1,2}|enter|space|tab|esc|del|home|end|up|down|left|right))+|f\d{1,2})\b", re.I)
 _QUOTE = re.compile(r"[\"'“‘]([^\"'”’]{1,60})[\"'”’]")
 _SENT = re.compile(r"(?<=[.!?])\s+|\n+")
@@ -51,12 +51,18 @@ def split_sentences(text: str) -> List[str]:
 _JOIN_RX = re.compile(r"\s*(?:,\s*(?:and\s+)?(?:then\s+)?|\band\s+then\s+|\bthen\s+|\band\s+)(?=(?:" + "|".join(sorted((re.escape(v) for v in _VERBS), key=len, reverse=True)) + r")\b)", re.I)
 
 
+_CHAIN_RX = re.compile(r"(?<=\w)\s+(?=(?:click|double-click|right-click|press|hit|select|choose|tap|drag)\b)", re.I)
+_CLAUSE_RX = re.compile(r"\b(?:and|then|to|so|which|that|will|would|in order|because|where|when|if|while|until|you|it|this|is|are|was|now)\b|[,.;:!?]", re.I)
+
+
 def extract_steps(text: str, lines: Optional[Sequence[str]] = None) -> List[Dict[str, Any]]:
     """Imperative steps of a passage: {text, verb, target, chord, quoted, route_hint, menu_path}. Rules only; a sentence that is not an instruction yields nothing.
     `lines` (caption lines of a transcript window, which carry no punctuation) are used as the sentences when given; a sentence is further split where 'and/then' introduces another verb."""
     sents: List[str] = []
     for sent in (list(lines) if lines else split_sentences(text)):
-        sents.extend(p for p in _JOIN_RX.split(sent) if p and p.strip())
+        for part in _JOIN_RX.split(sent):
+            if part and part.strip():
+                sents.extend(q_ for q_ in _CHAIN_RX.split(part) if q_ and q_.strip())          # "click the file menu click save as" -> two steps
     steps = []
     for sent in sents:
         m = _VERB_RX.match(re.sub(r"^[-*\d.)\s]+", "", sent.strip()))
@@ -67,6 +73,9 @@ def extract_steps(text: str, lines: Optional[Sequence[str]] = None) -> List[Dict
         rest = (m.group(2) if m else sent).strip(" .:;,")
         quoted = _QUOTE.findall(sent)
         target = quoted[0] if quoted else _PATH_ARROW.split(rest)[-1].strip() if _PATH_ARROW.search(rest) else re.sub(r"^(?:the|a|an|on|in|to|into|your)\s+", "", rest, flags=re.I)
+        if not quoted:
+            target = _CLAUSE_RX.split(target, 1)[0].strip()                                        # the object ends where the clause does: "tools and then short link" -> "tools"
+            target = " ".join(target.split()[:6])
         target = re.sub(r"\s+(?:button|tool|menu|tab|option|icon|field|panel|to\s+\w+.*)\b.*$", "", target, flags=re.I).strip()[:80] if not quoted else target
         hint = "hotkey" if chord else ("menu_path" if _PATH_ARROW.search(rest) else ("type" if verb in ("type", "enter") else "control_click"))
         steps.append({"text": sent.strip()[:240], "verb": verb, "target": target, "chord": re.sub(r"\s*\+\s*", "+", chord.group(1).lower()) if chord else "", "quoted": quoted, "route_hint": hint,

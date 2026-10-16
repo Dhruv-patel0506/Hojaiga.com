@@ -746,3 +746,19 @@ Measured on the real store after the fixes: 28-49 ms per uncached query (was 3-7
 - transformers 5.x Qwen3-VL REQUIRES `mm_token_type_ids` whenever images are passed; the processor emits it and the collator forwards/pads every per-token tensor.
 - Verified on a tiny random Qwen3-VL built from config (no download): LoRA targets only language-model projections (14 of 14; vision blocks only with `--vision`; never embeddings/lm_head); training on the real GPU with `paged_adamw_8bit` + bf16 + gradient checkpointing + sliced loss runs and lowers the loss (TR9); adapters save and reload bit-identically.
 - **NOT verified: training a real model.** No trainable weights are on disk (only inference GGUFs), Qwen3-VL-2B/4B would be a multi-GB download, and the Unsloth backend is untested (not installed). Export is a plan (merge -> llama.cpp GGUF + mmproj -> the same `llama-server` flags `start_hojaiga.bat` uses); Ollama cannot reliably load a custom vision GGUF + projector.
+
+### 19b. Scaling the training data: what real footage taught us (2026-10-17)
+Measured over 11 on-topic videos (7 apps), 45-49 clips of <= 12 s (~8-10 min of footage), after each fix below:
+
+| Stage | Result |
+|---|---|
+| first generator | 23 pairs, **2 grounded** |
+| + utterances, concrete-step filter | 25 pairs, 6 grounded |
+| visual audit (contact sheet) | **~40% of "pre" frames were not software UI at all**: presenters, title cards, stock footage, motion graphics (cuts between talking head and screen recording). Classical features (face detection, long-line share, edge density) could not separate them. |
+| + UI-frame gate (`frame_gate`, local qwen2.5vl:3b, 21/25 on hand-judged frames, 0 presenters accepted, ~1.7 s/frame, cached by image hash; unreachable model => *unverified* => not trainable) | 34 pairs, 7 usable |
+| visual QA of those 7 | one WRONG click label (`share file` matched the menu-bar `File`: label-subset-of-target was accepted) and one zoomed-tooltip frame labelled "press F9" |
+| + matcher: target must be CONTAINED in the label (never the reverse); instruction-to-change window 3 s; >= 6 elements; goal = the instruction only | **21 pairs, 6 usable** (3 click, 3 hotkey), judged correct by eye |
+| download reliability | AV1 + forced re-encode crashed ffmpeg intermittently (Windows memory-pattern exit code): now H.264-first, one retry without forced re-encode; "video not available" is permanent per video and is not a block signal. 33-44 of 34-45 clips download. |
+
+**Yield: ~0.55 usable pairs per tutorial video.** 200 pairs (the trainer's minimum) needs ~365 on-topic videos; the brief's 10,000-25,000 needs ~18,000-45,000. At ~12 s of footage per clip and ~25 s of OCR per pair, volume is bounded by how many videos can be fetched, not by compute. Levers that would raise it: more on-topic videos per app (several queries, playlists), a cheaper element reader than Tesseract for UI text, and click grounding for icon-only controls (needs the vision model, i.e. the Professor's contact-sheet naming), which is where most ungrounded click pairs die.
+**Access:** YouTube's transcript endpoint blocked this address after ~40 requests (`Blocked`, on the first video of the next batch). The harvester stops on a block by design; no proxy/cookie workaround is attempted. Section downloads (yt-dlp) were unaffected during the same period.

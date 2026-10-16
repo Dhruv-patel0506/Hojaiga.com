@@ -59,7 +59,7 @@ def make_pairs(root: str, spec):
             {"role": "system", "content": [{"type": "text", "text": "You operate software."}]},
             {"role": "user", "content": [{"type": "image", "image": rel}, {"type": "text", "text": "Application: calc\nElements:\n#1 text \"File\" [0,0,10,10]\nGoal: click File"}]},
             {"role": "assistant", "content": [{"type": "text", "text": json.dumps(ans)}]}],
-            "meta": {"pair_id": f"p{i}", "video_id": f"{vid}@{i}", "grounded": grounded, "t": float(i)}})
+            "meta": {"pair_id": f"p{i}", "video_id": f"{vid}@{i}", "grounded": grounded, "ui_frames": True, "t": float(i)}})
     p = os.path.join(root, "pairs.jsonl")
     with open(p, "w", encoding="utf-8") as f:
         for r in rows:
@@ -189,6 +189,9 @@ def run_tr3() -> "TestOutcome":
         s_tight = T.prepare(T.TrainConfig(max_seq_length=200), p, root, os.path.join(root, "run_tight"))
         probs = T.validate_pair(json.loads(open(p, encoding="utf-8").readline()), root)
         worse = {"messages": [{"role": "user", "content": []}]}
+        unverified = json.loads(open(p, encoding="utf-8").readline())
+        unverified["meta"].pop("ui_frames")
+        s_unchecked = T.prepare(T.TrainConfig(require_ui_gate=False), p, root, os.path.join(root, "run_unchecked"))
         checks = {"reads_everything_and_survives_bad_json": s["read"] == 10 and s["bad_json"] == 1,
                   "ungrounded_dropped_by_default": s["ungrounded_dropped"] == 1 and s_all["ungrounded_dropped"] == 0,
                   "broken_pairs_rejected_with_reasons": s["n_rejected"] == 2 and any("click without a target_id" in " ".join(r["problems"]) for r in s["rejected"]) and any("image missing" in " ".join(r["problems"]) for r in s["rejected"]),
@@ -198,6 +201,7 @@ def run_tr3() -> "TestOutcome":
                   "token_estimate_scales_with_image_size": T.estimate_pair_tokens(tr[0], root, 448 * 448) > 30,
                   "too_long_pairs_are_filtered": s_tight["too_long"] >= 1 and s_tight["valid"] < s["valid"],
                   "files_written": all(os.path.isfile(os.path.join(root, "run", f)) for f in ("train.jsonl", "eval.jsonl", "data_summary.json")),
+                  "unverified_frames_are_rejected_by_default": any("not verified as a software UI" in x for x in T.validate_pair(unverified, root)) and T.validate_pair(unverified, root, require_ui=False) == [],
                   "single_video_goes_wholly_to_train": T.split_by_video([tr[0]], 0.5, 1) == ([tr[0]], [])}
         return _verdict(checks, f"read={s['read']} valid={s['valid']} train={s['train']} eval={s['eval']} rejected={[r['problems'][0][:30] for r in s['rejected']]}")
 
