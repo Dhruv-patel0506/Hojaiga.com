@@ -115,7 +115,7 @@ def build_ann(rag, table: Optional[str] = None, force: bool = False) -> Dict[str
     return out
 
 
-def maintain(rag) -> Dict[str, Any]:
+def maintain(rag, ann: bool = True) -> Dict[str, Any]:
     """Everything that should run after a bulk ingest or on a schedule: compaction, text-index consistency, ANN indexes."""
     from . import lt
     st = rag.st
@@ -126,7 +126,8 @@ def maintain(rag) -> Dict[str, Any]:
             res["compacted"].append(name)
             if st.text.count(name) != st.count(name):
                 res["text_healed"].append((name, st.text.heal(name, S.KEYS[name], S.FTS_TEXT[name], lt._cols(name))))
-    res["ann"] = build_ann(rag)
+    if ann:
+        res["ann"] = build_ann(rag)
     return res
 
 
