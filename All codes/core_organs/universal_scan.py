@@ -38,6 +38,8 @@ from typing import Any, Dict, List, Optional, Tuple
 logger = logging.getLogger("hojaiga.universal_scan")
 
 _u32 = ctypes.windll.user32 if os.name == "nt" else None
+_k32 = ctypes.windll.kernel32 if os.name == "nt" else None
+_initial_desktop = _u32.GetThreadDesktop(_k32.GetCurrentThreadId()) if (_u32 and _k32) else None
 _start_apps_cache: Optional[List[Tuple[str, str]]] = None
 
 
@@ -55,23 +57,59 @@ def classify_target(target: str) -> str:
 # ------------------------------------------------------------------ window helpers
 
 def _top_windows() -> Dict[int, Tuple[int, str, str]]:
-    """hwnd -> (pid, class, title) for visible top-level windows."""
+    """hwnd -> (pid, class, title) for visible top-level windows across interactive and host desktops."""
+    from core_organs import headless_input as _hin
+    _hin.ensure_input_desktop()
     out: Dict[int, Tuple[int, str, str]] = {}
+    seen_hwnds = set()
+    desktops = []
+    init_desk = _hin.initial_desktop()
+    if init_desk and init_desk not in desktops:
+        desktops.append(init_desk)
+    if _initial_desktop and _initial_desktop not in desktops:
+        desktops.append(_initial_desktop)
+    cur = _u32.GetThreadDesktop(_k32.GetCurrentThreadId()) if (_u32 and _k32) else None
+    if cur and cur not in desktops:
+        desktops.append(cur)
+    try:
+        inp = _u32.OpenInputDesktop(0, False, 0x01FF)
+        if inp and inp not in desktops:
+            desktops.append(inp)
+    except Exception:
+        pass
+    try:
+        def_desk = _u32.OpenDesktopW("Default", 0, False, 0x01FF)
+        if def_desk and def_desk not in desktops:
+            desktops.append(def_desk)
+    except Exception:
+        pass
 
     @ctypes.WINFUNCTYPE(ctypes.c_bool, wt.HWND, wt.LPARAM)
     def cb(h, _):
+        ih = int(h)
+        if ih in seen_hwnds:
+            return True
         try:
-            if _u32.IsWindowVisible(h):
+            if _u32.IsWindowVisible(h) or _u32.IsIconic(h):
+                seen_hwnds.add(ih)
                 p = wt.DWORD()
                 _u32.GetWindowThreadProcessId(h, ctypes.byref(p))
                 c = ctypes.create_unicode_buffer(128)
                 _u32.GetClassNameW(h, c, 128)
                 from core_organs import headless_input as _hin      # deadlock-safe title read (see safe_window_text)
-                out[int(h)] = (int(p.value), c.value, _hin.safe_window_text(int(h), 200)[:200])
+                out[ih] = (int(p.value), c.value, _hin.safe_window_text(ih, 200)[:200])
         except Exception:
             pass
         return True
-    _u32.EnumWindows(cb, 0)
+
+    if desktops:
+        for d in desktops:
+            try:
+                _u32.EnumDesktopWindows(d, cb, 0)
+            except Exception:
+                pass
+    else:
+        _u32.EnumWindows(cb, 0)
     return out
 
 
@@ -198,11 +236,41 @@ def _is_startup_dialog(hwnd: int) -> bool:
     return pp.looks_like_dialog(hwnd)
 
 
-def launch_hidden(name: str, timeout_s: float = 45.0, fast: bool = False) -> Dict[str, Any]:
+def _notice_window(h: int) -> bool:
+    """A window that is never an application's main window: owned by another window, a tool window, or one that refuses activation (toasts, task panes, tooltips)."""
+    try:
+        ex = _u32.GetWindowLongW(h, -20) & 0xFFFFFFFF                        # GWL_EXSTYLE
+        return bool(_u32.GetWindow(h, 4)) or bool(ex & 0x80) or bool(ex & 0x08000000)   # GW_OWNER, WS_EX_TOOLWINDOW, WS_EX_NOACTIVATE
+    except Exception:
+        return False
+
+
+class _WP(ctypes.Structure):
+    _fields_ = [("length", wt.UINT), ("flags", wt.UINT), ("showCmd", wt.UINT), ("ptMin", wt.POINT), ("ptMax", wt.POINT), ("rcNormal", wt.RECT)]
+
+
+def _main_rank(h: int) -> Tuple[int, int, int]:
+    r = wt.RECT()
+    try:
+        if _u32.IsIconic(h):                                                  # a minimized window's rect is the minimized stub: its restored size is what tells main from popup
+            wp = _WP()
+            wp.length = ctypes.sizeof(_WP)
+            _u32.GetWindowPlacement(h, ctypes.byref(wp))
+            r = wp.rcNormal
+        else:
+            _u32.GetWindowRect(h, ctypes.byref(r))
+    except Exception:
+        pass
+    area = max(0, r.right - r.left) * max(0, r.bottom - r.top)
+    return (0 if _notice_window(h) else 1, 1 if _u32.IsIconic(h) else 0, area)
+
+
+def launch_hidden(name: str, timeout_s: float = 45.0, fast: bool = False, args: Optional[List[str]] = None) -> Dict[str, Any]:
     """Start `name` and keep its window minimized / unfocused from the moment it appears. `fast=True` shortens the protective settle waits
     (a window must be 0.6 s old and chosen for 0.6 s, startup is watched 3 s with 0.6 s of quiet instead of 1.0 / 1.2 / 5 s / 1.0 s): a splash
     screen that lives longer than that is still rejected by the size / title / proven-stable test, only the margin is smaller."""
-    from core_organs import background_window as bw
+    from core_organs import background_window as bw, headless_input as _hin
+    _hin.ensure_input_desktop()
     info: Dict[str, Any] = {"launched": False, "hwnd": 0, "notes": []}
     app = resolve_app(name)
     if not app:
@@ -235,7 +303,8 @@ def launch_hidden(name: str, timeout_s: float = 45.0, fast: bool = False) -> Dic
             si = subprocess.STARTUPINFO()
             si.dwFlags = 1
             si.wShowWindow = 7                                  # SW_SHOWMINNOACTIVE
-            subprocess.Popen([appid], startupinfo=si, cwd=os.path.dirname(appid))
+            si.lpDesktop = "WinSta0\\Default"
+            subprocess.Popen([appid] + list(args or []), startupinfo=si, cwd=os.path.dirname(appid))         # args: e.g. a scripting bridge the application loads at start-up
         elif re.match(r"^[A-Za-z]:\\", appid) or appid.lower().endswith(".exe"):
             subprocess.Popen(["cmd", "/c", "start", "/min", "", appid], creationflags=0x08000000)
         else:
@@ -267,6 +336,8 @@ def launch_hidden(name: str, timeout_s: float = 45.0, fast: bool = False) -> Dic
             if not (_u32.IsWindow(h) and now.get(h, (0, "", ""))[2]):
                 return False
             title = now[h][2]
+            if any(ord(ch) < 32 for ch in title) or _notice_window(h):         # a toast / notification / tool window of the app (measured: Office's 'Clipboard - Item not Collected')
+                return False
             if _SECOND_INSTANCE_RE.search(title):
                 if title not in dialog_seen:
                     dialog_seen.append(title)
@@ -283,8 +354,12 @@ def launch_hidden(name: str, timeout_s: float = 45.0, fast: bool = False) -> Dic
             info.setdefault("trace", []).append(
                 f"{info['_tick']}s new={[(now[h][1][:14], now[h][2][:12], bool(_u32.IsIconic(h)), _ok(h)) for h in new][:4]}")
         if stable:
-            pick = g.find_window(name)
-            best = pick if pick in stable else max(stable, key=lambda h: len(now[h][2]) + (50 if _u32.IsIconic(h) else 0))
+            cand_names = [name]
+            base_name = os.path.splitext(os.path.basename(name))[0]
+            if base_name and base_name != name:
+                cand_names.append(base_name)
+            pick = next((g.find_window(cn) for cn in cand_names if g.find_window(cn) in stable), None) or g.find_window(name)
+            best = pick if pick in stable else max(stable, key=_main_rank)       # the app's main window: unowned, largest - never the window with the longest title
             if best != chosen:
                 chosen, chosen_since = best, time.time()
             elif time.time() - chosen_since >= (0.6 if fast else 1.2):

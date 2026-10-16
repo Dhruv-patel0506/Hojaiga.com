@@ -18,6 +18,7 @@ Everything degrades: any failure returns None and callers fall back to the slow 
 from __future__ import annotations
 
 import logging
+import time
 from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger("hojaiga.fast_uia")
@@ -39,6 +40,9 @@ CONTROL_TYPES = {
 # property ids (UIA_*PropertyId)
 P_RECT, P_CTYPE, P_NAME, P_ACCEL, P_AID, P_CLASS, P_HELP = 30001, 30003, 30005, 30006, 30011, 30012, 30013
 P_ENABLED, P_OFFSCREEN = 30010, 30022
+P_PID = 30002                   # UIA_ProcessId: WHICH PROCESS owns this node. A merged tree (a window plus its popups, plus a helper process's picker) must never be read as one
+                                # interface, and a catalog must never claim another application's controls (measured: Word's catalog held a browser's 'Address and search bar'
+                                # after Word opened a web picker, and every later search of Word's own box picked that foreign field)
 P_PAT = {"invoke": 30031, "toggle": 30041, "expand": 30028, "select": 30036, "value": 30043, "scroll": 30034,
          "text": 30040}
 P_EXPAND_STATE = 30070          # ExpandCollapseExpandCollapseState
@@ -53,7 +57,7 @@ _DEFAULT_TIMEOUT_MS = int(__import__("os").environ.get("HOJAIGA_UIA_TIMEOUT_MS",
 # The cheap rung's property set: only what decides the SHAPE of the tree. Everything else (help text, accelerator,
 # pattern availability, expand/toggle/select state) costs provider work per node and is not what a first-contact
 # depth/count measurement needs.
-CHEAP_PROPS = (P_RECT, P_CTYPE, P_NAME, P_AID, P_CLASS)
+CHEAP_PROPS = (P_RECT, P_CTYPE, P_NAME, P_AID, P_CLASS, P_PID)
 
 
 def _set_timeout(ms: int) -> bool:
@@ -115,7 +119,7 @@ def _request(cheap: bool = False):
     if _cache_request is None:
         iua, core, _ = _client()
         cr = iua.CreateCacheRequest()
-        for pid in (P_RECT, P_CTYPE, P_NAME, P_ACCEL, P_AID, P_CLASS, P_HELP, P_ENABLED, P_OFFSCREEN, P_ACCESSKEY,
+        for pid in (P_RECT, P_CTYPE, P_NAME, P_ACCEL, P_AID, P_CLASS, P_PID, P_HELP, P_ENABLED, P_OFFSCREEN, P_ACCESSKEY,
                     P_EXPAND_STATE, P_SELECTED, P_TOGGLE_STATE, *P_PAT.values()):
             try:
                 cr.AddProperty(pid)
@@ -129,10 +133,11 @@ def _request(cheap: bool = False):
 
 class Node:
     __slots__ = ("idx", "parent", "depth", "ctype", "name", "aid", "cls", "rect", "enabled", "offscreen",
-                 "help", "accel", "pats", "expand_state", "selected", "toggle_state", "el", "_ctrl", "children")
+                 "help", "accel", "pats", "expand_state", "selected", "toggle_state", "el", "_ctrl", "children", "pid")
 
     def __init__(self):
         self.children: List[int] = []
+        self.pid = 0
         self._ctrl = None
 
     @property
@@ -158,6 +163,10 @@ def _read(el, idx: int, parent: int, depth: int) -> Node:
     n.name = (el.CachedName or "").strip()
     n.aid = (el.CachedAutomationId or "").strip()
     n.cls = el.CachedClassName or ""
+    try:
+        n.pid = int(el.GetCachedPropertyValue(P_PID))         # who ANSWERS this node: 0 when the caller's cache request did not ask for it
+    except Exception:
+        n.pid = 0
     try:
         r = el.CachedBoundingRectangle
         n.rect = (int(r.left), int(r.top), int(r.right), int(r.bottom))
@@ -196,9 +205,9 @@ def _read(el, idx: int, parent: int, depth: int) -> Node:
     return n
 
 
-def _flatten(cached_root, max_nodes: int) -> List[Node]:
-    nodes: List[Node] = []
-    stack: List[Tuple[Any, int, int]] = [(cached_root, -1, 0)]
+def _flatten(cached_root, max_nodes: int, nodes: Optional[List[Node]] = None, parent0: int = -1, depth0: int = 0) -> List[Node]:
+    nodes = [] if nodes is None else nodes
+    stack: List[Tuple[Any, int, int]] = [(cached_root, parent0, depth0)]
     while stack and len(nodes) < max_nodes:
         el, parent, depth = stack.pop()
         node = _read(el, len(nodes), parent, depth)
@@ -218,6 +227,88 @@ def _flatten(cached_root, max_nodes: int) -> List[Node]:
     return nodes
 
 
+_level_request = None
+
+
+def _children_request():
+    """The full property set for ONE element and its direct children (the resilient walk's step)."""
+    global _level_request
+    if _level_request is None:
+        iua, core, _ = _client()
+        full = _request(False)
+        cr = full.Clone()
+        cr.TreeScope = core.TreeScope_Element | core.TreeScope_Children
+        _level_request = cr
+    return _level_request
+
+
+def _resilient(hwnd: int, max_nodes: int, budget_s: float) -> Optional[List[Node]]:
+    """The whole-subtree cache request fails as ONE call when a single descendant's provider errors (measured: Word right after 'Blank document' - E_FAIL for the window while
+    the window itself answers). Walk instead: a branch is cached whole when it can be, else level by level, and only the branch that errors is left out."""
+    iua, core, _ = _client()
+    end = time.time() + budget_s
+    sub, lvl = _request(False), _children_request()
+    nodes: List[Node] = []
+    root = iua.ElementFromHandle(hwnd)
+    stack: List[Tuple[Any, int, int]] = [(root, -1, 0)]
+    while stack and len(nodes) < max_nodes and time.time() < end:
+        raw, parent, depth = stack.pop()
+        if parent >= 0:
+            try:
+                cached = raw.BuildUpdatedCache(sub)                      # this branch in one call when it can
+                _flatten(cached, max_nodes, nodes, parent, depth)
+                continue
+            except Exception:
+                pass
+        try:
+            cached = raw.BuildUpdatedCache(lvl)                          # ...else this element and its direct children, and down from there
+        except Exception:
+            continue                                                     # the element that errors (and only it) is left out
+        node = _read(cached, len(nodes), parent, depth)
+        nodes.append(node)
+        if parent >= 0:
+            nodes[parent].children.append(node.idx)
+        try:
+            arr = cached.GetCachedChildren()
+            kids = [arr.GetElement(i) for i in range(arr.Length)]
+        except Exception:
+            kids = []
+        for k in reversed(kids):
+            stack.append((k, node.idx, depth + 1))
+    return nodes or None
+
+
+_UNLAID: Dict[int, bool] = {}                                    # parked windows whose content reports no layout (zero-size controls): their size is not a visibility test
+
+
+def _offscreen_by_window(hwnd: int, nodes: List[Any]) -> int:
+    """A PARKED window (off every monitor, on purpose) whose provider computes IsOffscreen against the monitors marks nearly its whole interface 'offscreen' (measured: Settings,
+    215 of 224 nodes incl. Back and Search, all with zero-size rectangles). For such a window 'offscreen' is re-read as 'outside the window's own rectangle' (scrolled away);
+    a zero-size node of it counts as present (acted on through its UIA pattern, never by coordinates).
+    Applied only when the window is parked and most named nodes carry the flag. Returns how many nodes were corrected."""
+    try:
+        from core_organs import background_window as bw   # lazy: background_window itself reads trees
+        if not bw.is_parked(hwnd):
+            return 0
+        named = [n for n in nodes if getattr(n, "name", "")]
+        off = [n for n in named if getattr(n, "offscreen", False)]
+        if len(named) < 10 or len(off) < 0.7 * len(named):
+            return 0
+        wl, wt, wr, wb = bw._rect(hwnd)
+        fixed = 0
+        _UNLAID[hwnd] = True
+        for n in nodes:
+            if not getattr(n, "offscreen", False):
+                continue
+            l, t, r, b = tuple(n.rect)[:4]
+            if (r > l and b > t and l < wr and r > wl and t < wb and b > wt) or (r <= l or b <= t):
+                n.offscreen = False                                       # inside the window, or NOT LAID OUT at all (zero size: the parked content is not rendered, but its
+                fixed += 1                                                # patterns work - measured: UIA Select on Settings' zero-size 'Accessibility' opened that page)
+        return fixed
+    except Exception:                                                     # noqa: BLE001
+        return 0
+
+
 def snapshot(hwnd: int, max_nodes: int = 20000, timeout_ms: Optional[int] = None,
              cheap: bool = False) -> Optional[List[Node]]:
     """Whole-window subtree in one call, bounded by `timeout_ms` (default 12 s; pass ~3000 for
@@ -229,11 +320,22 @@ def snapshot(hwnd: int, max_nodes: int = 20000, timeout_ms: Optional[int] = None
         _set_timeout(timeout_ms or _DEFAULT_TIMEOUT_MS)
         try:
             root = iua.ElementFromHandleBuildCache(hwnd, _request(cheap))
-            return _flatten(root, max_nodes)
+            out = _flatten(root, max_nodes)
+            _offscreen_by_window(hwnd, out)
+            return out
         finally:
             _set_timeout(_DEFAULT_TIMEOUT_MS)
     except Exception as exc:
         logger.debug("[fast_uia] snapshot(%s, cheap=%s) failed: %s", hwnd, cheap, exc)
+        if cheap or "-2147467259" not in str(exc) and "Unspecified" not in str(exc):
+            return None
+    try:                                                                 # E_FAIL from one bad descendant: walk around it
+        out = _resilient(hwnd, max_nodes, max(8.0, (timeout_ms or _DEFAULT_TIMEOUT_MS) / 1000.0))
+        if out:
+            _offscreen_by_window(hwnd, out)
+        return out
+    except Exception as exc:
+        logger.debug("[fast_uia] resilient snapshot(%s) failed: %s", hwnd, exc)
         return None
 
 
@@ -249,6 +351,28 @@ def snapshot_element(raw_el, max_nodes: int = 5000, timeout_ms: Optional[int] = 
     except Exception as exc:
         logger.debug("[fast_uia] snapshot_element failed: %s", exc)
         return None
+
+
+def rebased(nodes: List[Node], base: int, root_parent: int = -1) -> List[Node]:
+    """A COPY of one window's snapshot whose indices start at `base`, so several windows can share ONE list without a parent / child link
+    reaching into ANOTHER window. Added indices are relative to each snapshot, so a merged list read by anything that walks parents (the
+    catalog's path builder, a container scan) mixes windows: measured on Word, a browser window's controls came out filed under a Word
+    toolbar and were saved as Word's own commands. The originals keep their own indices."""
+    out: List[Node] = []
+    slots = Node.__slots__
+    for n in nodes:
+        c = Node()
+        for s in slots:
+            try:
+                setattr(c, s, getattr(n, s, None))
+            except Exception:                                        # noqa: BLE001
+                continue
+        p = getattr(n, "parent", -1)
+        c.idx = base + int(getattr(n, "idx", 0) or 0)
+        c.parent = (base + int(p)) if isinstance(p, int) and p >= 0 else root_parent
+        c.children = [base + int(x) for x in (getattr(n, "children", []) or [])]
+        out.append(c)
+    return out
 
 
 def descendants_of(nodes: List[Node], idx: int) -> List[Node]:
