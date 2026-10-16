@@ -264,6 +264,9 @@ class FastPaths:
         self.st.bump(f"fast:{r['app_key']}")
         return vals
 
+    def count(self, app_key: str) -> int:
+        return int(self.st.table("fast_paths").count_rows(lt.where_app(app_key))) if self.st.count("fast_paths") else 0
+
     def stats(self, app_key: str = "") -> Dict[str, Any]:
         n = self.st.table("fast_paths").count_rows(lt.where_app(app_key)) if self.st.count("fast_paths") else 0
         return {"rows": int(n)}
@@ -292,7 +295,9 @@ def spoken_chords(text: str) -> List[str]:
 
 def _by_chord(self, app_key: str, chord: str, limit: int = 5) -> List[Evidence]:
     """The vault rows whose key payload IS this chord (exact), for 'what does ctrl+h do'."""
-    rows = self._overlay(lt.fetch(self.st, "fast_paths", lt.where_app(app_key, f"payload = {lt.q(chord)}"), 50))
+    arrows = {"up": "↑", "down": "↓", "left": "←", "right": "→"}                  # published tables store arrow keys as glyphs
+    variants = {chord} | {"+".join(arrows.get(p, p) for p in chord.split("+"))}
+    rows = self._overlay(lt.fetch(self.st, "fast_paths", lt.where_app(app_key, "payload IN (" + ", ".join(lt.q(v) for v in sorted(variants)) + ")"), 50))
     rows.sort(key=lambda r: (-(1 if (r["verified"] or r["trust"] in DIRECT_TRUST) else 0), -_reliability(r)))
     return [self._evidence(r, "", None, 1.0) for r in rows[:limit]]
 

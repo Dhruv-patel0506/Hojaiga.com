@@ -495,7 +495,15 @@ class Router:
             have = {x.citation for x in ret.evidence}
             ret.evidence += [e for e in passages[:2] if e.citation not in have]
 
+    def _has_knowledge(self, app: str) -> bool:
+        r = self.r
+        return bool(app) and (r.lex.n_commands(app) > 0 or r.proc.chunk_count(app) > 0 or r.fast.count(app) > 0)
+
     def _rewrite(self, app: str, goal: str, ret: Retrieval) -> List[str]:
+        if not self._has_knowledge(app):                    # nothing to search with a better wording: do not spend an LLM call (seconds) to rephrase a question about an app we know nothing about
+            ret.trace.append({"probe": "llm_rewrite", "ms": 0.0, "hits": 0, "why": "no_knowledge"})
+            ret.gaps.append("app_has_no_knowledge")
+            return []
         key = hashlib.sha1(f"{app}|{' '.join(toks(goal))}".encode()).hexdigest()
         row = self.st.sql("cache").one("SELECT v FROM rewrite_cache WHERE k=?", (key,))
         if row:
@@ -593,7 +601,10 @@ class Router:
                     e.confidence *= C.BORROW_CONFIDENCE_MULT
                     chunks.append(e)
                     ret.gaps.append(f"borrowed_from:{sib}")
-        fused = self._fuse([chunks, fast, where], [1.0, C.SHORTCUT_QUERY_BOOST if keyq else 1.0, 1.0])
+        # the key-question boost applies only to hotkey rows that genuinely matched (found by both legs); a row that matched one stray word must not outrank a passage that answers the question
+        fast_strong = [e for e in fast if e.score >= C.WEAK_RECALL_SCORE]
+        fast_weak = [e for e in fast if e.score < C.WEAK_RECALL_SCORE]
+        fused = self._fuse([chunks, fast_strong, fast_weak, where], [1.0, C.SHORTCUT_QUERY_BOOST if keyq else 1.0, 1.0, 1.0])
         have = {e.citation for e in exact}
         ret.evidence += (exact + [e for e in fused if e.citation not in have])[:6]
         if not ret.evidence:

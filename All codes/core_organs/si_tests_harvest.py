@@ -9,6 +9,7 @@ si_tests_harvest -- tests for Checkpoint 3 (harvest/): the data pipeline that fe
   HV6  SoM + explain: numbered elements read from a real frame, the delta-box rescan finds the new menu in full-frame coordinates, training pairs are well-formed, grounded only when the target matches, dedup
   HV7  paths: HOJAIGA_HARVEST_DIR wins; an unmounted storage root falls back and says so
   HV8  shortcut-table parsing finds the key column by content (regression for the votes-column bug found in the first live scrape)
+  HV9  data-quality gates found on real footage: off-topic videos quarantined, loose verbs are not UI actions, audit + purge, one instruction labels one change
 """
 
 from __future__ import annotations
@@ -424,7 +425,75 @@ def run_hv8() -> "TestOutcome":
     return _verdict(checks, f"rows={sorted(pairs1)[:4]}")
 
 
-TESTS = [("HV1", run_hv1), ("HV2", run_hv2), ("HV3", run_hv3), ("HV4", run_hv4), ("HV5", run_hv5), ("HV6", run_hv6), ("HV7", run_hv7), ("HV8", run_hv8)]
+def run_hv9() -> "TestOutcome":
+    """HV9: data-quality gates found on real footage -- off-topic videos, loose action verbs, audit + purge, one instruction labels one change"""
+    import pandas as pd
+    from core_organs.harvest import bridge as B, free_master_harvester as M, video_explain as VE, video_pipeline as VP
+    from si_tests_rag import _Env
+    on = M.on_topic
+    mentions = " ".join(["so open the calculator and press the button"] * 6)
+    # a harvester run with one on-topic title, one off-topic video, and one whose title is vague but whose speaker keeps naming the app
+    segs_plain = [{"text": "click File", "start": 1.0, "duration": 2.0}, {"text": "press Ctrl+S", "start": 4.0, "duration": 2.0}]
+    segs_calc = [{"text": "now in the calculator we press the calculator memory button", "start": float(i * 3), "duration": 2.0} for i in range(6)]
+    vids = [{"id": "v_title", "title": "Windows Calculator basics", "duration": 600, "view_count": 900, "uploader": "a"},
+            {"id": "v_off", "title": "15 Amazing Shortcuts You Aren't Using", "duration": 700, "view_count": 800, "uploader": "b"},
+            {"id": "v_vague", "title": "Tips and tricks everyone should know", "duration": 650, "view_count": 700, "uploader": "c"}]
+    with _Dir() as root:
+        net, _ = fake_net({M.WINGET_CSV: WINGET_FIXTURE.encode("utf-8")}, {"v_title": segs_plain, "v_off": segs_plain, "v_vague": segs_calc}, {"calculator": vids})
+        rep = M.run_harvester(max_apps=1, videos_per_app=3, net=net, root=root, delay_s=0, only_apps=["Windows Calculator"])
+        rows = pd.read_excel(M.workbook_path(root), sheet_name=M.SHEET_VIDEOS)
+        st = dict(zip(rows["video_id"], rows["transcript_status"]))
+        kept = sorted(f for f in os.listdir(os.path.join(root, "transcripts_json")) if f.endswith(".json"))
+        quarantined = sorted(os.listdir(os.path.join(root, "transcripts_json", "_off_topic"))) if os.path.isdir(os.path.join(root, "transcripts_json", "_off_topic")) else []
+    # action moments
+    acts = {"use this, but it can come in handy.": False, "use a mac": False, "press Ctrl+S": True, "click the File menu": True, "select it": False, "so you can just type your name": True, "hit M+": False}
+    got = {t: VP.is_ui_action(__import__("core_organs.rag.procedures", fromlist=["x"]).extract_steps(t, [t])[0]) if __import__("core_organs.rag.procedures", fromlist=["x"]).extract_steps(t, [t]) else False for t in acts}
+    moments = VP.action_moments([{"text": "use this, but it can come in handy", "start": 5.0, "duration": 2.0}, {"text": "now click the File menu", "start": 30.0, "duration": 2.0}, {"text": "use a mac", "start": 60.0, "duration": 1.0}])
+    # audit + purge against a RAG that already holds an off-topic video
+    with _Dir() as root, _Env() as R:
+        os.makedirs(os.path.join(root, "transcripts_json"))
+        calc_ok = [{"text": "in the calculator press the calculator memory button to store the value", "start": float(i * 4), "duration": 3.0} for i in range(8)]
+        for vid, segs in (("v_good", calc_ok), ("v_bad", [{"text": f"press Windows plus V to open the clipboard {i}", "start": float(i * 4), "duration": 3.0} for i in range(8)])):
+            json.dump(segs, open(os.path.join(root, "transcripts_json", f"calculator__{vid}.json"), "w"))
+            R.proc.ingest_transcript("calculator", segs, vid, "t")
+        M.write_sheets(root, [{"app_name": "Windows Calculator", "app_key": "calculator", "tier": 1}],
+                       [{"app_name": "Windows Calculator", "app_key": "calculator", "video_id": "v_good", "title": "Windows Calculator tips", "transcript_status": "Downloaded"},
+                        {"app_name": "Windows Calculator", "app_key": "calculator", "video_id": "v_bad", "title": "10 Windows shortcuts", "transcript_status": "Downloaded"}])
+        before = R.proc.stats("calculator")["chunks"]
+        dry = B.audit_topics(None, root, fix=False)
+        still_there = sorted(os.listdir(os.path.join(root, "transcripts_json")))
+        fixed = B.audit_topics(R, root, fix=True)
+        after = R.proc.stats("calculator")["chunks"]
+        gone = R.proc.query("calculator", "open the clipboard windows plus v", k=5)
+        kept_q = R.proc.query("calculator", "calculator memory button store the value", k=5)
+        synced = R.st.text.count("knowledge_chunks") == R.st.count("knowledge_chunks")
+        moved = os.path.isfile(os.path.join(root, "transcripts_json", "_off_topic", "calculator__v_bad.json"))
+    # one instruction labels the FIRST change it causes
+    som = lambda image, region=None: {"elements": [{"id": 1, "label": "File", "role": "text", "box": [0, 0, 5, 5]}], "seconds": 0.0, "size": [100, 100], "tiers_used": [], "tiers_skipped": []}
+    kf = [{"t": 3.0, "pre": "frames/a_pre.jpg", "post": "frames/a_post.jpg", "bbox": [0, 0, 50, 50]}, {"t": 4.0, "pre": "frames/b_pre.jpg", "post": "frames/b_post.jpg", "bbox": [0, 0, 60, 60]},
+          {"t": 9.0, "pre": "frames/c_pre.jpg", "post": "frames/c_post.jpg", "bbox": [0, 0, 10, 10]}]
+    said = [{"text": "now click the File menu", "start": 2.5, "duration": 1.0}]
+    with _Dir() as root, _Env() as R2:
+        rep2 = VE.explain_video(R2, "calc", "vidX", said, kf, out_jsonl=os.path.join(root, "p.jsonl"), root=root, som_fn=som, scan_delta=False, ingest=False)
+    junk = VE.clean_labels([{"label": l} for l in ("McC", "|||", "a", "Calculator", "calculator", "Programmer", "x1", "Date calculation", "ynVerter", "")])
+    checks = {"title_naming_the_app_is_on_topic": on("Windows Calculator", "Secrets of The Windows Calculator") and on("MS Paint", "Intro to Paint for kids"),
+              "generic_title_is_off_topic": not on("Windows Calculator", "15 Amazing Shortcuts You Aren't Using") and not on("Windows Calculator", "Stop Using Your Mouse"),
+              "a_speaker_who_keeps_naming_the_app_counts": on("Windows Calculator", "Tips", mentions) and not on("Windows Calculator", "Tips", "open the thing and press a button"),
+              "app_tokens_drop_generic_words": M.app_tokens("Windows Calculator") == ["calculator"] and M.app_tokens("MS Paint") == ["paint"],
+              "harvester_keeps_on_topic_and_quarantines_the_rest": st.get("v_title") == "Downloaded" and st.get("v_off") == "Off_Topic" and st.get("v_vague") == "Downloaded"
+                                                                   and kept == ["calculator__v_title.json", "calculator__v_vague.json"] and quarantined == ["calculator__v_off.json"] and rep["stats"]["off_topic"] == 1,
+              "loose_verbs_are_not_ui_actions": got == acts,
+              "action_moments_skip_ordinary_speech": len(moments) == 1 and "File" in moments[0]["text"],
+              "audit_dry_run_changes_nothing": [o["video_id"] for o in dry["off_topic"]] == ["v_bad"] and still_there == ["calculator__v_bad.json", "calculator__v_good.json"],
+              "audit_fix_quarantines_and_purges_the_rag": moved and fixed["removed_chunks"] >= 1 and after < before and not any(e.citation.startswith("v_bad") for e in gone),
+              "audit_keeps_the_good_video": any(e.citation.startswith("v_good") for e in kept_q),
+              "text_and_vector_indexes_stay_in_sync": synced,
+              "one_instruction_labels_one_change": rep2["pairs"] == 1 and rep2["step_already_used"] == 1 and rep2["no_step_nearby"] == 1,
+              "ocr_debris_is_not_shown_as_what_appeared": junk == ["Calculator", "Programmer", "Date calculation"]}
+    return _verdict(checks, f"statuses={st} dry={[o['video_id'] for o in dry['off_topic']]} purged={fixed['removed_chunks']} pairs={rep2['pairs']} junk_out={junk}")
+
+
+TESTS = [("HV1", run_hv1), ("HV2", run_hv2), ("HV3", run_hv3), ("HV4", run_hv4), ("HV5", run_hv5), ("HV6", run_hv6), ("HV7", run_hv7), ("HV8", run_hv8), ("HV9", run_hv9)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]

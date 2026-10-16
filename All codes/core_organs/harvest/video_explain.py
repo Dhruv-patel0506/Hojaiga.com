@@ -46,7 +46,7 @@ def match_element(som: Dict[str, Any], target: str) -> Optional[Dict[str, Any]]:
     return best
 
 
-def steps_before(segments: Sequence[Dict[str, Any]], t: float, lookback_s: float = 8.0, lookahead_s: float = 1.5) -> List[Dict[str, Any]]:
+def steps_before(segments: Sequence[Dict[str, Any]], t: float, lookback_s: float = 5.0, lookahead_s: float = 1.0) -> List[Dict[str, Any]]:
     """Actionable steps the speaker said in (t - lookback, t + lookahead): the instruction that explains the change at t. Newest last."""
     from core_organs.rag.procedures import extract_steps
     out = []
@@ -55,6 +55,21 @@ def steps_before(segments: Sequence[Dict[str, Any]], t: float, lookback_s: float
         if t - lookback_s <= s0 <= t + lookahead_s:
             for st in extract_steps(seg["text"], [seg["text"]]):
                 out.append(dict(st, t=s0))
+    return out
+
+
+def clean_labels(elements: Sequence[Dict[str, Any]], limit: int = 8) -> List[str]:
+    """Element names fit to be shown as 'what appeared': at least 3 letters, mostly alphabetic, no OCR debris ('McC', '|||'), no duplicates."""
+    out, seen = [], set()
+    for e in elements:
+        lab = (e.get("label") or "").strip()
+        letters = sum(c.isalpha() for c in lab)
+        if len(lab) < 3 or letters < 3 or letters / len(lab) < 0.7 or lab.lower() in seen or re.search(r"[a-z][A-Z]", lab):
+            continue
+        seen.add(lab.lower())
+        out.append(lab)
+        if len(out) >= limit:
+            break
     return out
 
 
@@ -81,7 +96,8 @@ def explain_video(rag, app_key: str, video_id: str, segments: Sequence[Dict[str,
                 seen.add(json.loads(l).get("meta", {}).get("pair_id"))
             except Exception:
                 pass
-    report: Dict[str, Any] = {"video_id": video_id, "keyframes": len(keyframes), "pairs": 0, "grounded": 0, "no_step_nearby": 0, "duplicates": 0, "som_seconds": 0.0}
+    report: Dict[str, Any] = {"video_id": video_id, "keyframes": len(keyframes), "pairs": 0, "grounded": 0, "no_step_nearby": 0, "step_already_used": 0, "duplicates": 0, "som_seconds": 0.0}
+    used_steps = set()                                         # an instruction labels the FIRST change it causes; later changes are consequences of later speech, not of this step
     if ingest and segments:
         r = rag.proc.ingest_transcript(app_key, list(segments), video_id, title)
         report["rag_chunks"] = r.inserted + r.updated
@@ -92,6 +108,11 @@ def explain_video(rag, app_key: str, video_id: str, segments: Sequence[Dict[str,
             report["no_step_nearby"] += 1
             continue
         step = steps[-1]                                          # the most recent instruction before the change
+        skey = (round(step["t"], 2), step["text"])
+        if skey in used_steps:
+            report["step_already_used"] += 1
+            continue
+        used_steps.add(skey)
         pair_id = hashlib.sha1(f"{video_id}|{ev['t']}|{step['text']}".encode()).hexdigest()[:16]
         if pair_id in seen:
             report["duplicates"] += 1
@@ -103,7 +124,7 @@ def explain_video(rag, app_key: str, video_id: str, segments: Sequence[Dict[str,
         if scan_delta and ev.get("bbox") and ev.get("post"):
             sub = som_fn(ev["post"], region=tuple(ev["bbox"]))     # delta-box scan: only the region that changed is analysed
             report["som_seconds"] += sub.get("seconds", 0.0)
-            names = [e["label"] for e in sub["elements"] if e["label"]][:8]
+            names = clean_labels(sub["elements"])
             if names:
                 expectation = "new on screen: " + ", ".join(names)
         grounded = el is not None or bool(step.get("chord"))

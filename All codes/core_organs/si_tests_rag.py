@@ -903,6 +903,11 @@ def run_rg18() -> "TestOutcome":
         C.ROUTER_VERSION = old_v
         # LOCATE with no scanned map
         loc = R.retrieve(Query(text="where is the calculation history", app_key="calc", mode="tutor"))
+    # an app we know nothing about: no model call to rephrase the question
+    with _Env(rewriter=quick) as R3:
+        n_before = len(calls)
+        unknown = R3.retrieve(Query(text="how do I schedule a meeting", app_key="no_such_app", mode="tutor"))
+        no_knowledge_calls = len(calls) - n_before
     # the wall-clock cap
     old_t = C.LLM_REWRITE_TIMEOUT_S
     C.LLM_REWRITE_TIMEOUT_S = 0.25
@@ -941,6 +946,7 @@ def run_rg18() -> "TestOutcome":
               "a_non_key_question_is_not_forced_to_hotkeys": not (nokey_q.evidence and nokey_q.evidence[0].sub_rag == "fast" and nokey_q.evidence[0].score > 0.5 and nokey_q.evidence[0].payload["payload"] == "ctrl+h"),
               "identical_question_is_cached": a1.trace[0]["probe"] == "cache",
               "a_router_version_bump_invalidates_the_cache": a2.trace[0]["probe"] != "cache",
+              "no_model_call_for_an_app_with_no_knowledge": no_knowledge_calls == 0 and "app_has_no_knowledge" in unknown.gaps and any(t["why"] == "no_knowledge" for t in unknown.trace),
               "llm_cap_is_wall_clock": capped_s < 0.9 and any(t["probe"] == "llm_rewrite" and t["why"] == "timeout" for t in capped.trace),
               "locate_without_a_map_answers_from_text_and_says_so": bool(loc.evidence) and "answered_from_text_not_from_a_ui_map" in loc.gaps,
               "query_embedding_keeps_model_warm_with_a_short_cap": sent.get("json", {}).get("keep_alive") == "30m" and sent.get("timeout") == C.QUERY_EMBED_TIMEOUT_S and got is None,

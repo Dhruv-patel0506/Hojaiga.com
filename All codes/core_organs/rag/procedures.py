@@ -324,6 +324,39 @@ class Procedures:
             self.lex.add_alias(o.app_key, str(a["surface"]), o.step.command_id, "transcript_term", "observed", "learned")
         self.st.bump(f"proc:{o.app_key}")
 
+    def forget_source(self, app_key: str, source_prefix: str) -> int:
+        """Remove every chunk (and the procedures built from them) whose source_ref starts with `source_prefix` -- e.g. a video id -- from this app. Used when a source turns out to be off-topic."""
+        like = source_prefix.replace("'", "''")
+        where = lt.where_app(app_key, f"source_ref LIKE '{like}%'")
+        rows = lt.fetch(self.st, "knowledge_chunks", where, 100000, ["chunk_id", "procedure_id"])
+        if not rows:
+            return 0
+        self.st.table("knowledge_chunks").delete(where)
+        ids = [r["chunk_id"] for r in rows]
+        ti = f"ti_knowledge_chunks"
+        with self.st.text.db.lock:
+            for i in range(0, len(ids), 400):
+                part = ids[i:i + 400]
+                ph = ",".join("?" for _ in part)
+                rowids = [x["rowid"] for x in self.st.text.db.rows(f"SELECT rowid FROM {ti} WHERE id IN ({ph})", part)]
+                for j in range(0, len(rowids), 400):
+                    rp = rowids[j:j + 400]
+                    rph = ",".join("?" for _ in rp)
+                    self.st.text.db.execute(f"DELETE FROM tf_knowledge_chunks WHERE rowid IN ({rph})", rp)
+                    self.st.text.db.execute(f"DELETE FROM {ti} WHERE rowid IN ({rph})", rp)
+            self.st.text.db.commit()
+        pids = sorted({r["procedure_id"] for r in rows if r["procedure_id"]})
+        for pid in pids:
+            self.st.table("procedures").delete(f"procedure_id = {lt.q(pid)}")
+            with self.st.text.db.lock:
+                rid = self.st.text.db.one("SELECT rowid FROM ti_procedures WHERE id=?", (pid,))
+                if rid:
+                    self.st.text.db.execute("DELETE FROM tf_procedures WHERE rowid=?", (rid["rowid"],))
+                    self.st.text.db.execute("DELETE FROM ti_procedures WHERE rowid=?", (rid["rowid"],))
+                    self.st.text.db.commit()
+        self.st.bump(f"proc:{app_key}")
+        return len(rows)
+
     def stats(self, app_key: str = "") -> Dict[str, Any]:
         return {"chunks": self.chunk_count(app_key) if app_key else self.st.count("knowledge_chunks"), "procedures": int(self.st.table("procedures").count_rows(lt.where_app(app_key))) if self.st.count("procedures") else 0}
 

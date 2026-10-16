@@ -109,13 +109,27 @@ def extract_keyframes(video_path: str, out_dir: str, video_id: str = "", **kw) -
 
 
 # ---- the transcript side ---------------------------------------------------------------------------------------------------------------------------
+# Verbs that name a deliberate act on the interface. 'use', 'add', 'set', 'run', 'start', 'create'... are ordinary speech ("use this, but it can come in handy", "use a mac"): they do not make a moment.
+_UI_VERBS = {"click", "double-click", "double click", "right-click", "right click", "press", "hit", "select", "choose", "drag", "drop", "type", "enter", "hold", "tap", "scroll", "open",
+             "go to", "navigate to", "switch to", "toggle", "check", "uncheck", "expand", "collapse", "pick"}
+_PRONOUN_TARGETS = {"this", "that", "it", "these", "those", "them", "here", "there", "one", "something", "anything", "up", "down", "back", "on", "off"}
+
+
+def is_ui_action(step: Dict[str, Any]) -> bool:
+    """A step the speaker performs ON THE INTERFACE: a key chord, or a UI verb with a real object (not 'this' / 'it')."""
+    if step.get("chord"):
+        return True
+    tgt = (step.get("target") or "").strip().lower()
+    return step.get("verb") in _UI_VERBS and len(tgt) >= 3 and tgt.split()[0] not in _PRONOUN_TARGETS
+
+
 def action_moments(segments: Sequence[Dict[str, Any]], pad_s: float = 2.0, merge_gap_s: float = 4.0) -> List[Dict[str, Any]]:
     """Time spans [t0, t1] where the speaker performs an action (imperative step or key chord), padded and merged: the only seconds worth downloading."""
     from core_organs.rag.procedures import extract_steps
     spans: List[List[float]] = []
     for seg in segments:
         text = str(seg.get("text", ""))
-        if extract_steps(text, [text]):
+        if any(is_ui_action(st) for st in extract_steps(text, [text])):
             t0 = max(0.0, float(seg["start"]) - pad_s)
             t1 = float(seg["start"]) + float(seg.get("duration", 0.0)) + pad_s
             if spans and t0 - spans[-1][1] <= merge_gap_s:

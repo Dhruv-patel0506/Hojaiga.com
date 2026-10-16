@@ -147,6 +147,35 @@ def _jsonl(root: str) -> List[Dict[str, Any]]:
     return [json.loads(l) for l in open(p, encoding="utf-8") if l.strip()]
 
 
+def audit_topics(rag=None, root: str = "", fix: bool = False) -> Dict[str, Any]:
+    """Re-judge every harvested transcript with the on-topic gate. With fix=True: quarantine the off-topic files and (when `rag` is given) remove their chunks/procedures from the store."""
+    from .free_master_harvester import on_topic
+    root = root or harvest_dir()[0]
+    rows = {(str(r.get("app_key")), str(r.get("video_id"))): r for r in _sheet(root, "2_YouTube_And_Transcripts")}
+    names = {str(r.get("app_key")): str(r.get("app_name")) for r in _sheet(root, "1_Master_1000_Apps")}
+    out = {"checked": 0, "off_topic": [], "removed_chunks": 0}
+    for path in sorted(glob.glob(os.path.join(root, "transcripts_json", "*.json"))):
+        base = os.path.basename(path)[:-5]
+        if "__" not in base:
+            continue
+        app, vid = base.split("__", 1)
+        try:
+            body = " ".join(s.get("text", "") for s in json.load(open(path, encoding="utf-8")))
+        except Exception:
+            continue
+        out["checked"] += 1
+        title = str(rows.get((app, vid), {}).get("title", ""))
+        if not on_topic(names.get(app, app.replace("_", " ")), title, body):
+            out["off_topic"].append({"app": app, "video_id": vid, "title": title})
+            if fix:
+                off = os.path.join(root, "transcripts_json", "_off_topic")
+                os.makedirs(off, exist_ok=True)
+                os.replace(path, os.path.join(off, os.path.basename(path)))
+                if rag is not None:
+                    out["removed_chunks"] += rag.proc.forget_source(app, vid)
+    return out
+
+
 def ingest_all(rag, root: str = "") -> Dict[str, Any]:
     root = root or harvest_dir()[0]
     hot = _sheet(root, "3_Hotkeys_Matrix")

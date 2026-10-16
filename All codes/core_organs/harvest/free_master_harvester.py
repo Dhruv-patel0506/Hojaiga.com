@@ -165,6 +165,26 @@ def build_app_list(net: Net, limit: int = 1000) -> Dict[str, Any]:
 
 
 # ---- videos + transcripts -----------------------------------------------------------------------------------------------------------------------------
+_GENERIC = {"windows", "microsoft", "ms", "desktop", "app", "application", "studio", "editor", "pro", "the", "adobe", "free", "tool", "11", "10", "3d", "engine", "a", "for", "of", "and"}
+
+
+def app_tokens(app_name: str) -> List[str]:
+    """The words that identify an application in a title / transcript: its name without the generic ones ('Windows Calculator' -> ['calculator'], 'MS Paint' -> ['paint'])."""
+    toks = [t for t in re.findall(r"[a-z0-9]+", app_name.lower()) if t not in _GENERIC and len(t) > 2]
+    return toks or [t for t in re.findall(r"[a-z0-9]+", app_name.lower()) if len(t) > 1]
+
+
+def on_topic(app_name: str, title: str, transcript_text: str = "", min_mentions: int = 5) -> bool:
+    """A tutorial is about the application if its TITLE names it, or the speaker names it at least `min_mentions` times. (A search for 'Windows Calculator shortcuts' also returns general Windows
+    shortcut videos; filing those under the calculator would put clipboard and virtual-desktop advice into the calculator's partition.)"""
+    toks = app_tokens(app_name)
+    low_t = (title or "").lower()
+    if any(re.search(rf"\b{re.escape(t)}", low_t) for t in toks):
+        return True
+    text = (transcript_text or "").lower()
+    return sum(len(re.findall(rf"\b{re.escape(t)}", text)) for t in toks) >= min_mentions
+
+
 def pick_videos(found: List[Dict[str, Any]], per_app: int, min_s: int = 120, max_s: int = 3600) -> List[Dict[str, Any]]:
     """Tutorials of a useful length, most-viewed first, one per id."""
     seen, out = set(), []
@@ -229,7 +249,7 @@ def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, ne
         apps = [a for a in apps if a["app_name"].lower() in want or a["app_key"] in want]
     batch = apps[start:start + max_apps]
     video_rows: List[Dict[str, Any]] = []
-    stats = {"apps_processed": 0, "apps_skipped_done": 0, "videos": 0, "downloaded": 0, "cached": 0, "no_subtitles": 0, "other_language": 0, "blocked": 0, "errors": 0}
+    stats = {"apps_processed": 0, "apps_skipped_done": 0, "videos": 0, "downloaded": 0, "cached": 0, "no_subtitles": 0, "other_language": 0, "off_topic": 0, "blocked": 0, "errors": 0}
     blocked = False
     for app in batch:
         if app["app_key"] in state["done_apps"]:
@@ -246,8 +266,18 @@ def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, ne
         for v in pick_videos(found, videos_per_app):
             t = fetch_transcript(net, root, app["app_key"], v["id"])
             st = t["status"]
+            if st in ("Downloaded", "Cached"):
+                try:
+                    body = " ".join(s.get("text", "") for s in json.load(open(t["path"], encoding="utf-8")))
+                except Exception:
+                    body = ""
+                if not on_topic(app["app_name"], v["title"], body):
+                    off = os.path.join(root, "transcripts_json", "_off_topic")
+                    os.makedirs(off, exist_ok=True)
+                    os.replace(t["path"], os.path.join(off, os.path.basename(t["path"])))          # quarantined, not deleted: the person can overrule the gate
+                    st, t = "Off_Topic", {"status": "Off_Topic", "segments": 0, "path": ""}
             stats["videos"] += 1
-            stats["downloaded" if st == "Downloaded" else "cached" if st == "Cached" else "no_subtitles" if st == "No_Subtitles" else "other_language" if st.startswith("Other_Language") else
+            stats["downloaded" if st == "Downloaded" else "cached" if st == "Cached" else "no_subtitles" if st == "No_Subtitles" else "other_language" if st.startswith("Other_Language") else "off_topic" if st == "Off_Topic" else
                   "blocked" if st.startswith("Blocked") else "errors"] += 1
             video_rows.append({"app_name": app["app_name"], "app_key": app["app_key"], "video_id": v["id"], "title": v["title"], "url": f"https://www.youtube.com/watch?v={v['id']}",
                                "duration_sec": v.get("duration", 0), "view_count": v.get("view_count", 0), "channel": v.get("uploader", ""), "transcript_status": st,
