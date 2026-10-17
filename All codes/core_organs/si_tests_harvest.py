@@ -15,6 +15,7 @@ si_tests_harvest -- tests for Checkpoint 3 (harvest/): the data pipeline that fe
   HV13 local recorder: containment grounding, change detection, a stand-in app driven into click / hotkey / type pairs in the video format
   HV14 captions through yt-dlp (paced, cookie-free, block = stop) + the local speech fallback
   HV15 keyframe pre-filter + normalized token-overlap target matcher
+  HV16 the slow YouTube loop (per-app harvest then pairs; target / deadline / audio-refusal stops)
   HV9  data-quality gates found on real footage: off-topic videos quarantined, loose verbs are not UI actions, audit + purge, one instruction labels one change
 """
 
@@ -968,7 +969,48 @@ def run_hv15() -> "TestOutcome":
     return _verdict(checks, f"matches={matches} flat={why_flat!r} skin={why_skin!r} pairs={rep['pairs']} prefiltered={rep['prefiltered']}")
 
 
-TESTS = [("HV1", run_hv1), ("HV2", run_hv2), ("HV3", run_hv3), ("HV4", run_hv4), ("HV5", run_hv5), ("HV6", run_hv6), ("HV7", run_hv7), ("HV8", run_hv8), ("HV9", run_hv9), ("HV10", run_hv10), ("HV11", run_hv11), ("HV12", run_hv12), ("HV13", run_hv13), ("HV14", run_hv14), ("HV15", run_hv15)]
+def run_hv16() -> "TestOutcome":
+    """HV16: the slow YouTube loop -- per app harvest then that app's pairs, short cool-off + local speech recognition + no cookies, stops at the target / the deadline / an audio refusal"""
+    from core_organs.harvest import free_master_harvester as M, pairs_batch as PB, youtube_loop as YL
+    real_h, real_p, real_u = M.run_harvester, PB.run_pairs_batch, YL._usable
+    calls, usable, block_on = [], {"n": 100}, {"app": ""}
+
+    def fake_h(**kw):
+        calls.append(("harvest", kw["only_apps"][0], kw["videos_per_app"], tuple(kw["block_cooldowns"]), kw["whisper_fallback"], sorted(kw)))
+        return {"stats": {"downloaded": 1}, "blocked": kw["only_apps"][0] == block_on["app"]}
+
+    def fake_p(rag, root, **kw):
+        calls.append(("pairs", kw["apps"]))
+        usable["n"] += 30
+        return {"attempted": 5, "pairs": 30, "grounded": 30}
+    M.run_harvester, PB.run_pairs_batch, YL._usable = fake_h, fake_p, lambda root: usable["n"]
+    try:
+        log = []
+        r_target = YL.run_loop(hours=1.0, target=190, videos_per_app=3, apps=["notepad", "slack", "vlc"], log=log.append)
+        first = list(calls[:3])
+        harvested = [c[1] for c in calls if c[0] == "harvest"]
+        calls.clear()
+        usable["n"] = 0
+        r_deadline = YL.run_loop(hours=0.0, target=10 ** 6, videos_per_app=3, apps=["notepad"], log=log.append)
+        n_deadline = len(calls)
+        calls.clear()
+        usable["n"] = 0
+        block_on["app"] = "Slack"
+        r_block = YL.run_loop(hours=1.0, target=10 ** 6, videos_per_app=3, apps=["notepad", "slack", "vlc"], log=log.append)
+        seq_block = [c[1] for c in calls if c[0] == "harvest"]
+        pairs_after_block = [c for c in calls if c[0] == "pairs"]
+    finally:
+        M.run_harvester, PB.run_pairs_batch, YL._usable = real_h, real_p, real_u
+    checks = {"stops_when_the_target_is_reached": r_target["stopped"] == "target reached" and r_target["rounds"][-1]["usable_now"] >= 190 and harvested == ["Notepad", "VLC Media Player", "Slack"][:len(harvested)],
+              "each_app_is_harvested_then_only_its_own_clips_become_pairs": [c[0] for c in first[:2]] == ["harvest", "pairs"] and first[1][1] == ["notepad"] and first[2][0] == "harvest" and first[2][1] == "VLC Media Player",
+              "a_short_cool_off_and_local_speech_recognition_no_cookies": first[0][3] == (60,) and first[0][4] is True and first[0][2] == 3 and not any("cookie" in k for k in first[0][5]),
+              "a_passed_deadline_does_nothing": r_deadline["stopped"] == "deadline" and n_deadline == 0,
+              "an_audio_refusal_stops_the_loop_after_that_apps_own_pairs": r_block["stopped"].startswith("blocked") and seq_block == ["Notepad", "VLC Media Player", "Slack"] and len(pairs_after_block) == 3,
+              "every_round_is_logged": len(log) >= 5}
+    return _verdict(checks, f"target={r_target['stopped']} harvested={harvested} deadline={r_deadline['stopped']} block={r_block['stopped']} seq={seq_block}")
+
+
+TESTS = [("HV1", run_hv1), ("HV2", run_hv2), ("HV3", run_hv3), ("HV4", run_hv4), ("HV5", run_hv5), ("HV6", run_hv6), ("HV7", run_hv7), ("HV8", run_hv8), ("HV9", run_hv9), ("HV10", run_hv10), ("HV11", run_hv11), ("HV12", run_hv12), ("HV13", run_hv13), ("HV14", run_hv14), ("HV15", run_hv15), ("HV16", run_hv16)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]

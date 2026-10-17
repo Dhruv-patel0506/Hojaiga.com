@@ -5,6 +5,7 @@
     ingest                                               everything harvested -> the RAG (idempotent)
     video       <video.mp4> <app_key> <video_id>         keyframes + SoM + training pairs for a local video file (no network)
     local       [--apps a,b] [--max-actions N] [--budget-s S] [--no-delta]   drive OWNED apps in the background and record pairs with UIA ground truth (no network)
+    loop        [--hours H] [--target N] [--videos V] [--apps a,b]   the slow YouTube route: per app, transcripts (local whisper when captions are refused) then clips -> pairs, until N usable pairs
     status                                               what exists on disk and in the RAG
 """
 from __future__ import annotations
@@ -22,6 +23,7 @@ def main(argv=None) -> int:
     sub.add_parser("ingest")
     v = sub.add_parser("video"); v.add_argument("path"); v.add_argument("app_key"); v.add_argument("video_id")
     lo = sub.add_parser("local"); lo.add_argument("--apps", default=""); lo.add_argument("--max-actions", type=int, default=30); lo.add_argument("--budget-s", type=float, default=600.0); lo.add_argument("--no-delta", action="store_true"); lo.add_argument("--nav", default=None, help="comma list: only these navigation entries"); lo.add_argument("--no-base", action="store_true"); lo.add_argument("--per-pass", type=int, default=0)
+    lp = sub.add_parser("loop"); lp.add_argument("--hours", type=float, default=4.0); lp.add_argument("--target", type=int, default=200); lp.add_argument("--videos", type=int, default=6); lp.add_argument("--apps", default="")
     sub.add_parser("status")
     args = ap.parse_args(argv)
     from . import free_master_harvester as M, free_hotkeys_and_macros_harvester as K, paths
@@ -40,6 +42,9 @@ def main(argv=None) -> int:
         frames = VP.extract_keyframes(args.path, f"{root}/frames/{args.video_id}", args.video_id)
         segs = json.load(open(f"{root}/transcripts_json/{args.app_key}__{args.video_id}.json", encoding="utf-8"))
         out = VE.explain_video(rag.get_rag(), args.app_key, args.video_id, segs, frames)
+    elif args.cmd == "loop":
+        from . import youtube_loop as YL
+        out = YL.run_loop(args.hours, args.target, args.videos, [x.strip() for x in args.apps.split(",") if x.strip()] or None, log=lambda s: print(s, flush=True))
     elif args.cmd == "local":
         from . import local_recorder as LR
         out = LR.run_local([x.strip() for x in args.apps.split(",") if x.strip()] or None, max_actions=args.max_actions, budget_s=args.budget_s, scan_delta=not args.no_delta,
