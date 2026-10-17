@@ -902,6 +902,13 @@ def run_hv14() -> "TestOutcome":
     net2 = M.Net(http_get=lambda u: WINGET_FIXTURE.encode("utf-8") if u == M.WINGET_CSV else None, search=lambda q, n: vids2, transcript=refused, whisper=speech, sleep=lambda x: waits.append(x))
     with _Dir() as r3:
         rep_w = M.run_harvester(max_apps=1, videos_per_app=3, net=net2, root=r3, delay_s=0, write_workbook=False, only_apps=["Notepad"], block_cooldowns=(600, 1200))
+    # the refusal first lands on a video whose title is off-topic: that is not a block, the run goes on to the next video
+    vids3 = [{"id": "x1", "title": "Cooking pasta", "duration": 600, "view_count": 9}, {"id": "x2", "title": "Notepad tips", "duration": 600, "view_count": 8}]
+    heard3 = []
+    net3 = M.Net(http_get=lambda u: WINGET_FIXTURE.encode("utf-8") if u == M.WINGET_CSV else None, search=lambda q, n: vids3, transcript=lambda v, l: (_ for _ in ()).throw(PermissionError("Blocked:429")),
+                 whisper=lambda v: (heard3.append(v), segs_ok)[1], sleep=lambda x: None)
+    with _Dir() as r4:
+        rep_o = M.run_harvester(max_apps=1, videos_per_app=2, net=net3, root=r4, delay_s=0, write_workbook=False, only_apps=["Notepad"], block_cooldowns=(60,))
     checks = {"rolling_auto_captions_merge_and_noise_is_dropped": [(s["text"], s["start"]) for s in parsed] == [("now click the File menu", 0.0), ("then press Ctrl+S", 12.0)],
               "captions_come_back_as_segments": [s["text"] for s in got] == [s["text"] for s in parsed],
               "paced_exactly_as_asked": seen_opts.get("sleep_interval_requests") == 1.5 and seen_opts.get("sleep_interval") == 2 and seen_opts.get("max_sleep_interval") == 5,
@@ -918,6 +925,7 @@ def run_hv14() -> "TestOutcome":
               "a_refusal_that_stays_stops_the_run_after_the_cool_offs": out["stays"] == (True, 0, 2, [600, 1200]),
               "captions_refused_for_good_means_local_speech_for_on_topic_videos": rep_w["stats"]["downloaded"] == 2 and rep_w["stats"]["via_whisper"] == 2 and heard_ids == ["w1", "w2"] and not rep_w["blocked"],
               "the_caption_endpoint_is_left_alone_after_that": cap_calls == ["w1", "w1", "w1"] and rep_w["stats"]["captions_down"] == 1 and rep_w["stats"]["cooldowns"] == 2,
+              "an_off_topic_title_hit_by_the_refusal_is_not_a_block": not rep_o["blocked"] and rep_o["stats"]["off_topic"] == 1 and heard3 == ["x2"] and rep_o["stats"]["downloaded"] == 1,
               "an_off_topic_title_costs_no_speech_recognition": "w3" not in heard_ids and rep_w["stats"]["off_topic"] == 1}
     return _verdict(checks, f"errs={errs} queries={list(queries)} cooloff={out}")
 

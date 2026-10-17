@@ -321,6 +321,8 @@ def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, ne
                 if on_topic(app["app_name"], v["title"]):
                     t = fetch_transcript(net, root, app["app_key"], v["id"], captions=False)
                     st = t["status"]                                           # a refusal of the AUDIO fetch as well is a block: the run stops below
+                else:
+                    t, st = {"status": "Off_Topic", "segments": 0, "path": ""}, "Off_Topic"      # not worth speech recognition, and NOT a block: the captions refusal says nothing about this video
             if st in ("Downloaded", "Cached"):
                 try:
                     body = " ".join(s.get("text", "") for s in json.load(open(t["path"], encoding="utf-8")))
