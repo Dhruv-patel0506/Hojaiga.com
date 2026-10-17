@@ -153,7 +153,7 @@ class OwnedApp:
             self.bg.lay_out()
             self.mode = self.bg.mode
             time.sleep(1.0)
-            if self._ready(15.0):
+            if self._ready(45.0):
                 return self
             last = f"the window never showed a usable interface (a splash screen; mode={self.mode})"
             self._close_window()

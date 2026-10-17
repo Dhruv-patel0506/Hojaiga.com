@@ -186,15 +186,24 @@ def app_tokens(app_name: str) -> List[str]:
     return toks or [t for t in re.findall(r"[a-z0-9]+", app_name.lower()) if len(t) > 1]
 
 
+_VARIANT = r"\s*(?:\+\+|\+|plus\b)"                                  # 'Notepad++', 'Notepad plus plus', 'Paint+' : a DIFFERENT program that merely starts with the same word
+
+
 def on_topic(app_name: str, title: str, transcript_text: str = "", min_mentions: int = 5) -> bool:
     """A tutorial is about the application if its TITLE names it, or the speaker names it at least `min_mentions` times. (A search for 'Windows Calculator shortcuts' also returns general Windows
-    shortcut videos; filing those under the calculator would put clipboard and virtual-desktop advice into the calculator's partition.)"""
+    shortcut videos; filing those under the calculator would put clipboard and virtual-desktop advice into the calculator's partition.) A lookalike does not count: 'Notepad++' is not Notepad
+    (found in QA of the first yt-dlp run: a Notepad++ video filed under notepad, its frames then taught the wrong interface)."""
     toks = app_tokens(app_name)
     low_t = (title or "").lower()
-    if any(re.search(rf"\b{re.escape(t)}", low_t) for t in toks):
+    own_variant = "+" in app_name or re.search(r"\bplus\b", app_name.lower())
+    if any(re.search(rf"\b{re.escape(t)}", low_t) and (own_variant or not re.search(rf"\b{re.escape(t)}{_VARIANT}", low_t)) for t in toks):
         return True
     text = (transcript_text or "").lower()
-    return sum(len(re.findall(rf"\b{re.escape(t)}", text)) for t in toks) >= min_mentions
+    plain = sum(len(re.findall(rf"\b{re.escape(t)}", text)) for t in toks)
+    variant = 0 if own_variant else sum(len(re.findall(rf"\b{re.escape(t)}{_VARIANT}", text)) for t in toks)
+    if variant and variant >= plain / 2:                                  # the speaker is mostly talking about the lookalike
+        return False
+    return plain >= min_mentions
 
 
 def pick_videos(found: List[Dict[str, Any]], per_app: int, min_s: int = 120, max_s: int = 3600) -> List[Dict[str, Any]]:
@@ -215,7 +224,8 @@ def transcript_path(root: str, app_key: str, video_id: str) -> str:
     return os.path.join(root, "transcripts_json", f"{app_key}__{video_id}.json")
 
 
-def fetch_transcript(net: Net, root: str, app_key: str, video_id: str, languages=("en", "en-US", "en-GB")) -> Dict[str, Any]:
+def fetch_transcript(net: Net, root: str, app_key: str, video_id: str, languages=("en", "en-US", "en-GB"), captions: bool = True) -> Dict[str, Any]:
+    """captions=False: do not ask the caption endpoint at all (it is refusing this address) -- go straight to local speech recognition."""
     path = transcript_path(root, app_key, video_id)
     if os.path.isfile(path):
         try:
@@ -224,6 +234,8 @@ def fetch_transcript(net: Net, root: str, app_key: str, video_id: str, languages
             n = 0
         return {"status": "Cached", "segments": n, "path": path}
     try:
+        if not captions:
+            raise TranscriptUnavailable("No_Subtitles")
         segs = net.transcript(video_id, list(languages))
     except PermissionError as exc:
         return {"status": f"Blocked:{exc}", "segments": 0, "path": ""}
@@ -253,7 +265,7 @@ def fetch_transcript(net: Net, root: str, app_key: str, video_id: str, languages
 # ---- the run --------------------------------------------------------------------------------------------------------------------------------------------
 def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, net: Optional[Net] = None, root: str = "", delay_s: float = 2.0, app_limit: int = 1000,
                   queries=("{app} tutorial step by step", "{app} how to use interface"), only_apps: Optional[List[str]] = None,
-                  write_workbook: bool = True, stop_on_block: bool = True, whisper_fallback: bool = True) -> Dict[str, Any]:
+                  write_workbook: bool = True, stop_on_block: bool = True, whisper_fallback: bool = True, block_cooldowns=(600, 1200), captions_down_s: float = 1800.0) -> Dict[str, Any]:
     """Harvest one batch: apps[start : start+max_apps]. Returns a report. Safe to re-run: finished apps are skipped, transcripts are cached, sheets are merged."""
     net = net or Net(whisper=_whisper if whisper_fallback else None)
     root = root or harvest_dir()[0]
@@ -270,8 +282,9 @@ def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, ne
         apps = [a for a in apps if a["app_name"].lower() in want or a["app_key"] in want]
     batch = apps[start:start + max_apps]
     video_rows: List[Dict[str, Any]] = []
-    stats = {"apps_processed": 0, "apps_skipped_done": 0, "videos": 0, "downloaded": 0, "cached": 0, "no_subtitles": 0, "other_language": 0, "off_topic": 0, "blocked": 0, "errors": 0, "via_whisper": 0}
+    stats = {"apps_processed": 0, "apps_skipped_done": 0, "videos": 0, "downloaded": 0, "cached": 0, "no_subtitles": 0, "other_language": 0, "off_topic": 0, "blocked": 0, "errors": 0, "via_whisper": 0, "cooldowns": 0, "captions_down": 0}
     blocked = False
+    captions_down_until = 0.0
     for app in batch:
         if app["app_key"] in state["done_apps"]:
             stats["apps_skipped_done"] += 1
@@ -285,8 +298,29 @@ def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, ne
                 video_rows.append({"app_name": app["app_name"], "app_key": app["app_key"], "video_id": "", "transcript_status": f"SearchError:{type(exc).__name__}"})
             net.sleep(delay_s)
         for v in pick_videos(found, videos_per_app):
-            t = fetch_transcript(net, root, app["app_key"], v["id"])
-            st = t["status"]
+            if net.whisper is not None and time.monotonic() < captions_down_until:
+                # the caption endpoint refused this address a moment ago and a cool-off did not clear it: do not ask again yet; the speaker's own words are recognised locally instead (only for a video
+                # whose TITLE names the app: CPU time is not spent on a video the on-topic gate would discard)
+                t = fetch_transcript(net, root, app["app_key"], v["id"], captions=False) if on_topic(app["app_name"], v["title"]) else {"status": "Off_Topic", "segments": 0, "path": ""}
+                st = t["status"]
+            else:
+                t = fetch_transcript(net, root, app["app_key"], v["id"])
+                st = t["status"]
+            for wait in block_cooldowns:
+                if time.monotonic() < captions_down_until and net.whisper is not None:
+                    break                           # a refusal is a rate limit, not a verdict: wait it out (longer each time) and ask again, politely; still refused = stop
+                if not st.startswith("Blocked"):
+                    break
+                stats["cooldowns"] += 1
+                net.sleep(wait)
+                t = fetch_transcript(net, root, app["app_key"], v["id"])
+                st = t["status"]
+            if st.startswith("Blocked") and net.whisper is not None and time.monotonic() >= captions_down_until:
+                captions_down_until = time.monotonic() + captions_down_s       # still refused after the cool-offs: stop asking the caption endpoint for a while
+                stats["captions_down"] += 1
+                if on_topic(app["app_name"], v["title"]):
+                    t = fetch_transcript(net, root, app["app_key"], v["id"], captions=False)
+                    st = t["status"]                                           # a refusal of the AUDIO fetch as well is a block: the run stops below
             if st in ("Downloaded", "Cached"):
                 try:
                     body = " ".join(s.get("text", "") for s in json.load(open(t["path"], encoding="utf-8")))

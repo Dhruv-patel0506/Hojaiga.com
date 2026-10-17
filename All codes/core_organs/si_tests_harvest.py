@@ -627,7 +627,14 @@ def run_hv11() -> "TestOutcome":
             rep_down = VE.explain_video(R, "app", "vidH", said, evs, out_jsonl=os.path.join(root, "h.jsonl"), root=root, som_fn=som, scan_delta=False, ingest=False, gate=h)
             rep_none = VE.explain_video(R, "app", "vidI", said, evs, out_jsonl=os.path.join(root, "i.jsonl"), root=root, som_fn=som, scan_delta=False, ingest=False, gate=None)
             none_rows = [json.loads(l) for l in open(os.path.join(root, "i.jsonl"), encoding="utf-8")]
-    checks = {"yes_means_ui_no_means_not": v_ui is True and v_no is False,
+        seq = iter(["8888", "YES"])                                            # degenerate tokens at the first size, a clean answer at another (measured on near-blank frames)
+        g_retry = UIFrameGate(url="http://x", cache_path="", post=lambda u, b, t: {"message": {"content": next(seq)}})
+        v_retry = g_retry.check(P("light"))
+        seq_bad = iter(["8888", "8888", "8888"])
+        g_bad = UIFrameGate(url="http://x", cache_path="", post=lambda u, b, t: {"message": {"content": next(seq_bad)}})
+        v_bad = g_bad.check(P("mid"))
+    checks = {"a_degenerate_answer_is_asked_again_at_another_size": v_retry[0] is True and g_retry.stats["asked"] == 2 and v_bad[0] is None and "unparseable" in v_bad[1] and g_bad.stats["asked"] == 3,
+              "yes_means_ui_no_means_not": v_ui is True and v_no is False,
               "an_unparseable_answer_is_unverified_not_a_guess": v_unparse is None and "unparseable" in why_unparse,
               "a_frame_is_judged_once": v_again is True and why_again == "cached" and calls_after_again == n_before,
               "the_cache_survives_a_restart": v_persist is False and why_persist == "cached",
@@ -841,6 +848,43 @@ def run_hv14() -> "TestOutcome":
         wh_file = os.path.isfile(M.transcript_path(root, "calc", "v2"))
     import inspect
     queries = inspect.signature(M.run_harvester).parameters["queries"].default
+    # a refusal is a rate limit: wait it out (longer each time), ask again; refused every time = stop
+    waits, calls = [], {"n": 0}
+    video = {"id": "v_cool", "title": "Notepad tutorial", "duration": 600, "view_count": 10}
+    segs_ok = [{"text": "in notepad click File then notepad Save, notepad is simple", "start": 1.0, "duration": 2.0}] * 6
+
+    def flaky(vid, langs):
+        calls["n"] += 1
+        if calls["n"] < 3:
+            raise PermissionError("Blocked:429")
+        return segs_ok
+
+    def always(vid, langs):
+        raise PermissionError("Blocked:429")
+    out = {}
+    for tag, fn in (("clears", flaky), ("stays", always)):
+        waits.clear()
+        calls["n"] = 0
+        net = M.Net(http_get=lambda u: WINGET_FIXTURE.encode("utf-8") if u == M.WINGET_CSV else None, search=lambda q, n: [video], transcript=fn, sleep=lambda x: waits.append(x))
+        with _Dir() as r2:
+            rep_c = M.run_harvester(max_apps=1, videos_per_app=1, net=net, root=r2, delay_s=0, write_workbook=False, only_apps=["Notepad"], block_cooldowns=(600, 1200))
+        out[tag] = (rep_c["blocked"], rep_c["stats"]["downloaded"], rep_c["stats"]["cooldowns"], [w for w in waits if w >= 600])
+    # captions refused for good: after the cool-offs the caption endpoint is left alone for a while and on-topic videos are recognised locally; an off-topic title is not worth CPU time
+    vids2 = [{"id": "w1", "title": "Notepad tutorial", "duration": 600, "view_count": 9}, {"id": "w2", "title": "Notepad tips", "duration": 600, "view_count": 8},
+             {"id": "w3", "title": "Cooking pasta", "duration": 600, "view_count": 7}]
+    cap_calls, heard_ids = [], []
+    waits.clear()
+
+    def refused(vid, langs):
+        cap_calls.append(vid)
+        raise PermissionError("Blocked:429")
+
+    def speech(vid):
+        heard_ids.append(vid)
+        return segs_ok
+    net2 = M.Net(http_get=lambda u: WINGET_FIXTURE.encode("utf-8") if u == M.WINGET_CSV else None, search=lambda q, n: vids2, transcript=refused, whisper=speech, sleep=lambda x: waits.append(x))
+    with _Dir() as r3:
+        rep_w = M.run_harvester(max_apps=1, videos_per_app=3, net=net2, root=r3, delay_s=0, write_workbook=False, only_apps=["Notepad"], block_cooldowns=(600, 1200))
     checks = {"rolling_auto_captions_merge_and_noise_is_dropped": [(s["text"], s["start"]) for s in parsed] == [("now click the File menu", 0.0), ("then press Ctrl+S", 12.0)],
               "captions_come_back_as_segments": [s["text"] for s in got] == [s["text"] for s in parsed],
               "paced_exactly_as_asked": seen_opts.get("sleep_interval_requests") == 1.5 and seen_opts.get("sleep_interval") == 2 and seen_opts.get("max_sleep_interval") == 5,
@@ -852,14 +896,19 @@ def run_hv14() -> "TestOutcome":
               "no_captions_falls_back_to_speech_recognition": wh["status"] == "Downloaded" and wh.get("via") == "whisper" and wh_file,
               "other_language_or_missing_video_never_triggers_it": other["status"].startswith("Other_Language") and gone["status"] == "Video_Unavailable",
               "a_block_during_the_fallback_is_a_block": blocked["status"].startswith("Blocked"),
-              "queries_favour_screencasts": list(queries) == ["{app} tutorial step by step", "{app} how to use interface"]}
-    return _verdict(checks, f"errs={errs} queries={list(queries)}")
+              "queries_favour_screencasts": list(queries) == ["{app} tutorial step by step", "{app} how to use interface"],
+              "a_refusal_that_clears_after_a_cool_off_is_harvested": out["clears"] == (False, 1, 2, [600, 1200]),
+              "a_refusal_that_stays_stops_the_run_after_the_cool_offs": out["stays"] == (True, 0, 2, [600, 1200]),
+              "captions_refused_for_good_means_local_speech_for_on_topic_videos": rep_w["stats"]["downloaded"] == 2 and rep_w["stats"]["via_whisper"] == 2 and heard_ids == ["w1", "w2"] and not rep_w["blocked"],
+              "the_caption_endpoint_is_left_alone_after_that": cap_calls == ["w1", "w1", "w1"] and rep_w["stats"]["captions_down"] == 1 and rep_w["stats"]["cooldowns"] == 2,
+              "an_off_topic_title_costs_no_speech_recognition": "w3" not in heard_ids and rep_w["stats"]["off_topic"] == 1}
+    return _verdict(checks, f"errs={errs} queries={list(queries)} cooloff={out}")
 
 
 def run_hv15() -> "TestOutcome":
     """HV15: the keyframe pre-filter (flat / skin-tone / face frames rejected before any OCR) and the normalized token-overlap target matcher"""
     from PIL import Image, ImageDraw
-    from core_organs.harvest import frame_prefilter as FP, video_explain as VE
+    from core_organs.harvest import frame_prefilter as FP, video_explain as VE, free_master_harvester as M2
     from si_tests_rag import _Env
     ui = Image.new("RGB", (800, 500), (245, 245, 245))
     d = ImageDraw.Draw(ui)
@@ -897,6 +946,8 @@ def run_hv15() -> "TestOutcome":
               "a_plural_and_a_missing_word_still_match": matches["setting"] == 4 and matches["change font size"] == 3 and matches["new tab"] == 5,
               "one_shared_word_never_carries_a_multiword_target": matches["share file"] is None and matches["open file menu"] is None,
               "a_one_word_target_matches_its_label": matches["file"] == 2,
+              "a_lookalike_program_is_not_the_app": not M2.on_topic("Notepad", "Notepad++ tutorial for beginners") and M2.on_topic("Notepad", "Windows Notepad tips") and M2.on_topic("Notepad++", "Notepad++ tutorial")
+                                                    and not M2.on_topic("Notepad", "Tips", " ".join(["notepad++"] * 6 + ["notepad"] * 2)) and M2.on_topic("Notepad", "Tips", " ".join(["notepad"] * 6)),
               "prefilter_runs_before_ocr_and_the_step_waits": rep["prefiltered"] == 1 and rep["pairs"] == 1 and len(seen_som) == 1 and "b_pre" in seen_som[0]}
     return _verdict(checks, f"matches={matches} flat={why_flat!r} skin={why_skin!r} pairs={rep['pairs']} prefiltered={rep['prefiltered']}")
 

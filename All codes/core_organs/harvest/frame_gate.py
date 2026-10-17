@@ -62,6 +62,7 @@ class UIFrameGate:
             im = Image.open(image).convert("RGB") if isinstance(image, (str, os.PathLike)) else image.convert("RGB")
         except Exception as exc:
             return False, f"unreadable image: {type(exc).__name__}"
+        im0 = im.copy()
         im.thumbnail((self.side, self.side))
         buf = io.BytesIO()
         im.save(buf, "JPEG", quality=85)
@@ -74,25 +75,40 @@ class UIFrameGate:
         if time.time() < self._down_until:
             self.stats["unverified"] += 1
             return None, "vision model unreachable (backing off)"
-        body = {"model": self.model, "stream": False, "keep_alive": self.keep_alive, "options": {"temperature": 0, "num_predict": 4},
-                "messages": [{"role": "user", "content": PROMPT, "images": [base64.b64encode(data).decode()]}]}
-        try:
-            if self._post:
-                resp = self._post(self.url + "/api/chat", body, self.timeout_s)
+        # MEASURED: on some frames qwen2.5vl:3b answers with degenerate tokens ('8888') at the standard size while the same picture, resized, gets a clean YES / NO. An unparseable answer is therefore
+        # asked again at two other sizes before the frame is called unverified.
+        ans, why = "", ""
+        for attempt, size in enumerate((self.side, 448, 896)):
+            if attempt:
+                alt = im0.copy()
+                alt.thumbnail((size, size))
+                bb = io.BytesIO()
+                alt.save(bb, "JPEG", quality=85)
+                payload = bb.getvalue()
             else:
-                import requests
-                r = requests.post(self.url + "/api/chat", json=body, timeout=self.timeout_s)
-                r.raise_for_status()
-                resp = r.json()
-            ans = str(resp["message"]["content"]).strip().upper()
-        except Exception as exc:
-            self._down_until = time.time() + 30.0
-            self.stats["unverified"] += 1
-            return None, f"vision model unreachable: {type(exc).__name__}"
-        self.stats["asked"] += 1
+                payload = data
+            body = {"model": self.model, "stream": False, "keep_alive": self.keep_alive, "options": {"temperature": 0, "num_predict": 4},
+                    "messages": [{"role": "user", "content": PROMPT, "images": [base64.b64encode(payload).decode()]}]}
+            try:
+                if self._post:
+                    resp = self._post(self.url + "/api/chat", body, self.timeout_s)
+                else:
+                    import requests
+                    r = requests.post(self.url + "/api/chat", json=body, timeout=self.timeout_s)
+                    r.raise_for_status()
+                    resp = r.json()
+                ans = str(resp["message"]["content"]).strip().upper()
+            except Exception as exc:
+                self._down_until = time.time() + 30.0
+                self.stats["unverified"] += 1
+                return None, f"vision model unreachable: {type(exc).__name__}"
+            self.stats["asked"] += 1
+            if ans.startswith("YES") or ans.startswith("NO"):
+                break
+            why = f"unparseable answer {ans[:20]!r}"
         if not (ans.startswith("YES") or ans.startswith("NO")):
             self.stats["unverified"] += 1
-            return None, f"unparseable answer {ans[:20]!r}"
+            return None, why
         verdict = ans.startswith("YES")
         with self._lock:
             self._cache[k] = verdict

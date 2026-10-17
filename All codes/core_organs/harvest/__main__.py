@@ -17,7 +17,7 @@ import sys
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="python -m core_organs.harvest")
     sub = ap.add_subparsers(dest="cmd", required=True)
-    a = sub.add_parser("apps"); a.add_argument("--max-apps", type=int, default=5); a.add_argument("--videos", type=int, default=2); a.add_argument("--start", type=int, default=0)
+    a = sub.add_parser("apps"); a.add_argument("--max-apps", type=int, default=5); a.add_argument("--videos", type=int, default=2); a.add_argument("--start", type=int, default=0); a.add_argument("--cooldowns", default="600,1200", help="seconds to wait (and re-ask) after a caption refusal, comma list"); a.add_argument("--no-whisper", action="store_true")
     h = sub.add_parser("hotkeys"); h.add_argument("--max-apps", type=int, default=5); h.add_argument("--no-scrape", action="store_true"); h.add_argument("--no-tldr", action="store_true"); h.add_argument("--model", action="store_true")
     sub.add_parser("ingest")
     v = sub.add_parser("video"); v.add_argument("path"); v.add_argument("app_key"); v.add_argument("video_id")
@@ -26,7 +26,7 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
     from . import free_master_harvester as M, free_hotkeys_and_macros_harvester as K, paths
     if args.cmd == "apps":
-        out = M.run_harvester(max_apps=args.max_apps, videos_per_app=args.videos, start=args.start)
+        out = M.run_harvester(max_apps=args.max_apps, videos_per_app=args.videos, start=args.start, block_cooldowns=tuple(float(x) for x in args.cooldowns.split(",") if x.strip()), whisper_fallback=not args.no_whisper)
     elif args.cmd == "hotkeys":
         out = K.run_hotkeys_and_macros_harvester(max_apps=args.max_apps, scrape=not args.no_scrape, tldr=not args.no_tldr, use_model=args.model)
     elif args.cmd == "ingest":
