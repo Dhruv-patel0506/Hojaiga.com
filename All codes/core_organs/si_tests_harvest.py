@@ -690,10 +690,11 @@ class _FakeCtl:
 class _FakeApp:
     """Stands in for OwnedApp: a window that draws its state, with named controls. 'Seven' / 'Plus' change the picture, 'Inert' does not, 'Delete' must never be touched."""
     mode = "fake"
-    LAYOUT = {"Seven": (10, 10, 100, 60), "Plus": (120, 10, 100, 60), "Inert": (230, 10, 100, 60), "Delete": (340, 10, 100, 60)}
+    LAYOUT = {"Seven": (10, 10, 100, 60), "Plus": (120, 10, 100, 60), "Inert": (230, 10, 100, 60), "Delete": (340, 10, 100, 60), "Menu": (10, 80, 100, 20)}
+    ITEMS = {"Item A": (10, 105, 100, 20), "Item B": (10, 130, 100, 20), "Delete item": (10, 155, 100, 20)}
 
     def __init__(self):
-        self.state, self.touched, self.typed, self.popups = 0, [], "", 0
+        self.state, self.touched, self.typed, self.popups, self.menu_open, self.layers, self.anchor = 0, [], "", 0, False, [], None
 
     def grab(self, popups=False, stable=True):
         from PIL import Image, ImageDraw
@@ -701,23 +702,36 @@ class _FakeApp:
         d = ImageDraw.Draw(im)
         for i, (n, b) in enumerate(self.LAYOUT.items()):
             d.rectangle([b[0], b[1], b[0] + b[2], b[1] + b[3]], fill=(90, 90, 90))
-        d.rectangle([10, 100, 10 + 20 * (self.state + len(self.typed)), 150], fill=(250, 250, 250))
+        d.rectangle([200, 100, 200 + 20 * (self.state + len(self.typed)), 150], fill=(250, 250, 250))
+        if self.menu_open and popups:
+            d.rectangle([10, 100, 112, 175], fill=(200, 200, 60))
+            self.layers = [{"hwnd": 1, "origin": (0, 0), "paste": (10, 100), "size": (102, 75)}]
+        else:
+            self.layers = []
         return im, (0, 0)
 
     def controls(self, origin, size):
-        return [{"key": f"ButtonControl|{n}", "name": n, "type": "ButtonControl", "box": b, "ctl": _FakeCtl(n)} for n, b in self.LAYOUT.items()]
+        out = [{"key": f"ButtonControl|{n}", "name": n, "type": "ButtonControl", "box": b, "ctl": _FakeCtl(n), "popup": False} for n, b in self.LAYOUT.items() if not (self.menu_open and n == "Inert")]
+        if self.menu_open:
+            out += [{"key": f"MenuItemControl|{n}", "name": n, "type": "MenuItemControl", "box": b, "ctl": _FakeCtl(n), "popup": True} for n, b in self.ITEMS.items()]
+        return out
 
     def act(self, ctl):
         self.touched.append(ctl.name)
         if ctl.name in ("Seven", "Plus"):
             self.state += 1
+        if ctl.name == "Menu":
+            self.menu_open = True
+        elif ctl.name in self.ITEMS:
+            self.menu_open = False
+            self.state += 2
         return "Invoke"
 
     def chord(self, combo):
         if combo == "ctrl+h":
             self.state += 2
         elif combo == "esc":
-            self.state = max(0, self.state - 1)
+            self.menu_open = False
         return True
 
     def type_text(self, text):
@@ -747,8 +761,9 @@ def run_hv13() -> "TestOutcome":
     ImageDraw.Draw(b_img).rectangle([20, 30, 49, 59], fill=(255, 255, 255))
     ok_ch, bbox = LR.changed(a_img, b_img)
     ok_same, _ = LR.changed(a_img, a_img.copy())
-    LR.APPS["fake"] = {"launch": "x", "modes": [], "chords": [("ctrl+h", "Open the history panel", "esc")], "type": "hello"}
-    fake_som = lambda image, region=None: {"elements": [{"id": i + 1, "label": n, "role": "button", "box": [b[0] + 30, b[1] + 20, 30, 20]} for i, (n, b) in enumerate(_FakeApp.LAYOUT.items())],
+    LR.APPS["fake"] = {"launch": "x", "modes": [], "chords": [("ctrl+h", "Open the history panel", "esc")], "type": "hello", "menus": ["Menu"]}
+    boxes = dict(_FakeApp.LAYOUT, **_FakeApp.ITEMS)
+    fake_som = lambda image, region=None: {"elements": [{"id": i + 1, "label": n, "role": "button", "box": [b[0] + 30, b[1] + b[3] // 2 - 5, 30, 10]} for i, (n, b) in enumerate(boxes.items())],
                                           "seconds": 0.0, "size": [460, 200], "tiers_used": [], "tiers_skipped": []}
     try:
         with _Dir() as root:
@@ -768,11 +783,12 @@ def run_hv13() -> "TestOutcome":
     checks = {"the_glyph_inside_a_key_is_its_element_and_a_label_beats_none": pick is not None and pick["id"] == 2,
               "nothing_inside_means_no_element": el_none is None,
               "change_detection_finds_the_region": ok_ch and bbox == (20, 30, 30, 30) and not ok_same,
-              "click_pairs_for_controls_that_changed_the_picture": sorted(by_goal) == sorted(["Click the Seven button", "Click the Plus button", "Open the history panel", "Type 'hello'"]) and len(clicks) == 4,          # two passes: empty page, then a page with text
+              "click_pairs_for_controls_that_changed_the_picture": sorted(by_goal) == sorted(["Click the Seven button", "Click the Plus button", "Click the Menu button", "Click the Item A menu item", "Click the Item B menu item", "Open the history panel", "Type 'hello'"]) and len(clicks) == 8,          # two passes: empty page, then a page with text
               "target_is_the_overlapping_element": seven.get("action") == "click" and seven.get("target_id") == 1,
               "hotkey_and_type_pairs": by_goal["Open the history panel"]["hotkey"] == "ctrl+h" and by_goal["Type 'hello'"]["text"] == "hello",
-              "unsafe_control_never_touched": "Delete" not in app.touched and rep["skipped_unsafe"] == 1,
-              "inert_control_is_not_a_pair": rep["no_change"] == 2 and app.touched.count("Inert") == 2,
+              "unsafe_control_never_touched": "Delete" not in app.touched and "Delete item" not in app.touched and rep["skipped_unsafe"] == 2,
+              "a_menu_is_opened_and_each_safe_item_in_it_is_a_pair": by_goal["Click the Item A menu item"]["action"] == "click" and by_goal["Click the Item B menu item"]["target_id"] is not None and "Item A" in app.touched and "Item B" in app.touched,
+              "inert_control_is_not_a_pair": rep["no_change"] == 4 and app.touched.count("Inert") >= 2,
               "rows_are_the_video_format_and_pass_the_training_validator": all(r["meta"]["ui_frames"] is True and r["meta"]["source"] == "local_uia" and r["meta"]["grounded"] for r in rows) and not any(validated),
               "a_rerun_adds_nothing": rep2["pairs"] == 0 and rep2["duplicates"] >= 1 and len(rows2) == len(rows),
               "popups_are_tidied_after_every_action": app.popups >= rep["actions"]}

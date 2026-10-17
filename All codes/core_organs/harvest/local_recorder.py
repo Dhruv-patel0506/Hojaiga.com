@@ -33,10 +33,12 @@ APPS: Dict[str, Dict[str, Any]] = {
                                                                                                     "Pressure Converter", "Angle Converter"], "home": "Standard Calculator"}, "type": None,
                    "chords": [("alt+2", "Switch the calculator to Scientific mode", "alt+1"), ("alt+4", "Switch the calculator to Programmer mode", "alt+1"),
                               ("alt+5", "Switch the calculator to Date calculation mode", "alt+1")]},
-    "notepad": {"launch": "notepad", "chords": [], "type": "Meeting notes for Monday"},
+    "notepad": {"launch": "notepad", "chords": [], "type": "Meeting notes for Monday", "menus": ["File", "Edit", "View"]},
     "clock": {"launch": "clock", "chords": [], "type": None},
-    "character_map": {"launch": "character map", "chords": [], "type": None},
-    "ms_paint": {"launch": "paint", "chords": [], "type": None, "stay": ["Show toolbar"]},
+    # `deny` (optional, per app) = words that make a control unsafe in THAT app on top of the global list. TRIED AND DROPPED on this machine: ODBC Data Sources (asks for elevation: never launched), XPS Viewer
+    # (an empty viewer has < 5 controls), System Information (its first page shows the machine name = the person's name). File Explorer, Command Prompt, Task Manager, 7-Zip and Office were NOT driven: they
+    # show or act on the person's own files and processes.
+    "ms_paint": {"launch": "paint", "chords": [], "type": None, "menus": ["File", "Edit", "View", "Show toolbar"]},
 }
 # MEASURED (Windows 11 Calculator / Notepad, parked): shortcuts posted as window messages reach an app only through its Alt accelerators -- Calculator's Alt+<n> modes switch, but F9, R, Ctrl+P, Delete and Esc
 # (Calculator) and Ctrl+F / Ctrl+H (Notepad) are delivered and ignored by the XAML input stack. Physical keystrokes are not allowed here, so those apps yield click and type pairs, and hotkey pairs only
@@ -44,10 +46,10 @@ APPS: Dict[str, Dict[str, Any]] = {
 
 # controls that leave the window, open a file dialog or change something outside the app
 DENY_RX = re.compile(r"\b(open|save|print|page setup|exit|close|quit|new|share|settings|feedback|help|about|import|export|upload|download|sign|account|extension|store|copilot|camera|scan|"
-                     r"recent|browse|email|send|delete|remove|erase|reset|clear history|license|privacy|update|window|sign(ed)?|log ?(in|out)|profile|hide|copy|cut|focus|spotify|microsoft to do)\b", re.I)
+                     r"recent|browse|email|send|delete|remove|erase|reset|clear history|license|privacy|update|window|sign(ed)?|log ?(in|out)|profile|hide|copy|cut|paste|focus|spotify|microsoft to do|bing|online|web)\b", re.I)
 CHROME_RX = re.compile(r"^(minimi[sz]e|maximi[sz]e|restore|close)\b|^system$", re.I)
-ACTIONABLE = ("ButtonControl", "MenuItemControl", "TabItemControl", "SplitButtonControl", "CheckBoxControl", "RadioButtonControl", "ListItemControl")
-NOUN = {"ButtonControl": "button", "MenuItemControl": "menu item", "TabItemControl": "tab", "SplitButtonControl": "button", "CheckBoxControl": "checkbox", "RadioButtonControl": "option", "ListItemControl": "item"}
+ACTIONABLE = ("ButtonControl", "MenuItemControl", "TabItemControl", "SplitButtonControl", "CheckBoxControl", "RadioButtonControl", "ListItemControl", "TreeItemControl")
+NOUN = {"ButtonControl": "button", "MenuItemControl": "menu item", "TabItemControl": "tab", "SplitButtonControl": "button", "CheckBoxControl": "checkbox", "RadioButtonControl": "option", "ListItemControl": "item", "TreeItemControl": "tree item"}
 
 
 def iou(a: Tuple[float, float, float, float], b: Tuple[float, float, float, float]) -> float:
@@ -140,7 +142,7 @@ class OwnedApp:
         self.guard = SPT.StateGuard(self.name, t.appid)
         self.guard.before()
         last = ""
-        for attempt in range(3):                                    # a UWP window parked off-screen sometimes never leaves its splash (measured: Calculator, Clock): end it and start over
+        for attempt in range(1):                                    # ONE attempt, 8 s wall clock: a window still on its splash screen is killed and the app skipped. A UWP window parked off-screen sometimes never leaves its splash (measured: Calculator, Clock): end it and start over
             info = LN.launch_owned(t, self.guard)
             self.hwnd = int(info.get("hwnd") or 0)
             self.notes = list(info.get("notes") or [])
@@ -153,7 +155,7 @@ class OwnedApp:
             self.bg.lay_out()
             self.mode = self.bg.mode
             time.sleep(1.0)
-            if self._ready(45.0):
+            if self._ready(8.0):
                 return self
             last = f"the window never showed a usable interface (a splash screen; mode={self.mode})"
             self._close_window()
@@ -214,11 +216,11 @@ class OwnedApp:
         while time.time() - t0 < timeout_s:
             with contextlib.suppress(Exception):
                 img, origin = self.grab(stable=False)
-                if img is not None and len([c for c in self.controls(origin, img.size) if not CHROME_RX.search(c["name"])]) >= 4:
+                if img is not None and len([c for c in self.controls(origin, img.size) if not CHROME_RX.search(c["name"])]) >= 5:
                     return True
-            if self.bg is not None and int(time.time() - t0) % 5 == 4:
+            if self.bg is not None and 2.5 < time.time() - t0 < 4.0:
                 with contextlib.suppress(Exception):
-                    self.bg.lay_out(settle_s=0.5)                   # re-nudge the 1-px sliver: a window that has not laid itself out yet often does after another one
+                    self.bg.lay_out(settle_s=0.4)                   # one nudge at ~3 s                   # re-nudge the 1-px sliver: a window that has not laid itself out yet often does after another one
             time.sleep(1.0)
         return False
 
@@ -239,48 +241,80 @@ class OwnedApp:
     # ---------------------------------------------------------------- reading
     def grab(self, popups: bool = False, stable: bool = True):
         """(PIL image, screen origin) of the window's own surface, or (None, None). stable: grab again until two pictures 0.25 s apart agree (a first frame can be half painted: Notepad's editor came back
-        black). popups: compose the app's open menus / flyouts / dialogs into the picture, as the person would see them."""
-        from core_organs import headless_input as hin
+        black). popups: compose the app's open menus / flyouts / dialogs into the picture. A menu of a PARKED window opens at the nearest real-screen position, so it is first moved off-screen
+        (background_window.keep_hidden), read from its own surface, and pasted under the control that opened it -- where the person would see it. Self.layers remembers where each one went."""
+        from core_organs import background_window as bw, headless_input as hin
         from core_organs.professor import capture as CAP
-        prev, fr = None, None
+        prev, out_origin = None, None
         for i in range(5 if stable else 1):
-            pops = hin.popup_windows(self.hwnd) if popups else []
-            fr = CAP.grab_composite(self.hwnd, pops) if pops else CAP.grab_window(self.hwnd, isolated=True)
-            if fr is None:
+            main = CAP.grab_window(self.hwnd, isolated=True)
+            if main is None:
                 return None, None
-            img = fr.image.convert("RGB")
+            img = main.image.convert("RGB")
+            self.layers = []
+            if popups:
+                with contextlib.suppress(Exception):
+                    bw.keep_hidden(self.hwnd)
+                for pw in hin.popup_windows(self.hwnd)[:4]:
+                    pf = CAP.grab_window(pw, isolated=True)
+                    if pf is None or pf.image.size[0] < 8 or pf.image.size[1] < 8:
+                        continue
+                    pimg = pf.image.convert("RGB")
+                    px, py = pf.origin[0] - main.origin[0], pf.origin[1] - main.origin[1]
+                    if not (0 <= px < img.width and 0 <= py < img.height):
+                        ax, ay, aw, ah = getattr(self, "anchor", None) or (0, 0, 0, 0)
+                        px, py = ax, ay + ah
+                    px = max(0, min(px, img.width - pimg.width))
+                    py = max(0, min(py, img.height - pimg.height))
+                    img.paste(pimg, (px, py))
+                    self.layers.append({"hwnd": pw, "origin": pf.origin, "paste": (px, py), "size": pimg.size})
+            out_origin = main.origin
             if prev is not None and prev.size == img.size and not changed(prev, img, threshold=12, min_px=20)[0]:
-                return img, fr.origin
+                return img, out_origin
             prev = img
             time.sleep(0.25)
-        return (prev, fr.origin) if prev is not None else (None, None)
+        return (prev, out_origin) if prev is not None else (None, None)
 
-    def controls(self, origin: Tuple[int, int], size: Tuple[int, int]) -> List[Dict[str, Any]]:
-        """Actionable controls now on screen: {key, name, type, box (image pixels), ctl}."""
+    def controls(self, origin: Tuple[int, int], size: Tuple[int, int], budget_s: float = 8.0) -> List[Dict[str, Any]]:
+        """Actionable controls now on screen: {key, name, type, box (image pixels), ctl, popup}. Controls inside a composed popup are mapped through where it was pasted. Wall-clock capped (a UIA
+        walk that has not finished in `budget_s` returns what it has: a hung app must not hang the recorder)."""
         import uiautomation as auto
         out, seen = [], set()
-        try:                                                   # a COMError mid-walk (a ribbon re-laying itself out) keeps what was read so far; the next pass reads again
-            root = auto.ControlFromHandle(self.hwnd)
-            for c, _depth in auto.WalkControl(root, maxDepth=9):
-                try:
-                    if c.ControlTypeName not in ACTIONABLE:
+        t_end = time.time() + budget_s
+        covered = [(l["paste"][0], l["paste"][1], l["size"][0], l["size"][1]) for l in getattr(self, "layers", [])]
+
+        def take(c, ox: int, oy: int, popup: bool) -> None:
+            if c.ControlTypeName not in ACTIONABLE:
+                return
+            name = (c.Name or "").strip()
+            r = c.BoundingRectangle
+            x, y, w, h = r.left - ox, r.top - oy, r.width(), r.height()
+            if not name or w < 8 or h < 8 or x < 0 or y < 0 or x + w > size[0] or y + h > size[1]:
+                return
+            if c.IsOffscreen or not c.IsEnabled:                      # a greyed-out key does nothing: no change, no pair
+                return
+            if not popup and any(cx <= x + w / 2 <= cx + cw and cy <= y + h / 2 <= cy + ch for cx, cy, cw, ch in covered):
+                return                                                # under a pasted menu: not reachable
+            key = (c.ControlTypeName, name, round(x / 4), round(y / 4))
+            if key in seen:
+                return
+            seen.add(key)
+            out.append({"key": f"{c.ControlTypeName}|{name}", "name": name, "type": c.ControlTypeName, "box": (x, y, w, h), "ctl": c, "popup": popup})
+
+        def walk(hwnd: int, ox: int, oy: int, popup: bool) -> None:
+            try:                                               # a COMError mid-walk (a ribbon re-laying itself out) keeps what was read so far; the next pass reads again
+                for c, _depth in auto.WalkControl(auto.ControlFromHandle(hwnd), maxDepth=9):
+                    if time.time() > t_end:
+                        return
+                    try:
+                        take(c, ox, oy, popup)
+                    except Exception:
                         continue
-                    name = (c.Name or "").strip()
-                    r = c.BoundingRectangle
-                    x, y, w, h = r.left - origin[0], r.top - origin[1], r.width(), r.height()
-                    if not name or w < 8 or h < 8 or x < 0 or y < 0 or x + w > size[0] or y + h > size[1]:
-                        continue
-                    if c.IsOffscreen or not c.IsEnabled:                  # a greyed-out key does nothing: no change, no pair
-                        continue
-                    key = (c.ControlTypeName, name, round(x / 4), round(y / 4))
-                    if key in seen:
-                        continue
-                    seen.add(key)
-                    out.append({"key": f"{c.ControlTypeName}|{name}", "name": name, "type": c.ControlTypeName, "box": (x, y, w, h), "ctl": c})
-                except Exception:
-                    continue
-        except Exception:
-            pass
+            except Exception:
+                pass
+        walk(self.hwnd, origin[0], origin[1], False)
+        for l in getattr(self, "layers", []):
+            walk(l["hwnd"], l["origin"][0] - l["paste"][0], l["origin"][1] - l["paste"][1], True)
         return out
 
     # ---------------------------------------------------------------- acting (UIA patterns / posted messages; never physical input)
@@ -376,6 +410,11 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
     from core_organs import safety_guard as SG
     spec = APPS[app_key]
     som_fn = som_fn or VP.som_of_frame
+    extra_deny = re.compile(spec["deny"], re.I) if spec.get("deny") else None
+
+    def unsafe(name: str) -> bool:
+        return (not SG.is_safe(name)) or bool(DENY_RX.search(name)) or _personal(name) or volatile(name) or bool(extra_deny and extra_deny.search(name))
+
     root = root or harvest_dir()[0]
     out_jsonl = out_jsonl or os.path.join(root, "training", "ui_training_dataset.jsonl")
     os.makedirs(os.path.dirname(out_jsonl), exist_ok=True)
@@ -392,7 +431,7 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
         n_frame = [0]
 
         def snap(tag: str):
-            return a.grab(popups=(tag == "post"))
+            return a.grab(popups=True)                                  # what is open (a menu, a dialog) is part of the picture, before and after
 
         def emit(pre, post, kind: str, goal: str, target_box, actions_fn, meta: Dict[str, Any]) -> bool:
             """Write one pair: SoM on the pre frame, the target by overlap, the delta from the pictures. Returns True when a row was kept."""
@@ -452,15 +491,16 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
             settle_and_tidy()
 
         # ---------------------------------------------------------------- clicks: every safe control, once each, in every mode the app has (a Scientific or Programmer layout is a different picture)
-        def click_control(c: Dict[str, Any], tidy: bool = True) -> bool:
+        def click_control(c: Dict[str, Any], tidy: bool = True, keep_open: bool = False) -> bool:
             """Operate one control through its UIA pattern; a pair when the picture changed. Returns True when it did."""
             rep["actions"] += 1
             pre, _origin = snap("pre")
+            a.anchor = c["box"]                                         # a menu this control opens is pasted just under it
             how = a.act(c["ctl"])
             if pre is None or not how:
                 rep["not_delivered"] += 1
                 return False
-            keep = c["name"] in spec.get("stay", ())                    # a control that REVEALS the rest of the interface (Paint's 'Show toolbar'): what it opened stays open
+            keep = keep_open or c["name"] in spec.get("stay", ())       # a control that REVEALS more interface (a menu header, Paint's 'Show toolbar'): what it opened stays open
             if keep:
                 time.sleep(settle_s + 0.6)
             else:
@@ -496,7 +536,7 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
                 for c in a.controls(origin, pre.size):
                     if c["key"] in done_keys or CHROME_RX.search(c["name"]):
                         continue
-                    if not SG.is_safe(c["name"]) or DENY_RX.search(c["name"]) or _personal(c["name"]) or volatile(c["name"]):
+                    if unsafe(c["name"]):
                         done_keys.add(c["key"])
                         rep["skipped_unsafe"] += 1
                         continue
@@ -519,6 +559,40 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
             it = find_control(item)
             return it is not None and click_control(it, tidy=False)
 
+        def menu_pass(opener: str, limit: int) -> None:
+            """Open a menu / flyout, click each safe item in it (re-opening the menu for the next one): the header, every item, and the dialog an item opens are all pairs."""
+            tried: set = set()
+            for _ in range(limit):
+                if time.time() - t0 >= budget_s:
+                    return
+                head = find_control(opener)
+                if head is None or head.get("popup"):
+                    return
+                if not click_control(head, tidy=False, keep_open=True):
+                    return
+                img, origin = snap("pre")
+                if img is None:
+                    return
+                items = [c for c in a.controls(origin, img.size) if c.get("popup") and c["key"] not in tried and not CHROME_RX.search(c["name"])]
+                pick = None
+                for c in items:
+                    if unsafe(c["name"]):
+                        tried.add(c["key"])
+                        rep["skipped_unsafe"] += 1
+                        continue
+                    pick = c
+                    break
+                if pick is None:
+                    a.chord("esc")
+                    settle_and_tidy()
+                    return
+                tried.add(pick["key"])
+                click_control(pick, tidy=False)
+                settle_and_tidy()                                       # an item that opened a dialog: closed again; a menu that stayed open: closed
+
+        for opener in spec.get("menus", []):
+            if time.time() - t0 < budget_s:
+                menu_pass(opener, max(3, max_actions // 2))
         nav = dict(spec["nav"]) if spec.get("nav") else None
         if nav and nav_items is not None:
             nav["items"] = list(nav_items)                              # a run can take a slice of the app's modes (one foreground run must stay under the tool's time limit)
