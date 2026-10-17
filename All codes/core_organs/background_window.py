@@ -347,7 +347,20 @@ def is_target_popup(h: int, target: int, pid: int = 0) -> bool:
         return False
     if _owner_chain_has(h, target):
         return True
-    return (pid or _pid(target)) == _pid(h) and cls in POPUP_CLASSES and cls != _cls(target)
+    same_pid = (pid or _pid(target)) == _pid(h)
+    if same_pid and cls in POPUP_CLASSES and cls != _cls(target):
+        return True
+    if same_pid and _u32.IsWindowVisible(h):
+        # a drop-down / context menu of a toolkit that does not set an owner (WinForms ToolStripDropDown, WPF popups): an UNOWNED, caption-less
+        # WS_POPUP tool-window or topmost window of the same process. Measured: such a menu opened at the top-left of the real screen because no rule matched it.
+        try:
+            style = _u32.GetWindowLongW(h, -16) & 0xFFFFFFFF
+            ex = _u32.GetWindowLongW(h, -20) & 0xFFFFFFFF
+            if (style & 0x80000000) and not (style & 0x00C00000) and (ex & 0x00000088) and not _u32.GetWindow(h, 4):
+                return True
+        except Exception:
+            pass
+    return False
 
 
 def target_popups(target: int, visible_only: bool = True) -> List[int]:
@@ -388,6 +401,7 @@ def user_idle_ms() -> int:
 
 
 CONCEAL_FLYOUTS = os.environ.get("HOJAIGA_CONCEAL_FLYOUTS", "1") != "0"
+PARK_SIZE: Optional[Tuple[int, int]] = None                      # None = the window's own size (small remembered ones are enlarged); set by a caller that wants a layout at a given size
 NOACTIVATE_PARKED = os.environ.get("HOJAIGA_PARK_NOACTIVATE", "0") == "1"
 
 
@@ -763,7 +777,9 @@ def enter(hwnd: int) -> Dict[str, Any]:
         orig = _placement(hwnd)
         rc = orig.rcNormalPosition
         w, h = rc.right - rc.left, rc.bottom - rc.top
-        if w < 640 or h < 420:
+        if PARK_SIZE:
+            w, h = PARK_SIZE                       # a requested layout size: one app, several layouts = several different pictures of the same controls
+        elif w < 640 or h < 420:
             # A parked window is laid out at ITS OWN size; a small remembered one (Notepad persisted 415x253) collapses toolbars
             # into menus and halves what a scan can see. Only the PARKED size changes: exit() puts the original placement back.
             w, h = 1100, 760

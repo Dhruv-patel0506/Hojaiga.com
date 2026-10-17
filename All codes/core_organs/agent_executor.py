@@ -37,6 +37,20 @@ def _norm_chord(c: Any) -> str:
     return re.sub(r"\s+", "", str(c or "")).lower()
 
 
+def som_from_controls(controls: Sequence[Dict[str, Any]], size: Tuple[int, int]) -> Dict[str, Any]:
+    """A Set-of-Marks built from the UI Automation tree alone (Layer 1 of the design): one numbered element per named control, boxes and labels exact, no OCR and no model. Used when the application exposes
+    enough of its tree; the OCR / icon scan stays the fallback for what UIA does not name."""
+    els, seen = [], set()
+    for c in controls:
+        x, y, w, h = c["box"]
+        key = (c["name"], round(x / 3), round(y / 3))
+        if key in seen or w < 4 or h < 4:
+            continue
+        seen.add(key)
+        els.append({"id": len(els) + 1, "label": c["name"], "role": str(c.get("type", "")).replace("Control", "").lower() or "control", "box": [int(x), int(y), int(w), int(h)]})
+    return {"elements": els, "seconds": 0.0, "size": list(size), "tiers_used": ["uia"], "tiers_skipped": []}
+
+
 def element_by_id(som: Dict[str, Any], tid: Any) -> Optional[Dict[str, Any]]:
     for e in som.get("elements", []):
         if e.get("id") == tid:
@@ -176,7 +190,7 @@ class Agent:
     def __init__(self, app_key: str, observe: Callable[[], Dict[str, Any]], ground: Callable[..., Tuple[Optional[Dict[str, Any]], str]], act: Optional[Callable[[Dict[str, Any], Dict[str, Any]], Tuple[bool, str]]] = None,
                  rag: Any = None, run_id: str = "", prefer_rag: bool = True, allow: Sequence[str] = (), settle_s: float = 0.6, verify: Optional[Callable[..., Tuple[bool, str]]] = None,
                  sleep: Callable[[float], None] = time.sleep, recover: Optional[Callable[..., Dict[str, Any]]] = None, assist: bool = True, max_attempts: int = 2, reuse_post: bool = True,
-                 reuse_max_age_s: float = 20.0):
+                 reuse_max_age_s: float = 20.0, tools: Sequence[Any] = (), uia_first: bool = False, observe_full: Optional[Callable[[], Dict[str, Any]]] = None):
         """`verify` = a custom (pre, post, src, dst) -> (worked, effect); without one the base test is 'the picture / state moved' and, where the app exposes UIA, the goal-aware rules (agent_verify).
         `recover(pre, post, verdict, names)` undoes a wrong effect (dismiss the dialog, restore the toggle) and returns {restored: bool, how}; without one a wrong effect is reported, not undone.
         `assist`: the UIA-name correction of the model's target. `reuse_post`: the screen seen after one step is the screen the next step starts from (one Set-of-Marks scan saved per step)."""
@@ -184,6 +198,8 @@ class Agent:
         self.run_id = run_id or f"agent-{int(time.time())}"
         self.prefer_rag, self.allow, self.settle_s, self.custom_verify, self.sleep = prefer_rag, tuple(allow), settle_s, verify, sleep
         self.recover, self.assist, self.max_attempts, self.reuse_post, self.reuse_max_age_s = recover, assist, max(1, int(max_attempts)), reuse_post, reuse_max_age_s
+        self.uia_first, self.observe_full, self._pre_override = uia_first, observe_full, None      # uia_first: a goal that names ONE control UIA lists is done through that control, with no model call and no OCR scan
+        self.tools = list(tools)                                  # tools take goals that are not one click (drawing: agent_artist.ArtistTools); each has matches(goal) and run(goal) -> StepRecord
         self.history: List[StepRecord] = []
         self._last_post: Optional[Tuple[Dict[str, Any], float]] = None
 
@@ -209,7 +225,29 @@ class Agent:
             pass
         return ""
 
+    def _uia_route(self, goal: str, pre: Dict[str, Any], exclude: Sequence[int]) -> Optional[Dict[str, Any]]:
+        """The control a goal names, when exactly one control UIA lists carries that name: a click on the Set-of-Marks element inside it."""
+        gname = AV.explicit_name(goal)
+        controls = pre.get("controls") or []
+        if not gname or not controls:
+            return None
+        named = [c for c in controls if AV.name_match(gname, c["name"])]
+        if len(named) != 1:
+            return None
+        from core_organs.harvest.local_recorder import element_at
+        el = element_at(pre["som"], named[0]["box"])
+        if el is None or el.get("id") in set(exclude):
+            return None
+        return {"step": 1, "action": "click", "target_id": el["id"], "hotkey": None, "text": None, "verify_expectation": "the screen changes"}
+
     def _decide(self, goal: str, pre: Dict[str, Any], ret: Any, exclude: Sequence[int] = ()) -> Tuple[Optional[Dict[str, Any]], str, str]:
+        if self.uia_first:
+            act_ = self._uia_route(goal, pre, exclude)
+            if act_ is not None:
+                return act_, "uia", f"UIA name '{AV.explicit_name(goal)}'"
+            if self.observe_full is not None and "uia" in (pre["som"].get("tiers_used") or []):
+                pre = self.observe_full()                      # the tree could not answer: the full scan (OCR + icons) is what the model was trained on
+                self._pre_override = pre
         chord = self._rag_hotkey(ret) if self.prefer_rag else ""
         if chord:
             return {"step": 1, "action": "hotkey", "target_id": None, "hotkey": chord, "text": None, "verify_expectation": "the screen changes"}, "rag", f"RAG fast path: {chord}"
@@ -287,6 +325,15 @@ class Agent:
         return names + ["Cancel", "No"]
 
     def step(self, goal: str) -> StepRecord:
+        for tool in self.tools:
+            try:
+                hit = tool.matches(goal)
+            except Exception:
+                hit = False
+            if hit:
+                rec = tool.run(goal)
+                self.history.append(rec)
+                return rec
         t_all = time.perf_counter()
         tm: Dict[str, float] = {}
 
@@ -320,6 +367,8 @@ class Agent:
             timed("retrieve", t0)
             t0 = time.perf_counter()
             action, source, reply = self._decide(goal, pre, ret, exclude)
+            if self._pre_override is not None:
+                pre, self._pre_override = self._pre_override, None
             timed("ground", t0)
             note = ""
             if source == "model":
@@ -464,6 +513,26 @@ class LiveSession:
 
     def __exit__(self, *exc) -> bool:
         return self.app.__exit__(*exc)
+
+    def observe_lite(self, min_controls: int = 8) -> Dict[str, Any]:
+        """The cheap observation: the picture and the UIA tree; the Set-of-Marks comes from the tree (no OCR). Falls back to the full scan when the app names fewer than `min_controls` controls."""
+        self._repark()
+        img, origin = None, (0, 0)
+        for _ in range(3):
+            img, origin = self.app.grab(popups=True, stable=False)
+            if img is not None:
+                break
+            time.sleep(0.5)
+        if img is None:
+            raise RuntimeError("no picture of the window")
+        self.origin, self.size = origin, img.size
+        try:
+            controls = [{"name": c["name"], "type": c["type"], "box": c["box"], "toggle": self._toggle(c["ctl"]), "ctl": c["ctl"]} for c in self.app.controls(origin, img.size)]
+        except Exception:
+            controls = []
+        if len(controls) < min_controls:
+            return self.observe()
+        return {"image": img, "som": som_from_controls(controls, img.size), "controls": controls}
 
     def observe(self) -> Dict[str, Any]:
         from core_organs.harvest import video_pipeline as VP

@@ -743,6 +743,9 @@ class TouchRoute:
                     if w > 0:
                         time.sleep(w)
                     x, y = int(round(e.x + ox)), int(round(e.y + oy))
+            gl, gt, gr, gb = window_rect(self.top)
+            cursor0 = cursor_pos()
+            person_moved = False
                     if e.kind == "down":
                         ok_all &= pi.frame(x, y, "down")
                         down = True
@@ -752,7 +755,14 @@ class TouchRoute:
                         ok_all &= pi.frame(x, y, "up")
                         down = False
                 if down:
-                    pi.frame(int(round(script_points(script)[-1][0] + ox)), int(round(script_points(script)[-1][1] + oy)), "up")
+                    last = script_points(script)[-1]
+                    pi.frame(int(round(last[0] + ox)), int(round(last[1] + oy)), "up")        # the contact is always lifted before the window goes back
+            if person_moved:
+                return Delivery(False, "the person is using the mouse / keyboard right now: the ghost window was withdrawn the moment their cursor moved")
+                    cur = cursor_pos()                                           # synthetic touch never moves the cursor (measured): if it moved, it is the PERSON -- they win, at once
+                    if cur != cursor0 and (gl <= cur[0] <= gr and gt <= cur[1] <= gb):
+                        person_moved = True
+                        break
             time.sleep(0.15)
         return Delivery(ok_all, "synthetic touch on a ghost window")
 

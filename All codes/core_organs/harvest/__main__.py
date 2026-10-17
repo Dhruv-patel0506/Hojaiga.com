@@ -22,7 +22,7 @@ def main(argv=None) -> int:
     h = sub.add_parser("hotkeys"); h.add_argument("--max-apps", type=int, default=5); h.add_argument("--no-scrape", action="store_true"); h.add_argument("--no-tldr", action="store_true"); h.add_argument("--model", action="store_true")
     sub.add_parser("ingest")
     v = sub.add_parser("video"); v.add_argument("path"); v.add_argument("app_key"); v.add_argument("video_id")
-    lo = sub.add_parser("local"); lo.add_argument("--apps", default=""); lo.add_argument("--max-actions", type=int, default=30); lo.add_argument("--budget-s", type=float, default=600.0); lo.add_argument("--no-delta", action="store_true"); lo.add_argument("--nav", default=None, help="comma list: only these navigation entries"); lo.add_argument("--no-base", action="store_true"); lo.add_argument("--per-pass", type=int, default=0)
+    lo = sub.add_parser("local"); lo.add_argument("--apps", default=""); lo.add_argument("--max-actions", type=int, default=30); lo.add_argument("--budget-s", type=float, default=600.0); lo.add_argument("--no-delta", action="store_true"); lo.add_argument("--nav", default=None, help="comma list: only these navigation entries"); lo.add_argument("--no-base", action="store_true"); lo.add_argument("--per-pass", type=int, default=0); lo.add_argument("--sizes", default="", help="comma list of WxH window sizes to lay each app out at, e.g. 900x640,1100x760,1400x900")
     lp = sub.add_parser("loop"); lp.add_argument("--hours", type=float, default=4.0); lp.add_argument("--target", type=int, default=200); lp.add_argument("--videos", type=int, default=6); lp.add_argument("--apps", default=""); lp.add_argument("--whisper", action="store_true", help="transcribe locally when captions are refused (slow)")
     sub.add_parser("status")
     args = ap.parse_args(argv)
@@ -48,7 +48,8 @@ def main(argv=None) -> int:
     elif args.cmd == "local":
         from . import local_recorder as LR
         out = LR.run_local([x.strip() for x in args.apps.split(",") if x.strip()] or None, max_actions=args.max_actions, budget_s=args.budget_s, scan_delta=not args.no_delta,
-                           nav_items=[x.strip() for x in args.nav.split(",") if x.strip()] if args.nav is not None else None, base_pass=not args.no_base, per_pass_actions=args.per_pass)
+                           nav_items=[x.strip() for x in args.nav.split(",") if x.strip()] if args.nav is not None else None, base_pass=not args.no_base, per_pass_actions=args.per_pass,
+                           sizes=[tuple(int(v) for v in z.lower().split("x")) for z in args.sizes.split(",") if "x" in z] or None)
     else:
         d, deg = paths.harvest_dir(False)
         import os

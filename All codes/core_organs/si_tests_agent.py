@@ -368,7 +368,7 @@ def run_ex9() -> "TestOutcome":
     checks = {"seen_means_in_the_training_split_of_local_pairs_only": names == {"evalapp": {"Alpha", "Beta"}},
               "only_safe_controls_are_asked": asked == ["Click the Alpha button", "Click the Beta button", "Click the Gamma button"],
               "the_answer_is_the_element_inside_the_control": [r["gt"] for r in res["rows"]] == [1, 2, 3],
-              "seen_and_unseen_are_scored_apart": sm["seen"] == {"n": 2, "exact": 1.0, "lexical_baseline": 1.0, "valid": 1.0, "chance": sm["seen"]["chance"]} and sm["unseen"]["n"] == 1 and sm["unseen"]["exact"] == 0.0,
+              "seen_and_unseen_are_scored_apart": {k: sm["seen"][k] for k in ("n", "exact", "lexical_baseline", "valid")} == {"n": 2, "exact": 1.0, "lexical_baseline": 1.0, "valid": 1.0} and sm["unseen"]["n"] == 1 and sm["unseen"]["exact"] == 0.0 and sm["unseen"]["assisted_exact"] == 1.0,
               "the_lexical_baseline_is_independent_of_the_model": sm["all"]["lexical_baseline"] == 1.0 and sm["all"]["exact"] == round(2 / 3, 3),
               "chance_is_one_over_the_elements": abs(sm["all"]["chance"] - 1 / 6) < 0.001}
     return _verdict(checks, f"summary={sm}")

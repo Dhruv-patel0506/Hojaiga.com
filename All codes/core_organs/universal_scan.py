@@ -454,7 +454,10 @@ def close_window(hwnd: int, timeout_s: float = 6.0, discard_unsaved: bool = Fals
             if discard_unsaved and not tried and time.time() > end - timeout_s / 3 + 0.8:
                 tried = True
                 try:
-                    _discard_unsaved(hwnd)
+                    import threading
+                    th = threading.Thread(target=_discard_unsaved, args=(hwnd,), daemon=True)      # MEASURED (OBS): a UIA snapshot of a heavy window can run for minutes and does not honour its timeout; the close must not wait for it
+                    th.start()
+                    th.join(3.0)
                 except Exception:
                     pass
             time.sleep(0.1)

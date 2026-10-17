@@ -24,6 +24,7 @@ import sys
 import time
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
+from . import child_windows as CW
 from .paths import harvest_dir
 
 # What may be exercised per application. `chords` = (keys, what it does, keys that undo it). Everything here was chosen because it is local, reversible and opens nothing outside the window.
@@ -35,6 +36,7 @@ APPS: Dict[str, Dict[str, Any]] = {
                               ("alt+5", "Switch the calculator to Date calculation mode", "alt+1")]},
     "notepad": {"launch": "notepad", "chords": [], "type": "Meeting notes for Monday", "menus": ["File", "Edit", "View"]},
     "clock": {"launch": "clock", "chords": [], "type": None},
+    "sticky_notes": {"launch": "Sticky Notes", "chords": [], "type": None},
     # `deny` (optional, per app) = words that make a control unsafe in THAT app on top of the global list. TRIED AND DROPPED on this machine: ODBC Data Sources (asks for elevation: never launched), XPS Viewer
     # (an empty viewer has < 5 controls), System Information (its first page shows the machine name = the person's name). File Explorer, Command Prompt, Task Manager, 7-Zip and Office were NOT driven: they
     # show or act on the person's own files and processes.
@@ -46,7 +48,11 @@ APPS: Dict[str, Dict[str, Any]] = {
 
 # controls that leave the window, open a file dialog or change something outside the app
 DENY_RX = re.compile(r"\b(open|save|print|page setup|exit|close|quit|new|share|settings|feedback|help|about|import|export|upload|download|sign|account|extension|store|copilot|camera|scan|"
-                     r"recent|browse|email|send|delete|remove|erase|reset|clear history|license|privacy|update|window|sign(ed)?|log ?(in|out)|profile|hide|copy|cut|paste|focus|spotify|microsoft to do|bing|online|web)\b", re.I)
+                     r"recent|browse|email|send|delete|remove|erase|reset|clear history|license|privacy|update|window|sign(ed)?|log ?(in|out)|profile|hide|copy|cut|paste|focus|spotify|microsoft to do|bing|online|web|"
+                     # MEASURED (OBS Studio): a scanner clicked 'Start Streaming' and 'Start Recording' because nothing here knew those words; only OBS's own 'No Sources' dialog stopped them. Anything that starts, stops,
+                     # broadcasts, publishes, installs, connects or erases something is never operated by a learner.
+                     r"start|stop|record(ing)?|stream(ing)?|broadcast|go live|publish|virtual camera|begin|run|execute|install|deploy|flash|burn|format|wipe|shutdown|restart|power|connect|pair|"
+                     r"post|tweet|submit|buy|purchase|subscribe|join|invite|mic(rophone)?)\b", re.I)
 CHROME_RX = re.compile(r"^(minimi[sz]e|maximi[sz]e|restore|close)\b|^system$", re.I)
 ACTIONABLE = ("ButtonControl", "MenuItemControl", "TabItemControl", "SplitButtonControl", "CheckBoxControl", "RadioButtonControl", "ListItemControl", "TreeItemControl")
 NOUN = {"ButtonControl": "button", "MenuItemControl": "menu item", "TabItemControl": "tab", "SplitButtonControl": "button", "CheckBoxControl": "checkbox", "RadioButtonControl": "option", "ListItemControl": "item", "TreeItemControl": "tree item"}
@@ -122,6 +128,8 @@ def changed(before, after, threshold: int = 24, min_px: int = 60) -> Tuple[bool,
 
 
 class OwnedApp:
+    VISIBLE_FALLBACK = False                                        # when the quiet start fails: open the app normally, wait for its interface, then park it and hand the focus back (a brief visible start)
+    READY_S = 8.0                                                    # how long a freshly started window gets to show a usable interface (a cold UWP / Electron start can need much longer)
     """An owned, parked instance: `with OwnedApp('calculator') as app:` -> app.hwnd, app.grab(), app.controls(), app.act(), app.chord(), app.type()."""
 
     def __init__(self, launch_name: str):
@@ -138,6 +146,8 @@ class OwnedApp:
         from core_organs import background_window as bw, headless_input as hin
         from core_organs.professor import launcher as LN, state_protect as SPT
         hin.ensure_input_desktop()
+        from core_organs import owned_guard as OG
+        OG.reap_orphans()                                           # an app a dead run left behind is ended (by PID) before a new one starts
         t = LN.resolve(self.name)
         self.guard = SPT.StateGuard(self.name, t.appid)
         self.guard.before()
@@ -145,24 +155,146 @@ class OwnedApp:
         for attempt in range(1):                                    # ONE attempt, 8 s wall clock: a window still on its splash screen is killed and the app skipped. A UWP window parked off-screen sometimes never leaves its splash (measured: Calculator, Clock): end it and start over
             info = LN.launch_owned(t, self.guard)
             self.hwnd = int(info.get("hwnd") or 0)
+            self.info = info                                        # kept: a browser's DevTools port (info['cdp_port']) is how a page is navigated
             self.notes = list(info.get("notes") or [])
             if not (info.get("launched") and self.hwnd):
                 last = f"could not start: {info.get('trace') or self.notes}"
                 print(f"[local_recorder] {self.name}: attempt {attempt + 1} did not start: {last[:300]}", file=sys.stderr, flush=True)
                 continue
+            with contextlib.suppress(Exception):
+                import ctypes
+                _pid = ctypes.c_ulong()
+                ctypes.windll.user32.GetWindowThreadProcessId(self.hwnd, ctypes.byref(_pid))
+                self.owned_pid = int(_pid.value)
+                self.owned_bind = OG.bind(self.owned_pid, self.name)   # dies with this process, however this process ends
             self.bg = bw.BackgroundSession(self.hwnd)
             self.bg.__enter__()
             self.bg.lay_out()
             self.mode = self.bg.mode
             time.sleep(1.0)
-            if self._ready(8.0):
+            if self._ready(self.READY_S):
+                return self
+            if self._start_dialog():                                # the first window was a start-up question ('launch in safe mode?', 'restore the session?'): answered safely, the real window adopted
                 return self
             last = f"the window never showed a usable interface (a splash screen; mode={self.mode})"
             self._close_window()
             restarted = self._restart_idle_frame_host()
             print(f"[local_recorder] {self.name}: attempt {attempt + 1} stayed on its splash screen; frame host restarted={restarted}", file=sys.stderr, flush=True)
+        if self.VISIBLE_FALLBACK and not getattr(t, "chromium", ""):
+            if self._visible_start(t):
+                return self
+            last += " | the visible start did not produce a usable window either"
         self.__exit__(None, None, None)
         raise RuntimeError(f"{self.name}: {last}")
+
+    # in order of preference: carry on normally first, then decline, then dismiss. Never Yes / OK / Accept / Sign in / Continue (they confirm something), never a 'safe mode' (it changes what is scanned).
+    START_DIALOG_ANSWERS = ("run in normal mode", "launch normally", "start normally", "normal mode", "no", "not now", "skip", "later", "maybe later", "don't save", "cancel", "dismiss", "close")
+
+    def _start_dialog(self) -> bool:
+        """A freshly started app that stops at a small dialog (OBS after a crash: 'launch in safe mode?') is not on a splash screen, it is asking something. Only a SAFE answer is ever pressed (No / Not now /
+        Skip / Later / Cancel / Close: never Yes / OK / Accept / Sign in); then the app's own main window is looked for and adopted exactly like a normal start."""
+        import ctypes
+        import uiautomation as auto
+        from core_organs import background_window as bw, headless_input as hin, universal_scan as us
+        if not self.hwnd or not hin.is_alive(self.hwnd):
+            return False
+        old = self.hwnd
+        pid = hin.window_pid(old)
+        btn = None
+        n = 0
+        t_end = time.time() + 4.0
+        with contextlib.suppress(Exception):
+            for c, _d in auto.WalkControl(auto.ControlFromHandle(old), maxDepth=8):
+                n += 1
+                if n > 150 or time.time() > t_end:
+                    break
+                if c.ControlTypeName == "ButtonControl" and (c.Name or "").strip().lower() in self.START_DIALOG_ANSWERS:
+                    rank = self.START_DIALOG_ANSWERS.index((c.Name or "").strip().lower())
+                    if btn is None or rank < btn[0]:
+                        btn = (rank, c)
+        if btn is None:
+            return False
+        label = (btn[1].Name or "").strip()                         # read BEFORE pressing: the button is gone afterwards
+        how = self.act(btn[1])
+        self.notes.append(f"start-up dialog answered: {label!r} ({how or 'no pattern'})")
+        t0 = time.time()
+        while time.time() - t0 < 25.0:
+            time.sleep(1.0)
+            for h, (p, cls, title) in us._top_windows().items():
+                if p != pid or h == old or not title:
+                    continue
+                self.hwnd = h
+                if self.bg is not None:
+                    with contextlib.suppress(Exception):
+                        self.bg.__exit__(None, None, None)
+                self.bg = bw.BackgroundSession(h)
+                self.bg.__enter__()
+                self.bg.lay_out()
+                self.mode = self.bg.mode
+                time.sleep(1.0)
+                if self._ready(self.READY_S):
+                    return True
+        self.hwnd = old
+        return False
+
+    def _visible_start(self, t: Any, timeout_s: float = 45.0) -> bool:
+        """The 'search it and open it' route: the app is started the way the Start menu starts it (shell:AppsFolder for a packaged app, the program for a classic one) WITHOUT being minimized -- a minimized
+        packaged app never draws its interface (MEASURED: it stays on its splash screen). Once its window shows >= 5 controls it is parked off-screen like any owned app and the focus goes back to what the person
+        was using. The person may see the window for a few seconds."""
+        import subprocess
+        from core_organs import background_window as bw, headless_input as hin, universal_scan as us
+        before = us._top_windows()
+        fg0 = bw.last_user_window() or us._u32.GetForegroundWindow()
+        try:
+            if t.exe and not t.packaged and os.path.isfile(t.exe):
+                subprocess.Popen([t.exe], cwd=os.path.dirname(t.exe))
+            elif t.appid:
+                subprocess.Popen(["explorer.exe", f"shell:AppsFolder\\{t.appid}"], creationflags=0x08000000)
+            else:
+                return False
+        except Exception as exc:
+            self.notes.append(f"visible start failed: {type(exc).__name__}")
+            return False
+        t0 = time.time()
+        while time.time() - t0 < timeout_s:
+            now = us._top_windows()
+            for h, (pid, cls, title) in now.items():
+                if not title or cls in ("Windows.UI.Core.CoreWindow",):
+                    continue
+                leftover = h in before and bool(us._u32.IsIconic(h)) and (title.lower() == (t.display or self.name).lower() or title.lower() == self.name.lower())
+                if h in before and not leftover:                         # a window that was there before and is on screen may be the PERSON'S own: never adopted. A minimized one with this app's name is what our own failed quiet start left behind.
+                    continue
+                if leftover:
+                    us._u32.ShowWindow(h, 4)                             # SW_SHOWNOACTIVATE: a minimized packaged window never draws
+                self.hwnd = h
+                self.bg = None
+                with contextlib.suppress(Exception):
+                    img, origin = self.grab(stable=False)
+                    if os.environ.get("HOJAIGA_DEBUG_LAUNCH"):
+                        print(f"[visible_start] {h} {cls!r} {title!r} img={img.size if img is not None else None} controls={len(self.controls(origin, img.size)) if img is not None else 0}", file=sys.stderr, flush=True)
+                    if img is not None and len([c for c in self.controls(origin, img.size) if not CHROME_RX.search(c["name"])]) >= 2:         # a narrow window collapses its navigation; once parked at the owned size it shows the rest
+                        with contextlib.suppress(Exception):
+                            import ctypes
+                            _pid = ctypes.c_ulong()
+                            ctypes.windll.user32.GetWindowThreadProcessId(h, ctypes.byref(_pid))
+                            from core_organs import owned_guard as OG
+                            self.owned_pid = int(_pid.value)
+                            self.owned_bind = OG.bind(self.owned_pid, self.name)
+                        self.bg = bw.BackgroundSession(h)
+                        self.bg.__enter__()                                # parked: off-screen, with its 1-px sliver so it keeps drawing
+                        self.bg.lay_out()
+                        self.mode = self.bg.mode
+                        with contextlib.suppress(Exception):
+                            if fg0 and us._u32.GetForegroundWindow() != fg0:
+                                hin._hand_back_focus(int(fg0))
+                        time.sleep(1.0)
+                        if not self._ready(self.READY_S):
+                            return False
+                        self.notes.append("started visibly, then parked")
+                        return True
+            time.sleep(0.5)
+        self.hwnd = 0
+        return False
 
     @staticmethod
     def _restart_idle_frame_host() -> bool:
@@ -233,6 +365,10 @@ class OwnedApp:
                 from core_organs.atlas import scanner as SC
                 SC.close_owned(self.hwnd)
                 time.sleep(1.2)
+        with contextlib.suppress(Exception):
+            from core_organs import owned_guard as OG
+            if getattr(self, "owned_pid", 0):
+                OG.release(self.owned_pid)
         with contextlib.suppress(Exception):
             if self.guard is not None:
                 self.guard.after()
@@ -321,18 +457,34 @@ class OwnedApp:
     @staticmethod
     def act(ctl) -> str:
         """Operate one control the way its own pattern says. Returns the pattern used, '' when none worked."""
+        import threading
         import uiautomation as auto
-        for pid, meth in ((auto.PatternId.InvokePattern, "Invoke"), (auto.PatternId.SelectionItemPattern, "Select"), (auto.PatternId.TogglePattern, "Toggle"),
-                          (auto.PatternId.ExpandCollapsePattern, "Expand")):
+        out = {"how": ""}
+
+        def work() -> None:
             try:
-                pat = ctl.GetPattern(pid)
-                if pat is None:
-                    continue
-                getattr(pat, meth)()
-                return meth
+                with auto.UIAutomationInitializerInThread():
+                    for pid, meth in ((auto.PatternId.InvokePattern, "Invoke"), (auto.PatternId.SelectionItemPattern, "Select"), (auto.PatternId.TogglePattern, "Toggle"),
+                                      (auto.PatternId.ExpandCollapsePattern, "Expand")):
+                        try:
+                            pat = ctl.GetPattern(pid)
+                            if pat is None:
+                                continue
+                            getattr(pat, meth)()
+                            out["how"] = meth
+                            return
+                        except Exception:
+                            continue
             except Exception:
-                continue
-        return ""
+                return
+        # MEASURED (OBS Studio): an Invoke on a button that opens a MODAL window does not return until that window is closed, so a plain call hangs the whole scan. The call runs on its own thread; if it is still
+        # running after a moment the command was dispatched and opened something (the caller reads and closes that window, which also lets the thread finish).
+        th = threading.Thread(target=work, daemon=True)
+        th.start()
+        th.join(2.5)
+        if th.is_alive():
+            return "Invoke (opened a modal window)"
+        return out["how"]
 
     def chord(self, combo: str) -> bool:
         from core_organs import headless_input as hin
@@ -402,36 +554,113 @@ def _existing_pair_ids(out_jsonl: str) -> set:
     return seen
 
 
+def _v2_row(v1: Dict[str, Any], pre: Any, som: Dict[str, Any], controls: List[Dict[str, Any]], root: str, ppre: str) -> Dict[str, Any]:
+    """A v1 pair re-issued in prompt format v2 (harvest.prompt_v2): the same picture, the same answer, plus zoomed crops of dense toolbar strips and a `Names:` line from the UIA control list."""
+    import copy
+    from . import prompt_v2 as P2
+    names = P2.name_elements(som["elements"], controls)
+    rel = os.path.relpath(ppre, root).replace("\\", "/")
+    strips = P2.dense_strips(som["elements"], pre.size)
+    refs = []
+    for i, c in enumerate(P2.strip_crops(pre, strips)):
+        p = ppre.replace("_pre.jpg", f"_strip{i}.jpg")
+        c.save(p, "JPEG", quality=90)
+        refs.append(os.path.relpath(p, root).replace("\\", "/"))
+    goal = re.search(r"Goal: (.*)$", v1["messages"][1]["content"][-1]["text"], re.S).group(1)
+    content, info = P2.user_content(pre, som, v1["meta"]["app_key"], goal, names=names, image_ref=rel, crop_refs=refs)
+    row = copy.deepcopy(v1)
+    row["messages"][1]["content"] = content
+    row["meta"].update({"prompt_version": 2, "strips": info["n_crops"], "names": info["n_names"]})
+    row["meta"].pop("controls_at_pre", None)
+    return row
+
+
+class AppCrashed(Exception):
+    """The app under scan died while a control was being operated: the control is remembered (never operated again) and the scan can be resumed in a fresh instance."""
+
+    def __init__(self, control: str, rep: Dict[str, Any]):
+        super().__init__(f"the application ended when '{control}' was operated")
+        self.control, self.rep = control, rep
+
+
 def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, root: str = "", out_jsonl: str = "", som_fn: Optional[Callable[..., Dict[str, Any]]] = None,
                app: Optional[Any] = None, settle_s: float = 0.45, scan_delta: bool = True, nav_items: Optional[List[str]] = None, base_pass: bool = True,
-               per_pass_actions: int = 0) -> Dict[str, Any]:
+               per_pass_actions: int = 0, spec_override: Optional[Dict[str, Any]] = None, rag_sink: bool = True, progress_path: str = "") -> Dict[str, Any]:
     """Drive one owned app and write pairs. `app` may be a stand-in with the OwnedApp interface (tests). Returns a report with every reason an action did NOT become a pair."""
     from . import video_explain as VE, video_pipeline as VP
     from core_organs import safety_guard as SG
-    spec = APPS[app_key]
+    spec = spec_override or APPS[app_key]                              # a catalogue app has no hand-written entry: {'launch': <name>} is enough, its menus are found on the screen
     som_fn = som_fn or VP.som_of_frame
     extra_deny = re.compile(spec["deny"], re.I) if spec.get("deny") else None
 
+    persist: Dict[str, Any] = {"done": [], "blocked": []}
+    if progress_path and os.path.isfile(progress_path):
+        with contextlib.suppress(Exception):
+            persist = json.load(open(progress_path, encoding="utf-8"))
+    done_before, blocked = set(persist.get("done", [])), set(persist.get("blocked", []))     # done_before = what EARLIER runs finished (skipped now); this run's own later passes (typed text, other layouts) repeat controls on purpose
+    persist_done = set(done_before)
+
+    def save_progress() -> None:
+        if progress_path:
+            with contextlib.suppress(Exception):
+                os.makedirs(os.path.dirname(progress_path), exist_ok=True)
+                json.dump({"done": sorted(persist_done), "blocked": sorted(blocked)}, open(progress_path, "w", encoding="utf-8"))
+
     def unsafe(name: str) -> bool:
+        if name in blocked:                                              # operating it ended the app once: never again
+            return True
         return (not SG.is_safe(name)) or bool(DENY_RX.search(name)) or _personal(name) or volatile(name) or bool(extra_deny and extra_deny.search(name))
 
     root = root or harvest_dir()[0]
     out_jsonl = out_jsonl or os.path.join(root, "training", "ui_training_dataset.jsonl")
     os.makedirs(os.path.dirname(out_jsonl), exist_ok=True)
     seen_ids = _existing_pair_ids(out_jsonl)
-    rep: Dict[str, Any] = {"app": app_key, "actions": 0, "pairs": 0, "no_change": 0, "not_delivered": 0, "no_grounding": 0, "skipped_unsafe": 0, "duplicates": 0, "popups_closed": 0,
+    rep: Dict[str, Any] = {"app": app_key, "actions": 0, "pairs": 0, "no_change": 0, "not_delivered": 0, "no_grounding": 0, "skipped_unsafe": 0, "duplicates": 0, "popups_closed": 0, "child_windows": [],
                            "by_action": {"click": 0, "hotkey": 0, "type": 0}, "seconds": 0.0, "errors": []}
+    plog = None
+    if rag_sink:                                                         # what is scanned fills the RAG as it is scanned: icon vault (Sub-RAG 1), UI graph (2), lexicon -- not only the training file
+        with contextlib.suppress(Exception):
+            from core_organs import artist_memory as AM, rag as _RAG
+            plog = AM.PaintLogger(_RAG.get_rag(), app_key=app_key, write_pairs=False, run_id=f"scan-{app_key}-{int(time.time())}")
     rows: List[Dict[str, Any]] = []
+    v2_rows: List[Dict[str, Any]] = []
     t0 = time.time()
     done_keys: set = set()
     own = app is None
     ctx = OwnedApp(spec["launch"]) if own else contextlib.nullcontext(app)
+    tmr: Dict[str, float] = {}
+
+    def timed(name: str, fn: Callable[..., Any]) -> Callable[..., Any]:
+        def w(*args: Any, **kw: Any) -> Any:
+            t_ = time.time()
+            try:
+                return fn(*args, **kw)
+            finally:
+                tmr[name] = tmr.get(name, 0.0) + time.time() - t_
+        return w
+    som_fn = timed("som_scan", som_fn)
+    _real_sleep = time.sleep
+
+    def _counting_sleep(sec: float) -> None:                          # every deliberate wait is counted: a scan's time is either work or waiting, and both are reported
+        tmr["sleep"] = tmr.get("sleep", 0.0) + max(0.0, float(sec))
+        _real_sleep(sec)
+    time.sleep = _counting_sleep
+    _cw_orig = {n: getattr(CW, n) for n in ("snapshot", "new_windows", "describe", "dismiss", "probe_items")}
+    for _n, _f in _cw_orig.items():
+        setattr(CW, _n, timed("child_windows." + _n, _f))
     with ctx as a:
+        for _m in ("controls", "grab", "act", "close_popups", "chord"):         # where the time goes: every phase of a scan is timed and reported (rep['timing_s'])
+            if hasattr(a, _m):
+                setattr(a, _m, timed(_m, getattr(a, _m)))
         rep["mode"] = getattr(a, "mode", "")
         n_frame = [0]
 
+        last_origin: List[Any] = [None]
+
         def snap(tag: str):
-            return a.grab(popups=True)                                  # what is open (a menu, a dialog) is part of the picture, before and after
+            img_, org_ = a.grab(popups=True)                            # what is open (a menu, a dialog) is part of the picture, before and after
+            last_origin[0] = org_
+            return img_, org_
 
         def emit(pre, post, kind: str, goal: str, target_box, actions_fn, meta: Dict[str, Any]) -> bool:
             """Write one pair: SoM on the pre frame, the target by overlap, the delta from the pictures. Returns True when a row was kept."""
@@ -449,10 +678,19 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
                 return False
             expectation = f"the screen changes in the region {list(bbox)}" if bbox else "the screen changes"
             if scan_delta and bbox:
-                sub = som_fn(ppost, region=bbox)
-                names = VE.clean_labels(sub["elements"])
-                if names:
-                    expectation = "new on screen: " + ", ".join(names)
+                names_pre = {x["name"] for x in (meta.get("controls_at_pre") or [])}
+                done_by_uia = False
+                if names_pre and last_origin[0] is not None:             # what is new on screen, read from the UIA control names (exact, ~0.2 s) instead of a second OCR scan of the picture (~5 s)
+                    with contextlib.suppress(Exception):
+                        post_names = [c["name"] for c in a.controls(last_origin[0], post.size) if c["name"] not in names_pre and not CHROME_RX.search(c["name"])]
+                        if post_names:
+                            expectation = "new on screen: " + ", ".join(dict.fromkeys(post_names[:8]))
+                        done_by_uia = True
+                if not done_by_uia:
+                    sub = som_fn(ppost, region=bbox)
+                    names = VE.clean_labels(sub["elements"])
+                    if names:
+                        expectation = "new on screen: " + ", ".join(names)
             pair_id = hashlib.sha1(f"{app_key}|{goal}|{hashlib.sha1(pre.tobytes()).hexdigest()}".encode()).hexdigest()[:16]
             if pair_id in seen_ids:
                 rep["duplicates"] += 1
@@ -463,11 +701,32 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
                                      dict(meta, source="local_uia", source_ref=f"local_{app_key}@{stamp}")))
             rep["pairs"] += 1
             rep["by_action"][kind] += 1
+            with contextlib.suppress(Exception):                        # written NOW: a scan that is cut off later keeps everything it has learned so far
+                with open(out_jsonl, "a", encoding="utf-8") as _f:
+                    _row = dict(rows[-1])
+                    _row["meta"] = {k: v for k, v in rows[-1]["meta"].items() if k != "controls_at_pre"}
+                    _f.write(json.dumps(_row, ensure_ascii=False) + "\n")
+            if plog is not None:
+                with contextlib.suppress(Exception):
+                    cb = target_box
+                    if cb and meta.get("uia_name"):
+                        plog.hook({"kind": kind, "name": meta["uia_name"], "type": meta.get("uia_type", "ButtonControl"), "box": tuple(cb), "pre": pre, "post": post,
+                                   "controls": [{"name": x["name"], "type": "ButtonControl"} for x in (meta.get("controls_at_pre") or [])], "origin": (0, 0)})
+            if meta.get("controls_at_pre"):
+                with contextlib.suppress(Exception):
+                    _v2 = _v2_row(rows[-1], pre, som, meta["controls_at_pre"], root, ppre)      # the same pair in prompt format v2: zoomed strips + the control names UIA gave
+                    with open(out_jsonl.replace(".jsonl", "_v2.jsonl"), "a", encoding="utf-8") as _f2:
+                        _f2.write(json.dumps(_v2, ensure_ascii=False) + "\n")
+                    rep["pairs_v2"] = rep.get("pairs_v2", 0) + 1
+                rows[-1]["meta"].pop("controls_at_pre", None)                                                # the v1 row stays as it was: no control list in it
             return True
 
         def settle_and_tidy(extra: float = 0.0):
             time.sleep(settle_s + extra)
             rep["popups_closed"] += a.close_popups()
+            if rep["actions"] % 10 == 0 and rep.get("_last_print") != rep["actions"]:
+                rep["_last_print"] = rep["actions"]
+                print(f"[scan] {app_key}: actions={rep['actions']} pairs={rep['pairs']} t={time.time() - t0:.0f}s timing={ {k: round(v) for k, v in tmr.items()} }", file=sys.stderr, flush=True)
 
         # ---------------------------------------------------------------- hotkeys FIRST, from the app's fresh state (measured: Calculator's Alt+2 stopped landing after a UIA click), each chord then its undo
         for entry in spec["chords"]:
@@ -491,11 +750,13 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
             settle_and_tidy()
 
         # ---------------------------------------------------------------- clicks: every safe control, once each, in every mode the app has (a Scientific or Programmer layout is a different picture)
-        def click_control(c: Dict[str, Any], tidy: bool = True, keep_open: bool = False) -> bool:
+        def click_control(c: Dict[str, Any], tidy: bool = True, keep_open: bool = False, ctrls: Optional[List[Dict[str, Any]]] = None) -> bool:
             """Operate one control through its UIA pattern; a pair when the picture changed. Returns True when it did."""
             rep["actions"] += 1
             pre, _origin = snap("pre")
             a.anchor = c["box"]                                         # a menu this control opens is pasted just under it
+            with contextlib.suppress(Exception):
+                kids_before = CW.snapshot(a.hwnd)
             how = a.act(c["ctl"])
             if pre is None or not how:
                 rep["not_delivered"] += 1
@@ -505,13 +766,55 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
                 time.sleep(settle_s + 0.6)
             else:
                 settle_and_tidy()
+            if getattr(a, "hwnd", 0):
+                import ctypes as _ct
+                if not _ct.windll.user32.IsWindow(a.hwnd):               # the window is gone: operating this control ended the application (MEASURED: OBS's audio mixer control crashes it through UI Automation)
+                    blocked.add(c["name"])
+                    save_progress()
+                    rep["crashed_on"] = rep.get("crashed_on", []) + [c["name"]]
+                    raise AppCrashed(c["name"], rep)
+            kid_info = None
+            crash_hit = None
+            with contextlib.suppress(Exception):                        # did this control open another WINDOW? (a deep section: its own controls, its own way out)
+                for kid in CW.new_windows(kids_before, a.hwnd):
+                    if re.search(r"crash|has stopped|stopped working|stopped responding|unhandled|fatal", kid["title"], re.I):
+                        crash_hit = kid                                 # the app's own crash reporter: it keeps the main window alive while it shows
+                        break
+                    detail = CW.describe(kid["hwnd"])
+                    generic = kid["title"].strip().lower() in ("", "pop-uphost", "pop-up", "popup")
+                    if detail["n_controls"] == 0 and (generic or kid["kind"] != "dialog"):
+                        continue                                        # an empty popup host (WinUI keeps them around) is not a window with content; a titled dialog whose controls UIA cannot read still is
+                    if (not keep and kid["kind"] in ("menu", "window") and detail["n_controls"] >= 1 and rep.get("deep_probes", 0) < 40 and time.time() - t0 < budget_s * 0.8
+                            and not any(e["opener"].startswith(c["name"] + " >") for e in rep["child_windows"])):
+                        sub_entries = CW.probe_items(a, c["ctl"], c["name"], kid, detail, unsafe, max_items=8)       # one level deeper: the dialogs this menu's items open
+                        rep["deep_probes"] = rep.get("deep_probes", 0) + len(sub_entries)
+                        for se in sub_entries:
+                            if not any(e["opener"] == se["opener"] and e["child_title"] == se["child_title"] for e in rep["child_windows"]):
+                                rep["child_windows"].append(se)
+                    closed = "left open" if keep else CW.dismiss(kid["hwnd"], a) if kid["kind"] != "menu" else "menu"
+                    ent = CW.entry(c, kid, detail, closed)
+                    if not any(e["opener"] == ent["opener"] and e["child_title"] == ent["child_title"] for e in rep["child_windows"]):
+                        rep["child_windows"].append(ent)
+                        with contextlib.suppress(Exception):             # registered the moment it is found, not at the end of the scan
+                            from core_organs import rag as _R2
+                            CW.register(_R2.get_rag(), app_key, [ent], root)
+                    kid_info = kid_info or {"title": kid["title"], "kind": kid["kind"], "n_controls": detail["n_controls"]}
+            if crash_hit is not None:
+                with contextlib.suppress(Exception):
+                    CW.dismiss(crash_hit["hwnd"], a)
+                blocked.add(c["name"])
+                save_progress()
+                rep["crashed_on"] = rep.get("crashed_on", []) + [c["name"]]
+                raise AppCrashed(c["name"], rep)
             post, _o = snap("post")
             if post is None or not changed(pre, post)[0]:
+                if kid_info is not None:
+                    rep["no_change_but_child_window"] = rep.get("no_change_but_child_window", 0) + 1
                 rep["no_change"] += 1
                 return False
             emit(pre, post, "click", goal_for(c["name"], c["type"]), c["box"],
                  lambda tid, exp: [{"step": 1, "action": "click", "target_id": tid, "hotkey": None, "text": None, "verify_expectation": exp}],
-                 {"uia_name": c["name"], "uia_type": c["type"], "pattern": how})
+                 dict({"uia_name": c["name"], "uia_type": c["type"], "pattern": how}, **({"opens_child_window": kid_info} if kid_info else {}), **({"controls_at_pre": [{"name": x["name"], "box": list(x["box"])} for x in ctrls[:400]]} if ctrls else {})))
             if tidy and not keep:
                 a.chord("esc")                                          # a menu/flyout this click opened is closed again so the next control is reachable from a known state
                 settle_and_tidy()
@@ -526,6 +829,7 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
         def click_pass(limit: int) -> None:
             stop_at = rep["actions"] + limit
             done_keys.clear()
+            done_keys.update(done_before)                                # controls an earlier run (or the run before a crash) already did are not done again
             stalls = 0
             while rep["actions"] < stop_at and time.time() - t0 < budget_s and stalls < 3:
                 pre, origin = snap("pre")
@@ -533,7 +837,8 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
                     rep["errors"].append("no frame")
                     break
                 pick = None
-                for c in a.controls(origin, pre.size):
+                ctrls = a.controls(origin, pre.size)                    # every control UIA names on this very screen: the 'Names:' line of a v2 prompt
+                for c in ctrls:
                     if c["key"] in done_keys or CHROME_RX.search(c["name"]):
                         continue
                     if unsafe(c["name"]):
@@ -549,7 +854,10 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
                     continue
                 stalls = 0
                 done_keys.add(pick["key"])
-                click_control(pick)
+                persist_done.add(pick["key"])
+                if len(persist_done) % 5 == 0:
+                    save_progress()
+                click_control(pick, ctrls=ctrls)
 
         def navigate(opener: str, item: str) -> bool:
             """The app's own navigation, as the person would use it: open the pane, pick the entry. Both clicks are pairs."""
@@ -590,7 +898,14 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
                 click_control(pick, tidy=False)
                 settle_and_tidy()                                       # an item that opened a dialog: closed again; a menu that stayed open: closed
 
-        for opener in spec.get("menus", []):
+        menus = list(spec.get("menus") or [])
+        if not menus:                                                    # the menu bar of an unknown app: the menu items in the top strip of the window
+            with contextlib.suppress(Exception):
+                img0, org0 = snap("pre")
+                if img0 is not None:
+                    menus = [c["name"] for c in a.controls(org0, img0.size) if c["type"] == "MenuItemControl" and c["box"][1] < 90 and not unsafe(c["name"]) and not CHROME_RX.search(c["name"])][:8]
+            rep["menus_found"] = menus
+        for opener in menus:
             if time.time() - t0 < budget_s:
                 menu_pass(opener, max(3, max_actions // 2))
         nav = dict(spec["nav"]) if spec.get("nav") else None
@@ -629,24 +944,42 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
                 a.clear_text()                                          # the throw-away document is emptied again
                 settle_and_tidy()
         rep["seconds"] = round(time.time() - t0, 1)
-    if rows:
-        with open(out_jsonl, "a", encoding="utf-8") as f:
-            for r in rows:
-                f.write(json.dumps(r, ensure_ascii=False) + "\n")
+        save_progress()
+        rep["timing_s"] = {k: round(v, 1) for k, v in tmr.items()}
+        time.sleep = _real_sleep
+        for _n, _f in _cw_orig.items():
+            setattr(CW, _n, _f)
+    if rep["child_windows"]:
+        with contextlib.suppress(Exception):
+            try:
+                from core_organs import rag as _RAG
+                _rg = _RAG.get_rag()
+            except Exception:
+                _rg = None
+            rep["child_windows_registered"] = CW.register(_rg, app_key, rep["child_windows"], root)
+    rep.pop("_last_print", None)
+    rep["jsonl_v2"] = out_jsonl.replace(".jsonl", "_v2.jsonl")
     rep["jsonl"] = out_jsonl
     return rep
 
 
-def run_local(apps: Optional[List[str]] = None, max_actions: int = 30, budget_s: float = 600.0, **kw: Any) -> Dict[str, Any]:
-    """Record every listed app in turn. A failure to start one app is reported and the rest still run."""
+def run_local(apps: Optional[List[str]] = None, max_actions: int = 30, budget_s: float = 600.0, sizes: Optional[List[Tuple[int, int]]] = None, **kw: Any) -> Dict[str, Any]:
+    """Record every listed app in turn. A failure to start one app is reported and the rest still run. `sizes` = window sizes to lay each app out at (responsive layouts move and re-style every control, so
+    each size is a set of NEW pictures of the same controls; pair ids hash the picture, so nothing is counted twice)."""
+    from core_organs import background_window as bw
     out: Dict[str, Any] = {"apps": {}}
-    for k in (apps or list(APPS)):
-        if k not in APPS:
-            out["apps"][k] = {"error": "unknown app (known: " + ", ".join(APPS) + ")"}
-            continue
-        try:
-            out["apps"][k] = record_app(k, max_actions=max_actions, budget_s=budget_s, **kw)
-        except Exception as exc:
-            out["apps"][k] = {"error": f"{type(exc).__name__}: {str(exc)[:200]}"}
+    for sz in (sizes or [None]):
+        bw.PARK_SIZE = tuple(sz) if sz else None
+        for k in (apps or list(APPS)):
+            tag = k if not sz else f"{k}@{sz[0]}x{sz[1]}"
+            if k not in APPS:
+                out["apps"][tag] = {"error": "unknown app (known: " + ", ".join(APPS) + ")"}
+                continue
+            try:
+                out["apps"][tag] = record_app(k, max_actions=max_actions, budget_s=budget_s, **kw)
+            except Exception as exc:
+                out["apps"][tag] = {"error": f"{type(exc).__name__}: {str(exc)[:200]}"}
+            print("[local_scale]", tag, {a: b for a, b in out["apps"][tag].items() if a in ("pairs", "actions", "seconds", "error")}, flush=True)
+    bw.PARK_SIZE = None
     out["pairs"] = sum(v.get("pairs", 0) for v in out["apps"].values())
     return out
