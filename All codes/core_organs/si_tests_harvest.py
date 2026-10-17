@@ -13,6 +13,8 @@ si_tests_harvest -- tests for Checkpoint 3 (harvest/): the data pipeline that fe
   HV11 UI-frame gate: verdict parsing, cache, unverified fallback; no pair from a frame that is not a software UI
   HV12 step extraction on the phrasings that broke the first real run
   HV13 local recorder: containment grounding, change detection, a stand-in app driven into click / hotkey / type pairs in the video format
+  HV14 captions through yt-dlp (paced, cookie-free, block = stop) + the local speech fallback
+  HV15 keyframe pre-filter + normalized token-overlap target matcher
   HV9  data-quality gates found on real footage: off-topic videos quarantined, loose verbs are not UI actions, audit + purge, one instruction labels one change
 """
 
@@ -534,9 +536,9 @@ def run_hv10() -> "TestOutcome":
         json.dump(said(50.0), open(os.path.join(root, "transcripts_json", "_off_topic", "gamma__vidD.json"), "w"))
         plan = PB.plan_clips(root)
         only_beta = PB.plan_clips(root, apps=["beta"])
-        rep = PB.run_pairs_batch(None, root, max_clips=10, delay_s=0, download=good_download, som_fn=som, gate=None, min_elements=1)
+        rep = PB.run_pairs_batch(None, root, max_clips=10, delay_s=0, download=good_download, som_fn=som, gate=None, prefilter=None, min_elements=1)
         jl = [json.loads(l) for l in open(os.path.join(root, "training", "ui_training_dataset.jsonl"), encoding="utf-8")]
-        again = PB.run_pairs_batch(None, root, max_clips=10, delay_s=0, download=good_download, som_fn=som, gate=None, min_elements=1)
+        again = PB.run_pairs_batch(None, root, max_clips=10, delay_s=0, download=good_download, som_fn=som, gate=None, prefilter=None, min_elements=1)
         n_made_after_rerun = len(made)
         frames_left = [f for d, _, fs in os.walk(os.path.join(root, "frames")) for f in fs]
         referenced = {os.path.basename(m["meta"]["pre"]) for m in jl} | {os.path.basename(m["meta"]["post"]) for m in jl if m["meta"].get("post")}
@@ -552,8 +554,8 @@ def run_hv10() -> "TestOutcome":
         def counting_boom(*a):
             calls.append(a)
             return boom(*a)
-        rep_fail = PB.run_pairs_batch(None, root2, max_clips=6, delay_s=0, download=counting_boom, som_fn=som, max_fail_streak=3, gate=None, min_elements=1)
-        rep_budget = PB.run_pairs_batch(None, root2, max_clips=6, budget_s=0.0, delay_s=0, download=good_download, som_fn=som, gate=None, min_elements=1)
+        rep_fail = PB.run_pairs_batch(None, root2, max_clips=6, delay_s=0, download=counting_boom, som_fn=som, max_fail_streak=3, gate=None, prefilter=None, min_elements=1)
+        rep_budget = PB.run_pairs_batch(None, root2, max_clips=6, budget_s=0.0, delay_s=0, download=good_download, som_fn=som, gate=None, prefilter=None, min_elements=1)
     checks = {"plan_covers_every_on_topic_video_and_skips_the_quarantine": sorted({c["app"] for c in plan}) == ["alpha", "beta"] and len(plan) == 3 and not any(c["app"] == "gamma" for c in plan),
               "plan_can_be_limited_to_apps": [c["app"] for c in only_beta] == ["beta"],
               "clips_are_short": all(c["t1"] - c["t0"] <= 12.0 for c in plan),
@@ -759,18 +761,147 @@ def run_hv13() -> "TestOutcome":
     checks = {"the_glyph_inside_a_key_is_its_element_and_a_label_beats_none": pick is not None and pick["id"] == 2,
               "nothing_inside_means_no_element": el_none is None,
               "change_detection_finds_the_region": ok_ch and bbox == (20, 30, 30, 30) and not ok_same,
-              "click_pairs_for_controls_that_changed_the_picture": sorted(by_goal) == sorted(["Click the Seven button", "Click the Plus button", "Open the history panel", "Type 'hello'"]) and len(clicks) == 2,
+              "click_pairs_for_controls_that_changed_the_picture": sorted(by_goal) == sorted(["Click the Seven button", "Click the Plus button", "Open the history panel", "Type 'hello'"]) and len(clicks) == 4,          # two passes: empty page, then a page with text
               "target_is_the_overlapping_element": seven.get("action") == "click" and seven.get("target_id") == 1,
               "hotkey_and_type_pairs": by_goal["Open the history panel"]["hotkey"] == "ctrl+h" and by_goal["Type 'hello'"]["text"] == "hello",
               "unsafe_control_never_touched": "Delete" not in app.touched and rep["skipped_unsafe"] == 1,
-              "inert_control_is_not_a_pair": rep["no_change"] == 1 and "Inert" in app.touched,
+              "inert_control_is_not_a_pair": rep["no_change"] == 2 and app.touched.count("Inert") == 2,
               "rows_are_the_video_format_and_pass_the_training_validator": all(r["meta"]["ui_frames"] is True and r["meta"]["source"] == "local_uia" and r["meta"]["grounded"] for r in rows) and not any(validated),
               "a_rerun_adds_nothing": rep2["pairs"] == 0 and rep2["duplicates"] >= 1 and len(rows2) == len(rows),
               "popups_are_tidied_after_every_action": app.popups >= rep["actions"]}
     return _verdict(checks, f"pairs={rep['pairs']} goals={sorted(by_goal)} rep={ {k: v for k, v in rep.items() if k not in ('jsonl',)} } validator={validated}")
 
 
-TESTS = [("HV1", run_hv1), ("HV2", run_hv2), ("HV3", run_hv3), ("HV4", run_hv4), ("HV5", run_hv5), ("HV6", run_hv6), ("HV7", run_hv7), ("HV8", run_hv8), ("HV9", run_hv9), ("HV10", run_hv10), ("HV11", run_hv11), ("HV12", run_hv12), ("HV13", run_hv13)]
+def run_hv14() -> "TestOutcome":
+    """HV14: captions through yt-dlp -- paced, cookie-free, block = stop, json3 parsing, and the local speech fallback only for a video with no captions at all"""
+    import yt_dlp
+    from core_organs.harvest import captions as CP, free_master_harvester as M
+    json3 = {"events": [{"tStartMs": 0, "dDurationMs": 2000, "segs": [{"utf8": "now click"}]}, {"tStartMs": 1000, "dDurationMs": 3000, "segs": [{"utf8": "now click the File menu"}]},
+                        {"tStartMs": 9000, "dDurationMs": 1000, "segs": [{"utf8": "[Music]"}]}, {"tStartMs": 12000, "dDurationMs": 2000, "segs": [{"utf8": "then press Ctrl+S"}]}, {"aAppend": 1}]}
+    parsed = CP.parse_json3(json3)
+    seen_opts = {}
+
+    class FakeYDL:
+        def __init__(self, opts):
+            seen_opts.update(opts)
+            self.opts = opts
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def download(self, urls):
+            vid = urls[0].rsplit("=", 1)[1]
+            if vid == "blocked":
+                raise Exception("ERROR: HTTP Error 429: Too Many Requests")
+            if vid == "gone":
+                raise Exception("ERROR: Video unavailable")
+            if vid != "nocaps":
+                d = os.path.dirname(self.opts["outtmpl"])
+                json.dump(json3, open(os.path.join(d, f"{vid}.en.json3"), "w", encoding="utf-8"))
+    real = yt_dlp.YoutubeDL
+    yt_dlp.YoutubeDL = FakeYDL
+    try:
+        got = CP.ytdlp_transcript("abc", ["en"])
+        errs = {}
+        for vid in ("blocked", "gone", "nocaps"):
+            try:
+                CP.ytdlp_transcript(vid, ["en"])
+                errs[vid] = "no error"
+            except PermissionError:
+                errs[vid] = "Blocked"
+            except CP.TranscriptUnavailable as e:
+                errs[vid] = str(e)
+    finally:
+        yt_dlp.YoutubeDL = real
+    fetched = {"audio": 0}
+
+    def fake_audio(vid, secs, d):
+        fetched["audio"] += 1
+        return os.path.join(d, "a.m4a")
+    heard = CP.whisper_transcript("x", 120.0, fetch_audio=fake_audio, transcribe=lambda path, model: [{"text": "click File", "start": 1.0, "duration": 1.0}])
+
+    def net_for(raises, whisper=None):
+        def tr(vid, langs):
+            raise raises
+        return M.Net(http_get=lambda u: None, search=lambda q, n: [], transcript=tr, whisper=whisper, sleep=lambda s: None)
+    one = lambda v: [{"text": "click File", "start": 0.0, "duration": 1.0}]
+    with _Dir() as root:
+        os.makedirs(os.path.join(root, "transcripts_json"))
+        nocap = M.fetch_transcript(net_for(CP.TranscriptUnavailable("No_Subtitles")), root, "calc", "v1")
+        wh = M.fetch_transcript(net_for(CP.TranscriptUnavailable("No_Subtitles"), whisper=one), root, "calc", "v2")
+        other = M.fetch_transcript(net_for(CP.TranscriptUnavailable("other:hi"), whisper=one), root, "calc", "v3")
+        gone = M.fetch_transcript(net_for(CP.TranscriptUnavailable("Video_Unavailable"), whisper=one), root, "calc", "v4")
+
+        def blk(v):
+            raise PermissionError("Blocked:429")
+        blocked = M.fetch_transcript(net_for(CP.TranscriptUnavailable("No_Subtitles"), whisper=blk), root, "calc", "v5")
+        wh_file = os.path.isfile(M.transcript_path(root, "calc", "v2"))
+    import inspect
+    queries = inspect.signature(M.run_harvester).parameters["queries"].default
+    checks = {"rolling_auto_captions_merge_and_noise_is_dropped": [(s["text"], s["start"]) for s in parsed] == [("now click the File menu", 0.0), ("then press Ctrl+S", 12.0)],
+              "captions_come_back_as_segments": [s["text"] for s in got] == [s["text"] for s in parsed],
+              "paced_exactly_as_asked": seen_opts.get("sleep_interval_requests") == 1.5 and seen_opts.get("sleep_interval") == 2 and seen_opts.get("max_sleep_interval") == 5,
+              "subtitles_only_no_video": seen_opts.get("skip_download") is True and seen_opts.get("writesubtitles") is True and seen_opts.get("writeautomaticsub") is True,
+              "no_browser_cookies_are_read": not any(k in seen_opts for k in ("cookiesfrombrowser", "cookiefile")),
+              "a_refusal_is_a_block_and_unavailable_and_no_caption_are_not": errs == {"blocked": "Blocked", "gone": "Video_Unavailable", "nocaps": "No_Subtitles"},
+              "whisper_runs_on_the_audio_section": heard[0]["text"] == "click File" and fetched["audio"] == 1,
+              "no_whisper_configured_means_no_subtitles": nocap["status"] == "No_Subtitles",
+              "no_captions_falls_back_to_speech_recognition": wh["status"] == "Downloaded" and wh.get("via") == "whisper" and wh_file,
+              "other_language_or_missing_video_never_triggers_it": other["status"].startswith("Other_Language") and gone["status"] == "Video_Unavailable",
+              "a_block_during_the_fallback_is_a_block": blocked["status"].startswith("Blocked"),
+              "queries_favour_screencasts": list(queries) == ["{app} tutorial step by step", "{app} how to use interface"]}
+    return _verdict(checks, f"errs={errs} queries={list(queries)}")
+
+
+def run_hv15() -> "TestOutcome":
+    """HV15: the keyframe pre-filter (flat / skin-tone / face frames rejected before any OCR) and the normalized token-overlap target matcher"""
+    from PIL import Image, ImageDraw
+    from core_organs.harvest import frame_prefilter as FP, video_explain as VE
+    from si_tests_rag import _Env
+    ui = Image.new("RGB", (800, 500), (245, 245, 245))
+    d = ImageDraw.Draw(ui)
+    for i in range(14):
+        d.rectangle([20 + (i % 7) * 105, 40 + (i // 7) * 120, 110 + (i % 7) * 105, 130 + (i // 7) * 120], outline=(40, 40, 40), width=2)
+        d.text((30 + (i % 7) * 105, 70 + (i // 7) * 120), f"Option {i}", fill=(0, 0, 0))
+    flat = Image.new("RGB", (800, 500), (30, 60, 140))
+    skin = Image.new("RGB", (800, 500), (224, 172, 105))
+    keep_ui, _ = FP.looks_like_screencast(ui)
+    keep_flat, why_flat = FP.looks_like_screencast(flat)
+    keep_skin, why_skin = FP.looks_like_screencast(skin)
+    keep_bad, why_bad = FP.looks_like_screencast("no/such/file.jpg")
+    som = {"elements": [{"id": 1, "label": "Save Ctrl+S", "box": [0, 0, 5, 5]}, {"id": 2, "label": "File", "box": [0, 0, 5, 5]}, {"id": 3, "label": "Font size", "box": [0, 0, 5, 5]},
+                        {"id": 4, "label": "Settings", "box": [0, 0, 5, 5]}, {"id": 5, "label": "New Tab", "box": [0, 0, 5, 5]}]}
+    case = lambda t: (VE.match_element(som, t) or {}).get("id")
+    matches = {"save": case("save"), "share file": case("share file"), "change font size": case("change font size"), "setting": case("setting"), "new tab": case("new tab"),
+               "open file menu": case("open file menu"), "file": case("file")}
+    # the pre-filter runs before any OCR and a rejected frame leaves the instruction available for a later change
+    seen_som = []
+    elements = [{"id": 1, "label": "File", "role": "text", "box": [0, 0, 5, 5]}] * 8
+
+    def som_fn(image, region=None):
+        seen_som.append(image)
+        return {"elements": elements, "seconds": 0.0, "size": [100, 100], "tiers_used": [], "tiers_skipped": []}
+    kf = [{"t": 3.0, "pre": "frames/a_pre.jpg", "post": "frames/a_post.jpg", "bbox": [0, 0, 50, 50]}, {"t": 3.5, "pre": "frames/b_pre.jpg", "post": "frames/b_post.jpg", "bbox": [0, 0, 60, 60]}]
+    said = [{"text": "now click the File menu", "start": 2.5, "duration": 1.0}]
+    with _Dir() as root, _Env() as R:
+        rep = VE.explain_video(R, "calc", "vidP", said, kf, out_jsonl=os.path.join(root, "p.jsonl"), root=root, som_fn=som_fn, scan_delta=False, ingest=False, min_elements=1,
+                               prefilter=lambda path: (("b_pre" in path), "presenter"))
+    checks = {"a_ui_frame_is_kept": keep_ui,
+              "a_flat_card_is_rejected": not keep_flat and "edges" in why_flat,
+              "a_skin_tone_close_up_is_rejected": not keep_skin and "skin" in why_skin,
+              "an_unreadable_frame_is_rejected": not keep_bad and "unreadable" in why_bad,
+              "shortcut_hint_in_the_label_is_ignored": matches["save"] == 1,
+              "a_plural_and_a_missing_word_still_match": matches["setting"] == 4 and matches["change font size"] == 3 and matches["new tab"] == 5,
+              "one_shared_word_never_carries_a_multiword_target": matches["share file"] is None and matches["open file menu"] is None,
+              "a_one_word_target_matches_its_label": matches["file"] == 2,
+              "prefilter_runs_before_ocr_and_the_step_waits": rep["prefiltered"] == 1 and rep["pairs"] == 1 and len(seen_som) == 1 and "b_pre" in seen_som[0]}
+    return _verdict(checks, f"matches={matches} flat={why_flat!r} skin={why_skin!r} pairs={rep['pairs']} prefiltered={rep['prefiltered']}")
+
+
+TESTS = [("HV1", run_hv1), ("HV2", run_hv2), ("HV3", run_hv3), ("HV4", run_hv4), ("HV5", run_hv5), ("HV6", run_hv6), ("HV7", run_hv7), ("HV8", run_hv8), ("HV9", run_hv9), ("HV10", run_hv10), ("HV11", run_hv11), ("HV12", run_hv12), ("HV13", run_hv13), ("HV14", run_hv14), ("HV15", run_hv15)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]

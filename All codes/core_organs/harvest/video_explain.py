@@ -25,12 +25,29 @@ def _tokens(s: str) -> set:
     return {w for w in re.findall(r"[a-z0-9]+", (s or "").lower()) if len(w) > 1}
 
 
-def match_element(som: Dict[str, Any], target: str) -> Optional[Dict[str, Any]]:
-    """The numbered element the spoken target names: exact label first, then every word of the target inside the label (or the label inside the target)."""
+_CHORD_RX = re.compile(r"\b(?:ctrl|control|shift|alt|cmd|win|fn)\s*\+\s*[a-z0-9]+\b|\bf\d{1,2}\b", re.I)
+
+
+def _norm_tokens(s: str) -> set:
+    """Tokens compared by meaning, not spelling: a shortcut hint in a menu label ('Save Ctrl+S') is dropped, plurals fold ('settings' = 'setting'), 'ok' counts."""
+    s = _CHORD_RX.sub(" ", (s or "").lower())
+    out = set()
+    for w in re.findall(r"[a-z0-9]+", s):
+        if len(w) > 3 and w.endswith("s") and not w.endswith("ss"):
+            w = w[:-1]
+        if len(w) > 1:
+            out.add(w)
+    return out
+
+
+def match_element(som: Dict[str, Any], target: str, min_cover: float = 0.66) -> Optional[Dict[str, Any]]:
+    """The numbered element the spoken target names, by normalized token overlap: at least `min_cover` (two of three words) of the target's words are in the label, AND the target accounts for at least half of the label's
+    words. 'save' -> 'Save Ctrl+S' and 'save' -> 'Save As' match; 'change font size' -> 'Font size' matches (2 of 3 words). The direction rule stays: 'share file' must NOT match the menu-bar item 'File'
+    (1 of 2 words, found in QA as a wrong click label), so a single shared word never carries a multi-word target."""
     t = (target or "").strip().lower()
     if not t:
         return None
-    tk = _tokens(t)
+    tk = _norm_tokens(t)
     best, score = None, 0.0
     for e in som["elements"]:
         lab = (e.get("label") or "").strip().lower()
@@ -38,12 +55,16 @@ def match_element(som: Dict[str, Any], target: str) -> Optional[Dict[str, Any]]:
             continue
         if lab == t:
             return e
-        lk = _tokens(lab)
-        # the spoken target must be CONTAINED in the label ("save" -> "Save As"), never the reverse: "share file" must not match the menu-bar item "File" (found in QA: a wrong click label)
-        if tk and lk and tk <= lk and len(lab) >= 3:
-            s = len(tk & lk) / max(len(tk | lk), 1)
-            if s > score:
-                best, score = e, s
+        lk = _norm_tokens(lab)
+        if not tk or not lk or len(lab) < 3:
+            continue
+        inter = len(tk & lk)
+        cover = inter / len(tk)
+        if cover < min_cover or inter / len(lk) < 0.5:
+            continue
+        s_ = cover * (inter / len(lk))                     # exactness: 1.0 for identical word sets
+        if s_ > score:
+            best, score = e, s_
     return best
 
 
@@ -146,7 +167,7 @@ def build_row(root: str, app_key: str, video_id: str, ev: Dict[str, Any], som: D
 
 
 def explain_video(rag, app_key: str, video_id: str, segments: Sequence[Dict[str, Any]], keyframes: Sequence[Dict[str, Any]], title: str = "", out_jsonl: str = "", root: str = "",
-                  som_fn: Optional[Callable[..., Dict[str, Any]]] = None, scan_delta: bool = True, max_pairs: int = 200, ingest: bool = True, gate: Any = None, min_elements: int = 1) -> Dict[str, Any]:
+                  som_fn: Optional[Callable[..., Dict[str, Any]]] = None, scan_delta: bool = True, max_pairs: int = 200, ingest: bool = True, gate: Any = None, min_elements: int = 1, prefilter: Any = None) -> Dict[str, Any]:
     """Produce training pairs (+ optionally the RAG entries) for one video. `keyframes` come from video_pipeline.extract_keyframes. `som_fn(image, region=None)` defaults to video_pipeline.som_of_frame."""
     from . import video_pipeline as VP
     som_fn = som_fn or VP.som_of_frame
@@ -160,7 +181,7 @@ def explain_video(rag, app_key: str, video_id: str, segments: Sequence[Dict[str,
                 seen.add(json.loads(l).get("meta", {}).get("pair_id"))
             except Exception:
                 pass
-    report: Dict[str, Any] = {"video_id": video_id, "keyframes": len(keyframes), "pairs": 0, "grounded": 0, "no_step_nearby": 0, "sparse_frame": 0, "not_ui_frame": 0, "unverified_frame": 0, "not_concrete": 0, "step_already_used": 0, "duplicates": 0, "som_seconds": 0.0}
+    report: Dict[str, Any] = {"video_id": video_id, "keyframes": len(keyframes), "pairs": 0, "grounded": 0, "no_step_nearby": 0, "sparse_frame": 0, "prefiltered": 0, "not_ui_frame": 0, "unverified_frame": 0, "not_concrete": 0, "step_already_used": 0, "duplicates": 0, "som_seconds": 0.0}
     used_steps = set()                                         # an instruction labels the FIRST change it causes; later changes are consequences of later speech, not of this step
     if ingest and segments:
         r = rag.proc.ingest_transcript(app_key, list(segments), video_id, title)
@@ -186,6 +207,12 @@ def explain_video(rag, app_key: str, video_id: str, segments: Sequence[Dict[str,
         if pair_id in seen:
             report["duplicates"] += 1
             continue
+        if prefilter is not None:                                  # milliseconds, before any OCR or GPU time: an obvious presenter close-up / flat card
+            keep, _why = prefilter(ev["pre"])
+            if not keep:
+                report["prefiltered"] += 1
+                used_steps.discard(skey)
+                continue
         # the frames must show a software UI. A cut to a presenter / title card / motion graphic is not an interface transition. gate=None means "not checked" and is recorded as such.
         ui_checked = None
         if gate is not None:

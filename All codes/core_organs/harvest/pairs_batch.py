@@ -82,8 +82,10 @@ def plan_clips(root: str, per_video: int = 6, max_clip_s: float = 12.0, min_gap_
 
 def run_pairs_batch(rag, root: str = "", max_clips: int = 40, budget_s: float = 1500.0, per_video: int = 6, delay_s: float = 2.0, max_fail_streak: int = 3,
                     download: Optional[Callable[[str, float, float, str], str]] = None, som_fn: Optional[Callable[..., Dict[str, Any]]] = None, apps: Optional[List[str]] = None,
-                    scene_kw: Optional[Dict[str, Any]] = None, gate: Any = "auto", min_elements: int = 6) -> Dict[str, Any]:
+                    scene_kw: Optional[Dict[str, Any]] = None, gate: Any = "auto", min_elements: int = 6, prefilter: Any = "auto") -> Dict[str, Any]:
     from . import video_explain as VE, video_pipeline as VP
+    if prefilter == "auto":
+        from .frame_prefilter import looks_like_screencast as prefilter          # noqa: N813
     owns_gate = False
     if gate == "auto":
         from .frame_gate import UIFrameGate
@@ -162,8 +164,8 @@ def run_pairs_batch(rag, root: str = "", max_clips: int = 40, budget_s: float = 
             segs = json.load(open(path, encoding="utf-8"))
             shifted = [dict(s, start=s["start"] - c["t0"]) for s in segs if c["t0"] - 6 <= s["start"] <= c["t1"] + 2]
             before = _count_lines(jsonl)
-            r = VE.explain_video(rag, c["app"], f"{c['video_id']}@{int(c['t0'])}", shifted, events, title=c["title"], out_jsonl=jsonl, root=root, som_fn=som_fn, ingest=False, max_pairs=8, gate=gate, min_elements=min_elements)
-            for k in ("sparse_frame", "not_ui_frame", "unverified_frame", "not_concrete", "step_already_used", "no_step_nearby"):
+            r = VE.explain_video(rag, c["app"], f"{c['video_id']}@{int(c['t0'])}", shifted, events, title=c["title"], out_jsonl=jsonl, root=root, som_fn=som_fn, ingest=False, max_pairs=8, gate=gate, prefilter=prefilter, min_elements=min_elements)
+            for k in ("sparse_frame", "prefiltered", "not_ui_frame", "unverified_frame", "not_concrete", "step_already_used", "no_step_nearby"):
                 rep[k] = rep.get(k, 0) + r.get(k, 0)
             rep["pairs"] += r["pairs"]
             rep["grounded"] += r["grounded"]

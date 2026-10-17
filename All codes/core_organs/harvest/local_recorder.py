@@ -20,6 +20,7 @@ import hashlib
 import json
 import os
 import re
+import sys
 import time
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
@@ -27,10 +28,14 @@ from .paths import harvest_dir
 
 # What may be exercised per application. `chords` = (keys, what it does, keys that undo it). Everything here was chosen because it is local, reversible and opens nothing outside the window.
 APPS: Dict[str, Dict[str, Any]] = {
-    "calculator": {"launch": "calculator", "nav": {"open": "Open Navigation", "items": ["Scientific Calculator", "Programmer Calculator"], "home": "Standard Calculator"}, "type": None,
+    "calculator": {"launch": "calculator", "nav": {"open": "Open Navigation", "items": ["Scientific Calculator", "Programmer Calculator", "Date calculation Calculator", "Volume Converter", "Length Converter", "Weight and mass Converter",
+                                                                                                    "Temperature Converter", "Energy Converter", "Area Converter", "Speed Converter", "Time Converter", "Power Converter", "Data Converter",
+                                                                                                    "Pressure Converter", "Angle Converter"], "home": "Standard Calculator"}, "type": None,
                    "chords": [("alt+2", "Switch the calculator to Scientific mode", "alt+1"), ("alt+4", "Switch the calculator to Programmer mode", "alt+1"),
                               ("alt+5", "Switch the calculator to Date calculation mode", "alt+1")]},
     "notepad": {"launch": "notepad", "chords": [], "type": "Meeting notes for Monday"},
+    "clock": {"launch": "clock", "chords": [], "type": None},
+    "character_map": {"launch": "character map", "chords": [], "type": None},
     "ms_paint": {"launch": "paint", "chords": [], "type": None, "stay": ["Show toolbar"]},
 }
 # MEASURED (Windows 11 Calculator / Notepad, parked): shortcuts posted as window messages reach an app only through its Alt accelerators -- Calculator's Alt+<n> modes switch, but F9, R, Ctrl+P, Delete and Esc
@@ -39,7 +44,7 @@ APPS: Dict[str, Dict[str, Any]] = {
 
 # controls that leave the window, open a file dialog or change something outside the app
 DENY_RX = re.compile(r"\b(open|save|print|page setup|exit|close|quit|new|share|settings|feedback|help|about|import|export|upload|download|sign|account|extension|store|copilot|camera|scan|"
-                     r"recent|browse|email|send|delete|remove|erase|reset|clear history|license|privacy|update|window|sign(ed)?|log ?(in|out)|profile|hide)\b", re.I)
+                     r"recent|browse|email|send|delete|remove|erase|reset|clear history|license|privacy|update|window|sign(ed)?|log ?(in|out)|profile|hide|copy|cut|focus|spotify|microsoft to do)\b", re.I)
 CHROME_RX = re.compile(r"^(minimi[sz]e|maximi[sz]e|restore|close)\b|^system$", re.I)
 ACTIONABLE = ("ButtonControl", "MenuItemControl", "TabItemControl", "SplitButtonControl", "CheckBoxControl", "RadioButtonControl", "ListItemControl")
 NOUN = {"ButtonControl": "button", "MenuItemControl": "menu item", "TabItemControl": "tab", "SplitButtonControl": "button", "CheckBoxControl": "checkbox", "RadioButtonControl": "option", "ListItemControl": "item"}
@@ -89,7 +94,14 @@ def _personal(name: str) -> bool:
     return bool(user and len(user) >= 3 and user in low)
 
 
+def volatile(name: str) -> bool:
+    """A control named by live data (a clock face, a timestamp, a long generated label) is not a stable instruction: the same control will have another name next time."""
+    clean = re.sub(r"[‎‏]", "", name or "")
+    return len(clean) > 50 or bool(re.search(r"\d{1,2}\s*:\s*\d{2}|\d{4}", clean))
+
+
 def goal_for(name: str, control_type: str) -> str:
+    name = re.sub(r"[‎‏]", "", name)
     name = re.sub(r"\s+", " ", name).strip()
     return f"Click the {name} {NOUN.get(control_type, 'button')}"
 
@@ -127,18 +139,88 @@ class OwnedApp:
         t = LN.resolve(self.name)
         self.guard = SPT.StateGuard(self.name, t.appid)
         self.guard.before()
-        info = LN.launch_owned(t, self.guard)
-        self.hwnd = int(info.get("hwnd") or 0)
-        self.notes = list(info.get("notes") or [])
-        if not (info.get("launched") and self.hwnd):
-            self.__exit__(None, None, None)
-            raise RuntimeError(f"could not start an owned {self.name}: {self.notes}")
-        self.bg = bw.BackgroundSession(self.hwnd)
-        self.bg.__enter__()
-        self.bg.lay_out()
-        self.mode = self.bg.mode
-        time.sleep(1.0)
-        return self
+        last = ""
+        for attempt in range(3):                                    # a UWP window parked off-screen sometimes never leaves its splash (measured: Calculator, Clock): end it and start over
+            info = LN.launch_owned(t, self.guard)
+            self.hwnd = int(info.get("hwnd") or 0)
+            self.notes = list(info.get("notes") or [])
+            if not (info.get("launched") and self.hwnd):
+                last = f"could not start: {info.get('trace') or self.notes}"
+                print(f"[local_recorder] {self.name}: attempt {attempt + 1} did not start: {last[:300]}", file=sys.stderr, flush=True)
+                continue
+            self.bg = bw.BackgroundSession(self.hwnd)
+            self.bg.__enter__()
+            self.bg.lay_out()
+            self.mode = self.bg.mode
+            time.sleep(1.0)
+            if self._ready(15.0):
+                return self
+            last = f"the window never showed a usable interface (a splash screen; mode={self.mode})"
+            self._close_window()
+            restarted = self._restart_idle_frame_host()
+            print(f"[local_recorder] {self.name}: attempt {attempt + 1} stayed on its splash screen; frame host restarted={restarted}", file=sys.stderr, flush=True)
+        self.__exit__(None, None, None)
+        raise RuntimeError(f"{self.name}: {last}")
+
+    @staticmethod
+    def _restart_idle_frame_host() -> bool:
+        """MEASURED: after a few launches the UWP frame host (ApplicationFrameHost.exe) can stay wedged and every packaged app parks on its splash screen; ending that one helper process (it restarts on demand)
+        clears it. Only when NO window it hosts is on the person's screen: a user's own UWP window is never taken down. Ended by PID, never by image name."""
+        try:
+            import ctypes
+            import psutil
+            from core_organs import background_window as bw
+            hosts = [p.pid for p in psutil.process_iter(["name"]) if (p.info.get("name") or "").lower() == "applicationframehost.exe"]
+            u = ctypes.windll.user32
+            hosted = []
+
+            def cb(h, _l):
+                if u.IsWindowVisible(h) or u.IsIconic(h):
+                    buf = ctypes.create_unicode_buffer(256)
+                    u.GetClassNameW(h, buf, 256)
+                    pid = ctypes.c_ulong()
+                    u.GetWindowThreadProcessId(h, ctypes.byref(pid))
+                    title = ctypes.create_unicode_buffer(256)
+                    u.GetWindowTextW(h, title, 256)
+                    if buf.value == "ApplicationFrameWindow" and pid.value in hosts and title.value.strip() and not bw.is_parked(h):
+                        hosted.append(h)
+                return True
+            proto = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
+            u.EnumWindows(proto(cb), 0)
+            if hosted:
+                return False
+            for pid in hosts:
+                psutil.Process(pid).terminate()
+            time.sleep(2.5)
+            return bool(hosts)
+        except Exception:
+            return False
+
+    def _close_window(self) -> None:
+        with contextlib.suppress(Exception):
+            if self.bg is not None:
+                self.bg.__exit__(None, None, None)
+            self.bg = None
+        if self.hwnd:
+            with contextlib.suppress(Exception):
+                from core_organs.atlas import scanner as SC
+                SC.close_owned(self.hwnd)
+                time.sleep(2.0)
+        self.hwnd = 0
+
+    def _ready(self, timeout_s: float) -> bool:
+        """True once the window shows several real controls (not just the title-bar buttons of a splash screen), read exactly as the recorder reads them."""
+        t0 = time.time()
+        while time.time() - t0 < timeout_s:
+            with contextlib.suppress(Exception):
+                img, origin = self.grab(stable=False)
+                if img is not None and len([c for c in self.controls(origin, img.size) if not CHROME_RX.search(c["name"])]) >= 4:
+                    return True
+            if self.bg is not None and int(time.time() - t0) % 5 == 4:
+                with contextlib.suppress(Exception):
+                    self.bg.lay_out(settle_s=0.5)                   # re-nudge the 1-px sliver: a window that has not laid itself out yet often does after another one
+            time.sleep(1.0)
+        return False
 
     def __exit__(self, *exc) -> bool:
         with contextlib.suppress(Exception):
@@ -287,7 +369,8 @@ def _existing_pair_ids(out_jsonl: str) -> set:
 
 
 def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, root: str = "", out_jsonl: str = "", som_fn: Optional[Callable[..., Dict[str, Any]]] = None,
-               app: Optional[Any] = None, settle_s: float = 0.45, scan_delta: bool = True) -> Dict[str, Any]:
+               app: Optional[Any] = None, settle_s: float = 0.45, scan_delta: bool = True, nav_items: Optional[List[str]] = None, base_pass: bool = True,
+               per_pass_actions: int = 0) -> Dict[str, Any]:
     """Drive one owned app and write pairs. `app` may be a stand-in with the OwnedApp interface (tests). Returns a report with every reason an action did NOT become a pair."""
     from . import video_explain as VE, video_pipeline as VP
     from core_organs import safety_guard as SG
@@ -413,7 +496,7 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
                 for c in a.controls(origin, pre.size):
                     if c["key"] in done_keys or CHROME_RX.search(c["name"]):
                         continue
-                    if not SG.is_safe(c["name"]) or DENY_RX.search(c["name"]) or _personal(c["name"]):
+                    if not SG.is_safe(c["name"]) or DENY_RX.search(c["name"]) or _personal(c["name"]) or volatile(c["name"]):
                         done_keys.add(c["key"])
                         rep["skipped_unsafe"] += 1
                         continue
@@ -436,9 +519,12 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
             it = find_control(item)
             return it is not None and click_control(it, tidy=False)
 
-        nav = spec.get("nav")
-        per_pass = max(1, max_actions // (1 + len(nav["items"]) if nav else 1))
-        click_pass(per_pass)
+        nav = dict(spec["nav"]) if spec.get("nav") else None
+        if nav and nav_items is not None:
+            nav["items"] = list(nav_items)                              # a run can take a slice of the app's modes (one foreground run must stay under the tool's time limit)
+        per_pass = per_pass_actions or max(1, max_actions // ((1 if base_pass else 0) + (len(nav["items"]) if nav else 0) or 1))
+        if base_pass:
+            click_pass(per_pass)
         for item in (nav["items"] if nav else []):
             if time.time() - t0 >= budget_s:
                 break
@@ -464,6 +550,8 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
                     emit(pre, post, "type", f"Type '{text}'", None,
                          lambda tid, exp: [{"step": 1, "action": "type", "target_id": tid, "hotkey": None, "text": text, "verify_expectation": exp}],
                          {"uia_name": "document", "uia_type": "type", "pattern": "posted_chars"})
+                if time.time() - t0 < budget_s and rep["actions"] < max_actions * 2:
+                    click_pass(max(1, max_actions // 3))                # a document WITH text is another state: controls that were inert on an empty page now act
                 a.clear_text()                                          # the throw-away document is emptied again
                 settle_and_tidy()
         rep["seconds"] = round(time.time() - t0, 1)

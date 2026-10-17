@@ -76,11 +76,12 @@ class Net:
     search: Callable[[str, int], List[Dict[str, Any]]] = None    # (query, n) -> [{id,title,duration,view_count,uploader}]
     transcript: Callable[[str, List[str]], List[Dict[str, Any]]] = None   # (video_id, languages) -> [{text,start,duration}]
     sleep: Callable[[float], None] = time.sleep
+    whisper: Optional[Callable[[str], List[Dict[str, Any]]]] = None         # (video_id) -> segments: local speech recognition for a video with no captions (None = off)
 
     def __post_init__(self):
         self.http_get = self.http_get or _http_get
         self.search = self.search or _yt_search
-        self.transcript = self.transcript or _yt_transcript
+        self.transcript = self.transcript or _yt_transcript_ytdlp
 
 
 def _http_get(url: str, timeout: float = 30.0) -> Optional[bytes]:
@@ -101,8 +102,7 @@ def _yt_search(query: str, n: int) -> List[Dict[str, Any]]:
             for e in (info or {}).get("entries", []) if e and e.get("id")]
 
 
-class TranscriptUnavailable(Exception):
-    pass
+from .captions import TranscriptUnavailable                         # noqa: E402  (shared with harvest.captions)
 
 
 def _yt_transcript(video_id: str, languages: List[str]) -> List[Dict[str, Any]]:
@@ -126,6 +126,18 @@ def _yt_transcript(video_id: str, languages: List[str]) -> List[Dict[str, Any]]:
 
 
 # ---- apps ---------------------------------------------------------------------------------------------------------------------------------------------
+def _yt_transcript_ytdlp(video_id: str, languages: List[str]) -> List[Dict[str, Any]]:
+    """The default: captions through yt-dlp, paced (sleep-requests 1.5, sleep-interval 2-5 s), no cookies (harvest.captions)."""
+    from . import captions
+    return captions.ytdlp_transcript(video_id, languages)
+
+
+def _whisper(video_id: str) -> List[Dict[str, Any]]:
+    from . import captions
+    return captions.whisper_transcript(video_id)
+
+
+# ---- apps
 def load_winget(net: Net) -> List[Dict[str, Any]]:
     """The Winget index as rows {app_name, package_id, last_update}. [] when unreachable (the caller records that)."""
     raw = net.http_get(WINGET_CSV)
@@ -217,24 +229,33 @@ def fetch_transcript(net: Net, root: str, app_key: str, video_id: str, languages
         return {"status": f"Blocked:{exc}", "segments": 0, "path": ""}
     except TranscriptUnavailable as exc:
         why = str(exc)
-        return {"status": ("Other_Language:" + why[6:]) if why.startswith("other:") else "No_Subtitles", "segments": 0, "path": "", "why": why}
+        if why.startswith("other:") or net.whisper is None or why == "Video_Unavailable":
+            return {"status": ("Other_Language:" + why[6:]) if why.startswith("other:") else ("Video_Unavailable" if why == "Video_Unavailable" else "No_Subtitles"), "segments": 0, "path": "", "why": why}
+        try:                                                   # no captions at all: the speaker's own words, recognised locally
+            segs, via = net.whisper(video_id), "whisper"
+        except PermissionError as e2:
+            return {"status": f"Blocked:{e2}", "segments": 0, "path": ""}
+        except Exception as e2:
+            return {"status": "No_Subtitles", "segments": 0, "path": "", "why": f"{why}; speech recognition failed: {type(e2).__name__}"}
     except Exception as exc:
         return {"status": f"Error:{type(exc).__name__}", "segments": 0, "path": ""}
+    else:
+        via = "captions"
     if not segs:
         return {"status": "No_Subtitles", "segments": 0, "path": ""}
     tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(segs, f, ensure_ascii=False)
     os.replace(tmp, path)
-    return {"status": "Downloaded", "segments": len(segs), "path": path}
+    return {"status": "Downloaded", "segments": len(segs), "path": path, "via": via}
 
 
 # ---- the run --------------------------------------------------------------------------------------------------------------------------------------------
-def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, net: Optional[Net] = None, root: str = "", delay_s: float = 1.0, app_limit: int = 1000,
-                  queries=("{app} full tutorial for beginners step by step english", "{app} shortcuts tips and tricks workflow english"), only_apps: Optional[List[str]] = None,
-                  write_workbook: bool = True, stop_on_block: bool = True) -> Dict[str, Any]:
+def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, net: Optional[Net] = None, root: str = "", delay_s: float = 2.0, app_limit: int = 1000,
+                  queries=("{app} tutorial step by step", "{app} how to use interface"), only_apps: Optional[List[str]] = None,
+                  write_workbook: bool = True, stop_on_block: bool = True, whisper_fallback: bool = True) -> Dict[str, Any]:
     """Harvest one batch: apps[start : start+max_apps]. Returns a report. Safe to re-run: finished apps are skipped, transcripts are cached, sheets are merged."""
-    net = net or Net()
+    net = net or Net(whisper=_whisper if whisper_fallback else None)
     root = root or harvest_dir()[0]
     os.makedirs(os.path.join(root, "transcripts_json"), exist_ok=True)
     state_path = os.path.join(root, "harvest_state.json")
@@ -249,7 +270,7 @@ def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, ne
         apps = [a for a in apps if a["app_name"].lower() in want or a["app_key"] in want]
     batch = apps[start:start + max_apps]
     video_rows: List[Dict[str, Any]] = []
-    stats = {"apps_processed": 0, "apps_skipped_done": 0, "videos": 0, "downloaded": 0, "cached": 0, "no_subtitles": 0, "other_language": 0, "off_topic": 0, "blocked": 0, "errors": 0}
+    stats = {"apps_processed": 0, "apps_skipped_done": 0, "videos": 0, "downloaded": 0, "cached": 0, "no_subtitles": 0, "other_language": 0, "off_topic": 0, "blocked": 0, "errors": 0, "via_whisper": 0}
     blocked = False
     for app in batch:
         if app["app_key"] in state["done_apps"]:
@@ -277,6 +298,7 @@ def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, ne
                     os.replace(t["path"], os.path.join(off, os.path.basename(t["path"])))          # quarantined, not deleted: the person can overrule the gate
                     st, t = "Off_Topic", {"status": "Off_Topic", "segments": 0, "path": ""}
             stats["videos"] += 1
+            stats["via_whisper"] += 1 if (t.get("via") == "whisper" and st == "Downloaded") else 0
             stats["downloaded" if st == "Downloaded" else "cached" if st == "Cached" else "no_subtitles" if st == "No_Subtitles" else "other_language" if st.startswith("Other_Language") else "off_topic" if st == "Off_Topic" else
                   "blocked" if st.startswith("Blocked") else "errors"] += 1
             video_rows.append({"app_name": app["app_name"], "app_key": app["app_key"], "video_id": v["id"], "title": v["title"], "url": f"https://www.youtube.com/watch?v={v['id']}",
