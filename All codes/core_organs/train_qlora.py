@@ -560,15 +560,29 @@ def train(cfg: TrainConfig, force: bool = False, jsonl: str = "", root: str = ""
 
 # ---- evaluation ------------------------------------------------------------------------------------------------------------------------------------
 def parse_action(text: str) -> Optional[Dict[str, Any]]:
-    """The first action of a model's reply ('[{"step": 1, "action": ...}]', possibly wrapped in a code fence or prose), or None when it is not valid JSON of that shape."""
+    """The first action of a model's reply ('[{"step": 1, "action": ...}]', possibly wrapped in a code fence or prose), or None when it is not an action. A reply CUT OFF in the free-text
+    verify_expectation (measured live: the action fields come first and the expectation can run past the token budget) still yields its action: the fields before the cut are read directly."""
     m = re.search(r"\[.*\]", text or "", re.S)
-    if not m:
+    if m:
+        try:
+            arr = json.loads(m.group(0))
+            return arr[0] if isinstance(arr, list) and arr and isinstance(arr[0], dict) else None
+        except Exception:
+            pass
+    kind = re.search(r'"action"\s*:\s*"(click|hotkey|type)"', text or "")
+    if not kind:
         return None
-    try:
-        arr = json.loads(m.group(0))
-    except Exception:
+    out: Dict[str, Any] = {"step": 1, "action": kind.group(1), "target_id": None, "hotkey": None, "text": None}
+    tid = re.search(r'"target_id"\s*:\s*(\d+)', text)
+    if tid:
+        out["target_id"] = int(tid.group(1))
+    for k in ("hotkey", "text"):
+        mm = re.search(rf'"{k}"\s*:\s*"((?:[^"\\]|\\.)*)"', text)
+        if mm:
+            out[k] = mm.group(1)
+    if out["action"] == "click" and out["target_id"] is None:
         return None
-    return arr[0] if isinstance(arr, list) and arr and isinstance(arr[0], dict) else None
+    return out
 
 
 def _norm_keys(k: Any) -> str:

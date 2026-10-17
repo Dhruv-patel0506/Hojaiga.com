@@ -443,6 +443,10 @@ def run_tr10() -> "TestOutcome":
               "one_group_means_no_eval": none == [] and len(one_group) == 2,
               "parse_finds_the_action_in_fences_and_prose": p('```json\n[{"action": "click", "target_id": 7}]\n```')["target_id"] == 7 and p('Sure: [{"action":"hotkey","hotkey":"alt+2"}] done')["action"] == "hotkey",
               "parse_rejects_non_json": p("click the File menu") is None and p("[not json]") is None and p("[]") is None,
+              "a_reply_cut_off_in_the_free_text_still_gives_its_action": p('[{"step": 1, "action": "click", "target_id": 17, "hotkey": null, "text": null, "verify_expectation": "new on screen: File, Edi')["target_id"] == 17
+                                                                         and p('[{"step": 1, "action": "hotkey", "target_id": null, "hotkey": "alt+2", "text": null, "verify_expectation": "the scr')["hotkey"] == "alt+2"
+                                                                         and p('[{"step": 1, "action": "type", "target_id": null, "hotkey": null, "text": "hi there", "verify_ex')["text"] == "hi there"
+                                                                         and p('[{"step": 1, "action": "click", "target_id": null, "ver') is None and p('[{"step": 1, "act') is None,
               "exact_needs_the_right_target": TQ.score_action(p('[{"action":"click","target_id":7}]'), gold_click) == {"valid": True, "action": True, "exact": True}
                                               and TQ.score_action(p('[{"action":"click","target_id":8}]'), gold_click) == {"valid": True, "action": True, "exact": False},
               "right_kind_wrong_answer_and_wrong_kind": TQ.score_action({"action": "hotkey", "hotkey": "ctrl+s"}, gold_click) == {"valid": True, "action": False, "exact": False},
