@@ -11,6 +11,12 @@ Rag over a temp store, so "the graph learns an edge after a verified step" is ch
   EX7  state transitions: the same labels = the same state; a different screen = a new state and a distinct edge; a repeat of the step credits the same edge
   EX8  cold start: universal_scan runs only for an app nothing is known about, and only when asked
   EX9  the live click-accuracy evaluator (UIA ground truth, seen vs unseen controls, baselines)
+  EX10 goal-aware verification (toggle flips / the right dialog / no unexpected dialog / the named control)
+  EX11 the UIA-name assist for dense icon strips
+  EX12 wrong click -> failed, undone, retried without the wrong target; the graph hears both
+  EX13 unrestorable stops; no_effect is never rolled back; the assist makes attempt 1 right
+  EX14 latency: the post-step screen is the next step's start
+  EX15 short generation that stops at the expectation
   TU1  advise(): says what to do, where (the box), a keyboard alternative from the RAG -- and does nothing and learns nothing
   TU2  advise() refuses what the guard refuses, in words
 """
@@ -368,7 +374,252 @@ def run_ex9() -> "TestOutcome":
     return _verdict(checks, f"summary={sm}")
 
 
-TESTS = [("EX1", run_ex1), ("EX2", run_ex2), ("EX3", run_ex3), ("EX4", run_ex4), ("EX5", run_ex5), ("EX6", run_ex6), ("EX7", run_ex7), ("EX8", run_ex8), ("EX9", run_ex9), ("TU1", run_tu1), ("TU2", run_tu2)]
+# ---------------------------------------------------------------------------------------------------- goal-aware verification, rollback, assist, latency
+TOOLBAR = ["Bold (Ctrl+B)", "Italic (Ctrl+I)", "Strikethrough (Ctrl+Shift+X)", "Link (Ctrl+K)"]
+
+
+def _ctl(name, i, toggle=0):
+    return {"name": name, "type": "ButtonControl", "box": (10 + 50 * i, 10, 40, 40), "toggle": toggle}
+
+
+def _toolbar_obs(toggles=(0, 0, 0, 0), shade=40):
+    """The toolbar screen: four toggle buttons, each with one unnamed icon element inside its rectangle (ids 1-4)."""
+    som = {"elements": [{"id": i + 1, "label": "", "role": "button", "box": [20 + 50 * i, 20, 20, 20]} for i in range(4)], "seconds": 0.0, "size": [400, 200], "tiers_used": [], "tiers_skipped": []}
+    return {"image": _image(shade, 0), "som": som, "controls": [_ctl(n, i, toggles[i]) for i, n in enumerate(TOOLBAR)]}
+
+
+def _dialog_obs():
+    names = ["Display text", "Address", "Insert", "Cancel"]
+    som = {"elements": [{"id": i + 1, "label": n, "role": "button", "box": [20 + 90 * i, 120, 80, 24]} for i, n in enumerate(names)], "seconds": 0.0, "size": [400, 200], "tiers_used": [], "tiers_skipped": []}
+    return {"image": _image(200, 4), "som": som, "controls": [{"name": n, "type": "ButtonControl", "box": (10 + 90 * i, 110, 80, 40), "toggle": None} for i, n in enumerate(names)]}
+
+
+def run_ex10() -> "TestOutcome":
+    """EX10: goal-aware verification -- a toggle must flip, a dialog opener must open the RIGHT dialog, a plain control must not open one, the operated control must carry the goal's name"""
+    from core_organs import agent_verify as AV
+    pre = _toolbar_obs()
+    click = lambda i: {"action": "click", "target_id": i}
+    strike_ok = AV.goal_verify("Click the Strikethrough button", click(3), pre, _toolbar_obs((0, 0, 1, 0), 60), True, "the screen changed")
+    strike_same = AV.goal_verify("Click the Strikethrough button", click(3), pre, _toolbar_obs((0, 0, 0, 0), 60), True, "the screen changed")
+    link_for_strike = AV.goal_verify("Click the Strikethrough button", click(4), pre, _dialog_obs(), True, "new on screen")
+    bold_opens_dialog = AV.goal_verify("Click the Bold button", click(1), pre, _dialog_obs(), True, "new on screen")
+    link_ok = AV.goal_verify("Click the Link button", click(4), pre, _dialog_obs(), True, "new on screen")
+    para_link = AV.goal_verify("insert a hyperlink", click(4), pre, _dialog_obs(), True, "new on screen")
+    para_wrong = AV.goal_verify("make the text italic", click(4), pre, _dialog_obs(), True, "new on screen")
+    no_dialog = AV.goal_verify("Click the Link button", click(4), pre, _toolbar_obs((0, 0, 0, 1), 60), True, "the screen changed")
+    unchanged = AV.goal_verify("Click the Bold button", click(1), pre, pre, False, "no_effect")
+    no_uia = AV.goal_verify("Click the Strikethrough button", click(4), {"som": pre["som"]}, {"som": _dialog_obs()["som"]}, True, "the screen changed")
+    plain_pre = _toolbar_obs()
+    plain_pre["controls"][0]["toggle"] = None
+    plain_dialog = AV.goal_verify("Click the Bold button", click(1), plain_pre, _dialog_obs(), True, "new on screen")
+    over = _toolbar_obs((0, 0, 0, 0), 90)
+    over["controls"] = over["controls"] + _dialog_obs()["controls"]                  # a XAML dialog: the toolbar is still listed behind it
+    quiet = _toolbar_obs((0, 0, 0, 0), 90)
+    quiet["controls"] = quiet["controls"] + [{"name": "Tip A", "type": "ButtonControl", "box": (300, 10, 40, 40), "toggle": None}, {"name": "Tip B", "type": "ButtonControl", "box": (350, 10, 40, 40), "toggle": None}]
+    link_xaml = AV.goal_verify("Click the Link button", click(4), pre, over, True, "new on screen")
+    bold_xaml = AV.goal_verify("Click the Bold button", click(1), pre, over, True, "new on screen")
+    new_but_no_dismiss = AV.modal_change(pre, quiet)
+    lone = _toolbar_obs((0, 0, 0, 0), 90)
+    lone["controls"] = lone["controls"] + [{"name": "Cancel", "type": "ButtonControl", "box": (300, 110, 80, 40), "toggle": None}]
+    lone_ok = AV.goal_verify("Click the Link button", click(4), pre, lone, True, "new on screen")
+    only_insert = _toolbar_obs((0, 0, 0, 0), 90)
+    only_insert["controls"] = only_insert["controls"] + [{"name": "Insert", "type": "ButtonControl", "box": (300, 110, 80, 40), "toggle": None}]
+    checks = {"a_lone_new_cancel_button_is_a_dialog": lone_ok["worked"] and AV.modal_change(pre, lone)["modal"] is True and AV.modal_change(pre, only_insert)["modal"] is False,
+              "a_dialog_over_a_still_listed_toolbar_is_detected_by_its_dismissal_button": link_xaml["worked"] and bold_xaml["reason"] == "unexpected_dialog" and AV.modal_change(pre, over)["dismiss"] == ["cancel", "insert"],
+              "new_controls_without_a_dismissal_button_and_nothing_lost_are_not_a_modal": new_but_no_dismiss["modal"] is False,
+              "a_toggle_that_flipped_is_verified": strike_ok["worked"] and strike_ok["intent"] == "toggle",
+              "a_toggle_that_did_not_flip_fails": not strike_same["worked"] and strike_same["reason"] == "toggle_unchanged",
+              "the_wrong_control_fails_even_though_the_screen_changed": not link_for_strike["worked"] and link_for_strike["reason"] == "wrong_control" and "Link" in link_for_strike["effect"],
+              "a_toggle_that_opens_a_dialog_fails": not bold_opens_dialog["worked"] and bold_opens_dialog["reason"] == "unexpected_dialog",
+              "a_dialog_opener_opening_its_dialog_is_verified": link_ok["worked"] and link_ok["intent"] == "dialog",
+              "a_paraphrased_goal_names_no_control_so_the_name_rule_is_skipped": para_link["worked"] and para_wrong["worked"] is True or para_wrong["reason"] in ("", "unexpected_dialog"),
+              "a_dialog_opener_that_opened_nothing_fails": not no_dialog["worked"] and no_dialog["reason"] == "no_dialog",
+              "nothing_changed_is_no_effect": not unchanged["worked"] and unchanged["reason"] == "no_effect",
+              "without_a_uia_tree_only_the_screen_change_is_checked": no_uia["worked"] and no_uia["checked"] == "screen",
+              "a_plain_control_that_opens_a_dialog_fails": not plain_dialog["worked"] and plain_dialog["reason"] == "unexpected_dialog",
+              "the_name_rule_reads_the_goal_and_ignores_shortcut_hints": AV.explicit_name("Click the Bold (Ctrl+B) button") == "Bold" and AV.explicit_name("Click the Cancel button") == "Cancel" and AV.explicit_name("insert a hyperlink") == ""}
+    return _verdict(checks, f"strike_ok={strike_ok['reason']!r} wrong={link_for_strike['effect']!r} para_wrong={para_wrong['reason']!r}")
+
+
+def run_ex11() -> "TestOutcome":
+    """EX11: the UIA-name assist -- the model's neighbouring icon is replaced by the one control that carries the goal's name; left alone when right, ambiguous, or without UIA"""
+    from core_organs import agent_verify as AV
+    from core_organs.harvest.local_recorder import element_at
+    pre = _toolbar_obs()
+    fix = lambda goal, tid, p=pre: AV.uia_assist(goal, {"action": "click", "target_id": tid}, p, element_at)
+    a_wrong, note = fix("Click the Italic button", 1)
+    a_right, _ = fix("Click the Italic button", 2)
+    a_para, _ = fix("make it italic", 1)
+    dup = _toolbar_obs()
+    dup["controls"].append(dict(dup["controls"][0], name="Italic (alt)", box=(300, 10, 40, 40)))
+    a_dup, _ = fix("Click the Italic button", 1, dup)
+    a_none, _ = fix("Click the Italic button", 1, {"som": pre["som"]})
+    a_hot, _ = AV.uia_assist("Click the Italic button", {"action": "hotkey", "hotkey": "ctrl+i"}, pre, element_at)
+    checks = {"the_neighbour_is_replaced_by_the_named_control": a_wrong is not None and a_wrong["target_id"] == 2 and "Bold" in note and "Italic" in note,
+              "a_right_pick_is_left_alone": a_right is None,
+              "a_paraphrased_goal_is_left_alone": a_para is None,
+              "an_ambiguous_name_is_left_alone": a_dup is None,
+              "no_uia_tree_means_no_assist": a_none is None,
+              "only_clicks_are_corrected": a_hot is None}
+    return _verdict(checks, f"note={note!r}")
+
+
+class _Dev:
+    """A scripted toolbar app with a Link dialog: clicking element 4 opens it, element 3 flips Strikethrough."""
+
+    def __init__(self):
+        self.state, self.toggles, self.acted, self.recovered, self.observed = "bar", [0, 0, 0, 0], [], [], 0
+
+    def observe(self):
+        self.observed += 1
+        return _dialog_obs() if self.state == "dialog" else _toolbar_obs(tuple(self.toggles), 40 + 60 * sum(self.toggles))
+
+    def act(self, action, som):
+        self.acted.append(action["target_id"])
+        if self.state == "dialog":
+            return True, "ok"
+        if action["target_id"] == 4:
+            self.state = "dialog"
+        else:
+            self.toggles[action["target_id"] - 1] ^= 1
+        return True, "ok"
+
+    def recover(self, pre, post, verdict, names):
+        self.recovered.append((verdict["reason"], list(names)))
+        if self.state == "dialog":
+            self.state = "bar"
+        return {"restored": True, "how": "escape"}
+
+
+class _Seq:
+    """A model that answers from a script and remembers which element ids it was offered."""
+
+    def __init__(self, ids):
+        self.ids, self.offered = list(ids), []
+
+    def __call__(self, image, som, app_key, goal):
+        self.offered.append([e["id"] for e in som["elements"]])
+        tid = self.ids.pop(0)
+        return {"step": 1, "action": "click", "target_id": tid, "hotkey": None, "text": None, "verify_expectation": ""}, "reply"
+
+
+def run_ex12() -> "TestOutcome":
+    """EX12: a wrong click that opens a dialog is failed, undone, retried on the right control without re-offering the wrong one -- and the graph hears about both"""
+    from si_tests_rag import _Env
+    from core_organs import agent_executor as AE
+    with _Env() as R:
+        dev = _Dev()
+        model = _Seq([4, 3])                                                   # first the neighbouring Link icon, then Strikethrough
+        ag = AE.Agent(APP, dev.observe, model, dev.act, rag=R, settle_s=0, sleep=lambda s: None, recover=dev.recover, assist=False)
+        rec = ag.step("Click the Strikethrough button")
+        obs = R.graph.db.rows("SELECT ok, effect FROM observations WHERE app_key=? ORDER BY ts", (APP,))
+    checks = {"the_first_attempt_is_failed_for_the_right_reason": rec.attempts[0]["reason"] == "wrong_control" and rec.attempts[0]["target_id"] == 4,
+              "the_dialog_was_dismissed_with_the_safe_names": len(dev.recovered) == 1 and dev.recovered[0][1][-2:] == ["Cancel", "No"] and "OK" not in dev.recovered[0][1] and dev.state == "bar",
+              "the_wrong_target_is_not_offered_again": model.offered[0] == [1, 2, 3, 4] and model.offered[1] == [1, 2, 3],
+              "the_second_attempt_is_verified_and_the_step_is_done": rec.status == "done" and len(rec.attempts) == 2 and rec.attempts[1]["worked"] and rec.rolled_back and dev.toggles == [0, 0, 1, 0],
+              "the_graph_heard_a_failure_and_then_a_success": [o["ok"] for o in obs] == [0, 1] and obs[0]["effect"] == "wrong_control",
+              "timings_are_recorded": {"observe", "ground", "act", "verify", "recover", "total"} <= set(rec.timings)}
+    return _verdict(checks, f"status={rec.status} attempts={[(a['target_id'], a['reason']) for a in rec.attempts]} obs={[(o['ok'], o['effect']) for o in obs]}")
+
+
+def run_ex13() -> "TestOutcome":
+    """EX13: when the wrong effect cannot be undone nothing else is tried; a 'no effect' is never 'rolled back'; with the assist the first attempt is already right"""
+    from core_organs import agent_executor as AE
+    dev = _Dev()
+    dev.recover = lambda pre, post, verdict, names: {"restored": False, "how": "stuck"}
+    model = _Seq([4, 3])
+    ag = AE.Agent(APP, dev.observe, model, dev.act, rag=None, settle_s=0, sleep=lambda s: None, recover=dev.recover, assist=False)
+    stuck = ag.step("Click the Strikethrough button")
+    dev2 = _Dev()
+    model2 = _Seq([4])
+    ag2 = AE.Agent(APP, dev2.observe, model2, dev2.act, rag=None, settle_s=0, sleep=lambda s: None, recover=dev2.recover, assist=True)
+    helped = ag2.step("Click the Strikethrough button")
+    dev3 = _Dev()
+    dev3.act = lambda action, som: (dev3.acted.append(action["target_id"]) or (True, "ok"))
+    model3 = _Seq([2, 2])
+    ag3 = AE.Agent(APP, dev3.observe, model3, dev3.act, rag=None, settle_s=0, sleep=lambda s: None, recover=dev3.recover, assist=False)
+    noeff = ag3.step("Click the Italic button")
+    checks = {"an_unrestorable_screen_stops_the_step": stuck.status == "wrong_effect" and len(stuck.attempts) == 1 and not stuck.rolled_back and len(model.offered) == 1,
+              "the_assist_makes_the_first_attempt_right": helped.status == "done" and len(helped.attempts) == 1 and helped.assisted.startswith("UIA name assist") and dev2.toggles == [0, 0, 1, 0] and dev2.recovered == [],
+              "no_effect_is_reported_and_not_rolled_back": noeff.status == "no_effect" and noeff.reason == "no_effect" and dev3.recovered == [] and len(noeff.attempts) == 1}
+    return _verdict(checks, f"stuck={stuck.status} helped={helped.status}({helped.assisted}) noeff={noeff.status}")
+
+
+def run_ex14() -> "TestOutcome":
+    """EX14: latency -- the screen seen after a step is the next step's starting screen (one Set-of-Marks scan saved per step); a rollback or a stale picture forces a fresh one"""
+    from core_organs import agent_executor as AE
+    dev = _Dev()
+    ag = AE.Agent(APP, dev.observe, _Seq([3, 2]), dev.act, rag=None, settle_s=0, sleep=lambda s: None, assist=False)
+    r1, r2 = ag.run(["Click the Strikethrough button", "Click the Italic button"], stop_on_fail=False)
+    reused = dev.observed
+    dev_b = _Dev()
+    ag_b = AE.Agent(APP, dev_b.observe, _Seq([3, 2]), dev_b.act, rag=None, settle_s=0, sleep=lambda s: None, assist=False, reuse_post=False)
+    ag_b.run(["Click the Strikethrough button", "Click the Italic button"], stop_on_fail=False)
+    dev_c = _Dev()
+    ag_c = AE.Agent(APP, dev_c.observe, _Seq([3, 2]), dev_c.act, rag=None, settle_s=0, sleep=lambda s: None, assist=False, reuse_max_age_s=-1)
+    ag_c.run(["Click the Strikethrough button", "Click the Italic button"], stop_on_fail=False)
+    checks = {"two_steps_cost_three_scans_not_four": reused == 3 and r2.timings.get("observe_reused") == 1 and "observe_reused" not in r1.timings,
+              "without_reuse_it_is_four": dev_b.observed == 4,
+              "a_stale_picture_is_not_reused": dev_c.observed == 4}
+    return _verdict(checks, f"scans: reuse={reused} no-reuse={dev_b.observed} stale={dev_c.observed}")
+
+
+def run_ex15() -> "TestOutcome":
+    """EX15: the adapter's generation is short and stops where the free-text expectation begins; a reply cut there still gives its action"""
+    import torch
+    from PIL import Image
+    from core_organs import agent_executor as AE
+    seen = {}
+
+    class FakeModel:
+        device = "cpu"
+
+        def generate(self, **kw):
+            seen.update(kw)
+            return torch.tensor([[1, 2, 3, 4, 5, 6, 7, 8]])
+
+    class FakeProc:
+        tokenizer = "TOK"
+
+        def apply_chat_template(self, msgs, **kw):
+            return {"input_ids": torch.tensor([[1, 2, 3, 4, 5]])}
+
+        def batch_decode(self, out, skip_special_tokens=True):
+            return ['[{"step": 1, "action": "click", "target_id": 20, "hotkey": null, "text": null, "verify_expectation']
+
+    g = AE.AdapterGrounder("no/such/adapter")
+    g._model, g._proc = FakeModel(), FakeProc()
+    action, reply = g(Image.new("RGB", (64, 64)), _som(["File", "Edit"]), "padx", "Click the File menu")
+    checks = {"the_budget_is_about_seventy_tokens": g.max_new_tokens == 72 and seen["max_new_tokens"] == 72 and seen["do_sample"] is False,
+              "generation_stops_at_the_expectation": seen["stop_strings"] == ['"verify_expectation"'] and seen["tokenizer"] == "TOK",
+              "the_input_size_is_the_training_size": g.max_pixels == 448 * 448,
+              "a_reply_cut_at_the_stop_string_still_parses": action is not None and action["action"] == "click" and action["target_id"] == 20}
+    return _verdict(checks, f"kwargs={sorted(seen)} action={action}")
+
+
+def run_ex16() -> "TestOutcome":
+    """EX16: a retry never repeats a target that was just undone -- the assist's pick included"""
+    from core_organs import agent_executor as AE
+
+    class NoDialogDev(_Dev):
+        def act(self, action, som):                              # the Link click toggles the button but opens no dialog (the verdict will be 'no_dialog')
+            self.acted.append(action["target_id"])
+            self.toggles[action["target_id"] - 1] ^= 1
+            return True, "ok"
+    dev = NoDialogDev()
+    model = _Seq([4, 3, 3])
+    ag = AE.Agent(APP, dev.observe, model, dev.act, rag=None, settle_s=0, sleep=lambda s: None, recover=dev.recover, assist=True, max_attempts=3)
+    rec = ag.step("Click the Link button")
+    d2 = _Dev()
+    r3 = AE.Agent(APP, d2.observe, _Seq([4, 4, 4]), d2.act, rag=None, settle_s=0, sleep=lambda s: None, recover=d2.recover, assist=True, max_attempts=3).step("Click the Strikethrough button")
+    checks = {"the_undone_target_is_clicked_once_only": dev.acted == [4] and len(rec.attempts) == 1 and rec.attempts[0]["reason"] == "no_dialog",
+              "the_step_ends_as_a_wrong_effect_with_the_reason": rec.status == "wrong_effect" and "already tried" in rec.why and rec.rolled_back,
+              "the_model_was_asked_again_without_that_element": len(model.offered) == 2 and 4 not in model.offered[1],
+              "the_assist_fixes_the_first_attempt_so_no_retry_is_needed": r3.status == "done" and len(r3.attempts) == 1 and r3.assisted.startswith("UIA name assist")}
+    return _verdict(checks, f"clicks={dev.acted} status={rec.status} why={rec.why!r} attempts={[(a['target_id'], a['reason']) for a in rec.attempts]}")
+
+
+TESTS = [("EX1", run_ex1), ("EX2", run_ex2), ("EX3", run_ex3), ("EX4", run_ex4), ("EX5", run_ex5), ("EX6", run_ex6), ("EX7", run_ex7), ("EX8", run_ex8), ("EX9", run_ex9), ("EX10", run_ex10), ("EX11", run_ex11), ("EX12", run_ex12), ("EX13", run_ex13), ("EX14", run_ex14), ("EX15", run_ex15), ("EX16", run_ex16), ("TU1", run_tu1), ("TU2", run_tu2)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]

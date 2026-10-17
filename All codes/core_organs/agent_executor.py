@@ -22,7 +22,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
-from core_organs import safety_guard as SG
+from core_organs import agent_verify as AV, safety_guard as SG
 
 # chords that close the window, lock or sign out, erase, or force-quit: never sent by the loop whoever asked
 DANGEROUS_CHORDS = {"alt+f4", "ctrl+alt+delete", "ctrl+shift+escape", "win+l", "ctrl+w", "ctrl+shift+delete", "shift+delete", "ctrl+q", "alt+f4+alt"}
@@ -103,7 +103,7 @@ def default_verify(pre: Dict[str, Any], post: Dict[str, Any], src_state: Optiona
 class AdapterGrounder:
     """The trained adapter: Qwen3-VL-2B (4-bit) + LoRA, in-process (~3-5 GB of VRAM). Prompt = the training format, byte for byte (build_messages)."""
 
-    def __init__(self, adapter_dir: str, base: str = "Qwen/Qwen3-VL-2B-Instruct", max_pixels: int = 448 * 448, max_new_tokens: int = 256):
+    def __init__(self, adapter_dir: str, base: str = "Qwen/Qwen3-VL-2B-Instruct", max_pixels: int = 448 * 448, max_new_tokens: int = 72):
         self.adapter_dir, self.base, self.max_pixels, self.max_new_tokens = adapter_dir, base, max_pixels, max_new_tokens
         self._model = None
         self._proc = None
@@ -144,7 +144,8 @@ class AdapterGrounder:
         enc = self._proc.apply_chat_template(msgs, tokenize=True, add_generation_prompt=True, return_dict=True, return_tensors="pt")
         enc = {k: (v.to(self._model.device) if hasattr(v, "to") else v) for k, v in enc.items()}
         with torch.no_grad():
-            out = self._model.generate(**enc, max_new_tokens=self.max_new_tokens, do_sample=False)
+            # the action fields come first in the reply and the free-text expectation after them: generation STOPS where the expectation starts (and is capped at ~72 tokens), parse_action reads the rest
+            out = self._model.generate(**enc, max_new_tokens=self.max_new_tokens, do_sample=False, stop_strings=['"verify_expectation"'], tokenizer=getattr(self._proc, "tokenizer", self._proc))
         text = self._proc.batch_decode(out[:, enc["input_ids"].shape[1]:], skip_special_tokens=True)[0]
         return parse_action(text), text
 
@@ -152,7 +153,7 @@ class AdapterGrounder:
 @dataclass
 class StepRecord:
     goal: str
-    status: str                                   # done | no_effect | blocked | no_action | not_delivered | no_observation | advised
+    status: str                                   # done | no_effect | wrong_effect | blocked | no_action | not_delivered | no_observation | advised
     source: str = ""                              # rag | model
     action: Optional[Dict[str, Any]] = None
     label: str = ""
@@ -164,16 +165,27 @@ class StepRecord:
     ms: float = 0.0
     evidence: List[str] = field(default_factory=list)
     reply: str = ""
+    reason: str = ""                              # '' on success, else no_effect | wrong_control | unexpected_dialog | toggle_unchanged | no_dialog
+    rolled_back: bool = False                     # a wrong effect was undone (dialog dismissed / toggle restored)
+    assisted: str = ""                            # the UIA-name assist changed the model's target: what it did
+    attempts: List[Dict[str, Any]] = field(default_factory=list)
+    timings: Dict[str, float] = field(default_factory=dict)
 
 
 class Agent:
     def __init__(self, app_key: str, observe: Callable[[], Dict[str, Any]], ground: Callable[..., Tuple[Optional[Dict[str, Any]], str]], act: Optional[Callable[[Dict[str, Any], Dict[str, Any]], Tuple[bool, str]]] = None,
                  rag: Any = None, run_id: str = "", prefer_rag: bool = True, allow: Sequence[str] = (), settle_s: float = 0.6, verify: Optional[Callable[..., Tuple[bool, str]]] = None,
-                 sleep: Callable[[float], None] = time.sleep):
+                 sleep: Callable[[float], None] = time.sleep, recover: Optional[Callable[..., Dict[str, Any]]] = None, assist: bool = True, max_attempts: int = 2, reuse_post: bool = True,
+                 reuse_max_age_s: float = 20.0):
+        """`verify` = a custom (pre, post, src, dst) -> (worked, effect); without one the base test is 'the picture / state moved' and, where the app exposes UIA, the goal-aware rules (agent_verify).
+        `recover(pre, post, verdict, names)` undoes a wrong effect (dismiss the dialog, restore the toggle) and returns {restored: bool, how}; without one a wrong effect is reported, not undone.
+        `assist`: the UIA-name correction of the model's target. `reuse_post`: the screen seen after one step is the screen the next step starts from (one Set-of-Marks scan saved per step)."""
         self.app_key, self.observe, self.ground, self.act, self.rag = app_key, observe, ground, act, rag
         self.run_id = run_id or f"agent-{int(time.time())}"
-        self.prefer_rag, self.allow, self.settle_s, self.verify, self.sleep = prefer_rag, tuple(allow), settle_s, verify or default_verify, sleep
+        self.prefer_rag, self.allow, self.settle_s, self.custom_verify, self.sleep = prefer_rag, tuple(allow), settle_s, verify, sleep
+        self.recover, self.assist, self.max_attempts, self.reuse_post, self.reuse_max_age_s = recover, assist, max(1, int(max_attempts)), reuse_post, reuse_max_age_s
         self.history: List[StepRecord] = []
+        self._last_post: Optional[Tuple[Dict[str, Any], float]] = None
 
     # ---------------------------------------------------------------------------------------------------- retrieve + ground
     def _retrieve(self, goal: str, snap: Dict[str, Any]) -> Any:
@@ -197,12 +209,22 @@ class Agent:
             pass
         return ""
 
-    def _decide(self, goal: str, pre: Dict[str, Any], ret: Any) -> Tuple[Optional[Dict[str, Any]], str, str]:
+    def _decide(self, goal: str, pre: Dict[str, Any], ret: Any, exclude: Sequence[int] = ()) -> Tuple[Optional[Dict[str, Any]], str, str]:
         chord = self._rag_hotkey(ret) if self.prefer_rag else ""
         if chord:
             return {"step": 1, "action": "hotkey", "target_id": None, "hotkey": chord, "text": None, "verify_expectation": "the screen changes"}, "rag", f"RAG fast path: {chord}"
-        action, reply = self.ground(pre["image"], pre["som"], self.app_key, goal)
+        som = pre["som"]
+        if exclude:                                                # a target that was just undone is not offered again
+            som = dict(som, elements=[e for e in som["elements"] if e.get("id") not in set(exclude)])
+        action, reply = self.ground(pre["image"], som, self.app_key, goal)
         return action, "model", reply
+
+    def _assist(self, goal: str, action: Optional[Dict[str, Any]], pre: Dict[str, Any]) -> Tuple[Optional[Dict[str, Any]], str]:
+        if not self.assist:
+            return action, ""
+        from core_organs.harvest.local_recorder import element_at
+        fixed, note = AV.uia_assist(goal, action, pre, element_at)
+        return (fixed, note) if fixed else (action, "")
 
     # ---------------------------------------------------------------------------------------------------- the teaching twin
     def advise(self, goal: str) -> Dict[str, Any]:
@@ -216,6 +238,7 @@ class Agent:
         snap = som_to_snapshot(pre["som"])
         ret = self._retrieve(goal, snap)
         action, source, reply = self._decide(goal, pre, ret)
+        action, _assist_note = self._assist(goal, action, pre)
         g = guard_action(goal, action, pre["som"], self.allow)
         alt = []
         try:
@@ -239,47 +262,141 @@ class Agent:
         return {"say": say, "point": point, "action": action if g["allowed"] else None, "source": source, "alternatives": alt, "allowed": g["allowed"], "record": rec}
 
     # ---------------------------------------------------------------------------------------------------- the loop
+    def _verdict(self, goal: str, action: Dict[str, Any], pre: Dict[str, Any], post: Dict[str, Any], src: Optional[str], dst: Optional[str]) -> Dict[str, Any]:
+        if self.custom_verify is not None:
+            worked, effect = self.custom_verify(pre, post, src, dst)
+            return {"worked": bool(worked), "effect": effect, "reason": "" if worked else "no_effect", "intent": "", "target": "", "checked": "custom", "new": []}
+        base_worked, base_effect = default_verify(pre, post, src, dst)
+        return AV.goal_verify(goal, action, pre, post, base_worked, base_effect)
+
+    def _recovery_names(self, goal: str, post: Dict[str, Any], verdict: Dict[str, Any]) -> List[str]:
+        """Buttons Sub-RAG 5 (recovery playbooks) names for this failure, else the safe dismissals. 'OK' / 'Yes' / 'Close' are never in the list: they confirm or close."""
+        names: List[str] = []
+        if self.rag is not None:
+            try:
+                from core_organs.rag import Query
+                ret = self.rag.retrieve(Query(text=goal, app_key=self.app_key, snapshot=som_to_snapshot(post["som"]), mode="auto",
+                                              failure={"code": verdict.get("reason", ""), "controls": verdict.get("new", [])}))
+                for plan in ret.plans[:2]:
+                    for st in plan.steps:
+                        nm = str((st.args or {}).get("text") or (st.args or {}).get("label") or "")
+                        if st.route == "control_click" and nm and SG.is_safe(nm) and nm.lower() not in ("ok", "yes", "close"):
+                            names.append(nm)
+            except Exception:
+                pass
+        return names + ["Cancel", "No"]
+
     def step(self, goal: str) -> StepRecord:
-        t0 = time.perf_counter()
+        t_all = time.perf_counter()
+        tm: Dict[str, float] = {}
+
+        def timed(key: str, t0: float) -> None:
+            tm[key] = round(tm.get(key, 0.0) + (time.perf_counter() - t0), 2)
+
+        def look(fresh: bool = False) -> Dict[str, Any]:
+            t0 = time.perf_counter()
+            if self.reuse_post and not fresh and self._last_post is not None and time.time() - self._last_post[1] <= self.reuse_max_age_s:
+                obs = self._last_post[0]                           # the screen seen after the last step IS the screen this one starts from
+                tm["observe_reused"] = 1
+            else:
+                obs = self.observe()
+            self._last_post = None
+            timed("observe", t0)
+            return obs
         try:
-            pre = self.observe()
+            pre = look()
         except Exception as exc:                                   # no picture = no step: nothing is guessed, nothing is learned
             rec = StepRecord(goal, "no_observation", why=f"could not observe the application ({type(exc).__name__}: {str(exc)[:60]})")
             self.history.append(rec)
             return rec
-        snap = som_to_snapshot(pre["som"])
-        loc = self.rag.localize(self.app_key, snap) if self.rag is not None else None
-        src = getattr(loc, "state_id", None)
-        ret = self._retrieve(goal, snap)
-        action, source, reply = self._decide(goal, pre, ret)
-        evid = [e.text[:80] for e in (ret.evidence[:3] if ret else [])]
-        rec = StepRecord(goal, "no_action", source, action, src_state=src, reply=reply, evidence=evid)
-        g = guard_action(goal, action, pre["som"], self.allow)
-        if action is None:
-            rec.why = "the model gave no valid action"
-        elif not g["allowed"]:
-            rec.status, rec.why = "blocked", g["why"]
-        elif self.act is None:
-            rec.status, rec.why = "advised", "no actor attached"
-        else:
+        exclude: List[int] = []
+        rec = StepRecord(goal, "no_action")
+        for attempt in range(self.max_attempts):
+            snap = som_to_snapshot(pre["som"])
+            loc = self.rag.localize(self.app_key, snap) if self.rag is not None else None
+            src = getattr(loc, "state_id", None)
+            t0 = time.perf_counter()
+            ret = self._retrieve(goal, snap)
+            timed("retrieve", t0)
+            t0 = time.perf_counter()
+            action, source, reply = self._decide(goal, pre, ret, exclude)
+            timed("ground", t0)
+            note = ""
+            if source == "model":
+                fixed, fnote = self._assist(goal, action, pre)
+                if fnote and fixed.get("target_id") in exclude:                  # the one control that carries this name was already tried and undone: not clicked a second time
+                    rec.status, rec.why = "wrong_effect", "the only control with that name was already tried and its effect was not the goal's"
+                    break
+                action, note = fixed, fnote
+            rec.action, rec.source, rec.src_state, rec.reply, rec.assisted = action, source, src, reply, note or rec.assisted
+            rec.evidence = [e.text[:80] for e in (ret.evidence[:3] if ret else [])]
+            g = guard_action(goal, action, pre["som"], self.allow)
+            if action is None:
+                rec.status, rec.why = "no_action", "the model gave no valid action"
+                break
+            if not g["allowed"]:
+                rec.status, rec.why = "blocked", g["why"]
+                break
+            if self.act is None:
+                rec.status, rec.why = "advised", "no actor attached"
+                break
             el = element_by_id(pre["som"], action.get("target_id")) if action["action"] == "click" else None
-            rec.label = (el.get("label") if el else "") or goal
-            ok_sent, note = self.act(action, pre["som"])
+            rec.label = (el.get("label") if el else "") or (AV.explicit_name(goal) or goal)
+            t0 = time.perf_counter()
+            ok_sent, why_sent = self.act(action, pre["som"])
+            timed("act", t0)
             if not ok_sent:
-                rec.status, rec.why = "not_delivered", note
-            else:
-                self.sleep(self.settle_s)
+                rec.status, rec.why = "not_delivered", why_sent
+                break
+            t0 = time.perf_counter()
+            self.sleep(self.settle_s)
+            timed("settle", t0)
+            t0 = time.perf_counter()
+            try:
                 post = self.observe()
-                dst = self.rag.localize(self.app_key, som_to_snapshot(post["som"])) if self.rag is not None else None
-                dst_id = getattr(dst, "state_id", None)
-                worked, effect = self.verify(pre, post, src, dst_id)
-                rec.status, rec.effect, rec.dst_state = ("done" if worked else "no_effect"), effect, dst_id
-                rec.learned = self._learn(goal, action, rec, post, worked, effect, (time.perf_counter() - t0) * 1000)
-        rec.ms = round((time.perf_counter() - t0) * 1000, 1)
+            except Exception as exc:                               # the click went out but the window can no longer be seen: say so; nothing is learned from a step nobody could check
+                rec.status, rec.why, rec.reason = "no_observation", f"could not observe the application after the step ({type(exc).__name__}: {str(exc)[:60]})", "no_observation"
+                rec.attempts.append({"attempt": attempt + 1, "target_id": action.get("target_id"), "worked": False, "reason": "no_observation", "operated": str(why_sent)[:80]})
+                break
+            timed("observe", t0)
+            dst = self.rag.localize(self.app_key, som_to_snapshot(post["som"])) if self.rag is not None else None
+            dst_id = getattr(dst, "state_id", None)
+            t0 = time.perf_counter()
+            verdict = self._verdict(goal, action, pre, post, src, dst_id)
+            timed("verify", t0)
+            rec.effect, rec.dst_state, rec.reason = verdict["effect"], dst_id, verdict["reason"]
+            rec.attempts.append({"attempt": attempt + 1, "target_id": action.get("target_id"), "hotkey": action.get("hotkey"), "worked": verdict["worked"], "reason": verdict["reason"], "effect": verdict["effect"][:90],
+                                 "assisted": note, "operated": str(why_sent)[:80]})
+            rec.learned = self._learn(goal, action, rec, post, verdict["worked"], verdict["effect"], (time.perf_counter() - t_all) * 1000, verdict["reason"]) or rec.learned
+            if verdict["worked"]:
+                rec.status, rec.why = "done", ""
+                self._last_post = (post, time.time())
+                break
+            rec.status = "no_effect" if verdict["reason"] == "no_effect" else "wrong_effect"
+            rec.why = verdict["effect"]
+            if verdict["reason"] == "no_effect" or self.recover is None or attempt + 1 >= self.max_attempts:
+                self._last_post = (post, time.time()) if verdict["reason"] == "no_effect" else None
+                break
+            t0 = time.perf_counter()
+            back = self.recover(pre, post, verdict, self._recovery_names(goal, post, verdict))     # undo it before anything else is tried
+            timed("recover", t0)
+            rec.attempts[-1]["rollback"] = back
+            if not (back or {}).get("restored"):
+                break                                                                                  # could not get back to where we were: no second guess on a screen we do not understand
+            rec.rolled_back = True
+            if action.get("target_id") is not None:
+                exclude.append(action["target_id"])
+            try:
+                pre = look(fresh=True)
+            except Exception:
+                break
+        tm["total"] = round(time.perf_counter() - t_all, 2)
+        rec.timings = tm
+        rec.ms = round((time.perf_counter() - t_all) * 1000, 1)
         self.history.append(rec)
         return rec
 
-    def _learn(self, goal: str, action: Dict[str, Any], rec: StepRecord, post: Dict[str, Any], worked: bool, effect: str, ms: float) -> bool:
+    def _learn(self, goal: str, action: Dict[str, Any], rec: StepRecord, post: Dict[str, Any], worked: bool, effect: str, ms: float, reason: str = "") -> bool:
         """Report the step to the RAG: the topology graph learns the edge src_state -(command)-> dst_state (and an unverified one is credited as a failure)."""
         if self.rag is None:
             return False
@@ -298,7 +415,7 @@ class Agent:
             if kind != "type":
                 self.rag.lex.add_command(self.app_key, rec.label if kind == "click" else goal, source="executor", trust="learned")
             self.rag.observe(Outcome(self.run_id, self.app_key, PlanStep(cid, route, args, None, effect[:60], 0.5, "allow"), src_state=rec.src_state, observed_snapshot=som_to_snapshot(post["som"]),
-                                     ok=bool(worked), effect=effect if worked else "no_effect", latency_ms=float(ms), failure_code="" if worked else "no_effect", observed_dst=rec.dst_state))
+                                     ok=bool(worked), effect=effect if worked else (reason or "no_effect"), latency_ms=float(ms), failure_code="" if worked else (reason or "no_effect"), observed_dst=rec.dst_state))
             return True
         except Exception:
             return False
@@ -350,6 +467,7 @@ class LiveSession:
 
     def observe(self) -> Dict[str, Any]:
         from core_organs.harvest import video_pipeline as VP
+        self._repark()
         img, origin = None, (0, 0)
         for _ in range(3):                                         # a frame can fail to render for a moment (measured: the first grab after a window settles)
             img, origin = self.app.grab(popups=True)
@@ -360,9 +478,81 @@ class LiveSession:
             raise RuntimeError("no picture of the window")
         self.origin = origin
         self.size = img.size
-        return {"image": img, "som": VP.som_of_frame(img)}
+        som = VP.som_of_frame(img)
+        controls: List[Dict[str, Any]] = []
+        for attempt in range(2):
+            try:
+                controls = [{"name": c["name"], "type": c["type"], "box": c["box"], "toggle": self._toggle(c["ctl"]), "ctl": c["ctl"]} for c in self.app.controls(origin, img.size)]
+            except Exception:
+                controls = []
+            if len(controls) >= 5:
+                break
+            time.sleep(0.6)                                        # a half-read tree (measured: Strikethrough missing right after a toolbar click) is read again
+        return {"image": img, "som": som, "controls": controls}
+
+    def _repark(self) -> None:
+        """MEASURED: opening Notepad's Link dialog moved the PARKED window onto the real screen (rect -345,0 .. 755,760). It is put back to its off-screen sliver straight away."""
+        try:
+            if getattr(self.app, "bg", None) is not None and self.app.bg.mode == "parked":
+                self.app.bg.lay_out(settle_s=0.0)
+        except Exception:
+            pass
+
+    @staticmethod
+    def _toggle(ctl: Any) -> Optional[int]:
+        try:
+            import uiautomation as auto
+            pat = ctl.GetPattern(auto.PatternId.TogglePattern)
+            return int(pat.ToggleState) if pat is not None else None
+        except Exception:
+            return None
+
+    def recover(self, pre: Dict[str, Any], post: Dict[str, Any], verdict: Dict[str, Any], names: Sequence[str]) -> Dict[str, Any]:
+        """Undo a wrong effect and check that the screen is back: a dialog is dismissed (Escape; then a button the recovery playbook / the safe list names), a toggle that flipped by mistake is flipped back.
+        `restored` = the control names on screen are again those of the screen before the click."""
+        from core_organs import headless_input as hin
+        how: List[str] = []
+
+        def same() -> bool:
+            try:
+                now = {(c["type"], c["name"].lower()) for c in self.app.controls(self.origin, self.size)}
+            except Exception:
+                return False
+            before = {(c["type"], c["name"].lower()) for c in pre.get("controls") or []}
+            return bool(before) and len(before & now) / max(len(before | now), 1) >= 0.9
+        if verdict.get("reason") in ("unexpected_dialog", "wrong_control", "no_dialog"):
+            for nm in names:                                       # a posted Escape is ignored by a XAML dialog (measured): the dismissal button the playbook / safe list names goes first
+                ctl = next((c for c in self.app.controls(self.origin, self.size) if c["name"].lower() == nm.lower()), None)
+                if ctl is not None and self.app.act(ctl["ctl"]):
+                    how.append(f"clicked {nm}")
+                    time.sleep(0.8)
+                    break
+            self._repark()
+            if not same():
+                hin.post_key_combo(self.app.hwnd, "esc")
+                how.append("escape")
+                time.sleep(0.8)
+                self._repark()
+        if not same() or verdict.get("reason") in ("wrong_control", "toggle_unchanged"):
+            tname = verdict.get("target", "")
+            before = next((c for c in pre.get("controls") or [] if c["name"] == tname), None)
+            now = next((c for c in self.app.controls(self.origin, self.size) if c["name"] == tname), None)
+            if before is not None and now is not None and before.get("toggle") is not None and self._toggle(now["ctl"]) != before.get("toggle"):
+                try:
+                    import uiautomation as auto
+                    now["ctl"].GetPattern(auto.PatternId.TogglePattern).Toggle()
+                    how.append(f"toggled {tname} back")
+                    time.sleep(0.6)
+                except Exception:
+                    pass
+        return {"restored": same(), "how": ", ".join(how) or "nothing to undo"}
 
     def act(self, action: Dict[str, Any], som: Dict[str, Any]) -> Tuple[bool, str]:
+        res = self._act(action, som)
+        self._repark()
+        return res
+
+    def _act(self, action: Dict[str, Any], som: Dict[str, Any]) -> Tuple[bool, str]:
         kind = action["action"]
         if kind == "click":
             el = element_by_id(som, action.get("target_id"))
@@ -375,6 +565,9 @@ class LiveSession:
                     under = [c for c in self.app.controls(self.origin, self.size) if c["box"][0] <= cx <= c["box"][0] + c["box"][2] and c["box"][1] <= cy <= c["box"][1] + c["box"][3]]
                     if under:
                         best = min(under, key=lambda c: c["box"][2] * c["box"][3])
+                        from core_organs.harvest.local_recorder import CHROME_RX
+                        if CHROME_RX.search(best["name"]):
+                            return False, f"refused: {best['name']!r} is window chrome"
                         how = self.app.act(best["ctl"])
                         if how:
                             return True, f"uia {how} on {best['name']!r}"
