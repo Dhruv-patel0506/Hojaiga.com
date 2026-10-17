@@ -104,7 +104,7 @@ def clean_labels(elements: Sequence[Dict[str, Any]], limit: int = 8) -> List[str
     for e in elements:
         lab = (e.get("label") or "").strip()
         letters = sum(c.isalpha() for c in lab)
-        if len(lab) < 3 or letters < 3 or letters / len(lab) < 0.7 or lab.lower() in seen or re.search(r"[a-z][A-Z]", lab):
+        if len(lab) < 3 or letters < 3 or letters / len(lab) < 0.7 or lab.lower() in seen or re.search(r"[a-z][A-Z]|[\[\]{}|\<>~^`]", lab):
             continue
         seen.add(lab.lower())
         out.append(lab)
@@ -128,6 +128,21 @@ def _action(step: Dict[str, Any], target_id: Optional[int], expectation: str) ->
     if step.get("verb") in ("type", "enter") and step.get("quoted"):
         return {"step": 1, "action": "type", "target_id": target_id, "hotkey": None, "text": step["quoted"][0], "verify_expectation": expectation}
     return {"step": 1, "action": "click", "target_id": target_id, "hotkey": None, "text": None, "verify_expectation": expectation}
+
+
+def build_row(root: str, app_key: str, video_id: str, ev: Dict[str, Any], som: Dict[str, Any], goal: str, actions: List[Dict[str, Any]], pair_id: str, grounded: bool, ui_checked: Optional[bool],
+              extra_meta: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """One Unsloth-shaped training record (shared by the video explainer and the local recorder, so both emit exactly the same format). `ev` carries pre / post paths, t and the delta bbox."""
+    from . import video_pipeline as VP
+    rel = lambda p: os.path.relpath(p, root).replace("\\", "/") if os.path.isabs(p) and p.startswith(root) else p
+    meta = {"pair_id": pair_id, "app_key": app_key, "video_id": video_id, "t": ev["t"], "pre": rel(ev["pre"]), "post": rel(ev.get("post", "")), "delta_bbox": ev.get("bbox"), "grounded": grounded, "ui_frames": ui_checked,
+            "source_ref": f"{video_id}@{int(ev['t'])}", "som_elements": len(som["elements"])}
+    meta.update(extra_meta or {})
+    return {"messages": [
+        {"role": "system", "content": [{"type": "text", "text": _SYSTEM_HINT}]},
+        {"role": "user", "content": [{"type": "image", "image": rel(ev["pre"])}, {"type": "text", "text": f"Application: {app_key}\nElements:\n{VP.som_text(som)}\nGoal: {goal}"}]},
+        {"role": "assistant", "content": [{"type": "text", "text": json.dumps(actions, ensure_ascii=False)}]}],
+        "meta": meta}
 
 
 def explain_video(rag, app_key: str, video_id: str, segments: Sequence[Dict[str, Any]], keyframes: Sequence[Dict[str, Any]], title: str = "", out_jsonl: str = "", root: str = "",
@@ -205,13 +220,7 @@ def explain_video(rag, app_key: str, video_id: str, segments: Sequence[Dict[str,
                 expectation = "new on screen: " + ", ".join(names)
         grounded = el is not None or bool(step.get("chord"))
         actions = [_action(step, el["id"] if el else None, expectation)]
-        rel = lambda p: os.path.relpath(p, root).replace("\\", "/") if os.path.isabs(p) and p.startswith(root) else p
-        rows.append({"messages": [
-            {"role": "system", "content": [{"type": "text", "text": _SYSTEM_HINT}]},
-            {"role": "user", "content": [{"type": "image", "image": rel(ev["pre"])}, {"type": "text", "text": f"Application: {app_key}\nElements:\n{VP.som_text(som)}\nGoal: {goal_text(step)}"}]},
-            {"role": "assistant", "content": [{"type": "text", "text": json.dumps(actions, ensure_ascii=False)}]}],
-            "meta": {"pair_id": pair_id, "app_key": app_key, "video_id": video_id, "t": ev["t"], "pre": rel(ev["pre"]), "post": rel(ev.get("post", "")), "delta_bbox": ev.get("bbox"), "grounded": grounded, "ui_frames": ui_checked,
-                     "source_ref": f"{video_id}@{int(ev['t'])}", "som_elements": len(som["elements"])}})
+        rows.append(build_row(root, app_key, video_id, ev, som, goal_text(step), actions, pair_id, grounded, ui_checked))
         report["pairs"] += 1
         report["grounded"] += 1 if grounded else 0
     if rows:

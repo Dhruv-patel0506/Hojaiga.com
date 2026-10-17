@@ -12,6 +12,7 @@ si_tests_harvest -- tests for Checkpoint 3 (harvest/): the data pipeline that fe
   HV10 clips -> pairs batch driver: planning across videos, resumable, stops on failure streak / time budget, prunes unused frames, dataset report
   HV11 UI-frame gate: verdict parsing, cache, unverified fallback; no pair from a frame that is not a software UI
   HV12 step extraction on the phrasings that broke the first real run
+  HV13 local recorder: containment grounding, change detection, a stand-in app driven into click / hotkey / type pairs in the video format
   HV9  data-quality gates found on real footage: off-topic videos quarantined, loose verbs are not UI actions, audit + purge, one instruction labels one change
 """
 
@@ -672,7 +673,104 @@ def run_hv12() -> "TestOutcome":
     return _verdict(checks, f"mismatches={bad}")
 
 
-TESTS = [("HV1", run_hv1), ("HV2", run_hv2), ("HV3", run_hv3), ("HV4", run_hv4), ("HV5", run_hv5), ("HV6", run_hv6), ("HV7", run_hv7), ("HV8", run_hv8), ("HV9", run_hv9), ("HV10", run_hv10), ("HV11", run_hv11), ("HV12", run_hv12)]
+class _FakeCtl:
+    def __init__(self, name):
+        self.name = name
+
+
+class _FakeApp:
+    """Stands in for OwnedApp: a window that draws its state, with named controls. 'Seven' / 'Plus' change the picture, 'Inert' does not, 'Delete' must never be touched."""
+    mode = "fake"
+    LAYOUT = {"Seven": (10, 10, 100, 60), "Plus": (120, 10, 100, 60), "Inert": (230, 10, 100, 60), "Delete": (340, 10, 100, 60)}
+
+    def __init__(self):
+        self.state, self.touched, self.typed, self.popups = 0, [], "", 0
+
+    def grab(self, popups=False, stable=True):
+        from PIL import Image, ImageDraw
+        im = Image.new("RGB", (460, 200), (40, 40, 40))
+        d = ImageDraw.Draw(im)
+        for i, (n, b) in enumerate(self.LAYOUT.items()):
+            d.rectangle([b[0], b[1], b[0] + b[2], b[1] + b[3]], fill=(90, 90, 90))
+        d.rectangle([10, 100, 10 + 20 * (self.state + len(self.typed)), 150], fill=(250, 250, 250))
+        return im, (0, 0)
+
+    def controls(self, origin, size):
+        return [{"key": f"ButtonControl|{n}", "name": n, "type": "ButtonControl", "box": b, "ctl": _FakeCtl(n)} for n, b in self.LAYOUT.items()]
+
+    def act(self, ctl):
+        self.touched.append(ctl.name)
+        if ctl.name in ("Seven", "Plus"):
+            self.state += 1
+        return "Invoke"
+
+    def chord(self, combo):
+        if combo == "ctrl+h":
+            self.state += 2
+        elif combo == "esc":
+            self.state = max(0, self.state - 1)
+        return True
+
+    def type_text(self, text):
+        self.typed += text
+        return True
+
+    def clear_text(self):
+        self.typed = ""
+
+    def close_popups(self):
+        self.popups += 1
+        return 0
+
+
+def run_hv13() -> "TestOutcome":
+    """HV13: the local recorder -- target found by containment, change detection, and a driven stand-in app yields click / hotkey / type pairs in the video route's format, never touching an unsafe control"""
+    from core_organs import train_qlora as TQ
+    from core_organs.harvest import local_recorder as LR
+    # containment, not IoU: the scanner finds the glyph INSIDE a key
+    som = {"elements": [{"id": 1, "label": "", "box": [150, 30, 20, 20]}, {"id": 2, "label": "7", "box": [40, 30, 20, 20]}, {"id": 3, "label": "Calculator", "box": [0, 0, 460, 12]},
+                        {"id": 4, "label": "", "box": [30, 25, 20, 20]}, {"id": 5, "label": "wide", "box": [0, 20, 300, 50]}]}
+    pick = LR.element_at(som, (10, 10, 100, 60))
+    el_none = LR.element_at(som, (300, 100, 50, 50))
+    from PIL import Image, ImageDraw
+    a_img = Image.new("RGB", (100, 100), (0, 0, 0))
+    b_img = a_img.copy()
+    ImageDraw.Draw(b_img).rectangle([20, 30, 49, 59], fill=(255, 255, 255))
+    ok_ch, bbox = LR.changed(a_img, b_img)
+    ok_same, _ = LR.changed(a_img, a_img.copy())
+    LR.APPS["fake"] = {"launch": "x", "modes": [], "chords": [("ctrl+h", "Open the history panel", "esc")], "type": "hello"}
+    fake_som = lambda image, region=None: {"elements": [{"id": i + 1, "label": n, "role": "button", "box": [b[0] + 30, b[1] + 20, 30, 20]} for i, (n, b) in enumerate(_FakeApp.LAYOUT.items())],
+                                          "seconds": 0.0, "size": [460, 200], "tiers_used": [], "tiers_skipped": []}
+    try:
+        with _Dir() as root:
+            out = os.path.join(root, "t", "p.jsonl")
+            app = _FakeApp()
+            rep = LR.record_app("fake", max_actions=10, budget_s=60, root=root, out_jsonl=out, som_fn=fake_som, app=app, settle_s=0.0)
+            rows = [json.loads(l) for l in open(out, encoding="utf-8")]
+            acts = [json.loads(r["messages"][2]["content"][0]["text"])[0] for r in rows]
+            rep2 = LR.record_app("fake", max_actions=10, budget_s=60, root=root, out_jsonl=out, som_fn=fake_som, app=_FakeApp(), settle_s=0.0)
+            rows2 = [json.loads(l) for l in open(out, encoding="utf-8")]
+            validated = [TQ.validate_pair(r, root) for r in rows]
+            by_goal = {r["messages"][1]["content"][1]["text"].split("Goal: ")[1]: json.loads(r["messages"][2]["content"][0]["text"])[0] for r in rows}
+    finally:
+        LR.APPS.pop("fake", None)
+    clicks = [a_ for a_ in acts if a_["action"] == "click"]
+    seven = by_goal.get("Click the Seven button", {})
+    checks = {"the_glyph_inside_a_key_is_its_element_and_a_label_beats_none": pick is not None and pick["id"] == 2,
+              "nothing_inside_means_no_element": el_none is None,
+              "change_detection_finds_the_region": ok_ch and bbox == (20, 30, 30, 30) and not ok_same,
+              "click_pairs_for_controls_that_changed_the_picture": sorted(by_goal) == sorted(["Click the Seven button", "Click the Plus button", "Open the history panel", "Type 'hello'"]) and len(clicks) == 2,
+              "target_is_the_overlapping_element": seven.get("action") == "click" and seven.get("target_id") == 1,
+              "hotkey_and_type_pairs": by_goal["Open the history panel"]["hotkey"] == "ctrl+h" and by_goal["Type 'hello'"]["text"] == "hello",
+              "unsafe_control_never_touched": "Delete" not in app.touched and rep["skipped_unsafe"] == 1,
+              "inert_control_is_not_a_pair": rep["no_change"] == 1 and "Inert" in app.touched,
+              "rows_are_the_video_format_and_pass_the_training_validator": all(r["meta"]["ui_frames"] is True and r["meta"]["source"] == "local_uia" and r["meta"]["grounded"] for r in rows) and not any(validated),
+              "a_rerun_adds_nothing": rep2["pairs"] == 0 and rep2["duplicates"] >= 1 and len(rows2) == len(rows),
+              "popups_are_tidied_after_every_action": app.popups >= rep["actions"]}
+    return _verdict(checks, f"pairs={rep['pairs']} goals={sorted(by_goal)} rep={ {k: v for k, v in rep.items() if k not in ('jsonl',)} } validator={validated}")
+
+
+TESTS = [("HV1", run_hv1), ("HV2", run_hv2), ("HV3", run_hv3), ("HV4", run_hv4), ("HV5", run_hv5), ("HV6", run_hv6), ("HV7", run_hv7), ("HV8", run_hv8), ("HV9", run_hv9), ("HV10", run_hv10), ("HV11", run_hv11), ("HV12", run_hv12), ("HV13", run_hv13)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]
