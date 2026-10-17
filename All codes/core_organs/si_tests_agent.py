@@ -10,6 +10,7 @@ Rag over a temp store, so "the graph learns an edge after a verified step" is ch
   EX6  the adapter's prompt is the TRAINING prompt, byte for byte, and its reply parser
   EX7  state transitions: the same labels = the same state; a different screen = a new state and a distinct edge; a repeat of the step credits the same edge
   EX8  cold start: universal_scan runs only for an app nothing is known about, and only when asked
+  EX9  the live click-accuracy evaluator (UIA ground truth, seen vs unseen controls, baselines)
   TU1  advise(): says what to do, where (the box), a keyboard alternative from the RAG -- and does nothing and learns nothing
   TU2  advise() refuses what the guard refuses, in words
 """
@@ -324,7 +325,50 @@ def run_tu2() -> "TestOutcome":
     return _verdict(checks, f"say={adv['say']!r} / {adv2['say']!r}")
 
 
-TESTS = [("EX1", run_ex1), ("EX2", run_ex2), ("EX3", run_ex3), ("EX4", run_ex4), ("EX5", run_ex5), ("EX6", run_ex6), ("EX7", run_ex7), ("EX8", run_ex8), ("TU1", run_tu1), ("TU2", run_tu2)]
+class _EvalApp:
+    """A parked app with four controls; two are named in the 'training set'."""
+
+    def __init__(self):
+        self.boxes = {"Alpha": (10, 10, 100, 40), "Beta": (120, 10, 100, 40), "Gamma": (230, 10, 100, 40), "Delete": (340, 10, 100, 40), "Close": (450, 10, 60, 40)}
+
+    def grab(self, popups=False, stable=True):
+        return _image(60, 2), (0, 0)
+
+    def controls(self, origin, size):
+        return [{"key": f"ButtonControl|{n}", "name": n, "type": "ButtonControl", "box": b, "ctl": None, "popup": False} for n, b in self.boxes.items()]
+
+
+def run_ex9() -> "TestOutcome":
+    """EX9: the live click-accuracy evaluator -- UIA ground truth, seen vs unseen controls, unsafe controls never asked, honest baselines"""
+    import tempfile
+    from core_organs import live_eval as LE
+    app = _EvalApp()
+    som = {"elements": [{"id": i + 1, "label": n, "role": "button", "box": [b[0] + 30, b[1] + 15, 30, 10]} for i, (n, b) in enumerate(app.boxes.items())] + [{"id": 9, "label": "", "role": "button", "box": [700, 300, 20, 20]}],
+           "seconds": 0.0, "size": [800, 400], "tiers_used": [], "tiers_skipped": []}
+    asked = []
+
+    def ground(image, s, app_key, goal):
+        asked.append(goal)
+        right = {"Click the Alpha button": 1, "Click the Beta button": 2}.get(goal)           # right on the two 'seen' controls, wrong (the unnamed icon) on Gamma
+        return {"action": "click", "target_id": right if right else 9}, "reply"
+    with tempfile.TemporaryDirectory() as d:
+        with open(os.path.join(d, "train.jsonl"), "w", encoding="utf-8") as f:
+            f.write(json.dumps({"meta": {"source": "local_uia", "app_key": "evalapp", "uia_name": "Alpha"}}) + "\n")
+            f.write(json.dumps({"meta": {"source": "local_uia", "app_key": "evalapp", "uia_name": "Beta"}}) + "\n")
+            f.write(json.dumps({"meta": {"source": "video", "app_key": "evalapp", "uia_name": "Gamma"}}) + "\n")                 # not a local pair: does not count as seen
+        names = LE.trained_control_names(d)
+    res = LE.click_accuracy(app, "evalapp", ground, names["evalapp"], lambda img: som, max_controls=10)
+    sm = res["summary"]
+    checks = {"seen_means_in_the_training_split_of_local_pairs_only": names == {"evalapp": {"Alpha", "Beta"}},
+              "only_safe_controls_are_asked": asked == ["Click the Alpha button", "Click the Beta button", "Click the Gamma button"],
+              "the_answer_is_the_element_inside_the_control": [r["gt"] for r in res["rows"]] == [1, 2, 3],
+              "seen_and_unseen_are_scored_apart": sm["seen"] == {"n": 2, "exact": 1.0, "lexical_baseline": 1.0, "valid": 1.0, "chance": sm["seen"]["chance"]} and sm["unseen"]["n"] == 1 and sm["unseen"]["exact"] == 0.0,
+              "the_lexical_baseline_is_independent_of_the_model": sm["all"]["lexical_baseline"] == 1.0 and sm["all"]["exact"] == round(2 / 3, 3),
+              "chance_is_one_over_the_elements": abs(sm["all"]["chance"] - 1 / 6) < 0.001}
+    return _verdict(checks, f"summary={sm}")
+
+
+TESTS = [("EX1", run_ex1), ("EX2", run_ex2), ("EX3", run_ex3), ("EX4", run_ex4), ("EX5", run_ex5), ("EX6", run_ex6), ("EX7", run_ex7), ("EX8", run_ex8), ("EX9", run_ex9), ("TU1", run_tu1), ("TU2", run_tu2)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]

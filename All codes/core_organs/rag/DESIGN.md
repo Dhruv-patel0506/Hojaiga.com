@@ -794,3 +794,19 @@ owned instance (`professor.launcher` + `StateGuard`, parked off-screen by `backg
 - `universal_scan.scan(target)` is the **cold start** (`Agent.ensure_known`), opt-in: a whole-app scan, not a per-step observer.
 - **Tests:** EX1-EX8, TU1-TU2 (`si_tests_agent.py`; real RAG over a temp store, fake screen / model / hands).
 - **Live run** (owned Notepad, real adapter, real store): "Click the Bold button" -> clicked the right control (B) but the screen did not change (`no_effect`, reported to the graph as a failure); "Click the Strikethrough button" -> clicked, screen changed (`done`, edge learned); "Delete all my files" -> the model proposed `alt+delete`, the guard blocked it, nothing was sent. 37-53 s per step on this machine (model load once, ~6 s Set-of-Marks, generation). **Not yet:** a multi-step task end to end, an app outside the training set, or any measure of how often the adapter's click lands on the intended control outside the 13 held-out pairs (53.8% exact there).
+
+### 20b. Live evaluation of the executor (owned Notepad / Paint, 2026-10-17; `live_eval.py`)
+**Click accuracy outside the 13 held-out pairs.** Every safe control UI Automation reports on a live screen is a question with a known answer (the Set-of-Marks element containing its rectangle), asked in the training wording; no click is made. 43 controls over three screens (Notepad empty, Notepad with text, Paint), the run's TRAIN split deciding which controls count as "seen":
+
+| | n | adapter exact | lexical matcher (no model) | chance |
+|---|---|---|---|---|
+| all | 43 | **67.4%** | 44.2% | 2.8% |
+| controls seen in training | 24 | 66.7% | 37.5% | |
+| controls never labelled in training | 19 | **68.4%** | 52.6% | |
+| Notepad empty / with text / Paint | 17 / 17 / 9 | 64.7% / 58.8% / 88.9% | 35.3 / 35.3 / 77.8% | |
+
+Valid action 100%. Unseen is not worse than seen, which argues against memorised names, but n is small, two of three screens are the same app, and the model has never met an app outside Notepad / Paint / Calculator. Latency in this run: 30-65 s per question (SoM + generation on a busy machine).
+
+**Multi-step task through the real loop** (owned Notepad, real adapter, real RAG store): type text; click Bold, Italic, Strikethrough, Link, Cancel. Ground truth taken from the screen the model decided on (a first version read it after the step and was wrong; fixed). Results with the final, UIA-first actor: all six steps took effect; **the right control on 2 of 5 clicks** (Bold, Cancel). Italic -> the neighbouring Bold-row control; Strikethrough -> Link (opened the Link dialog), after which "Link" clicked inside the dialog; the error cascaded. Verification ("something changed") cannot tell a wrong control from the right one, so the loop reported `done` for all six: **a wrong click that changes the screen passes verify.** Open: compare the effect with the goal / the model's own `verify_expectation`, and stop or re-plan on a mismatch.
+
+**Hands.** The same three controls on an owned Notepad: UIA pattern call changed the screen 3/3, the posted virtual-mouse click 2/3 (and 0/4 in the first multi-step run). `LiveSession.act` is now UIA-first (the control under the point is operated through its own pattern; the posted click is the fallback).

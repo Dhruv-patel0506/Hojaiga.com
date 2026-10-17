@@ -331,11 +331,13 @@ class LiveSession:
     """`with LiveSession('notepad') as s: Agent('notepad', s.observe, grounder, s.act, rag).step('Click the Bold button')`.
     The app is OWNED (started by this process, state-guarded, parked off-screen, never the person's focus); input goes through professor.effectors (posted messages / UIA)."""
 
-    def __init__(self, launch_name: str):
+    def __init__(self, launch_name: str, uia_first: bool = True):
         from core_organs.harvest.local_recorder import OwnedApp
         self.app = OwnedApp(launch_name)
         self.eff = None
         self.origin = (0, 0)
+        self.size = (0, 0)
+        self.uia_first = uia_first
 
     def __enter__(self) -> "LiveSession":
         self.app.__enter__()
@@ -357,6 +359,7 @@ class LiveSession:
         if img is None:
             raise RuntimeError("no picture of the window")
         self.origin = origin
+        self.size = img.size
         return {"image": img, "som": VP.som_of_frame(img)}
 
     def act(self, action: Dict[str, Any], som: Dict[str, Any]) -> Tuple[bool, str]:
@@ -364,7 +367,20 @@ class LiveSession:
         if kind == "click":
             el = element_by_id(som, action.get("target_id"))
             x, y, w, h = el["box"]
-            return self.eff.click_xy(int(self.origin[0] + x + w / 2), int(self.origin[1] + y + h / 2))
+            cx, cy = x + w / 2, y + h / 2
+            if self.uia_first:
+                # MEASURED on an owned Notepad: a UIA pattern call on the control under the point worked 3 of 3; the posted mouse click worked 2 of 3 (and 0 of 4 in the multi-step run). So the control the
+                # point falls in is operated through its own pattern, and the posted click is the fallback for what UIA does not expose.
+                try:
+                    under = [c for c in self.app.controls(self.origin, self.size) if c["box"][0] <= cx <= c["box"][0] + c["box"][2] and c["box"][1] <= cy <= c["box"][1] + c["box"][3]]
+                    if under:
+                        best = min(under, key=lambda c: c["box"][2] * c["box"][3])
+                        how = self.app.act(best["ctl"])
+                        if how:
+                            return True, f"uia {how} on {best['name']!r}"
+                except Exception:
+                    pass
+            return self.eff.click_xy(int(self.origin[0] + cx), int(self.origin[1] + cy))
         if kind == "hotkey":
             return self.eff.key(str(action["hotkey"]))
         return self.eff.insert_text(str(action.get("text") or ""))
