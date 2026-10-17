@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import math
 import os
 import random
@@ -63,7 +64,7 @@ MODEL_SPECS: Dict[str, ModelSpec] = {
     "8b": ModelSpec("Qwen3-VL-8B-Instruct", 4096, 36, 12288, 32, 8, 128, 151936, False, 0.45e9, "measured from the local GGUF header; vision tower size estimated"),
     # NOT measured locally (no weights on disk): the published model configs, to be re-checked the moment a config.json is downloaded
     "4b": ModelSpec("Qwen3-VL-4B-Instruct", 2560, 36, 9728, 32, 8, 128, 151936, True, 0.40e9, "published config, unverified locally"),
-    "2b": ModelSpec("Qwen3-VL-2B-Instruct", 2048, 28, 6144, 16, 8, 128, 151936, True, 0.40e9, "published config, unverified locally"),
+    "2b": ModelSpec("Qwen3-VL-2B-Instruct", 2048, 28, 6144, 16, 8, 128, 151936, True, 0.40e9, "MEASURED: matches the downloaded config.json (28 layers, hidden 2048, ffn 6144, 16/8 heads, vocab 151936, tied embeddings); vision tower size estimated"),
 }
 HF_NAMES = {"8b": "Qwen/Qwen3-VL-8B-Instruct", "4b": "Qwen/Qwen3-VL-4B-Instruct", "2b": "Qwen/Qwen3-VL-2B-Instruct"}
 UNSLOTH_NAMES = {"8b": "unsloth/Qwen3-VL-8B-Instruct-unsloth-bnb-4bit", "4b": "unsloth/Qwen3-VL-4B-Instruct-unsloth-bnb-4bit", "2b": "unsloth/Qwen3-VL-2B-Instruct-unsloth-bnb-4bit"}
@@ -282,15 +283,36 @@ def validate_pair(rec: Dict[str, Any], root: str, require_ui: bool = True) -> Li
     return probs
 
 
+def _group_of(p: Dict[str, Any]) -> str:
+    """What must not straddle the split. A video's frames are near-duplicates of each other (group = the video). A locally recorded pair has ONE 'video' per app, so that would put a whole app on one side:
+    there the unit is the CONTROL (app + its UIA name): the eval set is then controls the model never saw a label for, on layouts it has seen."""
+    m = p.get("meta", {})
+    if m.get("source") == "local_uia":
+        return f"{m.get('app_key', '')}::{m.get('uia_name', '')}"
+    return m.get("video_id", "").split("@")[0]
+
+
 def split_by_video(pairs: Sequence[Dict[str, Any]], eval_frac: float, seed: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
-    """Train/eval split BY SOURCE VIDEO: frames of one video are near-duplicates of each other, so a random split would leak the answer into the eval set."""
-    vids = sorted({p.get("meta", {}).get("video_id", "").split("@")[0] for p in pairs})
+    """Train/eval split by GROUP (see _group_of): a random pair-level split would leak the answer into the eval set. Whole groups are moved to eval until it holds ~eval_frac of the pairs."""
+    groups: Dict[str, List[Dict[str, Any]]] = {}
+    for p in pairs:
+        groups.setdefault(_group_of(p), []).append(p)
+    keys = sorted(groups)
+    if len(keys) < 2:
+        return list(pairs), []
     rnd = random.Random(seed)
-    rnd.shuffle(vids)
-    n_eval = int(round(len(vids) * eval_frac)) if len(vids) > 1 else 0
-    eval_v = set(vids[:n_eval])
-    tr = [p for p in pairs if p.get("meta", {}).get("video_id", "").split("@")[0] not in eval_v]
-    ev = [p for p in pairs if p.get("meta", {}).get("video_id", "").split("@")[0] in eval_v]
+    rnd.shuffle(keys)
+    want = int(round(len(pairs) * eval_frac))
+    eval_k, n = set(), 0
+    for k in keys:
+        if n >= want or len(eval_k) >= len(keys) - 1:
+            break
+        eval_k.add(k)
+        n += len(groups[k])
+    if not eval_k:
+        eval_k.add(keys[0])
+    tr = [p for p in pairs if _group_of(p) not in eval_k]
+    ev = [p for p in pairs if _group_of(p) in eval_k]
     return tr, ev
 
 
@@ -536,6 +558,78 @@ def train(cfg: TrainConfig, force: bool = False, jsonl: str = "", root: str = ""
     return out
 
 
+# ---- evaluation ------------------------------------------------------------------------------------------------------------------------------------
+def parse_action(text: str) -> Optional[Dict[str, Any]]:
+    """The first action of a model's reply ('[{"step": 1, "action": ...}]', possibly wrapped in a code fence or prose), or None when it is not valid JSON of that shape."""
+    m = re.search(r"\[.*\]", text or "", re.S)
+    if not m:
+        return None
+    try:
+        arr = json.loads(m.group(0))
+    except Exception:
+        return None
+    return arr[0] if isinstance(arr, list) and arr and isinstance(arr[0], dict) else None
+
+
+def _norm_keys(k: Any) -> str:
+    return re.sub(r"\s+", "", str(k or "")).lower()
+
+
+def score_action(pred: Optional[Dict[str, Any]], gold: Dict[str, Any]) -> Dict[str, bool]:
+    """valid JSON / right kind of action / the whole action right (click: same target_id; hotkey: same keys; type: same text). verify_expectation is free text and not scored."""
+    if pred is None:
+        return {"valid": False, "action": False, "exact": False}
+    same_kind = pred.get("action") == gold.get("action")
+    exact = same_kind and (pred.get("target_id") == gold.get("target_id") if gold.get("action") == "click"
+                           else _norm_keys(pred.get("hotkey")) == _norm_keys(gold.get("hotkey")) if gold.get("action") == "hotkey"
+                           else str(pred.get("text") or "").strip() == str(gold.get("text") or "").strip())
+    return {"valid": True, "action": bool(same_kind), "exact": bool(exact)}
+
+
+def summarize_scores(rows: Sequence[Dict[str, bool]]) -> Dict[str, Any]:
+    n = max(len(rows), 1)
+    return {"n": len(rows), "valid_json": round(sum(r["valid"] for r in rows) / n, 3), "action_kind": round(sum(r["action"] for r in rows) / n, 3), "exact": round(sum(r["exact"] for r in rows) / n, 3)}
+
+
+def evaluate_run(run_dir: str, model_id: str, cfg: Optional[TrainConfig] = None, root: str = "", max_new_tokens: int = 160) -> Dict[str, Any]:
+    """Held-out pairs (run_dir/eval.jsonl): the BASE model (same 4-bit load) and base + the trained adapter, greedy decoding, scored with score_action. The honest question: did the adapter learn
+    anything the base model did not already do? (Held-out = controls the adapter never saw a label for, on layouts it has seen.)"""
+    import torch
+    from peft import PeftModel
+    from transformers import AutoProcessor, BitsAndBytesConfig, Qwen3VLForConditionalGeneration
+    cfg = cfg or TrainConfig(model=model_id)
+    root = root or default_root()
+    rows = [json.loads(l) for l in open(os.path.join(run_dir, "eval.jsonl"), encoding="utf-8")]
+    bf16 = torch.cuda.is_bf16_supported()
+    bnb = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=torch.bfloat16 if bf16 else torch.float16, llm_int8_skip_modules=["visual", "lm_head"])
+    model = Qwen3VLForConditionalGeneration.from_pretrained(model_id, quantization_config=bnb, device_map={"": 0}, dtype=torch.bfloat16 if bf16 else torch.float16)
+    proc = AutoProcessor.from_pretrained(model_id)
+    col = VLMCollator(proc, root, cfg.max_pixels, cfg.max_seq_length)
+
+    def run(m, tag: str) -> Dict[str, Any]:
+        m.eval()
+        scores, samples = [], []
+        for r in rows:
+            gold = json.loads(r["messages"][2]["content"][0]["text"])[0]
+            msgs = col._messages(r)[:-1]
+            enc = proc.apply_chat_template(msgs, tokenize=True, add_generation_prompt=True, return_dict=True, return_tensors="pt")
+            enc = {k: (v.to(m.device) if hasattr(v, "to") else v) for k, v in enc.items()}
+            with torch.no_grad():
+                out = m.generate(**enc, max_new_tokens=max_new_tokens, do_sample=False)
+            text = proc.batch_decode(out[:, enc["input_ids"].shape[1]:], skip_special_tokens=True)[0]
+            sc = score_action(parse_action(text), gold)
+            scores.append(sc)
+            samples.append({"goal": r["messages"][1]["content"][1]["text"].split("Goal: ")[-1][:70], "gold": {k: gold.get(k) for k in ("action", "target_id", "hotkey", "text")}, "reply": text[:200], **sc})
+        return {"scores": summarize_scores(scores), "samples": samples, "tag": tag}
+    res = {"base": run(model, "base")}
+    adapter = os.path.join(run_dir, "adapter")
+    if os.path.isdir(adapter):
+        tuned = PeftModel.from_pretrained(model, adapter)
+        res["adapter"] = run(tuned, "adapter")
+    json.dump(res, open(os.path.join(run_dir, "eval_report.json"), "w"), indent=2, default=str)
+    return res
+
+
 # ---- export ----------------------------------------------------------------------------------------------------------------------------------------------
 def export_plan(run_dir: str, base_model: str, llama_cpp_dir: str = "") -> Dict[str, Any]:
     """merge -> GGUF -> mmproj -> quantise -> the llama-server line this project already uses. Each step is a command; prerequisites are checked, nothing is guessed.
@@ -575,7 +669,7 @@ def merge_adapter(base_model: str, adapter_dir: str, out_dir: str) -> str:
 # ---- CLI -----------------------------------------------------------------------------------------------------------------------------------------------
 def main(argv: Optional[Sequence[str]] = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m core_organs.train_qlora")
-    ap.add_argument("cmd", choices=["preflight", "prepare", "train", "export"])
+    ap.add_argument("cmd", choices=["preflight", "prepare", "train", "evaluate", "export"])
     ap.add_argument("--model", default=TrainConfig.model)
     ap.add_argument("--backend", default="auto")
     ap.add_argument("--seq", type=int, default=2048)
@@ -596,6 +690,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         out = prepare(cfg, a.jsonl)
     elif a.cmd == "train":
         out = train(cfg, a.force, a.jsonl)
+    elif a.cmd == "evaluate":
+        res = evaluate_run(a.run, cfg.model, cfg)
+        out = {k: v["scores"] for k, v in res.items()}
     else:
         out = export_plan(a.run or os.path.join(default_root(), "training", "runs"), a.model)
     print(json.dumps(out, indent=2, default=str))

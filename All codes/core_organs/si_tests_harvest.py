@@ -16,6 +16,7 @@ si_tests_harvest -- tests for Checkpoint 3 (harvest/): the data pipeline that fe
   HV14 captions through yt-dlp (paced, cookie-free, block = stop) + the local speech fallback
   HV15 keyframe pre-filter + normalized token-overlap target matcher
   HV16 the slow YouTube loop (per-app harvest then pairs; target / deadline / audio-refusal stops)
+  HV17 failover on a caption refusal: static sources at once, no waiting, no speech recognition
   HV9  data-quality gates found on real footage: off-topic videos quarantined, loose verbs are not UI actions, audit + purge, one instruction labels one change
 """
 
@@ -119,7 +120,7 @@ def run_hv1() -> "TestOutcome":
         # a blocked address stops the run instead of hammering
         net_b, log_b = fake_net({M.WINGET_CSV: WINGET_FIXTURE.encode("utf-8")}, {"v_ok1": PermissionError("RequestBlocked"), "v_ok2": segs}, {"notepad": vids, "obs": [{"id": "v_ok2", "title": "x", "duration": 600, "view_count": 1}]})
         with _Dir() as root_b:
-            rep_b = M.run_harvester(max_apps=2, videos_per_app=2, net=net_b, root=root_b, delay_s=0)
+            rep_b = M.run_harvester(max_apps=2, videos_per_app=2, net=net_b, root=root_b, delay_s=0, on_block="wait")
         # winget unreachable: only the seed apps, and it SAYS so
         net_n, _ = fake_net({})
         plan_n = M.build_app_list(net_n, limit=40)
@@ -884,7 +885,7 @@ def run_hv14() -> "TestOutcome":
         calls["n"] = 0
         net = M.Net(http_get=lambda u: WINGET_FIXTURE.encode("utf-8") if u == M.WINGET_CSV else None, search=lambda q, n: [video], transcript=fn, sleep=lambda x: waits.append(x))
         with _Dir() as r2:
-            rep_c = M.run_harvester(max_apps=1, videos_per_app=1, net=net, root=r2, delay_s=0, write_workbook=False, only_apps=["Notepad"], block_cooldowns=(600, 1200))
+            rep_c = M.run_harvester(max_apps=1, videos_per_app=1, net=net, root=r2, delay_s=0, write_workbook=False, only_apps=["Notepad"], block_cooldowns=(600, 1200), on_block="wait")
         out[tag] = (rep_c["blocked"], rep_c["stats"]["downloaded"], rep_c["stats"]["cooldowns"], [w for w in waits if w >= 600])
     # captions refused for good: after the cool-offs the caption endpoint is left alone for a while and on-topic videos are recognised locally; an off-topic title is not worth CPU time
     vids2 = [{"id": "w1", "title": "Notepad tutorial", "duration": 600, "view_count": 9}, {"id": "w2", "title": "Notepad tips", "duration": 600, "view_count": 8},
@@ -901,14 +902,14 @@ def run_hv14() -> "TestOutcome":
         return segs_ok
     net2 = M.Net(http_get=lambda u: WINGET_FIXTURE.encode("utf-8") if u == M.WINGET_CSV else None, search=lambda q, n: vids2, transcript=refused, whisper=speech, sleep=lambda x: waits.append(x))
     with _Dir() as r3:
-        rep_w = M.run_harvester(max_apps=1, videos_per_app=3, net=net2, root=r3, delay_s=0, write_workbook=False, only_apps=["Notepad"], block_cooldowns=(600, 1200))
+        rep_w = M.run_harvester(max_apps=1, videos_per_app=3, net=net2, root=r3, delay_s=0, write_workbook=False, only_apps=["Notepad"], block_cooldowns=(600, 1200), on_block="wait")
     # the refusal first lands on a video whose title is off-topic: that is not a block, the run goes on to the next video
     vids3 = [{"id": "x1", "title": "Cooking pasta", "duration": 600, "view_count": 9}, {"id": "x2", "title": "Notepad tips", "duration": 600, "view_count": 8}]
     heard3 = []
     net3 = M.Net(http_get=lambda u: WINGET_FIXTURE.encode("utf-8") if u == M.WINGET_CSV else None, search=lambda q, n: vids3, transcript=lambda v, l: (_ for _ in ()).throw(PermissionError("Blocked:429")),
                  whisper=lambda v: (heard3.append(v), segs_ok)[1], sleep=lambda x: None)
     with _Dir() as r4:
-        rep_o = M.run_harvester(max_apps=1, videos_per_app=2, net=net3, root=r4, delay_s=0, write_workbook=False, only_apps=["Notepad"], block_cooldowns=(60,))
+        rep_o = M.run_harvester(max_apps=1, videos_per_app=2, net=net3, root=r4, delay_s=0, write_workbook=False, only_apps=["Notepad"], block_cooldowns=(60,), on_block="wait")
     checks = {"rolling_auto_captions_merge_and_noise_is_dropped": [(s["text"], s["start"]) for s in parsed] == [("now click the File menu", 0.0), ("then press Ctrl+S", 12.0)],
               "captions_come_back_as_segments": [s["text"] for s in got] == [s["text"] for s in parsed],
               "paced_exactly_as_asked": seen_opts.get("sleep_interval_requests") == 1.5 and seen_opts.get("sleep_interval") == 2 and seen_opts.get("max_sleep_interval") == 5,
@@ -984,7 +985,7 @@ def run_hv16() -> "TestOutcome":
     calls, usable, block_on = [], {"n": 100}, {"app": ""}
 
     def fake_h(**kw):
-        calls.append(("harvest", kw["only_apps"][0], kw["videos_per_app"], tuple(kw["block_cooldowns"]), kw["whisper_fallback"], sorted(kw)))
+        calls.append(("harvest", kw["only_apps"][0], kw["videos_per_app"], tuple(kw["block_cooldowns"]), kw["whisper_fallback"], sorted(kw), kw["on_block"]))
         return {"stats": {"downloaded": 1}, "blocked": kw["only_apps"][0] == block_on["app"]}
 
     def fake_p(rag, root, **kw):
@@ -994,7 +995,11 @@ def run_hv16() -> "TestOutcome":
     M.run_harvester, PB.run_pairs_batch, YL._usable = fake_h, fake_p, lambda root: usable["n"]
     try:
         log = []
-        r_target = YL.run_loop(hours=1.0, target=190, videos_per_app=3, apps=["notepad", "slack", "vlc"], log=log.append)
+        r_default = YL.run_loop(hours=1.0, target=10 ** 6, videos_per_app=3, apps=["notepad"], log=log.append)
+        default_call = calls[0]
+        calls.clear()
+        usable["n"] = 100
+        r_target = YL.run_loop(hours=1.0, target=190, videos_per_app=3, apps=["notepad", "slack", "vlc"], whisper=True, log=log.append)
         first = list(calls[:3])
         harvested = [c[1] for c in calls if c[0] == "harvest"]
         calls.clear()
@@ -1011,14 +1016,44 @@ def run_hv16() -> "TestOutcome":
         M.run_harvester, PB.run_pairs_batch, YL._usable = real_h, real_p, real_u
     checks = {"stops_when_the_target_is_reached": r_target["stopped"] == "target reached" and r_target["rounds"][-1]["usable_now"] >= 190 and harvested == ["Notepad", "VLC Media Player", "Slack"][:len(harvested)],
               "each_app_is_harvested_then_only_its_own_clips_become_pairs": [c[0] for c in first[:2]] == ["harvest", "pairs"] and first[1][1] == ["notepad"] and first[2][0] == "harvest" and first[2][1] == "VLC Media Player",
-              "a_short_cool_off_and_local_speech_recognition_no_cookies": first[0][3] == (60,) and first[0][4] is True and first[0][2] == 3 and not any("cookie" in k for k in first[0][5]),
+              "the_default_fails_over_without_waiting_or_transcribing": default_call[3] == () and default_call[4] is False and default_call[6] == "failover",
+              "a_short_cool_off_and_local_speech_recognition_no_cookies": first[0][3] == (60,) and first[0][4] is True and first[0][6] == "wait" and first[0][2] == 3 and not any("cookie" in k for k in first[0][5]),
               "a_passed_deadline_does_nothing": r_deadline["stopped"] == "deadline" and n_deadline == 0,
               "an_audio_refusal_stops_the_loop_after_that_apps_own_pairs": r_block["stopped"].startswith("blocked") and seq_block == ["Notepad", "VLC Media Player", "Slack"] and len(pairs_after_block) == 3,
               "every_round_is_logged": len(log) >= 5}
     return _verdict(checks, f"target={r_target['stopped']} harvested={harvested} deadline={r_deadline['stopped']} block={r_block['stopped']} seq={seq_block}")
 
 
-TESTS = [("HV1", run_hv1), ("HV2", run_hv2), ("HV3", run_hv3), ("HV4", run_hv4), ("HV5", run_hv5), ("HV6", run_hv6), ("HV7", run_hv7), ("HV8", run_hv8), ("HV9", run_hv9), ("HV10", run_hv10), ("HV11", run_hv11), ("HV12", run_hv12), ("HV13", run_hv13), ("HV14", run_hv14), ("HV15", run_hv15), ("HV16", run_hv16)]
+def run_hv17() -> "TestOutcome":
+    """HV17: failover on a caption refusal -- no sleeping, no speech recognition; the app goes to the static sources at once, the caption endpoint is left alone for the following apps"""
+    from core_organs.harvest import free_master_harvester as M
+    slept, static_calls, transcript_calls, heard = [], [], [], []
+    vids = [{"id": "f1", "title": "Notepad tutorial", "duration": 600, "view_count": 9}, {"id": "f2", "title": "Notepad tips", "duration": 600, "view_count": 8}]
+
+    def refused(vid, langs):
+        transcript_calls.append(vid)
+        raise PermissionError("Blocked:429")
+
+    def static(app_name, root):
+        static_calls.append(app_name)
+        return {"ok": True}
+    net = M.Net(http_get=lambda u: WINGET_FIXTURE.encode("utf-8") if u == M.WINGET_CSV else None, search=lambda q, n: vids, transcript=refused, whisper=lambda v: heard.append(v) or [], sleep=lambda x: slept.append(x))
+    with _Dir() as root:
+        rep = M.run_harvester(max_apps=2, videos_per_app=2, net=net, root=root, delay_s=0, write_workbook=False, static_source=static, only_apps=["Notepad", "Windows Calculator"])
+        state = json.load(open(os.path.join(root, "harvest_state.json"), encoding="utf-8"))
+    import inspect
+    params = inspect.signature(M.run_harvester).parameters
+    checks = {"a_refusal_costs_no_sleep_and_no_speech_recognition": all(w <= 0 for w in slept) and heard == [] and rep["stats"]["cooldowns"] == 0,
+              "the_app_switches_to_static_sources_at_once": static_calls[:1] == ["Notepad"] and rep["stats"]["failover"] >= 1,
+              "the_refused_video_is_not_retried_and_the_next_one_is_skipped": transcript_calls == ["f1"],
+              "the_next_app_never_asks_the_caption_endpoint": static_calls == ["Notepad", "Windows Calculator"] and transcript_calls == ["f1"] and rep["stats"]["failover"] == 2,
+              "nothing_is_reported_as_a_block_and_the_batch_finishes": not rep["blocked"] and rep["stats"]["apps_processed"] == 2 and rep["failed_over"] == ["notepad", "calculator"],
+              "failed_over_apps_are_marked_done": all(state["done_apps"].get(k) for k in ("notepad", "calculator")),
+              "defaults_are_failover_no_whisper_no_cool_off": params["on_block"].default == "failover" and params["whisper_fallback"].default is False and tuple(params["block_cooldowns"].default) == ()}
+    return _verdict(checks, f"slept={slept} static={static_calls} captions_asked={transcript_calls} stats={ {k: rep['stats'][k] for k in ('failover', 'captions_down', 'static_ok')} }")
+
+
+TESTS = [("HV1", run_hv1), ("HV2", run_hv2), ("HV3", run_hv3), ("HV4", run_hv4), ("HV5", run_hv5), ("HV6", run_hv6), ("HV7", run_hv7), ("HV8", run_hv8), ("HV9", run_hv9), ("HV10", run_hv10), ("HV11", run_hv11), ("HV12", run_hv12), ("HV13", run_hv13), ("HV14", run_hv14), ("HV15", run_hv15), ("HV16", run_hv16), ("HV17", run_hv17)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]

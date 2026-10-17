@@ -263,10 +263,28 @@ def fetch_transcript(net: Net, root: str, app_key: str, video_id: str, languages
 
 
 # ---- the run --------------------------------------------------------------------------------------------------------------------------------------------
+def _static_docs(app_name: str, root: str) -> Dict[str, Any]:
+    """The source that never rate-limits: public shortcut tables (robots.txt respected) and tldr pages for this app, through the hotkeys harvester -> sheets 3-4 + JSONL (bridge.ingest_all puts them in the
+    RAG). Nothing is executed on this machine (no `--help` of unknown programs)."""
+    from . import free_hotkeys_and_macros_harvester as K
+    try:
+        r = K.run_hotkeys_and_macros_harvester(app_names=[app_name], max_apps=1, scrape=True, tldr=True, use_model=False, root=root, write_workbook=True)
+        return {"ok": True, **{k: v for k, v in r.items() if k in ("stats",)}}
+    except Exception as exc:
+        return {"ok": False, "error": f"{type(exc).__name__}: {str(exc)[:80]}"}
+
+
 def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, net: Optional[Net] = None, root: str = "", delay_s: float = 2.0, app_limit: int = 1000,
                   queries=("{app} tutorial step by step", "{app} how to use interface"), only_apps: Optional[List[str]] = None,
-                  write_workbook: bool = True, stop_on_block: bool = True, whisper_fallback: bool = True, block_cooldowns=(600, 1200), captions_down_s: float = 1800.0) -> Dict[str, Any]:
-    """Harvest one batch: apps[start : start+max_apps]. Returns a report. Safe to re-run: finished apps are skipped, transcripts are cached, sheets are merged."""
+                  write_workbook: bool = True, stop_on_block: bool = True, whisper_fallback: bool = False, block_cooldowns=(), captions_down_s: float = 1800.0,
+                  on_block: str = "failover", static_source: Optional[Callable[[str, str], Dict[str, Any]]] = None) -> Dict[str, Any]:
+    """Harvest one batch: apps[start : start+max_apps]. Returns a report. Safe to re-run: finished apps are skipped, transcripts are cached, sheets are merged.
+
+    on_block="failover" (default): a caption refusal (HTTP 429, per-address) costs NO waiting and NO speech recognition. The app switches at once to the sources that never rate-limit (public shortcut
+    tables, tldr pages: `static_source`), the caption endpoint is left alone for `captions_down_s` for every following app, and the batch moves on. on_block="wait": the older behaviour (cool-offs
+    `block_cooldowns`, then local speech recognition when whisper_fallback) for a run where time does not matter."""
+    failover = on_block == "failover"
+    static_source = static_source or _static_docs
     net = net or Net(whisper=_whisper if whisper_fallback else None)
     root = root or harvest_dir()[0]
     os.makedirs(os.path.join(root, "transcripts_json"), exist_ok=True)
@@ -282,12 +300,21 @@ def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, ne
         apps = [a for a in apps if a["app_name"].lower() in want or a["app_key"] in want]
     batch = apps[start:start + max_apps]
     video_rows: List[Dict[str, Any]] = []
-    stats = {"apps_processed": 0, "apps_skipped_done": 0, "videos": 0, "downloaded": 0, "cached": 0, "no_subtitles": 0, "other_language": 0, "off_topic": 0, "blocked": 0, "errors": 0, "via_whisper": 0, "cooldowns": 0, "captions_down": 0}
+    stats = {"apps_processed": 0, "apps_skipped_done": 0, "videos": 0, "downloaded": 0, "cached": 0, "no_subtitles": 0, "other_language": 0, "off_topic": 0, "blocked": 0, "errors": 0, "via_whisper": 0, "cooldowns": 0, "captions_down": 0, "failover": 0, "static_ok": 0}
     blocked = False
     captions_down_until = 0.0
+    failed_over: List[str] = []
     for app in batch:
         if app["app_key"] in state["done_apps"]:
             stats["apps_skipped_done"] += 1
+            continue
+        if failover and time.monotonic() < captions_down_until:
+            stats["failover"] += 1                                       # captions are refused for this address right now: this app goes straight to the static sources
+            failed_over.append(app["app_key"])
+            r_static = static_source(app["app_name"], root)
+            stats["static_ok"] += 1 if r_static.get("ok") else 0
+            state["done_apps"][app["app_key"]] = {"ts": time.time(), "videos": 0, "failover": True}
+            stats["apps_processed"] += 1
             continue
         found: List[Dict[str, Any]] = []
         for q in queries:
@@ -298,7 +325,7 @@ def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, ne
                 video_rows.append({"app_name": app["app_name"], "app_key": app["app_key"], "video_id": "", "transcript_status": f"SearchError:{type(exc).__name__}"})
             net.sleep(delay_s)
         for v in pick_videos(found, videos_per_app):
-            if net.whisper is not None and time.monotonic() < captions_down_until:
+            if not failover and net.whisper is not None and time.monotonic() < captions_down_until:
                 # the caption endpoint refused this address a moment ago and a cool-off did not clear it: do not ask again yet; the speaker's own words are recognised locally instead (only for a video
                 # whose TITLE names the app: CPU time is not spent on a video the on-topic gate would discard)
                 t = fetch_transcript(net, root, app["app_key"], v["id"], captions=False) if on_topic(app["app_name"], v["title"]) else {"status": "Off_Topic", "segments": 0, "path": ""}
@@ -315,7 +342,7 @@ def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, ne
                 net.sleep(wait)
                 t = fetch_transcript(net, root, app["app_key"], v["id"])
                 st = t["status"]
-            if st.startswith("Blocked") and net.whisper is not None and time.monotonic() >= captions_down_until:
+            if not failover and st.startswith("Blocked") and net.whisper is not None and time.monotonic() >= captions_down_until:
                 captions_down_until = time.monotonic() + captions_down_s       # still refused after the cool-offs: stop asking the caption endpoint for a while
                 stats["captions_down"] += 1
                 if on_topic(app["app_name"], v["title"]):
@@ -340,6 +367,15 @@ def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, ne
             video_rows.append({"app_name": app["app_name"], "app_key": app["app_key"], "video_id": v["id"], "title": v["title"], "url": f"https://www.youtube.com/watch?v={v['id']}",
                                "duration_sec": v.get("duration", 0), "view_count": v.get("view_count", 0), "channel": v.get("uploader", ""), "transcript_status": st,
                                "transcript_segments": t["segments"], "local_json_path": os.path.relpath(t["path"], root).replace("\\", "/") if t["path"] else ""})
+            if st.startswith("Blocked") and failover:
+                captions_down_until = time.monotonic() + captions_down_s     # no waiting, no speech recognition: this app's remaining videos are skipped and the static sources are used
+                stats["captions_down"] += 1
+                stats["failover"] += 1
+                failed_over.append(app["app_key"])
+                r_static = static_source(app["app_name"], root)
+                stats["static_ok"] += 1 if r_static.get("ok") else 0
+                video_rows[-1]["transcript_status"] = "Failover:static_sources"
+                break
             if st.startswith("Blocked"):
                 blocked = True
                 break
@@ -350,7 +386,7 @@ def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, ne
         stats["apps_processed"] += 1
     with open(state_path, "w", encoding="utf-8") as f:
         json.dump(state, f)
-    out = {"root": root, "winget_ok": plan["winget_ok"], "winget_rows": plan["winget_rows"], "apps_planned": len(plan["apps"]), "batch": [a["app_name"] for a in batch], "stats": stats, "blocked": blocked}
+    out = {"root": root, "winget_ok": plan["winget_ok"], "winget_rows": plan["winget_rows"], "apps_planned": len(plan["apps"]), "batch": [a["app_name"] for a in batch], "stats": stats, "blocked": blocked, "failed_over": failed_over}
     if write_workbook:
         out["workbook"] = write_sheets(root, plan["apps"], video_rows)
     return out

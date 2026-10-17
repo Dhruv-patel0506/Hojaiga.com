@@ -421,7 +421,40 @@ def run_tr8() -> "TestOutcome":
     return _verdict(checks, f"{len(allp)} pairs, {len(good)} valid, {len(grounded_valid)} grounded+valid, {len(bad)} invalid {[p[:1] for _, p in bad][:3]} -- the brief wants 10,000-25,000")
 
 
-TESTS = [("TR1", run_tr1), ("TR2", run_tr2), ("TR3", run_tr3), ("TR4", run_tr4), ("TR5", run_tr5), ("TR6", run_tr6), ("TR7", run_tr7), ("TR8", run_tr8), ("TR9", run_tr9)]
+def run_tr10() -> "TestOutcome":
+    """TR10: the held-out split keeps a control's pairs together (locally recorded data has one 'video' per app), and the evaluation scorer counts valid / right-kind / exact honestly"""
+    from core_organs import train_qlora as TQ
+    pairs = []
+    for app in ("calc", "pad"):
+        for ctl in range(12):
+            for rep_ in range(2):                                      # two pairs per control: a leak would put one in train and one in eval
+                pairs.append({"meta": {"source": "local_uia", "app_key": app, "uia_name": f"ctl{ctl}", "video_id": f"local_{app}@{ctl}{rep_}"}})
+    vids = [{"meta": {"video_id": f"vid{i}@{j}"}} for i in range(6) for j in range(3)]
+    tr, ev = TQ.split_by_video(pairs, 0.1, 3407)
+    groups_tr = {TQ._group_of(p) for p in tr}
+    groups_ev = {TQ._group_of(p) for p in ev}
+    tv, evv = TQ.split_by_video(vids, 0.2, 3407)
+    one_group, none = TQ.split_by_video(pairs[:2], 0.5, 1)
+    gold_click, gold_key, gold_type = {"action": "click", "target_id": 7}, {"action": "hotkey", "hotkey": "alt+2"}, {"action": "type", "text": "hi"}
+    p = TQ.parse_action
+    checks = {"a_split_gives_an_eval_set_of_about_the_asked_size": 2 <= len(ev) <= 6 and len(tr) + len(ev) == len(pairs),
+              "a_control_never_straddles_train_and_eval": not (groups_tr & groups_ev) and all(sum(1 for q in ev if TQ._group_of(q) == g) == 2 for g in groups_ev),
+              "videos_still_split_by_video": {q["meta"]["video_id"].split("@")[0] for q in tv}.isdisjoint({q["meta"]["video_id"].split("@")[0] for q in evv}) and len(evv) > 0,
+              "one_group_means_no_eval": none == [] and len(one_group) == 2,
+              "parse_finds_the_action_in_fences_and_prose": p('```json\n[{"action": "click", "target_id": 7}]\n```')["target_id"] == 7 and p('Sure: [{"action":"hotkey","hotkey":"alt+2"}] done')["action"] == "hotkey",
+              "parse_rejects_non_json": p("click the File menu") is None and p("[not json]") is None and p("[]") is None,
+              "exact_needs_the_right_target": TQ.score_action(p('[{"action":"click","target_id":7}]'), gold_click) == {"valid": True, "action": True, "exact": True}
+                                              and TQ.score_action(p('[{"action":"click","target_id":8}]'), gold_click) == {"valid": True, "action": True, "exact": False},
+              "right_kind_wrong_answer_and_wrong_kind": TQ.score_action({"action": "hotkey", "hotkey": "ctrl+s"}, gold_click) == {"valid": True, "action": False, "exact": False},
+              "hotkey_compares_keys_not_spacing_or_case": TQ.score_action({"action": "hotkey", "hotkey": "Alt + 2"}, gold_key)["exact"] and not TQ.score_action({"action": "hotkey", "hotkey": "alt+4"}, gold_key)["exact"],
+              "type_compares_the_text": TQ.score_action({"action": "type", "text": " hi "}, gold_type)["exact"] and not TQ.score_action({"action": "type", "text": "ho"}, gold_type)["exact"],
+              "invalid_output_scores_zero": TQ.score_action(None, gold_click) == {"valid": False, "action": False, "exact": False},
+              "summary_is_rates": TQ.summarize_scores([{"valid": True, "action": True, "exact": True}, {"valid": True, "action": False, "exact": False}, {"valid": False, "action": False, "exact": False}, {"valid": True, "action": True, "exact": False}])
+                                  == {"n": 4, "valid_json": 0.75, "action_kind": 0.5, "exact": 0.25}}
+    return _verdict(checks, f"eval={len(ev)} of {len(pairs)} ({len(groups_ev)} controls held out)")
+
+
+TESTS = [("TR1", run_tr1), ("TR2", run_tr2), ("TR3", run_tr3), ("TR4", run_tr4), ("TR5", run_tr5), ("TR6", run_tr6), ("TR7", run_tr7), ("TR8", run_tr8), ("TR9", run_tr9), ("TR10", run_tr10)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]
