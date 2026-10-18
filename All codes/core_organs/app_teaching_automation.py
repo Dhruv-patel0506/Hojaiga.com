@@ -497,10 +497,11 @@ class AppIntelligenceEngine:
             drv = WR.CdpDriver(CdpPage(new[-1]))
             ai = SBR.ai_summary(drv, query)
         if ai.get("found") and len(ai.get("steps") or []) < 3:                  # a summary written as prose: its sentences are the steps
-            sents = [x.strip() for x in re.split(r"(?<=[.!?])\s+|\n+", ai.get("text", "")) if 25 <= len(x.strip()) <= 300 and not re.match(r"(?i)(like|dislike|show more|sources?)\b", x.strip())]
+            act = re.compile(r"\b(click|select|choose|open|press|go to|navigate|tap|use|type|enter|drag|hold|check|toggle|set|add|insert|save|export|draw|fill|pick|then)\b", re.I)
+            sents = [x.strip() for x in re.split(r"(?<=[.!?])\s+|\n+", ai.get("text", "")) if 25 <= len(x.strip()) <= 300 and act.search(x) and not re.match(r"(?i)(like|dislike|show more|sources?)\b", x.strip())]
             if len(sents) > len(ai.get("steps") or []):
                 ai["steps"] = [{"text": x, "names": [], "keys": [k if isinstance(k, str) else k[0] for k in LC.KEY_RX.findall(x)][:3], "imgs": []} for x in sents[:12]]
-        out["found"] = bool(ai.get("found") and ai.get("steps"))
+        out["found"] = bool(ai.get("found") and len(ai.get("steps") or []) >= 2)             # a summary with fewer than two instruction lines is not a lesson
         if out["found"]:
             steps = ai["steps"]
             out["steps"] = [st["text"] for st in steps]

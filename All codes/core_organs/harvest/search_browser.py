@@ -162,7 +162,7 @@ def steps_from_summary(text: str, items: Sequence[str] = ()) -> List[Dict[str, A
 AI_JS_GOOGLE = r"""(function(){
   function txt(e){return (e.innerText||'').replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim();}
   var heads=[].slice.call(document.querySelectorAll('h1,h2,h3,div,span')).filter(function(e){var t=(e.innerText||'').trim();return /^(AI Overview|AI Mode)$/i.test(t)&&e.children.length<=2;});
-  for(var i=0;i<heads.length;i++){var n=heads[i];for(var k=0;k<8&&n;k++){n=n.parentElement;if(n&&txt(n).length>260){var items=[].slice.call(n.querySelectorAll('li,p')).map(txt).filter(function(s){return s.length>15&&s.length<400;});
+  for(var i=0;i<heads.length;i++){var n=heads[i];for(var k=0;k<8&&n;k++){n=n.parentElement;if(n&&txt(n).length>260&&txt(n).length<4500){var items=[].slice.call(n.querySelectorAll('li,p')).map(txt).filter(function(s){return s.length>15&&s.length<400;});
       return {found:true,selector:'ai-heading',text:txt(n).slice(0,6000),items:items.slice(0,40),cites:[].slice.call(n.querySelectorAll('a[href^=http]')).map(function(a){return a.href}).filter(function(h){return h.indexOf('google.')<0}).slice(0,8)};}}}
   return {found:false};})()"""
 

@@ -165,13 +165,15 @@ class MicroTutor:
     def teach(self, question: str) -> Dict[str, Any]:
         self.refresh()
         steps, src = self.steps_for(question)
-        beats = MB.plan_beats(steps, self.controls, image=self.screenshot())
+        beats = MB.plan_beats(steps, self.controls, image=self.screenshot(), app=self.app)
         self.log(f"[tutor] {len(steps)} step(s) from {src} -> {len(beats)} beat(s)")
         if not beats:
             self.say("I could not find the steps for that on this window. Tell me what you want done and I will do it for you.")
             self.state("Idle")
             return {"beats": 0, "source": src}
-        self.say(f"Here is how, in {sum(1 for b in beats if b.wait in ('click',) or b.wait.startswith('key'))} move(s).") if len(beats) > 2 else None
+        moves = sum(1 for b in beats if b.wait in ("click",) or b.wait.startswith("key"))
+        if moves:
+            self.say(f"Here is how, in {moves} move{'s' if moves != 1 else ''}.")
         out = self.run(beats)
         out["source"] = src
         return out
@@ -198,14 +200,36 @@ class MicroTutor:
             if b.late and b.box is None:                                          # its control may exist NOW (the dialog the last beat opened): look again before drawing
                 with contextlib.suppress(Exception):
                     self.refresh()
-                    got = [x for x in MB.plan_beats([b.late], self.controls) if x.primitive == "box_pointer"]
+                    got = [x for x in MB.plan_beats([b.late], self.controls, app=self.app) if x.primitive == "box_pointer"]
                     if got:
                         beats[i] = b = got[0]
                         self.history.append({"relocated": b.target})
             self.draw(b)
             self.say(b.speech)
-            if b.wait == "none" or (b.wait == "next" and b.primitive == "none"):
+            if b.wait == "none":
                 time.sleep(0.4)
+                i += 1
+                continue
+            if b.wait == "next" and b.primitive == "none":                         # nothing to point at: say it, then give the person a few seconds to do it / say 'next'
+                self.state("Listening")
+                ev = self.watcher.wait(timeout=9.0)
+                self.history.append({"event": ev})
+                if ev["kind"] == "line":
+                    cmd = ev.get("command", "")
+                    if cmd == "stop":
+                        break
+                    if cmd == "back":
+                        i = max(0, i - 1)
+                        continue
+                    if cmd == "repeat":
+                        continue
+                    if cmd == "delegate":
+                        self.delegate(beats, i)
+                        delegated = True
+                        break
+                    if not cmd:
+                        self.teach(ev["text"])
+                        return {"beats": len(beats), "done": done, "interrupted_by": ev["text"]}
                 i += 1
                 continue
             self.state("Listening")
@@ -295,12 +319,18 @@ class MicroTutor:
                     break
                 continue
             text, cmd = ev["text"], ev.get("command", "")
+            self.log(f"[heard] {text!r} -> {cmd or 'a question or task'}")
             if cmd == "stop":
                 break
-            if re.search(r"\b(for me|take over|automate)\b", text, re.I) or self._is_order(text):
-                self.do_task(text)
-            else:
-                self.teach(text)
+            try:
+                if re.search(r"\b(for me|take over|automate)\b", text, re.I) or self._is_order(text):
+                    self.do_task(text)
+                else:
+                    self.teach(text)
+            except Exception as exc:                                               # one failed question must never end the conversation
+                self.log(f"[tutor] failed: {type(exc).__name__}: {str(exc)[:160]}")
+                self.say("Sorry, that one went wrong on my side. Ask me again, or ask it another way.")
+                self.state("Idle")
         self.close()
 
     @staticmethod

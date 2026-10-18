@@ -427,8 +427,8 @@ def run_ar32(verdict):
         def wait(self, box=None, keys=(), timeout=0):
             return self.events.pop(0) if self.events else {"kind": "line", "text": "stop", "command": "stop"}
     ov = TO.RecordingRedOverlay()
-    t = MT.MicroTutor(overlay=ov, voice=TV.Voice(enabled=False), watcher=Script([{"kind": "click", "at": (1, 1)}, {"kind": "line", "text": "back", "command": "back"}, {"kind": "click", "at": (2, 2)},
-                                                                                {"kind": "key", "key": "space"}]), bar=False, log=lambda s: None)
+    t = MT.MicroTutor(overlay=ov, voice=TV.Voice(enabled=False), watcher=Script([{"kind": "click", "at": (1, 1)}, {"kind": "line", "text": "next", "command": "next"}, {"kind": "line", "text": "back", "command": "back"}, {"kind": "line", "text": "next", "command": "next"},
+                                                                                {"kind": "click", "at": (2, 2)}, {"kind": "key", "key": "space"}]), bar=False, log=lambda s: None)
     out = t.run(beats)
     drawn = [h for h in t.history if "draw" in h]
     stopped = MT.MicroTutor(overlay=TO.RecordingRedOverlay(), voice=TV.Voice(enabled=False), watcher=Script([{"kind": "line", "text": "stop", "command": "stop"}]), bar=False, log=lambda s: None)

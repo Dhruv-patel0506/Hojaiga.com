@@ -197,6 +197,49 @@ def pick_cell(grid: List[List[Tuple[float, float, float, float]]], row: Optional
 
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------ wording
+DOMAIN_RX = re.compile(r"\s*\b[\w-]+(?:\.[\w-]+)*\.(?:com|org|net|io|co|edu|gov|info|app|dev)\b", re.I)
+REVEAL_RX = re.compile(r"^(show|expand|open|reveal|more)\b.*\b(toolbar|ribbon|tools|menu|panel|options|commands)\b|^(show|expand) ", re.I)
+PHRASE_RX = re.compile(r"\b([A-Z][\w-]*(?:\s+[A-Za-z][\w-]*){0,3}?)\s+(?:tool|button|icon|tab|menu|option|command|field|box|dropdown|slider|checkbox|swatch)\b")
+
+
+def clean_text(text: str) -> str:
+    """A step's words without the source's attribution (a site's name tacked on after the sentence)."""
+    return re.sub(r"\s{2,}", " ", DOMAIN_RX.sub("", text or "")).strip()
+
+
+def group_name(raw: str) -> str:
+    """A matched phrase without the verbs and articles in front of the name ('Use the Rectangle' -> 'Rectangle')."""
+    prev = None
+    while prev != raw:
+        prev = raw
+        raw = re.sub(r"^(?:the|a|an|your|this|that|click|use|select|choose|press|open|then|and|also)\s+", "", raw.strip(), flags=re.I)
+    return raw.strip()
+
+
+def phrases_in(text: str) -> List[str]:
+    """Control names a sentence mentions: quoted names, and a capitalised name before 'tool / button / tab ...' ('the Rectangle tool' -> 'Rectangle')."""
+    out = list(re.findall(r"[\"\u201c']([^\"\u201d']{2,32})[\"\u201d']", text))
+    for m in PHRASE_RX.finditer(text):
+        w = group_name(m.group(1))
+        if w and w.lower() not in ("the", "a") and w not in out:
+            out.append(w)
+    return out
+
+
+def starts_app(text: str, app: str) -> bool:
+    """A step that only tells the person to start the program they are already in."""
+    t = text.lower()
+    return bool(app) and bool(re.match(r"\s*(?:open|launch|start|run)\b", t)) and any(w in t for w in tokens(app))
+
+
+def reveal_control(controls: Sequence[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    """A control whose job is to show the rest of the interface (a collapsed toolbar / ribbon)."""
+    for c in controls:
+        if c.get("type") in ("Button", "MenuItem", "SplitButton", "TabItem") and REVEAL_RX.search(c.get("name", "")) and not UNSAFE.search(c.get("name", "")):
+            return c
+    return None
+
+
 def first_sentence(text: str, cap: int = 130) -> str:
     s = re.split(r"(?<=[.!?])\s+", re.sub(r"\s+", " ", text).strip())[0]
     return s if len(s) <= cap else s[:cap].rsplit(" ", 1)[0] + "..."
@@ -216,16 +259,19 @@ def last_key(keys: str) -> str:
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------ the plan
 def plan_beats(steps: Sequence[Dict[str, Any]], controls: Sequence[Dict[str, Any]], image: Any = None, ground: Optional[Callable[[str], Optional[Tuple[float, float, float, float]]]] = None,
-               max_beats: int = 24) -> List[Beat]:
+               max_beats: int = 24, app: str = "") -> List[Beat]:
     """Steps ({text, names, keys}) -> beats. Each step becomes at most: a region beat (the first time a row of controls is used), then ONE beat for the control / key. Steps that cannot be shown on this
     screen are still said (and waited for), never invented."""
     beats: List[Beat] = []
     shown_regions: set = set()
+    revealed = False
     for st in steps:
         if len(beats) >= max_beats:
             break
-        text = str(st.get("text") or "")
-        names = [n for n in (st.get("names") or []) if n]
+        text = clean_text(str(st.get("text") or ""))
+        if starts_app(text, app):
+            continue
+        names = [n for n in (st.get("names") or []) if n] or phrases_in(text)
         keys = (st.get("keys") or [""])[0] if st.get("keys") else ""
         ctl = None
         for n in names:
@@ -245,6 +291,10 @@ def plan_beats(steps: Sequence[Dict[str, Any]], controls: Sequence[Dict[str, Any
             beats.append(Beat(speech=say_click(nm) + ((" Or press " + keys.replace("+", " plus ") + ".") if keys else ""), primitive="box_pointer", box=box_of(ctl), pill=nm[:28], wait="click",
                               keys=keys, target=nm, layer="uia", expect=f"{nm} was used"))
             continue
+        rv = reveal_control(controls) if (names and not revealed) else None
+        if rv is not None:                                                    # the thing is not on screen but the interface has a control that shows more of itself: that comes first
+            revealed = True
+            beats.append(Beat(speech=f"Some tools are hidden. Click {rv['name']} first.", primitive="box_pointer", box=box_of(rv), pill=rv["name"][:28], wait="click", target=rv["name"], layer="uia"))
         # a cell of a repeated-cell panel ('step 5', 'second row')
         row, col = cell_request(text)
         if (row or col) and image is not None and controls:
@@ -267,7 +317,7 @@ def plan_beats(steps: Sequence[Dict[str, Any]], controls: Sequence[Dict[str, Any
                 if gb:
                     beats.append(Beat(speech=say_click(names[0]), primitive="box_pointer", box=tuple(gb), pill=names[0][:28], wait="click", target=names[0], layer="model"))
                     continue
-        quoted = names or [a or b for a, b in re.findall(r"[\"“']([^\"”']{2,32})[\"”']", text)]
+        quoted = names or list(re.findall(r"[\"“']([^\"”']{2,32})[\"”']", text))
         late = dict(st, names=quoted) if quoted else None
         if keys:
             beats.append(Beat(speech=say_keys(keys), primitive="none", pill=keys, wait=f"key:{last_key(keys)}", keys=keys, layer="none", expect=keys, late=late))
