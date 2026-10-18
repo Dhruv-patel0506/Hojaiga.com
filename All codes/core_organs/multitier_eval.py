@@ -237,19 +237,29 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--apps", default="")
     ap.add_argument("--max-controls", type=int, default=12)
     ap.add_argument("--no-probe", action="store_true")
+    ap.add_argument("--adapter", default="", help="an adapter directory (default: the latest v1 run)")
+    ap.add_argument("--prompt-version", type=int, default=1)
+    ap.add_argument("--no-names", action="store_true", help="v2 prompt without the Names line (strips only)")
+    ap.add_argument("--tag", default="")
     ap.add_argument("--out", default=r"D:\new_automation\data\multitier")
     a = ap.parse_args(argv)
     from core_organs import agent_executor as AE, live_eval as LE, rag as RAG
     from core_organs.harvest.paths import harvest_dir
     root = harvest_dir()[0]
-    run_dir = os.path.dirname(sorted(glob.glob(os.path.join(root, "training", "runs", "run_*", "adapter")), key=os.path.getmtime)[-1])
-    seen_apps, seen_controls = dataset_apps(root), LE.trained_control_names(run_dir)
+    run_dir = os.path.dirname(a.adapter) if a.adapter else os.path.dirname(sorted(glob.glob(os.path.join(root, "training", "runs", "run_*", "adapter")), key=os.path.getmtime)[-1])
+    # 'seen' is relative to THIS adapter: an app is seen when the adapter's own training split holds a pair of it
+    seen_apps: Dict[str, int] = {}
+    for line in open(os.path.join(run_dir, "train.jsonl"), encoding="utf-8"):
+        with __import__("contextlib").suppress(Exception):
+            k = json.loads(line)["meta"]["app_key"]
+            seen_apps[k] = seen_apps.get(k, 0) + 1
+    seen_controls = LE.trained_control_names(run_dir)
     want = {x.strip().lower() for x in a.apps.split(",") if x.strip()}
     specs = [t for t in TIERS if not want or t["key"] in want or t["launch"].lower() in want]
-    ground = AE.AdapterGrounder(os.path.join(run_dir, "adapter"))
+    ground = AE.AdapterGrounder(a.adapter or os.path.join(run_dir, "adapter"), prompt_version=a.prompt_version, use_names=not a.no_names)
     rag = RAG.get_rag()
     stamp = time.strftime("%Y%m%d_%H%M%S")
-    out_dir = os.path.join(a.out, stamp)
+    out_dir = os.path.join(a.out, stamp + (("_" + a.tag) if a.tag else ""))
     os.makedirs(out_dir, exist_ok=True)
     rows: List[Dict[str, Any]] = []
     for sp in specs:

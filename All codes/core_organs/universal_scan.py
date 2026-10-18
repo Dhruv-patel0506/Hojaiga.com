@@ -305,7 +305,7 @@ def launch_hidden(name: str, timeout_s: float = 45.0, fast: bool = False, args: 
             si.wShowWindow = 7                                  # SW_SHOWMINNOACTIVE
             si.lpDesktop = "WinSta0\\Default"
             subprocess.Popen([appid] + list(args or []), startupinfo=si, cwd=os.path.dirname(appid))         # args: e.g. a scripting bridge the application loads at start-up
-        elif re.match(r"^[A-Za-z]:\\", appid) or appid.lower().endswith(".exe"):
+        elif (re.match(r"^[A-Za-z]:\\", appid) or appid.lower().endswith(".exe")) and not appid.startswith("{"):          # a '{known-folder-GUID}\\app\\app.exe' id is NOT a path cmd can start (MEASURED: 23 apps never opened); the shell resolves it
             subprocess.Popen(["cmd", "/c", "start", "/min", "", appid], creationflags=0x08000000)
         else:
             subprocess.Popen(["explorer.exe", f"shell:AppsFolder\\{appid}"], creationflags=0x08000000)

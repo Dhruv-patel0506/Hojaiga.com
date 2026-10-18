@@ -31,7 +31,9 @@ EXCLUDE = re.compile(
     r"on-screen keyboard|click to do|screenshots|steps recorder|\bhp\b|omen|nvidia|intel|samsung|wooting|wootility|power automate|microsoft store|\bnews\b|microsoft to do|whiteboard|adobe express|crop images|edit photos|"
     r"remove background|rotate photos|view photos|add text|clipchamp|capcut|solitaire|\bdev home\b|windows tools|control panel|\brun\b|settings|reset |debuggable|application verifier|app cert|performance recorder|"
     r"gpuview|windows performance|sql server .*(configuration|installation|error|import)|database engine|profiler|telemetry|office language|spreadsheet compare|\bfamily\b|\bconsole\b|jupyter|anaconda prompt|"
-    r"uninstall|reset keymapper|server|cluster|monitor$|scheduler|licensing|ansys help|\bhelp\b|pdf help|configuration manager|configuration 20|file association", re.I)
+    r"uninstall|reset keymapper|server|cluster|monitor$|scheduler|licensing|ansys help|\bhelp\b|pdf help|configuration manager|configuration 20|file association|"
+    # MEASURED (Oct 18): file managers and notebooks show the person's own folders / notes in every screenshot (7-Zip showed C:\Users\<name>\Downloads); media / VM / IDE launchers list their personal libraries and projects
+    r"github desktop|media player|visual studio 2022|ans_admin|onenote|virtualbox|publisher", re.I)       # 7-Zip is allowed again: it is started on the sandbox folder (harvest.sandbox)
 
 # category by name / program keyword (first hit wins; order matters)
 CATEGORIES = [

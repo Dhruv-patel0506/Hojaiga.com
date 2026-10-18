@@ -258,13 +258,15 @@ def validate_pair(rec: Dict[str, Any], root: str, require_ui: bool = True) -> Li
         return ["roles must be system, user, assistant"]
     user, asst = msgs[1].get("content") or [], msgs[2].get("content") or []
     imgs = [c for c in user if c.get("type") == "image"]
-    if len(imgs) != 1:
-        probs.append("exactly one image expected")
+    v2 = rec.get("meta", {}).get("prompt_version") == 2                     # prompt format v2: the full picture first, then up to four zoomed strip crops
+    if (not v2 and len(imgs) != 1) or (v2 and not 1 <= len(imgs) <= 5):
+        probs.append("exactly one image expected" if not v2 else "a v2 prompt has the picture plus at most four strip crops")
     else:
-        p = imgs[0].get("image", "")
-        full = p if os.path.isabs(p) else os.path.join(root, p)
-        if not os.path.isfile(full):
-            probs.append(f"image missing: {p}")
+        for im in imgs:
+            p = im.get("image", "")
+            full = p if os.path.isabs(p) else os.path.join(root, p)
+            if not os.path.isfile(full):
+                probs.append(f"image missing: {p}")
     if not any(c.get("type") == "text" and "Elements:" in c.get("text", "") for c in user):
         probs.append("no numbered element list in the prompt")
     try:
@@ -319,10 +321,14 @@ def split_by_video(pairs: Sequence[Dict[str, Any]], eval_frac: float, seed: int)
 def estimate_pair_tokens(rec: Dict[str, Any], root: str, max_pixels: int) -> int:
     from PIL import Image
     user = rec["messages"][1]["content"]
-    img = next(c["image"] for c in user if c.get("type") == "image")
-    w, h = Image.open(img if os.path.isabs(img) else os.path.join(root, img)).size
+    n_img = 0
+    for c in user:                                                          # every picture counts (prompt format v2 adds the zoomed strip crops)
+        if c.get("type") == "image":
+            img = c["image"]
+            w, h = Image.open(img if os.path.isabs(img) else os.path.join(root, img)).size
+            n_img += image_tokens_for(w, h, max_pixels)
     text = "".join(c.get("text", "") for m in rec["messages"] for c in m["content"] if c.get("type") == "text")
-    return image_tokens_for(w, h, max_pixels) + int(len(text) / 3.2) + 40
+    return n_img + int(len(text) / 3.2) + 40
 
 
 def prepare(cfg: TrainConfig, jsonl: str = "", root: str = "", out_dir: str = "") -> Dict[str, Any]:
@@ -531,7 +537,8 @@ def run_training(model, collate_fn, train_rows: Sequence[Dict[str, Any]], cfg: T
             "adapter": os.path.join(out_dir, "adapter")}
 
 
-def train(cfg: TrainConfig, force: bool = False, jsonl: str = "", root: str = "") -> Dict[str, Any]:
+def train(cfg: TrainConfig, force: bool = False, jsonl: str = "", root: str = "", presplit_dir: str = "") -> Dict[str, Any]:
+    """`presplit_dir`: a directory that already holds train.jsonl / eval.jsonl (a split made by the caller, e.g. whole apps held out); it is used as it is instead of the automatic split."""
     root = root or default_root()
     backend = resolve_backend(cfg)
     pf = preflight(cfg, backend=backend)
@@ -539,7 +546,12 @@ def train(cfg: TrainConfig, force: bool = False, jsonl: str = "", root: str = ""
     if not pf["ok"] and not force:
         out["status"] = "refused: does not fit this GPU (see preflight.advice; --force to try anyway)"
         return out
-    data = prepare(cfg, jsonl, root)
+    if presplit_dir:
+        n_tr = sum(1 for _ in open(os.path.join(presplit_dir, "train.jsonl"), encoding="utf-8"))
+        n_ev = sum(1 for _ in open(os.path.join(presplit_dir, "eval.jsonl"), encoding="utf-8"))
+        data = {"out_dir": presplit_dir, "train": n_tr, "eval": n_ev, "presplit": True}
+    else:
+        data = prepare(cfg, jsonl, root)
     out["data"] = {k: v for k, v in data.items() if k not in ("rejected",)}
     if data["train"] < cfg.min_examples:
         out["status"] = (f"refused: {data['train']} training examples (< --min-examples {cfg.min_examples}). A LoRA trained on this few pairs memorises them and learns nothing general; "
@@ -605,7 +617,8 @@ def summarize_scores(rows: Sequence[Dict[str, bool]]) -> Dict[str, Any]:
     return {"n": len(rows), "valid_json": round(sum(r["valid"] for r in rows) / n, 3), "action_kind": round(sum(r["action"] for r in rows) / n, 3), "exact": round(sum(r["exact"] for r in rows) / n, 3)}
 
 
-def evaluate_run(run_dir: str, model_id: str, cfg: Optional[TrainConfig] = None, root: str = "", max_new_tokens: int = 160) -> Dict[str, Any]:
+def evaluate_run(run_dir: str, model_id: str, cfg: Optional[TrainConfig] = None, root: str = "", max_new_tokens: int = 160, eval_file: str = "eval.jsonl", adapter_dir: str = "", with_base: bool = True,
+                 report_name: str = "eval_report.json") -> Dict[str, Any]:
     """Held-out pairs (run_dir/eval.jsonl): the BASE model (same 4-bit load) and base + the trained adapter, greedy decoding, scored with score_action. The honest question: did the adapter learn
     anything the base model did not already do? (Held-out = controls the adapter never saw a label for, on layouts it has seen.)"""
     import torch
@@ -613,7 +626,7 @@ def evaluate_run(run_dir: str, model_id: str, cfg: Optional[TrainConfig] = None,
     from transformers import AutoProcessor, BitsAndBytesConfig, Qwen3VLForConditionalGeneration
     cfg = cfg or TrainConfig(model=model_id)
     root = root or default_root()
-    rows = [json.loads(l) for l in open(os.path.join(run_dir, "eval.jsonl"), encoding="utf-8")]
+    rows = [json.loads(l) for l in open(os.path.join(run_dir, eval_file), encoding="utf-8")]
     bf16 = torch.cuda.is_bf16_supported()
     bnb = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=torch.bfloat16 if bf16 else torch.float16, llm_int8_skip_modules=["visual", "lm_head"])
     model = Qwen3VLForConditionalGeneration.from_pretrained(model_id, quantization_config=bnb, device_map={"": 0}, dtype=torch.bfloat16 if bf16 else torch.float16)
@@ -635,12 +648,12 @@ def evaluate_run(run_dir: str, model_id: str, cfg: Optional[TrainConfig] = None,
             scores.append(sc)
             samples.append({"goal": r["messages"][1]["content"][1]["text"].split("Goal: ")[-1][:70], "gold": {k: gold.get(k) for k in ("action", "target_id", "hotkey", "text")}, "reply": text[:200], **sc})
         return {"scores": summarize_scores(scores), "samples": samples, "tag": tag}
-    res = {"base": run(model, "base")}
-    adapter = os.path.join(run_dir, "adapter")
+    res = {"base": run(model, "base")} if with_base else {}
+    adapter = adapter_dir or os.path.join(run_dir, "adapter")
     if os.path.isdir(adapter):
         tuned = PeftModel.from_pretrained(model, adapter)
         res["adapter"] = run(tuned, "adapter")
-    json.dump(res, open(os.path.join(run_dir, "eval_report.json"), "w"), indent=2, default=str)
+    json.dump(res, open(os.path.join(run_dir, report_name), "w"), indent=2, default=str)
     return res
 
 
@@ -696,6 +709,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     ap.add_argument("--min-examples", type=int, default=200)
     ap.add_argument("--vision", action="store_true", help="also LoRA the vision tower")
     ap.add_argument("--force", action="store_true")
+    ap.add_argument("--presplit", default="", help="a directory holding train.jsonl + eval.jsonl made by the caller (whole apps held out)")
+    ap.add_argument("--eval-file", default="eval.jsonl")
+    ap.add_argument("--adapter", default="", help="evaluate this adapter directory instead of <run>/adapter")
+    ap.add_argument("--no-base", action="store_true")
+    ap.add_argument("--report", default="eval_report.json")
     a = ap.parse_args(argv)
     cfg = TrainConfig(model=a.model, backend=a.backend, max_seq_length=a.seq, lora_r=a.rank, lora_alpha=a.rank, max_steps=a.steps, grounded_only=not a.all_pairs, require_ui_gate=not a.allow_unchecked_frames, min_examples=a.min_examples, finetune_vision=a.vision)
     if a.cmd == "preflight":
@@ -703,9 +721,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     elif a.cmd == "prepare":
         out = prepare(cfg, a.jsonl)
     elif a.cmd == "train":
-        out = train(cfg, a.force, a.jsonl)
+        out = train(cfg, a.force, a.jsonl, presplit_dir=a.presplit)
     elif a.cmd == "evaluate":
-        res = evaluate_run(a.run, cfg.model, cfg)
+        res = evaluate_run(a.run, cfg.model, cfg, eval_file=a.eval_file, adapter_dir=a.adapter, with_base=not a.no_base, report_name=a.report)
         out = {k: v["scores"] for k, v in res.items()}
     else:
         out = export_plan(a.run or os.path.join(default_root(), "training", "runs"), a.model)

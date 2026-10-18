@@ -103,8 +103,12 @@ def scan(limit: int, per_app_min: float, only: List[str]) -> None:
     log = open(os.path.join(OUT, f"scan_{stamp}.log"), "a", encoding="utf-8")
     print(f"[overnight] {len(apps)} apps, {per_app_min} min each at most", flush=True)
     for i, a in enumerate(apps):
-        if st["apps"].get(a["name"], {}).get("ok"):
+        prev = st["apps"].get(a["name"], {})
+        if prev.get("ok"):
             print(f"[overnight] {i + 1}/{len(apps)} {a['name']}: done before, skipped", flush=True)
+            continue
+        if prev.get("attempts", 0) >= 2 and "could not start" in (prev.get("error") or ""):
+            print(f"[overnight] {i + 1}/{len(apps)} {a['name']}: no window appeared in {prev['attempts']} attempts, skipped (not retried tonight)", flush=True)
             continue
         OG.reap_orphans()
         t0 = time.time()
@@ -118,12 +122,31 @@ def scan(limit: int, per_app_min: float, only: List[str]) -> None:
             res = json.loads(line[7:]) if line else {"name": a["name"], "ok": False, "error": "no result line (the process ended without one)"}
         except subprocess.TimeoutExpired:
             res = {"name": a["name"], "ok": False, "error": f"hard time limit ({per_app_min * 60 + 420:.0f}s): the process and its app were ended"}
-        res.update({"category": a.get("category"), "tier_hint": a.get("tier_hint")})
+        res.update({"category": a.get("category"), "tier_hint": a.get("tier_hint"), "attempts": prev.get("attempts", 0) + 1})
         st["apps"][a["name"]] = res
         save_state(st)
         log.flush()
         print(f"[overnight] {i + 1}/{len(apps)} {a['name']}: ok={res.get('ok')} pairs={res.get('pairs')} v2={res.get('pairs_v2')} tier={res.get('tier_measured')} child_windows={len(res.get('child_windows') or [])} "
               f"{res.get('seconds')}s {res.get('error', '')[:100]}", flush=True)
+        time.sleep(3)
+    # second pass: apps that would not start quietly (a parked packaged app stays on its splash screen) are scanned in the visible mode, one after the other, the person's focus handed back each time
+    st = load_state()
+    retry = [a for a in apps if not st["apps"].get(a["name"], {}).get("ok") and any(k in (st["apps"].get(a["name"], {}).get("error") or "") for k in ("never showed a usable", "splash"))]
+    print(f"[overnight] visible second pass for {len(retry)} apps: {[a['name'] for a in retry]}", flush=True)
+    for a in retry:
+        OG.reap_orphans()
+        env = dict(os.environ, PYTHONIOENCODING="utf-8", HOJAIGA_VISIBLE_SCAN="1")
+        cmd = [sys.executable, "-u", "-W", "ignore", "-m", "core_organs.overnight", "one", a["name"], "--per-app-min", str(per_app_min)]
+        try:
+            p = subprocess.run(cmd, capture_output=True, text=True, timeout=per_app_min * 60 + 420, env=env, cwd=os.path.join("D:", os.sep, "new_automation", "All codes"))
+            line = next((l for l in p.stdout.splitlines() if l.startswith("RESULT ")), "")
+            res = json.loads(line[7:]) if line else {"name": a["name"], "ok": False, "error": "no result line"}
+        except subprocess.TimeoutExpired:
+            res = {"name": a["name"], "ok": False, "error": "hard time limit in the visible pass"}
+        res.update({"category": a.get("category"), "tier_hint": a.get("tier_hint"), "visible_pass": True})
+        st["apps"][a["name"]] = res
+        save_state(st)
+        print(f"[overnight] visible pass {a['name']}: ok={res.get('ok')} pairs={res.get('pairs')} {res.get('seconds')}s {res.get('error', '')[:100]}", flush=True)
         time.sleep(3)
     report()
 

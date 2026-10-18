@@ -768,7 +768,16 @@ def run_ar20() -> "TestOutcome":
     return _verdict(checks, f"not refused={bad} wrongly refused={over}")
 
 
-TESTS = [("AR1", run_ar1), ("AR2", run_ar2), ("AR3", run_ar3), ("AR4", run_ar4), ("AR5", run_ar5), ("AR6", run_ar6), ("AR7", run_ar7), ("AR8", run_ar8), ("AR9", run_ar9), ("AR10", run_ar10), ("AR11", run_ar11), ("AR12", run_ar12), ("AR13", run_ar13), ("AR14", run_ar14), ("AR15", run_ar15), ("AR16", run_ar16), ("AR17", run_ar17), ("AR18", run_ar18), ("AR19", run_ar19), ("AR20", run_ar20)]
+def run_ar21() -> "TestOutcome":
+    """AR21: nothing personal in a frame or a launch -- account badges are masked, a document app is started on the sandbox, and the scrub quarantines a frame that shows the person's identifiers"""
+    try:
+        from si_tests_privacy import run_ar21 as _impl  # type: ignore
+    except ImportError:
+        from core_organs.si_tests_privacy import run_ar21 as _impl  # type: ignore
+    return _impl(_verdict)
+
+
+TESTS = [("AR1", run_ar1), ("AR2", run_ar2), ("AR3", run_ar3), ("AR4", run_ar4), ("AR5", run_ar5), ("AR6", run_ar6), ("AR7", run_ar7), ("AR8", run_ar8), ("AR9", run_ar9), ("AR10", run_ar10), ("AR11", run_ar11), ("AR12", run_ar12), ("AR13", run_ar13), ("AR14", run_ar14), ("AR15", run_ar15), ("AR16", run_ar16), ("AR17", run_ar17), ("AR18", run_ar18), ("AR19", run_ar19), ("AR20", run_ar20), ("AR21", run_ar21)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]

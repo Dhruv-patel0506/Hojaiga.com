@@ -117,10 +117,19 @@ def default_verify(pre: Dict[str, Any], post: Dict[str, Any], src_state: Optiona
 class AdapterGrounder:
     """The trained adapter: Qwen3-VL-2B (4-bit) + LoRA, in-process (~3-5 GB of VRAM). Prompt = the training format, byte for byte (build_messages)."""
 
-    def __init__(self, adapter_dir: str, base: str = "Qwen/Qwen3-VL-2B-Instruct", max_pixels: int = 448 * 448, max_new_tokens: int = 72):
+    def __init__(self, adapter_dir: str, base: str = "Qwen/Qwen3-VL-2B-Instruct", max_pixels: int = 448 * 448, max_new_tokens: int = 72, prompt_version: int = 1, use_names: bool = True):
+        """prompt_version 2 = the format of harvest.prompt_v2 (the picture + zoomed crops of dense toolbar strips + a `Names:` line from UI Automation when `use_names`); an adapter trained on v1 must not be given v2."""
         self.adapter_dir, self.base, self.max_pixels, self.max_new_tokens = adapter_dir, base, max_pixels, max_new_tokens
+        self.prompt_version, self.use_names = prompt_version, use_names
         self._model = None
         self._proc = None
+
+    def build_messages_v2(self, image: Any, som: Dict[str, Any], app_key: str, goal: str, controls: Optional[Sequence[Dict[str, Any]]] = None) -> List[Dict[str, Any]]:
+        from core_organs.harvest import prompt_v2 as P2, video_explain as VE
+        from core_organs.train_qlora import shrink
+        content, _info = P2.user_content(image, som, app_key, goal, controls=list(controls) if (controls and self.use_names) else None)
+        content = [dict(c, image=shrink(c["image"], self.max_pixels)) if c.get("type") == "image" else c for c in content]
+        return [{"role": "system", "content": [{"type": "text", "text": VE._SYSTEM_HINT}]}, {"role": "user", "content": content}]
 
     @staticmethod
     def build_messages(image: Any, som: Dict[str, Any], app_key: str, goal: str) -> List[Dict[str, Any]]:
@@ -147,14 +156,14 @@ class AdapterGrounder:
         except Exception:
             pass
 
-    def __call__(self, image: Any, som: Dict[str, Any], app_key: str, goal: str) -> Tuple[Optional[Dict[str, Any]], str]:
+    def __call__(self, image: Any, som: Dict[str, Any], app_key: str, goal: str, controls: Optional[Sequence[Dict[str, Any]]] = None) -> Tuple[Optional[Dict[str, Any]], str]:
         import torch
         from PIL import Image
         from core_organs.train_qlora import parse_action, shrink
         if self._model is None:
             self._load()
         img = Image.open(image).convert("RGB") if isinstance(image, (str, os.PathLike)) else image.convert("RGB")
-        msgs = self.build_messages(shrink(img, self.max_pixels), som, app_key, goal)
+        msgs = self.build_messages_v2(img, som, app_key, goal, controls) if self.prompt_version == 2 else self.build_messages(shrink(img, self.max_pixels), som, app_key, goal)
         enc = self._proc.apply_chat_template(msgs, tokenize=True, add_generation_prompt=True, return_dict=True, return_tensors="pt")
         enc = {k: (v.to(self._model.device) if hasattr(v, "to") else v) for k, v in enc.items()}
         with torch.no_grad():

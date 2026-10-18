@@ -65,7 +65,10 @@ def click_accuracy(app: Any, app_key: str, ground: Callable[..., Any], seen_name
         if gt is None:                                           # the scanner found nothing inside this control: there is no right answer to ask for
             continue
         goal = LR.goal_for(c["name"], c["type"])
-        action, reply = ground(img, som, app_key, goal)
+        try:
+            action, reply = ground(img, som, app_key, goal, controls=all_controls)       # a v2 grounder uses the control names; a v1 one does not take them
+        except TypeError:
+            action, reply = ground(img, som, app_key, goal)
         fixed, note = AV.uia_assist(goal, action, {"som": som, "controls": all_controls}, LR.element_at)       # the same UIA-name correction the Agent applies
         final = fixed or action
         lexical = VE.match_element(som, re.sub(r"\(.*?\)", "", c["name"]).strip())

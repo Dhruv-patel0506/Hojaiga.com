@@ -153,7 +153,15 @@ class OwnedApp:
         self.guard.before()
         last = ""
         for attempt in range(1):                                    # ONE attempt, 8 s wall clock: a window still on its splash screen is killed and the app skipped. A UWP window parked off-screen sometimes never leaves its splash (measured: Calculator, Clock): end it and start over
-            info = LN.launch_owned(t, self.guard)
+            sb_args: List[str] = []
+            with contextlib.suppress(Exception):
+                from . import sandbox as SB
+                sb_args = SB.args_for(t.exe) if getattr(t, "exe", "") else []        # a document / archive app is started on the sandbox, never on the person's last file or folder
+            if sb_args:
+                self.notes.append(f"started on the sandbox: {sb_args}")
+                info = LN.launch_owned(t, self.guard, exe=t.exe, args=sb_args)
+            else:
+                info = LN.launch_owned(t, self.guard)
             self.hwnd = int(info.get("hwnd") or 0)
             self.info = info                                        # kept: a browser's DevTools port (info['cdp_port']) is how a page is navigated
             self.notes = list(info.get("notes") or [])
@@ -280,6 +288,18 @@ class OwnedApp:
                             from core_organs import owned_guard as OG
                             self.owned_pid = int(_pid.value)
                             self.owned_bind = OG.bind(self.owned_pid, self.name)
+                        if os.environ.get("HOJAIGA_VISIBLE_SCAN") == "1":
+                            # MEASURED: a packaged app parked off-screen stops drawing (splash screen). In this mode it stays where it opened -- on screen, never activated, the person's focus handed straight back --
+                            # and is operated only through UI Automation patterns (no physical input), so the person's mouse and keyboard are never touched.
+                            self.mode = "visible"
+                            with contextlib.suppress(Exception):
+                                if fg0 and us._u32.GetForegroundWindow() != fg0:
+                                    hin._hand_back_focus(int(fg0))
+                            time.sleep(1.0)
+                            if self._ready(min(self.READY_S, 12.0)):
+                                self.notes.append("started visibly and kept visible (HOJAIGA_VISIBLE_SCAN)")
+                                return True
+                            return False
                         self.bg = bw.BackgroundSession(h)
                         self.bg.__enter__()                                # parked: off-screen, with its 1-px sliver so it keeps drawing
                         self.bg.lay_out()
@@ -656,6 +676,7 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
         n_frame = [0]
 
         last_origin: List[Any] = [None]
+        last_ctrls: List[Any] = [None]
 
         def snap(tag: str):
             img_, org_ = a.grab(popups=True)                            # what is open (a menu, a dialog) is part of the picture, before and after
@@ -666,6 +687,10 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
             """Write one pair: SoM on the pre frame, the target by overlap, the delta from the pictures. Returns True when a row was kept."""
             n_frame[0] += 1
             stamp = hashlib.sha1((app_key + goal + str(n_frame[0]) + str(time.time())).encode()).hexdigest()[:10]
+            with contextlib.suppress(Exception):                     # account badges / profile initials / anything named like the person are painted over BEFORE a frame is saved
+                from . import privacy as PV
+                _cs = meta.get("controls_at_pre") or last_ctrls[0] or []
+                pre, post = PV.mask_personal(pre, _cs), PV.mask_personal(post, _cs)
             ppre, ppost = _save_frame(pre, root, app_key, f"{stamp}_pre"), _save_frame(post, root, app_key, f"{stamp}_post")
             ok_change, bbox = changed(pre, post)
             som = som_fn(ppre)
@@ -838,6 +863,7 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
                     break
                 pick = None
                 ctrls = a.controls(origin, pre.size)                    # every control UIA names on this very screen: the 'Names:' line of a v2 prompt
+                last_ctrls[0] = [{"name": x["name"], "box": list(x["box"]), "type": x.get("type", "")} for x in ctrls[:400]]
                 for c in ctrls:
                     if c["key"] in done_keys or CHROME_RX.search(c["name"]):
                         continue
