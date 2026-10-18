@@ -199,6 +199,19 @@ class Rag:
         return {"lexicon": self.lex.forget_app(app_key), "graph": self.graph.forget_app(app_key), "fast": self.fast.forget_app(app_key), "procedures": self.proc.forget_app(app_key),
                 "recovery": self.rec.forget_app(app_key), "icons": self.icons.forget_app(app_key) if self.icons else 0}
 
+    # ---- master domains (rag.domains) ---------------------------------------------------------------------------------------------------------------
+    def domain_of(self, app_key: str) -> str:
+        from . import domains as DM
+        return DM.domain_of(app_key, DM.load(self))
+
+    def register_domain(self, app_key: str, domain: str, evidence: Optional[Dict[str, Any]] = None) -> None:
+        from . import domains as DM
+        DM.register(self, app_key, domain, evidence)
+
+    def domain_stats(self) -> Dict[str, Dict[str, int]]:
+        from . import domains as DM
+        return DM.stats(self)
+
     def close(self) -> None:
         if self.icons:
             self.icons.close()
@@ -237,6 +250,11 @@ class Router:
         app = q.app_key or r.resolve_app(q.text)
         if not app:
             ret.gaps.append("app_unknown")
+        if q.domain and app:                                           # master-domain partition: a key of another domain is not this query's knowledge (rag.domains)
+            from . import domains as DM
+            if DM.domain_of(app, DM.load(r)) != q.domain:
+                ret.gaps.append(f"wrong_domain:{DM.domain_of(app, DM.load(r))}")
+                return ret
         # Stage A: tier and state
         info = r.lex.app(app) if app else {"tier": -1}
         tier = infer_tier(q.snapshot, info.get("tier", -1)) if (q.snapshot is not None or info.get("tier", -1) >= 0) else 0

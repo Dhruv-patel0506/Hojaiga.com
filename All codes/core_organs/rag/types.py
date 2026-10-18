@@ -76,6 +76,7 @@ class Query:
     allow_llm_rewrite: bool = True
     app_version: str = ""
     crop: Any = None                # PIL image of the region for IDENTIFY (optional)
+    domain: str = ""                # master domain filter ('desktop_app' | 'website' | 'web_app'); '' = no filter (rag.domains)
 
 
 @dataclass

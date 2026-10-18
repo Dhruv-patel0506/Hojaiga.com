@@ -49,6 +49,7 @@ def one(name: str, per_app_min: float) -> Dict[str, Any]:
         LR.OwnedApp.VISIBLE_FALLBACK = True
     import faulthandler
     faulthandler.dump_traceback_later(int(per_app_min * 60 + 360), exit=True, file=sys.stderr)      # a scan that overruns its budget by 2.5 min reports where it stands and ends (what it learned is already saved)
+    os.environ.setdefault("HOJAIGA_LAUNCH_S", "45")                            # an app that shows no window in 45 s is not worth more: the scan moves to the next one
     key = CAT.slug(name)
     spec = LR.APPS.get(key) or {"launch": name, "chords": [], "type": None}
     t0 = time.time()
@@ -73,7 +74,7 @@ def one(name: str, per_app_min: float) -> Dict[str, Any]:
                 time.sleep(4)
         res["crashed_on"] = crashes
         rep.pop("errors", None)
-        res.update({k: rep.get(k) for k in ("actions", "pairs", "pairs_v2", "no_change", "not_delivered", "no_grounding", "skipped_unsafe", "duplicates", "popups_closed", "menus_found", "mode", "child_windows_registered", "timing_s")})
+        res.update({k: rep.get(k) for k in ("actions", "pairs", "pairs_v2", "no_change", "not_delivered", "no_grounding", "skipped_unsafe", "duplicates", "popups_closed", "menus_found", "mode", "child_windows_registered", "timing_s", "start_screen", "start_screen_registered")})
         cw = rep.get("child_windows", [])
         res["child_windows"] = [{"opener": e["opener"], "child": e["child_title"], "kind": e["child_kind"], "controls": e["n_controls"], "closed_by": e["closed_by"]} for e in cw]
         res["controls_seen"] = rep.get("actions", 0) + rep.get("skipped_unsafe", 0)

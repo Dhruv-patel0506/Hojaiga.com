@@ -23,6 +23,8 @@ def main(argv=None) -> int:
     sub.add_parser("ingest")
     v = sub.add_parser("video"); v.add_argument("path"); v.add_argument("app_key"); v.add_argument("video_id")
     lo = sub.add_parser("local"); lo.add_argument("--apps", default=""); lo.add_argument("--max-actions", type=int, default=30); lo.add_argument("--budget-s", type=float, default=600.0); lo.add_argument("--no-delta", action="store_true"); lo.add_argument("--nav", default=None, help="comma list: only these navigation entries"); lo.add_argument("--no-base", action="store_true"); lo.add_argument("--per-pass", type=int, default=0); lo.add_argument("--sizes", default="", help="comma list of WxH window sizes to lay each app out at, e.g. 900x640,1100x760,1400x900")
+    ws = sub.add_parser("websites"); ws.add_argument("--urls", default=""); ws.add_argument("--max-actions", type=int, default=15); ws.add_argument("--which", default="all", choices=["all", "websites", "webapps"])
+    wb = sub.add_parser("web"); wb.add_argument("--apps", default=""); wb.add_argument("--minutes", type=float, default=20.0)
     lp = sub.add_parser("loop"); lp.add_argument("--hours", type=float, default=4.0); lp.add_argument("--target", type=int, default=200); lp.add_argument("--videos", type=int, default=6); lp.add_argument("--apps", default=""); lp.add_argument("--whisper", action="store_true", help="transcribe locally when captions are refused (slow)")
     sub.add_parser("status")
     args = ap.parse_args(argv)
@@ -45,6 +47,14 @@ def main(argv=None) -> int:
     elif args.cmd == "loop":
         from . import youtube_loop as YL
         out = YL.run_loop(args.hours, args.target, args.videos, [x.strip() for x in args.apps.split(",") if x.strip()] or None, whisper=args.whisper, log=lambda s: print(s, flush=True))
+    elif args.cmd == "websites":
+        from . import web_recorder as _WR
+        urls = [u for u in args.urls.split(",") if u.strip()] or ((_WR.SITES_WEBSITE if args.which in ("all", "websites") else []) + (_WR.SITES_WEBAPP if args.which in ("all", "webapps") else []))
+        out = _WR.record_sites(urls, max_actions=args.max_actions)
+    elif args.cmd == "web":
+        from . import web_search_failover as WF, free_master_harvester as _M
+        names = [x.strip() for x in args.apps.split(",") if x.strip()] or [a["app_name"] for a in _M.CORE_APPS][:12]
+        out = WF.run_batch(names, args.minutes)
     elif args.cmd == "local":
         from . import local_recorder as LR
         out = LR.run_local([x.strip() for x in args.apps.split(",") if x.strip()] or None, max_actions=args.max_actions, budget_s=args.budget_s, scan_delta=not args.no_delta,

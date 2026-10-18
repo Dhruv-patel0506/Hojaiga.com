@@ -33,7 +33,7 @@ EXCLUDE = re.compile(
     r"gpuview|windows performance|sql server .*(configuration|installation|error|import)|database engine|profiler|telemetry|office language|spreadsheet compare|\bfamily\b|\bconsole\b|jupyter|anaconda prompt|"
     r"uninstall|reset keymapper|server|cluster|monitor$|scheduler|licensing|ansys help|\bhelp\b|pdf help|configuration manager|configuration 20|file association|"
     # MEASURED (Oct 18): file managers and notebooks show the person's own folders / notes in every screenshot (7-Zip showed C:\Users\<name>\Downloads); media / VM / IDE launchers list their personal libraries and projects
-    r"github desktop|media player|visual studio 2022|ans_admin|onenote|virtualbox|publisher", re.I)       # 7-Zip is allowed again: it is started on the sandbox folder (harvest.sandbox)
+    r"github desktop|media player|visual studio 2022|ans_admin|onenote|virtualbox|publisher|magnifier|node\.js|python 3\.13 \(64|python 3\.13 module|software development kit|install movie codec", re.I)       # 7-Zip is allowed again: it is started on the sandbox folder (harvest.sandbox)
 
 # category by name / program keyword (first hit wins; order matters)
 CATEGORIES = [
@@ -70,6 +70,19 @@ def installed() -> List[Dict[str, str]]:
     return out
 
 
+def stale_shortcuts() -> set:
+    """Lower-case names of Start-menu shortcuts whose target program is MISSING (an uninstalled product leaves its shortcuts behind; MEASURED: 88 of 266 on this machine, every Ansys 2025 R2 entry, Acrobat, HxD).
+    Opening one shows a 'cannot find' box, never a window: they are not applications and must not count as failures of the scanner."""
+    ps = ("$w = New-Object -ComObject WScript.Shell; "
+          "Get-ChildItem \"$env:ProgramData/Microsoft/Windows/Start Menu/Programs\",\"$env:APPDATA/Microsoft/Windows/Start Menu/Programs\" -Recurse -Filter *.lnk -ErrorAction SilentlyContinue | "
+          "ForEach-Object { try { $t = $w.CreateShortcut($_.FullName).TargetPath } catch { $t = '' }; if ($t -and -not (Test-Path $t)) { $_.BaseName } }")
+    try:
+        r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", ps], capture_output=True, text=True, timeout=90)
+        return {ln.strip().lower() for ln in r.stdout.splitlines() if ln.strip()}
+    except Exception:
+        return set()
+
+
 def slug(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")[:40]
 
@@ -84,8 +97,9 @@ def classify(name: str) -> Dict[str, Any]:
 
 def candidates() -> List[Dict[str, Any]]:
     out = []
+    stale = stale_shortcuts()
     for a in installed():
-        if EXCLUDE.search(a["name"]):
+        if EXCLUDE.search(a["name"]) or a["name"].lower() in stale:
             continue
         c = classify(a["name"])
         out.append({"name": a["name"], "key": slug(a["name"]), "appid": a["appid"], **c})

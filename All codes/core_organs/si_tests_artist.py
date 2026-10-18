@@ -777,7 +777,44 @@ def run_ar21() -> "TestOutcome":
     return _impl(_verdict)
 
 
-TESTS = [("AR1", run_ar1), ("AR2", run_ar2), ("AR3", run_ar3), ("AR4", run_ar4), ("AR5", run_ar5), ("AR6", run_ar6), ("AR7", run_ar7), ("AR8", run_ar8), ("AR9", run_ar9), ("AR10", run_ar10), ("AR11", run_ar11), ("AR12", run_ar12), ("AR13", run_ar13), ("AR14", run_ar14), ("AR15", run_ar15), ("AR16", run_ar16), ("AR17", run_ar17), ("AR18", run_ar18), ("AR19", run_ar19), ("AR20", run_ar20), ("AR21", run_ar21)]
+def run_ar22() -> "TestOutcome":
+    """AR22: start screens -- passed safely (blank / new / skip, never a recent file), a workbench left alone, the chooser learned by the RAG"""
+    try:
+        from si_tests_start import run_ar22 as _impl  # type: ignore
+    except ImportError:
+        from core_organs.si_tests_start import run_ar22 as _impl  # type: ignore
+    return _impl(_verdict)
+
+
+def _dom_test(name):
+    try:
+        import si_tests_domains as _m  # type: ignore
+    except ImportError:
+        from core_organs import si_tests_domains as _m  # type: ignore
+    return getattr(_m, name)(_verdict)
+
+
+def run_ar23() -> "TestOutcome":
+    """AR23: three master domains (desktop_app / website / web_app): classification from evidence, namespaced keys, retrieval refuses another domain, per-domain stats"""
+    return _dom_test("run_ar23")
+
+
+def run_ar24() -> "TestOutcome":
+    """AR24: the web recorder's safety decisions (never sign-in / purchase / file / off-site; reject cookie banners)"""
+    return _dom_test("run_ar24")
+
+
+def run_ar25() -> "TestOutcome":
+    """AR25: a site recorded end to end on a stand-in browser (pairs for what changed, v2 twins, nothing unsafe clicked)"""
+    return _dom_test("run_ar25")
+
+
+def run_ar26() -> "TestOutcome":
+    """AR26: the web failover chain (steps, keys, clips, relevance, engine breaker, before/after pairs from screenshots)"""
+    return _dom_test("run_ar26")
+
+
+TESTS = [("AR1", run_ar1), ("AR2", run_ar2), ("AR3", run_ar3), ("AR4", run_ar4), ("AR5", run_ar5), ("AR6", run_ar6), ("AR7", run_ar7), ("AR8", run_ar8), ("AR9", run_ar9), ("AR10", run_ar10), ("AR11", run_ar11), ("AR12", run_ar12), ("AR13", run_ar13), ("AR14", run_ar14), ("AR15", run_ar15), ("AR16", run_ar16), ("AR17", run_ar17), ("AR18", run_ar18), ("AR19", run_ar19), ("AR20", run_ar20), ("AR21", run_ar21), ("AR22", run_ar22), ("AR23", run_ar23), ("AR24", run_ar24), ("AR25", run_ar25), ("AR26", run_ar26)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]

@@ -284,7 +284,11 @@ def run_harvester(max_apps: int = 5, videos_per_app: int = 2, start: int = 0, ne
     tables, tldr pages: `static_source`), the caption endpoint is left alone for `captions_down_s` for every following app, and the batch moves on. on_block="wait": the older behaviour (cool-offs
     `block_cooldowns`, then local speech recognition when whisper_fallback) for a run where time does not matter."""
     failover = on_block == "failover"
-    static_source = static_source or _static_docs
+    if static_source is None:
+        try:
+            from .web_search_failover import web_failover_source as static_source      # a refusal switches to the web chain (illustrated pages, clips), never to a wait
+        except Exception:
+            static_source = _static_docs
     net = net or Net(whisper=_whisper if whisper_fallback else None)
     root = root or harvest_dir()[0]
     os.makedirs(os.path.join(root, "transcripts_json"), exist_ok=True)

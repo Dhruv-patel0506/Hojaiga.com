@@ -131,6 +131,6 @@ def launch_owned(t: Target, guard: SPT.StateGuard, timeout_s: float = 40.0, exe:
         return info
     # a heavy application (a 3D suite compiling shaders, an IDE indexing) can take more than 40 s before its main window exists: measured 45-60 s for Blender 5.2's first window
     if exe and args:                                                          # the program that hosts a scripting bridge (professor.adapters.script_bridge), started with it
-        return us.launch_hidden(exe, timeout_s=max(timeout_s, 90.0), fast=True, args=list(args))
+        return us.launch_hidden(exe, timeout_s=max(timeout_s, float(os.environ.get("HOJAIGA_LAUNCH_S", 90))), fast=True, args=list(args))
     # the Start-menu entry (what a person searches for and opens) is the ground truth; a program path GUESSED from the name can be another program (MEASURED: IDLE resolved to the Python console)
-    return us.launch_hidden((t.display or t.name) if t.appid else (t.exe if (t.exe and not t.packaged) else t.name), timeout_s=max(timeout_s, 90.0), fast=True)
+    return us.launch_hidden((t.display or t.name) if t.appid else (t.exe if (t.exe and not t.packaged) else t.name), timeout_s=max(timeout_s, float(os.environ.get("HOJAIGA_LAUNCH_S", 90))), fast=True)

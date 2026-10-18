@@ -924,6 +924,24 @@ def record_app(app_key: str, max_actions: int = 30, budget_s: float = 600.0, roo
                 click_control(pick, tidy=False)
                 settle_and_tidy()                                       # an item that opened a dialog: closed again; a menu that stayed open: closed
 
+        # ---------------------------------------------------------------- a start screen (a chooser: blank / new / recent files) is passed first, safely, and learned
+        try:
+            from . import start_screen as SS
+            img_s, org_s = snap("pre")
+            ctr_s = a.controls(org_s, img_s.size) if img_s is not None else []
+            pick_s = SS.pick_start_control(ctr_s)
+            if pick_s is not None and not unsafe(pick_s["name"]):
+                info_s = SS.describe(ctr_s, pick_s)
+                click_control(pick_s, tidy=False, ctrls=ctr_s)
+                rep["start_screen"] = info_s
+                settle_and_tidy(1.0)
+                with contextlib.suppress(Exception):
+                    from core_organs import rag as _RS
+                    rep["start_screen_registered"] = SS.register(_RS.get_rag(), app_key, spec.get("launch", app_key), info_s)
+        except AppCrashed:
+            raise
+        except Exception as _exc_s:
+            rep["errors"].append(f"start screen: {type(_exc_s).__name__}")
         menus = list(spec.get("menus") or [])
         if not menus:                                                    # the menu bar of an unknown app: the menu items in the top strip of the window
             with contextlib.suppress(Exception):
