@@ -27,8 +27,12 @@ def main(argv=None) -> int:
     ap.add_argument("--no-recall", action="store_true", help="do not start from stored recipes")
     ap.add_argument("--no-vlm", action="store_true")
     ap.add_argument("--live", action="store_true", help="teach: look at the live screen and point")
+    ap.add_argument("--tutor", action="store_true", help="the live tutor: the program on screen, red marks, voice (needs --app)")
     ap.add_argument("--list", action="store_true")
     a = ap.parse_args(argv)
+    if a.tutor:
+        import hojaiga_tutor
+        return hojaiga_tutor.main([a.app or a.task] + ([a.task] if a.app and a.task else []))
     from sections import HoJaiga
     hj = HoJaiga().discover()
     if a.list or not a.task:

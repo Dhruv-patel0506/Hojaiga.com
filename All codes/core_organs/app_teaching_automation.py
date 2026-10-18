@@ -457,15 +457,24 @@ class AppIntelligenceEngine:
             ret = self.get_rag().retrieve(Query(text=goal, app_key=key, snapshot=snapshot, mode="auto"))
         return {"plans": BP.pathways(ret), "evidence": BP.evidence_lines(ret)}
 
+    GENERIC = {"how", "what", "where", "when", "why", "can", "does", "would", "should", "could", "there", "some", "need", "want", "help", "show", "tell", "teach", "please", "get", "got", "way", "thing"}
+
     @staticmethod
-    def weak(pathways: Dict[str, Any], goal: str) -> bool:
-        """The RAG's answer does not speak about the goal: no pathway step shares a meaningful word with it."""
-        want = _tokens(goal)
+    def weak(pathways: Dict[str, Any], goal: str, app: str = "") -> bool:
+        """The RAG's answer does not speak about the goal: none of the goal's own words (not the program's name, not question words) appears in any pathway step or evidence line."""
+        skip = set(_tokens(app)) | AppIntelligenceEngine.GENERIC
+        want = [w for w in _tokens(goal) if w not in skip]
+        if not want:
+            return False
+
+        def hit(text: str) -> bool:
+            have = _tokens(text)
+            return any(w == h or (len(w) >= 4 and len(h) >= 4 and (w.startswith(h[:4]) or h.startswith(w[:4]))) for w in want for h in have)
         for pl in pathways.get("plans", []):
-            if want & _tokens(" ".join(pl.get("steps", []))):
+            if hit(" ".join(pl.get("steps", []))):
                 return False
         for line in pathways.get("evidence", []):
-            if want & _tokens(line):
+            if hit(line):
                 return False
         return True
 
@@ -495,6 +504,7 @@ class AppIntelligenceEngine:
         if out["found"]:
             steps = ai["steps"]
             out["steps"] = [st["text"] for st in steps]
+            out["step_dicts"] = [{"text": st["text"], "names": list(st.get("names") or []), "keys": list(st.get("keys") or [])} for st in steps]
             out["summary"] = (ai.get("text") or "")[:600]
             chains = LC.build_chains(steps, [[] for _ in steps], ai.get("text", ""))
             out["written"] = LC.write(self.get_rag(), key, app, chains, [[] for _ in steps], "bing:ai-summary?q=" + urllib.parse.quote_plus(query), f"AI summary: {query}")
@@ -609,7 +619,7 @@ class AppTeachingAutomationSection:
             with flow.enter("plan", "RAG pathway lookup") as st:
                 teach = {"rag": E.pathways(task, key)}
                 st["note"] = f"{len(teach['rag']['plans'])} pathway(s)"
-            if learn != "never" and E.weak(teach["rag"], task):
+            if learn != "never" and E.weak(teach["rag"], task, host):
                 with flow.enter("learn", "the question itself, to the engine's AI summary in a browser") as st:
                     web = E.ask_web(task, host, key)
                     teach["web"] = web
@@ -857,7 +867,7 @@ class AppTeachingAutomationSection:
             with flow.enter("plan", "RAG pathway lookup") as st:
                 out["teach"] = {"rag": E.pathways(task, key)}
                 st["note"] = f"{len(out['teach']['rag']['plans'])} pathway(s), {len(out['teach']['rag']['evidence'])} evidence line(s)"
-                if learn_ok and E.weak(out["teach"]["rag"], task):
+                if learn_ok and E.weak(out["teach"]["rag"], task, app):
                     st["note"] += "; none speaks about this question"
                     with flow.enter("learn", "the question itself, to the engine's AI summary in a browser") as st2:
                         web = E.ask_web(task, app, key)

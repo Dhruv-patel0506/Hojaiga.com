@@ -395,3 +395,56 @@ def run_ar31(verdict):
               "documentation_steps_are_found_under_their_heading": len(md) == 1 and md[0][0] == "Make a chart" and len(md[0][1]) == 2 and md[0][1][1]["keys"] == ["Ctrl+Shift+C"],
               "a_workflow_reaches_the_stores": bool(w) and (w.get("procedures", 0) >= 1), "one_step_is_not_a_workflow": one == {}}
     return verdict(checks, "w=%s steps=%s" % (w, [s["text"][:30] for s in steps]))
+
+
+def run_ar32(verdict):
+    """AR32: the interactive tutor -- red marks drawn as data, repeated cells found by OpenCV and picked by 'row / step', beats waited on and steered by words, 'do it for me' hands over, unsafe controls never pointed at"""
+    import numpy as np
+    import cv2
+    from core_organs import micro_beats as MB, micro_tutor as MT, tutor_overlay as TO, tutor_voice as TV
+    from PIL import Image
+    img = np.full((720, 1280, 3), 40, np.uint8)
+    ctrls = []
+    for i, nm in enumerate(["New", "Open", "Find", "Replace", "Undo", "Redo"]):
+        x = 20 + i * 70
+        cv2.rectangle(img, (x, 20), (x + 60, 50), (90, 90, 90), -1)
+        ctrls.append({"name": nm, "type": "Button", "box": (x, 20, 60, 30)})
+    ctrls.append({"name": "Close", "type": "Button", "box": (1200, 5, 40, 30)})
+    ctrls.append({"name": "Cells", "type": "Pane", "box": (100, 200, 1000, 260)})
+    for r in range(4):
+        for c in range(16):
+            x, y = 120 + c * 56 + (c // 4) * 10, 215 + r * 60
+            cv2.rectangle(img, (x, y), (x + 44, y + 44), (200, 200, 200) if c % 4 == 0 else (150, 150, 150), -1)
+    grid = MB.detect_grid(img, (100, 200, 1100, 460))
+    steps = [{"text": "Use the Find button.", "names": ["Find"], "keys": ["Ctrl+F"]}, {"text": "Then close it.", "names": ["Close"], "keys": []},
+             {"text": "On the second row click step 13.", "names": [], "keys": []}, {"text": "Press Space.", "names": [], "keys": ["Space"]}]
+    beats = MB.plan_beats(steps, ctrls, image=img)
+
+    class Script:
+        """A watcher that answers from a list, in order."""
+        def __init__(self, events):
+            self.events, self._speaking = list(events), lambda: False
+        def wait(self, box=None, keys=(), timeout=0):
+            return self.events.pop(0) if self.events else {"kind": "line", "text": "stop", "command": "stop"}
+    ov = TO.RecordingRedOverlay()
+    t = MT.MicroTutor(overlay=ov, voice=TV.Voice(enabled=False), watcher=Script([{"kind": "click", "at": (1, 1)}, {"kind": "line", "text": "back", "command": "back"}, {"kind": "click", "at": (2, 2)},
+                                                                                {"kind": "key", "key": "space"}]), bar=False, log=lambda s: None)
+    out = t.run(beats)
+    drawn = [h for h in t.history if "draw" in h]
+    stopped = MT.MicroTutor(overlay=TO.RecordingRedOverlay(), voice=TV.Voice(enabled=False), watcher=Script([{"kind": "line", "text": "stop", "command": "stop"}]), bar=False, log=lambda s: None)
+    out2 = stopped.run(beats)
+    prev = TO.compose_red_preview(Image.new("RGB", (1280, 720), (46, 52, 64)), [{"cmd": "box", "box": __import__("core_organs.professor.schema", fromlist=["Box"]).Box(900, 300, 1000, 340), "pill": "kick step five"},
+                                                                          {"cmd": "shape", "kind": "polygon", "points": [(100, 400), (100, 300), (300, 400)], "pill": "right angle"}, {"cmd": "status", "text": "Speaking"}])
+    px = np.asarray(prev.convert("RGB"))
+    red_edge = int((px[300:342, 900:1000, 0] > 200).sum()) > 80 and int(((px[:, :, 0] > 220) & (px[:, :, 1] < 90)).sum()) > 400
+    checks = {"repeated_cells_are_found_by_geometry": grid is not None and len(grid) == 4 and all(len(r) == 16 for r in grid),
+              "a_cell_is_picked_by_row_and_step": any(b.layer == "grid" and b.box and abs(b.box[0] - 822) < 3 and abs(b.box[1] - 275) < 3 for b in beats),
+              "a_toolbar_row_is_one_beat_and_stops_at_a_gap": beats[0].primitive == "region" and beats[0].box[2] < 600,
+              "a_control_that_closes_is_never_pointed_at": not any(b.target == "Close" for b in beats),
+              "a_key_step_waits_for_that_key": any(b.wait == "key:space" for b in beats),
+              "the_overlay_is_driven_beat_by_beat": len(drawn) >= len(beats) and out["done"] >= 3,
+              "words_steer_the_lesson": out["reached"] >= len(beats) - 1 and stopped.history and out2["done"] == 0 and out2["reached"] <= 1,
+              "red_marks_render_with_their_badges": bool(red_edge),
+              "commands_are_read_from_words": TV.command_of("do it for me") == "delegate" and TV.command_of("go back") == "back" and TV.command_of("where is Find") == ""}
+    return verdict(checks, "beats=%s out=%s drawn=%d" % ([(b.primitive, b.wait) for b in beats], out, len(drawn)))
+

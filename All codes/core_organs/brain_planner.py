@@ -413,10 +413,10 @@ def design_parts(brain: Brain, task: str, shapes: Sequence[str], examples: Seque
 # ------------------------------------------------------------------------------------------------------------------------------------------------ pathways
 def plain_step(text: str) -> str:
     """A stored chain 'PRECONDITION: a | ACTION: b | EXPECT: c | IF BLOCKED: d' as one readable step: 'b  (in: a)  -> then c'."""
-    m = re.match(r"PRECONDITION:\s*(.*?)\s*\|\s*ACTION:\s*(.*?)\s*\|\s*EXPECT:\s*(.*?)\s*\|\s*IF BLOCKED:", text)
+    m = re.match(r"PRECONDITION:\s*(.*?)\s*\|\s*ACTION:\s*(.*?)\s*\|\s*EXPECT:\s*(.*?)\s*\|\s*IF BLOCKED:", text, re.S)
     if not m:
         return text
-    pre, act, exp = m.group(1), m.group(2), m.group(3)
+    pre, act, exp = (re.sub(r"\s+", " ", g) for g in (m.group(1), m.group(2), m.group(3)))
     s = act
     if pre and pre != "any state":
         s += f"  (where: {pre[:60]})"
