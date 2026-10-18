@@ -814,7 +814,32 @@ def run_ar26() -> "TestOutcome":
     return _dom_test("run_ar26")
 
 
-TESTS = [("AR1", run_ar1), ("AR2", run_ar2), ("AR3", run_ar3), ("AR4", run_ar4), ("AR5", run_ar5), ("AR6", run_ar6), ("AR7", run_ar7), ("AR8", run_ar8), ("AR9", run_ar9), ("AR10", run_ar10), ("AR11", run_ar11), ("AR12", run_ar12), ("AR13", run_ar13), ("AR14", run_ar14), ("AR15", run_ar15), ("AR16", run_ar16), ("AR17", run_ar17), ("AR18", run_ar18), ("AR19", run_ar19), ("AR20", run_ar20), ("AR21", run_ar21), ("AR22", run_ar22), ("AR23", run_ar23), ("AR24", run_ar24), ("AR25", run_ar25), ("AR26", run_ar26)]
+def run_ar27() -> "TestOutcome":
+    """AR27: logic chains (precondition / action / expectation / fallback) written to the five stores"""
+    return _dom_test("run_ar27")
+
+
+def run_ar28() -> "TestOutcome":
+    """AR28: intent from words, app from the catalogue, AI-summary answers turned into steps"""
+    return _dom_test("run_ar28")
+
+
+def run_ar29() -> "TestOutcome":
+    """AR29: 3D design checks for any object (registry shapes, floating / buried / duplicated parts)"""
+    return _dom_test("run_ar29")
+
+
+def run_ar30() -> "TestOutcome":
+    """AR30: the unified section (shared state machine, measured quality, recipes, router)"""
+    return _dom_test("run_ar30")
+
+
+def run_ar31() -> "TestOutcome":
+    """AR31: workflow feeds (recorded actions to structure, web traces, documentation steps, nothing typed kept)"""
+    return _dom_test("run_ar31")
+
+
+TESTS = [("AR1", run_ar1), ("AR2", run_ar2), ("AR3", run_ar3), ("AR4", run_ar4), ("AR5", run_ar5), ("AR6", run_ar6), ("AR7", run_ar7), ("AR8", run_ar8), ("AR9", run_ar9), ("AR10", run_ar10), ("AR11", run_ar11), ("AR12", run_ar12), ("AR13", run_ar13), ("AR14", run_ar14), ("AR15", run_ar15), ("AR16", run_ar16), ("AR17", run_ar17), ("AR18", run_ar18), ("AR19", run_ar19), ("AR20", run_ar20), ("AR21", run_ar21), ("AR22", run_ar22), ("AR23", run_ar23), ("AR24", run_ar24), ("AR25", run_ar25), ("AR26", run_ar26), ("AR27", run_ar27), ("AR28", run_ar28), ("AR29", run_ar29), ("AR30", run_ar30), ("AR31", run_ar31)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]

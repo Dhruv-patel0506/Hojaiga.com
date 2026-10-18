@@ -27,6 +27,9 @@ from core_organs import train_qlora as TQ
 from core_organs.harvest.paths import harvest_dir
 
 
+BASE_MODEL = "Qwen/Qwen3-VL-2B-Instruct"                           # what the old adapter was trained on and what fits the 6 GB card (the 8B default is refused)
+
+
 def _read(p: str) -> List[Dict[str, Any]]:
     return [json.loads(line) for line in open(p, encoding="utf-8")] if os.path.isfile(p) else []
 
@@ -66,7 +69,7 @@ def build_split(root: str = "", holdout: str = "alternate") -> Dict[str, Any]:
         if TQ.validate_pair(r, root, cfg.require_ui_gate):
             continue
         try:
-            if TQ.estimate_pair_tokens(r, root, cfg.max_pixels) > cfg.max_seq_length:
+            if TQ.estimate_pair_tokens(r, root, cfg.max_pixels) > cfg.max_seq_length - 300:         # the estimate under-counts multi-image rows (measured: an 'ok' row was 2087 tokens)
                 continue
         except Exception:
             continue
@@ -75,7 +78,14 @@ def build_split(root: str = "", holdout: str = "alternate") -> Dict[str, Any]:
     for r in good:
         by_app[r["meta"]["app_key"]] = by_app.get(r["meta"]["app_key"], 0) + 1
     zero = sorted(a for a, n in by_app.items() if a not in old_apps and n >= 5)
-    held = set(zero[1::2]) if holdout == "alternate" else set(zero)
+    if holdout == "alternate":                                                  # about a fifth of the rows, spread over apps of every kind (a few large apps would otherwise be most of the eval)
+        budget, held, used = int(0.22 * len(good)), set(), 0
+        for a in zero[1::2] + zero[0::2]:
+            if by_app[a] <= 80 and used + by_app[a] <= budget:
+                held.add(a)
+                used += by_app[a]
+    else:
+        held = set(zero)
     ev = [r for r in good if r["meta"]["app_key"] in held]
     tr = [r for r in good if r["meta"]["app_key"] not in held]
     out_dir = os.path.join(tdir, "runs", "run_" + time.strftime("%Y%m%d_%H%M%S") + "_v2split")
@@ -91,18 +101,18 @@ def build_split(root: str = "", holdout: str = "alternate") -> Dict[str, Any]:
 
 
 def _py(args: List[str]) -> int:
-    return subprocess.run([sys.executable, "-u", "-W", "ignore", "-m", "core_organs.train_qlora"] + args, cwd=os.path.join("D:" + os.sep, "new_automation", "All codes")).returncode
+    return subprocess.run([sys.executable, "-u", "-W", "ignore", "-m", "core_organs.train_qlora"] + args + ([] if "--model" in args else ["--model", BASE_MODEL]), cwd=os.path.join("D:" + os.sep, "new_automation", "All codes")).returncode
 
 
-def run(steps: int = 450) -> None:
+def run(steps: int = 450, skip_train: bool = False) -> None:
     root = harvest_dir()[0]
     split = max(glob.glob(os.path.join(root, "training", "runs", "*_v2split")), key=os.path.getmtime)
     old = old_run(root)
     print("[compare] training the new adapter on", split, flush=True)
-    rc = _py(["train", "--presplit", split, "--steps", str(steps), "--model", TQ.TrainConfig.model, "--min-examples", "100"])
+    rc = 0 if skip_train else _py(["train", "--presplit", split, "--steps", str(steps), "--model", BASE_MODEL, "--min-examples", "100"])
     print("[compare] train rc", rc, flush=True)
     print("[compare] new adapter, v2 with names", flush=True)
-    _py(["evaluate", "--run", split, "--eval-file", "eval.jsonl", "--report", "eval_new_names.json"])
+    _py(["evaluate", "--run", split, "--eval-file", "eval.jsonl", "--no-base", "--report", "eval_new_names.json"])
     print("[compare] new adapter, v2 without names", flush=True)
     _py(["evaluate", "--run", split, "--eval-file", "eval_nonames.jsonl", "--no-base", "--report", "eval_new_alone.json"])
     if old:
@@ -124,8 +134,62 @@ def report() -> str:
              "| model | n | valid JSON | right action kind | exact (right control) |", "|---|---|---|---|---|"]
     for name, d in rows:
         lines.append(f"| {name} | {d.get('n', '-')} | {d.get('valid_json', '-')} | {d.get('action_kind', '-')} | {d.get('exact', '-')} |")
+    # per DOMAIN (desktop_app / website / web_app): the same answers, re-scored by the domain of each held-out pair (samples are in the order of the eval file)
+    def by_domain(report_name: str, key: str, eval_file: str) -> Dict[str, Any]:
+        p = os.path.join(split, report_name)
+        if not os.path.isfile(p):
+            return {}
+        samples = json.load(open(p)).get(key, {}).get("samples", [])
+        rows_ = _read(os.path.join(split, eval_file))
+        acc: Dict[str, List[bool]] = {}
+        for r, sm in zip(rows_, samples):
+            ok = bool(TQ.score_action(TQ.parse_action(sm.get("reply", "")), sm.get("gold", {}))["exact"])
+            acc.setdefault(r["meta"].get("domain", "desktop_app"), []).append(ok)
+        return {d: (len(v), round(sum(v) / max(len(v), 1), 3)) for d, v in acc.items()}
+    doms = {"old adapter, v1 (model alone)": by_domain("eval_old_v1.json", "adapter", "eval_v1.jsonl"), "new adapter, strips only (model alone)": by_domain("eval_new_alone.json", "adapter", "eval_nonames.jsonl"),
+            "new adapter + UIA names": by_domain("eval_new_names.json", "adapter", "eval.jsonl")}
+    lines += ["", "Exact (right control) by master domain: n / accuracy", "", "| model | desktop_app | website | web_app |", "|---|---|---|---|"]
+    for name, d in doms.items():
+        lines.append("| " + name + " | " + " | ".join(("%d / %.0f%%" % (d[k][0], 100 * d[k][1])) if k in d else "-" for k in ("desktop_app", "website", "web_app")) + " |")
     md = "\n".join(lines)
     open(os.path.join(split, "compare_report.md"), "w", encoding="utf-8").write(md)
+    return md
+
+
+def report_half() -> str:
+    """The comparison on the SAME rows: every second row of the held-out set (the first variant was run on all 250, the other two on every second row), per variant and per master domain."""
+    root = harvest_dir()[0]
+    split = max(glob.glob(os.path.join(root, "training", "runs", "*_v2split")), key=os.path.getmtime)
+    s = json.load(open(os.path.join(split, "split_summary.json")))
+    full = _read(os.path.join(split, "eval.jsonl"))[::2]
+    half_v1 = _read(os.path.join(split, "eval_v1_half.jsonl"))
+
+    def samples(name: str, key: str, stride: int) -> List[Dict[str, Any]]:
+        p = os.path.join(split, name)
+        return json.load(open(p)).get(key, {}).get("samples", [])[::stride] if os.path.isfile(p) else []
+    variants = [("old adapter, v1 prompt (model alone)", samples("eval_old_v1_half.json", "adapter", 1), half_v1),
+                ("new adapter, v2 strips only (model alone)", samples("eval_new_alone_half.json", "adapter", 1), full),
+                ("new adapter, v2 strips + UIA names", samples("eval_new_names.json", "adapter", 2), full)]
+    lines = [f"Held-out: the same {len(full)} rows (every second row of {s['eval']}) from {len(s['held_out_apps'])} apps the old adapter never saw; new adapter trained on {s['train']} rows (checkpoint step 100).", "",
+             "| model | n | valid JSON | right action kind | exact (right control) |", "|---|---|---|---|---|"]
+    by_dom: Dict[str, Dict[str, List[bool]]] = {}
+    for name, sm, rows in variants:
+        n = min(len(sm), len(rows))
+        if not n:
+            lines.append(f"| {name} | - | - | - | - |")
+            continue
+        sc = [TQ.score_action(TQ.parse_action(x.get("reply", "")), x.get("gold", {})) for x in sm[:n]]
+        valid = sum(1 for c in sc if c["valid"]) / n
+        kind = sum(1 for c in sc if c["action"]) / n
+        ex = sum(1 for c in sc if c["exact"]) / n
+        lines.append(f"| {name} | {n} | {valid:.2f} | {kind:.2f} | {ex:.3f} |")
+        for r, c in zip(rows[:n], sc):
+            by_dom.setdefault(name, {}).setdefault(r["meta"].get("domain", "desktop_app"), []).append(bool(c["exact"]))
+    lines += ["", "Exact by master domain: n / accuracy", "", "| model | desktop_app | website | web_app |", "|---|---|---|---|"]
+    for name, d in by_dom.items():
+        lines.append("| " + name + " | " + " | ".join(("%d / %.0f%%" % (len(d[k]), 100 * sum(d[k]) / len(d[k]))) if k in d else "-" for k in ("desktop_app", "website", "web_app")) + " |")
+    md = "\n".join(lines)
+    open(os.path.join(split, "compare_report_half.md"), "w", encoding="utf-8").write(md)
     return md
 
 
@@ -134,6 +198,8 @@ if __name__ == "__main__":
     if cmd == "split":
         print(json.dumps(build_split(), indent=1))
     elif cmd == "run":
-        run(int(sys.argv[2]) if len(sys.argv) > 2 else 450)
+        run(int(sys.argv[2]) if len(sys.argv) > 2 and sys.argv[2].isdigit() else 450, skip_train="evaluate-only" in sys.argv)
+    elif cmd == "half":
+        print(report_half())
     else:
         print(report())

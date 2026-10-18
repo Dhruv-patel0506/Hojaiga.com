@@ -56,9 +56,8 @@ def onboard(text: str, explore: bool = True, per_app_min: float = 10.0, max_acti
     DM.register(rag, c["key"], c["domain"], c.get("evidence"))
     name_for_docs = c.get("name") or DM.host_of(c.get("url", ""))
     log(f"[onboard] {text!r} -> {c['domain']} ({c['key']})")
-    h = W.harvest_app(name_for_docs, rag=rag, max_pages=4, max_pairs=8)
+    h = W.harvest_app(name_for_docs, rag=rag, max_pages=4, max_pairs=8, app_key=c["key"])
     out["docs"] = {k: h.get(k) for k in ("pages", "steps", "procedures", "hotkeys", "pairs", "engine", "seconds")}
-    # the web chain files its knowledge under the plain slug of the name; move it into the domain partition (same stores, namespaced key)
     out["explore"] = {}
     if explore:
         if c["domain"] == DM.DESKTOP:

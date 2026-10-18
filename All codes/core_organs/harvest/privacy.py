@@ -137,7 +137,7 @@ def purge_app(root: str, app_key: str) -> Dict[str, int]:
     return n
 
 
-def scrub(root: str, since: float = 0.0, extra_terms: Sequence[str] = (), apps: Optional[Sequence[str]] = None, progress: bool = True) -> Dict[str, Any]:
+def scrub(root: str, since: float = 0.0, extra_terms: Sequence[str] = (), apps: Optional[Sequence[str]] = None, progress: bool = True, all_sources: bool = False) -> Dict[str, Any]:
     """OCR the frames of local pairs made after `since` (epoch seconds; the frame file's own time) and quarantine the pairs that show the person's identifiers."""
     terms = personal_terms(extra_terms)
     rx = _rx(terms)
@@ -150,7 +150,7 @@ def scrub(root: str, since: float = 0.0, extra_terms: Sequence[str] = (), apps: 
     for ds in _datasets(root)[:1]:                                              # the v1 file lists every pair once; v2 pairs share the pair_id
         for r in _read(ds):
             m = r.get("meta", {})
-            if m.get("source") != "local_uia" or (apps and m.get("app_key") not in apps):
+            if (m.get("source") != "local_uia" and not all_sources) or (apps and m.get("app_key") not in apps):
                 continue
             pre = os.path.join(root, m.get("pre", ""))
             if not os.path.isfile(pre) or os.path.getmtime(pre) < since:
@@ -197,5 +197,5 @@ if __name__ == "__main__":
         for k in sys.argv[2:]:
             print(k, purge_app(root, k))
     else:
-        since = float(sys.argv[1]) if len(sys.argv) > 1 else 0.0
-        print(json.dumps(scrub(root, since), indent=1))
+        since = float(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1] != "all" else 0.0
+        print(json.dumps(scrub(root, since, all_sources="all" in sys.argv[1:] or (len(sys.argv) > 2 and sys.argv[2] == "all")), indent=1))

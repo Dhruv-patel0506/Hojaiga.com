@@ -322,6 +322,10 @@ def pairs_from_steps(app_key: str, steps: Sequence[Dict[str, Any]], source_url: 
     out_dir = os.path.join(root, "frames", "web", app_key)
     shots: List[Tuple[Dict[str, Any], str]] = []
     for st in steps:
+        if st.get("local_imgs"):                                             # a picture the browser rendered and the recorder captured from the page: no download, no image-server challenge
+            rep["images"] += 1
+            shots.append((st, st["local_imgs"][0]))
+            continue
         for u in st["imgs"][:1]:
             code, data = get(u, binary=True, max_bytes=MAX_IMG_BYTES)
             p = save_image(data, out_dir) if code == 200 and data else None
@@ -381,11 +385,11 @@ def feed_rag(rag: Any, app_key: str, app_name: str, steps: Sequence[Dict[str, An
     return n
 
 
-def harvest_app(app_name: str, root: str = "", rag: Any = None, max_pages: int = 4, max_pairs: int = 12, write_pairs: bool = True, log: Any = None, with_clips: bool = True, with_open_video: bool = False) -> Dict[str, Any]:
+def harvest_app(app_name: str, root: str = "", rag: Any = None, max_pages: int = 4, max_pairs: int = 12, write_pairs: bool = True, log: Any = None, with_clips: bool = True, with_open_video: bool = False, app_key: str = "") -> Dict[str, Any]:
     """One app through the web chain: search -> illustrated pages -> RAG + pairs; clips on pages that have them. Speed and counts are returned."""
     from . import free_master_harvester as M
     root = root or harvest_dir()[0]
-    app_key = M.app_key_of(app_name)
+    app_key = app_key or M.app_key_of(app_name)                          # a caller may file the knowledge under a domain key ('web:<host>' / 'webapp:<host>')
     t0 = time.time()
     rep: Dict[str, Any] = {"app": app_key, "pages": 0, "steps": 0, "procedures": 0, "hotkeys": 0, "images": 0, "pairs": 0, "clips_found": 0, "engine": "", "urls": []}
     queries = [f"{app_name} tutorial site:{h}" for h in DOC_HOSTS] + [f"{app_name} keyboard shortcuts"]

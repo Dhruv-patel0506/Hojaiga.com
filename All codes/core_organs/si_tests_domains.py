@@ -221,3 +221,177 @@ def run_ar26(verdict):
               "before_after_pairs_come_from_consecutive_screenshots": len(rows) == 2 and acts[0]["target_id"] == 1 and acts[1]["target_id"] == 2,
               "pair_rows_name_their_source": all(r["meta"]["source"] == "web_steps" and r["meta"]["post"] for r in rows)}
     return verdict(checks, "steps=%d clips=%s keys=%s pairs=%s calls=%s r1=%s" % (len(steps), [(c["kind"]) for c in clips], [s["keys"] for s in steps], pr["grounded"], calls, r1["tried"]))
+
+
+def run_ar27(verdict):
+    """AR27: logic chains -- precondition / action / expectation / fallback are built from tutorial steps and written to the five stores (graph edge, procedure, hotkey, recovery, icon)"""
+    from core_organs.rag import logic_chains as LC
+    from si_tests_rag import _Env
+    steps = [{"text": "In the Insert tab, click Chart and choose a bar chart. If you do not see the Chart button, widen the window.", "names": ["Chart"], "keys": [], "imgs": []},
+             {"text": "Press Ctrl+Shift+S to save a copy.", "names": [], "keys": ["Ctrl+Shift+S"], "imgs": []},
+             {"text": "Open File > Export > PDF to finish.", "names": [], "keys": [], "imgs": []},
+             {"text": "Click Done.", "names": ["Done"], "keys": [], "imgs": []}]
+    labels = [["Home", "Insert", "Design"], ["Chart Title", "Series", "Axis"], ["Save", "Close"], ["Done"]]
+    page = "Troubleshooting. If the Chart button is greyed out, select a cell first. Unrelated sentence here."
+    chains = LC.build_chains(steps, labels, page)
+    texts = [LC.chain_text(c) for c in chains]
+    with _Env(icons=True) as R:
+        w = LC.write(R, "fancy", "Fancy Editor", chains, labels, "https://docs.example.org/x", "Make a chart")
+        procs = R.proc.stats("fancy")["procedures"]
+        fast = R.fast.count("fancy")
+        nodes = R.graph.stats("fancy").get("edges", 0)
+        rec = R.rec.lookup("fancy", failure_code="tutorial_fallback", message="the Chart button is greyed out, select a cell first")
+    checks = {"the_place_a_step_names_is_its_precondition": chains[0]["precondition"]["where"].lower() == "insert tab" and chains[0]["precondition"]["screen_labels"][:2] == ["Home", "Insert"],
+              "a_click_a_hotkey_and_a_menu_path_are_told_apart": [c["action"]["kind"] for c in chains] == ["click", "hotkey", "menu_path", "click"] and chains[2]["action"]["menu_path"] == ["File", "Export", "PDF"],
+              "what_appears_next_is_the_expectation": chains[0]["expected"]["new_labels"] == ["Chart Title", "Series", "Axis"],
+              "fallbacks_come_from_the_step_and_from_the_page": len(chains[0]["fallback"]) == 2 and any("greyed out" in f for f in chains[0]["fallback"]) and chains[3]["fallback"] == [],
+              "the_chain_reads_as_one_line": all(t.startswith("PRECONDITION:") and "| ACTION:" in t and "| EXPECT:" in t and "| IF BLOCKED:" in t for t in texts) and "press Ctrl+Shift+S" in texts[1],
+              "every_store_got_its_part": w["procedures"] >= 1 and w["edges"] >= 1 and w["playbooks"] >= 2 and procs >= 1 and nodes >= 1,
+              "a_click_with_a_known_shortcut_is_linked_both_ways": any(c["action"]["target"] == "Chart" for c in chains) and fast >= 0,
+              "recovery_finds_the_tutorial_fallback": bool(rec)}
+    return verdict(checks, "w=%s procs=%s edges=%s texts0=%s" % (w, procs, nodes, texts[0][:160]))
+
+
+def json_copy(x):
+    import json
+    return json.loads(json.dumps(x))
+
+
+def run_ar28(verdict):
+    """AR28: the CPU brain's language layer -- intent from words, app from the catalogue (versions ignored), AI-summary answer turned into steps"""
+    from core_organs import brain_planner as BP
+    from core_organs.harvest import search_browser as SBR
+    names = ["Blender 5.2", "Calculator", "Photometric Calc 2025 R2", "Paint", "Word"]
+    i1, i2, i3 = BP.classify_intent("how do I add a cube in Blender?"), BP.classify_intent("build a wooden table in Blender"), BP.classify_intent("learn Calculator and map it")
+    text = "Like\nDislike\nYou can add a cube.\nPress Shift + A in the 3D Viewport.\nIn Object Mode, open the Toolbar and choose Add Cube.\nHelpful Hotkeys\nCtrl - Toggle snapping\nThis covers both ways of working here."
+    steps = SBR.steps_from_summary(text)
+    checks = {"a_question_is_teach": i1["mode"] == "teach", "an_order_is_delegate": i2["mode"] == "delegate", "learn_is_understand": i3["mode"] == "understand",
+              "the_app_is_found_without_its_version": BP.detect_app("how do I add a cube in Blender?", names) == "Blender 5.2" and BP.detect_app("open photometric calc", names) == "Photometric Calc 2025 R2",
+              "no_app_named_is_empty": BP.detect_app("make me a sandwich", names) == "",
+              "version_suffixes_are_stripped": BP.strip_version("Blender 5.2") == "Blender" and BP.strip_version("Photometric Calc 2025 R2") == "Photometric Calc",
+              "summary_steps_are_the_instruction_lines": len(steps) == 2 and steps[0]["keys"] == ["Shift + A"]}
+    return verdict(checks, "intents=%s/%s/%s steps=%s" % (i1["mode"], i2["mode"], i3["mode"], [s["text"][:30] for s in steps]))
+
+
+def run_ar29(verdict):
+    """AR29: 3D design checks that hold for any object -- shapes read from the registry, floating / buried / duplicated parts named, a good design passes"""
+    from core_organs import brain_planner as BP
+    reg = [{"id": "mesh.primitive_cube_add"}, {"id": "mesh.primitive_uv_sphere_add"}, {"id": "mesh.primitive_cylinder_add"}, {"id": "object.delete"}, {"id": "curve.primitive_bezier_curve_add"}]
+    shapes = BP.shapes_of(reg)
+    sh = sorted(shapes)
+    good = {"object": "stool", "parts": [{"name": "seat", "shape": "cube", "size": [0.4, 0.4, 0.05], "at": [0, 0, 0.475], "rotate": [0, 0, 0], "color": [0.5, 0.3, 0.2]},
+                                         {"name": "leg_a", "shape": "cylinder", "size": [0.05, 0.05, 0.45], "at": [0.15, 0.15, 0.225], "rotate": [0, 0, 0], "color": [0.4, 0.3, 0.2]},
+                                         {"name": "leg_b", "shape": "cylinder", "size": [0.05, 0.05, 0.45], "at": [-0.15, -0.15, 0.225], "rotate": [0, 0, 0], "color": [0.4, 0.3, 0.2]}]}
+    clean, p1 = BP.validate_design(good, sh)
+    float_ = json_copy(good)
+    float_["parts"][1]["at"] = [0.15, 0.15, 0.9]
+    buried = json_copy(good)
+    buried["parts"][2]["at"] = [-0.15, -0.15, -0.3]
+    dup = json_copy(good)
+    dup["parts"][2]["at"] = [0.15, 0.15, 0.225]
+    bad_shape, p2 = BP.validate_design({"parts": [{"name": "x", "shape": "dodecahedron", "size": [1, 1, 1], "at": [0, 0, 0.5]}]}, sh)
+    rot = BP.part_box({"size": [1.0, 0.2, 0.2], "at": [0, 0, 0], "rotate": [0, 0, 90]})
+    cf = BP.critic(BP.validate_design(float_, sh)[0])
+    based, pb = BP.validate_design({"parts": [{"name": "post", "shape": "cylinder", "size": [0.1, 0.1, 0.8], "base": [0, 0, 0]}, {"name": "slab", "shape": "cube", "size": [1, 1, 0.04], "base": [0, 0, 0.8]}]}, sh)
+    rest = {"parts": [{"name": "leg1", "shape": "cylinder", "size": [0.06, 0.06, 0.7], "on": "ground", "xy": [-0.5, -0.3]}, {"name": "leg2", "shape": "cylinder", "size": [0.06, 0.06, 0.7], "on": "ground", "xy": [0.5, 0.3]},
+                     {"name": "top", "shape": "cube", "size": [1.2, 0.8, 0.04], "on": ["leg1", "leg2"], "xy": [0, 0]}]}
+    stk, ps = BP.validate_design(rest, sh)
+    lost = BP.validate_design({"parts": [{"name": "top", "shape": "cube", "size": [1, 1, 0.04], "on": ["leg9"], "xy": [0, 0]}]}, sh)[1]
+    away = BP.validate_design({"parts": [{"name": "leg", "shape": "cylinder", "size": [0.05, 0.05, 0.7], "on": "ground", "xy": [3, 3]}, {"name": "top", "shape": "cube", "size": [1, 1, 0.04], "on": ["leg"], "xy": [0, 0]}]}, sh)[1]
+    loop = BP.validate_design({"parts": [{"name": "a", "shape": "cube", "size": [1, 1, 0.1], "on": ["b"], "xy": [0, 0]}, {"name": "b", "shape": "cube", "size": [1, 1, 0.1], "on": ["a"], "xy": [0, 0]}]}, sh)[1]
+    back = BP.infer_on(stk)
+    words = BP.describe_design(stk)
+    flat = BP.shapes_of([{"id": "mesh.primitive_plane_add"}, {"id": "mesh.primitive_cube_add"}])
+    checks = {"shapes_come_from_the_registry": sh == ["cube", "cylinder", "uv_sphere"], "a_sound_design_has_no_problems": not p1 and not BP.critic(clean),
+              "a_floating_part_is_named": any("leg_a" in x and "floating" in x for x in cf),
+              "a_part_below_the_ground_is_named": any("leg_b" in x and "below the ground" in x for x in BP.critic(BP.validate_design(buried, sh)[0])),
+              "two_parts_in_one_place_are_named": any("same place" in x for x in BP.critic(BP.validate_design(dup, sh)[0])),
+              "an_unknown_shape_is_refused": bool(p2) and not bad_shape["parts"],
+              "a_base_point_is_turned_into_a_centre": not pb and abs(based["parts"][0]["at"][2] - 0.4) < 1e-9 and abs(based["parts"][1]["at"][2] - 0.82) < 1e-9 and not BP.critic(based),
+              "flat_shapes_are_not_offered": sorted(flat) == ["cube"],
+              "the_top_is_put_on_the_legs_by_the_system": not ps and abs(stk["parts"][2]["at"][2] - 0.72) < 1e-9 and not BP.critic(stk),
+              "an_unknown_support_a_loop_and_a_part_off_its_supports_are_named": any("not one of your parts" in x for x in lost) and any("loop" in x for x in loop) and any("not above it" in x for x in away),
+              "the_design_is_described_in_words_from_its_geometry": "leg1: a tall thin post" in words and "stands on the ground; it carries top" in words and "top: a flat board" in words and "rests on leg1 and leg2" in words,
+              "what_a_part_rests_on_is_read_back_from_geometry": back["top"] == ["leg1", "leg2"] and back["leg1"] == "ground",
+              "a_turned_part_has_a_turned_box": abs((rot[1][0] - rot[0][0]) - 0.2) < 1e-6 and abs((rot[1][1] - rot[0][1]) - 1.0) < 1e-6}
+    return verdict(checks, "shapes=%s p1=%s critic_float=%s" % (sh, p1, cf))
+
+
+def run_ar30(verdict):
+    """AR30: the unified section -- one state machine, quality judged from measurements, recipes remembered, a router that mounts sections"""
+    import tempfile
+    from core_organs import app_teaching_automation as ATA
+    design = {"object": "stool", "parts": [{"name": "seat", "shape": "cube", "size": [0.4, 0.4, 0.05], "at": [0, 0, 0.475], "rotate": [0, 0, 0], "color": [0.5, 0.3, 0.2]},
+                                           {"name": "leg", "shape": "cylinder", "size": [0.05, 0.05, 0.45], "at": [0.1, 0.1, 0.225], "rotate": [0, 0, 0], "color": [0.4, 0.3, 0.2]}]}
+    steps = [{"part": "seat", "ok": True, "attempts": [{"ok": True, "dim_err": 0.0, "pos_err_m": 0.0}]}, {"part": "leg", "ok": True, "attempts": [{"ok": False, "rolled_back": True}, {"ok": True, "dim_err": 0.01, "pos_err_m": 0.002}]}]
+    before = {"objects": [{"name": "old", "loc": [0, 0, 0], "dims": [1, 1, 1], "verts": 8}]}
+    after = {"objects": before["objects"] + [{"name": "seat", "bbox": [[-0.2, -0.2, 0.45], [0.2, 0.2, 0.5]], "dims": [0.4, 0.4, 0.05], "loc": [0, 0, 0.475], "mats": ["m"], "verts": 8},
+                                              {"name": "leg", "bbox": [[0.075, 0.075, 0.0], [0.125, 0.125, 0.45]], "dims": [0.05, 0.05, 0.45], "loc": [0.1, 0.1, 0.225], "mats": ["m"], "verts": 32}]}
+    q = ATA.judge_scene("a stool", design, {"steps": steps, "made": ["seat", "leg"]}, before, after)
+    broken = json_copy(after)
+    broken["objects"][2]["bbox"] = [[0.5, 0.5, 0.0], [0.6, 0.6, 0.45]]
+    qb = ATA.judge_scene("a stool", design, {"steps": steps, "made": ["seat", "leg"]}, before, broken)
+    with tempfile.TemporaryDirectory() as d:
+        old = ATA.RECIPES
+        ATA.RECIPES = d
+        try:
+            ATA.remember_recipe("blender", "build a wooden dining table with four legs", design, 90.0)
+            near = ATA.recall_recipes("blender", "build a wooden dining table", 0.2)
+            far = ATA.recall_recipes("blender", "make a sandwich", 0.2)
+        finally:
+            ATA.RECIPES = old
+    off = ATA._free_offset({"objects": [{"bbox": [[0, 0, 0], [1, 1, 1]]}]}, design)
+    weak_yes = ATA.AppIntelligenceEngine.weak({"plans": [{"steps": ["click Click 'View' (a menuitem)."]}], "evidence": []}, "how do I draw a rectangle in Paint?")
+    weak_no = ATA.AppIntelligenceEngine.weak({"plans": [{"steps": ["click the Rectangle shape in the Shapes group"]}], "evidence": []}, "how do I draw a rectangle in Paint?")
+    fl = ATA.Flow(lambda s: None)
+    with fl.enter("recall", "x"):
+        pass
+    checks = {"a_sound_build_scores_high": q["score"] >= 90 and q["connected"] and q["on_ground"] and q["earlier_objects_untouched"] and q["rollbacks"] == 1,
+              "a_detached_part_lowers_the_score": (not qb["connected"]) and qb["score"] < q["score"] and qb["floating_parts"] == ["leg"],
+              "a_recipe_is_found_by_its_words": len(near) == 1 and near[0]["similarity"] > 0.4 and far == [],
+              "a_new_object_is_placed_clear_of_the_old": off[0] >= 0.9,
+              "an_answer_that_does_not_speak_of_the_question_is_weak": weak_yes and not weak_no,
+              "states_are_timed": bool(fl.states) and fl.states[0]["state"] == "recall",
+              "the_router_mounts_and_chooses": _router_ok()}
+    return verdict(checks, "score=%s broken=%s offset=%s" % (q["score"], qb["score"], off))
+
+
+def _router_ok():
+    import os
+    import sys
+    sys.path.insert(0, os.path.join("D:" + os.sep, "new_automation", "All codes"))
+    from sections import HoJaiga
+
+    class Dummy:
+        name, description = "x_demo", "draw charts and spreadsheets"
+
+        def handle(self, task, **kw):
+            return {"ok": True}
+    hj = HoJaiga().mount(Dummy())
+    return hj.choose("make charts") == "x_demo" and hj.handle("charts")["section"] == "x_demo" and "error" in hj.handle("t", section="nope")
+
+
+def run_ar31(verdict):
+    """AR31: workflow feeds -- recorded actions become structure (control / keys / type), web traces and documentation become steps, values the person typed are dropped, fall-backs are not copied"""
+    from core_organs.harvest import rag_feed as RF
+    from si_tests_rag import _Env
+    a1, a2, a3, a4 = (RF.parse_pyautogui("pyautogui.hotkey('ctrl', 'shift', 's')"), RF.parse_pyautogui("pyautogui.typewrite('hello there')"),
+                      RF.parse_pyautogui("pyautogui.click(350, 214)"), RF.parse_pyautogui("pyautogui.press('enter')"))
+    rows = [{"action_nl": 'Click the "Rating" filter button.', "action_pyautogui": "pyautogui.click(1, 2)", "action_target": '{"name": "Rating", "role": "static"}'},
+            {"action_nl": "Type the address into the bar.", "action_pyautogui": "pyautogui.typewrite('secret@mail.com')", "action_target": "None"},
+            {"action_nl": "Save the file.", "action_pyautogui": "pyautogui.hotkey('ctrl', 's')", "action_target": "None"}]
+    steps = RF.steps_from_trace(rows)
+    m2w = RF.mind2web_steps("['[button] Search -> CLICK', '[textbox] From -> TYPE: Boston', '[select] Sort by -> SELECT: Price', '[link] Cheapest -> CLICK']")
+    NL = chr(10)
+    doc = NL.join(["# Make a chart", '1. Click **Insert** and choose "Chart".', "2. Press Ctrl+Shift+C to copy the format.", "Some prose that is not a step at all here.", "# Other", "nothing to do here"])
+    md = RF.md_steps(doc)
+    with _Env(icons=False) as R:
+        w = RF.write_workflow(R, "fancy_feed", "Fancy Feed", "Rate things", steps, "hf:test (apache-2.0)")
+        one = RF.write_workflow(R, "fancy_feed", "Fancy Feed", "Too short", steps[:1], "hf:test")
+    checks = {"a_hotkey_is_read_with_its_keys": a1["kind"] == "hotkey" and a1["keys"] == "Ctrl+Shift+S", "typing_a_click_and_a_key_press_are_told_apart": a2["kind"] == "type" and a3["kind"] == "click" and a4["kind"] == "press" and a4["keys"] == "Enter",
+              "the_control_comes_from_the_recording": steps[0]["names"] == ["Rating"] and steps[2]["keys"] == ["Ctrl+S"],
+              "typed_content_is_not_kept": "secret" not in json.dumps(steps) and steps[1]["names"] == [],
+              "a_web_trace_becomes_steps_without_values": [s["names"] for s in m2w] == [["Search"], ["From"], ["Sort by"], ["Cheapest"]] and "Boston" not in json.dumps(m2w) and "Price" not in json.dumps(m2w),
+              "documentation_steps_are_found_under_their_heading": len(md) == 1 and md[0][0] == "Make a chart" and len(md[0][1]) == 2 and md[0][1][1]["keys"] == ["Ctrl+Shift+C"],
+              "a_workflow_reaches_the_stores": bool(w) and (w.get("procedures", 0) >= 1), "one_step_is_not_a_workflow": one == {}}
+    return verdict(checks, "w=%s steps=%s" % (w, [s["text"][:30] for s in steps]))

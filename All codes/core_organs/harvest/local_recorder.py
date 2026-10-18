@@ -292,6 +292,9 @@ class OwnedApp:
                             # MEASURED: a packaged app parked off-screen stops drawing (splash screen). In this mode it stays where it opened -- on screen, never activated, the person's focus handed straight back --
                             # and is operated only through UI Automation patterns (no physical input), so the person's mouse and keyboard are never touched.
                             self.mode = "visible"
+                            with contextlib.suppress(Exception):                    # a narrow window collapses its navigation: the owned size (as for a parked window), on screen, not activated
+                                us._u32.SetWindowPos(h, 0, 20, 20, 1100, 760, 0x0010 | 0x0004)
+                                time.sleep(1.5)
                             with contextlib.suppress(Exception):
                                 if fg0 and us._u32.GetForegroundWindow() != fg0:
                                     hin._hand_back_focus(int(fg0))
@@ -531,14 +534,40 @@ class OwnedApp:
         try:
             ed = self._editor()
             if ed is None:
-                return False
+                return self._post_text(text)
             vp = ed.GetValuePattern()
             if vp.IsReadOnly:
                 return False
             vp.SetValue((vp.Value or "") + text)
             return text in (ed.GetValuePattern().Value or "")
         except Exception:
+            return self._post_text(text)
+
+    EDIT_CLASSES = ("_WwG", "RichEditD2DPT", "RICHEDIT50W", "RichEdit20W", "Edit", "EXCEL7", "Scintilla")
+
+    def _post_text(self, text: str) -> bool:
+        """A document window that has no writable UIA value (a classic Win32 editor: its body is a window of its own) takes the characters as posted WM_CHAR messages, to that window, in the background:
+        no focus is taken. The caller reads the result back; True here only means 'delivered'."""
+        import ctypes
+        import ctypes.wintypes as wt
+        u = ctypes.windll.user32
+        found: List[int] = []
+        CB = ctypes.WINFUNCTYPE(ctypes.c_bool, wt.HWND, wt.LPARAM)
+
+        def cb(h, _l):
+            buf = ctypes.create_unicode_buffer(64)
+            u.GetClassNameW(h, buf, 64)
+            if buf.value in self.EDIT_CLASSES and u.IsWindowVisible(h):
+                found.append(h)
+            return True
+        u.EnumChildWindows(self.hwnd, CB(cb), 0)
+        if not found:
             return False
+        target = found[0]
+        for ch in text:
+            u.PostMessageW(target, 0x0102, ord(ch), 0)                     # WM_CHAR
+            time.sleep(0.004)
+        return True
 
     def clear_text(self) -> None:
         with contextlib.suppress(Exception):

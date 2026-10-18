@@ -148,6 +148,20 @@ class ScriptBridge:
         note = r.get("note") or r.get("error")
         return bool(r.get("ok")) and "CANCELLED" not in str(note), f"scripting: {script_id} -> {note}"
 
+    def select_object(self, kind: str) -> Tuple[bool, str]:
+        """One of the document's own objects of that kind selected and active (all elements inside edit mode); 'needs_object: ...' when the document has none of that kind."""
+        r = self.request("select_object", kind=kind, timeout=10.0)
+        self.calls.append({"select_object": kind, "res": r})
+        if r.get("needs_object"):
+            return False, f"needs_object: {r.get('note')}"
+        return bool(r.get("ok")), f"scripting: {r.get('note') or r.get('error')}"
+
+    def key_resolve(self, chord: str) -> Dict[str, Any]:
+        """Which command the application's ACTIVE keymaps bind to this chord in its current state (mode, editor): {id, props, keymap, kind: command | menu | interactive}; ok False when none."""
+        r = self.request("key_resolve", chord=chord, timeout=10.0)
+        self.calls.append({"key_resolve": chord, "res": r})
+        return r
+
     def fileinfo(self, script_id: str) -> Dict[str, Any]:
         """Does the command take a file (so that, run without one, it would open the application's own file browser)? {path_props, exts, direction}."""
         r = self.request("fileinfo", id=script_id, timeout=10.0)
@@ -192,6 +206,65 @@ class ScriptBridge:
             else:
                 return False, "scripting: the step names a setting but no value to give it"
         return self.rna_set(key, val)
+
+    def scene(self) -> Dict[str, Any]:
+        """The document's contents as measurements: objects, kinds, transforms, sizes, mesh counts, bounding boxes."""
+        r = self.request("scene", timeout=15.0)
+        return r if r.get("ok") else {"objects": [], "error": r.get("error")}
+
+    def scene_restore(self, prior: Dict[str, Any]) -> Dict[str, Any]:
+        """Roll the document back to an earlier scene() dump (extra objects removed, transforms and modifiers restored)."""
+        return self.request("scene_restore", prior=prior, timeout=20.0)
+
+    def batch_add(self, items: List[Dict[str, Any]], chunk: int = 120) -> Dict[str, Any]:
+        """Many parts in a few requests (the application's own add commands, run back to back inside it): {made, failed, materials}."""
+        made: List[str] = []
+        failed: List[Any] = []
+        mats = 0
+        for i in range(0, len(items), chunk):
+            r = self.request("batch_add", items=items[i:i + chunk], timeout=240.0)
+            made += r.get("made", [])
+            failed += r.get("failed", []) if r.get("ok") else [["batch", str(r.get("error"))]]
+            mats += int(r.get("materials", 0))
+        self.calls.append({"batch_add": len(items), "made": len(made), "failed": len(failed)})
+        return {"made": made, "failed": failed, "materials": mats}
+
+    def view_shot(self, path: str, hide: Optional[List[str]] = None, view: str = "iso", frame: Optional[List[str]] = None) -> bool:
+        """A picture of the 3D view with the named collections hidden, seen from 'iso' / 'south' / 'top', framed on the named collections."""
+        r = self.request("view_shot", path=path, hide=hide or [], view=view, frame=frame or [], timeout=60.0)
+        self.calls.append({"view_shot": path, "res": r})
+        return bool(r.get("ok"))
+
+    def open_file(self, path: str) -> Tuple[bool, str]:
+        """Open a document that lies inside the run's sandbox (the one door through which a saved document comes back; any other path is refused by the bridge)."""
+        r = self.request("open_file", path=path, timeout=60.0)
+        self.calls.append({"open_file": path, "res": r})
+        return bool(r.get("ok")) and "FINISHED" in str(r.get("note")), str(r.get("note") or r.get("error"))
+
+    def shot(self, path: str, names: Optional[List[str]] = None) -> bool:
+        """The 3D view as a PNG in the sandbox, framed on the named objects when given."""
+        r = self.request("shot", path=path, names=names or [], timeout=40.0)
+        self.calls.append({"shot": path, "res": r})
+        return bool(r.get("ok"))
+
+    def paint(self, name: str, rgba: List[float], rename: str = "") -> str:
+        """A colour (a material) for one mesh object and, optionally, a new name; returns the object's name afterwards ('' when it failed)."""
+        r = self.request("paint", name=name, rgba=rgba, rename=rename, timeout=10.0)
+        self.calls.append({"paint": name, "res": r})
+        return str(r.get("name") or "") if r.get("ok") else ""
+
+    def menus(self) -> Dict[str, Any]:
+        r = self.request("menus", timeout=90.0)
+        return r.get("menus", {}) if r.get("ok") else {}
+
+    def keymap(self) -> Dict[str, Any]:
+        r = self.request("keymap", timeout=60.0)
+        return r.get("keys", {}) if r.get("ok") else {}
+
+    def op_props(self, script_id: str) -> List[Dict[str, Any]]:
+        """The settings a command takes (name, type, default, choices): what a plan may pass to it."""
+        r = self.request("op_props", id=script_id, timeout=10.0)
+        return r.get("props", []) if r.get("ok") else []
 
     def rna_set(self, key: str, value: Any) -> Tuple[bool, str]:
         r = self.request("rna_set", key=key, value=value, timeout=15.0)

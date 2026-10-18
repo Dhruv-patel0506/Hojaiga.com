@@ -118,6 +118,9 @@ class Estimate:
     notes: List[str] = field(default_factory=list)
 
 
+STRIP_PIXELS = int(os.environ.get("HOJAIGA_STRIP_PIXELS", "0"))          # 0 = strips use the same cap as the main picture (the adapters trained so far); set 65536 (512*128) for the next training pass: a zoomed toolbar strip is wide and thin: it is capped at this many pixels (about 64 visual tokens) so a row with several strips fits the 2048-token / 4.5 GB budget
+
+
 def image_tokens_for(width: int, height: int, max_pixels: int, px_per_token: int = 32) -> int:
     """Visual tokens for an image after it is shrunk to <= max_pixels (aspect kept, sides rounded to the 32-px token grid). Qwen3-VL: 16-px patches merged 2x2 = one token per 32x32 pixels."""
     scale = min(1.0, math.sqrt(max_pixels / max(1, width * height)))
@@ -321,12 +324,13 @@ def split_by_video(pairs: Sequence[Dict[str, Any]], eval_frac: float, seed: int)
 def estimate_pair_tokens(rec: Dict[str, Any], root: str, max_pixels: int) -> int:
     from PIL import Image
     user = rec["messages"][1]["content"]
-    n_img = 0
-    for c in user:                                                          # every picture counts (prompt format v2 adds the zoomed strip crops)
+    n_img, seen = 0, 0
+    for c in user:                                                          # every picture counts (prompt format v2 adds the zoomed strip crops, which have their own smaller cap)
         if c.get("type") == "image":
             img = c["image"]
             w, h = Image.open(img if os.path.isabs(img) else os.path.join(root, img)).size
-            n_img += image_tokens_for(w, h, max_pixels)
+            n_img += image_tokens_for(w, h, max_pixels if (seen == 0 or not STRIP_PIXELS) else STRIP_PIXELS)
+            seen += 1
     text = "".join(c.get("text", "") for m in rec["messages"] for c in m["content"] if c.get("type") == "text")
     return n_img + int(len(text) / 3.2) + 40
 
@@ -398,10 +402,12 @@ class VLMCollator:
         msgs = []
         for m in rec["messages"]:
             content = []
+            seen = 0
             for c in m["content"]:
                 if c["type"] == "image":
                     path = c["image"] if os.path.isabs(c["image"]) else os.path.join(self.root, c["image"])
-                    content.append({"type": "image", "image": shrink(Image.open(path).convert("RGB"), self.max_pixels)})
+                    content.append({"type": "image", "image": shrink(Image.open(path).convert("RGB"), self.max_pixels if (seen == 0 or not STRIP_PIXELS) else STRIP_PIXELS)})
+                    seen += 1
                 else:
                     content.append({"type": "text", "text": c["text"]})
             msgs.append({"role": m["role"], "content": content})
@@ -458,7 +464,7 @@ def training_arguments(cfg: TrainConfig, out_dir: str, optim: Optional[str] = No
     import torch
     bf16 = bool(torch.cuda.is_available() and torch.cuda.is_bf16_supported())
     kw = dict(output_dir=out_dir, per_device_train_batch_size=cfg.per_device_batch, gradient_accumulation_steps=cfg.grad_accum, learning_rate=cfg.lr, warmup_steps=cfg.warmup_steps,
-              max_steps=cfg.max_steps, optim=optim or cfg.optim, logging_steps=5, save_strategy="steps", save_steps=100, save_total_limit=2, report_to="none", remove_unused_columns=False,
+              max_steps=cfg.max_steps, optim=optim or cfg.optim, logging_steps=5, save_strategy="steps", save_steps=25, save_total_limit=2, report_to="none", remove_unused_columns=False,
               gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False}, bf16=bf16, fp16=not bf16 and torch.cuda.is_available(), seed=cfg.seed, dataloader_num_workers=0)
     kw.update(extra)
     return TrainingArguments(**kw)
@@ -524,11 +530,27 @@ class ListDataset:
         return self.rows[i]
 
 
+def memory_callback(every: int = 10):
+    """Every `every` steps: gc.collect() + torch.cuda.empty_cache(). MEASURED: without it the step time on the 6 GB WDDM card crept from 27 s to 68 s as the allocator fragmented and spilled into shared memory."""
+    from transformers import TrainerCallback
+
+    class _Mem(TrainerCallback):
+        def on_step_end(self, args, state, control, **kw):
+            if state.global_step % every == 0:
+                import gc
+                import torch
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+    return _Mem()
+
+
 def run_training(model, collate_fn, train_rows: Sequence[Dict[str, Any]], cfg: TrainConfig, out_dir: str, optim: Optional[str] = None, eval_rows: Sequence[Dict[str, Any]] = (), **args_extra) -> Dict[str, Any]:
     """The training loop (transformers.Trainer): the same code path the real model uses, so it can be exercised on a tiny model."""
     from transformers import Trainer
     args = training_arguments(cfg, out_dir, optim, **args_extra)
     trainer = (make_trainer_class() if cfg.slice_logits else Trainer)(model=model, args=args, train_dataset=ListDataset(train_rows), eval_dataset=ListDataset(eval_rows) if eval_rows else None, data_collator=collate_fn)
+    trainer.add_callback(memory_callback(10))
     t0 = time.time()
     res = trainer.train()
     model.save_pretrained(os.path.join(out_dir, "adapter"))
@@ -564,6 +586,16 @@ def train(cfg: TrainConfig, force: bool = False, jsonl: str = "", root: str = ""
     collate = VLMCollator(proc, root, cfg.max_pixels, cfg.max_seq_length, pad_id=getattr(tok, "pad_token_id", 0) or 0)
     rows = [json.loads(l) for l in open(os.path.join(run_dir, "train.jsonl"), encoding="utf-8")]
     ev = [json.loads(l) for l in open(os.path.join(run_dir, "eval.jsonl"), encoding="utf-8")]
+    kept, dropped = [], 0
+    for r in rows:                                                  # the estimate under-counts some multi-image rows (measured: 2087 and 2472 tokens against 2048): the real tokenizer decides
+        try:
+            collate.encode(r)
+            kept.append(r)
+        except ValueError:
+            dropped += 1
+    rows = kept
+    out["dropped_over_length"] = dropped
+    print(f"[train] {len(rows)} rows kept, {dropped} dropped for length", flush=True)
     out["train"] = run_training(model, collate, rows, cfg, run_dir, eval_rows=ev)
     json.dump({**out, "config": asdict(cfg)}, open(os.path.join(run_dir, "run_summary.json"), "w"), indent=2, default=str)
     out["status"] = "trained"
@@ -646,7 +678,7 @@ def evaluate_run(run_dir: str, model_id: str, cfg: Optional[TrainConfig] = None,
             text = proc.batch_decode(out[:, enc["input_ids"].shape[1]:], skip_special_tokens=True)[0]
             sc = score_action(parse_action(text), gold)
             scores.append(sc)
-            samples.append({"goal": r["messages"][1]["content"][1]["text"].split("Goal: ")[-1][:70], "gold": {k: gold.get(k) for k in ("action", "target_id", "hotkey", "text")}, "reply": text[:200], **sc})
+            samples.append({"goal": [c.get("text", "") for c in r["messages"][1]["content"] if c.get("type") == "text"][-1].split("Goal: ")[-1][:70], "gold": {k: gold.get(k) for k in ("action", "target_id", "hotkey", "text")}, "reply": text[:200], **sc})
         return {"scores": summarize_scores(scores), "samples": samples, "tag": tag}
     res = {"base": run(model, "base")} if with_base else {}
     adapter = adapter_dir or os.path.join(run_dir, "adapter")

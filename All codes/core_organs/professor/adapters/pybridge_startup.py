@@ -671,6 +671,96 @@ def _gesture(kind):
     return True, "view3d " + kind
 
 
+_MODE_KEYMAP = {"OBJECT": "Object Mode", "EDIT_MESH": "Mesh", "POSE": "Pose", "EDIT_ARMATURE": "Armature", "SCULPT": "Sculpt", "PAINT_WEIGHT": "Weight Paint", "PAINT_VERTEX": "Vertex Paint",
+                "PAINT_TEXTURE": "Image Paint", "EDIT_CURVE": "Curve", "EDIT_CURVES": "Curves", "EDIT_TEXT": "Font", "EDIT_LATTICE": "Lattice", "EDIT_METABALL": "Metaball", "PARTICLE": "Particle",
+                "EDIT_SURFACE": "Curve", "EDIT_GREASE_PENCIL": "Grease Pencil Edit Mode"}
+_KEY_ALIAS = {"del": "delete", "ret": "enter", "return": "enter", "esc": "escape", "back_space": "backspace", "space": "space", "page_up": "pageup", "page_down": "pagedown",
+              "up_arrow": "up", "down_arrow": "down", "left_arrow": "left", "right_arrow": "right", "zero": "0", "one": "1", "two": "2", "three": "3", "four": "4", "five": "5", "six": "6",
+              "seven": "7", "eight": "8", "nine": "9", "control": "ctrl"}
+
+
+def _canon(chord):
+    parts = [p.strip().lower().replace(" ", "_") for p in str(chord).split("+") if p.strip()]
+    mods = {_KEY_ALIAS.get(p, p) for p in parts[:-1]} & {"ctrl", "alt", "shift", "oskey"}
+    key = _KEY_ALIAS.get(parts[-1], parts[-1]) if parts else ""
+    return mods, key
+
+
+def _key_resolve(chord):
+    """The command the ACTIVE keymaps bind to a chord in the application's current state: the current mode's keymap first, then the 3D viewport's, then the screen / window ones (the
+    order the application itself looks them up in). A chord that opens a menu or starts an interactive transform is reported, not run: it needs a choice / a gesture value."""
+    want_mods, want_key = _canon(chord)
+    if not want_key:
+        return {"ok": False, "note": "no key"}
+    kc = bpy.context.window_manager.keyconfigs.active or bpy.context.window_manager.keyconfigs.default
+    order = [_MODE_KEYMAP.get(bpy.context.mode, ""), "Object Non-modal", "3D View", "3D View Generic", "Frames", "Screen", "Window"]
+    first = None
+    for name in [n for n in order if n]:
+        km = kc.keymaps.get(name)
+        if km is None:
+            continue
+        for kmi in km.keymap_items:
+            if not kmi.active or not kmi.idname or kmi.map_type != "KEYBOARD" or kmi.value in ("DOUBLE_CLICK", "CLICK_DRAG", "RELEASE"):
+                continue
+            if _KEY_ALIAS.get(kmi.type.lower(), kmi.type.lower()) != want_key:
+                continue
+            if any((m in want_mods) != bool(f) for m, f in (("ctrl", kmi.ctrl), ("alt", kmi.alt), ("shift", kmi.shift), ("oskey", kmi.oskey)) if f != -1):
+                continue
+            props = {}
+            try:
+                for p in kmi.properties.bl_rna.properties:
+                    if p.identifier != "rna_type" and kmi.properties.is_property_set(p.identifier):
+                        val = getattr(kmi.properties, p.identifier)
+                        props[p.identifier] = val if isinstance(val, (str, int, float, bool)) else (list(val) if hasattr(val, "__len__") and not isinstance(val, str) else str(val))
+            except Exception:
+                pass
+            kind = "menu" if kmi.idname.startswith(("wm.call_menu", "wm.call_panel", "wm.call_menu_pie")) else ("interactive" if kmi.idname.startswith(("transform.", "view3d.rotate", "view3d.move", "view3d.zoom")) else "command")
+            hit = {"ok": True, "id": kmi.idname, "props": props, "keymap": name, "mode": bpy.context.mode, "kind": kind}
+            try:                                                   # a binding whose command cannot run here belongs to another editor (Ctrl+Z of the asset browser): the next binding is the live one
+                mod, op = _op(kmi.idname)
+                ov = _view3d()
+                with (bpy.context.temp_override(**ov) if ov is not None else contextlib.nullcontext()):
+                    can = bool(op.poll())
+            except Exception:
+                can = True
+            if can:
+                return hit
+            first = first or dict(hit, poll=False)
+    if first:
+        return first                                               # bound, but its precondition is not met now (no object selected ...): the caller hears it as a precondition
+    return {"ok": False, "note": "no active keymap of the current state binds %s" % chord, "mode": bpy.context.mode}
+
+
+_ELEMENT_WORDS = ("vertex", "vertices", "edge", "edges", "face", "faces", "element", "elements")
+
+
+def _select_object(kind):
+    """A guide step that works on 'an object' / 'a mesh' / 'the camera' / 'mesh elements': one of the scene's own objects of that kind is selected and made active (inside edit mode: all of
+    the elements). None of that kind -> needs_object (the caller creates one with the application's own Add command and asks again)."""
+    k = (kind or "object").lower().strip()
+    mode = bpy.context.mode
+    if any(w in k for w in _ELEMENT_WORDS) or (mode.startswith("EDIT") and k in ("object", "objects", "")):
+        if mode == "EDIT_MESH":
+            ov = _view3d()
+            with (bpy.context.temp_override(**ov) if ov is not None else contextlib.nullcontext()):
+                return {"ok": True, "note": "all elements selected: " + str(bpy.ops.mesh.select_all(action="SELECT"))}
+        k = "mesh"
+    want = {"mesh": "MESH", "meshes": "MESH", "camera": "CAMERA", "light": "LIGHT", "lamp": "LIGHT", "armature": "ARMATURE", "bone": "ARMATURE", "bones": "ARMATURE", "curve": "CURVE",
+            "text": "FONT", "font": "FONT", "empty": "EMPTY", "lattice": "LATTICE", "surface": "SURFACE", "metaball": "META", "grease pencil": "GREASEPENCIL", "volume": "VOLUME"}
+    typ = next((t for w, t in want.items() if w in k), "")
+    objs = [o for o in bpy.context.view_layer.objects if (not typ or o.type == typ or (typ == "GREASEPENCIL" and o.type.startswith("GP")))]
+    if not objs:
+        return {"ok": False, "needs_object": True, "note": "no %s in the scene" % (typ.lower() or "object")}
+    if mode != "OBJECT" and bpy.context.view_layer.objects.active is not None and bpy.context.view_layer.objects.active in objs:
+        return {"ok": True, "note": "the active %s is already being edited" % objs[0].type.lower()}
+    o = next((x for x in objs if x.type == "MESH"), objs[0]) if not typ else objs[0]
+    for x in bpy.context.view_layer.objects:
+        x.select_set(False)
+    o.select_set(True)
+    bpy.context.view_layer.objects.active = o
+    return {"ok": True, "note": "selected and made active: %s (%s)" % (o.name, o.type.lower())}
+
+
 def _state():
     v = _view3d()
     r3d = v["area"].spaces.active.region_3d if v else None
@@ -682,14 +772,189 @@ def _state():
             "file": bpy.data.filepath, "dirty": bool(bpy.data.is_dirty)}
 
 
+def _scene():
+    """The document's contents as measurements (read only): every object with its kind, transform, size in world units, mesh counts, materials, modifiers, parent and its world bounding box."""
+    from mathutils import Vector
+    objs = []
+    for o in bpy.context.view_layer.objects:
+        d = {"name": o.name, "type": o.type, "loc": [round(c, 4) for c in o.location], "rot": [round(c, 4) for c in o.rotation_euler], "scale": [round(c, 4) for c in o.scale],
+             "dims": [round(c, 4) for c in o.dimensions], "parent": o.parent.name if o.parent else "", "mods": [m.name for m in o.modifiers],
+             "mats": [s.material.name for s in o.material_slots if s.material], "visible": bool(o.visible_get())}
+        if o.type == "MESH" and o.data is not None:
+            d["verts"], d["faces"] = len(o.data.vertices), len(o.data.polygons)
+        try:
+            cs = [o.matrix_world @ Vector(c) for c in o.bound_box]
+            d["bbox"] = [[round(min(c[i] for c in cs), 4) for i in range(3)], [round(max(c[i] for c in cs), 4) for i in range(3)]]
+        except Exception:
+            pass
+        objs.append(d)
+    return {"ok": True, "objects": objs, "mode": bpy.context.mode, "file": bpy.data.filepath, "dirty": bool(bpy.data.is_dirty), "units": bpy.context.scene.unit_settings.system}
+
+
+def _scene_restore(prior):
+    """Put the document back to an earlier `_scene()` dump: objects that were not there are removed, the others get their transform back and lose modifiers that were not there (a rollback)."""
+    want = {o["name"]: o for o in prior.get("objects", [])}
+    removed, reset = [], []
+    if bpy.context.mode != "OBJECT":
+        with contextlib.suppress(Exception):
+            bpy.ops.object.mode_set(mode="OBJECT")
+    for o in list(bpy.context.view_layer.objects):
+        if o.name not in want:
+            gone = o.name
+            bpy.data.objects.remove(o, do_unlink=True)
+            removed.append(gone)
+            continue
+        w = want[o.name]
+        o.location, o.rotation_euler, o.scale = w["loc"], w["rot"], w["scale"]
+        for m in list(o.modifiers):
+            if m.name not in w.get("mods", []):
+                o.modifiers.remove(m)
+        reset.append(o.name)
+    return {"ok": True, "removed": removed, "reset": reset}
+
+
+def _shot(path, names=None):
+    """The 3D view as a picture inside the run's sandbox (the window is not needed on screen)."""
+    if not _inside(path):
+        return {"ok": False, "note": "refused: outside the run's sandbox folder"}
+    ov = _view3d()
+    if ov is None:
+        return {"ok": False, "note": "no 3D view"}
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    sc = bpy.context.scene
+    old = (sc.render.filepath, sc.render.image_settings.file_format)
+    try:
+        sc.render.image_settings.file_format = "PNG"
+        sc.render.filepath = path
+        with bpy.context.temp_override(**ov):
+            picked = [bpy.data.objects[n] for n in (names or []) if n in bpy.data.objects]
+            if picked:                                                         # frame the built object itself, not the whole scene with its camera and light
+                for o in bpy.context.view_layer.objects:
+                    o.select_set(False)
+                for o in picked:
+                    o.select_set(True)
+                bpy.ops.view3d.view_selected()
+                for o in picked:
+                    o.select_set(False)
+            else:
+                bpy.ops.view3d.view_all(center=False)
+            bpy.ops.render.opengl(write_still=True, view_context=True)
+        return {"ok": os.path.isfile(path), "path": path}
+    finally:
+        sc.render.filepath, sc.render.image_settings.file_format = old
+
+
+def _batch_add(items):
+    """Many parts in one request: each item is the application's own add command with its settings (op, props), then a name, a colour (one material per colour) and a collection."""
+    ov = _view3d()
+    mats, made, failed = {}, [], []
+    for it in items:
+        try:
+            op_id = it["op"]
+            if REFUSED_OPS.search(op_id):
+                failed.append([it.get("name", ""), "refused"])
+                continue
+            mod, op = _op(op_id)
+            cm = bpy.context.temp_override(**ov) if ov is not None else contextlib.nullcontext()
+            with cm:
+                op(**dict(it.get("props") or {}))
+            o = bpy.context.view_layer.objects.active
+            if o is None:
+                failed.append([it.get("name", ""), "no object"])
+                continue
+            if it.get("name"):
+                o.name = str(it["name"])[:60]
+            rgba = it.get("rgba")
+            if rgba and o.type == "MESH":
+                key = tuple(round(float(c), 3) for c in rgba)
+                if key not in mats:
+                    m = bpy.data.materials.new("hojaiga_%d" % len(mats))
+                    m.diffuse_color = list(key) + [1.0] * (4 - len(key))
+                    mats[key] = m
+                o.data.materials.clear()
+                o.data.materials.append(mats[key])
+            cn = it.get("collection")
+            if cn:
+                coll = bpy.data.collections.get(cn)
+                if coll is None:
+                    coll = bpy.data.collections.new(cn)
+                    bpy.context.scene.collection.children.link(coll)
+                for c in list(o.users_collection):
+                    c.objects.unlink(o)
+                coll.objects.link(o)
+            made.append(o.name)
+        except Exception as exc:
+            failed.append([it.get("name", ""), type(exc).__name__ + ": " + str(exc)[:80]])
+    return {"ok": True, "made": made, "failed": failed, "materials": len(mats)}
+
+
+def _view_shot(path, collections=None, hide=None, view="iso", frame=None):
+    """A picture of the 3D view: the named collections hidden for the shot (a roof lifted off), the view turned to look from above or from the south-east, framed on the named collections."""
+    if not _inside(path):
+        return {"ok": False, "note": "refused: outside the run's sandbox folder"}
+    ov = _view3d()
+    if ov is None:
+        return {"ok": False, "note": "no 3D view"}
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    import math
+    from mathutils import Euler
+    sc = bpy.context.scene
+    old = (sc.render.filepath, sc.render.image_settings.file_format)
+    hidden = []
+    try:
+        for cn in hide or []:
+            c = bpy.data.collections.get(cn)
+            if c is not None and not c.hide_viewport:
+                c.hide_viewport = True
+                hidden.append(c)
+        r3d = ov["area"].spaces.active.region_3d
+        with bpy.context.temp_override(**ov):
+            if view == "top":
+                bpy.ops.view3d.view_axis(type="TOP")
+            else:
+                r3d.view_perspective = "PERSP"
+                pitch, yaw = {"iso": (62, 35), "south": (62, 20), "steep": (30, 18)}.get(view, (62, 35))                       # degrees from the vertical, and turn
+                r3d.view_rotation = Euler((math.radians(pitch), 0, math.radians(yaw)), "XYZ").to_quaternion()
+            objs = []
+            for cn in frame or []:
+                c = bpy.data.collections.get(cn)
+                if c is not None:
+                    objs += list(c.objects)
+            for o in bpy.context.view_layer.objects:
+                o.select_set(False)
+            for o in objs:
+                if not o.hide_viewport:
+                    o.select_set(True)
+            if objs:
+                bpy.ops.view3d.view_selected()
+            else:
+                bpy.ops.view3d.view_all(center=False)
+            for o in bpy.context.view_layer.objects:
+                o.select_set(False)
+            sc.render.image_settings.file_format = "PNG"
+            sc.render.filepath = path
+            bpy.ops.render.opengl(write_still=True, view_context=True)
+        return {"ok": os.path.isfile(path), "path": path}
+    finally:
+        for c in hidden:
+            c.hide_viewport = False
+        sc.render.filepath, sc.render.image_settings.file_format = old
+
+
 def _serve():
     try:
         conn, _ = _srv.accept()
     except BlockingIOError:
         return 0.05
     try:
-        conn.settimeout(5.0)
-        req = json.loads(conn.recv(1 << 20).decode("utf-8"))
+        conn.settimeout(20.0)
+        buf = b""
+        while True:                                                                  # a long request (a batch of parts) arrives in pieces; the client closes its side when done
+            piece = conn.recv(1 << 16)
+            if not piece:
+                break
+            buf += piece
+        req = json.loads(buf.decode("utf-8"))
         if req.get("token") != TOKEN:
             conn.sendall(b'{"ok": false, "error": "bad token"}'); return 0.05
         what = req.get("what")
@@ -728,7 +993,19 @@ def _serve():
                     chord = "+".join(mods + [kmi.type.title() if len(kmi.type) > 1 else kmi.type])
                     if chord not in [c for c, _ in keys[kmi.idname]]:
                         keys[kmi.idname].append((chord, km.name))
+                    if kmi.idname.startswith("wm.call_menu"):                       # a key that opens a menu: filed under the menu's own class name
+                        try:
+                            mname = "menu:" + str(kmi.properties.name)
+                            keys.setdefault(mname, [])
+                            if chord not in [c for c, _ in keys[mname]]:
+                                keys[mname].append((chord, km.name))
+                        except Exception:
+                            pass
             res = {"ok": True, "keys": keys}
+        elif what == "select_object":
+            res = _select_object(req.get("kind", ""))
+        elif what == "key_resolve":
+            res = _key_resolve(req.get("chord", ""))
         elif what == "gesture":
             ok, note = _gesture(req.get("kind", ""))
             res = {"ok": ok, "note": note}
@@ -736,6 +1013,47 @@ def _serve():
             res = _execute(req.get("id", ""), req.get("props"))
         elif what == "state":
             res = _state()
+        elif what == "batch_add":
+            res = _batch_add(req.get("items") or [])
+        elif what == "view_shot":
+            res = _view_shot(req.get("path", ""), None, req.get("hide"), req.get("view", "iso"), req.get("frame"))
+        elif what == "scene":
+            res = _scene()
+        elif what == "paint":
+            o = bpy.data.objects.get(req.get("name", ""))
+            if o is None or o.type != "MESH":
+                res = {"ok": False, "note": "no such mesh object"}
+            else:
+                col = [float(c) for c in (list(req.get("rgba") or [0.8, 0.8, 0.8]) + [1.0])[:4]]
+                mat = bpy.data.materials.new("hojaiga_" + o.name)
+                mat.diffuse_color = col
+                try:
+                    mat.use_nodes = True
+                    bsdf = mat.node_tree.nodes.get("Principled BSDF")
+                    if bsdf is not None:
+                        bsdf.inputs["Base Color"].default_value = col
+                except Exception:
+                    pass
+                o.data.materials.clear()
+                o.data.materials.append(mat)
+                if req.get("rename"):
+                    o.name = str(req["rename"])[:60]
+                res = {"ok": True, "note": "material " + mat.name, "name": o.name}
+        elif what == "open_file":
+            path = req.get("path", "")
+            if not _inside(path) or not os.path.isfile(path):
+                res = {"ok": False, "note": "refused or missing: only a file inside the run's sandbox folder can be opened"}
+            else:
+                res = {"ok": True, "note": str(bpy.ops.wm.open_mainfile(filepath=path)), "file": path}
+        elif what == "scene_restore":
+            res = _scene_restore(req.get("prior") or {})
+        elif what == "shot":
+            res = _shot(req.get("path", ""), req.get("names"))
+        elif what == "op_props":
+            _m, _o = _op(req.get("id", ""))
+            res = {"ok": True, "props": [{"name": p.identifier, "type": p.type, "default": (list(p.default_array) if getattr(p, "is_array", False) and p.type in ("FLOAT", "INT", "BOOLEAN") else (p.default if p.type in ("FLOAT", "INT", "BOOLEAN", "STRING") else None)),
+                                          "enum": [e.identifier for e in p.enum_items] if p.type == "ENUM" else None, "desc": (p.description or "")[:100]}
+                                         for p in _o.get_rna_type().properties if p.identifier != "rna_type"]}
         elif what == "layout":
             res = {"ok": True, "layout": _layout()}
         else:

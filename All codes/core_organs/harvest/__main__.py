@@ -24,6 +24,7 @@ def main(argv=None) -> int:
     v = sub.add_parser("video"); v.add_argument("path"); v.add_argument("app_key"); v.add_argument("video_id")
     lo = sub.add_parser("local"); lo.add_argument("--apps", default=""); lo.add_argument("--max-actions", type=int, default=30); lo.add_argument("--budget-s", type=float, default=600.0); lo.add_argument("--no-delta", action="store_true"); lo.add_argument("--nav", default=None, help="comma list: only these navigation entries"); lo.add_argument("--no-base", action="store_true"); lo.add_argument("--per-pass", type=int, default=0); lo.add_argument("--sizes", default="", help="comma list of WxH window sizes to lay each app out at, e.g. 900x640,1100x760,1400x900")
     ws = sub.add_parser("websites"); ws.add_argument("--urls", default=""); ws.add_argument("--max-actions", type=int, default=15); ws.add_argument("--which", default="all", choices=["all", "websites", "webapps"])
+    sb = sub.add_parser("search-browser"); sb.add_argument("--apps", default=""); sb.add_argument("--tutorials", type=int, default=3)
     wb = sub.add_parser("web"); wb.add_argument("--apps", default=""); wb.add_argument("--minutes", type=float, default=20.0)
     lp = sub.add_parser("loop"); lp.add_argument("--hours", type=float, default=4.0); lp.add_argument("--target", type=int, default=200); lp.add_argument("--videos", type=int, default=6); lp.add_argument("--apps", default=""); lp.add_argument("--whisper", action="store_true", help="transcribe locally when captions are refused (slow)")
     sub.add_parser("status")
@@ -47,6 +48,10 @@ def main(argv=None) -> int:
     elif args.cmd == "loop":
         from . import youtube_loop as YL
         out = YL.run_loop(args.hours, args.target, args.videos, [x.strip() for x in args.apps.split(",") if x.strip()] or None, whisper=args.whisper, log=lambda s: print(s, flush=True))
+    elif args.cmd == "search-browser":
+        from . import search_browser as _SB, free_master_harvester as _M2
+        names = [x.strip() for x in args.apps.split(",") if x.strip()] or [a["app_name"] for a in _M2.CORE_APPS][:10]
+        out = _SB.run(names, max_tutorials=args.tutorials)
     elif args.cmd == "websites":
         from . import web_recorder as _WR
         urls = [u for u in args.urls.split(",") if u.strip()] or ((_WR.SITES_WEBSITE if args.which in ("all", "websites") else []) + (_WR.SITES_WEBAPP if args.which in ("all", "webapps") else []))
