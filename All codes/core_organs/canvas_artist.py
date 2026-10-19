@@ -313,6 +313,26 @@ def completion(strokes: Sequence[Stroke], observed: Any, canvas: Box, tol: int =
     return round(100.0 * float((p & inked).sum()) / max(float(p.sum()), 1.0), 2)
 
 
+def edge_coverage(tstats: Dict[str, Any], observed: Any, canvas: Box, tol: int = 4, ink: int = 128) -> float:
+    """The picture-level score of a trace: of the REFERENCE's edge pixels (mapped into the canvas by the trace's own scale / offset), the % that have ink within `tol` px on the captured canvas.
+    `completion` asks 'did the planned strokes get drawn'; this asks 'does the drawing hold the reference's edges' (the two differ when the plan left edges out)."""
+    import cv2
+    m = tstats["map"]
+    edges = tstats["edges"]
+    sc, (ox, oy) = m["scale"], m["offset"]
+    g = np.asarray(observed.convert("L") if hasattr(observed, "convert") else observed)
+    H, W = g.shape
+    ys, xs = np.nonzero(edges > 0)
+    px = np.round(ox + xs * sc).astype(int)
+    py = np.round(oy + ys * sc).astype(int)
+    ok_ = (px >= 0) & (px < W) & (py >= 0) & (py < H)
+    px, py = px[ok_], py[ok_]
+    if px.size == 0:
+        return 0.0
+    inked = cv2.dilate((g < ink).astype(np.uint8), np.ones((2 * tol + 1, 2 * tol + 1), np.uint8)) > 0
+    return round(100.0 * float(inked[py, px].mean()), 2)
+
+
 def leak_pixels(before: Any, after: Any, canvas: Box, thr: int = 24, margin: int = 2) -> int:
     """Pixels that changed OUTSIDE the canvas box (a stroke that escaped onto the chrome)."""
     a, b = (np.asarray(x.convert("L"), dtype=np.int16) for x in (before, after))

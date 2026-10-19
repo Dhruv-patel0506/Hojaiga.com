@@ -131,6 +131,19 @@ class AdapterGrounder:
         content = [dict(c, image=shrink(c["image"], self.max_pixels)) if c.get("type") == "image" else c for c in content]
         return [{"role": "system", "content": [{"type": "text", "text": VE._SYSTEM_HINT}]}, {"role": "user", "content": content}]
 
+    def build_messages_v3(self, image: Any, som: Dict[str, Any], app_key: str, goal: str, controls: Optional[Sequence[Dict[str, Any]]] = None, hint: str = "") -> List[Dict[str, Any]]:
+        """Prompt format v3 (harvest.prompt_v3): the picture + zoomed strips as in v2, the Top-40 elements for THIS goal as centre points, the Names of those, and the RAG's hint when it has one."""
+        from core_organs.harvest import prompt_v2 as P2, prompt_v3 as P3, video_explain as VE
+        from core_organs.train_qlora import shrink
+        els = som["elements"]
+        nm = P2.name_elements(els, list(controls)) if (controls and self.use_names) else {}
+        gtext = re.sub(r"^goal:\s*", "", goal, flags=re.I)
+        kept = P3.trim(els, gtext, nm, P3.TOP_K)
+        content, info = P2.user_content(image, dict(som, elements=som.get("all_elements") or els), app_key, goal, controls=None)       # the strips were chosen on the whole scan in training
+        imgs = [dict(c, image=shrink(c["image"], self.max_pixels)) for c in content if c.get("type") == "image"]
+        text = P3.build_text(app_key, kept, {i: n for i, n in nm.items() if i in {e["id"] for e in kept}}, hint, info.get("n_crops", 0), gtext)
+        return [{"role": "system", "content": [{"type": "text", "text": VE._SYSTEM_HINT}]}, {"role": "user", "content": imgs + [{"type": "text", "text": text}]}]
+
     @staticmethod
     def build_messages(image: Any, som: Dict[str, Any], app_key: str, goal: str) -> List[Dict[str, Any]]:
         from core_organs.harvest import video_explain as VE, video_pipeline as VP
@@ -156,14 +169,17 @@ class AdapterGrounder:
         except Exception:
             pass
 
-    def __call__(self, image: Any, som: Dict[str, Any], app_key: str, goal: str, controls: Optional[Sequence[Dict[str, Any]]] = None) -> Tuple[Optional[Dict[str, Any]], str]:
+    def __call__(self, image: Any, som: Dict[str, Any], app_key: str, goal: str, controls: Optional[Sequence[Dict[str, Any]]] = None, hint: str = "") -> Tuple[Optional[Dict[str, Any]], str]:
         import torch
         from PIL import Image
         from core_organs.train_qlora import parse_action, shrink
         if self._model is None:
             self._load()
         img = Image.open(image).convert("RGB") if isinstance(image, (str, os.PathLike)) else image.convert("RGB")
-        msgs = self.build_messages_v2(img, som, app_key, goal, controls) if self.prompt_version == 2 else self.build_messages(shrink(img, self.max_pixels), som, app_key, goal)
+        if self.prompt_version == 3:
+            msgs = self.build_messages_v3(img, som, app_key, goal, controls, hint)
+        else:
+            msgs = self.build_messages_v2(img, som, app_key, goal, controls) if self.prompt_version == 2 else self.build_messages(shrink(img, self.max_pixels), som, app_key, goal)
         enc = self._proc.apply_chat_template(msgs, tokenize=True, add_generation_prompt=True, return_dict=True, return_tensors="pt")
         enc = {k: (v.to(self._model.device) if hasattr(v, "to") else v) for k, v in enc.items()}
         with torch.no_grad():

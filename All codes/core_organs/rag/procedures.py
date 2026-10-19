@@ -354,7 +354,13 @@ class Procedures:
                     self.st.text.db.execute(f"DELETE FROM tf_knowledge_chunks WHERE rowid IN ({rph})", rp)
                     self.st.text.db.execute(f"DELETE FROM {ti} WHERE rowid IN ({rph})", rp)
             self.st.text.db.commit()
-        pids = sorted({r["procedure_id"] for r in rows if r["procedure_id"]})
+        self.forget_procedure_ids(sorted({r["procedure_id"] for r in rows if r["procedure_id"]}))
+        self.st.bump(f"proc:{app_key}")
+        return len(rows)
+
+    def forget_procedure_ids(self, pids: Sequence[str]) -> int:
+        """Remove procedures (table row + both text-index rows) by id. Used by forget_source and by rag.maintenance (dedupe / purge)."""
+        n = 0
         for pid in pids:
             self.st.table("procedures").delete(f"procedure_id = {lt.q(pid)}")
             with self.st.text.db.lock:
@@ -363,8 +369,8 @@ class Procedures:
                     self.st.text.db.execute("DELETE FROM tf_procedures WHERE rowid=?", (rid["rowid"],))
                     self.st.text.db.execute("DELETE FROM ti_procedures WHERE rowid=?", (rid["rowid"],))
                     self.st.text.db.commit()
-        self.st.bump(f"proc:{app_key}")
-        return len(rows)
+            n += 1
+        return n
 
     def stats(self, app_key: str = "") -> Dict[str, Any]:
         return {"chunks": self.chunk_count(app_key) if app_key else self.st.count("knowledge_chunks"), "procedures": int(self.st.table("procedures").count_rows(lt.where_app(app_key))) if self.st.count("procedures") else 0}

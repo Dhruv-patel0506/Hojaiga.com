@@ -236,8 +236,30 @@ def validate_design(d: Any, shapes: Sequence[str]) -> Tuple[Dict[str, Any], List
                       **({"on": on} if "on" in p else {})})
     if not parts:
         problems.append("no usable part")
+    resolve_on(parts)
     problems += stack(parts)
     return {"object": str(d.get("object") or "object")[:60], "parts": parts}, problems
+
+
+def resolve_on(parts: List[Dict[str, Any]]) -> None:
+    """A part says it rests on 'legs' and the plan has leg1 ... leg4: the group name is read as those parts (names equal after dropping digits / a plural 's'). A name that matches nothing is left for stack() to report."""
+    import re as _re
+
+    def stem(n: str) -> str:
+        n = _re.sub(r"[\d_\- ]+$", "", n.lower())
+        return n[:-1] if n.endswith("s") and len(n) > 3 else n
+    names = [p["name"] for p in parts]
+    for p in parts:
+        if not p.get("on"):
+            continue
+        out: List[str] = []
+        for nm in p["on"]:
+            if nm in names:
+                out.append(nm)
+                continue
+            grp = [n for n in names if n != p["name"] and (stem(n) == stem(nm) or stem(n).startswith(stem(nm)) or stem(nm).startswith(stem(n)) and len(stem(n)) >= 3)]
+            out += grp if grp else [nm]
+        p["on"] = list(dict.fromkeys(out))
 
 
 def stack(parts: List[Dict[str, Any]]) -> List[str]:
@@ -318,6 +340,111 @@ def components(boxes: Sequence[Tuple[List[float], List[float]]], gap: float = 0.
     return out
 
 
+def piercing(boxes: Sequence[Tuple[List[float], List[float]]], names: Sequence[str], tol: float = 0.03) -> List[str]:
+    """Parts that stick THROUGH another: one part's footprint centre lies inside the other's footprint, they overlap in height, and the first reaches more than `tol` above the other's top surface
+    while starting below it (a table leg that is taller than the table and pokes up through its top). Returns 'A through B' strings."""
+    out: List[str] = []
+    for i in range(len(boxes)):
+        for j in range(len(boxes)):
+            if i == j:
+                continue
+            a, b = boxes[i], boxes[j]
+            cx, cy = (a[0][0] + a[1][0]) / 2.0, (a[0][1] + a[1][1]) / 2.0
+            inside = b[0][0] <= cx <= b[1][0] and b[0][1] <= cy <= b[1][1]
+            if inside and a[1][2] > b[1][2] + tol and a[0][2] < b[1][2] - tol and a[1][2] > b[0][2] + tol and (b[1][2] - b[0][2]) < (a[1][2] - a[0][2]) and (a[1][0] - a[0][0]) * (a[1][1] - a[0][1]) < 0.5 * (b[1][0] - b[0][0]) * (b[1][1] - b[0][1]):
+                out.append(f"{names[i]} through {names[j]}")
+    return out
+
+
+def settle(design: Dict[str, Any], tol: float = 0.03) -> List[str]:
+    """Plain-geometry repairs, applied to a plan BEFORE the critic reads it (a model's numbers are often a few centimetres or half a metre off; the fix is arithmetic, not another model call). Unrotated parts only.
+      - a part that pokes up THROUGH another is shortened so its top ends at the other's underside (a table leg taller than the table);
+      - a thin post that stops short of the part above it (footprints overlap) is lengthened up to that part's underside;
+      - any other detached part whose footprint overlaps the main body is moved up / down until the boxes touch (never below the ground).
+    Returns what was changed (empty when the plan needed nothing)."""
+    parts = design.get("parts", [])
+    notes: List[str] = []
+    if not parts or any(any(abs(a) > 1e-6 for a in p.get("rotate", [0, 0, 0])) for p in parts):
+        return notes
+
+    def foot(p: Dict[str, Any]) -> Tuple[float, float, float, float]:
+        return p["at"][0] - p["size"][0] / 2, p["at"][1] - p["size"][1] / 2, p["at"][0] + p["size"][0] / 2, p["at"][1] + p["size"][1] / 2
+
+    def zr(p: Dict[str, Any]) -> Tuple[float, float]:
+        return p["at"][2] - p["size"][2] / 2, p["at"][2] + p["size"][2] / 2
+
+    def overlap_xy(a: Dict[str, Any], b: Dict[str, Any]) -> float:
+        fa, fb = foot(a), foot(b)
+        w, h = min(fa[2], fb[2]) - max(fa[0], fb[0]), min(fa[3], fb[3]) - max(fa[1], fb[1])
+        return max(0.0, w) * max(0.0, h) / max((fa[2] - fa[0]) * (fa[3] - fa[1]), 1e-9)
+    for _round in range(3):
+        changed = False
+        for b in parts:                                                             # 0. a flat board lying on the ground with posts standing in its footprint: it belongs ON the posts
+            if b["size"][2] >= 0.12 * max(b["size"][0], b["size"][1]) or zr(b)[0] > 0.02:
+                continue
+            posts = [a for a in parts if a is not b and a["size"][2] > 3 * max(a["size"][0], a["size"][1]) and overlap_xy(a, b) >= 0.9 and zr(a)[1] > zr(b)[1] + 0.2 and zr(a)[0] <= zr(b)[0] + 0.02]
+            if len(posts) >= 2:
+                top = min(zr(a)[1] for a in posts)
+                notes.append(f"'{b['name']}' lifted from the ground onto the top of its posts ({top:.2f} m)")
+                b["at"][2] = top + b["size"][2] / 2
+                changed = True
+        for a in parts:                                                             # 1. through
+            for b in parts:
+                if a is b or overlap_xy(a, b) < 0.9 or (foot(a)[2] - foot(a)[0]) * (foot(a)[3] - foot(a)[1]) >= 0.5 * (foot(b)[2] - foot(b)[0]) * (foot(b)[3] - foot(b)[1]):
+                    continue
+                (alo, ahi), (blo, bhi) = zr(a), zr(b)
+                if ahi > bhi + tol and alo < bhi - tol and (bhi - blo) < (ahi - alo) and alo < blo + 1e-6:
+                    h = blo - alo
+                    if h > 0.02:
+                        notes.append(f"'{a['name']}' shortened from {a['size'][2]:.2f} to {h:.2f} m so it ends under '{b['name']}'")
+                        a["size"][2], a["at"][2] = h, alo + h / 2
+                        changed = True
+        for a in parts:                                                             # 2. a thin post that stops short: it reaches down to what it stands on (or the ground) and up to what it holds
+            w = max(a["size"][0], a["size"][1])
+            if a["size"][2] < 2.0 * w:
+                continue
+            alo, ahi = zr(a)
+            below = [b for b in parts if b is not a and zr(b)[1] < alo - 0.005 and overlap_xy(a, b) >= 0.5]
+            new_lo = alo
+            if not any(zr(b)[1] >= alo - tol and zr(b)[0] < alo and overlap_xy(a, b) >= 0.5 for b in parts if b is not a) and alo > 0.02:
+                new_lo = max((zr(b)[1] for b in below), default=0.0)                  # onto the top of the part below, else onto the ground
+            above = [b for b in parts if b is not a and zr(b)[0] > ahi + 0.005 and overlap_xy(a, b) >= 0.5 and zr(b)[0] - ahi < 3.0]
+            new_hi = ahi
+            if above and not any(zr(b)[0] <= ahi + tol and zr(b)[1] >= ahi - tol and overlap_xy(a, b) >= 0.5 for b in parts if b is not a):
+                new_hi = zr(min(above, key=lambda q: zr(q)[0]))[0]
+            if new_lo < alo - 0.005 or new_hi > ahi + 0.005:
+                notes.append(f"'{a['name']}' stretched from {alo:.2f}-{ahi:.2f} m to {new_lo:.2f}-{new_hi:.2f} m so it stands on its support and meets what it holds")
+                a["size"][2], a["at"][2] = new_hi - new_lo, (new_hi + new_lo) / 2
+                changed = True
+        boxes = [part_box(p) for p in parts]
+        comps = components(boxes, 0.01)
+        if len(comps) > 1:                                                          # 3. a detached group: slide it vertically onto the main body
+            main = max(comps, key=lambda c: (len(c), sum((boxes[i][1][0] - boxes[i][0][0]) * (boxes[i][1][1] - boxes[i][0][1]) * (boxes[i][1][2] - boxes[i][0][2]) for i in c)))
+            for c in comps:
+                if c is main:
+                    continue
+                mp = [parts[i] for i in main]
+                if min(boxes[i][0][2] for i in c) <= 0.02 and min(boxes[i][0][2] for i in main) > 0.02:
+                    continue                                                        # a group standing on the ground is never lifted onto something floating
+                for i in c:
+                    q = parts[i]
+                    tgt = [m for m in mp if overlap_xy(q, m) >= 0.3]
+                    if not tgt:
+                        continue
+                    m = min(tgt, key=lambda t: min(abs(zr(q)[0] - zr(t)[1]), abs(zr(q)[1] - zr(t)[0])))
+                    (qlo, qhi), (mlo, mhi) = zr(q), zr(m)
+                    dz = (mhi - qlo) if qlo > mhi else ((mlo - qhi) if qhi < mlo else 0.0)
+                    if abs(dz) > 0.005 and qlo + dz >= -0.005:
+                        for k in c:
+                            parts[k]["at"][2] += dz
+                        notes.append(f"'{', '.join(parts[k]['name'] for k in c)}' moved {dz:+.2f} m to touch '{m['name']}'")
+                        changed = True
+                        break
+        if not changed:
+            break
+    return notes
+
+
 def critic(design: Dict[str, Any]) -> List[str]:
     """Geometry that cannot be right for a physical object, whatever it is: parts below the ground, pieces that touch nothing, nothing on the ground, absurd scale."""
     parts = design.get("parts", [])
@@ -337,6 +464,9 @@ def critic(design: Dict[str, Any]) -> List[str]:
                 nb = [boxes[i] for i in main]
                 near = min(range(len(main)), key=lambda k: sum(abs(((boxes[c[0]][0][a] + boxes[c[0]][1][a]) - (nb[k][0][a] + nb[k][1][a])) / 2.0) for a in range(3)))
                 out.append(f"'{names}' touches no other part (floating): move it so its box meets the box of '{parts[main[near]]['name']}' (their boxes must overlap or be within 0.01 m)")
+    for pair in piercing(boxes, [p["name"] for p in parts]):
+        a, b = pair.split(" through ")
+        out.append(f"'{a}' pokes up through '{b}': it is taller than the level of '{b}'s top. A part that holds '{b}' up must END at the underside of '{b}' (shorten '{a}' so its top is at the height where '{b}' starts, and put '{b}' on it with 'on')")
     if min(b[0][2] for b in boxes) > 0.02:
         out.append("nothing rests on the ground: the lowest part starts at z=%.2f, it should start at z=0" % min(b[0][2] for b in boxes))
     for i in range(len(parts)):
@@ -396,6 +526,9 @@ def design_parts(brain: Brain, task: str, shapes: Sequence[str], examples: Seque
         meta.append({k: r.get(k) for k in ("seconds", "prompt_tokens", "tokens", "error")})
         design, problems = validate_design(obj, shapes)
         if not problems:
+            fixed = settle(design)                                       # arithmetic repairs first: through / short post / detached
+            if fixed:
+                meta[-1]["settled"] = fixed
             problems = critic(design)
         if not problems and review:
             ok, why, secs = review_design(brain, task, design)

@@ -39,8 +39,9 @@ class AutoWatcher:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("app")
+    ap.add_argument("app", nargs="?", default="")
     ap.add_argument("question", nargs="?", default="")
+    ap.add_argument("--explain", default="", help="draw this concept on the screen with the voice (no program is opened)")
     ap.add_argument("--no-voice", action="store_true")
     ap.add_argument("--mic", action="store_true")
     ap.add_argument("--no-bar", action="store_true")
@@ -50,6 +51,11 @@ def main(argv=None) -> int:
     from core_organs import micro_tutor as MT, tutor_voice as TV
     import uiautomation as auto
     tutor = MT.MicroTutor(voice=TV.Voice(enabled=not a.no_voice), watcher=AutoWatcher() if a.auto else None, bar=not a.no_bar and not a.auto, mic=a.mic)
+    if a.explain or not a.app:
+        if a.explain:
+            tutor.explain(a.explain)
+        tutor.close()
+        return 0
     with auto.UIAutomationInitializerInThread():
         tutor.open(a.app)
         try:

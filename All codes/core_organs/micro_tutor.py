@@ -71,7 +71,7 @@ def steps_from_pathways(pw: Dict[str, Any], limit: int = 10, goal: str = "", app
 
 class MicroTutor:
     def __init__(self, engine: Any = None, overlay: Any = None, voice: Optional[TV.Voice] = None, watcher: Optional[TV.Watcher] = None, bar: bool = True, mic: bool = False,
-                 log: Callable[[str], None] = print, shot: Optional[Callable[[], Any]] = None) -> None:
+                 log: Callable[[str], None] = print, shot: Optional[Callable[[], Any]] = None, vision: bool = True) -> None:
         self.engine = engine
         self.overlay = overlay
         self.voice = voice or TV.Voice(enabled=True)
@@ -86,8 +86,51 @@ class MicroTutor:
         self.controls: List[Dict[str, Any]] = []
         self.history: List[Dict[str, Any]] = []         # what was shown / said / done, for the report and the tests
         self.stop = threading.Event()
+        self.want_vision = vision
+        self._vision: Any = None
 
     # ------------------------------------------------------------------------------------------------------------------------------- pieces
+    def vision_fn(self) -> Optional[Callable[[str], Any]]:
+        """`ground(name) -> box`: the trained Qwen3-VL-2B reading a fresh screenshot, used by the planner only when the accessibility tree and the grid finder have nothing (loaded on first use)."""
+        if not self.want_vision:
+            return None
+        if self._vision is None:
+            from core_organs import vision_ground as VG
+            self._vision = VG.VisionGrounder(self._engine(), self.key or "screen")
+        vg = self._vision
+
+        def ground(name: str) -> Any:
+            box = vg.ground_fn(self.screenshot, self.controls)(name)
+            self.history.append({"vision": name, "box": box, "info": dict(vg.last)})
+            return box
+        return ground
+
+    def growth(self) -> Any:
+        """The self-growing memory (rag.self_growth): a beat whose click changed the screen as expected is kept as a fast path for next time."""
+        if getattr(self, "_growth", None) is None:
+            from core_organs.rag import self_growth as SG
+            self._growth = SG.SelfGrowth()
+        return self._growth
+
+    def _labels(self) -> List[str]:
+        return [str(c.get("name") or c.get("label") or "") for c in self.controls if (c.get("name") or c.get("label"))][:60]
+
+    def remember(self, b: MB.Beat, before: List[str]) -> None:
+        """After a beat's action and the rescan: if the set of control labels changed, the step worked -- keep (parent screen, control, action, post screen)."""
+        if b.primitive != "box_pointer" or not b.target or not b.box:
+            return
+        after = self._labels()
+        from core_organs.rag import self_growth as SG
+        if not before or not after or SG.jaccard(SG.signature(before), SG.signature(after)) >= 0.95:
+            return                                                                   # nothing changed: not a verified step
+        x, y, w, h = b.box
+        with contextlib.suppress(Exception):
+            crop = None
+            with contextlib.suppress(Exception):
+                crop = self.screenshot().crop((int(x), int(y), int(x + w), int(y + h)))
+            k = self.growth().learn(self.key or self.app or "screen", before, {"name": b.target, "type": "button", "center": (int(x + w / 2), int(y + h / 2)), "box": (int(x), int(y), int(w), int(h))}, "click", after, crop, True)
+            self.history.append({"grew": b.target, "key": k})
+
     def _engine(self) -> Any:
         if self.engine is None:
             from core_organs import app_teaching_automation as ATA
@@ -165,7 +208,7 @@ class MicroTutor:
     def teach(self, question: str) -> Dict[str, Any]:
         self.refresh()
         steps, src = self.steps_for(question)
-        beats = MB.plan_beats(steps, self.controls, image=self.screenshot(), app=self.app)
+        beats = MB.plan_beats(steps, self.controls, image=self.screenshot(), app=self.app, ground=self.vision_fn())
         self.log(f"[tutor] {len(steps)} step(s) from {src} -> {len(beats)} beat(s)")
         if not beats:
             self.say("I could not find the steps for that on this window. Tell me what you want done and I will do it for you.")
@@ -200,7 +243,7 @@ class MicroTutor:
             if b.late and b.box is None:                                          # its control may exist NOW (the dialog the last beat opened): look again before drawing
                 with contextlib.suppress(Exception):
                     self.refresh()
-                    got = [x for x in MB.plan_beats([b.late], self.controls, app=self.app) if x.primitive == "box_pointer"]
+                    got = [x for x in MB.plan_beats([b.late], self.controls, app=self.app, ground=self.vision_fn()) if x.primitive == "box_pointer"]
                     if got:
                         beats[i] = b = got[0]
                         self.history.append({"relocated": b.target})
@@ -233,6 +276,7 @@ class MicroTutor:
                 i += 1
                 continue
             self.state("Listening")
+            before_labels = self._labels()
             keys: List[str] = []
             if b.wait.startswith("key:"):
                 keys = [b.wait[4:]]
@@ -242,7 +286,11 @@ class MicroTutor:
             self.history.append({"event": ev})
             if ev["kind"] in ("click", "key"):
                 done += 1
-                time.sleep(0.5)
+                time.sleep(0.7)                                                   # let a dialog / flyout / composer the action opened appear ...
+                with contextlib.suppress(Exception):
+                    self.refresh()                                                # ... then read the live window again: the next beat is located on what is there NOW
+                    self.history.append({"rescan": len(self.controls)})
+                    self.remember(b, before_labels)
                 i += 1
             elif ev["kind"] == "line":
                 cmd = ev.get("command", "")
@@ -269,6 +317,38 @@ class MicroTutor:
         self.state("Idle")
         return {"beats": len(beats), "done": done, "delegated": delegated, "reached": i}
 
+    # ------------------------------------------------------------------------------------------------------------------------------- drawing a concept
+    def explain(self, request: str, region: Optional[Tuple[float, float, float, float]] = None, hold_s: float = 25.0) -> Dict[str, Any]:
+        """Explain something by DRAWING it on the screen (no drawing program): the brain plans the diagram, the red overlay draws each part while its sentence is spoken, the labels appear beside the strokes."""
+        import ctypes
+        from core_organs import diagram_teach as DT
+        self.state("Thinking")
+        plan = DT.plan_diagram(self._engine().get_brain(), request)
+        if not plan["parts"]:
+            self.say("I could not work out a clear drawing for that. Try asking it another way.")
+            self.state("Idle")
+            return {"parts": 0, "problems": plan["problems"]}
+        if region is None:
+            u = ctypes.windll.user32
+            sw, sh = u.GetSystemMetrics(0), u.GetSystemMetrics(1)
+            region = (sw * 0.12, sh * 0.14, sw * 0.88, sh * 0.9)
+        parts = DT.to_screen(plan["parts"], region)
+        self.log(f"[tutor] diagram: {len(parts)} part(s) planned in {plan['seconds']}s")
+        ov = self._overlay()
+        for k, part in enumerate(parts):
+            self.history.append({"shape": part["kind"], "label": part["label"], "say": part["say"]})
+            self.state("Speaking")
+            ov.shape(part["kind"], part["points"], part["label"], seconds=1.0)
+            if part["say"]:
+                self.log(f"[say] {part['say']}")
+                self.voice.speak(part["say"], wait=True)
+            time.sleep(0.25)
+        self.state("Listening")
+        ev = self.watcher.wait(timeout=hold_s)                                    # the drawing stays until the person says something (or a while)
+        ov.wipe()
+        self.state("Idle")
+        return {"parts": len(parts), "seconds": plan["seconds"], "ended_by": ev.get("kind")}
+
     # ------------------------------------------------------------------------------------------------------------------------------- doing
     def delegate(self, beats: List[MB.Beat], start: int = 0) -> Dict[str, Any]:
         """'do it for me': the remaining beats become actions on the same window. The tiny pointer glides to each control, the engine operates it (UIA first, verified), one sentence says what is happening."""
@@ -287,8 +367,13 @@ class MicroTutor:
                 time.sleep(0.9)                                                  # the pointer arrives before the click
                 ok = False
                 if agent is not None and b.target and b.layer == "uia":
+                    before_labels = self._labels()
                     rec = agent.step(f"Click the {b.target} button")
                     ok = rec.status == "done"
+                    if ok:
+                        with contextlib.suppress(Exception):
+                            self.refresh()
+                            self.remember(b, before_labels)
                     self.history.append({"did": b.target, "status": rec.status, "source": rec.source})
                 if ok:
                     done += 1
@@ -323,7 +408,10 @@ class MicroTutor:
             if cmd == "stop":
                 break
             try:
-                if re.search(r"\b(for me|take over|automate)\b", text, re.I) or self._is_order(text):
+                from core_organs import diagram_teach as _DT
+                if _DT.is_diagram_request(text):
+                    self.explain(text)
+                elif re.search(r"\b(for me|take over|automate)\b", text, re.I) or self._is_order(text):
                     self.do_task(text)
                 else:
                     self.teach(text)

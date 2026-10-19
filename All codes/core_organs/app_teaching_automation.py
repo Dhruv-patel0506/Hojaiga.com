@@ -328,18 +328,21 @@ def judge_scene(task: str, design: Dict[str, Any], build: Dict[str, Any], before
     main = max(comps, key=lambda c: (len(c), sum(vol(i) for i in c))) if comps else []
     floating = [mine[i]["name"] for c in comps if c is not main for i in c]
     zmin = min((b[0][2] for b in boxes), default=0.0)
+    pierced = BP.piercing(boxes, [o["name"] for o in mine if o.get("bbox")]) if boxes else []
     prior_before = {o["name"]: (o["loc"], o["dims"], o.get("verts")) for o in before["objects"]}
     prior_after = {o["name"]: (o["loc"], o["dims"], o.get("verts")) for o in after["objects"] if o["name"] in prior_before}
     untouched = all(prior_after.get(k) == v for k, v in prior_before.items())
     rolled = sum(1 for s in steps for a in s["attempts"] if a.get("rolled_back"))
     colours = sum(1 for o in mine if o.get("mats"))
     m = {"parts_wanted": n_want, "parts_built": n_got, "completeness": round(n_got / max(n_want, 1), 3), "dim_err_mean": round(sum(derr) / max(len(derr), 1), 4), "pos_err_mean_m": round(sum(perr) / max(len(perr), 1), 4),
-         "connected": biggest == n_got and n_got > 0, "floating_parts": floating, "on_ground": abs(zmin) <= 0.02, "lowest_z": round(zmin, 4), "coloured": colours, "rollbacks": rolled,
+         "connected": biggest == n_got and n_got > 0, "floating_parts": floating, "piercing": pierced, "on_ground": abs(zmin) <= 0.02, "lowest_z": round(zmin, 4), "coloured": colours, "rollbacks": rolled,
          "earlier_objects_untouched": untouched, "earlier_objects": len(prior_before), "extent_m": [round(max(b[1][i] for b in boxes) - min(b[0][i] for b in boxes), 3) for i in range(3)] if boxes else None,
          "vertices": sum(o.get("verts", 0) or 0 for o in mine)}
     score = 100.0 * (0.35 * m["completeness"] + 0.15 * (1 - min(m["dim_err_mean"] / 0.05, 1)) + 0.10 * (1 - min(m["pos_err_mean_m"] / 0.05, 1)) + 0.20 * (1.0 if m["connected"] else 0.0)
                      + 0.10 * (1.0 if m["on_ground"] else 0.0) + 0.05 * (colours / max(n_got, 1)) + 0.05 * (1.0 if untouched else 0.0))
-    m["score"] = round(score, 1)
+    if pierced:
+        score -= min(30.0, 10.0 * len(pierced))                                    # a part through another is not a sound build, however well connected
+    m["score"] = round(max(score, 0.0), 1)
     return m
 
 
@@ -453,9 +456,18 @@ class AppIntelligenceEngine:
     def pathways(self, goal: str, key: str, snapshot: Any = None) -> Dict[str, Any]:
         from core_organs.rag import Query
         ret = None
+        rag = self.get_rag()
         with contextlib.suppress(Exception):
-            ret = self.get_rag().retrieve(Query(text=goal, app_key=key, snapshot=snapshot, mode="auto"))
-        return {"plans": BP.pathways(ret), "evidence": BP.evidence_lines(ret)}
+            from core_organs.rag import hybrid as HY
+            key = HY.resolve_key(rag, key) or key                         # 'vscode' -> 'visual_studio_code': the store's own key
+        with contextlib.suppress(Exception):
+            ret = rag.retrieve(Query(text=goal, app_key=key, snapshot=snapshot, mode="auto"))
+        plans = BP.pathways(ret)
+        if not plans:                                                     # nothing under this key: the same task on a similar app / site (marked as such, never presented as this app's own)
+            with contextlib.suppress(Exception):
+                from core_organs.rag import hybrid as HY
+                plans = HY.pathways(rag, goal, key, 3)
+        return {"plans": plans, "evidence": BP.evidence_lines(ret)}
 
     GENERIC = {"how", "what", "where", "when", "why", "can", "does", "would", "should", "could", "there", "some", "need", "want", "help", "show", "tell", "teach", "please", "get", "got", "way", "thing"}
 
@@ -518,10 +530,17 @@ class AppIntelligenceEngine:
         holder: Dict[str, Any] = {}
         adapter = self.adapter_dir or newest_adapter()
 
-        def call(image: Any, som: Dict[str, Any], app_key: str, goal: str, controls: Any = None) -> Any:
+        def call(image: Any, som: Dict[str, Any], app_key: str, goal: str, controls: Any = None, hint: str = "") -> Any:
             if "g" not in holder:
-                holder["g"] = AE.AdapterGrounder(adapter[0], prompt_version=adapter[1])
-            return holder["g"](image, som, app_key, goal, controls=controls)
+                from core_organs import vision_ground as VG
+                vg = VG.VisionGrounder(self, app_key)
+                if vg._in_process():                                          # this Python can hold the model (peft + a new enough transformers): in-process
+                    holder["g"], holder["mode"] = AE.AdapterGrounder(adapter[0], prompt_version=adapter[1]), "in"
+                else:                                                         # the product's own environment cannot: the model runs in its own process and is asked over a local port
+                    holder["g"], holder["mode"] = vg, "server"
+            if holder["mode"] == "server":
+                return holder["g"]._ask(image, som, goal, list(controls or []), hint)
+            return holder["g"](image, som, app_key, goal, controls=controls, hint=hint) if adapter[1] == 3 else holder["g"](image, som, app_key, goal, controls=controls)
         call.holder = holder                                                # type: ignore[attr-defined]
         return call
 
@@ -529,10 +548,15 @@ class AppIntelligenceEngine:
 def newest_adapter() -> Tuple[str, int]:
     """(the directory of the newest trained adapter, the prompt format it was trained on)."""
     import glob
+    choice = os.path.join(DATA, "ai_root", "harvest", "training", "runs", "ADAPTER_CHOICE.json")      # written from a MEASURED held-out comparison (core_organs.eval_v3), not from file dates
+    with contextlib.suppress(Exception):
+        c = json.load(open(choice, encoding="utf-8"))
+        if os.path.isdir(c["adapter"]):
+            return c["adapter"], int(c["prompt_version"])
     runs = sorted(glob.glob(os.path.join(DATA, "ai_root", "harvest", "training", "runs", "run_*", "adapter")), key=os.path.getmtime)
     if not runs:
         return "", 1
-    return runs[-1], (2 if "v2split" in runs[-1] else 1)
+    return runs[-1], (3 if "v3split" in runs[-1] else 2 if "v2split" in runs[-1] else 1)
 
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------ the section
@@ -546,7 +570,7 @@ class AppTeachingAutomationSection:
 
     # -------------------------------------------------------------------------------------------------- entry point
     def handle(self, task: str, app: str = "", mode: str = "auto", file: str = "", learn: str = "auto", recall: bool = True, live: bool = False, vlm: bool = True,
-               keep_open: bool = False, refine: int = 1) -> Dict[str, Any]:
+               keep_open: bool = False, refine: int = 1, confirm: Optional[Callable[[str, str], bool]] = None, visible_browser: bool = True) -> Dict[str, Any]:
         """One request in, one report out. `mode` auto|understand|teach|delegate; `file` = a document inside a previous run's sandbox to continue in (the 'same file' case) or '' for a new one;
         `learn` auto|always|never (the on-the-fly scan); `recall` = may the run start from a recipe it stored before."""
         E = self.engine
@@ -561,12 +585,14 @@ class AppTeachingAutomationSection:
             host = "" if app_ else web_host_in(task)
             st["note"] = f"mode={mode_} ({intent['how']}), app={app_ or host or '?'}"
             rep["mode"], rep["app"] = mode_, app_ or host
+            if not app_ and not host and mode_ == "delegate":
+                host = "(browser)"                                                      # an order that names no installed program: the browser is where it is done; the first look at the page decides
             if not app_ and not host:
                 rep["error"] = "no installed program or web address is named in the request; say which one"
                 rep["flow"] = flow.states
                 return rep
-            if host:                                                                    # a site or web app: the same recall -> learn -> teach pipeline, through the web domains of the RAG
-                return self._web(task, host, mode_, learn, flow, rep)
+            if host:                                                                    # a site or web app: the same recall -> learn -> teach / do pipeline, through the web domains of the RAG
+                return self._web(task, "" if host == "(browser)" else host, mode_, learn, flow, rep, confirm, visible_browser)
             key = E.key_of(app_)
             rep["app_key"] = key
         with flow.enter("recall", key) as st:
@@ -597,7 +623,35 @@ class AppTeachingAutomationSection:
             json.dump(rep, f, indent=1, default=str)
         return rep
 
-    def _web(self, task: str, host: str, mode: str, learn: str, flow: Flow, rep: Dict[str, Any]) -> Dict[str, Any]:
+    def web_delegate(self, task: str, host: str = "", confirm: Optional[Callable[[str, str], bool]] = None, visible: bool = True, max_steps: int = 14, on_login: Optional[Callable[[], bool]] = None) -> Dict[str, Any]:
+        """Do the order in a browser of our own (visible, its own persistent profile): look -> decide -> gate -> act -> check, until done, staged at a send / post control, waiting for a sign-in, or out of steps."""
+        from core_organs import web_delegate as WD
+        out: Dict[str, Any] = {}
+        with WD.OwnedBrowser(visible=visible) as br:
+            drv = br.driver()
+            agent = WD.WebAgent(self.engine.get_brain(), drv, log=self.log, confirm=confirm, max_steps=max_steps, on_login=on_login, growth=self.growth())
+            proof: Dict[str, str] = {}
+            if host:
+                with contextlib.suppress(Exception):
+                    drv.navigate("https://" + host)
+                    time.sleep(2.5)
+                    if self.proof_dir:
+                        os.makedirs(self.proof_dir, exist_ok=True)
+                        proof["before"] = os.path.join(self.proof_dir, f"before_{_slug(host)[:30]}.png")
+                        drv.screenshot().save(proof["before"])
+            out = agent.run(task, "")
+            with contextlib.suppress(Exception):
+                shot = os.path.join(RUNS, time.strftime("%Y%m%d_%H%M%S_") + "web_final.png")
+                drv.screenshot().save(shot)
+                out["picture"] = shot
+                if self.proof_dir:
+                    proof["after"] = os.path.join(self.proof_dir, f"after_{_slug(host or 'web')[:30]}.png")
+                    drv.screenshot().save(proof["after"])
+            out["proof"] = proof
+        out["route"] = "web-delegate"
+        return out
+
+    def _web(self, task: str, host: str, mode: str, learn: str, flow: Flow, rep: Dict[str, Any], confirm: Optional[Callable[[str, str], bool]] = None, visible: bool = True) -> Dict[str, Any]:
         """A website / web app. Teach: what the RAG holds for the site, and - when that does not speak to the question - the question put to the search engine's summary. Understand: onboarding of the address.
         Delegate is not built for the web in this MVP and says so."""
         from core_organs.rag import domains as DM
@@ -610,7 +664,10 @@ class AppTeachingAutomationSection:
             rep["rag_before"] = E.coverage(key)
             st["note"] = str(rep["rag_before"])
         if mode == "delegate":
-            rep["error"] = "doing work inside a website is not part of this MVP (teaching and learning are); say 'how do I ...' to be taught"
+            with flow.enter("act", f"doing it in the browser ({host or 'wherever the order leads'})") as st:
+                out = self.web_delegate(task, host, confirm=confirm, visible=visible)
+                rep.update(out)
+                st["note"] = f"{out.get('status')}: {out.get('done_steps', 0)}/{len(out.get('steps', []))} steps worked"
         elif mode == "understand":
             with flow.enter("learn", f"onboarding {host}") as st:
                 from core_organs.rag import onboard as OB
@@ -687,13 +744,13 @@ class AppTeachingAutomationSection:
             with flow.enter("plan", "RAG recipes -> CPU brain -> parts") as st:
                 recipes = recall_recipes(key, task, 0.0, 3) if recall else []
                 out["recipes_seen"] = [{"task": r["task"], "similarity": r["similarity"], "score": r.get("score")} for r in recipes]
-                exact = next((r for r in recipes if r["similarity"] >= 0.85 and r.get("score", 0) >= 75), None)
+                exact = next((r for r in recipes if r["similarity"] >= 0.85 and r.get("score", 0) >= 75 and not BP.critic(r["design"])), None)          # a stored design is reused only if it still passes today's geometry critic
                 exact_design = bool(exact)
                 if exact:
                     design, probs, planner = exact["design"], [], {"source": "recipe", "attempts": []}
                     st["note"] = "reused a stored recipe (no model call)"
                 else:
-                    fs = [r["design"] for r in recipes if r.get("score", 0) >= 75 and r["similarity"] < 0.85]
+                    fs = [r["design"] for r in recipes if r.get("score", 0) >= 75 and r["similarity"] < 0.85 and not BP.critic(r["design"])]
                     res = BP.design_parts(E.get_brain(), task, sorted(shapes), fs)
                     design, probs, planner = res["design"], res["problems"], {"source": "brain", "attempts": res["attempts"]}
                     st["note"] = f"{len(design['parts'])} parts, {len(probs)} problem(s) left, {len(planner['attempts'])} attempt(s), {sum(a.get('seconds') or 0 for a in planner['attempts']):.0f}s on the CPU"
@@ -858,6 +915,28 @@ class AppTeachingAutomationSection:
         return out
 
     # -------------------------------------------------------------------------------------------------- accessibility-tree route
+    _growth_store: Any = None
+
+    def growth(self) -> Any:
+        """The self-growing memory shared by every route of this section (rag.self_growth)."""
+        if self._growth_store is None:
+            from core_organs.rag import self_growth as SG
+            self._growth_store = SG.SelfGrowth()
+        return self._growth_store
+
+    proof_dir = ""                                                     # set by a caller that wants before / after pictures of the window it works in (the gauntlet)
+
+    def proof_shot(self, s: Any, tag: str, which: str) -> str:
+        if not self.proof_dir:
+            return ""
+        with contextlib.suppress(Exception):
+            os.makedirs(self.proof_dir, exist_ok=True)
+            img, _origin = s.app.grab(popups=True)
+            path = os.path.join(self.proof_dir, f"{which}_{_slug(tag)[:40]}.png")
+            img.convert("RGB").save(path)
+            return path
+        return ""
+
     def _uia(self, task: str, app: str, key: str, mode: str, flow: Flow, live: bool, vlm: bool, session: Any = None, learn_ok: bool = True) -> Dict[str, Any]:
         from core_organs import agent_executor as AE
         E = self.engine
@@ -908,6 +987,7 @@ class AppTeachingAutomationSection:
                 out["goals"] = goals
                 st["note"] = f"{len(goals)} goals"
             recs = []
+            out["proof"] = {"before": self.proof_shot(s, key, "before")}
             with flow.enter("act", "run the goals: ground, act, verify, roll back") as st:
                 for g in goals:
                     hwnd0 = s.app.hwnd
@@ -923,9 +1003,10 @@ class AppTeachingAutomationSection:
                     if r.status != "done" and r.status != "advised":
                         break
                 st["note"] = f"{sum(1 for r in recs if r.status == 'done')}/{len(goals)} done"
-            out["steps"] = [{"goal": r.goal, "status": r.status, "source": r.source, "reason": r.reason, "rolled_back": r.rolled_back, "assisted": r.assisted, "ms": r.ms, "effect": r.effect[:100]} for r in recs]
+            out["steps"] = [{"goal": r.goal, "status": r.status, "source": r.source, "reason": r.reason, "rolled_back": r.rolled_back, "assisted": r.assisted, "ms": r.ms, "effect": r.effect[:400]} for r in recs]
             with flow.enter("verify", "read the result back from the screen") as st:
                 out["final_text"] = read_back(s)
+                out["proof"]["after"] = self.proof_shot(s, key, "after")
                 st["note"] = f"{len(out['final_text'])} characters read back"
             with flow.enter("verify", "summary") as st:
                 out["verification"] = {"done": sum(1 for r in recs if r.status == "done"), "total": len(goals), "rollbacks": sum(1 for r in recs if r.rolled_back),
@@ -966,12 +1047,36 @@ def say_pathway(task: str, teach: Dict[str, Any], brain: Optional[BP.Brain] = No
     return "\n".join(lines)
 
 
+PLACE_RX = re.compile(r"\b(title|subtitle|heading)\s+(?:of\s+|called\s+|named\s+|saying\s+|as\s+|is\s+)?[\"\u201c']?(.+?)[\"\u201d']?(?=\s*(?:,|;|\band\s+(?:a\s+|the\s+)?(?:sub)?(?:title|heading)\b|$))", re.I)
+
+
+def placeholder_goals(task: str) -> List[str]:
+    """'add a title Roadmap 2027 and a subtitle Q1 plan' -> ['Type "Roadmap 2027" in the title', 'Type "Q1 plan" in the subtitle']: text for a slide's placeholders is read from the words, never planned by a model."""
+    if not re.search(r"\b(?:add|insert|set|put|write|create|make|give)\b", task, re.I):
+        return []
+    if re.match(r"^\s*(?:how|where|what|why|can|could|show|teach|explain|tell)\b", task, re.I):
+        return []                                                                  # a question is answered, not typed
+    out: List[str] = []
+    for m in PLACE_RX.finditer(task):
+        where = "subtitle" if m.group(1).lower() == "subtitle" else "title"
+        txt = m.group(2).strip(" .\"'")
+        if txt and len(txt) < 120 and not re.match(r"^(?:in|on|to|for|at|of)\s", txt, re.I):
+            out.append(f'Type "{txt}" in the {where}')
+    return out
+
+
 def plan_goals(brain: BP.Brain, task: str, control_names: Sequence[str], rag_hint: Dict[str, Any]) -> List[str]:
     """The job as goals a screen can answer one at a time ('Click the Bold button', 'Type "..."'). A drawing job is passed whole (the drawing tools take it). Each goal that names a control names one that exists."""
     if re.search(r"\b(draw|trace|sketch|lightboard|colou?r|shade)\b", task, re.I):
         return [task]
+    ph = placeholder_goals(task)
+    if ph:
+        return ph
     m = re.search(r"\b(?:type|write|enter)\s+(?:the\s+(?:words?|text|sentence)\s+|a\s+(?:line|sentence)\s+)?[\"\u201c']?(.+?)[\"\u201d']?(?:\s+(?:for me|please|in\s+\w+))*\s*$", task, re.I)
     if m and len(m.group(1)) > 1:                                                  # the task names the text itself: nothing to decompose
+        sp = re.split(r"\s*[,;]?\s*(?:and\s+)?then\s+", m.group(1).strip(), maxsplit=1, flags=re.I)
+        if len(sp) == 2 and sp[1].strip():                                         # 'type X, then <something else>': X is typed as it is, the rest is planned on the screen's controls
+            return ['Type "' + sp[0].strip(" ,;") + '"'] + plan_goals(brain, sp[1].strip(), control_names, rag_hint)
         return ['Type "' + m.group(1).strip() + '"']
     with contextlib.suppress(Exception):                                          # arithmetic is read from the words and mapped to the keys the screen really has: the model never picks a digit (measured: it planned 7 + 8 for 21 + 21)
         from core_organs import goal_planner as GP
@@ -988,7 +1093,7 @@ def plan_goals(brain: BP.Brain, task: str, control_names: Sequence[str], rag_hin
     return goals[:12] or [task]
 
 
-TYPE_RX = re.compile(r"^\s*(?:type|enter|write)\s+(?:the\s+(?:words?|text)\s+)?[\"\u201c'](.+?)[\"\u201d']\s*$", re.I)
+TYPE_RX = re.compile(r"^\s*(?:type|enter|write)\s+(?:the\s+(?:words?|text)\s+)?[\"\u201c'](.+?)[\"\u201d'](?:\s+(?:in|into|as)\s+the\s+(title|subtitle|heading|body))?\s*$", re.I)
 
 
 def direct_type(session: Any, goal: str) -> Any:
@@ -999,7 +1104,11 @@ def direct_type(session: Any, goal: str) -> Any:
     from core_organs.agent_executor import StepRecord
     text = m.group(1)
     t0 = time.perf_counter()
-    ok = bool(session.app.type_text(text))
+    where = (m.group(2) or "").lower()
+    try:
+        ok = bool(session.app.type_text(text, where=where)) if where else bool(session.app.type_text(text))
+    except TypeError:
+        ok = bool(session.app.type_text(text))
     time.sleep(0.6)
     seen = read_back(session).lower()
     words = [w for w in re.findall(r"\w+", text.lower()) if len(w) > 2]
@@ -1023,7 +1132,23 @@ def read_back(session: Any) -> str:
     if img is not None:
         with contextlib.suppress(Exception):
             import pytesseract
-            parts.append(pytesseract.image_to_string(img.convert("L"), config="--psm 11"))
+            from PIL import ImageOps
+            g = img.convert("L")
+            parts.append(pytesseract.image_to_string(g, config="--psm 11"))
+            big = g.resize((g.width * 2, g.height * 2))                       # small / pale text (a slide's subtitle, a dark theme) needs a second and third look: enlarged, and inverted
+            parts.append(pytesseract.image_to_string(big, config="--psm 11"))
+            parts.append(pytesseract.image_to_string(ImageOps.invert(big), config="--psm 11"))
+    with contextlib.suppress(Exception):                                  # a slide's text is not in the UI tree and is small on the canvas: read the slide itself, enlarged
+        if re.search(r"powerpoint|impress|slides", str(getattr(session.app, "name", "")), re.I):
+            got = session.app.slide_rect()
+            if got:
+                import pytesseract
+                from PIL import ImageOps
+                crop = got[1].convert("L")
+                big = crop.resize((crop.width * 3, crop.height * 3))
+                for psm in ("6", "4"):                                    # the rotate handle under a title can break one reading and not the other
+                    parts.append(pytesseract.image_to_string(big, config="--psm " + psm))
+                parts.append(pytesseract.image_to_string(ImageOps.invert(big), config="--psm 6"))
     return re.sub(r"\s+", " ", " ".join(parts))[:20000]
 
 

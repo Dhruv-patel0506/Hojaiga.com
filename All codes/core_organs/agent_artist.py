@@ -49,9 +49,12 @@ def _items(goal: str) -> List[str]:
 
 
 class ArtistTools:
+    DEFAULT_TRACE = (300, 0.0)                                      # (max strokes, share of the edge length to cover); the gauntlet sets (900, 0.97)
+
     def __init__(self, painter: Any, rag: Any = None, ref_dir: str = REF_DIR):
         self.p, self.rag, self.ref_dir = painter, rag, ref_dir
         self.last: Dict[str, Any] = {}
+        self.trace_max, self.trace_coverage = self.DEFAULT_TRACE                  # 300 strokes by default; a caller asking for detail sets e.g. (900, 0.97): strokes are added, longest first, until that share of the edge length is covered
 
     # ---------------------------------------------------------------- dispatch
     @staticmethod
@@ -101,7 +104,7 @@ class ArtistTools:
                 return ctx
             ref = cv2.imread(img)
             if kind == "trace":
-                ctx["strokes"], ctx["tstats"] = CA.trace_strokes(ref, box, max_strokes=300)
+                ctx["strokes"], ctx["tstats"] = CA.trace_strokes(ref, box, max_strokes=self.trace_max, coverage=self.trace_coverage)
             else:
                 from core_organs import canvas_teach as CT, canvas_stages as ST
                 zones = CT.lightboard_zones(box)
@@ -140,6 +143,10 @@ class ArtistTools:
             worked = comp >= 97.0 and cont == 100.0 and not overlaps
             self.last = dict(ctx, box=box, after=after, before=before)
             effect = f"{kind}: {len(strokes)} strokes, completion {comp}%, containment {cont}%, overlapping pairs {len(overlaps)}, repaired {rep['redrawn']}"
+            if kind == "trace" and ctx.get("tstats"):
+                ec = CA.edge_coverage(ctx["tstats"], after, box)
+                self.last["edge_coverage"] = ec
+                effect += f", reference edge length covered by the plan {ctx['tstats'].get('length_covered_pct')}%, edge pixels inked on the canvas {ec}%"
             logged = self._remember(kind, goal, ctx) if worked else {}
             return StepRecord(goal, "done" if worked else "wrong_effect", source="artist", effect=effect, learned=bool(logged), ms=round((time.time() - t0) * 1000),
                               evidence=[f"drawn {ex['drawn']}/{len(strokes)}", f"repair passes {rep['passes']}"], why="" if worked else "the drawing did not meet completion >= 97%, containment 100%, zero overlap")

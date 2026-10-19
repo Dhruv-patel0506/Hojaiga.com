@@ -529,8 +529,113 @@ class OwnedApp:
                 continue
         return best
 
-    def type_text(self, text: str) -> bool:
-        """Type into the editor through UIA's ValuePattern (XAML/WinUI apps ignore posted characters: measured on Notepad), then READ IT BACK: delivered is not the same as landed."""
+    PLACEHOLDER = {"title": r"click to add title|add title|^title\b|title \d|^title$", "subtitle": r"click to add subtitle|add subtitle|^subtitle\b|subtitle \d", "heading": r"click to add title|add title|^title\b",
+                   "body": r"click to add text|add text|content placeholder|text placeholder"}
+
+    def placeholder_rect(self, where: str):
+        """The on-screen box of a slide placeholder ('Click to add title'): the smallest visible control whose name says it (UI Automation), or None."""
+        import uiautomation as auto
+        rx = re.compile(self.PLACEHOLDER.get(where, where), re.I)
+        best, area = None, 10 ** 12
+        for c, _d in auto.WalkControl(auto.ControlFromHandle(self.hwnd), maxDepth=14):
+            try:
+                if c.IsOffscreen or not rx.search((c.Name or "").strip()):
+                    continue
+                r = c.BoundingRectangle
+                a = r.width() * r.height()
+                if r.width() >= 80 and r.height() >= 20 and a < area:
+                    best, area = (r.left, r.top, r.right, r.bottom), a
+            except Exception:
+                continue
+        return best
+
+    # the default Office 'Title Slide' layout as a share of the slide: title box centre / subtitle box centre (x, y); body of a 'Title and Content' slide
+    LAYOUT_POINTS = {"title": (0.50, 0.31), "heading": (0.50, 0.31), "subtitle": (0.50, 0.59), "body": (0.50, 0.55)}
+
+    def slide_rect(self):
+        """Screen box of the slide on a PowerPoint-style canvas. The slide is not in the UI Automation tree, so it is read from a picture of the window: the largest light panel below the ribbon."""
+        import cv2
+        import numpy as np
+        img, origin = self.grab(popups=False)
+        g = np.asarray(img.convert("L"))
+        h, w = g.shape
+        top, bot = int(h * 0.26), int(h * 0.90)
+        mask = np.zeros_like(g, np.uint8)
+        mask[top:bot, int(w * 0.10):] = (g[top:bot, int(w * 0.10):] > 150).astype(np.uint8)
+        n, lab, st, _c = cv2.connectedComponentsWithStats(mask, connectivity=4)
+        if n <= 1:
+            return None
+        i = 1 + int(np.argmax(st[1:, cv2.CC_STAT_AREA]))
+        x, y, ww, hh = (int(v) for v in st[i, :4])
+        if ww < w * 0.2 or hh < h * 0.2:
+            return None
+        return (origin[0] + x, origin[1] + y, origin[0] + x + ww, origin[1] + y + hh), img.crop((x, y, x + ww, y + hh))
+
+    def type_placeholder(self, text: str, where: str) -> bool:
+        """A slide's placeholders have no value of their own and are not in the UI Automation tree: find the slide in a picture, make the first slide when the deck is empty ('Click to add first slide'), click inside
+        the layout's title / subtitle box (a posted click, background), then post the characters to the control that took the focus."""
+        from core_organs import headless_input as hin
+        got = self.slide_rect()
+        if got is None:
+            return False
+        rect, crop = got
+        with contextlib.suppress(Exception):
+            import pytesseract
+            if "first slide" in pytesseract.image_to_string(crop.convert("L"), config="--psm 6").lower():
+                hin.post_click(self.hwnd, (rect[0] + rect[2]) // 2, (rect[1] + rect[3]) // 2)
+                time.sleep(1.8)
+                got = self.slide_rect() or got
+                rect = got[0]
+        fx, fy = self.LAYOUT_POINTS.get(where, (0.5, 0.5))
+        cx, cy = int(rect[0] + (rect[2] - rect[0]) * fx), int(rect[1] + (rect[3] - rect[1]) * fy)
+        hin.post_click(self.hwnd, cx, cy)
+        time.sleep(0.6)
+        tgt = hin.focused_control(self.hwnd) or self.hwnd
+        done, _n = hin.post_text(tgt, text)
+        time.sleep(0.5)
+        if not done:
+            done = self._post_text(text)
+        with contextlib.suppress(Exception):                              # leave edit mode and drop the selection (its handles and rotate icon sit on the text and break reading it back)
+            hin.post_key_combo(self.hwnd, "escape")
+            time.sleep(0.2)
+            hin.post_key_combo(self.hwnd, "escape")
+        return bool(done)
+
+    TASK_PANES = ("clipboard", "navigation", "document recovery", "research", "thesaurus", "selection", "reuse slides", "designer", "comments")
+
+    def close_task_panes(self) -> int:
+        """Side panes that squeeze the document (Word's Clipboard / Navigation / Document Recovery) are closed through their own 'Close pane' button (UI Automation Invoke): the page they cover is where text
+        lands and is read back."""
+        import uiautomation as auto
+        n = 0
+        with contextlib.suppress(Exception):
+            for _round in range(4):
+                hit = None
+                for c, _d in auto.WalkControl(auto.ControlFromHandle(self.hwnd), maxDepth=12):
+                    try:
+                        if c.ControlTypeName in ("PaneControl", "GroupControl", "CustomControl", "WindowControl") and (c.Name or "").strip().lower() in self.TASK_PANES and not c.IsOffscreen:
+                            b = c.ButtonControl(searchDepth=5, SubName="Close")
+                            if b.Exists(0, 0):
+                                hit = b
+                                break
+                    except Exception:
+                        continue
+                if hit is None:
+                    break
+                hit.GetInvokePattern().Invoke()
+                n += 1
+                time.sleep(0.6)
+        return n
+
+    def type_text(self, text: str, where: str = "") -> bool:
+        """Type into the editor through UIA's ValuePattern (XAML/WinUI apps ignore posted characters: measured on Notepad), then READ IT BACK: delivered is not the same as landed.
+        `where` ('title' / 'subtitle' / 'body') names a slide placeholder: it is clicked first (its box comes from UI Automation), then typed into."""
+        with contextlib.suppress(Exception):
+            self.close_task_panes()
+        if where:
+            with contextlib.suppress(Exception):
+                if self.type_placeholder(text, where):
+                    return True
         try:
             ed = self._editor()
             if ed is None:

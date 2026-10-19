@@ -702,34 +702,46 @@ def run_ar19() -> "TestOutcome":
     from core_organs.harvest import child_windows as CW
     from core_organs import headless_input as hin
     from si_tests_rag import _Env
-    code = chr(10).join(["import tkinter as tk",
+    flag = os.path.join(tempfile.gettempdir(), "hj_ar19_%d.flag" % os.getpid())            # the child window opens when THIS test says so (a slow start of the helper process cannot make it open early)
+    if os.path.exists(flag):
+        os.remove(flag)
+    code = chr(10).join(["import tkinter as tk", "FLAG = %r" % flag,
                       "r = tk.Tk(); r.title('Parent app'); r.geometry('300x120+40+40'); tk.Label(r, text='main').pack()",
                       "def open_child():",
                       "    t = tk.Toplevel(r); t.title('Create Source'); tk.Button(t, text='OK').pack(); tk.Button(t, text='Cancel', command=t.destroy).pack()",
-                      "r.after(2500, open_child)",
-                      "r.after(14000, r.destroy)",
+                      "import os",
+                      "def wait_flag():",
+                      "    (open_child() if os.path.exists(FLAG) else r.after(200, wait_flag))",
+                      "r.after(200, wait_flag)",
+                      "r.after(90000, r.destroy)",
                       "r.mainloop()"])
     proc = subprocess.Popen([sys.executable, "-c", code])
     out = {}
     try:
         hw = 0
         t0 = time.time()
-        while time.time() - t0 < 8 and not hw:
+        while time.time() - t0 < 20 and not hw:
             import ctypes
             P = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
             found = []
 
             def cb(h, l):
-                if hin.window_pid(h) == proc.pid and hin.safe_window_text(h) == "Parent app" and ctypes.windll.user32.IsWindowVisible(h):
+                try:
+                    import psutil
+                    mine = {proc.pid} | {c.pid for c in psutil.Process(proc.pid).children(recursive=True)}          # a venv's python.exe is a launcher: the window belongs to its child interpreter
+                except Exception:
+                    mine = {proc.pid}
+                if hin.window_pid(h) in mine and hin.safe_window_text(h) == "Parent app" and ctypes.windll.user32.IsWindowVisible(h):
                     found.append(h)
                 return True
             ctypes.windll.user32.EnumWindows(P(cb), 0)
             hw = found[0] if found else 0
             time.sleep(0.3)
         before = CW.snapshot(hw)
+        open(flag, 'w').write('go')
         kids = []
         t0 = time.time()
-        while time.time() - t0 < 8 and not kids:
+        while time.time() - t0 < 25 and not kids:
             kids = CW.new_windows(before, hw)
             time.sleep(0.3)
         kid = kids[0] if kids else {}
@@ -844,7 +856,32 @@ def run_ar32() -> "TestOutcome":
     return _dom_test("run_ar32")
 
 
-TESTS = [("AR1", run_ar1), ("AR2", run_ar2), ("AR3", run_ar3), ("AR4", run_ar4), ("AR5", run_ar5), ("AR6", run_ar6), ("AR7", run_ar7), ("AR8", run_ar8), ("AR9", run_ar9), ("AR10", run_ar10), ("AR11", run_ar11), ("AR12", run_ar12), ("AR13", run_ar13), ("AR14", run_ar14), ("AR15", run_ar15), ("AR16", run_ar16), ("AR17", run_ar17), ("AR18", run_ar18), ("AR19", run_ar19), ("AR20", run_ar20), ("AR21", run_ar21), ("AR22", run_ar22), ("AR23", run_ar23), ("AR24", run_ar24), ("AR25", run_ar25), ("AR26", run_ar26), ("AR27", run_ar27), ("AR28", run_ar28), ("AR29", run_ar29), ("AR30", run_ar30), ("AR31", run_ar31), ("AR32", run_ar32)]
+def run_ar33() -> "TestOutcome":
+    """AR33: web delegate (shortlist, checked actions, change-checked loop, send / post / pay staged until a live yes, sign-in wall)"""
+    return _dom_test("run_ar33")
+
+
+def run_ar34() -> "TestOutcome":
+    """AR34: self-growing / self-healing memory (checked steps kept, corrupted locator repaired through UIA, persisted, demoted when unrepairable, PNG proof)"""
+    return _dom_test("run_ar34")
+
+
+def run_ar35() -> "TestOutcome":
+    """AR35: retrieval that does not give up (loose app name -> store key, similar-site fallback, noise refused, dedupe / observe-only purge, PNG proof)"""
+    return _dom_test("run_ar35")
+
+
+def run_ar36() -> "TestOutcome":
+    """AR36: concept drawings are geometrically honest (shape-word critic, overlap, constructed squares on a side, PNG proof)"""
+    return _dom_test("run_ar36")
+
+
+def run_ar37() -> "TestOutcome":
+    """AR37: no part pokes through another (table legs taller than the top), critic + measured build quality, PNG proof"""
+    return _dom_test("run_ar37")
+
+
+TESTS = [("AR1", run_ar1), ("AR2", run_ar2), ("AR3", run_ar3), ("AR4", run_ar4), ("AR5", run_ar5), ("AR6", run_ar6), ("AR7", run_ar7), ("AR8", run_ar8), ("AR9", run_ar9), ("AR10", run_ar10), ("AR11", run_ar11), ("AR12", run_ar12), ("AR13", run_ar13), ("AR14", run_ar14), ("AR15", run_ar15), ("AR16", run_ar16), ("AR17", run_ar17), ("AR18", run_ar18), ("AR19", run_ar19), ("AR20", run_ar20), ("AR21", run_ar21), ("AR22", run_ar22), ("AR23", run_ar23), ("AR24", run_ar24), ("AR25", run_ar25), ("AR26", run_ar26), ("AR27", run_ar27), ("AR28", run_ar28), ("AR29", run_ar29), ("AR30", run_ar30), ("AR31", run_ar31), ("AR32", run_ar32), ("AR33", run_ar33), ("AR34", run_ar34), ("AR35", run_ar35), ("AR36", run_ar36), ("AR37", run_ar37)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]

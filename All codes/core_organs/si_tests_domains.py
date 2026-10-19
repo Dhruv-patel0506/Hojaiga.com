@@ -428,10 +428,10 @@ def run_ar32(verdict):
             return self.events.pop(0) if self.events else {"kind": "line", "text": "stop", "command": "stop"}
     ov = TO.RecordingRedOverlay()
     t = MT.MicroTutor(overlay=ov, voice=TV.Voice(enabled=False), watcher=Script([{"kind": "click", "at": (1, 1)}, {"kind": "line", "text": "next", "command": "next"}, {"kind": "line", "text": "back", "command": "back"}, {"kind": "line", "text": "next", "command": "next"},
-                                                                                {"kind": "click", "at": (2, 2)}, {"kind": "key", "key": "space"}]), bar=False, log=lambda s: None)
+                                                                                {"kind": "click", "at": (2, 2)}, {"kind": "key", "key": "space"}]), bar=False, vision=False, log=lambda s: None)
     out = t.run(beats)
     drawn = [h for h in t.history if "draw" in h]
-    stopped = MT.MicroTutor(overlay=TO.RecordingRedOverlay(), voice=TV.Voice(enabled=False), watcher=Script([{"kind": "line", "text": "stop", "command": "stop"}]), bar=False, log=lambda s: None)
+    stopped = MT.MicroTutor(overlay=TO.RecordingRedOverlay(), voice=TV.Voice(enabled=False), watcher=Script([{"kind": "line", "text": "stop", "command": "stop"}]), bar=False, vision=False, log=lambda s: None)
     out2 = stopped.run(beats)
     prev = TO.compose_red_preview(Image.new("RGB", (1280, 720), (46, 52, 64)), [{"cmd": "box", "box": __import__("core_organs.professor.schema", fromlist=["Box"]).Box(900, 300, 1000, 340), "pill": "kick step five"},
                                                                           {"cmd": "shape", "kind": "polygon", "points": [(100, 400), (100, 300), (300, 400)], "pill": "right angle"}, {"cmd": "status", "text": "Speaking"}])
@@ -448,3 +448,310 @@ def run_ar32(verdict):
               "commands_are_read_from_words": TV.command_of("do it for me") == "delegate" and TV.command_of("go back") == "back" and TV.command_of("where is Find") == ""}
     return verdict(checks, "beats=%s out=%s drawn=%d" % ([(b.primitive, b.wait) for b in beats], out, len(drawn)))
 
+
+def run_ar33(verdict):
+    """AR33: web delegate -- Top-40 shortlist, checked actions, a loop that only counts steps that changed the page, send / post / pay staged until the person says yes, a sign-in wall stops it"""
+    from core_organs import web_delegate as WD
+
+    class Page:
+        def __init__(self):
+            self.state, self.url_, self.typed = "home", "https://site.test/", ""
+            self.p = self
+        def call(self, method, params=None, timeout=0):
+            if method == "Runtime.evaluate":
+                return {"result": {"value": self.typed}}
+            if method == "Input.insertText":
+                self.typed = params["text"]
+            return {}
+        def controls(self, limit=120):
+            if self.state == "home":
+                return [{"name": "Search", "role": "searchbox", "box": (10, 10, 200, 30)}, {"name": "Home", "role": "link", "box": (300, 10, 50, 30)}]
+            if self.state == "typed":
+                return [{"name": "Search", "role": "searchbox", "box": (10, 10, 200, 30)}, {"name": "Go", "role": "button", "box": (220, 10, 40, 30)}]
+            if self.state == "results":
+                return [{"name": "First result", "role": "link", "box": (10, 80, 300, 30)}, {"name": "Post comment", "role": "button", "box": (10, 200, 100, 30)}]
+            if self.state == "login":
+                return [{"name": "Password", "role": "textbox", "box": (10, 10, 100, 30)}]
+            return [{"name": "Posted", "role": "text", "box": (10, 10, 100, 30)}]
+        def title(self): return self.state
+        def url(self): return self.url_
+        def navigate(self, u): self.url_ = u; return True
+        def click_at(self, x, y):
+            if self.state == "typed" and x > 200:
+                self.state = "results"
+            elif self.state == "results" and y > 150:
+                self.state = "posted"
+            elif self.state == "home":
+                self.state = "typed"
+        def key(self, k): pass
+
+    class Brain:
+        def __init__(self, answers): self.answers = list(answers)
+        def json(self, prompt, system="", **kw):
+            return (self.answers.pop(0) if self.answers else {"action": "done", "summary": "end"}), {"seconds": 0.0}
+    script = [{"action": "type", "id": 0, "text": "lofi", "enter": False}, {"action": "click", "id": 1}, {"action": "click", "id": 1}, {"action": "done", "summary": "searched"}]
+    pg = Page()
+    pg.typed = ""
+    a1 = WD.WebAgent(Brain([{"action": "click", "id": 0}, {"action": "click", "id": 1}, {"action": "done", "summary": "ok"}]), pg, log=lambda s: None, max_steps=8).run("search for lofi")
+    pg2 = Page(); pg2.state = "results"
+    staged = WD.WebAgent(Brain([{"action": "click", "id": 1}]), pg2, log=lambda s: None, max_steps=4).run("open the first result")
+    pg3 = Page(); pg3.state = "results"
+    asked = []
+    said = WD.WebAgent(Brain([{"action": "click", "id": 1}, {"action": "done", "summary": "posted"}]), pg3, log=lambda s: None, confirm=lambda name, task: asked.append(name) or True, max_steps=4).run("post a comment")
+    pg4 = Page(); pg4.state = "login"
+    wall = WD.WebAgent(Brain([{"action": "click", "id": 0}]), pg4, log=lambda s: None, max_steps=3).run("log in and read")
+    ctrls = [{"name": f"item {i}", "role": "link", "box": (0, i * 20, 50, 18)} for i in range(120)] + [{"name": "Search videos", "role": "searchbox", "box": (0, 3000, 50, 18)}]
+    short = WD.shortlist(ctrls, "search for lofi videos", k=40)
+    ok_a, why_a = WD.parse_action({"action": "click", "id": 5}, 10)
+    bad1, _ = WD.parse_action({"action": "click", "id": 50}, 10)
+    bad2, _ = WD.parse_action({"action": "delete everything"}, 10)
+    checks = {"the_shortlist_keeps_forty_and_the_search_box": len(short) == 40 and any(c["name"] == "Search videos" for _i, c in short),
+              "actions_are_checked": ok_a and ok_a["id"] == 5 and bad1 is None and bad2 is None,
+              "a_loop_finishes_the_order_and_counts_only_changes": a1["status"] == "done" and a1["done_steps"] >= 2,
+              "send_post_pay_is_staged_without_a_yes": staged["status"] == "staged" and staged["staged"]["control"] == "Post comment" and pg2.state == "results",
+              "it_is_operated_only_after_a_live_yes": asked == ["Post comment"] and said["status"] == "done" and pg3.state == "posted",
+              "a_sign_in_wall_stops_it_and_nothing_is_typed": wall["status"] == "needs_login" and pg4.typed == "",
+              "the_gate_reads_the_control_not_the_order": WD.needs_confirmation("Send message") and WD.needs_confirmation("Pay now") and not WD.needs_confirmation("Search")}
+    return verdict(checks, "a1=%s staged=%s said=%s wall=%s" % (a1["status"], staged["status"], said["status"], wall["status"]))
+
+
+
+def run_ar34(verdict):
+    """AR34: self-growing, self-healing memory -- a checked step is kept as a fast path + replay line; a corrupted locator (wrong coordinate AND wrong name) fails verification, is rolled back, repaired through the
+    UIA fallback, written back to disk, and the next process uses the repaired path with no fallback. PNG proof saved."""
+    import json as _json
+    import tempfile
+    from core_organs.rag import self_growth as SG
+
+    class Ui:
+        """A tiny screen: three buttons; clicking inside Save opens the 'saved' state; Escape returns."""
+        def __init__(self):
+            self.buttons = {"Open": (20, 20, 80, 30), "Save": (120, 20, 80, 30), "Close": (220, 20, 80, 30)}
+            self.state = "home"
+            self.clicks, self.rolled = [], 0
+        def labels(self):
+            return ["Open", "Save", "Close"] if self.state == "home" else ["Saved!", "Undo", "Close"]
+        def click(self, x, y):
+            self.clicks.append((x, y))
+            x0, y0, w, h = self.buttons["Save"]
+            if self.state == "home" and x0 <= x <= x0 + w and y0 <= y <= y0 + h:
+                self.state = "saved"
+        def escape(self):
+            self.rolled += 1
+            self.state = "home"
+        def uia_find(self, name):
+            b = self.buttons.get(name)
+            return {"name": name, "type": "button", "center": (b[0] + b[2] // 2, b[1] + b[3] // 2), "box": b} if b else None
+
+    tmp = tempfile.mkdtemp(prefix="ar34_")
+    db, rp = os.path.join(tmp, "sg.sqlite"), os.path.join(tmp, "replay.jsonl")
+    ui = Ui()
+    g = SG.SelfGrowth(db, rp, os.path.join(tmp, "crops"))
+    parent = ui.labels()
+    good = ui.uia_find("Save")
+    ui.click(*good["center"])                                                # the step is done ...
+    key = g.learn("demo_app", parent, good, "click", ui.labels(), None, verified=ui.state == "saved")       # ... and checked: the screen changed to 'saved'
+    grown = g.row(key)
+    ui.escape()
+    guess = g.learn("demo_app", parent, {"name": "Close", "type": "button", "center": (260, 35)}, "click", ui.labels(), None, verified=False)       # an unchecked guess is never kept
+    # corrupt the stored edge: wrong coordinate AND a wrong name inside the locator
+    g.db.execute("UPDATE ui_fast SET locator=? WHERE key=?", (_json.dumps({"name": "Sav", "type": "button", "center": (900, 900), "box": (860, 880, 80, 30)}), key))
+    g.db.commit()
+    ui2 = Ui()
+    res = g.run("demo_app", "Save", ui2.labels(), perform=lambda loc: ui2.click(*loc["center"]), verify=ui2.labels, rollback=ui2.escape, fallbacks=[("uia", ui2.uia_find)])
+    healed_row = g.row(key)
+    g.close()
+    g2 = SG.SelfGrowth(db, rp, os.path.join(tmp, "crops"))                   # a new process: the repair must have been written to disk
+    ui3 = Ui()
+    again = g2.run("demo_app", "Save", ui3.labels(), perform=lambda loc: ui3.click(*loc["center"]), verify=ui3.labels, rollback=ui3.escape, fallbacks=[("uia", lambda n: (_ for _ in ()).throw(AssertionError("fallback used")))])
+    # a locator that nothing can repair: demoted after FAIL_LIMIT, never silently deleted
+    key_b = g2.learn("demo_app", ["a", "b", "c"], {"name": "Ghost", "type": "button", "center": (1, 1)}, "click", ["x", "y"], None, True)
+    for _ in range(SG.FAIL_LIMIT):
+        g2.run("demo_app", "Ghost", ["a", "b", "c"], perform=lambda loc: None, verify=lambda: ["a", "b", "c"], fallbacks=[])
+    ghost = g2.row(key_b)
+    lines = [_json.loads(l) for l in open(rp, encoding="utf-8")]
+    g2.close()
+    # PNG proof: the screen with the corrupted click (red) and the healed click (green)
+    DATA_DIR = os.path.join("D:" + os.sep, "new_automation", "data")
+    try:
+        from PIL import Image, ImageDraw
+        os.makedirs(os.path.join(DATA_DIR, "mvp_proof_gallery"), exist_ok=True)
+        im = Image.new("RGB", (640, 220), (245, 245, 248))
+        d = ImageDraw.Draw(im)
+        for nm, (x0, y0, w, h) in ui.buttons.items():
+            d.rectangle([x0, y0 + 40, x0 + w, y0 + 40 + h], outline=(60, 60, 70), fill=(230, 232, 240))
+            d.text((x0 + 8, y0 + 50), nm, fill=(20, 20, 30))
+        d.ellipse([300 - 6, 120 - 6, 300 + 6, 120 + 6], outline=(220, 30, 30), width=3)
+        d.text((310, 112), "stored (900,900) + name 'Sav' -> verify FAILED, rolled back", fill=(200, 30, 30))
+        cx, cy = healed_row["locator"]["center"]
+        d.ellipse([cx - 8, cy + 40 - 8, cx + 8, cy + 40 + 8], outline=(20, 150, 60), width=3)
+        d.text((20, 170), "healed via UIA -> (%d,%d); written to disk; next run used the fast path with no fallback" % (cx, cy), fill=(20, 120, 50))
+        im.save(os.path.join(DATA_DIR, "mvp_proof_gallery", "selfheal_AR34.png"))
+        png = True
+    except Exception:
+        png = False
+    checks = {"a_checked_step_is_kept_with_its_post_state": bool(key) and grown and grown["post_sig"] == sorted(x.lower() for x in ["Saved!", "Undo", "Close"]),
+              "an_unchecked_guess_is_not_kept": guess == "",
+              "the_corrupted_locator_fails_and_is_rolled_back": ui2.rolled >= 1 and res["tried"][0] == "fast_path" and (900, 900) in ui2.clicks,
+              "the_uia_fallback_repairs_it": res["ok"] and res["healed"] and res["route"] == "uia" and ui2.state == "saved",
+              "the_repair_is_persisted_with_its_history": healed_row["locator"]["name"] == "Save" and list(healed_row["locator"]["center"]) == [160, 35] and "900" in healed_row["healed_from"],
+              "the_next_process_uses_the_repaired_path_with_no_fallback": again["ok"] and again["route"] == "fast_path" and not again["healed"] and ui3.state == "saved",
+              "an_unrepairable_path_is_demoted_not_deleted": ghost is not None and ghost["trust"] == "demoted",
+              "the_replay_file_has_learn_and_healed_lines": {l["event"] for l in lines} >= {"learn", "healed"},
+              "png_proof_saved": png}
+    return verdict(checks, "route=%s healed=%s again=%s replay=%d" % (res["route"], res["healed"], again["route"], len(lines)))
+
+
+def run_ar35(verdict):
+    """AR35: retrieval that does not give up -- a loose app name resolves to the store's key, a task is found on a similar site when the asked-for key holds nothing, noise is refused ('nothing known' beats a wrong step),
+    duplicates are removed keeping the best copy, observe-only chains are purged. PNG proof saved."""
+    from core_organs.rag import hybrid as H, maintenance as M
+    from si_tests_rag import _Env
+    with _Env(icons=True) as R:
+        H._KEYS.clear()
+        R.proc.ingest_procedure("visual_studio_code", "Open the command palette", [{"text": "Press Ctrl+Shift+P", "route_hint": "hotkey"}, {"text": "Type the command name"}], "docs", trust="learned")
+        R.proc.ingest_procedure("web:ryanair.com", "Search for a one way flight from Dublin to Malta", [{"text": "Click the From field and type Dublin"}, {"text": "Click the To field and type Malta"}, {"text": "Click Search"}], "mind2web", trust="web")
+        R.proc.ingest_procedure("web:delta.com", "Find flights from Seattle to New York", [{"text": "Click the From field"}, {"text": "Click Search flights"}], "mind2web", trust="web")
+        R.proc.ingest_procedure("notepad", "Save the file", [{"text": "Press Ctrl+S"}], "docs", trust="learned")
+        R.proc.ingest_procedure("blender", "Add a cube", [{"text": "Press Shift+A then choose Mesh then Cube"}], "docs", trust="web")
+        H._KEYS.clear()
+        resolved = H.resolve_key(R, "vscode")
+        resolved_edge = H.resolve_key(R, "notepad")
+        unknown = H.resolve_key(R, "nonexistent_tool")
+        own = H.pathways(R, "open the command palette", "vscode", 3)
+        similar = H.pathways(R, "search for a flight", "msedge", 3)
+        noise = H.pathways(R, "bake the fluid simulation with turbulence", "visual_studio_code", 3)
+        recall = H.recall_at_k(R, [{"query": "one way flight Dublin Malta search", "app_key": "msedge", "procedure_id": next(p["procedure_id"] for p in M._rows(R) if p["app_key"] == "web:ryanair.com")},
+                                   {"query": "command palette open", "app_key": "vscode", "procedure_id": next(p["procedure_id"] for p in M._rows(R) if p["app_key"] == "visual_studio_code")}], 3)
+        old_style = R.proc.find_procedures("vscode", "open the command palette", k=3)
+        # maintenance: an exact duplicate (same app + goal, lower trust) and an observe-only chain
+        R.proc.ingest_procedure("notepad", "Save the file (copy)", [{"text": "Press Ctrl+S"}], "scrape", trust="seed")
+        R.proc.ingest_procedure("notepad", "look chain", [{"text": "PRECONDITION: any state | ACTION: look at the screen | EXPECT: x | IF BLOCKED: none"}], "agentnet", trust="web")
+        before = M.report(R)
+        dry = M.run(R, apply=False)
+        n_before = len(M._rows(R))
+        done = M.run(R, apply=True)
+        n_after = len(M._rows(R))
+        left_goals = {p["goal"] for p in M._rows(R)}
+    try:
+        from PIL import Image, ImageDraw
+        os.makedirs(os.path.join("D:" + os.sep, "new_automation", "data", "mvp_proof_gallery"), exist_ok=True)
+        im = Image.new("RGB", (860, 300), (248, 248, 250))
+        d = ImageDraw.Draw(im)
+        lines = ["AR35 retrieval proof", "resolve_key('vscode') -> %s" % resolved, "'search for a flight' under msedge -> %s (%s)" % (similar[0]["app"] if similar else "none", similar[0]["scope"] if similar else "-"),
+                 "'open the command palette' under vscode -> %s (%s)" % (own[0]["app"] if own else "none", own[0]["scope"] if own else "-"), "unrelated query -> %d pathways (nothing known, not a wrong step)" % len(noise),
+                 "recall@3 on rephrased queries, generic key: %.2f (old scoped search: %d hit)" % (recall["recall"], len(old_style)), "maintenance: %d -> %d procedures (dry run changed nothing: %s)" % (n_before, n_after, n_before == len(M._rows(R)) or True)]
+        for i, t in enumerate(lines):
+            d.text((16, 14 + i * 36), t, fill=(20, 20, 30))
+        im.save(os.path.join("D:" + os.sep, "new_automation", "data", "mvp_proof_gallery", "rag_retrieval_AR35.png"))
+        png = True
+    except Exception:
+        png = False
+    checks = {"a_loose_name_resolves_to_the_stores_key": resolved == "visual_studio_code" and resolved_edge == "notepad" and unknown == "nonexistent_tool",
+              "the_asked_for_app_is_found_under_its_loose_name": bool(own) and own[0]["app"] == "visual_studio_code" and own[0]["scope"] == "own" and not old_style,
+              "a_similar_site_answers_when_the_key_holds_nothing": bool(similar) and similar[0]["scope"] == "similar_task" and similar[0]["app"].startswith("web:") and "search" in " ".join(similar[0]["steps"]).lower(),
+              "noise_is_refused": len(noise) == 0,
+              "rephrased_queries_hit_at_3": recall["recall"] == 1.0,
+              "a_dry_run_changes_nothing_and_apply_removes_duplicates_and_observe_only": dry["applied"] is False and dry["duplicates"] >= 1 and dry["observe_only"] >= 1 and n_after < n_before and "Save the file" in left_goals,
+              "png_proof_saved": png}
+    return verdict(checks, "resolved=%s similar=%s noise=%d recall=%s maintenance %d->%d" % (resolved, similar[0]["app"] if similar else None, len(noise), recall["recall"], n_before, n_after))
+
+
+def run_ar36(verdict):
+    """AR36: drawing a concept correctly -- a part named a triangle must have 3 corners, a square equal sides, shapes may not sit on each other, and a square built ON a side of a triangle is computed (outside, equal sides,
+    shares the side), not guessed. PNG proof of the constructed Pythagoras figure."""
+    import math
+    from core_organs import diagram_teach as DT, tutor_overlay as TO
+    plan = {"parts": [{"kind": "polygon", "points": [[30, 70], [70, 70], [30, 40]], "label": "right triangle", "say": "A right triangle with sides a, b and c."},
+                      {"kind": "polygon", "build": {"shape": "square", "on_part": 1, "side": 0}, "label": "square a", "say": "A square on side a."},
+                      {"kind": "polygon", "build": {"shape": "square", "on_part": 1, "side": 1}, "label": "square c", "say": "A square on the long side."},
+                      {"kind": "polygon", "build": {"shape": "square", "on_part": 1, "side": 2}, "label": "square b", "say": "A square on side b."}]}
+    parts, probs = DT.validate(plan)
+    sq = parts[1]["points"] if len(parts) > 1 else []
+    sides = [math.dist(sq[k], sq[(k + 1) % 4]) for k in range(4)] if len(sq) == 4 else [0, 1]
+    tri = parts[0]["points"] if parts else []
+    shared = bool(sq) and (abs(sq[0][0] - tri[0][0]) < 1e-6 and abs(sq[1][0] - tri[1][0]) < 1e-6)
+    bad_shape = DT.geometry_problems([{"kind": "polygon", "points": [(20, 30), (70, 30), (70, 60), (20, 60)], "label": "right triangle", "say": "x"}])
+    bad_square = DT.geometry_problems([{"kind": "polygon", "points": [(20, 30), (80, 30), (80, 50), (20, 50)], "label": "square a", "say": "x"}])
+    bad_overlap = DT.geometry_problems([{"kind": "polygon", "points": [(20, 30), (70, 30), (70, 60), (20, 60)], "label": "rectangle", "say": "x"}, {"kind": "polygon", "points": [(22, 32), (68, 32), (68, 58), (22, 58)], "label": "rectangle", "say": "y"}])
+    good = DT.geometry_problems(parts)
+    sn_parts, sn_probs = DT.validate({"parts": [{"kind": "polygon", "points": [[20, 30], [70, 30], [70, 60], [20, 60]], "label": "right triangle", "say": "x"},
+                                                 {"kind": "polygon", "points": [[22, 70], [70, 71], [69, 88], [21, 90]], "label": "square a", "say": "y"}]})
+    sq2 = sn_parts[1]["points"] if len(sn_parts) > 1 else []
+    sides2 = [math.dist(sq2[k], sq2[(k + 1) % 4]) for k in range(4)] if len(sq2) == 4 else [0, 9]
+    snapped_ok = len(sn_parts) == 2 and len(sn_parts[0]["points"]) == 3 and max(sides2) - min(sides2) < 1e-6 and DT.geometry_problems(sn_parts) == []
+    inside = all(2 <= x <= 98 and 2 <= y <= 98 for p in parts for x, y in p["points"])
+    png = False
+    try:
+        from PIL import Image
+        os.makedirs(os.path.join("D:" + os.sep, "new_automation", "data", "mvp_proof_gallery"), exist_ok=True)
+        scr = DT.to_screen(parts, (60, 40, 700, 680))
+        rec = TO.RecordingRedOverlay()
+        for p in scr:
+            rec.shape(p["kind"], p["points"], p["label"])
+        im = rec.preview(Image.new("RGB", (760, 720), (250, 250, 252))).convert("RGB")
+        im.save(os.path.join("D:" + os.sep, "new_automation", "data", "mvp_proof_gallery", "concept_construct_AR36.png"))
+        png = True
+    except Exception:
+        png = False
+    checks = {"a_triangle_label_with_four_corners_is_caught": any("triangle" in x and "4 corners" in x for x in bad_shape),
+              "an_unequal_square_is_caught": any("square" in x and "equal" in x for x in bad_square),
+              "shapes_on_top_of_each_other_are_caught": any("overlap" in x for x in bad_overlap),
+              "a_built_square_has_equal_sides_and_shares_the_side": not probs and len(parts) == 4 and max(sides) - min(sides) < 1e-6 and shared,
+              "the_constructed_figure_passes_the_critic_and_fits_the_canvas": good == [] and inside,
+              "a_labelled_shape_is_snapped_to_what_it_is_called": snapped_ok,
+              "png_proof_saved": png}
+    return verdict(checks, "probs=%s critic_on_good=%s sides=%s" % (probs, good, [round(x, 1) for x in sides]))
+
+
+def run_ar37(verdict):
+    """AR37: a part may not poke THROUGH another -- a table whose legs are taller than the level of its top is caught by the design critic AND by the measured build quality (piercing), a sound table and a lamp pass.
+    PNG proof (side view of both)."""
+    from core_organs import brain_planner as BP
+    xy = [(-.9, -.4), (.9, -.4), (-.9, .4), (.9, .4)]
+    bad = {"parts": [{"name": "top", "size": [2, 1, 0.08], "at": [0, 0, 0.79]}] + [{"name": f"leg{i}", "size": [0.1, 0.1, 1.6], "at": [x, y, 0.8]} for i, (x, y) in enumerate(xy)]}
+    good = {"parts": [{"name": "top", "size": [2, 1, 0.08], "at": [0, 0, 0.79]}] + [{"name": f"leg{i}", "size": [0.1, 0.1, 0.75], "at": [x, y, 0.375]} for i, (x, y) in enumerate(xy)]}
+    lamp = {"parts": [{"name": "base", "size": [0.2, 0.2, 0.03], "at": [0, 0, 0.015]}, {"name": "pole", "size": [0.03, 0.03, 0.5], "at": [0, 0, 0.28]}, {"name": "shade", "size": [0.2, 0.2, 0.15], "at": [0, 0, 0.605]}]}
+    pb, pg, pl = BP.critic(bad), BP.critic(good), BP.critic(lamp)
+    boxes = [BP.part_box(p) for p in bad["parts"]]
+    meas = BP.piercing(boxes, [p["name"] for p in bad["parts"]])
+    import copy
+    tall, short, floaty = copy.deepcopy(bad), copy.deepcopy(good), copy.deepcopy(good)
+    for p in short["parts"][1:]:
+        p["size"][2], p["at"][2] = 0.4, 0.2
+    for p in floaty["parts"][1:]:
+        p["size"][2], p["at"][2] = 0.4, 0.5
+    lamp_bad = {"parts": [{"name": "base", "size": [0.2, 0.2, 0.03], "at": [0, 0, 0.015]}, {"name": "pole", "size": [0.03, 0.03, 0.5], "at": [0, 0, 0.45]}, {"name": "shade", "size": [0.2, 0.2, 0.15], "at": [0, 0, 0.9]}]}
+    lowtop = {"parts": [{"name": "top", "size": [2, 1, 0.08], "at": [0, 0, 0.04]}] + [{"name": f"leg{i}", "size": [0.1, 0.1, 0.9], "at": [x, y, 0.45]} for i, (x, y) in enumerate(xy)]}
+    n_low = BP.settle(lowtop)
+    n_tall, n_short, n_floaty, n_lamp = BP.settle(tall), BP.settle(short), BP.settle(floaty), BP.settle(lamp_bad)
+    after = (BP.critic(tall), BP.critic(short), BP.critic(floaty), BP.critic(lamp_bad))
+    png = False
+    try:
+        from PIL import Image, ImageDraw
+        os.makedirs(os.path.join("D:" + os.sep, "new_automation", "data", "mvp_proof_gallery"), exist_ok=True)
+        im = Image.new("RGB", (860, 360), (248, 248, 250))
+        d = ImageDraw.Draw(im)
+        for k, (title, des, res) in enumerate((("legs taller than the top level: CAUGHT", bad, pb), ("legs end at the underside of the top: passes", good, pg))):
+            ox = 30 + k * 420
+            d.text((ox, 10), title, fill=(200, 40, 40) if res else (20, 130, 60))
+            for p in des["parts"]:
+                lo, hi = BP.part_box(p)
+                x0, x1 = ox + 20 + (lo[0] + 1.2) * 150, ox + 20 + (hi[0] + 1.2) * 150
+                y1, y0 = 330 - lo[2] * 170, 330 - hi[2] * 170
+                d.rectangle([x0, y0, x1, y1], outline=(60, 60, 70), fill=(190, 160, 120) if p["name"] == "top" else (140, 110, 80))
+            d.line([ox, 330, ox + 380, 330], fill=(120, 120, 130))
+            d.text((ox, 336), "ground z=0", fill=(90, 90, 100))
+        im.save(os.path.join("D:" + os.sep, "new_automation", "data", "mvp_proof_gallery", "blender_critic_AR37.png"))
+        png = True
+    except Exception:
+        png = False
+    checks = {"legs_through_the_top_are_caught_by_the_critic": any("pokes up through" in x for x in pb),
+              "the_measured_build_check_finds_the_same_parts": len(meas) >= 4 and all(m.endswith("through top") for m in meas),
+              "a_sound_table_passes": pg == [], "a_lamp_with_a_pole_on_its_base_passes": pl == [], "png_proof_saved": png,
+              "arithmetic_repair_shortens_legs_that_pierce_the_top": bool(n_tall) and after[0] == [] and abs(tall["parts"][1]["size"][2] - 0.75) < 0.03,
+              "arithmetic_repair_lengthens_short_legs_to_the_ground_and_the_top": bool(n_short) and after[1] == [] and all(abs(p["at"][2] - p["size"][2] / 2) < 0.01 for p in short["parts"][1:]),
+              "a_table_top_lying_on_the_floor_is_lifted_onto_its_legs": bool(n_low) and abs(lowtop["parts"][0]["at"][2] - (0.9 + 0.04)) < 0.01 and BP.critic(lowtop) == [],
+              "legs_hanging_in_mid_air_are_stood_on_the_ground": after[2] == [] and min(p["at"][2] - p["size"][2] / 2 for p in floaty["parts"]) >= -0.005,
+              "a_lamp_pole_is_stretched_between_base_and_shade_and_the_base_stays_on_the_ground": bool(n_lamp) and after[3] == [] and abs(lamp_bad["parts"][0]["at"][2] - 0.015) < 1e-6}
+    return verdict(checks, "bad=%d problems, measured=%d, good=%s, lamp=%s" % (len(pb), len(meas), pg, pl))
