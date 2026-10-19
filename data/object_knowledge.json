@@ -1,0 +1,119 @@
+{
+ "_about": "Object knowledge store (repeat levels: N = compartments, N+1 boards: a bottom, N-1 between, a top): real-world object categories as PART ROLES with dimension ranges [min, max, typical] in metres and the formulas that place every part. Written as data so new categories need no code. Sizes follow common ergonomic / furniture standards (seat height ~0.45 m, dining table ~0.75 m, desk ~0.74 m, bookcase depth 0.25-0.35 m, shelf thickness 0.02-0.03 m). Sources: general woodworking / furniture-design conventions (no text copied); licence: facts, none claimed.",
+ "wood": [0.55, 0.38, 0.22],
+ "categories": {
+  "chair": {
+   "keywords": ["chair", "armchair", "dining chair"],
+   "dims": {"W": [0.40, 0.55, 0.45], "D": [0.40, 0.55, 0.45], "H": [0.85, 1.05, 0.92]},
+   "params": {"seat_h": [0.42, 0.48, 0.45], "t": [0.03, 0.04, 0.03], "leg": [0.035, 0.05, 0.04]},
+   "parts": [
+    {"name": "seat", "shape": "cube", "size": ["W", "D", "t"], "at": ["0", "0", "seat_h - t/2"]},
+    {"name": "leg{i}", "repeat": "corners_front", "shape": "cube", "size": ["leg", "leg", "seat_h - t"], "at": ["SX*(W/2 - leg/2)", "SY*(D/2 - leg/2)", "(seat_h - t)/2"]},
+    {"name": "rearleg{i}", "repeat": "sides", "shape": "cube", "size": ["leg", "leg", "seat_h - t"], "at": ["SX*(W/2 - leg/2)", "-(D/2 - leg/2)", "(seat_h - t)/2"]},
+    {"name": "rearpost{i}", "repeat": "sides", "shape": "cube", "size": ["leg", "leg", "H - seat_h"], "at": ["SX*(W/2 - leg/2)", "-(D/2 - leg/2)", "seat_h + (H - seat_h)/2"]},
+    {"name": "backrest_slat_top", "shape": "cube", "size": ["W - 2*leg", "t", "0.14"], "at": ["0", "-(D/2 - t/2)", "H - 0.10"]},
+    {"name": "backrest_slat_low", "shape": "cube", "size": ["W - 2*leg", "t", "0.10"], "at": ["0", "-(D/2 - t/2)", "H - 0.30"]}
+   ]
+  },
+  "stool": {
+   "keywords": ["stool"],
+   "dims": {"W": [0.30, 0.40, 0.34], "D": [0.30, 0.40, 0.34], "H": [0.40, 0.75, 0.46]},
+   "params": {"t": [0.03, 0.04, 0.035], "leg": [0.03, 0.045, 0.035]},
+   "parts": [
+    {"name": "seat", "shape": "cylinder", "size": ["W", "D", "t"], "at": ["0", "0", "H - t/2"]},
+    {"name": "leg{i}", "repeat": "corners", "shape": "cylinder", "size": ["leg", "leg", "H - t"], "at": ["SX*(W/2 - leg*1.5)", "SY*(D/2 - leg*1.5)", "(H - t)/2"]}
+   ]
+  },
+  "table": {
+   "keywords": ["dining table", "table"],
+   "dims": {"W": [1.20, 2.00, 1.60], "D": [0.70, 1.00, 0.90], "H": [0.72, 0.78, 0.75]},
+   "params": {"t": [0.03, 0.05, 0.04], "leg": [0.06, 0.09, 0.07]},
+   "parts": [
+    {"name": "top", "shape": "cube", "size": ["W", "D", "t"], "at": ["0", "0", "H - t/2"]},
+    {"name": "leg{i}", "repeat": "corners", "shape": "cube", "size": ["leg", "leg", "H - t"], "at": ["SX*(W/2 - leg/2 - 0.04)", "SY*(D/2 - leg/2 - 0.04)", "(H - t)/2"]}
+   ]
+  },
+  "desk": {
+   "keywords": ["desk", "writing desk", "office desk"],
+   "dims": {"W": [1.10, 1.60, 1.30], "D": [0.55, 0.75, 0.65], "H": [0.72, 0.76, 0.74]},
+   "params": {"t": [0.025, 0.04, 0.03], "leg": [0.04, 0.07, 0.05]},
+   "parts": [
+    {"name": "top", "shape": "cube", "size": ["W", "D", "t"], "at": ["0", "0", "H - t/2"]},
+    {"name": "leg{i}", "repeat": "corners", "shape": "cube", "size": ["leg", "leg", "H - t"], "at": ["SX*(W/2 - leg/2 - 0.03)", "SY*(D/2 - leg/2 - 0.03)", "(H - t)/2"]},
+    {"name": "modesty_panel", "shape": "cube", "size": ["W - 2*leg - 0.06", "0.02", "0.30"], "at": ["0", "-(D/2 - leg/2 - 0.03)", "H - t - 0.15"]}
+   ]
+  },
+  "coffee table": {
+   "keywords": ["coffee table", "side table"],
+   "dims": {"W": [0.80, 1.20, 1.00], "D": [0.45, 0.70, 0.55], "H": [0.38, 0.48, 0.42]},
+   "params": {"t": [0.03, 0.05, 0.04], "leg": [0.04, 0.07, 0.05]},
+   "parts": [
+    {"name": "top", "shape": "cube", "size": ["W", "D", "t"], "at": ["0", "0", "H - t/2"]},
+    {"name": "leg{i}", "repeat": "corners", "shape": "cube", "size": ["leg", "leg", "H - t"], "at": ["SX*(W/2 - leg/2 - 0.03)", "SY*(D/2 - leg/2 - 0.03)", "(H - t)/2"]}
+   ]
+  },
+  "bookshelf": {
+   "keywords": ["bookshelf", "bookcase", "shelving unit", "shelf unit", "shelves"],
+   "dims": {"W": [0.70, 1.20, 0.90], "D": [0.25, 0.38, 0.30], "H": [1.20, 2.00, 1.80]},
+   "params": {"t": [0.018, 0.03, 0.022], "N": [2, 7, 4]},
+   "parts": [
+    {"name": "side{i}", "repeat": "sides", "shape": "cube", "size": ["t", "D", "H"], "at": ["SX*(W/2 - t/2)", "0", "H/2"]},
+    {"name": "shelf{i}", "repeat": "levels", "count": "N + 1", "shape": "cube", "size": ["W - 2*t", "D - 0.012", "t"], "at": ["0", "0.006", "0.06 + t/2 + K*(H - 0.06 - t)/N"]},
+    {"name": "back_panel", "shape": "cube", "size": ["W - 0.004", "0.008", "H - 0.04"], "at": ["0", "-(D/2 - 0.004)", "H/2 + 0.01"]}
+   ]
+  },
+  "bed": {
+   "keywords": ["bed"],
+   "dims": {"W": [0.90, 1.60, 1.40], "D": [1.90, 2.10, 2.00], "H": [0.45, 0.60, 0.50]},
+   "params": {"leg": [0.05, 0.08, 0.06], "t": [0.18, 0.25, 0.20], "head_h": [0.75, 1.10, 0.95]},
+   "parts": [
+    {"name": "frame", "shape": "cube", "size": ["W", "D", "0.06"], "at": ["0", "0", "H - t - 0.03"]},
+    {"name": "mattress", "shape": "cube", "size": ["W - 0.06", "D - 0.10", "t"], "at": ["0", "0.02", "H - t/2"]},
+    {"name": "leg{i}", "repeat": "corners", "shape": "cube", "size": ["leg", "leg", "H - t - 0.06"], "at": ["SX*(W/2 - leg/2)", "SY*(D/2 - leg/2)", "(H - t - 0.06)/2"]},
+    {"name": "headboard", "shape": "cube", "size": ["W - 2*leg", "0.05", "head_h"], "at": ["0", "-(D/2 - 0.025)", "head_h/2"]}
+   ]
+  },
+  "cabinet": {
+   "keywords": ["cabinet", "cupboard", "sideboard", "dresser"],
+   "dims": {"W": [0.60, 1.40, 0.90], "D": [0.35, 0.55, 0.45], "H": [0.70, 1.00, 0.85]},
+   "params": {"t": [0.018, 0.03, 0.02], "leg": [0.04, 0.06, 0.05], "foot": [0.08, 0.12, 0.10]},
+   "parts": [
+    {"name": "side{i}", "repeat": "sides", "shape": "cube", "size": ["t", "D", "H - foot"], "at": ["SX*(W/2 - t/2)", "0", "foot + (H - foot)/2"]},
+    {"name": "top", "shape": "cube", "size": ["W", "D", "t"], "at": ["0", "0", "H - t/2"]},
+    {"name": "bottom", "shape": "cube", "size": ["W - 2*t", "D", "t"], "at": ["0", "0", "foot + t/2"]},
+    {"name": "back_panel", "shape": "cube", "size": ["W - 2*t", "0.008", "H - foot - t"], "at": ["0", "-(D/2 - 0.004)", "foot + (H - foot)/2"]},
+    {"name": "door{i}", "repeat": "sides", "shape": "cube", "size": ["(W - 2*t)/2 - 0.004", "0.018", "H - foot - 2*t"], "at": ["SX*((W - 2*t)/4)", "D/2 - 0.009", "foot + (H - foot)/2"]},
+    {"name": "foot{i}", "repeat": "corners", "shape": "cube", "size": ["leg", "leg", "foot"], "at": ["SX*(W/2 - leg/2 - 0.02)", "SY*(D/2 - leg/2 - 0.02)", "foot/2"]}
+   ]
+  },
+  "bench": {
+   "keywords": ["bench"],
+   "dims": {"W": [0.90, 1.80, 1.20], "D": [0.30, 0.45, 0.38], "H": [0.42, 0.50, 0.46]},
+   "params": {"t": [0.035, 0.05, 0.04], "leg": [0.05, 0.08, 0.06]},
+   "parts": [
+    {"name": "seat", "shape": "cube", "size": ["W", "D", "t"], "at": ["0", "0", "H - t/2"]},
+    {"name": "leg{i}", "repeat": "corners", "shape": "cube", "size": ["leg", "leg", "H - t"], "at": ["SX*(W/2 - leg/2 - 0.05)", "SY*(D/2 - leg/2 - 0.03)", "(H - t)/2"]}
+   ]
+  },
+  "desk lamp": {
+   "keywords": ["desk lamp", "table lamp", "lamp"],
+   "dims": {"W": [0.14, 0.24, 0.18], "D": [0.14, 0.24, 0.18], "H": [0.35, 0.55, 0.45]},
+   "params": {"base_t": [0.015, 0.025, 0.02], "pole": [0.012, 0.02, 0.015], "shade_h": [0.10, 0.16, 0.13]},
+   "parts": [
+    {"name": "base", "shape": "cylinder", "size": ["W", "D", "base_t"], "at": ["0", "0", "base_t/2"], "color": [0.35, 0.35, 0.38]},
+    {"name": "pole", "shape": "cylinder", "size": ["pole", "pole", "H - base_t - shade_h*0.6"], "at": ["0", "0", "base_t + (H - base_t - shade_h*0.6)/2"], "color": [0.35, 0.35, 0.38]},
+    {"name": "shade", "shape": "cone", "size": ["W*1.1", "D*1.1", "shade_h"], "at": ["0", "0", "H - shade_h/2"], "color": [0.9, 0.85, 0.6]}
+   ]
+  },
+  "floor lamp": {
+   "keywords": ["floor lamp", "standing lamp"],
+   "dims": {"W": [0.25, 0.40, 0.30], "D": [0.25, 0.40, 0.30], "H": [1.40, 1.70, 1.55]},
+   "params": {"base_t": [0.02, 0.03, 0.025], "pole": [0.02, 0.03, 0.025], "shade_h": [0.22, 0.32, 0.27]},
+   "parts": [
+    {"name": "base", "shape": "cylinder", "size": ["W", "D", "base_t"], "at": ["0", "0", "base_t/2"], "color": [0.35, 0.35, 0.38]},
+    {"name": "pole", "shape": "cylinder", "size": ["pole", "pole", "H - base_t - shade_h*0.6"], "at": ["0", "0", "base_t + (H - base_t - shade_h*0.6)/2"], "color": [0.35, 0.35, 0.38]},
+    {"name": "shade", "shape": "cone", "size": ["W*1.1", "D*1.1", "shade_h"], "at": ["0", "0", "H - shade_h/2"], "color": [0.9, 0.85, 0.6]}
+   ]
+  }
+ }
+}

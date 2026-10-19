@@ -229,9 +229,9 @@ class ScriptBridge:
         self.calls.append({"batch_add": len(items), "made": len(made), "failed": len(failed)})
         return {"made": made, "failed": failed, "materials": mats}
 
-    def view_shot(self, path: str, hide: Optional[List[str]] = None, view: str = "iso", frame: Optional[List[str]] = None) -> bool:
+    def view_shot(self, path: str, hide: Optional[List[str]] = None, view: str = "iso", frame: Optional[List[str]] = None, only: Optional[List[str]] = None) -> bool:
         """A picture of the 3D view with the named collections hidden, seen from 'iso' / 'south' / 'top', framed on the named collections."""
-        r = self.request("view_shot", path=path, hide=hide or [], view=view, frame=frame or [], timeout=60.0)
+        r = self.request("view_shot", path=path, hide=hide or [], view=view, frame=frame or [], only=only or [], timeout=60.0)
         self.calls.append({"view_shot": path, "res": r})
         return bool(r.get("ok"))
 

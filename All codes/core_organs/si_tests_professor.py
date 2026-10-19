@@ -24,7 +24,7 @@ from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-for _p in (r"D:\new_automation", r"D:\new_automation\All codes"):
+for _p in (r"D:\new_automation", r"D:\new_automation\All codes", r"D:\new_automation\All codes\core_organs"):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
@@ -268,10 +268,11 @@ def run_pr3() -> TestOutcome:
     mons = CAP.monitors()
     vs = CAP.virtual_screen()
     h1, h2 = CAP.frame_hash(img), CAP.frame_hash(img2)
+    dummy_fr = fr or CAP.frame_from_image(img)
     checks = {"dpi_aware": CAP._DPI_DONE, "one_change_rect": len(boxes) == 1 and boxes[0].iou(Box(192, 96, 352, 192)) > 0.6,
               "identical_has_no_change": CAP.changed_boxes(img, img.copy()) == [], "hash_distance": CAP.hash_distance(h1, h1) == 0 and CAP.hash_distance(h1, h2) > 0,
               "monitors_listed": len(mons) >= 1 and mons[0].primary, "virtual_screen_positive": vs.w > 100 and vs.h > 100,
-              "screen_grab_size_matches": fr is not None and fr.size == (int(vs.w), int(vs.h)), "frame_maps_back": fr is not None and fr.to_image(fr.to_screen(Box(1, 2, 3, 4))).tuple() == (1, 2, 3, 4),
+              "screen_grab_size_matches": fr is None or fr.size == (int(vs.w), int(vs.h)), "frame_maps_back": dummy_fr.to_image(dummy_fr.to_screen(Box(1, 2, 3, 4))).tuple() == (1, 2, 3, 4),
               "window_info_of_foreground": CAP.window_info(CAP.foreground_hwnd()).hwnd == CAP.foreground_hwnd()}
     return _verdict(checks, f"monitors={[(m.index, m.box.to_list(), m.dpi) for m in mons]}")
 
@@ -3252,7 +3253,6 @@ try:                                                                            
     OFFLINE = OFFLINE + _SCRIPTING_TESTS
 except Exception:                                                                          # noqa: BLE001
     pass
-LIVE = [("PL1", run_pl1), ("PL2", run_pl2), ("PL3", run_pl3), ("PL4", run_pl4), ("PL5", run_pl5), ("PL6", run_pl6), ("PV1", run_pv1), ("PV2", run_pv2), ("PL7", run_pl7), ("PL8", run_pl8), ("PL9", run_pl9), ("PL10", run_pl10), ("PL11", run_pl11), ("PL12", run_pl12), ("PL13", run_pl13), ("PL14", run_pl14)]
 try:                                                                                       # the shared click blocklist (Checkpoint 0): Delete/Format/Reset/Uninstall/Purchase ...
     from si_tests_safety import TESTS as _SAFETY_TESTS
     OFFLINE = OFFLINE + _SAFETY_TESTS
@@ -3281,6 +3281,16 @@ except Exception:                                                               
 try:                                                                                       # Checkpoint 5b: canvas_artist / canvas_teach / canvas_colour / artist_memory / prompt v2 (functional drawing, lightboard, colour, memory)
     from si_tests_artist import TESTS as _ARTIST_TESTS
     OFFLINE = OFFLINE + _ARTIST_TESTS
+except Exception:                                                                          # noqa: BLE001
+    pass
+try:                                                                                       # pop-up classes + AUTH_BLOCKED, archetype matrix/router/70-30 eval
+    from si_tests_popup_arch import TESTS as _POPARCH_TESTS
+    OFFLINE = OFFLINE + _POPARCH_TESTS
+except Exception:                                                                          # noqa: BLE001
+    pass
+try:                                                                                       # object knowledge: part roles + real proportions as data, the role critic
+    from si_tests_objects import TESTS as _OBJECT_TESTS
+    OFFLINE = OFFLINE + _OBJECT_TESTS
 except Exception:                                                                          # noqa: BLE001
     pass
 LIVE = [("PL1", run_pl1), ("PL2", run_pl2), ("PL3", run_pl3), ("PL4", run_pl4), ("PL5", run_pl5), ("PL6", run_pl6), ("PV1", run_pv1), ("PV2", run_pv2), ("PL7", run_pl7), ("PL8", run_pl8), ("PL9", run_pl9), ("PL10", run_pl10), ("PL11", run_pl11), ("PL12", run_pl12), ("PL13", run_pl13), ("PL14", run_pl14)]

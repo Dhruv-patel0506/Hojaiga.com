@@ -349,6 +349,52 @@ def judge_scene(task: str, design: Dict[str, Any], build: Dict[str, Any], before
     return m
 
 
+def _crop_to_object(im: Any, margin: float = 0.10) -> Any:
+    """The picture cut to the object's own box (the coloured, non-grey pixels of the viewport), so the picture reader sees it large; the whole picture when nothing coloured is found."""
+    try:
+        import numpy as np
+        a = np.asarray(im).astype(int)
+        m = ((a[..., 0] - a[..., 2]) > 18) & (a[..., 1] - a[..., 2] > 8) & (a[..., 0] > a[..., 1]) & (a[..., 0] > 60)                 # wood-like (r > g > b); the red / green axis lines of the viewport are not
+        ys, xs = np.where(m)
+        if len(xs) < 200:
+            return im
+        x0, x1, y0, y1 = xs.min(), xs.max(), ys.min(), ys.max()
+        mx, my = max(8, int((x1 - x0) * margin)), max(8, int((y1 - y0) * margin))
+        return im.crop((max(0, x0 - mx), max(0, y0 - my), min(im.width, x1 + mx), min(im.height, y1 + my)))
+    except Exception:
+        return im
+
+
+def three_view_look(be: Any, made: Sequence[str], task: str, outdir: str, tag: str = "") -> Dict[str, Any]:
+    """The finished object from the front, the side and a corner, pasted into one sheet (kept next to the proof pictures) and judged by the picture reader on the GPU server. Falls back to nothing when the reader is not running."""
+    try:
+        from PIL import Image
+        from core_organs import vision_ground as VG
+        tiles = []
+        for v in ("iso_front", "low_front", "iso"):
+            p = be.outbox_path(f"{_slug(task)[:24]}{tag}_{v}.png")
+            if be.bridge.view_shot(p, view=v, frame=list(made), only=list(made)):
+                tiles.append(_crop_to_object(Image.open(p).convert("RGB")))
+        if len(tiles) < 2:
+            return {"ok": False, "why": "no views"}
+        h = 420
+        tiles = [t.resize((max(1, int(t.width * h / t.height)), h)) for t in tiles]
+        sheet = Image.new("RGB", (sum(t.width for t in tiles), h), (40, 40, 40))
+        x = 0
+        for t in tiles:
+            sheet.paste(t, (x, 0))
+            x += t.width
+        os.makedirs(outdir, exist_ok=True)
+        path = os.path.join(outdir, time.strftime("%Y%m%d_%H%M%S_") + _slug(task)[:30] + tag + "_3view.png")
+        sheet.save(path)
+        r = VG.critique_object(sheet, task)
+        r["sheet"] = path
+        r["model"] = "qwen2.5-vl-7b (llama-server :8081)"
+        return r
+    except Exception as exc:
+        return {"ok": False, "why": f"{type(exc).__name__}: {str(exc)[:100]}"}
+
+
 def vlm_look(image: str, task: str, model: str = "qwen2.5vl:3b") -> Dict[str, Any]:
     """A second opinion from a picture-reading model (on the CPU): does the picture show what was asked? Reported next to the measurements, never in place of them."""
     import base64
@@ -758,10 +804,25 @@ class AppTeachingAutomationSection:
                 out["recipes_seen"] = [{"task": r["task"], "similarity": r["similarity"], "score": r.get("score")} for r in recipes]
                 exact = next((r for r in recipes if r["similarity"] >= 0.85 and r.get("score", 0) >= 75 and not BP.critic(r["design"])), None)          # a stored design is reused only if it still passes today's geometry critic
                 exact_design = bool(exact)
+                known = None
+                if not exact:
+                    from core_organs import object_knowledge as OK                            # a builder's knowledge of the object (part roles, real proportions): no model call
+                    known = OK.compile_design(task, sorted(shapes))
+                    if known:
+                        kd, kp = BP.validate_design(known["design"], sorted(shapes))
+                        if not kp:
+                            BP.settle(kd)
+                        kp = kp +BP.critic(kd) + BP.quantity_problems(task, [p["name"] for p in kd["parts"]], kd) + OK.role_critic(task, kd)
+                        if kp or not kd["parts"]:
+                            known = None                                                      # the compiled design failed its own critics: the model plans it instead
+                        else:
+                            exact_design = True                                               # compiled from verified proportions: not re-planned by the picture reader
+                            design, probs, planner = kd, [], {"source": "object_knowledge", "category": known["category"], "dims": known["dims"], "notes": known["notes"], "attempts": []}
+                            st["note"] = f"compiled a {known['category']} from stored part roles {known['dims']} (no model call)"
                 if exact:
                     design, probs, planner = exact["design"], [], {"source": "recipe", "attempts": []}
                     st["note"] = "reused a stored recipe (no model call)"
-                else:
+                elif not known:
                     fs = [r["design"] for r in recipes if r.get("score", 0) >= 75 and r["similarity"] < 0.85 and not BP.critic(r["design"])]
                     res = BP.design_parts(E.get_brain(), task, sorted(shapes), fs)
                     design, probs, planner = res["design"], res["problems"], {"source": "brain", "attempts": res["attempts"]}
@@ -788,7 +849,7 @@ class AppTeachingAutomationSection:
                         import shutil
                         shutil.copy(shot, keep)
                         pic = keep
-                return {"design": des, "build": b, "quality": q, "picture": pic, "vlm": vlm_look(pic, task) if (vlm and pic) else None}
+                return {"design": des, "build": b, "quality": q, "picture": pic, "vlm": ((lambda r: r if r.get("ok") else vlm_look(pic, task))(three_view_look(be, b["made"], task, RUNS, tag)) if (vlm and pic) else None)}
 
             with flow.enter("act", f"building {len(design['parts'])} parts with the application's own commands") as st:
                 best = attempt(design, "")
@@ -1028,7 +1089,9 @@ class AppTeachingAutomationSection:
                 if cached:
                     goals, plan_src = cached, "cache"
                 else:
+                    PLAN_USED_MODEL[0] = False
                     goals, plan_src = plan_goals(E.get_brain(), task, names, E.pathways(task, key)), "planner"
+                    out["plan_used_model"] = PLAN_USED_MODEL[0]
                 out["goals"], out["plan_source"] = goals, plan_src
                 st["note"] = f"{len(goals)} goals ({plan_src})"
             recs = []
@@ -1070,14 +1133,14 @@ class AppTeachingAutomationSection:
                 st["note"] = f"{len(out['final_text'])} characters read back"
             with flow.enter("verify", "summary") as st:
                 out["verification"] = {"done": sum(1 for r in recs if r.status == "done"), "total": len(goals), "rollbacks": sum(1 for r in recs if r.rolled_back),
-                                       "caught": sum(1 for r in recs if r.reason or r.rolled_back), "model_calls": sum(1 for r in recs if r.source == "model") + (1 if out.get("plan_source") == "planner" else 0)}
+                                       "caught": sum(1 for r in recs if r.reason or r.rolled_back), "model_calls": sum(1 for r in recs if r.source == "model") + (1 if out.get("plan_source") == "planner" and out.get("plan_used_model") else 0)}
                 st["note"] = str(out["verification"])
                 with contextlib.suppress(Exception):
                     from core_organs import knowledge_first as KF
                     v = out["verification"]
                     all_done = bool(goals) and v["done"] == v["total"] and len(recs) == len(goals)
                     KF.store(key, task, goals, all_done, replayed=out.get("plan_source") == "cache", source="planner")   # a verified novel plan becomes Tier 0; a replayed one that failed is demoted
-                    KF.record(task[:60], key, time.time() - t_run, v["model_calls"], "T0" if out.get("plan_source") == "cache" else "T3", out.get("plan_source") != "cache", all_done)
+                    KF.record(task[:60], key, time.time() - t_run, v["model_calls"], "T0" if out.get("plan_source") == "cache" else ("T1" if not out.get("plan_used_model") else "T3"), out.get("plan_source") != "cache", all_done)
         return out
 
 
@@ -1192,6 +1255,9 @@ def replace_goals(task: str, rag_hint: Dict[str, Any]) -> List[str]:
     return path + [f'Type "{old}"', f'Type "{new}"', "Click the Replace all button"]
 
 
+PLAN_USED_MODEL = [False]                                                      # set by plan_goals when it really asked the model (rules / arithmetic / placeholders / replace paths do not)
+
+
 def plan_goals(brain: BP.Brain, task: str, control_names: Sequence[str], rag_hint: Dict[str, Any]) -> List[str]:
     """The job as goals a screen can answer one at a time ('Click the Bold button', 'Type "..."'). A drawing job is passed whole (the drawing tools take it). Each goal that names a control names one that exists."""
     if re.search(r"\b(draw|trace|sketch|lightboard|colou?r|shade)\b", task, re.I):
@@ -1217,6 +1283,7 @@ def plan_goals(brain: BP.Brain, task: str, control_names: Sequence[str], rag_hin
             g = GP.expand(task, list(control_names))
             if g and g != [task]:
                 return [re.sub(r"^press\s+(.+)$", r"Click the " + chr(92) + "1 button", x, flags=re.I) for x in g]          # the form the screen's own control names answer directly (no model call)
+    PLAN_USED_MODEL[0] = True                                                    # from here on the planner model is really asked: counted as a model call
     hints = "; ".join(" -> ".join(p["steps"]) for p in rag_hint.get("plans", [])[:2])
     prompt = (f'Job: "{task}"\nControls visible on the screen now: {", ".join(control_names)}\nWhat was learned about this program: {hints or "nothing"}\n'
               'Split the job into the smallest steps, each ONE action: Click the <control name> button | Type "<text>" | Press <keys>. Use control names from the list when one fits. '

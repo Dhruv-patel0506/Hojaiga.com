@@ -888,7 +888,7 @@ def _batch_add(items):
     return {"ok": True, "made": made, "failed": failed, "materials": len(mats)}
 
 
-def _view_shot(path, collections=None, hide=None, view="iso", frame=None):
+def _view_shot(path, collections=None, hide=None, view="iso", frame=None, only=None):
     """A picture of the 3D view: the named collections hidden for the shot (a roof lifted off), the view turned to look from above or from the south-east, framed on the named collections."""
     if not _inside(path):
         return {"ok": False, "note": "refused: outside the run's sandbox folder"}
@@ -901,7 +901,14 @@ def _view_shot(path, collections=None, hide=None, view="iso", frame=None):
     sc = bpy.context.scene
     old = (sc.render.filepath, sc.render.image_settings.file_format)
     hidden = []
+    hidden_objs = []
     try:
+        if only:                                                                   # a picture of THESE objects alone: everything else is hidden for the shot (an earlier model standing in the scene is not part of this one)
+            keep = set(only)
+            for o in bpy.context.view_layer.objects:
+                if o.name not in keep and not o.hide_viewport:
+                    o.hide_viewport = True
+                    hidden_objs.append(o)
         for cn in hide or []:
             c = bpy.data.collections.get(cn)
             if c is not None and not c.hide_viewport:
@@ -909,17 +916,19 @@ def _view_shot(path, collections=None, hide=None, view="iso", frame=None):
                 hidden.append(c)
         r3d = ov["area"].spaces.active.region_3d
         with bpy.context.temp_override(**ov):
-            if view == "top":
-                bpy.ops.view3d.view_axis(type="TOP")
+            if view in ("top", "front", "side"):
+                bpy.ops.view3d.view_axis(type={"top": "TOP", "front": "BACK", "side": "RIGHT"}[view])
             else:
                 r3d.view_perspective = "PERSP"
-                pitch, yaw = {"iso": (62, 35), "south": (62, 20), "steep": (30, 18)}.get(view, (62, 35))                       # degrees from the vertical, and turn
+                pitch, yaw = {"iso": (62, 35), "south": (62, 20), "steep": (30, 18), "iso_front": (62, 145), "low_front": (80, 160)}.get(view, (62, 35))                       # degrees from the vertical, and turn
                 r3d.view_rotation = Euler((math.radians(pitch), 0, math.radians(yaw)), "XYZ").to_quaternion()
             objs = []
             for cn in frame or []:
                 c = bpy.data.collections.get(cn)
                 if c is not None:
                     objs += list(c.objects)
+                elif bpy.data.objects.get(cn) is not None:                           # a loose part (a design built without collections) is framed by its own name
+                    objs.append(bpy.data.objects[cn])
             for o in bpy.context.view_layer.objects:
                 o.select_set(False)
             for o in objs:
@@ -936,7 +945,7 @@ def _view_shot(path, collections=None, hide=None, view="iso", frame=None):
             bpy.ops.render.opengl(write_still=True, view_context=True)
         return {"ok": os.path.isfile(path), "path": path}
     finally:
-        for c in hidden:
+        for c in hidden + hidden_objs:
             c.hide_viewport = False
         sc.render.filepath, sc.render.image_settings.file_format = old
 
@@ -1016,7 +1025,7 @@ def _serve():
         elif what == "batch_add":
             res = _batch_add(req.get("items") or [])
         elif what == "view_shot":
-            res = _view_shot(req.get("path", ""), None, req.get("hide"), req.get("view", "iso"), req.get("frame"))
+            res = _view_shot(req.get("path", ""), None, req.get("hide"), req.get("view", "iso"), req.get("frame"), req.get("only"))
         elif what == "scene":
             res = _scene()
         elif what == "paint":

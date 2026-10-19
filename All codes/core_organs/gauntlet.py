@@ -199,7 +199,7 @@ def run_desktop(case: Dict[str, Any], section: Any, log: Callable[[str], None]) 
     a = Image.open(proof["after"]) if proof.get("after") and os.path.isfile(proof["after"]) else None
     out_png = os.path.join(GALLERY, f"before_after_{cid}.png")
     compose_before_after(b, a, f"{case['app']}: {case['task']}", verdict, ok, out_png, note=f"{rep['wall_s']}s | steps: " + "; ".join(f"{s['goal'][:40]}={s['status']}" for s in (rep.get('steps') or [])[:4]))
-    res = {"case": cid, "kind": "desktop", "ok": ok, "verdict": verdict, "wall_s": rep["wall_s"], "png": out_png, "report": {k: rep.get(k) for k in ("route", "steps", "verification", "error", "learned")}}
+    res = {"case": cid, "kind": "desktop", "ok": ok, "verdict": verdict, "wall_s": rep["wall_s"], "png": out_png, "report": {k: rep.get(k) for k in ("route", "steps", "verification", "error", "learned", "plan_source")}}
     return res
 
 
@@ -234,7 +234,7 @@ def run_scripted(case: Dict[str, Any], section: Any, log: Callable[[str], None])
     cid = case["id"]
     t0 = time.time()
     file = _SAVED.get(case["file"][7:], "") if str(case.get("file", "")).startswith("@saved:") else ""
-    rep = section.handle(case["task"], app=case.get("app", ""), mode="delegate", file=file, learn="auto", recall=False, live=False, vlm=False, keep_open=False)       # recall=False: every build is planned live, no stored recipe / plan is replayed
+    rep = section.handle(case["task"], app=case.get("app", ""), mode="delegate", file=file, learn="auto", recall=False, live=False, vlm=not case.get("house"), keep_open=False)       # recall=False: every build is planned live; vlm = the three-view critique by the picture reader, no stored recipe / plan is replayed
     sv = rep.get("saved") or {}
     if sv.get("ok"):
         _SAVED[cid] = sv["path"]
@@ -251,14 +251,18 @@ def run_scripted(case: Dict[str, Any], section: Any, log: Callable[[str], None])
     else:
         if rep.get("picture") and os.path.isfile(rep["picture"]):
             pics = [rep["picture"]]
+        look = rep.get("vlm") or {}
+        if look.get("sheet") and os.path.isfile(look["sheet"]):
+            pics.append(look["sheet"])
+        look_score = look.get("score") if look.get("ok") else None
         lowest = q.get("lowest_z")
         ok = (not rep.get("error") and q.get("score", 0) >= 90 and q.get("connected") is True and not q.get("floating_parts") and not q.get("piercing") and not q.get("quantity_problems") and q.get("on_ground") is True and lowest is not None and abs(lowest) <= 0.005
-              and q.get("earlier_objects_untouched") is True and q.get("parts_built") == q.get("parts_wanted") and bool(pics))
+              and q.get("earlier_objects_untouched") is True and q.get("parts_built") == q.get("parts_wanted") and bool(pics) and look_score is not None and look_score >= 4)       # a PASS needs the picture reader's 3-view score >= 4/5, not only measurements
         ext = q.get("extent_m") or [0, 0, 0]
-        verdict = f"{q.get('parts_built')}/{q.get('parts_wanted')} parts, connected={q.get('connected')}, floating={q.get('floating_parts')}, piercing={q.get('piercing')}, order-counts={q.get('quantity_problems') or 'ok'}, lowest z {lowest} (rule: 0), earlier objects untouched={q.get('earlier_objects_untouched')} ({q.get('earlier_objects')}), extent {ext}, score {q.get('score')}"
+        verdict = f"{q.get('parts_built')}/{q.get('parts_wanted')} parts, connected={q.get('connected')}, floating={q.get('floating_parts')}, piercing={q.get('piercing')}, order-counts={q.get('quantity_problems') or 'ok'}, lowest z {lowest} (rule: 0), earlier objects untouched={q.get('earlier_objects_untouched')} ({q.get('earlier_objects')}), extent {ext}, score {q.get('score')}, planner {(rep.get('planner') or {}).get('source')}, picture reader {look_score} ('{look.get('wrong', '')[:90]}')"
     out_png = os.path.join(GALLERY, f"before_after_{cid}.png")
     compose_sheet(pics, f"Blender: {case['task']}", verdict, ok, out_png, cols=2 if len(pics) > 1 else 1)
-    return {"case": cid, "kind": "scripted", "ok": ok, "verdict": verdict, "wall_s": round(time.time() - t0, 1), "png": out_png, "blend": sv.get("path", ""), "pictures": pics, "report": {"quality": q, "error": rep.get("error")}}
+    return {"case": cid, "kind": "scripted", "ok": ok, "verdict": verdict, "wall_s": round(time.time() - t0, 1), "png": out_png, "blend": sv.get("path", ""), "pictures": pics, "report": {"quality": q, "error": rep.get("error"), "tier": (rep.get("planner") or {}).get("source"), "model_calls": len((rep.get("planner") or {}).get("attempts") or []) + (1 if (rep.get("vlm") or {}).get("ok") else 0)}}
 
 
 def run_selfheal_live(case: Dict[str, Any], section: Any, log: Callable[[str], None]) -> Dict[str, Any]:
@@ -319,8 +323,17 @@ def run_selfheal_live(case: Dict[str, Any], section: Any, log: Callable[[str], N
         g = SG.SelfGrowth(db, rp, os.path.join(tmp, "crops"))
         parent = labels()
         good = find("Seven")
-        click(good)
-        d1 = display()
+        d1 = ""
+        for _try in range(3):                                                   # a slow XAML window may need a second press before the display shows the digit
+            click(good)
+            for _w in range(6):
+                d1 = display()
+                if "7" in d1:
+                    break
+                time.sleep(0.5)
+            if "7" in d1:
+                break
+            clear()
         ok1 = "7" in d1
         crop = None
         with contextlib.suppress(Exception):
@@ -341,7 +354,7 @@ def run_selfheal_live(case: Dict[str, Any], section: Any, log: Callable[[str], N
         g2 = SG.SelfGrowth(db, rp, os.path.join(tmp, "crops"))
         parent3 = labels()
         r2 = g2.run("calculator", "Seven", parent3, perform=click, verify=labels, rollback=clear, fallbacks=[("uia", lambda n: (_ for _ in ()).throw(AssertionError("fallback used")))], check=lambda: "7" in display())
-        lines = [json.loads(l) for l in open(rp, encoding="utf-8")]
+        lines = [json.loads(l) for l in open(rp, encoding="utf-8") if l.strip()]
         g2.close()
         with contextlib.suppress(Exception):
             after = snap()[0].convert("RGB")
@@ -581,6 +594,13 @@ def teach_proof(case: Dict[str, Any], log: Callable[[str], None], max_beats: int
     return res
 
 
+def live_guard() -> None:
+    """Live runs open real windows on the person's own screen. They never start unless the person has said so: HOJAIGA_ALLOW_LIVE=1 is set by them (or by an assistant they told to run it), never by default."""
+    if os.environ.get("HOJAIGA_ALLOW_LIVE") != "1":
+        print("REFUSED: this run opens real windows on the screen. Set HOJAIGA_ALLOW_LIVE=1 only when the person has asked for a live run and is not working on the machine.", flush=True)
+        raise SystemExit(3)
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", nargs="*", default=[])
@@ -593,6 +613,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         for c in CASES:
             print(c["id"], "|", c["kind"], "|", c.get("task", ""))
         return 0
+    live_guard()
     from core_organs import app_teaching_automation as ATA
     section = ATA.AppTeachingAutomationSection(log=lambda s: print(s, flush=True))
     os.makedirs(os.path.join(GALLERY, "results"), exist_ok=True)

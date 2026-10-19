@@ -317,3 +317,36 @@ def find_on_screen(image: Any, target: str, port: int = 8081, timeout: float = 2
     except Exception as exc:
         out["error"] = f"{type(exc).__name__}: {str(exc)[:120]}"
     return out
+
+
+def critique_object(image: Any, task: str, port: int = 8081, timeout: float = 240.0) -> Dict[str, Any]:
+    """A builder's look at a contact sheet of one object seen from the front, the side and a corner (the local Qwen2.5-VL-7B on `port`): does it look like what the order asked for, built the way a carpenter would?
+    {ok, score 1-5, sees, wrong, seconds, error}. Unreachable / unreadable -> ok False, never a guessed score."""
+    import base64
+    import io
+    import json as _j
+    import time
+    import urllib.request
+    out: Dict[str, Any] = {"ok": False, "score": None, "sees": "", "wrong": "", "seconds": 0.0, "error": ""}
+    try:
+        im = image.convert("RGB")
+        im.thumbnail((1280, 640))
+        buf = io.BytesIO()
+        im.save(buf, "JPEG", quality=85)
+        q = ('The picture shows ONE 3D model from three sides (front, side, corner). The order was: "%s". Judge it as a carpenter would: does it look like that object, with the right parts in the right places and plausible proportions '
+             '(legs under the seat or top, shelves as thin flat boards between the sides, nothing floating or sticking through)? Judge only what this kind of object normally has: never ask for a part it does not normally have (a table has no backrest, a lamp no legs), '
+             'and ignore any other object in the picture. Score 1-5 (5 = a believable, well-built %s; 3 = recognisable but something is off; 1 = not that object). '
+             'Reply JSON {"score": n, "sees": "what you see", "wrong": "the main thing that is off, or none"}' % (task, task))
+        body = {"model": "x", "max_tokens": 200, "temperature": 0.1, "messages": [{"role": "user", "content": [
+            {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()}}, {"type": "text", "text": q}]}]}
+        t0 = time.time()
+        r = urllib.request.Request(f"http://127.0.0.1:{port}/v1/chat/completions", data=_j.dumps(body).encode(), headers={"Content-Type": "application/json"})
+        text = _j.loads(urllib.request.urlopen(r, timeout=timeout).read().decode())["choices"][0]["message"]["content"]
+        out["seconds"] = round(time.time() - t0, 1)
+        m = re.search(r"\{.*\}", text, re.S)
+        obj = _j.loads(m.group(0)) if m else {}
+        sc = obj.get("score")
+        out.update(ok=isinstance(sc, (int, float)) and 1 <= sc <= 5, score=sc if isinstance(sc, (int, float)) else None, sees=str(obj.get("sees", ""))[:200], wrong=str(obj.get("wrong", ""))[:200])
+    except Exception as exc:
+        out["error"] = f"{type(exc).__name__}: {str(exc)[:120]}"
+    return out

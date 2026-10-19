@@ -65,6 +65,9 @@ class SelfGrowth:
         self.rag = rag
         self._lock = threading.RLock()
         os.makedirs(os.path.dirname(self.db_path) or ".", exist_ok=True)
+        os.makedirs(os.path.dirname(self.replay_path) or ".", exist_ok=True)
+        if not os.path.exists(self.replay_path):                                 # the replay log always exists, even before the first lesson (a reader of it never meets a missing file)
+            open(self.replay_path, "a", encoding="utf-8").close()
         self.db = sqlite3.connect(self.db_path, check_same_thread=False)
         self.db.row_factory = sqlite3.Row
         self.db.execute("""CREATE TABLE IF NOT EXISTS ui_fast(
