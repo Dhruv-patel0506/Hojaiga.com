@@ -74,6 +74,14 @@ _SAVE_CHANGES_CUES = ("save changes", "do you want to save", "want to save", "un
 _PERMISSION_CUES = ("user account control", "administrator", "elevat", "permission", "credential",
                     "password", "sign in", "authenticat", "allow this app to make changes",
                     "smartscreen", "protected your pc", "unknown publisher", "cannot verify", "can't verify")   # 'Run anyway' is a security decision
+_LOGIN_CUES = ("sign in", "sign-in", "log in", "login", "log on", "enter your password", "enter password", "your account",
+               "verification code", "two-factor", "2-step", "captcha", "i'm not a robot", "security code", "one-time code")
+_UAC_CUES = ("user account control", "windows security", "administrator", "elevat", "allow this app to make changes")
+_RECOVERY_CUES = ("document recovery", "recovered", "recover your", "restore pages", "restore your", "didn't shut down", "did not shut down",
+                  "closed unexpectedly", "autorecover", "unsaved files were found")
+_UPDATE_CUES = ("update available", "new version", "updates are available", "update now", "update to", "install update", "check for updates",
+                "restart to update", "upgrade to")
+_WELCOME_CUES = ("welcome", "what's new", "whats new", "take a tour", "get started", "quick tour", "getting started", "tip of the day", "did you know")
 _COOKIE_CUES = ("cookie", "consent", "gdpr", "privacy preferences", "we value your privacy")
 _ERROR_CUES = ("error", "failed", "cannot", "can't", "could not", "unable", "not responding",
                "stopped working", "problem", "exception", "crash")
@@ -115,6 +123,9 @@ POLICY: Dict[str, Tuple[str, ...]] = {
     "file_picker": ("cancel",),
     "error": ("ok", "close", "continue", "ignore", "cancel"),
     "info": ("ok", "close", "continue", "yes", "cancel"),
+    "recovery_pane": ("close", "ignore", "cancel"),     # never 'Recover'/'Open' blind and never 'Delete': the pane is closed, the files stay on disk
+    "update": ("ignore", "close", "cancel", "no"),      # 'Remind me later' / 'Not now' / 'Skip': an update restarts the app and changes state
+    "welcome": ("close", "continue", "ok", "ignore", "cancel"),
     "cookie_consent": ("reject", "decline", "no", "close", "cancel", "ok"),
     "browser_prompt": ("block", "ignore", "no", "cancel", "close"),
     "unknown": ("cancel", "close", "no", "ok", "ignore", "decline", "reject", "block"),
@@ -233,6 +244,7 @@ class Decision:
     dialog: str = ""
     note: str = ""
     ms: float = 0.0
+    status: str = ""                 # 'AUTH_BLOCKED' for a sign-in / 2FA / CAPTCHA wall, else '' (action stays 'need_human' for every escalation)
 
 
 def _norm(s: str) -> str:
@@ -415,6 +427,8 @@ def classify(info: DialogInfo, kind: str = "") -> str:
     title = _norm(info.title)
     blob = _norm(info.title + " " + info.message)
     cues = _STRICT_ELEVATION if kind in _BENIGN_KINDS else _PERMISSION_CUES
+    if kind not in _BENIGN_KINDS and not any(c in blob for c in _UAC_CUES) and any(c in blob for c in _LOGIN_CUES):
+        return "login"                       # a sign-in / 2FA / CAPTCHA wall: nothing is typed, the run stops as AUTH_BLOCKED
     if _KIND_CATEGORY.get(kind) == "permission" or any(c in blob for c in cues):
         return "permission"
     if any(c in blob for c in _OVERWRITE_CUES):
@@ -425,15 +439,35 @@ def classify(info: DialogInfo, kind: str = "") -> str:
         return "save_changes"
     if kind in _KIND_CATEGORY:
         return _KIND_CATEGORY[kind]
+    if any(c in blob for c in _RECOVERY_CUES):
+        return "recovery_pane"
+    if any(c in blob for c in _UPDATE_CUES):
+        return "update"
     if any(c in blob for c in _COOKIE_CUES):
         return "cookie_consent"
     if any(c in blob for c in BROWSER_PROMPT_KEYWORDS):
         return "browser_prompt"
     if any(c in blob for c in _ERROR_CUES):
         return "error"
+    if any(c in blob for c in _WELCOME_CUES):
+        return "welcome"
     if any(c in blob for c in _INFO_CUES):
         return "info"
     return "unknown"
+
+
+def _stamp(d: "Decision", status: str) -> "Decision":
+    d.status = "AUTH_BLOCKED" if status == "AUTH_BLOCKED" else ""
+    return d
+
+
+def escalation_action(category: str, blob: str) -> str:
+    """'AUTH_BLOCKED' when the popup is a sign-in / 2FA / CAPTCHA wall (the run stops, nothing is typed, and it is never reported as a PASS);
+    'need_human' for elevation (UAC) and other escalations."""
+    b = _norm(blob)
+    if category == "login" or (not any(c in b for c in _UAC_CUES) and any(c in b for c in _LOGIN_CUES)):
+        return "AUTH_BLOCKED"
+    return "need_human"
 
 
 def _button_role(name: str, aid: str) -> str:
@@ -785,8 +819,8 @@ def resolve_view(view: PopupView, *, db=None, key_sender: Optional[Callable[[str
     cat = info.category
 
     elev_words = _STRICT_ELEVATION if view.kind in _BENIGN_KINDS else ELEVATION_KEYWORDS
-    if cat == "permission" or view.kind == "authentication" or _has(lex_blob, elev_words):
-        return done(False, True, "need_human", "escalate", note="elevation/credential prompt: never auto-accepted", dialog=brief)
+    if cat in ("permission", "login") or view.kind == "authentication" or _has(lex_blob, elev_words):
+        return _stamp(done(False, True, "need_human", "escalate", note="elevation/credential prompt: never auto-accepted", dialog=brief), escalation_action(cat, lex_blob))
 
     if cat == "file_picker" and mode == "inflight" and paths:
         return done(False, False, "owned-by-task", "escalate", note="task names a path; file-dialog rung drives it", dialog=brief)
@@ -816,8 +850,8 @@ def resolve_view(view: PopupView, *, db=None, key_sender: Optional[Callable[[str
             info.category = classify(info, view.kind)
             cat, brief = info.category, info.brief()
             lex_blob = " ".join([view.title or "", view.text or "", info.message]).lower()
-            if cat == "permission" or _has(lex_blob, elev_words):
-                return done(False, True, "need_human", "escalate", note="elevation/credential prompt: never auto-accepted", dialog=brief)
+            if cat in ("permission", "login") or _has(lex_blob, elev_words):
+                return _stamp(done(False, True, "need_human", "escalate", note="elevation/credential prompt: never auto-accepted", dialog=brief), escalation_action(cat, lex_blob))
             role, btn = choose_button(info, POLICY.get(cat, POLICY["unknown"]))
             if not unrendered(info):
                 break

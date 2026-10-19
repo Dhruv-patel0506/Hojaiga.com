@@ -288,7 +288,7 @@ class OwnedApp:
                             from core_organs import owned_guard as OG
                             self.owned_pid = int(_pid.value)
                             self.owned_bind = OG.bind(self.owned_pid, self.name)
-                        if os.environ.get("HOJAIGA_VISIBLE_SCAN") == "1":
+                        if os.environ.get("HOJAIGA_VISIBLE_SCAN") == "1" or getattr(t, "packaged", False):   # packaged apps stop drawing when parked off-screen (measured): they stay on screen, never activated
                             # MEASURED: a packaged app parked off-screen stops drawing (splash screen). In this mode it stays where it opened -- on screen, never activated, the person's focus handed straight back --
                             # and is operated only through UI Automation patterns (no physical input), so the person's mouse and keyboard are never touched.
                             self.mode = "visible"
