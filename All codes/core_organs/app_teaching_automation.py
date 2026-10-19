@@ -606,10 +606,19 @@ class AppTeachingAutomationSection:
         with contextlib.suppress(Exception):
             scripted = ScriptedBackend.capable(app_)
         rep["route"] = "scripting-engine" if scripted else "accessibility-tree"
-        need_learn = learn == "always" or mode_ == "understand" or (learn == "auto" and E.thin(cov0))
+        from core_organs.harvest import universal_scan as US
+        fp, reg = "", None
+        with contextlib.suppress(Exception):
+            fp = US.fingerprint(app_)
+            reg = US.known(key, fp)                                                  # scan-once: a known (exe, file version) loads from data/app_registry.json, no scan
+        rep["registry"] = {"fingerprint": fp, "known": bool(reg), "controls": (reg or {}).get("n_controls", 0)}
+        need_learn = learn == "always" or mode_ == "understand" or (learn == "auto" and E.thin(cov0) and not reg)
         if need_learn and not scripted and learn != "never":
             with flow.enter("learn", f"{app_}: the RAG is thin ({'understand requested' if mode_ == 'understand' else 'under-mapped'}) - scanning now") as st:
+                t_scan = time.time()
                 rep["learned"] = E.learn_desktop(app_)
+                with contextlib.suppress(Exception):
+                    US.register(key, fp, [{"name": n, "source": "onboard"} for n in (rep["learned"].get("classified") or {}).get("controls", [])], time.time() - t_scan)
                 rep["rag_after_learn"] = E.coverage(key)
                 st["note"] += f" -> {rep['rag_after_learn']}"
         try:
@@ -971,6 +980,7 @@ class AppTeachingAutomationSection:
         from core_organs import agent_executor as AE
         E = self.engine
         out: Dict[str, Any] = {}
+        t_run = time.time()
         if mode == "understand":
             return out
         if mode == "teach" and not live:
@@ -1013,9 +1023,14 @@ class AppTeachingAutomationSection:
             with flow.enter("plan", "split the job into goals the screen can answer") as st:
                 obs = s.observe_lite()
                 names = [c["name"] for c in obs.get("controls", []) if c.get("name")][:80]
-                goals = plan_goals(E.get_brain(), task, names, E.pathways(task, key))
-                out["goals"] = goals
-                st["note"] = f"{len(goals)} goals"
+                from core_organs import knowledge_first as KF
+                cached = KF.lookup(key, task)                                       # Tier 0: a verified parameterised plan for this intent, parameters bound from this task - no planner call
+                if cached:
+                    goals, plan_src = cached, "cache"
+                else:
+                    goals, plan_src = plan_goals(E.get_brain(), task, names, E.pathways(task, key)), "planner"
+                out["goals"], out["plan_source"] = goals, plan_src
+                st["note"] = f"{len(goals)} goals ({plan_src})"
             recs = []
             out["proof"] = {"before": self.proof_shot(s, key, "before")}
             with flow.enter("act", "run the goals: ground, act, verify, roll back") as st:
@@ -1043,6 +1058,9 @@ class AppTeachingAutomationSection:
                             CW.register(E.get_rag(), key, [CW.entry({"name": g}, kid, det, "left open")])
                             out.setdefault("new_windows_learned", []).append(kid.get("title", ""))
                     if r.status != "done" and r.status != "advised":
+                        with contextlib.suppress(Exception):
+                            from core_organs.harvest import universal_scan as US
+                            US.mark_stale(key, US.fingerprint(app), g)               # a control stopped matching: the next run diff-scans this app instead of trusting the registry
                         break
                 st["note"] = f"{sum(1 for r in recs if r.status == 'done')}/{len(goals)} done"
             out["steps"] = [{"goal": r.goal, "status": r.status, "source": r.source, "reason": r.reason, "rolled_back": r.rolled_back, "assisted": r.assisted, "ms": r.ms, "effect": r.effect[:400], "attempts": r.attempts} for r in recs]
@@ -1052,8 +1070,14 @@ class AppTeachingAutomationSection:
                 st["note"] = f"{len(out['final_text'])} characters read back"
             with flow.enter("verify", "summary") as st:
                 out["verification"] = {"done": sum(1 for r in recs if r.status == "done"), "total": len(goals), "rollbacks": sum(1 for r in recs if r.rolled_back),
-                                       "caught": sum(1 for r in recs if r.reason or r.rolled_back), "model_calls": sum(1 for r in recs if r.source == "model")}
+                                       "caught": sum(1 for r in recs if r.reason or r.rolled_back), "model_calls": sum(1 for r in recs if r.source == "model") + (1 if out.get("plan_source") == "planner" else 0)}
                 st["note"] = str(out["verification"])
+                with contextlib.suppress(Exception):
+                    from core_organs import knowledge_first as KF
+                    v = out["verification"]
+                    all_done = bool(goals) and v["done"] == v["total"] and len(recs) == len(goals)
+                    KF.store(key, task, goals, all_done, replayed=out.get("plan_source") == "cache", source="planner")   # a verified novel plan becomes Tier 0; a replayed one that failed is demoted
+                    KF.record(task[:60], key, time.time() - t_run, v["model_calls"], "T0" if out.get("plan_source") == "cache" else "T3", out.get("plan_source") != "cache", all_done)
         return out
 
 
