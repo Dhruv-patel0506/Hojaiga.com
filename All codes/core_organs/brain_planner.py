@@ -350,10 +350,22 @@ def piercing(boxes: Sequence[Tuple[List[float], List[float]]], names: Sequence[s
                 continue
             a, b = boxes[i], boxes[j]
             cx, cy = (a[0][0] + a[1][0]) / 2.0, (a[0][1] + a[1][1]) / 2.0
-            inside = b[0][0] <= cx <= b[1][0] and b[0][1] <= cy <= b[1][1]
+            aw, ad = a[1][0] - a[0][0], a[1][1] - a[0][1]
+            m = max(aw, ad) if max(aw, ad) >= 3 * max(min(aw, ad), 1e-6) else 0.0     # a thin PANEL at the edge of a board (a shelf unit's side) is beside it, not through it; a square post (a leg) is through it wherever it is
+            inside = b[0][0] + m <= cx <= b[1][0] - m and b[0][1] + m <= cy <= b[1][1] - m
             if inside and a[1][2] > b[1][2] + tol and a[0][2] < b[1][2] - tol and a[1][2] > b[0][2] + tol and (b[1][2] - b[0][2]) < (a[1][2] - a[0][2]) and (a[1][0] - a[0][0]) * (a[1][1] - a[0][1]) < 0.5 * (b[1][0] - b[0][0]) * (b[1][1] - b[0][1]):
                 out.append(f"{names[i]} through {names[j]}")
-    return out
+    by_post: Dict[str, List[str]] = {}
+    for x in out:
+        a_, b_ = x.split(" through ")
+        by_post.setdefault(a_, []).append(b_)
+    keep: List[str] = []
+    for a_, bs in by_post.items():
+        zs = sorted(boxes[list(names).index(b_)][1][2] for b_ in bs)
+        levels = 1 + sum(1 for u, v in zip(zs, zs[1:]) if v - u >= 0.15)
+        if levels < 2:                                                          # a post through ONE board is a leg too tall; through several levels it is the frame of a shelf unit
+            keep += [f"{a_} through {b_}" for b_ in bs]
+    return keep
 
 
 def settle(design: Dict[str, Any], tol: float = 0.03) -> List[str]:
@@ -388,11 +400,29 @@ def settle(design: Dict[str, Any], tol: float = 0.03) -> List[str]:
                 notes.append(f"'{b['name']}' lifted from the ground onto the top of its posts ({top:.2f} m)")
                 b["at"][2] = top + b["size"][2] / 2
                 changed = True
-        for a in parts:                                                             # 1. through
+        def interior(a: Dict[str, Any], b: Dict[str, Any]) -> bool:
+            fb = foot(b)
+            w, d = a["size"][0], a["size"][1]
+            m = max(w, d) if max(w, d) >= 3 * max(min(w, d), 1e-6) else 0.0
+            return fb[0] + m <= a["at"][0] <= fb[2] - m and fb[1] + m <= a["at"][1] <= fb[3] - m
+        for a in parts:                                                             # 1b. embedded: a part whose bottom is sunk INTO a board it stands on (its top above the board's top): it rests ON the board
             for b in parts:
-                if a is b or overlap_xy(a, b) < 0.9 or (foot(a)[2] - foot(a)[0]) * (foot(a)[3] - foot(a)[1]) >= 0.5 * (foot(b)[2] - foot(b)[0]) * (foot(b)[3] - foot(b)[1]):
+                if a is b or overlap_xy(a, b) < 0.9 or not interior(a, b) or (foot(a)[2] - foot(a)[0]) * (foot(a)[3] - foot(a)[1]) >= 0.5 * (foot(b)[2] - foot(b)[0]) * (foot(b)[3] - foot(b)[1]):
                     continue
                 (alo, ahi), (blo, bhi) = zr(a), zr(b)
+                if b["size"][2] < 0.2 * max(b["size"][0], b["size"][1]) and ahi > bhi + tol and blo + tol < alo < bhi - tol:
+                    notes.append(f"'{a['name']}' was sunk {bhi - alo:.2f} m into '{b['name']}': it now stands on its top")
+                    h = ahi - bhi
+                    a["size"][2], a["at"][2] = h, bhi + h / 2
+                    changed = True
+        for a in parts:                                                             # 1. through
+            for b in parts:
+                if a is b or overlap_xy(a, b) < 0.9 or not interior(a, b) or (foot(a)[2] - foot(a)[0]) * (foot(a)[3] - foot(a)[1]) >= 0.5 * (foot(b)[2] - foot(b)[0]) * (foot(b)[3] - foot(b)[1]):
+                    continue
+                (alo, ahi), (blo, bhi) = zr(a), zr(b)
+                crossing = sorted(zr(q)[1] for q in parts if q is not a and q is not b and overlap_xy(a, q) >= 0.9 and interior(a, q) and zr(q)[0] > alo and zr(q)[1] < ahi - tol and q["size"][2] < 0.2 * max(q["size"][0], q["size"][1]))
+                if crossing and any(abs(c - bhi) >= 0.15 for c in crossing):          # the post carries boards at several heights: a frame, not a leg too tall for its top
+                    continue
                 if ahi > bhi + tol and alo < bhi - tol and (bhi - blo) < (ahi - alo) and alo < blo + 1e-6:
                     h = blo - alo
                     if h > 0.02:
@@ -516,6 +546,129 @@ def review_design(brain: Brain, task: str, design: Dict[str, Any]) -> Tuple[bool
     return bool(obj["ok"]), str(obj.get("problem", ""))[:240], float(meta.get("seconds") or 0.0)
 
 
+
+NUMBER_WORDS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10, "twelve": 12}
+
+
+def _stem(w: str) -> str:
+    w = re.sub(r"[^a-z]", "", w.lower())
+    for suf in ("ves", "ies", "es", "s"):
+        if w.endswith(suf) and len(w) - len(suf) >= 3:
+            return w[:-len(suf)] + ("f" if suf == "ves" else "y" if suf == "ies" else "")
+    return w
+
+
+def quantity_wants(task: str) -> List[Tuple[int, str]]:
+    """What the ORDER counts: 'a bookshelf with three shelves' -> (3, 'shelf'); 'a four legged chair' -> (4, 'leg'); '12 rooms' -> (12, 'room'). Number words and digits before a noun, 'legged' read as 'leg'."""
+    out: List[Tuple[int, str]] = []
+    for m in re.finditer(r"\b(\d+|" + "|".join(NUMBER_WORDS) + r")[\s-]+([a-z]+)", task.lower()):
+        n = int(m.group(1)) if m.group(1).isdigit() else NUMBER_WORDS[m.group(1)]
+        noun = re.sub(r"ged$", "", m.group(2)) if m.group(2).endswith("legged") else m.group(2)
+        noun = "leg" if m.group(2).endswith("legged") else _stem(noun)
+        if noun in ("storey", "story", "floor", "inch", "foot", "metre", "meter", "cm", "mm", "minute", "second", "hour", "day", "year", "time", "step", "point", "pixel", "stroke", "word", "sentence", "line", "page", "slide", "row", "column") or len(noun) < 3:
+            continue
+        out.append((n, noun))
+    return out
+
+
+def quantity_problems(task: str, names: Sequence[str], design: Optional[Dict[str, Any]] = None) -> List[str]:
+    """The plan must hold what the order counts. A part counts toward 'shelf' when its name carries that stem; for stacked boards the design's flat parts at distinct heights are counted too (a shelf is a board)."""
+    out: List[str] = []
+    for n, noun in quantity_wants(task):
+        have = sum(1 for nm in names if noun in _stem(nm) or _stem(nm) in noun and len(_stem(nm)) >= 3)
+        if design is not None and noun in ("shelf", "board", "plank", "tier", "level", "step", "layer"):
+            zs = sorted(p["at"][2] for p in design.get("parts", []) if p["size"][2] < 0.2 * max(p["size"][0], p["size"][1]))
+            levels = 0
+            last = -1e9
+            for z in zs:                                                          # boards closer than 15 cm in height are one level, not two shelves
+                if z - last >= 0.15:
+                    levels += 1
+                    last = z
+            have = levels                                                           # a stack noun counts LEVELS (boards at distinct heights), whatever the parts are named
+        if have < n:
+            out.append(f"the order says {n} {noun}(s) but the plan has only {have} part(s) that are {noun}s: add the missing ones (each its own part, named '{noun}1', '{noun}2' ..., at its own position; separate levels need at least 0.15 m between them in height)")
+    return out
+
+
+
+def fulfill_counts(task: str, design: Dict[str, Any]) -> List[str]:
+    """Make the plan hold what the ORDER counts, by repeating the model's own part (arithmetic, not another model call):
+      - 'N shelves / tiers / levels': the board(s) the plan already has are spread over N evenly spaced heights between the lowest board and the top of the posts that carry them (clones are added as needed);
+      - 'N legs / posts / columns': the plan's post is repeated at the corners of the board it holds up (inset by its own width) until there are N.
+    Returns what was done."""
+    notes: List[str] = []
+    parts = design.get("parts", [])
+    if not parts:
+        return notes
+    for n, noun in quantity_wants(task):
+        names = [p["name"] for p in parts]
+        like = [p for p in parts if noun in _stem(p["name"])]
+        if noun in ("shelf", "tier", "level", "board", "plank", "layer"):
+            flats = [p for p in parts if p["size"][2] < 0.2 * max(p["size"][0], p["size"][1])]
+            tmpl = (like or flats or [None])[0]
+            if tmpl is None:
+                continue
+            posts = [p for p in parts if p["size"][2] > 3 * max(p["size"][0], p["size"][1])]
+            others = [p for p in flats if p not in like and p["at"][2] - p["size"][2] / 2 < 0.1]         # a base plate under the unit: the first shelf stands above it, not inside it
+            lo = max((p["at"][2] + p["size"][2] / 2 + 0.12 for p in others), default=min((p["at"][2] - p["size"][2] / 2 for p in flats), default=0.0))
+            top = max([p["at"][2] + p["size"][2] / 2 for p in posts] + [max(p["at"][2] + p["size"][2] / 2 for p in flats)])
+            if n < 2 or top - lo < 0.15 * (n - 1):
+                continue
+            zs = [lo + tmpl["size"][2] / 2 + k * (top - lo - tmpl["size"][2]) / (n - 1) for k in range(n)]
+            boards = like if len(like) >= 1 else [tmpl]
+            for k, z in enumerate(zs):
+                if k < len(boards):
+                    boards[k]["at"][0], boards[k]["at"][1], boards[k]["at"][2] = tmpl["at"][0], tmpl["at"][1], z            # one stack: every level shares the footprint
+                else:
+                    c = {**tmpl, "name": f"{noun}{k + 1}", "at": [tmpl["at"][0], tmpl["at"][1], z], "size": list(tmpl["size"]), "rotate": list(tmpl.get("rotate", [0, 0, 0])), "color": list(tmpl.get("color", [0.7, 0.7, 0.7]))}
+                    c.pop("on", None)
+                    parts.append(c)
+            for b in boards[n:]:
+                parts.remove(b)
+            notes.append(f"{n} {noun} levels spread between {lo:.2f} and {top:.2f} m")
+        elif noun in ("leg", "post", "column", "pillar", "pole"):
+            posts = [p for p in parts if noun in _stem(p["name"])] or [p for p in parts if p["size"][2] > 3 * max(p["size"][0], p["size"][1])]
+            if not posts or len(posts) >= n:
+                continue
+            tmpl = posts[0]
+            holds = [p for p in parts if p not in posts and p["size"][2] < 0.2 * max(p["size"][0], p["size"][1]) and p["at"][2] - p["size"][2] / 2 >= tmpl["at"][2] + tmpl["size"][2] / 2 - 0.1]
+            if not holds:
+                continue
+            b = holds[0]
+            inset = max(tmpl["size"][0], tmpl["size"][1])
+            xs = [b["at"][0] - b["size"][0] / 2 + inset, b["at"][0] + b["size"][0] / 2 - inset]
+            ys = [b["at"][1] - b["size"][1] / 2 + inset, b["at"][1] + b["size"][1] / 2 - inset]
+            corners = [(x, y) for x in xs for y in ys] if n <= 4 else [(x, y) for x in xs for y in ys] + [(b["at"][0], ys[0]), (b["at"][0], ys[1])]
+            for k, (x, y) in enumerate(corners[:n]):
+                if k < len(posts):
+                    posts[k]["at"][0], posts[k]["at"][1] = x, y
+                else:
+                    c = {**tmpl, "name": f"{noun}{k + 1}", "at": [x, y, tmpl["at"][2]], "size": list(tmpl["size"]), "rotate": list(tmpl.get("rotate", [0, 0, 0])), "color": list(tmpl.get("color", [0.7, 0.7, 0.7]))}
+                    c.pop("on", None)
+                    parts.append(c)
+            notes.append(f"{n} {noun}s placed at the corners of '{b['name']}'")
+    return notes
+
+
+
+BOARD_NOUNS = ("shelf", "tier", "top", "tabletop", "seat", "board", "plank", "panel", "deck", "floor", "wall", "door", "backrest", "headboard", "lid", "tray", "platform", "slab", "roof", "back", "base")
+POST_NOUNS = ("leg", "post", "column", "pillar", "pole", "stand", "support", "upright")
+
+
+def normalize_shapes(design: Dict[str, Any], shapes: Sequence[str]) -> List[str]:
+    """A part NAMED like a board (shelf, seat, top, panel ...) is a box (a round top may stay a cylinder), whatever other shape the model picked (a squashed sphere is not a shelf); a part named like a post may be a cylinder or a box. Returns what changed."""
+    notes: List[str] = []
+    if "cube" not in shapes:
+        return notes
+    for p in design.get("parts", []):
+        nm = _stem(re.sub(r"[\d_\- ]+$", "", p["name"].lower()))
+        words = {_stem(w) for w in re.split(r"[_\-\s]+", p["name"].lower()) if w}
+        if (nm in BOARD_NOUNS or words & set(BOARD_NOUNS)) and not (words & set(POST_NOUNS)) and p["shape"] not in ("cube", "cylinder") and p["size"][2] < 0.35 * max(p["size"][0], p["size"][1]) + 1e-9:
+            notes.append(f"'{p['name']}' is a {p['shape']} but is named like a board: made a box")
+            p["shape"] = "cube"
+    return notes
+
+
 def design_parts(brain: Brain, task: str, shapes: Sequence[str], examples: Sequence[Dict[str, Any]] = (), tries: int = 3, extra_problems: Sequence[str] = (), review: bool = True) -> Dict[str, Any]:
     """Ask the CPU model for a part list; check it against the application's own shapes (validate) and against plain geometry (critic); ask again with the problems named. The attempt with the fewest problems wins."""
     problems: List[str] = list(extra_problems)                       # a reviewer's remarks go into the very first prompt
@@ -525,11 +678,15 @@ def design_parts(brain: Brain, task: str, shapes: Sequence[str], examples: Seque
         obj, r = brain.json(design_prompt(task, shapes, examples, problems), DESIGN_SYSTEM, max_tokens=1100, temperature=0.2 + 0.15 * attempt)
         meta.append({k: r.get(k) for k in ("seconds", "prompt_tokens", "tokens", "error")})
         design, problems = validate_design(obj, shapes)
+        if problems and design["parts"] and all(("rests on" in x or "not above" in x or "loop of supports" in x) for x in problems):
+            for pt in design["parts"]:                                   # the support claims ('on') are what is wrong, the parts are fine: drop the claims and let the arithmetic repairs (settle) put every part where it stands
+                pt.pop("on", None)
+            problems = []
         if not problems:
-            fixed = settle(design)                                       # arithmetic repairs first: through / short post / detached
+            fixed = normalize_shapes(design, shapes) + fulfill_counts(task, design) + settle(design)          # arithmetic repairs first: the counts the order names, then through / short post / detached
             if fixed:
                 meta[-1]["settled"] = fixed
-            problems = critic(design)
+            problems = critic(design) + quantity_problems(task, [p['name'] for p in design['parts']], design)
         if not problems and review:
             ok, why, secs = review_design(brain, task, design)
             meta[-1]["review"] = {"ok": ok, "problem": why, "seconds": secs}

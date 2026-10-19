@@ -881,7 +881,22 @@ def run_ar37() -> "TestOutcome":
     return _dom_test("run_ar37")
 
 
-TESTS = [("AR1", run_ar1), ("AR2", run_ar2), ("AR3", run_ar3), ("AR4", run_ar4), ("AR5", run_ar5), ("AR6", run_ar6), ("AR7", run_ar7), ("AR8", run_ar8), ("AR9", run_ar9), ("AR10", run_ar10), ("AR11", run_ar11), ("AR12", run_ar12), ("AR13", run_ar13), ("AR14", run_ar14), ("AR15", run_ar15), ("AR16", run_ar16), ("AR17", run_ar17), ("AR18", run_ar18), ("AR19", run_ar19), ("AR20", run_ar20), ("AR21", run_ar21), ("AR22", run_ar22), ("AR23", run_ar23), ("AR24", run_ar24), ("AR25", run_ar25), ("AR26", run_ar26), ("AR27", run_ar27), ("AR28", run_ar28), ("AR29", run_ar29), ("AR30", run_ar30), ("AR31", run_ar31), ("AR32", run_ar32), ("AR33", run_ar33), ("AR34", run_ar34), ("AR35", run_ar35), ("AR36", run_ar36), ("AR37", run_ar37)]
+def run_ar38() -> "TestOutcome":
+    """AR38: concepts from a scene for THIS screen (exact Pythagoras, quietest region, card, point at an existing diagram), PNG proof"""
+    return _dom_test("run_ar38")
+
+
+def run_ar39() -> "TestOutcome":
+    """AR39: the Top-N candidate selector (generic goals, RAG step names, headers, neighbours)"""
+    return _dom_test("run_ar39")
+
+
+def run_ar40() -> "TestOutcome":
+    """AR40: executor generality (flyout in the tree, hotkey effect, exact pressable control, piercing stored design)"""
+    return _dom_test("run_ar40")
+
+
+TESTS = [("AR1", run_ar1), ("AR2", run_ar2), ("AR3", run_ar3), ("AR4", run_ar4), ("AR5", run_ar5), ("AR6", run_ar6), ("AR7", run_ar7), ("AR8", run_ar8), ("AR9", run_ar9), ("AR10", run_ar10), ("AR11", run_ar11), ("AR12", run_ar12), ("AR13", run_ar13), ("AR14", run_ar14), ("AR15", run_ar15), ("AR16", run_ar16), ("AR17", run_ar17), ("AR18", run_ar18), ("AR19", run_ar19), ("AR20", run_ar20), ("AR21", run_ar21), ("AR22", run_ar22), ("AR23", run_ar23), ("AR24", run_ar24), ("AR25", run_ar25), ("AR26", run_ar26), ("AR27", run_ar27), ("AR28", run_ar28), ("AR29", run_ar29), ("AR30", run_ar30), ("AR31", run_ar31), ("AR32", run_ar32), ("AR33", run_ar33), ("AR34", run_ar34), ("AR35", run_ar35), ("AR36", run_ar36), ("AR37", run_ar37), ("AR38", run_ar38), ("AR39", run_ar39), ("AR40", run_ar40)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]

@@ -44,7 +44,7 @@ def fit(img: Any, w: int = 760, h: int = 520) -> Any:
     return img.resize((max(1, int(img.width * r)), max(1, int(img.height * r))))
 
 
-def compose_before_after(before: Any, after: Any, title: str, verdict: str, ok: bool, out_path: str, note: str = "") -> str:
+def compose_before_after(before: Any, after: Any, title: str, verdict: str, ok: bool, out_path: str, note: str = "", status: str = "") -> str:
     """Two pictures side by side; the verdict (and what was checked) written on the picture so the proof cannot be read as anything else."""
     from PIL import Image, ImageDraw
     b = fit(before) if before is not None else Image.new("RGB", (400, 200), (230, 230, 230))
@@ -59,11 +59,12 @@ def compose_before_after(before: Any, after: Any, title: str, verdict: str, ok: 
     d.text((b.width + pad * 2, head - 4), "AFTER", fill=(90, 90, 100), font=_font(13))
     im.paste(b, (pad, head + 14))
     im.paste(a, (b.width + pad * 2, head + 14))
-    col = (20, 140, 60) if ok else (200, 40, 40)
+    status = status or ("PASS" if ok else "FAIL")
+    col = (20, 140, 60) if status == "PASS" else ((200, 130, 20) if status in ("AUTH_BLOCKED", "DEMO") else (200, 40, 40))
     y = head + 14 + max(b.height, a.height) + 8
-    d.rectangle([pad, y, pad + 92, y + 24], fill=col)
-    d.text((pad + 8, y + 3), "PASS" if ok else "FAIL", fill=(255, 255, 255), font=_font(15))
-    d.text((pad + 104, y + 3), (verdict or "")[:150], fill=(30, 30, 40), font=_font(14))
+    d.rectangle([pad, y, pad + 150, y + 24], fill=col)
+    d.text((pad + 8, y + 3), status, fill=(255, 255, 255), font=_font(15))
+    d.text((pad + 162, y + 3), (verdict or "")[:140], fill=(30, 30, 40), font=_font(14))
     if note:
         d.text((pad, y + 28), note[:190], fill=(90, 90, 100), font=_font(12))
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
@@ -105,6 +106,8 @@ def contact_sheet(paths: Sequence[str], out_path: str, cols: int = 3, cell: Tupl
 CASES: List[Dict[str, Any]] = [
     {"id": "blender_table", "kind": "scripted", "app": "Blender", "task": "build a wooden dining table in Blender", "label": "blender_table"},
     {"id": "blender_lamp", "kind": "scripted", "app": "Blender", "task": "build a simple desk lamp in Blender", "file": "@saved:blender_table", "label": "blender_lamp"},
+    {"id": "blender_chair", "kind": "scripted", "app": "Blender", "task": "build a four legged wooden chair with a backrest in Blender", "label": "blender_chair"},
+    {"id": "blender_bookshelf", "kind": "scripted", "app": "Blender", "task": "build a bookshelf with three shelves in Blender", "label": "blender_bookshelf"},
     {"id": "blender_house", "kind": "scripted", "app": "Blender", "task": "build a very big two storey luxury house with 12 rooms in Blender", "house": True, "label": "blender_house"},
     {"id": "notepad", "kind": "desktop", "app": "Notepad", "task": "in Notepad type the words Quarterly report sales are up twelve percent", "expect_words": ["quarterly", "report", "twelve"],
      "teach": "how do I find and replace text in Notepad?"},
@@ -118,6 +121,7 @@ CASES: List[Dict[str, Any]] = [
     {"id": "wikipedia", "kind": "web", "host": "en.wikipedia.org", "task": "search for Ada Lovelace and open her article", "check_url_end": "Ada_Lovelace", "check_text": ["lovelace", "mathematician"]},
     {"id": "youtube", "kind": "web", "host": "www.youtube.com", "task": "search for lofi coding music and open the first video", "check_url": "/watch"},
     {"id": "excalidraw", "kind": "web", "host": "excalidraw.com", "task": "draw a rectangle on the canvas",
+     "pre_js": "localStorage.removeItem('excalidraw');localStorage.removeItem('excalidraw-state');1",
      "check_js": "(function(){try{var a=JSON.parse(localStorage.getItem('excalidraw')||'[]');return a.filter(function(e){return !e.isDeleted}).length}catch(x){return 0}})()"},
     {"id": "vscode_web", "kind": "web", "host": "vscode.dev", "task": "open the command palette",
      "check_js": "(function(){var q=document.querySelector('.quick-input-widget');return q&&q.style.display!=='none'&&q.offsetHeight>0?1:0})()"},
@@ -127,6 +131,7 @@ CASES: List[Dict[str, Any]] = [
     {"id": "whatsapp_wall", "kind": "web", "host": "web.whatsapp.com", "task": "open the newest chat", "wall": True, "steps": 3, "mask": [(0.40, 0.25, 0.95, 0.75)]},
     {"id": "selfheal_calculator", "kind": "selfheal"},
     {"id": "paint_trace", "kind": "desktop", "app": "Paint", "task": "trace the Ganapati1 image in Paint", "trace": (900, 0.97), "check": "trace", "teach": "how do I draw a rectangle in Paint?"},
+    {"id": "paint_trace_unseen", "kind": "desktop", "app": "Paint", "task": "trace the Zorbmark image in Paint", "trace": (900, 0.97), "check": "trace", "make_image": "Zorbmark"},
     {"id": "paint_lightboard", "kind": "desktop", "app": "Paint", "task": "make a lightboard of the Ganapati1 image in Paint", "check": "lightboard"},
     {"id": "sticky_notes", "kind": "desktop", "app": "Sticky Notes", "task": "in Sticky Notes type the words buy milk and call mom", "expect_words": ["milk"], "teach": "how do I add a new note in Sticky Notes?"},
 ]
@@ -144,6 +149,22 @@ def run_desktop(case: Dict[str, Any], section: Any, log: Callable[[str], None]) 
     cid = case["id"]
     pdir = os.path.join(GALLERY, "raw", cid)
     section.proof_dir = pdir
+    if case.get("make_image"):                                           # an image that did not exist before this run (drawn now, with a name no stored file has): the trace must work from the picture itself
+        from PIL import Image, ImageDraw
+        from core_organs import agent_artist as _AAx
+        import random as _r
+        rr = _r.Random(int(time.time()) % 10007)
+        im = Image.new("RGB", (640, 480), (245, 245, 240))
+        d = ImageDraw.Draw(im)
+        bx, by = rr.randint(160, 240), rr.randint(220, 260)
+        d.rectangle([bx, by, bx + 220, by + 170], outline=(30, 30, 30), width=5)
+        d.polygon([(bx - 20, by), (bx + 110, by - rr.randint(90, 130)), (bx + 240, by)], outline=(30, 30, 30), width=5)
+        d.rectangle([bx + 90, by + 70, bx + 140, by + 170], outline=(30, 30, 30), width=4)
+        d.ellipse([bx + 270, by - 150, bx + 340, by - 80], outline=(30, 30, 30), width=5)
+        for k in range(rr.randint(3, 6)):
+            x = rr.randint(30, 600)
+            d.line([x, 420, x + rr.randint(-20, 20), 380], fill=(30, 30, 30), width=4)
+        im.save(os.path.join(_AAx.REF_DIR, case["make_image"] + ".png"))
     if case.get("trace"):
         from core_organs import agent_artist as _AA
         _AA.ArtistTools.DEFAULT_TRACE = tuple(case["trace"])
@@ -170,8 +191,8 @@ def run_desktop(case: Dict[str, Any], section: Any, log: Callable[[str], None]) 
     else:
         v = rep.get("verification") or {}
         all_found = bool(words) and all(words.values())
-        # each typed text was read back from the screen right after it was typed (goal 'done'); the final whole-window OCR can lose a word behind a selection handle, so it must still find at least half
-        ok = not rep.get("error") and bool(words) and (all_found or (v.get("total", 0) >= 1 and v.get("done") == v.get("total") and sum(words.values()) * 2 >= len(words)))
+        # strict: EVERY expected word must be read back from the window afterwards (the document's own object model lists all text; OCR / UI Automation for the rest) and every goal must have been done
+        ok = not rep.get("error") and all_found and v.get("total", 0) >= 1 and v.get("done") == v.get("total")
         verdict = ("found " + ", ".join(w for w, v in words.items() if v) + (" | missing " + ", ".join(w for w, v in words.items() if not v) if not all(words.values()) else "")) if words else (rep.get("error") or "no expectation")
     from PIL import Image
     b = Image.open(proof["before"]) if proof.get("before") and os.path.isfile(proof["before"]) else None
@@ -213,7 +234,7 @@ def run_scripted(case: Dict[str, Any], section: Any, log: Callable[[str], None])
     cid = case["id"]
     t0 = time.time()
     file = _SAVED.get(case["file"][7:], "") if str(case.get("file", "")).startswith("@saved:") else ""
-    rep = section.handle(case["task"], app=case.get("app", ""), mode="delegate", file=file, learn="auto", recall=True, live=False, vlm=False, keep_open=False)
+    rep = section.handle(case["task"], app=case.get("app", ""), mode="delegate", file=file, learn="auto", recall=False, live=False, vlm=False, keep_open=False)       # recall=False: every build is planned live, no stored recipe / plan is replayed
     sv = rep.get("saved") or {}
     if sv.get("ok"):
         _SAVED[cid] = sv["path"]
@@ -231,10 +252,10 @@ def run_scripted(case: Dict[str, Any], section: Any, log: Callable[[str], None])
         if rep.get("picture") and os.path.isfile(rep["picture"]):
             pics = [rep["picture"]]
         lowest = q.get("lowest_z")
-        ok = (not rep.get("error") and q.get("score", 0) >= 90 and q.get("connected") is True and not q.get("floating_parts") and not q.get("piercing") and q.get("on_ground") is True and lowest is not None and abs(lowest) <= 0.005
+        ok = (not rep.get("error") and q.get("score", 0) >= 90 and q.get("connected") is True and not q.get("floating_parts") and not q.get("piercing") and not q.get("quantity_problems") and q.get("on_ground") is True and lowest is not None and abs(lowest) <= 0.005
               and q.get("earlier_objects_untouched") is True and q.get("parts_built") == q.get("parts_wanted") and bool(pics))
         ext = q.get("extent_m") or [0, 0, 0]
-        verdict = f"{q.get('parts_built')}/{q.get('parts_wanted')} parts, connected={q.get('connected')}, floating={q.get('floating_parts')}, piercing={q.get('piercing')}, lowest z {lowest} (rule: 0), earlier objects untouched={q.get('earlier_objects_untouched')} ({q.get('earlier_objects')}), extent {ext}, score {q.get('score')}"
+        verdict = f"{q.get('parts_built')}/{q.get('parts_wanted')} parts, connected={q.get('connected')}, floating={q.get('floating_parts')}, piercing={q.get('piercing')}, order-counts={q.get('quantity_problems') or 'ok'}, lowest z {lowest} (rule: 0), earlier objects untouched={q.get('earlier_objects_untouched')} ({q.get('earlier_objects')}), extent {ext}, score {q.get('score')}"
     out_png = os.path.join(GALLERY, f"before_after_{cid}.png")
     compose_sheet(pics, f"Blender: {case['task']}", verdict, ok, out_png, cols=2 if len(pics) > 1 else 1)
     return {"case": cid, "kind": "scripted", "ok": ok, "verdict": verdict, "wall_s": round(time.time() - t0, 1), "png": out_png, "blend": sv.get("path", ""), "pictures": pics, "report": {"quality": q, "error": rep.get("error")}}
@@ -351,6 +372,15 @@ def run_web(case: Dict[str, Any], section: Any, log: Callable[[str], None]) -> D
         drv = br.driver()
         drv.navigate("https://" + host)
         time.sleep(3.0)
+        if case.get("pre_js"):                                              # the harness (not the agent) puts the page into a known empty state: the owned profile keeps earlier drawings
+            with contextlib.suppress(Exception):
+                drv.p.call("Runtime.evaluate", {"expression": case["pre_js"], "returnByValue": True})
+                drv.navigate("https://" + host)
+                time.sleep(3.0)
+        probe0 = None
+        if case.get("check_js"):
+            with contextlib.suppress(Exception):
+                probe0 = drv.p.call("Runtime.evaluate", {"expression": case["check_js"], "returnByValue": True}).get("result", {}).get("value")
         with contextlib.suppress(Exception):
             before = drv.screenshot().convert("RGB")
         agent = WD.WebAgent(section.engine.get_brain(), drv, log=log, confirm=None, max_steps=case.get("steps", 12), growth=section.growth())
@@ -376,14 +406,16 @@ def run_web(case: Dict[str, Any], section: Any, log: Callable[[str], None]) -> D
         for w in case.get("check_text", []):
             checks["page says " + w] = w.lower() in (text or "").lower()
         if case.get("check_js"):
-            checks["page probe > 0"] = bool(probe)
+            checks["page probe rose (%s -> %s)" % (probe0, probe)] = isinstance(probe, (int, float)) and probe > (probe0 or 0)
         ok = bool(checks) and all(checks.values())
         if rep.get("status") == "needs_login":
             ok = False
         if case.get("wall"):                                                  # a site that needs a signed-in session: the honest result is 'stopped at the sign-in wall, nothing typed'
             typed = [x for x in (rep.get("steps") or []) if x.get("action") == "type"]
-            ok = rep.get("status") == "needs_login" and not typed
-            checks = {"stopped at the sign-in wall": rep.get("status") == "needs_login", "nothing typed": not typed}
+            blocked = rep.get("status") == "needs_login" and not typed
+            ok = False                                                          # a sign-in wall is a BLOCK, never a pass: nothing of the task was done
+            case["_status"] = "AUTH_BLOCKED" if blocked else "FAIL"
+            checks = {"stopped at the sign-in wall (task NOT done)": blocked, "nothing typed": not typed}
         for img_name in ("before", "after"):
             im = before if img_name == "before" else after
             leaked = bool(case.get("wall")) and rep.get("status") != "needs_login"      # a personal page that did load (a signed-in session): everything below the title bar is masked, whatever the case says
@@ -400,8 +432,8 @@ def run_web(case: Dict[str, Any], section: Any, log: Callable[[str], None]) -> D
             if im is not None:
                 im.save(os.path.join(pdir, f"{nm}.png"))
     out_png = os.path.join(GALLERY, f"before_after_{cid}.png")
-    compose_before_after(before, after, f"{host}: {case['task']}", verdict, ok, out_png, note=f"{round(time.time() - t0, 1)}s | steps: " + "; ".join(f"{s_['action']} {s_['target'][:25]}={'ok' if s_['ok'] else 'no'}" for s_ in (rep.get('steps') or [])[:5]))
-    return {"case": cid, "kind": "web", "ok": ok, "verdict": verdict, "wall_s": round(time.time() - t0, 1), "png": out_png, "report": {k: rep.get(k) for k in ("status", "steps", "done_steps", "model_seconds", "summary")}}
+    compose_before_after(before, after, f"{host}: {case['task']}", verdict, ok, out_png, status=case.get("_status", ""), note=f"{round(time.time() - t0, 1)}s | steps: " + "; ".join(f"{s_['action']} {s_['target'][:25]}={'ok' if s_['ok'] else 'no'}" for s_ in (rep.get('steps') or [])[:5]))
+    return {"case": cid, "kind": "web", "ok": ok, "status": case.get("_status") or ("PASS" if ok else "FAIL"), "verdict": verdict, "wall_s": round(time.time() - t0, 1), "png": out_png, "report": {k: rep.get(k) for k in ("status", "steps", "done_steps", "model_seconds", "summary")}}
 
 
 CONCEPTS = [
@@ -450,27 +482,58 @@ def concept_proof(case: Dict[str, Any], brain: Any) -> Dict[str, Any]:
     return res
 
 
-def concept_over_page(page_case: str, concept: str) -> Dict[str, Any]:
-    """A concept drawing over a real page (HeyClicky-style: the red overlay sits above whatever app is open): the saved plan of `concept` is drawn, part by part, over the saved picture of `page_case`'s browser."""
+def concept_over_page(page_case: str, request: str, target: str = "") -> Dict[str, Any]:
+    """A concept drawn FOR a real page (HeyClicky-style), after the vision model has LOOKED at it: (1) what is on the screen, (2) is a diagram of the concept already visible (then it is pointed at, not redrawn), else (3) the
+    figure is planned (exact geometry when the concept is geometric) and drawn on an opaque card in the quietest part of the screen. With `target`, the vision model also finds that thing on the page and a red box + label is
+    anchored to it. Rendered from the same overlay commands the live click-through overlay draws."""
     from PIL import Image
-    from core_organs import diagram_teach as DT, tutor_overlay as TO
+    from core_organs import diagram_teach as DT, tutor_overlay as TO, vision_ground as VG, brain_planner as BP
     from core_organs.professor.schema import Box
-    res: Dict[str, Any] = {"case": f"concept_over_{page_case}", "ok": False}
+    res: Dict[str, Any] = {"case": f"screen_{page_case}", "ok": False, "status": "FAIL"}
     try:
-        plan = json.load(open(os.path.join(GALLERY, "results", f"concept_{concept}.json"), encoding="utf-8")).get("plan") or []
         page = Image.open(os.path.join(GALLERY, "raw", page_case, "after.png")).convert("RGB")
         W, H = page.size
-        parts = DT.to_screen([dict(p, points=[tuple(q) for q in p["points"]]) for p in plan], (W * 0.12, H * 0.14, W * 0.88, H * 0.9))
         rec = TO.RecordingRedOverlay()
-        for p in parts:
-            rec.shape(p["kind"], p["points"], p["label"], seconds=1.0)
-        out = os.path.join(GALLERY, f"overlay_teach_{page_case}_concept_{concept}.png")
-        img = rec.preview(page).convert("RGB")
-        compose_before_after(page, img, f"Concept drawn over {page_case}: {concept} ({len(parts)} parts, the sentence for each is spoken)", f"{len(parts)} parts drawn over the live page", len(parts) >= 4, out,
-                             note="rendered from the same overlay commands the live click-through overlay draws over any application")
-        res.update({"ok": len(parts) >= 4, "png": out})
+        notes = []
+        look = VG.look_at(page, request)
+        notes.append(f"VLM sees: {look.get('description') or look.get('error')} | diagram of the concept visible: {look.get('diagram_visible')}")
+        n_marks = 0
+        f: Dict[str, Any] = {}
+        if target:
+            f = VG.find_on_screen(page, target)
+            if f["found"]:
+                x0, y0, x1, y1 = f["bbox"][0] * W, f["bbox"][1] * H, f["bbox"][2] * W, f["bbox"][3] * H
+                rec.commands = [c for c in rec.commands if c["cmd"] != "box"]
+                rec.box(Box(x0, y0, x1, y1), target, pointer=True)
+                n_marks += 1
+                notes.append(f"VLM found '{target}' at {[round(v, 2) for v in f['bbox']]} ({f['description']})")
+            else:
+                notes.append(f"VLM did not find '{target}' ({f.get('error') or 'not found'})")
+        base_img = rec.preview(page).convert("RGB")
+        avoid = [(f["bbox"][0] * W, f["bbox"][1] * H, f["bbox"][2] * W, f["bbox"][3] * H)] if (target and f.get("found")) else []
+        sp = DT.plan_on_screen(BP.Brain(), request, page, look, avoid) if request else {"mode": "none"}
+        img = base_img
+        if sp["mode"] == "draw":
+            rec2 = TO.RecordingRedOverlay()
+            rec2.shape("card", sp["card"], "")
+            for p in sp["parts"]:
+                rec2.shape(p["kind"], p["points"], p["label"])
+            img = rec2.preview(base_img).convert("RGB")
+            n_marks += len(sp["parts"])
+            notes.append(f"figure: {len(sp['parts'])} parts ({sp['plan'].get('mode', 'freeform')}), critic problems left: {sp['plan']['problems'] or 'none'}")
+        elif sp["mode"] == "annotate":
+            x0, y0, x1, y1 = sp["box"]
+            rec3 = TO.RecordingRedOverlay()
+            rec3.box(Box(x0, y0, x1, y1), "the diagram", pointer=True)
+            img = rec3.preview(base_img).convert("RGB")
+            n_marks += 1
+        ok = n_marks >= 1 and not (sp["mode"] == "draw" and sp["plan"]["problems"]) and not look.get("error")
+        out = os.path.join(GALLERY, f"overlay_teach_{page_case}_screen_concept.png")
+        compose_before_after(page, img, f"Screen-grounded overlay on {page_case}: \"{request}\"" + (f" + point at {target}" if target else ""), " | ".join(notes)[:150], ok, out, note=" | ".join(notes)[:230])
+        res.update({"ok": ok, "status": "PASS" if ok else "FAIL", "png": out, "verdict": " | ".join(notes), "look": look, "mode": sp["mode"]})
     except Exception as exc:
         res["error"] = f"{type(exc).__name__}: {exc}"[:200]
+        res["verdict"] = res["error"]
     return res
 
 
@@ -524,7 +587,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--no-teach", action="store_true")
     ap.add_argument("--concepts", action="store_true", help="draw the concept diagrams (the brain plans them; CPU)")
-    ap.add_argument("--over", nargs=2, metavar=("PAGE_CASE", "CONCEPT"), help="draw a saved concept over a saved web page picture")
+    ap.add_argument("--over", nargs="+", metavar=("PAGE_CASE", "REQUEST"), help="PAGE_CASE 'request' [target]: look at a saved page picture with the vision model, then draw the concept for it / point at the target")
     a = ap.parse_args(argv)
     if a.list:
         for c in CASES:
@@ -535,7 +598,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     os.makedirs(os.path.join(GALLERY, "results"), exist_ok=True)
     if a.over:
         r = concept_over_page(*a.over)
-        print(json.dumps(r))
+        json.dump(r, open(os.path.join(GALLERY, "results", f"screen_{a.over[0]}.json"), "w", encoding="utf-8"), indent=1, default=str)
+        print(json.dumps({k: r.get(k) for k in ("case", "ok", "status", "verdict", "png")}))
         return 0
     if a.concepts:
         outc = []
@@ -561,7 +625,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         if c.get("teach") and not a.no_teach:
             r["teach"] = teach_proof(c, print)
         json.dump(r, open(os.path.join(GALLERY, "results", c["id"] + ".json"), "w", encoding="utf-8"), indent=1, default=str)
-        print(f"##### {c['id']}: {'PASS' if r.get('ok') else 'FAIL'} - {r.get('verdict')}", flush=True)
+        r["status"] = r.get("status") or ("PASS" if r.get("ok") else "FAIL")
+        print(f"##### {c['id']}: {r['status']} - {r.get('verdict')}", flush=True)
         results.append(r)
     print(json.dumps({"passed": sum(1 for r in results if r.get("ok")), "total": len(results)}))
     return 0

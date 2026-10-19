@@ -142,6 +142,12 @@ def path_length(pts: Sequence[Tuple[float, float]]) -> float:
 
 def render_shape(kind: str, points: Sequence[Tuple[float, float]], fraction: float = 1.0, width: float = 4.5, fill: bool = True) -> Tuple[Image.Image, Tuple[int, int]]:
     """A red polygon / line / curve / arrow drawn up to `fraction` of its length (stroke animation). Returns the picture and the screen position of its top-left."""
+    if kind == "card":                                                  # an opaque light panel behind a drawing, so a figure is legible over any screen (a video, a busy page)
+        xs, ys = [float(q[0]) for q in points], [float(q[1]) for q in points]
+        x0, y0, x1, y1 = int(min(xs)), int(min(ys)), int(max(xs)), int(max(ys))
+        img = Image.new("RGBA", (x1 - x0 + 2, y1 - y0 + 2), (0, 0, 0, 0))
+        ImageDraw.Draw(img).rounded_rectangle([0, 0, x1 - x0, y1 - y0], radius=18, fill=(252, 252, 254, 238), outline=(150, 150, 165, 255), width=2)
+        return img, (x0, y0)
     path = _path(kind, points)
     xs, ys = [p[0] for p in path], [p[1] for p in path]
     pad = int(width * 3 + 14)

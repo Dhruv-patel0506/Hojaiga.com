@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 import os
+import contextlib
 import re
 import time
 from dataclasses import dataclass, field
@@ -108,9 +109,13 @@ def default_verify(pre: Dict[str, Any], post: Dict[str, Any], src_state: Optiona
         moved = False
     if src_state and dst_state and src_state != dst_state:
         moved = True
+    if not moved and (pre.get("doc") or post.get("doc")) and pre.get("doc") != post.get("doc"):
+        return True, "the document's text changed"
+    new = new_on_screen(pre["som"], post["som"])
+    if not moved and len(new) >= 2:                                 # a flyout whose picture cannot be captured (WinUI): its items appeared in the accessibility tree
+        return True, "new on screen (not in the picture): " + ", ".join(new)
     if not moved:
         return False, "no_effect"
-    new = new_on_screen(pre["som"], post["som"])
     return True, ("new on screen: " + ", ".join(new)) if new else "the screen changed"
 
 
@@ -138,7 +143,7 @@ class AdapterGrounder:
         els = som["elements"]
         nm = P2.name_elements(els, list(controls)) if (controls and self.use_names) else {}
         gtext = re.sub(r"^goal:\s*", "", goal, flags=re.I)
-        kept = P3.trim(els, gtext, nm, P3.TOP_K)
+        kept = P3.trim(els, gtext, nm, P3.TOP_K, hint_words=P3.tokens(hint))               # the Mind's retrieved step names count as goal words (the parent menu of 'Replace' is 'Edit')
         content, info = P2.user_content(image, dict(som, elements=som.get("all_elements") or els), app_key, goal, controls=None)       # the strips were chosen on the whole scan in training
         imgs = [dict(c, image=shrink(c["image"], self.max_pixels)) for c in content if c.get("type") == "image"]
         text = P3.build_text(app_key, kept, {i: n for i, n in nm.items() if i in {e["id"] for e in kept}}, hint, info.get("n_crops", 0), gtext)
@@ -184,8 +189,16 @@ class AdapterGrounder:
         enc = {k: (v.to(self._model.device) if hasattr(v, "to") else v) for k, v in enc.items()}
         with torch.no_grad():
             # the action fields come first in the reply and the free-text expectation after them: generation STOPS where the expectation starts (and is capped at ~72 tokens), parse_action reads the rest
-            out = self._model.generate(**enc, max_new_tokens=self.max_new_tokens, do_sample=False, stop_strings=['"verify_expectation"'], tokenizer=getattr(self._proc, "tokenizer", self._proc))
+            gen = self._model.generate(**enc, max_new_tokens=self.max_new_tokens, do_sample=False, stop_strings=['"verify_expectation"'], tokenizer=getattr(self._proc, "tokenizer", self._proc),
+                                       return_dict_in_generate=True, output_scores=True)
+        out = gen.sequences
         text = self._proc.batch_decode(out[:, enc["input_ids"].shape[1]:], skip_special_tokens=True)[0]
+        self.last = {"conf": None}
+        with contextlib.suppress(Exception):                      # how sure the model was: the geometric mean of its own token probabilities over the answer it gave (1.0 = certain)
+            import math
+            sc = self._model.compute_transition_scores(gen.sequences, gen.scores, normalize_logits=True)[0]
+            vals = [float(x) for x in sc.float().cpu().tolist()]
+            self.last = {"conf": round(math.exp(sum(vals) / max(len(vals), 1)), 4), "min_p": round(math.exp(min(vals)), 4) if vals else None, "tokens": len(vals)}
         return parse_action(text), text
 
 
@@ -257,6 +270,12 @@ class Agent:
         if not gname or not controls:
             return None
         named = [c for c in controls if AV.name_match(gname, c["name"])]
+        if len(named) > 1:                                          # several controls carry the name: the one whose name IS the goal's, then the one that can be pressed (a menu / button / tab, not a text area)
+            exact = [c for c in named if c["name"].strip().lower() == gname.strip().lower()]
+            named = exact or named
+        if len(named) > 1:
+            presser = [c for c in named if str(c.get("type", "")) in ("ButtonControl", "MenuItemControl", "TabItemControl", "ListItemControl", "HyperlinkControl", "CheckBoxControl", "RadioButtonControl", "SplitButtonControl")]
+            named = presser or named
         if len(named) != 1:
             return None
         from core_organs.harvest.local_recorder import element_at
@@ -437,6 +456,13 @@ class Agent:
             dst_id = getattr(dst, "state_id", None)
             t0 = time.perf_counter()
             verdict = self._verdict(goal, action, pre, post, src, dst_id)
+            if not verdict["worked"] and verdict["reason"] == "no_effect":          # a slow effect (a replace over a long document, a dialog still painting): look once more before calling it nothing
+                self.sleep(1.4)
+                with contextlib.suppress(Exception):
+                    post2 = self.observe()
+                    v2 = self._verdict(goal, action, pre, post2, src, dst_id)
+                    if v2["worked"]:
+                        post, verdict = post2, v2
             timed("verify", t0)
             rec.effect, rec.dst_state, rec.reason = verdict["effect"], dst_id, verdict["reason"]
             rec.attempts.append({"attempt": attempt + 1, "target_id": action.get("target_id"), "hotkey": action.get("hotkey"), "worked": verdict["worked"], "reason": verdict["reason"], "effect": verdict["effect"][:90],
@@ -557,7 +583,7 @@ class LiveSession:
             controls = []
         if len(controls) < min_controls:
             return self.observe()
-        return {"image": img, "som": som_from_controls(controls, img.size), "controls": controls}
+        return {"image": img, "som": som_from_controls(controls, img.size), "controls": controls, "doc": self._doc()}
 
     def observe(self) -> Dict[str, Any]:
         from core_organs.harvest import video_pipeline as VP
@@ -582,7 +608,13 @@ class LiveSession:
             if len(controls) >= 5:
                 break
             time.sleep(0.6)                                        # a half-read tree (measured: Strikethrough missing right after a toolbar click) is read again
-        return {"image": img, "som": som, "controls": controls}
+        return {"image": img, "som": som, "controls": controls, "doc": self._doc()}
+
+    def _doc(self) -> str:
+        try:
+            return self.app.doc_text()
+        except Exception:
+            return ""
 
     def _repark(self) -> None:
         """MEASURED: opening Notepad's Link dialog moved the PARKED window onto the real screen (rect -345,0 .. 755,760). It is put back to its off-screen sliver straight away."""

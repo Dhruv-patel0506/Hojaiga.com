@@ -94,6 +94,8 @@ def goal_verify(goal: str, action: Dict[str, Any], pre: Dict[str, Any], post: Di
     if not have_uia:
         return v                                            # no UIA tree: only "the screen changed" can be checked
     v["checked"] = "uia"
+    if action.get("action") == "hotkey":                    # a shortcut opens whatever it opens (a find bar, a dialog, a panel): that IS its effect, not an accident of a mis-aimed click
+        return v
     target = None
     if action.get("action") == "click":
         el = next((e for e in pre["som"]["elements"] if e.get("id") == action.get("target_id")), None)
@@ -106,6 +108,8 @@ def goal_verify(goal: str, action: Dict[str, Any], pre: Dict[str, Any], post: Di
         return dict(v, worked=False, reason="wrong_control", effect=f"clicked {target['name']!r}, not {gname!r}")
     intent = classify(gname, target) if action.get("action") == "click" else "plain"
     v["intent"] = intent
+    if intent in ("dialog", "plain") and (pre.get("doc") or post.get("doc")) and pre.get("doc") != post.get("doc"):
+        return dict(v, effect="the document's text changed")                     # a button inside an already-open find / replace bar does its work on the document; no new dialog is the right outcome
     if intent == "toggle":
         if mod["modal"]:
             return dict(v, worked=False, reason="unexpected_dialog", effect="a dialog opened instead of a toggle: " + ", ".join(mod["new"][:4]))

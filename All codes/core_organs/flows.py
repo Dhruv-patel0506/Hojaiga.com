@@ -138,12 +138,15 @@ def flow_web_to_excel(section: Any, log: Any) -> Dict[str, Any]:
         with LR.OwnedApp("Excel") as app:
             with contextlib.suppress(Exception):
                 before = app.grab(popups=True)[0].convert("RGB")
-            sheet = excel_sheet_of(app.hwnd)                                 # Excel's own object model, reached through THIS window (the owned instance, never another Excel)
-            for i, (k, v) in enumerate(rows, 1):
-                for col, text in (("A", k), ("B", v)):
-                    with contextlib.suppress(Exception):
-                        sheet.Range(f"{col}{i}").Value = text
-            written = sum(1 for i, (k, v) in enumerate(rows, 1) for col, text in (("A", k), ("B", v)) if str(getattr(sheet.Range(f"{col}{i}"), "Value", "") or "") == text) if sheet is not None else 0
+            from core_organs import office_om as OM
+            cells = {f"{col}{i}": text for i, (k, v) in enumerate(rows, 1) for col, text in (("A", k), ("B", v))}
+            res_kb = OM.grid_type(app.hwnd, cells)                          # the keyboard route: Name Box -> characters to the grid -> Enter
+            route = "keyboard (Name Box + typed characters + Enter)"
+            if sum(res_kb.values()) < len(cells):                           # whatever did not stick is written through the sheet's object model, then read back
+                res_om = OM.grid_write(app.hwnd, {a: t for a, t in cells.items() if not res_kb.get(a)})
+                res_kb.update({a: v for a, v in res_om.items() if v})
+                route += " + object model for the rest"
+            written = sum(res_kb.values())
             time.sleep(1.0)
             with contextlib.suppress(Exception):
                 after = app.grab(popups=True)[0].convert("RGB")
@@ -156,9 +159,10 @@ def flow_web_to_excel(section: Any, log: Any) -> Dict[str, Any]:
             seen = read_back(s).lower()
             hits = sum(1 for k, v in rows if k.lower()[:6] in seen or v.lower()[:6] in seen)
             ok = written == len(rows) * 2
-            verdict = f"{len(rows)} fact rows read from {host}; {written}/{len(rows) * 2} cells hold the value when read back through Excel's object model (screen OCR read {hits}/{len(rows)} rows)"
+            verdict = f"{len(rows)} fact rows read from {host}; {written}/{len(rows) * 2} cells hold the value when read back through Excel's object model via the {route} (screen OCR read {hits}/{len(rows)} rows)"
     else:
         verdict = "no facts table could be read from the page"
+    verdict += " | page reached by " + ("the web agent" if not w["direct_fallback"] else "a direct address (the agent did not land on it)")
     out_png = os.path.join(G.GALLERY, "before_after_flow_web_to_excel.png")
     G.compose_before_after(w["after"], after, "Flow: facts table on a site -> Excel cells", verdict, ok, out_png, note=("rows: " + "; ".join(f"{a}={b}" for a, b in rows)[:180]))
     return {"case": "flow_web_to_excel", "kind": "flow", "ok": ok, "verdict": verdict, "wall_s": round(time.time() - t0, 1), "png": out_png, "rows": rows}

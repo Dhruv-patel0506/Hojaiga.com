@@ -472,8 +472,32 @@ class OwnedApp:
             except Exception:
                 pass
         walk(self.hwnd, origin[0], origin[1], False)
+        composed = {l["hwnd"] for l in getattr(self, "layers", [])}
         for l in getattr(self, "layers", []):
             walk(l["hwnd"], l["origin"][0] - l["paste"][0], l["origin"][1] - l["paste"][1], True)
+        # a Windows 11 (WinUI) flyout is a window of its own (a PopupWindowSiteBridge) whose picture cannot be captured, but its items ARE in the accessibility tree: read them from there, boxes in this
+        # window's picture coordinates (they may lie outside it; the items are operated through UI Automation, not by position)
+        with contextlib.suppress(Exception):
+            from core_organs import headless_input as hin
+            for pw in hin.popup_windows(self.hwnd)[:4]:
+                if pw in composed:
+                    continue
+                try:
+                    for c, _depth in auto.WalkControl(auto.ControlFromHandle(pw), maxDepth=6):
+                        if time.time() > t_end + 3:
+                            break
+                        if c.ControlTypeName not in ACTIONABLE or not (c.Name or "").strip() or not c.IsEnabled:
+                            continue
+                        r = c.BoundingRectangle
+                        if r.width() < 4 or r.height() < 4:
+                            continue
+                        key = (c.ControlTypeName, (c.Name or "").strip(), round((r.left - origin[0]) / 4), round((r.top - origin[1]) / 4))
+                        if key in seen:
+                            continue
+                        seen.add(key)
+                        out.append({"key": f"{c.ControlTypeName}|{c.Name.strip()}", "name": c.Name.strip(), "type": c.ControlTypeName, "box": (r.left - origin[0], r.top - origin[1], r.width(), r.height()), "ctl": c, "popup": True, "unpictured": True})
+                except Exception:
+                    continue
         return out
 
     # ---------------------------------------------------------------- acting (UIA patterns / posted messages; never physical input)
@@ -673,6 +697,44 @@ class OwnedApp:
             u.PostMessageW(target, 0x0102, ord(ch), 0)                     # WM_CHAR
             time.sleep(0.004)
         return True
+
+    def doc_text(self, limit: int = 6000) -> str:
+        """The text of the main editing surface right now (its UI Automation value; '' when the window has none): a change to it is an effect no picture comparison can miss."""
+        with contextlib.suppress(Exception):
+            ed = self._editor()
+            if ed is not None:
+                return str(ed.GetValuePattern().Value or "")[:limit]
+        return ""
+
+    def focus_editor(self) -> bool:
+        """Give the document / text area the keyboard focus by clicking inside it (a posted click, background): a window whose first characters went to a side pane or a banner drops them."""
+        from core_organs import headless_input as hin
+        with contextlib.suppress(Exception):
+            ed = self._editor()
+            if ed is not None:
+                r = ed.BoundingRectangle
+                ok, _n = hin.post_click(self.hwnd, (r.left + r.right) // 2, (r.top + r.bottom) // 2)
+                time.sleep(0.4)
+                return bool(ok)
+        import ctypes
+        import ctypes.wintypes as wt
+        found: List[int] = []
+        u = ctypes.windll.user32
+
+        def cb(h, _l):
+            buf = ctypes.create_unicode_buffer(64)
+            u.GetClassNameW(h, buf, 64)
+            if buf.value in self.EDIT_CLASSES and u.IsWindowVisible(h):
+                found.append(h)
+            return True
+        u.EnumChildWindows(self.hwnd, ctypes.WINFUNCTYPE(ctypes.c_bool, wt.HWND, wt.LPARAM)(cb), 0)
+        if found:
+            r = wt.RECT()
+            u.GetWindowRect(found[0], ctypes.byref(r))
+            ok, _n = hin.post_click(self.hwnd, (r.left + r.right) // 2, (r.top + r.bottom) // 2)
+            time.sleep(0.4)
+            return bool(ok)
+        return False
 
     def clear_text(self) -> None:
         with contextlib.suppress(Exception):

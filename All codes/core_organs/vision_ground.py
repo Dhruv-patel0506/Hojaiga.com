@@ -12,6 +12,7 @@ same format, only fewer rows (measured effect on accuracy: see the report; not r
 from __future__ import annotations
 
 import contextlib
+import os
 import re
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
@@ -131,7 +132,7 @@ class VisionGrounder:
             time.sleep(1.0)
         return False
 
-    def _ask(self, image: Any, som: Dict[str, Any], goal: str, controls: Optional[Sequence[Dict[str, Any]]], hint: str = "") -> Tuple[Optional[Dict[str, Any]], str]:
+    def _ask(self, image: Any, som: Dict[str, Any], goal: str, controls: Optional[Sequence[Dict[str, Any]]], hint: str = "", which: str = "default") -> Tuple[Optional[Dict[str, Any]], str]:
         if self._ground is None and self.mode == "":
             self.mode = "in-process" if self._in_process() else ("server" if self._server() else "none")
             if self.mode == "in-process":
@@ -147,7 +148,7 @@ class VisionGrounder:
             os.close(fd)
             try:
                 image.save(path)
-                body = _j.dumps({"image": path, "som": {k: v for k, v in som.items() if k in ("elements", "size", "tiers_used", "all_elements")}, "goal": goal, "hint": hint, "app_key": self.app_key,
+                body = _j.dumps({"image": path, "som": {k: v for k, v in som.items() if k in ("elements", "size", "tiers_used", "all_elements")}, "goal": goal, "hint": hint, "which": which, "app_key": self.app_key,
                                  "controls": [{k: v for k, v in c.items() if k in ("name", "type", "box")} for c in (controls or [])]}, default=str).encode("utf-8")
                 r = urllib.request.Request(f"http://127.0.0.1:{self.port}/ground", data=body, headers={"Content-Type": "application/json"})
                 out = _j.loads(urllib.request.urlopen(r, timeout=300).read().decode())
@@ -156,8 +157,41 @@ class VisionGrounder:
                     os.remove(path)
             if out.get("error"):
                 raise RuntimeError(out["error"])
+            self.last_conf = out.get("conf") or {}
             return out.get("action"), out.get("reply", "")
         return None, "no Python on this machine can load the vision model"
+
+    @staticmethod
+    def _tau() -> float:
+        """The router threshold: HOJAIGA_ROUTER_CONF if set, else the one measured on held-out rows (data/router_tau.json, written from router_calibrate), else 0.85."""
+        if os.environ.get("HOJAIGA_ROUTER_CONF"):
+            return float(os.environ["HOJAIGA_ROUTER_CONF"])
+        try:
+            import json as _j
+            return float(_j.load(open(os.path.join(os.environ.get("HOJAIGA_DATA", os.path.join("D:" + os.sep, "new_automation", "data")), "router_tau.json"), encoding="utf-8"))["tau"])
+        except Exception:
+            return 0.85
+
+    CONF_MIN = property(lambda self: self._tau())
+
+    def routed(self, image: Any, full: Dict[str, Any], short: Dict[str, Any], name: str, controls: Any, hint: str) -> Tuple[Optional[Dict[str, Any]], str, str]:
+        """The router, cheapest and surest first (the name layers - UIA / OCR - ran before this): (1) the Top-40 adapter, accepted when it is sure of its own answer (geometric-mean token probability >= CONF_MIN) and
+        the id it names is one it was shown; (2) otherwise the full-list adapter, which sees every element. When only one adapter exists, it is used as it is."""
+        import os as _os
+        goal = f"Click the {name}"
+        if self.mode == "server" and _os.environ.get("HOJAIGA_ROUTER", "on").lower() not in ("off", "0") and self.CONF_MIN <= 1.0:          # a threshold above 1 means the measurement found no gain: the full-list adapter answers alone
+            try:
+                act, reply = self._ask(image, short, goal, controls, hint, which="new")
+                conf = (getattr(self, "last_conf", {}) or {}).get("conf")
+                shown = {e.get("id") for e in short.get("elements", [])}
+                if act and act.get("action") == "click" and act.get("target_id") in shown and conf is not None and conf >= self.CONF_MIN:
+                    return act, reply, f"top40 (conf {conf})"
+                act2, reply2 = self._ask(image, dict(full, elements=full.get("elements", [])), goal, controls, "", which="old")
+                return act2, reply2, f"full-list (top40 conf {conf})"
+            except Exception:
+                pass
+        act, reply = self._ask(image, short, goal, controls, hint)
+        return act, reply, "single"
 
     def close(self) -> None:
         with contextlib.suppress(Exception):
@@ -187,8 +221,9 @@ class VisionGrounder:
                     hint = re.sub(r"\s+", " ", str(pl["steps"][0]))[:110]
                     break
         named = [{"name": e["label"], "type": "Text", "box": tuple(e["box"])} for e in short.get("elements", []) if e.get("label")]       # the words read off the screen go in as the `Names:` line, as UI Automation's names do in training
-        action, reply = self._ask(image, short, f"Click the {name}", list(controls or []) or named, hint)
-        self.last = {"layer": "model", "elements": len(som.get("elements", [])), "labelled": labelled, "shown": len(short.get("elements", [])), "reply": str(reply)[:120], "action": action}
+        action, reply, route = self.routed(image, som, short, name, list(controls or []) or named, hint)
+        self.last = {"layer": "model", "route": route, "elements": len(som.get("elements", [])), "labelled": labelled, "shown": len(short.get("elements", [])), "reply": str(reply)[:120], "action": action,
+                     "conf": dict(getattr(self, "last_conf", {}) or {})}
         if not action or action.get("action") != "click":
             return None
         el = element_by_id(short, action.get("target_id"))
@@ -205,3 +240,80 @@ class VisionGrounder:
                 return self.locate(img, name, controls)
             return None
         return ground
+
+
+def _bbox_fractions(obj: Dict[str, Any], size: Tuple[int, int]) -> Optional[List[float]]:
+    """A box from the model's JSON: 'bbox' / 'bbox_2d' in pixels of the picture it was shown (size = that picture's width, height) or already as fractions; returned as fractions 0-1, or None when it is not a sane box."""
+    bb = obj.get("bbox_2d") or obj.get("bbox")
+    if not (isinstance(bb, list) and len(bb) == 4 and all(isinstance(v, (int, float)) for v in bb)):
+        return None
+    W, H = size
+    x0, y0, x1, y1 = (float(v) for v in bb)
+    if max(x0, y0, x1, y1) > 1.5:                                       # pixels
+        x0, x1, y0, y1 = x0 / W, x1 / W, y0 / H, y1 / H
+    if not (0 <= x0 < x1 <= 1.02 and 0 <= y0 < y1 <= 1.02):
+        return None
+    return [round(x0, 4), round(y0, 4), round(min(x1, 1.0), 4), round(min(y1, 1.0), 4)]
+
+
+def look_at(image: Any, concept: str, port: int = 8081, timeout: float = 240.0) -> Dict[str, Any]:
+    """What is on this screen, and is a diagram of `concept` already visible? Asked of the local Qwen2.5-VL-7B (llama.cpp server on `port`, 127.0.0.1 only). Returns {description, diagram_visible, bbox (fractions of the picture) | None,
+    seconds, error}. A screen the model cannot read gives diagram_visible None (unknown), never a guess."""
+    import base64
+    import io
+    import json as _j
+    import time
+    import urllib.request
+    out: Dict[str, Any] = {"description": "", "diagram_visible": None, "bbox": None, "seconds": 0.0, "error": ""}
+    try:
+        im = image.convert("RGB")
+        im.thumbnail((896, 896))
+        buf = io.BytesIO()
+        im.save(buf, "JPEG", quality=82)
+        q = ('Describe in one sentence what is on this screen. Then say whether a diagram or figure that explains "%s" is ALREADY visible on it (a chart, drawing or picture of that concept; a photo, video frame or '
+             'page of text about something else is NOT). Reply JSON {"description": "...", "diagram_visible": true|false, "bbox_2d": [x0,y0,x1,y1] in pixels of this picture, or null}' % concept)
+        body = {"model": "x", "max_tokens": 200, "temperature": 0.1, "messages": [{"role": "user", "content": [
+            {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()}}, {"type": "text", "text": q}]}]}
+        t0 = time.time()
+        r = urllib.request.Request(f"http://127.0.0.1:{port}/v1/chat/completions", data=_j.dumps(body).encode(), headers={"Content-Type": "application/json"})
+        text = _j.loads(urllib.request.urlopen(r, timeout=timeout).read().decode())["choices"][0]["message"]["content"]
+        out["seconds"] = round(time.time() - t0, 1)
+        m = re.search(r"\{.*\}", text, re.S)
+        obj = _j.loads(m.group(0)) if m else {}
+        out["description"] = str(obj.get("description", text))[:240]
+        out["diagram_visible"] = bool(obj["diagram_visible"]) if isinstance(obj.get("diagram_visible"), bool) else None
+        out["bbox"] = _bbox_fractions(obj, im.size)
+    except Exception as exc:
+        out["error"] = f"{type(exc).__name__}: {str(exc)[:120]}"
+    return out
+
+
+def find_on_screen(image: Any, target: str, port: int = 8081, timeout: float = 240.0) -> Dict[str, Any]:
+    """Where is `target` ('the laptop', 'the play button') on this picture? The local Qwen2.5-VL-7B answers with a box in fractions of the picture; {found, bbox, description, seconds, error}. Not found / unreadable -> found False."""
+    import base64
+    import io
+    import json as _j
+    import time
+    import urllib.request
+    out: Dict[str, Any] = {"found": False, "bbox": None, "description": "", "seconds": 0.0, "error": ""}
+    try:
+        im = image.convert("RGB")
+        im.thumbnail((896, 896))
+        buf = io.BytesIO()
+        im.save(buf, "JPEG", quality=82)
+        q = ('Find "%s" on this screen. Reply ONLY JSON {"found": true|false, "bbox_2d": [x0,y0,x1,y1] in pixels of this picture, tight around it, "description": "what it is, in a few words"}' % target)
+        body = {"model": "x", "max_tokens": 120, "temperature": 0.05, "messages": [{"role": "user", "content": [
+            {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()}}, {"type": "text", "text": q}]}]}
+        t0 = time.time()
+        r = urllib.request.Request(f"http://127.0.0.1:{port}/v1/chat/completions", data=_j.dumps(body).encode(), headers={"Content-Type": "application/json"})
+        text = _j.loads(urllib.request.urlopen(r, timeout=timeout).read().decode())["choices"][0]["message"]["content"]
+        out["seconds"] = round(time.time() - t0, 1)
+        m = re.search(r"\{.*\}", text, re.S)
+        obj = _j.loads(m.group(0)) if m else {}
+        out["description"] = str(obj.get("description", ""))[:120]
+        fr = _bbox_fractions(obj, im.size)
+        if obj.get("found") is True and fr is not None:
+            out.update(found=True, bbox=fr)
+    except Exception as exc:
+        out["error"] = f"{type(exc).__name__}: {str(exc)[:120]}"
+    return out

@@ -334,12 +334,15 @@ def judge_scene(task: str, design: Dict[str, Any], build: Dict[str, Any], before
     untouched = all(prior_after.get(k) == v for k, v in prior_before.items())
     rolled = sum(1 for s in steps for a in s["attempts"] if a.get("rolled_back"))
     colours = sum(1 for o in mine if o.get("mats"))
-    m = {"parts_wanted": n_want, "parts_built": n_got, "completeness": round(n_got / max(n_want, 1), 3), "dim_err_mean": round(sum(derr) / max(len(derr), 1), 4), "pos_err_mean_m": round(sum(perr) / max(len(perr), 1), 4),
+    qty = BP.quantity_problems(task, [o["name"] for o in mine], design)
+    m = {"quantity_problems": qty, "parts_wanted": n_want, "parts_built": n_got, "completeness": round(n_got / max(n_want, 1), 3), "dim_err_mean": round(sum(derr) / max(len(derr), 1), 4), "pos_err_mean_m": round(sum(perr) / max(len(perr), 1), 4),
          "connected": biggest == n_got and n_got > 0, "floating_parts": floating, "piercing": pierced, "on_ground": abs(zmin) <= 0.02, "lowest_z": round(zmin, 4), "coloured": colours, "rollbacks": rolled,
          "earlier_objects_untouched": untouched, "earlier_objects": len(prior_before), "extent_m": [round(max(b[1][i] for b in boxes) - min(b[0][i] for b in boxes), 3) for i in range(3)] if boxes else None,
          "vertices": sum(o.get("verts", 0) or 0 for o in mine)}
     score = 100.0 * (0.35 * m["completeness"] + 0.15 * (1 - min(m["dim_err_mean"] / 0.05, 1)) + 0.10 * (1 - min(m["pos_err_mean_m"] / 0.05, 1)) + 0.20 * (1.0 if m["connected"] else 0.0)
                      + 0.10 * (1.0 if m["on_ground"] else 0.0) + 0.05 * (colours / max(n_got, 1)) + 0.05 * (1.0 if untouched else 0.0))
+    if qty:
+        score -= 25.0                                                                  # the order counted things the build does not have
     if pierced:
         score -= min(30.0, 10.0 * len(pierced))                                    # a part through another is not a sound build, however well connected
     m["score"] = round(max(score, 0.0), 1)
@@ -924,6 +927,33 @@ class AppTeachingAutomationSection:
             self._growth_store = SG.SelfGrowth()
         return self._growth_store
 
+    def heal_goal(self, agent: Any, s: Any, goal: str, key: str) -> Any:
+        """Self-healing by ANOTHER PATH: when a goal's first route fails its check, the keyboard alternatives the RAG holds for the same goal are tried one by one (posted to the window, then verified by what appeared on screen).
+        A route that works is remembered (rag.self_growth) so the next run starts from it."""
+        from core_organs.agent_executor import StepRecord
+        from core_organs import agent_executor as AE
+        from core_organs.rag import logic_chains as LC
+        t0 = time.perf_counter()
+        try:
+            adv = agent.advise(goal)
+            alts = [m for t in (adv.get("alternatives") or []) for m in LC.KEY_RX.findall(t)]
+        except Exception:
+            alts = []
+        for combo in list(dict.fromkeys(alts))[:3]:
+            try:
+                pre = s.observe_lite()
+                s.app.chord(combo.lower().replace(" ", ""))
+                time.sleep(0.9)
+                post = s.observe_lite()
+                worked, effect = AE.default_verify(pre, post, None, None)
+            except Exception:
+                continue
+            if worked:
+                with contextlib.suppress(Exception):
+                    self.growth().learn(key, [c["name"] for c in pre.get("controls", [])][:60], {"name": goal, "type": "hotkey", "keys": combo}, "hotkey", [c["name"] for c in post.get("controls", [])][:60], None, True)
+                return StepRecord(goal, "done", source="heal:rag-hotkey", effect=f"the click path failed its check; the RAG's shortcut {combo} worked: {effect}", ms=round((time.perf_counter() - t0) * 1000, 1))
+        return None
+
     proof_dir = ""                                                     # set by a caller that wants before / after pictures of the window it works in (the gauntlet)
 
     def proof_shot(self, s: Any, tag: str, which: str) -> str:
@@ -991,9 +1021,21 @@ class AppTeachingAutomationSection:
             with flow.enter("act", "run the goals: ground, act, verify, roll back") as st:
                 for g in goals:
                     hwnd0 = s.app.hwnd
+                    is_type = bool(re.match(r"^\s*type\b", g, re.I))
+                    fields_before = set() if is_type else {field_id(c) for c in small_fields(s)}
                     before_w = CW.snapshot(hwnd0)
                     r = direct_type(s, g) or agent.step(g)
+                    if r.status in ("no_effect", "wrong_effect") and not re.match(r"^\s*(?:type|press)\b", g, re.I):
+                        healed = self.heal_goal(agent, s, g, key)               # the click path did not work: the RAG's other way to the same goal (a keyboard shortcut) is tried and checked
+                        if healed is not None:
+                            r = healed
                     recs.append(r)
+                    if not is_type:                                                  # what this step opened: the fields that were not there before it (a Find / Replace bar), to be filled in order by the next 'type' goals
+                        time.sleep(0.8)
+                        after_ids = {field_id(c) for c in small_fields(s)}
+                        s._new_fields, s._filled_fields = after_ids - fields_before, set()
+                        if s._new_fields:
+                            self.log(f"[fields] {len(s._new_fields)} text field(s) opened by '{g}': " + ", ".join(sorted(f.split('|')[0] for f in s._new_fields)))
                     kids = CW.new_windows(before_w, hwnd0)
                     for kid in kids:                                              # a window this run opened that the RAG has not seen: learn it now
                         with contextlib.suppress(Exception):
@@ -1003,7 +1045,7 @@ class AppTeachingAutomationSection:
                     if r.status != "done" and r.status != "advised":
                         break
                 st["note"] = f"{sum(1 for r in recs if r.status == 'done')}/{len(goals)} done"
-            out["steps"] = [{"goal": r.goal, "status": r.status, "source": r.source, "reason": r.reason, "rolled_back": r.rolled_back, "assisted": r.assisted, "ms": r.ms, "effect": r.effect[:400]} for r in recs]
+            out["steps"] = [{"goal": r.goal, "status": r.status, "source": r.source, "reason": r.reason, "rolled_back": r.rolled_back, "assisted": r.assisted, "ms": r.ms, "effect": r.effect[:400], "attempts": r.attempts} for r in recs]
             with flow.enter("verify", "read the result back from the screen") as st:
                 out["final_text"] = read_back(s)
                 out["proof"]["after"] = self.proof_shot(s, key, "after")
@@ -1065,6 +1107,67 @@ def placeholder_goals(task: str) -> List[str]:
     return out
 
 
+REPLACE_RXS = (re.compile(r"\b(?:change|swap)\s+(?:every\s+|all\s+|the\s+word\s+)?[\"“']?([^\"”',]+?)[\"”']?\s+(?:to|into)\s+[\"“']?([^\"”',]+?)[\"”']?\s*$", re.I),
+               re.compile(r"\breplace\s+(?:every\s+|all\s+|the\s+word\s+)?[\"“']?([^\"”',]+?)[\"”']?\s+(?:with|by)\s+[\"“']?([^\"”',]+?)[\"”']?\s*$", re.I))
+
+
+class _ReplaceRx:
+    @staticmethod
+    def search(task: str) -> Any:
+        for rx in REPLACE_RXS:
+            m = rx.search(task)
+            if m and not re.match(r"^(?:to|the|a)\s", m.group(1), re.I):
+                return m
+        return None
+
+
+REPLACE_RX = _ReplaceRx()
+
+
+def replace_goals(task: str, rag_hint: Dict[str, Any]) -> List[str]:
+    """'... use Edit Replace to change cat to bird': the way to the replace tool comes from what the RAG learned about THIS program (its menu path), then the two words are typed into the two fields that open, and the replace-all
+    control is pressed. Nothing here names a program: the path is read from the stored pathway (Open the X menu / Choose Y)."""
+    m = REPLACE_RX.search(task)
+    if not m:
+        return []
+    old, new = m.group(1).strip(), m.group(2).strip()
+    path: List[str] = []
+    for pl in (rag_hint or {}).get("plans", [])[:3]:
+        steps = [str(x) for x in pl.get("steps", [])]
+        if not any(re.search(r"\breplace\b", x, re.I) for x in steps):
+            continue
+        for x in steps:
+            ma = re.search(r"([A-Z][A-Za-z]{1,16}(?: [A-Z][A-Za-z]{1,16})?)\s*(?:→|>|›|->)\s*([A-Z][A-Za-z ]{1,24}?)(?:[.)→>]|$)", x)
+            if ma and re.search(r"replace", ma.group(2), re.I):                    # 'go to Edit -> Replace': a menu path as written in the stored pathway
+                path = [f"Click the {ma.group(1).strip()} button", f"Click the {ma.group(2).strip()} option"]
+                break
+            mm = re.search(r"(?:open|click)\s+(?:the\s+)?([A-Z][\w ]{1,20}?)\s+menu", x, re.I)
+            if mm:
+                path.append(f"Click the {mm.group(1).strip()} button")
+            mc = re.search(r"(?:choose|click|select)\s+(?:the\s+)?[\"']?([A-Za-z][\w ]{1,24}?)[\"']?(?:\s*[(\-]|\s+option|\s+button|$)", x, re.I)
+            if mc and re.search(r"replace", mc.group(1), re.I):
+                path.append(f"Click the {mc.group(1).strip()} option")
+                break
+        if path:
+            break
+    if not path:
+        mt = re.search(r"\b([A-Z][a-z]+)\s*(?:>|→|-)?\s*(Find and Replace|Replace)\b", task)       # the order itself names the menu path ('use Edit Replace ...')
+        if mt:
+            path = [f"Click the {mt.group(1)} button", f"Click the {mt.group(2)} option"]
+    if not path:
+        for pl in (rag_hint or {}).get("plans", [])[:3]:                           # else the shortcut the stored pathway gives for it
+            for x in pl.get("steps", []):
+                mk = re.search(r"((?:Ctrl|Control|Alt|Shift)\s*\+\s*[A-Za-z0-9])\b[^.]{0,40}replace|replace[^.]{0,40}((?:Ctrl|Control|Alt|Shift)\s*\+\s*[A-Za-z0-9])\b", str(x), re.I)
+                if mk:
+                    path = ["Press " + re.sub(r"\s+", "", (mk.group(1) or mk.group(2)))]
+                    break
+            if path:
+                break
+    if not path:
+        return []
+    return path + [f'Type "{old}"', f'Type "{new}"', "Click the Replace all button"]
+
+
 def plan_goals(brain: BP.Brain, task: str, control_names: Sequence[str], rag_hint: Dict[str, Any]) -> List[str]:
     """The job as goals a screen can answer one at a time ('Click the Bold button', 'Type "..."'). A drawing job is passed whole (the drawing tools take it). Each goal that names a control names one that exists."""
     if re.search(r"\b(draw|trace|sketch|lightboard|colou?r|shade)\b", task, re.I):
@@ -1072,6 +1175,12 @@ def plan_goals(brain: BP.Brain, task: str, control_names: Sequence[str], rag_hin
     ph = placeholder_goals(task)
     if ph:
         return ph
+    if REPLACE_RX.search(task):
+        typed = re.match(r"^(.*?)[,;]?\s+(?:and\s+)?then\s+(.*)$", task, re.I)
+        rg = replace_goals(typed.group(2) if typed else task, rag_hint)
+        if rg:
+            head = re.search(r"\b(?:type|write|enter)\s+(?:the\s+(?:words?|text)\s+)?[\"“']?(.+?)[\"”']?\s*$", typed.group(1), re.I) if typed else None
+            return ([f'Type "{head.group(1).strip()}"'] if head else []) + rg
     m = re.search(r"\b(?:type|write|enter)\s+(?:the\s+(?:words?|text|sentence)\s+|a\s+(?:line|sentence)\s+)?[\"\u201c']?(.+?)[\"\u201d']?(?:\s+(?:for me|please|in\s+\w+))*\s*$", task, re.I)
     if m and len(m.group(1)) > 1:                                                  # the task names the text itself: nothing to decompose
         sp = re.split(r"\s*[,;]?\s*(?:and\s+)?then\s+", m.group(1).strip(), maxsplit=1, flags=re.I)
@@ -1105,6 +1214,16 @@ def direct_type(session: Any, goal: str) -> Any:
     text = m.group(1)
     t0 = time.perf_counter()
     where = (m.group(2) or "").lower()
+    field = None if where else empty_field(session)
+    if field is not None:                                                  # a form field the last step opened (Find / Replace with ...) takes the text, in order, before the document does
+        try:
+            vp = field.GetValuePattern()
+            vp.SetValue(text)
+            time.sleep(0.4)
+            if text in (vp.Value or ""):
+                return StepRecord(goal, "done", source="direct", effect=f"typed into the field '{field.Name}'; its value now holds the words", ms=round((time.perf_counter() - t0) * 1000, 1))
+        except Exception:
+            pass
     try:
         ok = bool(session.app.type_text(text, where=where)) if where else bool(session.app.type_text(text))
     except TypeError:
@@ -1113,8 +1232,73 @@ def direct_type(session: Any, goal: str) -> Any:
     seen = read_back(session).lower()
     words = [w for w in re.findall(r"\w+", text.lower()) if len(w) > 2]
     hit = bool(words) and sum(1 for w in words if w in seen) >= max(1, len(words) // 2)
+    if not hit and not where:                                              # the words did not land: take the keyboard focus (click the text area), start the field clean and type once more
+        with contextlib.suppress(Exception):
+            session.app.focus_editor()
+            session.app.clear_text()
+            ok = bool(session.app.type_text(text))
+            time.sleep(0.6)
+            seen = read_back(session).lower()
+            hit = bool(words) and sum(1 for w in words if w in seen) >= max(1, len(words) // 2)
     return StepRecord(goal, "done" if (ok and hit) else "no_effect", source="direct", effect="typed into the text area; the words are readable on the window" if hit else "the text could not be read back from the window",
                       reason="" if hit else "no_effect", ms=round((time.perf_counter() - t0) * 1000, 1))
+
+
+def small_fields(session: Any) -> List[Any]:
+    """The small text fields of the window and its flyouts (Find, Replace with, a search box ...), top-to-bottom, left-to-right, one per distinct field; the document's own big text area is not one. Read straight from the
+    accessibility tree (text fields are not in the list of pressable controls)."""
+    import uiautomation as auto
+    out: List[Any] = []
+    with contextlib.suppress(Exception):
+        from core_organs import headless_input as hin
+        ed = None
+        with contextlib.suppress(Exception):
+            ed = session.app._editor()
+        edr = ed.BoundingRectangle if ed is not None else None
+        seen = set()
+        roots = [session.app.hwnd] + list(hin.popup_windows(session.app.hwnd)[:3])
+        for hw in roots:
+            try:
+                for c, _d in auto.WalkControl(auto.ControlFromHandle(hw), maxDepth=14):
+                    if c.ControlTypeName not in ("EditControl", "ComboBoxControl") or c.IsOffscreen:
+                        continue
+                    r = c.BoundingRectangle
+                    if r.width() < 20 or r.height() < 10 or r.height() > 120:
+                        continue
+                    if edr is not None and r.width() * r.height() >= 0.5 * edr.width() * edr.height():
+                        continue
+                    key = (c.Name, r.left // 6, r.top // 6)
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    out.append(c)
+            except Exception:
+                continue
+    return sorted(out, key=lambda c: (round(c.BoundingRectangle.top / 12), c.BoundingRectangle.left))
+
+
+def field_id(ctl: Any) -> str:
+    r = ctl.BoundingRectangle
+    return f"{ctl.Name}|{ctl.AutomationId}|{r.left // 6}|{r.top // 6}"
+
+
+def empty_field(session: Any) -> Any:
+    """The text field the LAST step opened, in order: a Find / Replace-with / search field that was not on the window before that step and has not been filled yet takes the text (even when the app pre-filled it with an old
+    search); with no such field, the first EMPTY small field; with none, None (the document's text area takes a bare 'type')."""
+    with contextlib.suppress(Exception):
+        fields = small_fields(session)
+        new = getattr(session, "_new_fields", set())
+        filled = getattr(session, "_filled_fields", set())
+        for c in fields:
+            fid = field_id(c)
+            if fid in new and fid not in filled:
+                session._filled_fields = filled | {fid}
+                return c
+        for c in fields:
+            vp = c.GetValuePattern()
+            if vp is not None and not vp.IsReadOnly and not (vp.Value or "").strip() and field_id(c) not in filled and not new:
+                return c
+    return None
 
 
 def read_back(session: Any) -> str:
@@ -1138,6 +1322,11 @@ def read_back(session: Any) -> str:
             big = g.resize((g.width * 2, g.height * 2))                       # small / pale text (a slide's subtitle, a dark theme) needs a second and third look: enlarged, and inverted
             parts.append(pytesseract.image_to_string(big, config="--psm 11"))
             parts.append(pytesseract.image_to_string(ImageOps.invert(big), config="--psm 11"))
+    with contextlib.suppress(Exception):                                  # the document's own object model lists ALL its text (every shape of every slide, the whole body, every used cell), selected or not
+        from core_organs import office_om as OM
+        om_text = OM.text_of(session.app.hwnd)
+        if om_text:
+            parts.append(om_text)
     with contextlib.suppress(Exception):                                  # a slide's text is not in the UI tree and is small on the canvas: read the slide itself, enlarged
         if re.search(r"powerpoint|impress|slides", str(getattr(session.app, "name", "")), re.I):
             got = session.app.slide_rect()

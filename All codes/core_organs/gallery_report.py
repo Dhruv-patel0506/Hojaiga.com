@@ -34,8 +34,10 @@ def build(v3: str = V3, gate: str = "") -> str:
     from core_organs import gauntlet as G
     results = [load(p) for p in sorted(glob.glob(os.path.join(GALLERY, "results", "*.json")))]
     results = [r for r in results if r]
-    cases = [r for r in results if not str(r.get("case", "")).startswith("concept_") or True]
-    passed = sum(1 for r in cases if r.get("ok"))
+    for r in results:
+        r["status"] = r.get("status") or ("PASS" if r.get("ok") else "FAIL")
+    cases = results
+    passed = sum(1 for r in cases if r["status"] == "PASS")
     ev = load(os.path.join(v3, "eval_v3_summary.json")) or {}
     hb = load(os.path.join("D:" + os.sep, "new_automation", "data", "overnight", "hybrid_bench_easy.json")) or {}
     hh = load(os.path.join("D:" + os.sep, "new_automation", "data", "overnight", "hybrid_bench_hard.json")) or {}
@@ -82,14 +84,14 @@ def build(v3: str = V3, gate: str = "") -> str:
     L += ["| case | kind | result | what was checked | seconds | proof |", "|---|---|---|---|---|---|"]
     for r in cases:
         png = os.path.basename(r.get("png", "") or "")
-        L.append(f"| {r.get('case')} | {r.get('kind', 'concept')} | {'PASS' if r.get('ok') else 'FAIL'} | {str(r.get('verdict', ''))[:110]} | {r.get('wall_s', '')} | {png} |")
+        L.append(f"| {r.get('case')} | {r.get('kind', 'concept')} | {r['status']} | {str(r.get('verdict', ''))[:110]} | {r.get('wall_s', '')} | {png} |")
     L.append("")
-    walls = [r for r in cases if str(r.get("case", "")).endswith("_wall")]
-    func = [r for r in cases if r not in walls]
-    fp = sum(1 for r in func if r.get("ok"))
-    L.append(f"**Gauntlet: {fp}/{len(func)} functional cases pass = {100.0 * fp / max(len(func), 1):.0f}%.** (All {passed}/{len(cases)} = {100.0 * passed / max(len(cases), 1):.0f}% if the {len(walls)} sign-in-wall stops are counted; "
-             "those only prove the agent STOPS at a login and types nothing - they do not prove it can work inside Gmail / Discord / WhatsApp, because no signed-in session was available: no Chrome extension was connected "
-             "and the owned Edge profile is not signed in.)")
+    blocked = [r for r in cases if r["status"] == "AUTH_BLOCKED"]
+    demos = [r for r in cases if r["status"] == "DEMO"]
+    func = [r for r in cases if r["status"] in ("PASS", "FAIL")]
+    fp = sum(1 for r in func if r["status"] == "PASS")
+    L.append(f"**Gauntlet (live planning, no replayed recipes): {fp}/{len(func)} cases PASS = {100.0 * fp / max(len(func), 1):.0f}%.** Not counted: {len(blocked)} AUTH_BLOCKED (stopped at a sign-in wall - the task was NOT done; no signed-in session "
+             f"was available) and {len(demos)} DEMO (mechanism shown, not a task result).")
     if gt:
         mg = gt.get("main_gate", {})
         L.append("")

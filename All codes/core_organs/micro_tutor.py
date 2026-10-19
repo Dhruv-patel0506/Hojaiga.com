@@ -323,18 +323,41 @@ class MicroTutor:
         import ctypes
         from core_organs import diagram_teach as DT
         self.state("Thinking")
-        plan = DT.plan_diagram(self._engine().get_brain(), request)
-        if not plan["parts"]:
-            self.say("I could not work out a clear drawing for that. Try asking it another way.")
-            self.state("Idle")
-            return {"parts": 0, "problems": plan["problems"]}
-        if region is None:
-            u = ctypes.windll.user32
-            sw, sh = u.GetSystemMetrics(0), u.GetSystemMetrics(1)
-            region = (sw * 0.12, sh * 0.14, sw * 0.88, sh * 0.9)
-        parts = DT.to_screen(plan["parts"], region)
-        self.log(f"[tutor] diagram: {len(parts)} part(s) planned in {plan['seconds']}s")
+        shot = self.screenshot()
+        look: Dict[str, Any] = {}
+        if shot is not None and self.want_vision:                                    # LOOK first: is the concept already drawn on this screen? what is on it?
+            from core_organs import vision_ground as VG
+            look = VG.look_at(shot, request)
+            self.history.append({"looked": look})
+        if shot is not None:
+            sp = DT.plan_on_screen(self._engine().get_brain(), request, shot, look)
+            if sp["mode"] == "annotate":
+                x0, y0, x1, y1 = sp["box"]
+                from core_organs.professor.schema import Box
+                self._overlay().box(Box(x0, y0, x1, y1), "the diagram", pointer=True)
+                self.say("That diagram on your screen is the one to look at. " + str(look.get("description", ""))[:120])
+                self.state("Idle")
+                return {"mode": "annotate", "look": look}
+            if sp["mode"] == "none":
+                self.say("I could not work out a clear drawing for that. Try asking it another way.")
+                self.state("Idle")
+                return {"parts": 0, "problems": sp["plan"]["problems"]}
+            plan, parts, card = sp["plan"], sp["parts"], sp["card"]
+        else:
+            plan = DT.plan_diagram(self._engine().get_brain(), request)
+            if not plan["parts"]:
+                self.say("I could not work out a clear drawing for that. Try asking it another way.")
+                self.state("Idle")
+                return {"parts": 0, "problems": plan["problems"]}
+            if region is None:
+                u = ctypes.windll.user32
+                sw, sh = u.GetSystemMetrics(0), u.GetSystemMetrics(1)
+                region = (sw * 0.12, sh * 0.14, sw * 0.88, sh * 0.9)
+            parts, card = DT.to_screen(plan["parts"], region), None
+        self.log(f"[tutor] diagram: {len(parts)} part(s) planned in {plan['seconds']}s ({plan.get('mode', 'freeform')})")
         ov = self._overlay()
+        if card:
+            ov.shape("card", card, "", seconds=0.1)
         for k, part in enumerate(parts):
             self.history.append({"shape": part["kind"], "label": part["label"], "say": part["say"]})
             self.state("Speaking")

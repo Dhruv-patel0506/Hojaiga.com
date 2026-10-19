@@ -166,6 +166,25 @@ class WebAgent:
     rejections = 0
     SEARCH_RX = re.compile(r"\bsearch(?:\s+(?:the\s+)?(?:\w+\s+)?(?:for|about))?\s+[\"“']?(.+?)[\"”']?(?=\s+(?:and|then|,|;)\b|[,;.]|$)", re.I)
 
+    DRAW_RX = re.compile(r"\b(draw|sketch|paint|doodle|scribble|diagram)\b", re.I)
+
+    def canvas_step(self, task: str, controls: Sequence[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+        """Tool-then-drag, read from the state: an order to DRAW on a page that has a drawing canvas, where the last thing that worked was clicking a control (a tool) and nothing has been dragged on the canvas since, is
+        answered by a drag on the canvas - never by clicking the tool again. Once per tool selection."""
+        if not self.DRAW_RX.search(task) or not self.history:
+            return None
+        last = self.history[-1]
+        if last["action"] == "drag" and last.get("ok") and not re.search(r"\b(and|then|also|more|several|three|two|four|five)\b|,", self.DRAW_RX.split(task, 1)[-1], re.I):
+            return {"action": "done", "summary": "the shape was drawn on the canvas (the drag changed the page)", "verified": True}        # a single thing was asked for and the drag took effect
+        if last["action"] != "click" or not last.get("ok") or getattr(self, "_dragged_for", None) == len(self.history):
+            return None
+        ci = next((i for i, c in enumerate(controls) if c.get("role") == "canvas"), None)
+        if ci is None:
+            return None
+        self._dragged_for = len(self.history) + 1
+        w, h = controls[ci]["box"][2], controls[ci]["box"][3]
+        return {"action": "drag", "id": ci, "dx": int(min(240, w * 0.25)), "dy": int(min(150, h * 0.2)), "why": "a drawing tool was just selected: drag on the canvas"}
+
     def search_step(self, task: str, controls: Sequence[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
         """'search for X ...': the first move is read from the order's own words (type X into the page's search box, Enter), not chosen by the model (which sometimes clicks the Search BUTTON first). Once per order."""
         if getattr(self, "_searched", False) or any(h["action"] == "type" for h in self.history):
@@ -321,11 +340,13 @@ class WebAgent:
                 stay = [c for c in pool if not self.leaves_site(c, task)]
                 pool = stay or pool               # a dialog that is open is the only thing that can be operated
             short = [(controls.index(c), c) for _i, c in shortlist(pool, task, [h.get("target", "") for h in self.history[-3:]])]
-            obj, meta = self.search_step(task, controls), {"seconds": 0.0}
+            obj, meta = self.search_step(task, controls) or self.canvas_step(task, controls), {"seconds": 0.0}
             if obj is None:
                 obj, meta = self.brain.json(decide_prompt(task, self.page(), short, self.history, problem), BP.DESIGN_SYSTEM.replace("3D modeller", "web operator"), max_tokens=150)
             self.model_seconds += float(meta.get("seconds") or 0.0)
             act, problem = parse_action(obj, len(controls))
+            if act is not None and isinstance(obj, dict) and obj.get("verified"):
+                act["verified"] = True
             if act is None:
                 fails += 1
                 self.log(f"[web] step {n + 1}: unusable answer ({problem})")
@@ -353,7 +374,7 @@ class WebAgent:
                     break
                 continue
             if act["action"] == "done":
-                if self.rejections < 2 and self.history:                          # the model says it is finished: look at the page once more before believing it
+                if self.rejections < 2 and self.history and not act.get("verified"):                          # the model says it is finished: look at the page once more before believing it
                     ok_done, why_not = self.check_done(task)
                     if not ok_done:
                         self.rejections += 1
@@ -432,7 +453,10 @@ class OwnedBrowser:
     """A browser the run starts, visible, with a profile of its OWN (data/web_profile): the person signs in there once and the session stays. The person's everyday browser profile is never touched. Ended by its
     process id at the end."""
 
-    def __init__(self, profile: str = "", exe: str = "", visible: bool = True) -> None:
+    def __init__(self, profile: str = "", exe: str = "", visible: bool = True, attach_port: int = 0) -> None:
+        self.attach_port = attach_port or int(os.environ.get("HOJAIGA_CDP_PORT", "0") or 0)      # a browser the person already runs with --remote-debugging-port=<n> (their signed-in session)
+        self.attached = False
+        self._tab: Dict[str, Any] = {}
         self.profile = profile or os.path.join(os.environ.get("HOJAIGA_DATA", r"D:\new_automation\data"), "web_profile")
         self.exe, self.visible = exe, visible
         self.proc: Optional[subprocess.Popen] = None
@@ -442,6 +466,11 @@ class OwnedBrowser:
     def __enter__(self) -> "OwnedBrowser":
         from core_organs.professor import launcher as LN
         from core_organs.professor.adapters.cdp import CdpBrowser
+        if self.attach_port:                                                      # ATTACH: the person's own signed-in browser through its DevTools port; a new tab of ours, nothing else touched, nothing killed at the end
+            br = CdpBrowser(self.attach_port)
+            if br.wait(3.0):
+                self.port, self.browser, self.attached = self.attach_port, br, True
+                return self
         exe = self.exe or LN.resolve("Microsoft Edge").exe or LN.resolve("Google Chrome").exe
         if not exe:
             raise RuntimeError("no Edge or Chrome found")
@@ -459,12 +488,25 @@ class OwnedBrowser:
         from core_organs.harvest import web_recorder as WR
         from core_organs.professor.adapters.cdp import CdpPage
         tg = [t for t in self.browser.targets() if t.get("type") == "page"]
+        if self.attached:                                                         # an attached everyday browser: a fresh tab of our own, never one the person is reading
+            import json as _j
+            import urllib.request
+            with contextlib.suppress(Exception):
+                rq = urllib.request.Request(f"http://127.0.0.1:{self.port}/json/new?about:blank", method="PUT")
+                self._tab = _j.loads(urllib.request.urlopen(rq, timeout=5).read().decode())
+                tg = [self._tab]
         d = WR.CdpDriver(CdpPage(tg[0]))
         with contextlib.suppress(Exception):
             d.p.call("Emulation.clearDeviceMetricsOverride")                          # a visible window keeps its real size
         return d
 
     def __exit__(self, *exc: Any) -> bool:
+        if self.attached:
+            with contextlib.suppress(Exception):                                  # close only the tab this run opened
+                import urllib.request
+                if self._tab.get("id"):
+                    urllib.request.urlopen(f"http://127.0.0.1:{self.port}/json/close/{self._tab['id']}", timeout=5).read()
+            return False
         if self.proc is not None:
             with contextlib.suppress(Exception):
                 import psutil
@@ -473,4 +515,35 @@ class OwnedBrowser:
                     with contextlib.suppress(Exception):
                         ch.kill()
                 par.kill()
+            with contextlib.suppress(Exception):                                  # a browser that hands its window to another process of the same profile leaves that one behind: every process
+                import psutil                                                    # started with THIS run's own profile directory (and no other) is ended, by pid
+                prof = os.path.normcase(os.path.abspath(self.profile))
+                for pr in psutil.process_iter(["pid", "cmdline"]):
+                    cl = " ".join(pr.info.get("cmdline") or [])
+                    if prof in os.path.normcase(cl):
+                        with contextlib.suppress(Exception):
+                            pr.kill()
         return False
+
+
+def main(argv: Optional[Sequence[str]] = None) -> int:
+    """python -m core_organs.web_delegate --sign-in https://web.whatsapp.com   : opens the owned browser (its own profile) on that address and keeps it open until you press Enter, so you can sign in ONCE yourself
+    (the session then stays in data/web_profile and later runs use it). Nothing is typed for you; passwords never pass through this program."""
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--sign-in", default="", help="address to open for a one-time manual sign-in")
+    ap.add_argument("--attach-port", type=int, default=0, help="use a browser you started with --remote-debugging-port=N instead of the owned one")
+    a = ap.parse_args(argv)
+    if not a.sign_in:
+        ap.print_help()
+        return 0
+    with OwnedBrowser(visible=True, attach_port=a.attach_port) as br:
+        d = br.driver()
+        d.navigate(a.sign_in)
+        input("Sign in in the browser window, then press Enter here to close it (the session is kept)... ")
+    return 0
+
+
+if __name__ == "__main__":
+    import sys as _sys
+    _sys.exit(main())

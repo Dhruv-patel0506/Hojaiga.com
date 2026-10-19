@@ -25,21 +25,51 @@ def tokens(s: str) -> List[str]:
     return [w for w in re.findall(r"[a-z0-9]+", (s or "").lower()) if len(w) > 1]
 
 
-def trim(elements: Sequence[Dict[str, Any]], goal: str, names: Optional[Dict[int, str]] = None, k: int = TOP_K) -> List[Dict[str, Any]]:
-    """The k elements that matter for the goal (label / name words shared with it first, unlabeled icons next, then buttons / fields); ids unchanged; order = original order."""
+def trim(elements: Sequence[Dict[str, Any]], goal: str, names: Optional[Dict[int, str]] = None, k: int = TOP_K, hint_words: Sequence[str] = (), reserve_headers: int = 6, reserve_neighbors: int = 6) -> List[Dict[str, Any]]:
+    """The k elements that matter for the goal; ids unchanged; order = original order. In rank order:
+      1. words the goal (and the RAG's retrieved step / menu names, `hint_words`) share with an element's label or accessibility name (a goal made ONLY of generic words - 'Click the Text button' - keeps them);
+      2. the application's top-level headers: short-labelled menu / tab / button elements in the top band of the picture ('File', 'Edit', 'Insert', 'Home') - the parent of what a goal names;
+      3. spatial neighbours of the best matches (a goal that names a value, a row or a category often names the thing beside the matched label);
+      4. unlabeled icons, then buttons / fields."""
     names = names or {}
-    want = [w for w in tokens(goal) if w not in GENERIC]
+    base_want = [w for w in tokens(goal) if w not in GENERIC]
+    want = base_want or [w for w in tokens(goal) if w not in ("click", "the", "to", "on", "in", "of", "and", "a", "an")]
+    hint = {w for w in (h.lower() for h in hint_words) if len(w) > 1}
+
+    def label_of(e: Dict[str, Any]) -> str:
+        return ((e.get("label") or "") + " " + names.get(e["id"], "")).strip()
 
     def score(e: Dict[str, Any]) -> float:
-        lab = ((e.get("label") or "") + " " + names.get(e["id"], "")).strip()
-        s = len(set(want) & set(tokens(lab))) * 2.0
+        lab = label_of(e)
+        toks = set(tokens(lab))
+        s = len(set(want) & toks) * 2.0 + len(hint & toks) * 1.5
         if not lab:
             s += 0.6
         if e.get("type") in ("button", "field", "checkbox", "radio", "tab", "menu"):
             s += 0.2
         return s
-    keep = {e["id"] for e in sorted(elements, key=lambda e: (-score(e), e["id"]))[:k]}
-    return [e for e in elements if e["id"] in keep]
+    ranked = sorted(elements, key=lambda e: (-score(e), e["id"]))
+    keep: List[int] = []
+    for e in ranked[:max(k - reserve_headers - reserve_neighbors, 1)]:
+        keep.append(e["id"])
+    top_band = sorted({e["box"][1] for e in elements})[:1]
+    y_limit = (top_band[0] if top_band else 0) + 130
+    heads = [e for e in elements if e["id"] not in keep and e["box"][1] <= y_limit and len((e.get("label") or "").strip()) <= 12 and e.get("type") in ("menu", "tab", "button", "text", "menuitem")]
+    for e in sorted(heads, key=lambda e: (e["box"][1], e["box"][0]))[:reserve_headers]:
+        keep.append(e["id"])
+    best = [e for e in ranked[:3] if score(e) >= 1.5]
+    for b in best:
+        bx, by = b["box"][0] + b["box"][2] / 2.0, b["box"][1] + b["box"][3] / 2.0
+        near = sorted((e for e in elements if e["id"] not in keep), key=lambda e: (e["box"][0] + e["box"][2] / 2.0 - bx) ** 2 + (e["box"][1] + e["box"][3] / 2.0 - by) ** 2)
+        for e in near[:max(reserve_neighbors // 3, 1)]:
+            keep.append(e["id"])
+    for e in ranked:                                                              # whatever room is left, by rank
+        if len(keep) >= k:
+            break
+        if e["id"] not in keep:
+            keep.append(e["id"])
+    keepset = set(keep[:k])
+    return [e for e in elements if e["id"] in keepset]
 
 
 def element_line(e: Dict[str, Any]) -> str:

@@ -755,3 +755,112 @@ def run_ar37(verdict):
               "legs_hanging_in_mid_air_are_stood_on_the_ground": after[2] == [] and min(p["at"][2] - p["size"][2] / 2 for p in floaty["parts"]) >= -0.005,
               "a_lamp_pole_is_stretched_between_base_and_shade_and_the_base_stays_on_the_ground": bool(n_lamp) and after[3] == [] and abs(lamp_bad["parts"][0]["at"][2] - 0.015) < 1e-6}
     return verdict(checks, "bad=%d problems, measured=%d, good=%s, lamp=%s" % (len(pb), len(meas), pg, pl))
+
+
+def run_ar38(verdict):
+    """AR38: concepts drawn from a SCENE, for THIS screen -- the compiler builds an exact right triangle with a square on each side (areas a^2 + b^2 = c^2 to the pixel, no overlap, squares outside), a screen that already shows the
+    diagram is pointed at (annotate), otherwise the figure goes on a card in the quietest part of the picture. PNG proof."""
+    import math
+    import random
+    from PIL import Image, ImageDraw
+    from core_organs import diagram_teach as DT, tutor_overlay as TO
+    scene = {"objects": [{"id": "t", "type": "right_triangle", "legs": [3, 4], "label": "right triangle"}, {"id": "a", "type": "square_on", "of": "t", "side": "leg_a", "label": "a squared"},
+                         {"id": "b", "type": "square_on", "of": "t", "side": "leg_b", "label": "b squared"}, {"id": "c", "type": "square_on", "of": "t", "side": "hypotenuse", "label": "c squared"}],
+             "steps": [{"show": ["t"], "say": "A right triangle."}, {"show": ["a", "b"], "say": "A square on each leg."}, {"show": ["c"], "say": "And one on the longest side."}]}
+    parts, probs = DT.compile_scene(scene)
+    ar = [DT._poly_area(p["points"]) for p in parts] if len(parts) == 4 else [0, 0, 0, 1]
+    tri = parts[0]["points"] if parts else []
+    ang = DT._angle(tri[1], tri[0], tri[2]) if len(tri) == 3 else 0
+    sq_ok = False
+    if len(parts) == 4:
+        sq_ok = all(max(math.dist(p["points"][k], p["points"][(k + 1) % 4]) for k in range(4)) - min(math.dist(p["points"][k], p["points"][(k + 1) % 4]) for k in range(4)) < 1e-6 for p in parts[1:])
+    bad_ref = DT.compile_scene({"objects": [{"id": "s", "type": "square_on", "of": "nothing", "side": "side0"}]})[1]
+    img = Image.new("RGB", (800, 500), (255, 255, 255))
+    d = ImageDraw.Draw(img)
+    random.seed(3)
+    for _ in range(900):
+        x, y = random.randint(0, 799), random.randint(0, 499)
+        if not (x > 520 and y > 250):
+            d.line([x, y, x + random.randint(-14, 14), y + random.randint(-14, 14)], fill=(30, 30, 30), width=1)
+    region = DT.clear_region(img)
+    quiet = (region[0] + region[2]) / 2 > 400 and (region[1] + region[3]) / 2 > 220
+
+    class _B:
+        def json(self, *a, **k):
+            return scene, {"seconds": 0.0}
+    drawn = DT.plan_on_screen(_B(), "explain the Pythagorean theorem", img, {"diagram_visible": False})
+    pointed = DT.plan_on_screen(_B(), "explain the Pythagorean theorem", img, {"diagram_visible": True, "bbox": [0.1, 0.2, 0.5, 0.7]})
+    png = False
+    try:
+        out = Image.new("RGB", (1600, 500), (255, 255, 255))
+        rec = TO.RecordingRedOverlay()
+        rec.shape("card", drawn["card"], "")
+        for p in drawn["parts"]:
+            rec.shape(p["kind"], p["points"], p["label"])
+        out.paste(rec.preview(img).convert("RGB"), (0, 0))
+        out.paste(img, (800, 0))
+        os.makedirs(os.path.join("D:" + os.sep, "new_automation", "data", "mvp_proof_gallery"), exist_ok=True)
+        out.save(os.path.join("D:" + os.sep, "new_automation", "data", "mvp_proof_gallery", "scene_concept_AR38.png"))
+        png = True
+    except Exception:
+        png = False
+    checks = {"the_scene_compiles_without_problems": not probs and len(parts) == 4,
+              "the_triangle_has_a_true_right_angle": abs(ang - 90) < 1e-6,
+              "pythagoras_holds_to_the_pixel": abs(ar[1] + ar[2] - ar[3]) < 1e-6 * ar[3],
+              "the_squares_are_squares_and_nothing_overlaps": sq_ok and DT.geometry_problems(parts) == [],
+              "a_shape_on_an_unknown_base_is_refused_in_words": any("EARLIER" in x for x in bad_ref),
+              "the_quietest_part_of_a_busy_picture_is_chosen": quiet,
+              "the_figure_goes_on_a_card_there": drawn["mode"] == "draw" and drawn["card"] is not None and len(drawn["parts"]) == 4,
+              "a_diagram_already_on_screen_is_pointed_at_not_redrawn": pointed["mode"] == "annotate" and not pointed["parts"],
+              "png_proof_saved": png}
+    return verdict(checks, "areas=%s angle=%.1f region=%s" % ([round(a) for a in ar], ang, [round(v) for v in region]))
+
+
+def run_ar39(verdict):
+    """AR39: the Top-N candidate selector keeps what a goal needs -- words of the goal AND of the RAG's retrieved step, a goal made only of generic words ('Click the Text button'), the application's top-level headers
+    (the parent menu of 'Replace'), and the neighbours of the best match; the cut is exactly N."""
+    from core_organs.harvest import prompt_v3 as P3
+    els = [{"id": i, "type": "button", "label": "item%d" % i, "box": (10 + i * 12, 300 + (i % 7) * 20, 40, 18)} for i in range(1, 91)]
+    els += [{"id": 100 + k, "type": "menu", "label": n, "box": (10 + k * 60, 10, 50, 20)} for k, n in enumerate(("File", "Edit", "View"))]
+    els.append({"id": 200, "type": "text", "label": "A", "box": (700, 31, 14, 14)})
+    ids = lambda kept: {e["id"] for e in kept}  # noqa: E731
+    k1 = P3.trim(els, "Click the Text button", {200: "Text"}, 40)
+    k2 = P3.trim(els, "replace the word cat", {}, 40, hint_words=["Edit", "Replace"])
+    k3 = P3.trim(els, "Click the item50 button", {}, 40)
+    near = [e["id"] for e in sorted([e for e in els if e["id"] != 50 and e["id"] < 100], key=lambda e: (e["box"][0] - els[49]["box"][0]) ** 2 + (e["box"][1] - els[49]["box"][1]) ** 2)[:2]]
+    checks = {"a_goal_made_only_of_generic_words_keeps_them": 200 in ids(k1),
+              "the_rags_step_names_pull_in_the_parent_menu": 101 in ids(k2),
+              "top_level_headers_are_always_kept": {100, 101, 102} <= ids(k3),
+              "the_neighbours_of_the_best_match_are_kept": all(n in ids(k3) for n in near),
+              "the_exact_match_is_kept": 50 in ids(k3),
+              "the_cut_is_exactly_n": len(k1) == len(k2) == len(k3) == 40,
+              "ids_are_unchanged_and_in_the_original_order": [e["id"] for e in k3] == [e["id"] for e in els if e["id"] in ids(k3)]}
+    return verdict(checks, "kept %d/%d" % (len(k3), len(els)))
+
+
+def run_ar40(verdict):
+    """AR40: honest grading and executor generality -- a hotkey's new UI counts as its effect, two controls with one name resolve to the exact pressable one, a flyout whose items are only in the accessibility tree counts as
+    an effect, a stored design that pierces is rejected."""
+    from core_organs import agent_verify as AV, agent_executor as AE, brain_planner as BP
+    one = {"elements": [{"id": 1, "label": "Edit", "box": [10, 10, 40, 20]}], "size": [600, 500]}
+    three = {"elements": [{"id": 1, "label": "Edit", "box": [10, 10, 40, 20]}, {"id": 2, "label": "Replace", "box": [10, 40, 60, 20]}, {"id": 3, "label": "Find", "box": [10, 60, 60, 20]}], "size": [600, 500]}
+    w1, e1 = AE.default_verify({"image": None, "som": one}, {"image": None, "som": three}, None, None)
+    pre = {"image": None, "som": one, "controls": [{"name": "Edit", "type": "MenuItemControl", "box": (10, 10, 40, 20)}]}
+    post = {"image": None, "som": three, "controls": [{"name": "Edit", "type": "MenuItemControl", "box": (10, 10, 40, 20)}, {"name": "Close replace options", "type": "ButtonControl", "box": (0, 0, 9, 9)}]}
+    v = AV.goal_verify("Press Ctrl+H", {"action": "hotkey", "hotkey": "Ctrl+H"}, pre, post, True, "the screen changed")
+    pre2 = {"som": {"elements": [{"id": 1, "label": "Edit", "box": [10, 10, 40, 20]}, {"id": 2, "label": "Edit", "box": [10, 100, 500, 300]}], "size": [600, 500]},
+            "controls": [{"name": "Edit", "type": "MenuItemControl", "box": (10, 10, 40, 20)}, {"name": "Edit", "type": "DocumentControl", "box": (10, 100, 500, 300)}]}
+
+    class _A(AE.Agent):
+        def __init__(self):
+            self.uia_first = True
+    route = _A()._uia_route("Click the Edit button", pre2, [])
+    xy = [(-.9, -.4), (.9, -.4), (-.9, .4), (.9, .4)]
+    stored = {"parts": [{"name": "top", "size": [2, 1, 0.08], "at": [0, 0, 0.04]}] + [{"name": "leg%d" % i, "size": [0.1, 0.1, 0.9], "at": [x, y, 0.45]} for i, (x, y) in enumerate(xy)]}
+    checks = {"a_flyout_seen_only_in_the_tree_is_an_effect": bool(w1) and "not in the picture" in e1,
+              "a_hotkeys_new_ui_is_its_effect_not_an_unexpected_dialog": v["worked"] is True,
+              "two_controls_with_one_name_resolve_to_the_pressable_one": route is not None and route["target_id"] == 1,
+              "a_stored_design_that_pierces_is_rejected_by_the_critic": bool(BP.critic(stored)),
+              "an_order_that_counts_three_shelves_is_not_met_by_one": bool(BP.quantity_problems("build a bookshelf with three shelves", ["side1", "side2", "shelf", "books"])),
+              "four_legs_are_counted_by_name": not BP.quantity_problems("a four legged chair", ["seat", "leg1", "leg2", "leg3", "leg4", "back"]) and bool(BP.quantity_problems("a four legged chair", ["seat", "leg1", "leg2"]))}
+    return verdict(checks, "effect=%s route=%s" % (e1[:50], route))
