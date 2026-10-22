@@ -271,6 +271,9 @@ class TutorSession:
         out: List[Dict[str, Any]] = []
         for r in sorted(rows, key=lambda r: {"MenuItem": 0, "TabItem": 0}.get(r["type"], 1)):          # the same control often shows up twice (a MenuItem wrapping a Button): keep the more specific one
             x, y, w, h = r["box"]
+            from core_organs import chrome_filter as CF
+            if CF.is_window_chrome(r["name"], r["type"], (x - wx, y - wy, w, h), (ww, wh)):          # the window frame (Minimize / Maximize / Restore / Close / system menu) is not part of the lesson
+                continue
             if any(o["name"] == r["name"] and abs(o["box"][0] - x) < 12 and abs(o["box"][1] - y) < 12 for o in out):
                 continue
             r.setdefault("key", "")

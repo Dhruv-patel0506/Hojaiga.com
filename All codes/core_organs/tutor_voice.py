@@ -84,6 +84,8 @@ class Voice:
             done.set()
 
     def speak(self, text: str, wait: bool = True, timeout: float = 25.0) -> bool:
+        from core_organs.speech_sanitize import clean_for_speech
+        text = clean_for_speech(text)                                    # never read the prompt machinery aloud
         self.said.append(text)
         if not self.enabled or not text:
             return False

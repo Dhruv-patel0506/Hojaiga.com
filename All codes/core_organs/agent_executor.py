@@ -23,7 +23,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
-from core_organs import agent_verify as AV, safety_guard as SG
+from core_organs import agent_verify as AV, chrome_filter as CF, picture_tier as PT, safety_guard as SG
 
 # chords that close the window, lock or sign out, erase, or force-quit: never sent by the loop whoever asked
 DANGEROUS_CHORDS = {"alt+f4", "ctrl+alt+delete", "ctrl+shift+escape", "win+l", "ctrl+w", "ctrl+shift+delete", "shift+delete", "ctrl+q", "alt+f4+alt"}
@@ -583,7 +583,13 @@ class LiveSession:
             controls = []
         if len(controls) < min_controls:
             return self.observe()
-        return {"image": img, "som": som_from_controls(controls, img.size), "controls": controls, "doc": self._doc()}
+        controls = CF.drop_chrome(controls, img.size)                  # the window frame is not part of the application: never a candidate
+        controls, tier = PT.augment(img, controls)                     # a thin tree or an empty work area: the picture's OCR words and icons join the candidates
+        som = som_from_controls(controls, img.size)
+        if tier.get("added"):
+            som["tiers_used"] = ["uia"] + [t for t in ("ocr", "icon") if tier.get({"ocr": "ocr", "icon": "icons"}[t])]
+            som["picture_tier"] = tier
+        return {"image": img, "som": som, "controls": controls, "doc": self._doc()}
 
     def observe(self) -> Dict[str, Any]:
         from core_organs.harvest import video_pipeline as VP
@@ -608,7 +614,7 @@ class LiveSession:
             if len(controls) >= 5:
                 break
             time.sleep(0.6)                                        # a half-read tree (measured: Strikethrough missing right after a toolbar click) is read again
-        return {"image": img, "som": som, "controls": controls, "doc": self._doc()}
+        return {"image": img, "som": som, "controls": CF.drop_chrome(controls, img.size), "doc": self._doc()}
 
     def _doc(self) -> str:
         try:
@@ -673,8 +679,72 @@ class LiveSession:
                     pass
         return {"restored": same(), "how": ", ".join(how) or "nothing to undo"}
 
+    foreground_ok = os.environ.get("HOJAIGA_ALLOW_FOREGROUND") == "1"      # bringing the window to the front takes the person's focus: off unless they allowed it
+
+    def ensure_ready(self, force: bool = False, win: Any = None) -> Dict[str, Any]:
+        """Before an action is sent, the window must be able to receive it (measured: a second launch of a packaged app stayed on its splash / cloaked and the click was 'not delivered'; a PowerPoint title never got its text).
+        A minimised window is restored WITHOUT being activated; a cloaked / zero-size frame is reported; the foreground is taken only when the person allowed it (`foreground_ok`) or the window already has it.
+        `win` is the Win32 surface (tests pass a fake)."""
+        notes: List[str] = []
+        if win is None:
+            import ctypes
+            u = ctypes.windll.user32
+
+            class _Win:
+                IsIconic = staticmethod(lambda h: bool(u.IsIconic(h)))
+                ShowNoActivate = staticmethod(lambda h: u.ShowWindow(h, 4))
+                Foreground = staticmethod(lambda: u.GetForegroundWindow())
+                SetForeground = staticmethod(lambda h: u.SetForegroundWindow(h))
+
+                @staticmethod
+                def cloaked(h: int) -> bool:
+                    v = ctypes.c_int(0)
+                    try:
+                        ctypes.windll.dwmapi.DwmGetWindowAttribute(h, 14, ctypes.byref(v), 4)
+                    except Exception:
+                        return False
+                    return bool(v.value)
+            win = _Win
+        h = self.app.hwnd
+        try:
+            if win.IsIconic(h):
+                win.ShowNoActivate(h)
+                notes.append("restored from minimised (not activated)")
+            if win.cloaked(h):
+                notes.append("window is cloaked (splash / not drawn yet)")
+            if win.Foreground() == h:
+                notes.append("already in front")
+            elif self.foreground_ok:
+                win.SetForeground(h)
+                notes.append("brought to the front (allowed)")
+        except Exception as exc:
+            notes.append(f"ready check failed: {type(exc).__name__}")
+        return {"ready": not any("cloaked" in n for n in notes), "notes": notes}
+
+    def fresh_box(self, el: Dict[str, Any]) -> Tuple[Tuple[int, int, int, int], str]:
+        """The box a control has NOW (the layout may have moved since the picture was taken): the control with the element's name and type nearest to its old centre, else the old box."""
+        x, y, w, h = el["box"]
+        try:
+            cx, cy = x + w / 2, y + h / 2
+            same = [c for c in self.app.controls(self.origin, self.size) if c["name"] == el.get("label") and c["box"][2] > 3 and c["box"][3] > 3]
+            if same:
+                best = min(same, key=lambda c: (c["box"][0] + c["box"][2] / 2 - cx) ** 2 + (c["box"][1] + c["box"][3] / 2 - cy) ** 2)
+                nb = tuple(int(v) for v in best["box"])
+                if abs(nb[0] - x) > 3 or abs(nb[1] - y) > 3:
+                    return nb, f"re-measured: moved ({nb[0] - int(x)},{nb[1] - int(y)})"
+                return nb, ""
+        except Exception:
+            pass
+        return (int(x), int(y), int(w), int(h)), ""
+
     def act(self, action: Dict[str, Any], som: Dict[str, Any]) -> Tuple[bool, str]:
+        self.ensure_ready()
         res = self._act(action, som)
+        if not res[0] and not str(res[1]).startswith("refused"):                   # not delivered: make the window ready again, measure again, send once more
+            ready = self.ensure_ready(force=True)
+            time.sleep(0.5)
+            res2 = self._act(action, som)
+            res = (res2[0], res2[1] + (" (after re-check: " + "; ".join(ready["notes"]) + ")" if res2[0] else "")) if res2[0] else (False, f"{res[1]} | retry: {res2[1]}")
         self._repark()
         return res
 
@@ -682,7 +752,10 @@ class LiveSession:
         kind = action["action"]
         if kind == "click":
             el = element_by_id(som, action.get("target_id"))
-            x, y, w, h = el["box"]
+            from core_organs import chrome_filter as _CF
+            if _CF.is_window_chrome(str(el.get("label", "")), "", el["box"], self.size):
+                return False, f"refused: {el.get('label')!r} is window chrome"
+            (x, y, w, h), moved = self.fresh_box(el)
             cx, cy = x + w / 2, y + h / 2
             if self.uia_first:
                 # MEASURED on an owned Notepad: a UIA pattern call on the control under the point worked 3 of 3; the posted mouse click worked 2 of 3 (and 0 of 4 in the multi-step run). So the control the
@@ -691,15 +764,15 @@ class LiveSession:
                     under = [c for c in self.app.controls(self.origin, self.size) if c["box"][0] <= cx <= c["box"][0] + c["box"][2] and c["box"][1] <= cy <= c["box"][1] + c["box"][3]]
                     if under:
                         best = min(under, key=lambda c: c["box"][2] * c["box"][3])
-                        from core_organs.harvest.local_recorder import CHROME_RX
-                        if CHROME_RX.search(best["name"]):
+                        if _CF.is_window_chrome(best["name"], best.get("type", ""), best["box"], self.size):
                             return False, f"refused: {best['name']!r} is window chrome"
                         how = self.app.act(best["ctl"])
                         if how:
                             return True, f"uia {how} on {best['name']!r}"
                 except Exception:
                     pass
-            return self.eff.click_xy(int(self.origin[0] + cx), int(self.origin[1] + cy))
+            ok, msg = self.eff.click_xy(int(self.origin[0] + cx), int(self.origin[1] + cy))
+            return ok, (msg + " " + moved).strip() if moved else msg
         if kind == "hotkey":
             return self.eff.key(str(action["hotkey"]))
         return self.eff.insert_text(str(action.get("text") or ""))
