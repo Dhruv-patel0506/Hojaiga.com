@@ -74,7 +74,7 @@ logger = logging.getLogger("hojaiga.organ37.llm_gateway")
 # MODULE-LEVEL call ledger: every LLMGateway() instance shares it, so a caller (or a test) can prove that a
 # decision path made ZERO big-model calls. 'brain' = the 7B execute_inference rung; 'small' = the 1-3B
 # execute_small_inference rung. reset_call_counts()/call_counts() are the assertions the NO-LLM-PATH test uses.
-_CALLS = {"brain": 0, "small": 0}
+_CALLS = {"brain": 0, "small": 0, "cloud": 0}
 
 
 def call_counts() -> dict:
@@ -84,6 +84,189 @@ def call_counts() -> dict:
 def reset_call_counts() -> None:
     _CALLS["brain"] = 0
     _CALLS["small"] = 0
+    _CALLS["cloud"] = 0
+
+
+# ---- the cloud rung: free hosted models behind ONE OpenAI-compatible call -------------------------------------------------------------------------------
+# A big hosted model is a stronger thinker and eye than the 2-7B local ones. Which providers exist is decided by the keys in .env (D:\new_automation\.env or
+# All codes\.env) or the environment; the model each one uses is HOJAIGA_<NAME>_MODEL (defaults below are only a starting point, the provider's /models list
+# says what is really there: cloud_models()). HOJAIGA_CLOUD = off | fallback (local first, cloud when local fails; default) | first (cloud first, local after).
+# Privacy: free tiers may keep what they are sent (Google says free-tier content is used to improve its products), so a prompt that carries a credential never
+# leaves the machine, and a caller can pass private=True for anything personal (mail, messages, the person's files).
+CLOUD_PROVIDERS = [  # (name, key names, chat URL, default model, reads images)
+    ("gemini", ("GEMINI_API_KEY", "GEMINI_API_KEY_1", "GEMINI_API_KEY_2", "GOOGLE_API_KEY"), "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "gemini-3.8-flash", True),
+    ("groq", ("GROQ_API_KEY", "GROQ_API_KEY_1", "GROQ_API_KEY_2"), "https://api.groq.com/openai/v1/chat/completions", "openai/gpt-oss-120b", False),
+    ("nvidia", ("NVIDIA_API_KEY", "NVIDIA_API_KEY_1", "NVIDIA_API_KEY_2"), "https://integrate.api.nvidia.com/v1/chat/completions", "nvidia/nemotron-3.5-super-vl-120b-a12b", False),   # Oct-27: the /models list names models this account gets 404 for; this one answered
+    ("nvidia_eye", ("NVIDIA_API_KEY", "NVIDIA_API_KEY_1", "NVIDIA_API_KEY_2"), "https://integrate.api.nvidia.com/v1/chat/completions", "nvidia/nemotron-3.5-super-vl-120b-a12b", True),
+    ("openrouter", ("OPENROUTER_API_KEY", "OPENROUTER_API_KEY_1", "OPENROUTER_API_KEY_2"), "https://openrouter.ai/api/v1/chat/completions", "openrouter/free", False),
+]
+_COOL: Dict[str, float] = {}           # provider -> time it may be asked again (after a 429 / failure / an empty budget)
+# Never cause a 429: a provider is asked only while its budget has room. The budget is what the provider itself reports (x-ratelimit-remaining-* headers, e.g. Groq
+# free = 1,000 requests/day and 8,000 tokens/minute, measured Oct-27) and, for providers that report nothing, a per-minute cap HOJAIGA_<NAME>_RPM (the defaults are
+# deliberately low starting points). When every provider is out of budget the caller stays on the local model, which has no limit.
+CLOUD_RPM_DEFAULT = {"gemini": 8, "groq": 25, "nvidia": 30, "nvidia_eye": 30, "openrouter": 15}
+_SENT: Dict[str, list] = {}           # provider -> send times in the last minute
+_RESERVE = 2                          # keep this many requests unused in the provider's own count
+# decisions repeat (the same screen, the same question): an answer is reused instead of asked again -- the cheapest call is the one not made
+_DECIDED: Dict[str, Any] = {}         # sha -> (time, answer)
+_DECIDED_MAX = 4000
+LAST_CLOUD: Dict[str, Any] = {}        # what the last cloud call used (provider, model, seconds) -- reports cite it, never the key
+_ENV_CACHE: Dict[str, str] = {}
+_CREDENTIAL = __import__("re").compile(r"(?i)\b(password|passcode|passwd|otp|cvv|cvc|pin|api[\s_-]?key|secret|token|card\s*number)\b\s*(is|=|:)\s*\S+|\b(sk|pk|ghp|gsk|nvapi|AIza)[-_A-Za-z0-9]{16,}")
+
+
+def env_keys(refresh: bool = False) -> Dict[str, str]:
+    """.env values (both places the project keeps one) under the real environment, which wins. Never logged."""
+    if _ENV_CACHE and not refresh:
+        return _ENV_CACHE
+    here = os.path.dirname(os.path.abspath(__file__))
+    out: Dict[str, str] = {}
+    for p in (os.path.join(os.environ.get("HOJAIGA_ROOT", r"D:\new_automation"), ".env"), os.path.join(os.path.dirname(here), ".env")):
+        try:
+            with open(p, "r", encoding="utf-8") as f:
+                for line in f:
+                    if "=" in line and not line.lstrip().startswith("#"):
+                        k, v = line.split("=", 1)
+                        out.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+        except OSError:
+            pass
+    out.update({k: v for k, v in os.environ.items() if k.startswith(("HOJAIGA_", "GEMINI_", "GOOGLE_API", "NVIDIA_", "GROQ_", "OPENROUTER_"))})
+    _ENV_CACHE.clear()
+    _ENV_CACHE.update(out)
+    return out
+
+
+def cloud_mode() -> str:
+    m = (env_keys().get("HOJAIGA_CLOUD") or "fallback").strip().lower()
+    return m if m in ("off", "fallback", "first") else "fallback"
+
+
+def cloud_ok_for(text: str, private: bool = False) -> bool:
+    """May this prompt go to a hosted model? Not when the caller says it is private, nor when it carries a credential."""
+    return not private and cloud_mode() != "off" and not _CREDENTIAL.search(text or "")
+
+
+def cloud_providers(need_images: bool = False) -> list:
+    """[(name, key, url, model)] usable now: has a key, is not cooling down after a 429, reads images when asked to."""
+    keys, now, out = env_keys(), time.time(), []
+    order = [s.strip() for s in (keys.get("HOJAIGA_CLOUD_ORDER") or "").split(",") if s.strip()]
+    provs = sorted(CLOUD_PROVIDERS, key=lambda p: order.index(p[0]) if p[0] in order else len(order))
+    for name, knames, url, model, images in provs:
+        key = next((keys[k] for k in knames if keys.get(k)), "")
+        if key and (images or not need_images) and _COOL.get(name, 0) <= now and _has_budget(name, now):
+            out.append((name, key, url, keys.get(f"HOJAIGA_{name.upper()}_MODEL") or model))
+    return out
+
+
+def _rpm(name: str) -> int:
+    try:
+        return int(env_keys().get(f"HOJAIGA_{name.upper()}_RPM") or CLOUD_RPM_DEFAULT.get(name, 10))
+    except ValueError:
+        return CLOUD_RPM_DEFAULT.get(name, 10)
+
+
+def _has_budget(name: str, now: float) -> bool:
+    sent = _SENT.setdefault(name, [])
+    sent[:] = [t for t in sent if now - t < 60.0]
+    return len(sent) < _rpm(name)
+
+
+def _seconds(s: str) -> float:
+    """'1m26.4s' / '577ms' / '2h3m' / '30' -> seconds."""
+    s = (s or "").strip()
+    if not s:
+        return 0.0
+    try:
+        return float(s)
+    except ValueError:
+        pass
+    total = 0.0
+    for num, unit in __import__("re").findall(r"([\d.]+)\s*(ms|h|m|s)", s):
+        total += float(num) * {"ms": 0.001, "s": 1, "m": 60, "h": 3600}[unit]
+    return total
+
+
+def _note_budget(name: str, headers: Any) -> None:
+    """Read the provider's own remaining counts; when one is at the reserve, rest the provider until that count resets (so the next call is never the 429)."""
+    h = {k.lower(): v for k, v in dict(headers or {}).items()}
+    for kind in ("requests", "tokens"):
+        left = h.get(f"x-ratelimit-remaining-{kind}")
+        if left is None:
+            continue
+        try:
+            low = float(left) <= (_RESERVE if kind == "requests" else 500)
+        except ValueError:
+            continue
+        if low:
+            _COOL[name] = max(_COOL.get(name, 0), time.time() + max(1.0, _seconds(h.get(f"x-ratelimit-reset-{kind}", "60"))))
+            logger.info("Gateway: cloud %s budget (%s) is at its reserve; resting it until it resets", name, kind)
+
+
+def budget_status() -> Dict[str, Any]:
+    """Per provider: sent in the last minute / cap, resting for how long. No keys."""
+    now = time.time()
+    out = {}
+    for p in CLOUD_PROVIDERS:
+        _has_budget(p[0], now)
+        out[p[0]] = {"sent_last_minute": len(_SENT.get(p[0], [])), "cap_per_minute": _rpm(p[0]), "resting_s": max(0, round(_COOL.get(p[0], 0) - now))}
+    return out
+
+
+def cloud_chat(system: str, prompt: str, images_b64: Optional[list] = None, temperature: float = 0.3, timeout: float = 120.0, max_tokens: int = 0, private: bool = False) -> Optional[str]:
+    """Ask the first free hosted model that answers. None when none may or can (no key, private, credential in the prompt, all rate-limited):
+    the caller then stays local. A 429 cools that provider down for a minute; other errors for five."""
+    if not cloud_ok_for(system + "\n" + prompt, private):
+        return None
+    import hashlib
+    sha = hashlib.sha1("\x1f".join([system, prompt] + list(images_b64 or [])).encode("utf-8", "ignore")).hexdigest()
+    ttl = float(env_keys().get("HOJAIGA_DECISION_TTL") or 3600)
+    hit = _DECIDED.get(sha) if temperature <= 0.3 else None
+    if hit and time.time() - hit[0] < ttl:
+        LAST_CLOUD.clear()
+        LAST_CLOUD.update({"provider": "cache", "model": hit[2], "seconds": 0.0})
+        return hit[1]
+    content: Any = prompt
+    if images_b64:
+        content = [{"type": "text", "text": prompt}] + [{"type": "image_url", "image_url": {"url": b if b.startswith("data:") else "data:image/png;base64," + b}} for b in images_b64]
+    for name, key, url, model in cloud_providers(need_images=bool(images_b64)):
+        body: Dict[str, Any] = {"model": model, "messages": [{"role": "system", "content": system}, {"role": "user", "content": content}], "temperature": temperature}
+        if max_tokens:
+            body["max_tokens"] = max_tokens
+        t0 = time.time()
+        try:
+            _CALLS["cloud"] += 1
+            _SENT.setdefault(name, []).append(t0)
+            resp = requests.post(url, json=body, headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"}, timeout=timeout)
+            _note_budget(name, resp.headers)
+            if resp.status_code == 429:                                                                # should not happen with the budget; if it does, obey retry-after
+                _COOL[name] = time.time() + max(60.0, _seconds(resp.headers.get("retry-after", "")))
+                logger.warning("Gateway: cloud %s rate-limited (429); trying the next provider", name)
+                continue
+            resp.raise_for_status()
+            text = (resp.json()["choices"][0]["message"].get("content") or "").strip()
+            if text:
+                LAST_CLOUD.clear()
+                LAST_CLOUD.update({"provider": name, "model": model, "seconds": round(time.time() - t0, 2)})
+                if temperature <= 0.3:
+                    if len(_DECIDED) >= _DECIDED_MAX:
+                        for k in sorted(_DECIDED, key=lambda k: _DECIDED[k][0])[: _DECIDED_MAX // 4]:
+                            _DECIDED.pop(k, None)
+                    _DECIDED[sha] = (time.time(), text, model)
+                return text
+        except Exception as exc:
+            _COOL[name] = time.time() + 300
+            logger.warning("Gateway: cloud %s failed (%s); trying the next provider", name, type(exc).__name__)
+    return None
+
+
+def cloud_models(name: str) -> list:
+    """The model ids a provider really offers today (its /models list), so HOJAIGA_<NAME>_MODEL can be set from fact, not memory."""
+    for n, key, url, _m in cloud_providers():
+        if n == name:
+            r = requests.get(url.rsplit("/chat/completions", 1)[0] + "/models", headers={"Authorization": f"Bearer {key}"}, timeout=30)
+            r.raise_for_status()
+            return sorted(m.get("id", "") for m in r.json().get("data", []))
+    return []
 
 class LLMGatewayError(Exception):
     pass
@@ -254,14 +437,8 @@ class LLMGateway:
         return ok
 
     def _load_keys(self):
-        self.keys = {}
-        env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
-        if os.path.exists(env_path):
-            with open(env_path, "r", encoding="utf-8") as f:
-                for line in f:
-                    if "=" in line and not line.startswith("#"):
-                        k, v = line.split("=", 1)
-                        self.keys[k.strip()] = v.strip().strip('"').strip("'")
+        # both .env files (the project root one is where the keys really live; reading only All codes\.env meant the cloud rungs never ran)
+        self.keys = dict(env_keys())
 
         self.groq_key = self.keys.get("GROQ_API_KEY", self.keys.get("GROQ_API_KEY_1", os.environ.get("GROQ_API_KEY", os.environ.get("GROQ_API_KEY_1", ""))))
         self.openrouter_key = self.keys.get("OPENROUTER_API_KEY", self.keys.get("OPENROUTER_API_KEY_1", os.environ.get("OPENROUTER_API_KEY", os.environ.get("OPENROUTER_API_KEY_1", ""))))
@@ -416,8 +593,9 @@ class LLMGateway:
     def execute_vision_inference(self, prompt: str, image_base64: str,
                                  system: str = "You are the Hojaiga vision interpreter. Describe the screenshot concisely and focus on what the automation needs to know.",
                                  model: Optional[str] = None, temperature: float = 0.2,
-                                 timeout: float = 120.0, reason: bool = False) -> str:
-        """Route a multimodal (image) prompt to a local vision model.
+                                 timeout: float = 120.0, reason: bool = False, private: bool = False) -> str:
+        """Route a multimodal (image) prompt to a local vision model (HOJAIGA_CLOUD=first: a hosted model that reads images first; fallback: after the
+        local eyes fail). A screenshot can show the person's mail or files, so callers pass private=True for those.
 
         Routing (per gatekeeper design):
           - raw image input       -> moondream            (HOJAIGA_VISION_MODEL)
@@ -442,6 +620,10 @@ class LLMGateway:
             logger.warning("Gateway: requested vision model '%s' is text-only; "
                            "using moondream for the eye.", model)
             model = "moondream"
+        if cloud_mode() == "first":
+            out = cloud_chat(system, prompt, [image_base64], temperature=temperature, timeout=timeout, private=private)
+            if out:
+                return out
         try:
             logger.info("Gateway: Routing vision request to Local Ollama (%s)...", model)
             return self._call_ollama_vision(prompt, image_base64, system, model, temperature, timeout)
@@ -455,7 +637,11 @@ class LLMGateway:
                     return self._call_ollama_vision(prompt, image_base64, system, "moondream:latest", temperature, timeout)
                 except Exception as e2:
                     logger.warning("Gateway: moondream fallback also failed (%s). Vision unavailable.", e2)
-            
+            if cloud_mode() == "fallback":
+                out = cloud_chat(system, prompt, [image_base64], temperature=temperature, timeout=timeout, private=private)
+                if out:
+                    return out
+
             # Memory fallback: if vision completely fails, check cached data
             if self._memory:
                 try:
@@ -524,10 +710,14 @@ class LLMGateway:
                 return resp.json().get("message", {}).get("content", "")
             raise
 
-    def execute_inference(self, system: str, prompt: str, temperature: float = 0.3, timeout: float = 120.0) -> str:
-        """Route to local Ollama models with graceful fallback to free tiers.
-        Auto-heals: if Gatekeeper is dead, refreshes it and retries."""
+    def execute_inference(self, system: str, prompt: str, temperature: float = 0.3, timeout: float = 120.0, private: bool = False) -> str:
+        """Route to local Ollama models with graceful fallback to free tiers (HOJAIGA_CLOUD=first asks the hosted models before the local one).
+        Auto-heals: if Gatekeeper is dead, refreshes it and retries. private=True keeps the prompt on this machine."""
         _CALLS["brain"] += 1
+        if cloud_mode() == "first":
+            out = cloud_chat(system, prompt, temperature=temperature, timeout=timeout, private=private)
+            if out:
+                return out
         # Auto-bootstrap on first call
         if not self._booted:
             self.bootstrap()
@@ -546,22 +736,13 @@ class LLMGateway:
                 except Exception as e2:
                     logger.warning("Gateway: Retry after Gatekeeper refresh also failed (%s)", e2)
 
-        # Priority 2: OpenRouter (Free Pool Fallback)
-        if self.openrouter_key:
-            try:
-                logger.info("Gateway: Routing request to OpenRouter...")
-                return self._call_openrouter(system, prompt, temperature, timeout)
-            except Exception as e:
-                logger.warning("Gateway: OpenRouter failed (%s). Degrading to Groq.", e)
+        # Priority 2: the free hosted models (Gemini, NVIDIA, Groq, OpenRouter -- whichever have keys), unless already tried first
+        if cloud_mode() == "fallback":
+            out = cloud_chat(system, prompt, temperature=temperature, timeout=timeout, private=private)
+            if out:
+                return out
+            logger.warning("Gateway: no hosted model answered. Degrading to Synthetic Fallback.")
 
-        # Priority 3: Groq (Fast Free Tier)
-        if self.groq_key:
-            try:
-                logger.info("Gateway: Routing request to Groq...")
-                return self._call_groq(system, prompt, temperature, timeout)
-            except Exception as e:
-                logger.warning("Gateway: Groq failed (%s). Degrading to Synthetic Fallback.", e)
-            
         # Priority 4: Synthetic Offline Fallback (Guarantees system continuity)
         logger.info("Gateway: Routing request to Synthetic Offline Fallback...")
         return self._call_synthetic_fallback(system, prompt)
