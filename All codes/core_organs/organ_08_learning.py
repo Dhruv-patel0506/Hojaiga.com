@@ -669,6 +669,625 @@ class LearningKernel:
     def close(self) -> None:
         self.store.close()
 
+# ═════════════════════════════════════════════════════════════════════════
+# NATURAL INTELLIGENCE CORTEX
+# -------------------------------------------------------------------------
+# The self-growing brain that sits in front of every model call.
+#
+#   ask ──► recall (own memory) ──► confident? ──yes──► native answer
+#                │                       │
+#                │                      no
+#                ▼                       ▼
+#        knowledge context ──►  teacher (local Qwen → external APIs)
+#                                        │
+#                                        ▼
+#                       learn: store, cross-check, raise/erode confidence
+#
+# Nothing here is hard-coded to an app, a task or a domain. Everything the
+# cortex knows arrives as data: teacher answers, files/URLs/text fed to it,
+# and success/failure feedback from the organs that used an answer.
+# The more consistent evidence it collects, the more it answers by itself
+# and the less it calls any external API ("self_reliance" in stats()).
+#
+# Storage is one SQLite file (HOJAIGA_NI_DB, default next to the learning
+# DB). Retrieval is dependency-free: FTS5 candidate search + hashed n-gram
+# cosine similarity, so it runs on any Python 3.10+ without numpy/torch.
+# Optionally an Ollama embedding model (HOJAIGA_NI_EMBED_MODEL) replaces the
+# hashed vectors once it is pulled locally.
+# ═════════════════════════════════════════════════════════════════════════
+
+import hashlib as _ni_hashlib
+import re as _ni_re
+import threading as _ni_threading
+
+NI_DB_PATH = Path(os.environ.get("HOJAIGA_NI_DB", str(HDD_ROOT / "natural_intelligence.sqlite")))
+NI_VEC_DIM = 512
+
+
+def _ni_env_float(name: str, default: float) -> float:
+    try:
+        return float(os.environ.get(name, default))
+    except (TypeError, ValueError):
+        return default
+
+
+def ni_mode() -> str:
+    """off | learn | on | full.
+
+    off   – cortex disabled entirely.
+    learn – record every teacher answer, never serve from memory.
+    on    – (default) also serve confirmed memories instead of calling a model.
+    full  – also inject fed knowledge into every teacher prompt (RAG). In
+            "on" mode that happens only when a caller passes use_knowledge=True.
+    """
+    mode = os.environ.get("HOJAIGA_NI_MODE", "on").strip().lower()
+    return mode if mode in ("off", "learn", "on", "full") else "on"
+
+
+def _ni_normalize(text: str) -> str:
+    return _ni_re.sub(r"\s+", " ", (text or "").strip().lower())
+
+
+def _ni_tokens(text: str) -> list[str]:
+    return _ni_re.findall(r"[a-z0-9_]+", _ni_normalize(text))
+
+
+def _ni_hash_vector(text: str, dim: int = NI_VEC_DIM) -> list[float]:
+    """Signed feature hashing over word unigrams+bigrams and char trigrams."""
+    vec = [0.0] * dim
+    toks = _ni_tokens(text)
+    feats = list(toks)
+    feats += [a + "_" + b for a, b in zip(toks, toks[1:])]
+    flat = " ".join(toks)
+    feats += ["#" + flat[i:i + 3] for i in range(max(0, len(flat) - 2))]
+    for f in feats:
+        h = int(_ni_hashlib.blake2b(f.encode("utf-8"), digest_size=8).hexdigest(), 16)
+        vec[h % dim] += 1.0 if (h >> 63) & 1 else -1.0
+    norm = math.sqrt(sum(v * v for v in vec)) or 1.0
+    return [v / norm for v in vec]
+
+
+def _ni_cosine(a: list[float], b: list[float]) -> float:
+    if not a or not b or len(a) != len(b):
+        return 0.0
+    return max(0.0, min(1.0, sum(x * y for x, y in zip(a, b))))
+
+
+def _ni_context_key(system: str) -> str:
+    """Answers are remembered per 'role' (system prompt), so a compiler answer
+    is never served to a chat question that happens to use the same words."""
+    return _ni_hashlib.sha1(_ni_normalize(system).encode("utf-8")).hexdigest()[:16]
+
+
+class NaturalIntelligenceCortex:
+    """Self-growing memory + teacher manager. Thread-safe, one instance per DB."""
+
+    _instances: dict[str, "NaturalIntelligenceCortex"] = {}
+    _instances_lock = _ni_threading.Lock()
+
+    # Tunables come from the environment so they can evolve without code edits.
+    def __init__(self, db_path: Optional[Path] = None):
+        self.db_path = Path(db_path or NI_DB_PATH)
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self._lock = _ni_threading.RLock()
+        self._conn = sqlite3.connect(str(self.db_path), check_same_thread=False)
+        self._conn.row_factory = sqlite3.Row
+        self._conn.execute("PRAGMA journal_mode=WAL")
+        self._fts = self._fts_available()
+        self._init_schema()
+        self.serve_similarity = _ni_env_float("HOJAIGA_NI_SERVE_SIM", 0.97)
+        self.serve_confidence = _ni_env_float("HOJAIGA_NI_SERVE_CONF", 0.75)
+        self.agree_similarity = _ni_env_float("HOJAIGA_NI_AGREE_SIM", 0.85)
+        self.creative_temperature = _ni_env_float("HOJAIGA_NI_CREATIVE_TEMP", 0.7)
+        self.embed_model = os.environ.get("HOJAIGA_NI_EMBED_MODEL", "").strip()
+        self.embed_url = os.environ.get("HOJAIGA_NI_EMBED_URL", "http://127.0.0.1:11434/api/embeddings")
+
+    @classmethod
+    def instance(cls, db_path: Optional[Path] = None) -> "NaturalIntelligenceCortex":
+        key = str(Path(db_path or NI_DB_PATH).resolve())
+        with cls._instances_lock:
+            if key not in cls._instances:
+                cls._instances[key] = cls(Path(key))
+            return cls._instances[key]
+
+    # ── schema ────────────────────────────────────────────────────────────
+    def _fts_available(self) -> bool:
+        try:
+            self._conn.execute("CREATE VIRTUAL TABLE IF NOT EXISTS temp.__ni_probe USING fts5(x)")
+            self._conn.execute("DROP TABLE IF EXISTS temp.__ni_probe")
+            return True
+        except sqlite3.OperationalError:
+            return False
+
+    def _init_schema(self) -> None:
+        with self._lock, self._conn:
+            self._conn.executescript(
+                """
+                CREATE TABLE IF NOT EXISTS ni_memory (
+                    id TEXT PRIMARY KEY,
+                    kind TEXT NOT NULL,              -- qa | fact
+                    context_key TEXT NOT NULL,
+                    question TEXT NOT NULL,
+                    answer TEXT NOT NULL,
+                    source TEXT NOT NULL,            -- teacher name, file, url, human
+                    confidence REAL NOT NULL,
+                    agreements INTEGER NOT NULL DEFAULT 0,
+                    disagreements INTEGER NOT NULL DEFAULT 0,
+                    uses INTEGER NOT NULL DEFAULT 0,
+                    successes INTEGER NOT NULL DEFAULT 0,
+                    failures INTEGER NOT NULL DEFAULT 0,
+                    vec TEXT NOT NULL,
+                    meta TEXT NOT NULL DEFAULT '{}',
+                    created REAL NOT NULL,
+                    updated REAL NOT NULL,
+                    last_used REAL
+                );
+                CREATE INDEX IF NOT EXISTS ix_ni_mem_ctx ON ni_memory(context_key, kind);
+                CREATE TABLE IF NOT EXISTS ni_teacher (
+                    teacher TEXT PRIMARY KEY,
+                    calls INTEGER NOT NULL DEFAULT 0,
+                    ok INTEGER NOT NULL DEFAULT 0,
+                    fail INTEGER NOT NULL DEFAULT 0,
+                    quality REAL NOT NULL DEFAULT 0.5,   -- EMA of downstream success
+                    latency_ms REAL NOT NULL DEFAULT 0,  -- EMA
+                    updated REAL NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS ni_answer_log (
+                    ts REAL NOT NULL,
+                    route TEXT NOT NULL,                 -- native | teacher | miss
+                    teacher TEXT,
+                    memory_id TEXT,
+                    latency_ms REAL
+                );
+                CREATE INDEX IF NOT EXISTS ix_ni_log_ts ON ni_answer_log(ts);
+                CREATE TABLE IF NOT EXISTS ni_curiosity (
+                    id TEXT PRIMARY KEY,                 -- hash of context+question
+                    context_key TEXT NOT NULL,
+                    system TEXT NOT NULL,
+                    question TEXT NOT NULL,
+                    asked INTEGER NOT NULL DEFAULT 1,
+                    studied REAL,
+                    created REAL NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS ni_feed (
+                    id TEXT PRIMARY KEY,
+                    source TEXT NOT NULL,
+                    chunks INTEGER NOT NULL,
+                    added REAL NOT NULL
+                );
+                """
+            )
+            if self._fts:
+                self._conn.execute(
+                    "CREATE VIRTUAL TABLE IF NOT EXISTS ni_memory_fts USING fts5("
+                    "id UNINDEXED, question, answer, tokenize='porter unicode61')"
+                )
+
+    # ── vectors ───────────────────────────────────────────────────────────
+    def _embed(self, text: str) -> list[float]:
+        if self.embed_model:
+            try:
+                import requests  # local import: optional dependency
+                r = requests.post(self.embed_url, json={"model": self.embed_model, "prompt": text[:4000]},
+                                  timeout=15)
+                r.raise_for_status()
+                emb = r.json().get("embedding") or []
+                if emb:
+                    norm = math.sqrt(sum(v * v for v in emb)) or 1.0
+                    return [v / norm for v in emb]
+            except Exception as exc:  # fall back silently to hashed vectors
+                log.debug("NI embed model unavailable (%s); using hashed vectors", exc)
+        return _ni_hash_vector(text)
+
+    # ── retrieval ─────────────────────────────────────────────────────────
+    def _candidates(self, text: str, context_key: Optional[str], kind: str, limit: int = 40) -> list[sqlite3.Row]:
+        toks = [t for t in _ni_tokens(text) if len(t) > 1][:24]
+        rows: list[sqlite3.Row] = []
+        with self._lock:
+            if self._fts and toks:
+                q = " OR ".join('"%s"' % t for t in toks)
+                sql = ("SELECT m.* FROM ni_memory_fts f JOIN ni_memory m ON m.id = f.id "
+                       "WHERE ni_memory_fts MATCH ? AND m.kind = ?")
+                params: list[Any] = [q, kind]
+                if context_key:
+                    sql += " AND m.context_key = ?"
+                    params.append(context_key)
+                sql += " ORDER BY bm25(ni_memory_fts) LIMIT ?"
+                params.append(limit)
+                try:
+                    rows = self._conn.execute(sql, params).fetchall()
+                except sqlite3.OperationalError:
+                    rows = []
+            if not rows:
+                sql = "SELECT * FROM ni_memory WHERE kind = ?"
+                params = [kind]
+                if context_key:
+                    sql += " AND context_key = ?"
+                    params.append(context_key)
+                sql += " ORDER BY updated DESC LIMIT ?"
+                params.append(limit * 5)
+                rows = self._conn.execute(sql, params).fetchall()
+        return rows
+
+    def _rank(self, text: str, rows: list[sqlite3.Row]) -> list[tuple[float, sqlite3.Row]]:
+        qv = self._embed(text)
+        scored = []
+        for r in rows:
+            try:
+                sim = _ni_cosine(qv, json.loads(r["vec"]))
+            except Exception:
+                sim = 0.0
+            scored.append((sim, r))
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return scored
+
+    def recall(self, prompt: str, system: str = "", temperature: float = 0.0) -> Optional[dict]:
+        """Return a confirmed memory that answers this exact kind of request, or None.
+
+        Served only when (a) the mode allows it, (b) the request is not creative
+        (high temperature means the caller wants variety, not a replay), (c) the
+        stored question is a near-duplicate under the same system role, and
+        (d) the memory's confidence was earned through agreement or feedback.
+        """
+        if ni_mode() not in ("on", "full") or temperature >= self.creative_temperature:
+            return None
+        ck = _ni_context_key(system)
+        ranked = self._rank(prompt, self._candidates(prompt, ck, "qa"))
+        if not ranked:
+            return None
+        sim, row = ranked[0]
+        if sim < self.serve_similarity or row["confidence"] < self.serve_confidence:
+            return None
+        now = time.time()
+        with self._lock, self._conn:
+            self._conn.execute("UPDATE ni_memory SET uses = uses + 1, last_used = ? WHERE id = ?", (now, row["id"]))
+            self._conn.execute("INSERT INTO ni_answer_log(ts, route, teacher, memory_id, latency_ms) VALUES (?,?,?,?,?)",
+                               (now, "native", None, row["id"], 0.0))
+        return {"memory_id": row["id"], "answer": row["answer"], "similarity": round(sim, 4),
+                "confidence": round(row["confidence"], 4), "source": row["source"]}
+
+    def knowledge_context(self, prompt: str, limit: int = 4, min_similarity: float = 0.25,
+                          max_chars: int = 3000) -> str:
+        """Fed knowledge (facts) relevant to the prompt, ready to prepend for a teacher."""
+        ranked = self._rank(prompt, self._candidates(prompt, None, "fact", limit=limit * 10))
+        parts, total = [], 0
+        for sim, row in ranked[:limit]:
+            if sim < min_similarity:
+                break
+            snippet = row["answer"].strip()
+            if total + len(snippet) > max_chars:
+                break
+            parts.append(f"[{row['source']}] {snippet}")
+            total += len(snippet)
+        return "\n\n".join(parts)
+
+    # ── learning ──────────────────────────────────────────────────────────
+    def _insert(self, kind: str, context_key: str, question: str, answer: str, source: str,
+                confidence: float, meta: Optional[dict] = None) -> str:
+        mid = uuid.uuid4().hex
+        now = time.time()
+        vec = json.dumps([round(v, 5) for v in self._embed(question)])
+        with self._lock, self._conn:
+            self._conn.execute(
+                "INSERT INTO ni_memory(id, kind, context_key, question, answer, source, confidence, vec, meta, created, updated)"
+                " VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                (mid, kind, context_key, question, answer, source, confidence, vec,
+                 json.dumps(meta or {}), now, now))
+            if self._fts:
+                self._conn.execute("INSERT INTO ni_memory_fts(id, question, answer) VALUES (?,?,?)",
+                                   (mid, question, answer[:2000]))
+        return mid
+
+    def learn(self, prompt: str, answer: str, system: str = "", source: str = "teacher",
+              latency_ms: float = 0.0) -> Optional[str]:
+        """Store a teacher answer; cross-check against what the brain already knows.
+
+        Same question + consistent answer from any teacher → confidence climbs.
+        Same question + contradicting answer → old memory erodes, new one kept.
+        """
+        if ni_mode() == "off" or not (answer or "").strip() or not (prompt or "").strip():
+            return None
+        ck = _ni_context_key(system)
+        ranked = self._rank(prompt, self._candidates(prompt, ck, "qa"))
+        now = time.time()
+        result_id: Optional[str] = None
+        if ranked and ranked[0][0] >= self.serve_similarity:
+            row = ranked[0][1]
+            ans_sim = _ni_cosine(self._embed(answer), self._embed(row["answer"]))
+            with self._lock, self._conn:
+                if ans_sim >= self.agree_similarity:
+                    # An independent teacher agreeing is strong evidence; the same
+                    # teacher repeating itself is weak evidence.
+                    boost = 0.12 if row["source"] == source else 0.35
+                    conf = min(0.99, row["confidence"] + boost * (1.0 - row["confidence"]))
+                    self._conn.execute(
+                        "UPDATE ni_memory SET confidence=?, agreements=agreements+1, updated=? WHERE id=?",
+                        (conf, now, row["id"]))
+                    result_id = row["id"]
+                else:
+                    conf = max(0.05, row["confidence"] - 0.25)
+                    self._conn.execute(
+                        "UPDATE ni_memory SET confidence=?, disagreements=disagreements+1, updated=? WHERE id=?",
+                        (conf, now, row["id"]))
+        if result_id is None:
+            result_id = self._insert("qa", ck, prompt, answer, source, 0.4,
+                                     {"system_excerpt": (system or "")[:300]})
+        with self._lock, self._conn:
+            self._conn.execute("INSERT INTO ni_answer_log(ts, route, teacher, memory_id, latency_ms) VALUES (?,?,?,?,?)",
+                               (now, "teacher", source, result_id, latency_ms))
+        return result_id
+
+    def feedback(self, memory_id: str, success: bool) -> Optional[float]:
+        """Downstream organs report whether an answer actually worked."""
+        with self._lock, self._conn:
+            row = self._conn.execute("SELECT confidence, source FROM ni_memory WHERE id=?", (memory_id,)).fetchone()
+            if not row:
+                return None
+            conf = row["confidence"]
+            conf = min(0.99, conf + 0.3 * (1 - conf)) if success else max(0.0, conf - 0.3)
+            col = "successes" if success else "failures"
+            self._conn.execute(f"UPDATE ni_memory SET confidence=?, {col}={col}+1, updated=? WHERE id=?",
+                               (conf, time.time(), memory_id))
+        self.teacher_quality(row["source"], success)
+        return conf
+
+    def note_curiosity(self, prompt: str, system: str = "") -> None:
+        """Remember a question the brain could not answer itself, for self-study."""
+        if ni_mode() == "off":
+            return
+        ck = _ni_context_key(system)
+        cid = _ni_hashlib.sha1((ck + _ni_normalize(prompt)).encode("utf-8")).hexdigest()
+        with self._lock, self._conn:
+            self._conn.execute(
+                "INSERT INTO ni_curiosity(id, context_key, system, question, created) VALUES (?,?,?,?,?) "
+                "ON CONFLICT(id) DO UPDATE SET asked = asked + 1",
+                (cid, ck, (system or "")[:4000], prompt[:8000], time.time()))
+
+    # ── teacher manager ───────────────────────────────────────────────────
+    def teacher_outcome(self, teacher: str, ok: bool, latency_ms: float = 0.0) -> None:
+        now = time.time()
+        with self._lock, self._conn:
+            self._conn.execute(
+                "INSERT INTO ni_teacher(teacher, calls, ok, fail, latency_ms, updated) VALUES (?,1,?,?,?,?) "
+                "ON CONFLICT(teacher) DO UPDATE SET calls=calls+1, ok=ok+excluded.ok, fail=fail+excluded.fail, "
+                "latency_ms = CASE WHEN latency_ms = 0 THEN excluded.latency_ms "
+                "ELSE latency_ms*0.7 + excluded.latency_ms*0.3 END, updated=excluded.updated",
+                (teacher, 1 if ok else 0, 0 if ok else 1, latency_ms, now))
+
+    def teacher_quality(self, teacher: str, success: bool) -> None:
+        with self._lock, self._conn:
+            self._conn.execute(
+                "INSERT INTO ni_teacher(teacher, quality, updated) VALUES (?,?,?) "
+                "ON CONFLICT(teacher) DO UPDATE SET quality = quality*0.7 + ?*0.3, updated=excluded.updated",
+                (teacher, 1.0 if success else 0.0, time.time(), 1.0 if success else 0.0))
+
+    def rank_teachers(self, names: list[str]) -> list[str]:
+        """Order teachers by learned reliability × quality; unknown teachers keep
+        their given position (neutral prior), so a new provider gets tried."""
+        with self._lock:
+            rows = {r["teacher"]: r for r in self._conn.execute("SELECT * FROM ni_teacher").fetchall()}
+
+        def score(item: tuple[int, str]) -> tuple[float, int]:
+            idx, name = item
+            r = rows.get(name)
+            if not r or r["calls"] < 3:
+                return (0.5, -idx)
+            reliability = (r["ok"] + 1) / (r["calls"] + 2)
+            return (reliability * (0.5 + 0.5 * r["quality"]), -idx)
+
+        return [n for _, n in sorted(enumerate(names), key=score, reverse=True)]
+
+    # ── feeding from the outside world ────────────────────────────────────
+    @staticmethod
+    def _chunk(text: str, size: int = 900, overlap: int = 120) -> list[str]:
+        text = _ni_re.sub(r"\n{3,}", "\n\n", text or "").strip()
+        if not text:
+            return []
+        paras, chunks, cur = text.split("\n\n"), [], ""
+        for p in paras:
+            if len(cur) + len(p) + 2 <= size:
+                cur = (cur + "\n\n" + p).strip()
+                continue
+            if cur:
+                chunks.append(cur)
+            while len(p) > size:
+                chunks.append(p[:size])
+                p = p[size - overlap:]
+            cur = p
+        if cur:
+            chunks.append(cur)
+        return chunks
+
+    def feed_text(self, text: str, source: str = "human") -> int:
+        if ni_mode() == "off":
+            return 0
+        fid = _ni_hashlib.sha1((source + "\0" + (text or "")).encode("utf-8")).hexdigest()
+        with self._lock:
+            if self._conn.execute("SELECT 1 FROM ni_feed WHERE id=?", (fid,)).fetchone():
+                return 0  # already learned this exact material
+        chunks = self._chunk(text)
+        for ch in chunks:
+            first_line = ch.split("\n", 1)[0][:200]
+            self._insert("fact", "", first_line + "\n" + ch, ch, source, 0.6)
+        with self._lock, self._conn:
+            self._conn.execute("INSERT INTO ni_feed(id, source, chunks, added) VALUES (?,?,?,?)",
+                               (fid, source, len(chunks), time.time()))
+        return len(chunks)
+
+    def feed_path(self, path: str, extensions: Optional[tuple[str, ...]] = None, max_bytes: int = 2_000_000) -> dict:
+        """Learn every readable text file under a file or folder."""
+        exts = extensions or tuple(e.strip() for e in os.environ.get(
+            "HOJAIGA_NI_FEED_EXT", ".md,.txt,.py,.json,.csv,.html,.yaml,.yml,.rst,.js,.ts").split(","))
+        p = Path(path)
+        files = [p] if p.is_file() else [f for f in p.rglob("*") if f.is_file() and f.suffix.lower() in exts]
+        report = {"files": 0, "chunks": 0, "skipped": 0}
+        for f in files:
+            try:
+                if f.stat().st_size > max_bytes or any(part.startswith(".") for part in f.parts[-4:-1]):
+                    report["skipped"] += 1
+                    continue
+                n = self.feed_text(f.read_text(encoding="utf-8", errors="ignore"), source=str(f))
+                report["files"] += 1
+                report["chunks"] += n
+            except Exception:
+                report["skipped"] += 1
+        return report
+
+    def feed_url(self, url: str, timeout: float = 20.0) -> int:
+        import requests
+        r = requests.get(url, timeout=timeout, headers={"User-Agent": "hojaiga-learner/1.0"})
+        r.raise_for_status()
+        text = r.text
+        if "html" in r.headers.get("content-type", ""):
+            text = _ni_re.sub(r"(?is)<(script|style|noscript).*?</\1>", " ", text)
+            text = _ni_re.sub(r"(?s)<[^>]+>", "\n", text)
+            text = _ni_re.sub(r"[ \t]+", " ", text)
+            text = _ni_re.sub(r"\n\s*\n+", "\n\n", text)
+        return self.feed_text(text, source=url)
+
+    # ── self-study ("sleep") ──────────────────────────────────────────────
+    def self_study(self, ask: Callable[[str, str], str], limit: int = 25) -> dict:
+        """Ask a teacher the questions the brain could not answer, most-asked first.
+        `ask(system, prompt)` is any callable — usually LLMGateway.teach()."""
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT * FROM ni_curiosity WHERE studied IS NULL ORDER BY asked DESC, created ASC LIMIT ?",
+                (limit,)).fetchall()
+        done = failed = 0
+        for r in rows:
+            try:
+                ans = ask(r["system"], r["question"])
+                if ans and ans.strip():
+                    done += 1
+                with self._lock, self._conn:
+                    self._conn.execute("UPDATE ni_curiosity SET studied=? WHERE id=?", (time.time(), r["id"]))
+            except Exception as exc:
+                failed += 1
+                log.warning("NI self-study failed for %s: %s", r["id"][:8], exc)
+        return {"studied": done, "failed": failed, "remaining": self._count("ni_curiosity", "studied IS NULL")}
+
+    def consolidate(self, halflife_days: float = 30.0, prune_below: float = 0.08) -> dict:
+        """Decay memories that were never confirmed or used, drop dead ones."""
+        now = time.time()
+        decayed = pruned = 0
+        with self._lock, self._conn:
+            rows = self._conn.execute(
+                "SELECT id, confidence, updated, last_used, successes, agreements FROM ni_memory WHERE kind='qa'"
+            ).fetchall()
+            for r in rows:
+                if r["successes"] or r["agreements"]:
+                    continue
+                age_days = (now - max(r["updated"], r["last_used"] or 0)) / 86400.0
+                conf = r["confidence"] * (0.5 ** (age_days / halflife_days))
+                if conf < prune_below:
+                    self._conn.execute("DELETE FROM ni_memory WHERE id=?", (r["id"],))
+                    if self._fts:
+                        self._conn.execute("DELETE FROM ni_memory_fts WHERE id=?", (r["id"],))
+                    pruned += 1
+                elif conf < r["confidence"] - 1e-6:
+                    self._conn.execute("UPDATE ni_memory SET confidence=? WHERE id=?", (conf, r["id"]))
+                    decayed += 1
+        return {"decayed": decayed, "pruned": pruned}
+
+    def export_training_set(self, out_path: str, min_confidence: Optional[float] = None) -> dict:
+        """Write confirmed knowledge as chat-format JSONL for LoRA / full fine-tuning
+        of any local model (LLM, VLM text side, small models) with standard tools."""
+        thr = self.serve_confidence if min_confidence is None else min_confidence
+        out = Path(out_path)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        n = 0
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT question, answer, meta FROM ni_memory WHERE kind='qa' AND confidence >= ? "
+                "AND failures <= successes ORDER BY confidence DESC", (thr,)).fetchall()
+        with out.open("w", encoding="utf-8") as fh:
+            for r in rows:
+                system = json.loads(r["meta"] or "{}").get("system_excerpt", "")
+                msgs = ([{"role": "system", "content": system}] if system else []) + [
+                    {"role": "user", "content": r["question"]},
+                    {"role": "assistant", "content": r["answer"]}]
+                fh.write(json.dumps({"messages": msgs}, ensure_ascii=False) + "\n")
+                n += 1
+        return {"path": str(out), "examples": n, "min_confidence": thr}
+
+    # ── introspection ─────────────────────────────────────────────────────
+    def _count(self, table: str, where: str = "1=1") -> int:
+        with self._lock:
+            return int(self._conn.execute(f"SELECT COUNT(*) FROM {table} WHERE {where}").fetchone()[0])
+
+    def stats(self, window_s: float = 7 * 86400) -> dict:
+        since = time.time() - window_s
+        with self._lock:
+            routes = {r["route"]: r["n"] for r in self._conn.execute(
+                "SELECT route, COUNT(*) AS n FROM ni_answer_log WHERE ts >= ? GROUP BY route", (since,))}
+            teachers = [dict(r) for r in self._conn.execute(
+                "SELECT teacher, calls, ok, fail, ROUND(quality,3) AS quality, ROUND(latency_ms,1) AS latency_ms "
+                "FROM ni_teacher ORDER BY calls DESC")]
+        native, taught = routes.get("native", 0), routes.get("teacher", 0)
+        return {
+            "mode": ni_mode(),
+            "db": str(self.db_path),
+            "memories_qa": self._count("ni_memory", "kind='qa'"),
+            "memories_confirmed": self._count("ni_memory", f"kind='qa' AND confidence >= {self.serve_confidence}"),
+            "facts": self._count("ni_memory", "kind='fact'"),
+            "open_questions": self._count("ni_curiosity", "studied IS NULL"),
+            "answers_native": native,
+            "answers_teacher": taught,
+            "self_reliance": round(native / (native + taught), 4) if (native + taught) else 0.0,
+            "teachers": teachers,
+        }
+
+    def close(self) -> None:
+        with self._lock:
+            self._conn.close()
+
+
+def get_cortex(db_path: Optional[Path] = None) -> NaturalIntelligenceCortex:
+    return NaturalIntelligenceCortex.instance(db_path)
+
+
+def _ni_cli(argv: list[str]) -> int:
+    """python -m core_organs.organ_08_learning ni <command> [...]
+
+    stats                         show memory size, self-reliance, teacher table
+    feed <path|url|-> [...]       learn files, folders, web pages, or stdin text
+    ask <question>                answer via the gateway (memory first, then teachers)
+    study [limit]                 let teachers answer the brain's open questions
+    consolidate                   decay / prune unconfirmed memories
+    export <out.jsonl> [min_conf] write fine-tuning dataset of confirmed knowledge
+    """
+    cortex = get_cortex()
+    cmd = argv[0] if argv else "stats"
+    if cmd == "stats":
+        print(json.dumps(cortex.stats(), indent=2))
+    elif cmd == "feed":
+        for src in argv[1:]:
+            if src == "-":
+                print(json.dumps({"stdin": cortex.feed_text(sys.stdin.read(), "stdin")}))
+            elif _ni_re.match(r"https?://", src):
+                print(json.dumps({src: cortex.feed_url(src)}))
+            else:
+                print(json.dumps({src: cortex.feed_path(src)}))
+    elif cmd in ("ask", "study"):
+        from core_organs.organ_37_llm_gateway import LLMGateway
+        gw = LLMGateway()
+        if cmd == "ask":
+            print(gw.execute_inference("You are Hojaiga, a precise and helpful assistant.",
+                                       " ".join(argv[1:]), use_knowledge=True))
+        else:
+            limit = int(argv[1]) if len(argv) > 1 else 25
+            print(json.dumps(cortex.self_study(gw.teach, limit=limit), indent=2))
+    elif cmd == "consolidate":
+        print(json.dumps(cortex.consolidate(), indent=2))
+    elif cmd == "export":
+        thr = float(argv[2]) if len(argv) > 2 else None
+        print(json.dumps(cortex.export_training_set(argv[1], thr), indent=2))
+    else:
+        print(_ni_cli.__doc__)
+        return 2
+    return 0
+
+
 
 # ─────────────────────────────────────────────────────────────────────────
 # Wire Protocol: [4-byte length | 2-byte op_code | JSON payload]
@@ -794,6 +1413,8 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "ni":
+        sys.exit(_ni_cli(sys.argv[2:]))
     try:
         asyncio.run(main())
     except KeyboardInterrupt:

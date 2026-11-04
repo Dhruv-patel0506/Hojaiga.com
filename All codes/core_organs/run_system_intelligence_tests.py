@@ -1004,6 +1004,50 @@ def test_k2_knowledge_speed() -> TestOutcome:
     )
 
 
+def test_ni1_natural_intelligence_growth() -> TestOutcome:
+    """NI1: the brain answers repeated questions from its own memory after it has
+    evidence, never replays creative or other-role requests, and uses fed knowledge."""
+    from pathlib import Path
+    from core_organs.organ_08_learning import NaturalIntelligenceCortex
+    from core_organs.organ_37_llm_gateway import LLMGateway
+
+    db = os.path.join(os.environ.get("TEMP", "."), "hojaiga_ni_" + uuid.uuid4().hex[:8] + ".sqlite")
+    cortex = NaturalIntelligenceCortex(Path(db))
+    gw = LLMGateway()
+    gw._booted = True
+    gw._ni_cortex = cortex
+    taught = []
+
+    def teacher(system, prompt, temperature, timeout):
+        taught.append(prompt)
+        return "Answer for: " + prompt.splitlines()[-1]
+
+    gw._teachers = lambda: [("ollama:test", teacher)]
+    role = "You are Hojaiga."
+    for i in range(10):
+        gw.execute_inference(role, "How do I rename a layer?", temperature=0.2)
+        if i < 2:
+            gw.report_outcome(True)
+    native_ok = len(taught) <= 3
+    before = len(taught)
+    gw.execute_inference(role, "How do I rename a layer?", temperature=0.9)
+    gw.execute_inference("You compile steps JSON.", "How do I rename a layer?", temperature=0.2)
+    guards_ok = len(taught) == before + 2
+    cortex.feed_text("Layers panel: double-click a layer name to rename it.", "test-doc")
+    gw.execute_inference(role, "rename a layer in the layers panel", temperature=0.2, use_knowledge=True)
+    rag_ok = "double-click" in taught[-1]
+    st = cortex.stats()
+    cortex.close()
+    passed = native_ok and guards_ok and rag_ok and st["self_reliance"] > 0.4
+    return TestOutcome(
+        passed=passed,
+        evidence=(f"10 repeats -> {before} teacher calls (native_ok={native_ok}); "
+                  f"creative/other-role guards={guards_ok}; knowledge injected={rag_ok}; "
+                  f"self_reliance={st['self_reliance']}"),
+        metrics={"ni_self_reliance": st["self_reliance"], "ni_confirmed": st["memories_confirmed"]},
+    )
+
+
 # ═══════════════════════════════════════════════════════════════════════
 # DATABASE
 # ═══════════════════════════════════════════════════════════════════════
@@ -2429,6 +2473,7 @@ def main() -> int:
         ("R2", "MEMORY", test_r2_session_rooms_and_snapshot),
         ("K1", "KNOWLEDGE", test_k1_knowledge_ingest_and_natural_search),
         ("K2", "KNOWLEDGE", test_k2_knowledge_speed),
+        ("NI1", "INTELLIGENCE", test_ni1_natural_intelligence_growth),
         ("D1", "DATABASE", test_d1_batch_element_roundtrip),
         ("D2", "DATABASE", test_d2_modal_and_cookie_roundtrip),
         ("G1", "GROUNDING", test_g1_grounding_ladder_honesty),

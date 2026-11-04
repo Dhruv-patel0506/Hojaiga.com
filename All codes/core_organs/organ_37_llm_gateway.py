@@ -251,6 +251,8 @@ class LLMGateway:
 
         self.groq_key = self.keys.get("GROQ_API_KEY", self.keys.get("GROQ_API_KEY_1", os.environ.get("GROQ_API_KEY", os.environ.get("GROQ_API_KEY_1", ""))))
         self.openrouter_key = self.keys.get("OPENROUTER_API_KEY", self.keys.get("OPENROUTER_API_KEY_1", os.environ.get("OPENROUTER_API_KEY", os.environ.get("OPENROUTER_API_KEY_1", ""))))
+        self.anthropic_key = self.keys.get("ANTHROPIC_API_KEY", os.environ.get("ANTHROPIC_API_KEY", ""))
+        self.claude_model = os.environ.get("HOJAIGA_CLAUDE_MODEL", "claude-opus-5-5")
 
     def _call_ollama(self, system: str, prompt: str, temperature: float, timeout: float) -> str:
         # Main brain model (default qwen2.5:7b); override via HOJAIGA_BRAIN_MODEL env.
@@ -510,47 +512,145 @@ class LLMGateway:
                 return resp.json().get("message", {}).get("content", "")
             raise
 
-    def execute_inference(self, system: str, prompt: str, temperature: float = 0.3, timeout: float = 120.0) -> str:
-        """Route to local Ollama models with graceful fallback to free tiers.
-        Auto-heals: if Gatekeeper is dead, refreshes it and retries."""
-        
+    # =================================================================
+    # NATURAL INTELLIGENCE: memory first, teachers second, learn always
+    # =================================================================
+    def _cortex(self):
+        """The self-growing brain (organ_08). None when disabled/unavailable."""
+        if getattr(self, "_ni_cortex", None) is None:
+            try:
+                from core_organs.organ_08_learning import get_cortex, ni_mode
+                self._ni_cortex = get_cortex() if ni_mode() != "off" else False
+            except Exception as e:
+                logger.debug("[Gateway] Natural-intelligence cortex unavailable: %s", e)
+                self._ni_cortex = False
+        return self._ni_cortex or None
+
+    def _call_claude(self, system: str, prompt: str, temperature: float, timeout: float) -> str:
+        """Claude as an optional teacher (only when ANTHROPIC_API_KEY is configured)."""
+        import anthropic  # optional dependency: pip install anthropic
+        client = anthropic.Anthropic(api_key=self.anthropic_key or None, timeout=max(timeout, 60.0))
+        resp = client.beta.messages.create(
+            model=self.claude_model,
+            max_tokens=16000,
+            system=system or anthropic.NOT_GIVEN,
+            messages=[{"role": "user", "content": prompt}],
+            output_config={"effort": os.environ.get("HOJAIGA_CLAUDE_EFFORT", "high")},
+            betas=["server-side-fallback-2026-07-01"],
+            fallbacks="default",
+        )
+        if resp.stop_reason == "refusal":
+            raise LLMGatewayError("Claude declined this request")
+        return "".join(b.text for b in resp.content if b.type == "text")
+
+    def _teachers(self):
+        """Every model this gateway can learn from, in the order to try them.
+
+        Local Ollama always goes first (free, private). External teachers are
+        ordered by what the cortex has learned about their reliability, unless
+        HOJAIGA_TEACHER_ORDER (comma list of names) pins an order.
+        """
+        local = [("ollama:" + self.brain_model, self._call_ollama)]
+        external = []
+        if self.anthropic_key or os.environ.get("HOJAIGA_CLAUDE_ENABLE") == "1":
+            external.append(("claude:" + self.claude_model, self._call_claude))
+        if self.openrouter_key:
+            external.append(("openrouter", self._call_openrouter))
+        if self.groq_key:
+            external.append(("groq", self._call_groq))
+        pinned = [n.strip() for n in os.environ.get("HOJAIGA_TEACHER_ORDER", "").split(",") if n.strip()]
+        allt = local + external
+        if pinned:
+            by = {n: f for n, f in allt}
+            return [(n, by[n]) for n in pinned if n in by] + [t for t in allt if t[0] not in pinned]
+        cortex = self._cortex()
+        if cortex and len(external) > 1:
+            order = cortex.rank_teachers([n for n, _ in external])
+            by = dict(external)
+            external = [(n, by[n]) for n in order]
+        return local + external
+
+    def _ask_teachers(self, system: str, prompt: str, temperature: float, timeout: float):
+        """Try teachers in order. Returns (answer, teacher_name, latency_ms)."""
+        cortex = self._cortex()
+        for name, fn in self._teachers():
+            t0 = time.time()
+            try:
+                logger.info("Gateway: Routing request to %s...", name)
+                answer = fn(system, prompt, temperature, timeout)
+            except Exception as e:
+                logger.warning("Gateway: %s failed (%s).", name, e)
+                answer = None
+                if name.startswith("ollama:") and self._port_alive(11435):
+                    # Auto-heal: refresh Gatekeeper and retry once
+                    self.refresh_gatekeeper()
+                    try:
+                        answer = fn(system, prompt, temperature, timeout)
+                    except Exception as e2:
+                        logger.warning("Gateway: Retry after Gatekeeper refresh also failed (%s)", e2)
+            latency = (time.time() - t0) * 1000
+            if cortex:
+                cortex.teacher_outcome(name, bool(answer and answer.strip()), latency)
+            if answer and answer.strip():
+                return answer, name, latency
+        # Synthetic Offline Fallback (Guarantees system continuity) - never learned from
+        logger.info("Gateway: Routing request to Synthetic Offline Fallback...")
+        return self._call_synthetic_fallback(system, prompt), "synthetic", 0.0
+
+    def teach(self, system: str, prompt: str, temperature: float = 0.2, timeout: float = 120.0) -> str:
+        """Ask the teachers directly (skip memory) and learn the answer. Used by self-study."""
+        answer, teacher, latency = self._ask_teachers(system, prompt, temperature, timeout)
+        cortex = self._cortex()
+        if cortex and teacher != "synthetic":
+            cortex.learn(prompt, answer, system, source=teacher, latency_ms=latency)
+        return answer if teacher != "synthetic" else ""
+
+    def execute_inference(self, system: str, prompt: str, temperature: float = 0.3, timeout: float = 120.0,
+                          use_knowledge: bool = False) -> str:
+        """Answer from the brain's own confirmed memory when it can; otherwise ask
+        the teachers (local Ollama first, then external APIs ranked by learned
+        reliability) and learn from the answer. Auto-heals the Gatekeeper.
+
+        use_knowledge=True lets fed knowledge (files/URLs) be added to the
+        teacher prompt; HOJAIGA_NI_MODE=full does that for every call.
+        """
         # Auto-bootstrap on first call
         if not self._booted:
             self.bootstrap()
 
-        # Priority 1: Local Ollama Brain (qwen2.5:7b — compilation only, free, private)
-        try:
-            logger.info("Gateway: Routing request to Local Ollama (%s)...", self.brain_model)
-            return self._call_ollama(system, prompt, temperature, timeout)
-        except Exception as e:
-            logger.warning("Gateway: Local Ollama primary model failed (%s). Auto-healing...", e)
-            # Auto-heal: refresh Gatekeeper and retry once
-            if self._port_alive(11435):
-                self.refresh_gatekeeper()
-                try:
-                    return self._call_ollama(system, prompt, temperature, timeout)
-                except Exception as e2:
-                    logger.warning("Gateway: Retry after Gatekeeper refresh also failed (%s)", e2)
+        cortex = self._cortex()
+        if cortex:
+            hit = cortex.recall(prompt, system, temperature)
+            if hit:
+                logger.info("Gateway: answered natively from memory %s (sim %.3f, conf %.2f)",
+                            hit["memory_id"][:8], hit["similarity"], hit["confidence"])
+                self.last_memory_id = hit["memory_id"]
+                return hit["answer"]
 
-        # Priority 2: OpenRouter (Free Pool Fallback)
-        if self.openrouter_key:
-            try:
-                logger.info("Gateway: Routing request to OpenRouter...")
-                return self._call_openrouter(system, prompt, temperature, timeout)
-            except Exception as e:
-                logger.warning("Gateway: OpenRouter failed (%s). Degrading to Groq.", e)
+        teacher_prompt = prompt
+        if cortex:
+            from core_organs.organ_08_learning import ni_mode
+            mode = ni_mode()
+            if mode == "full" or (use_knowledge and mode == "on"):
+                context = cortex.knowledge_context(prompt)
+                if context:
+                    teacher_prompt = ("Relevant knowledge you have learned (use it if it helps):\n"
+                                      f"{context}\n\n---\n{prompt}")
 
-        # Priority 3: Groq (Fast Free Tier)
-        if self.groq_key:
-            try:
-                logger.info("Gateway: Routing request to Groq...")
-                return self._call_groq(system, prompt, temperature, timeout)
-            except Exception as e:
-                logger.warning("Gateway: Groq failed (%s). Degrading to Synthetic Fallback.", e)
-            
-        # Priority 4: Synthetic Offline Fallback (Guarantees system continuity)
-        logger.info("Gateway: Routing request to Synthetic Offline Fallback...")
-        return self._call_synthetic_fallback(system, prompt)
+        answer, teacher, latency = self._ask_teachers(system, teacher_prompt, temperature, timeout)
+        self.last_memory_id = None
+        if cortex:
+            if teacher == "synthetic":
+                cortex.note_curiosity(prompt, system)
+            else:
+                self.last_memory_id = cortex.learn(prompt, answer, system, source=teacher, latency_ms=latency)
+        return answer
+
+    def report_outcome(self, success: bool, memory_id: Optional[str] = None) -> Optional[float]:
+        """Tell the brain whether the last answer worked (raises/erodes confidence)."""
+        cortex = self._cortex()
+        mid = memory_id or getattr(self, "last_memory_id", None)
+        return cortex.feedback(mid, success) if (cortex and mid) else None
 
     def execute_small_inference(self, system: str, prompt: str,
                                 temperature: float = 0.2, timeout: float = 30.0) -> str:
