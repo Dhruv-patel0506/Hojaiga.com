@@ -976,6 +976,26 @@ class CortexRuntime:
                                ignore_index=self.tok.PAD)
         return float(math.exp(min(20.0, float(loss))))
 
+    def describe(self, media_path: str, samples: int = 2, max_new: int = 80) -> list[str]:
+        """Caption an image, diagram, screenshot or video with our own vision encoder + decoder."""
+        cfg = self.model.cfg
+        ext = _BPath(media_path).suffix.lower()
+        if ext in VIDEO_EXT:
+            vid = torch.tensor(load_video_frames(media_path, cfg.video_frames, cfg.img_size))[None].to(self.device)
+            img = None
+        else:
+            img = torch.tensor(load_image_array(media_path, cfg.img_size))[None].to(self.device)
+            vid = None
+        outs = []
+        for _ in range(samples):
+            ids = torch.tensor([[self.tok.BOS]], device=self.device)
+            gen = self.model.generate(ids, max_new=max_new, temperature=0.6, image=img, video=vid,
+                                      eos_id=self.tok.EOS)
+            text = self.tok.decode(gen[0, 1:].tolist()).strip()
+            if text:
+                outs.append(text)
+        return outs
+
     def answer(self, question: str, context: str = "", samples: int = 2, max_new: int = 120) -> list[str]:
         prompt = [self.tok.BOS] + self.tok.encode(context[-1500:]) + [self.tok.SEP, self.tok.Q] + \
             self.tok.encode(question) + [self.tok.A]
@@ -1151,6 +1171,7 @@ class CortexTrainer:
                 opt.load_state_dict(state["optim"])
                 for g in opt.param_groups:
                     g["lr"] = lr
+                    g["initial_lr"] = lr
             except Exception:
                 pass
         steps_per_epoch = max(1, math.ceil(len(train_ex) / batch))
@@ -1160,7 +1181,7 @@ class CortexTrainer:
             opt, lambda s: min(1.0, (s + 1) / warm) * (0.1 + 0.9 * 0.5 * (1 + math.cos(math.pi * min(1.0, s / total)))))
         use_amp = self.device == "cuda"
         amp_dtype = torch.bfloat16 if (use_amp and torch.cuda.is_bf16_supported()) else torch.float16
-        scaler = torch.cuda.amp.GradScaler(enabled=use_amp and amp_dtype == torch.float16)
+        scaler = torch.amp.GradScaler("cuda", enabled=use_amp and amp_dtype == torch.float16)
         logger.info("cortex: %.1fM params, %d train / %d val examples, %d steps on %s",
                     model.num_params() / 1e6, len(train_ex), len(val), total, self.device)
 
@@ -1179,14 +1200,14 @@ class CortexTrainer:
                     loss_lm = F.cross_entropy(logits.reshape(-1, logits.shape[-1]).float(),
                                               ids[:, 1:].reshape(-1), ignore_index=tok.PAD)
                     loss = loss_lm
-                    parts = {"lm": float(loss_lm)}
+                    parts = {"lm": float(loss_lm.detach())}
                     if "visual_embedding" in out and ids.shape[0] > 1:
                         scale = model.logit_scale.exp().clamp(max=100)
                         sim = scale * out["visual_embedding"] @ out["embedding"].T
                         tgt = torch.arange(sim.shape[0], device=self.device)
                         loss_c = (F.cross_entropy(sim.float(), tgt) + F.cross_entropy(sim.T.float(), tgt)) / 2
                         loss = loss + 0.5 * loss_c
-                        parts["contrastive"] = float(loss_c)
+                        parts["contrastive"] = float(loss_c.detach())
                     if len(b["qa"]) > 1:
                         qs, ans = zip(*b["qa"])
                         neg = list(ans[1:]) + [ans[0]]
@@ -1198,7 +1219,7 @@ class CortexTrainer:
                         lab = torch.tensor([1.0] * len(qs) + [0.0] * len(qs), device=self.device)
                         loss_v = F.binary_cross_entropy_with_logits(vl, lab)
                         loss = loss + 0.3 * loss_v
-                        parts["verify"] = float(loss_v)
+                        parts["verify"] = float(loss_v.detach())
                 opt.zero_grad(set_to_none=True)
                 scaler.scale(loss).backward()
                 scaler.unscale_(opt)
@@ -2430,6 +2451,8 @@ def brain_cli(argv: list[str]) -> int:
     p.add_argument("--intent")
     sub.add_parser("status")
     sub.add_parser("reindex", help="recompute dense vectors with the trained cortex")
+    p = sub.add_parser("describe", help="describe an image / diagram / video with the trained cortex")
+    p.add_argument("media")
     p = sub.add_parser("generate", help="raw text from the neural cortex")
     p.add_argument("prompt", nargs="+")
     p = sub.add_parser("overnight", help="ingest → train → reindex → self-study → distill, repeatedly")
@@ -2483,6 +2506,13 @@ def brain_cli(argv: list[str]) -> int:
             print("neural cortex not trained yet: brain train --data <folder>")
             return 1
         for g in rt.answer(" ".join(args.prompt), samples=1, max_new=200):
+            print(g)
+    elif args.cmd == "describe":
+        rt = CortexRuntime(home)
+        if not rt.available():
+            print("neural cortex not trained yet: brain train --data <folder>")
+            return 1
+        for g in rt.describe(args.media):
             print(g)
     elif args.cmd == "overnight":
         _brain_overnight(args)

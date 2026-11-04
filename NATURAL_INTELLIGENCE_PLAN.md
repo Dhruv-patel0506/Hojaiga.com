@@ -5,6 +5,79 @@ asks, answers more and more on its own, and calls external APIs less over time.
 External models (Claude, OpenRouter, Groq) and local Qwen are **teachers**. The
 brain is the **student that becomes independent**.
 
+## 0. Morning quickstart: feed data, train, ask, render
+
+All commands run from `All codes` (Windows: activate the venv first, see `hojaiga-environment-rules`).
+The brain lives in `storage/brain` (change it with `--home` or `HOJAIGA_BRAIN_HOME`).
+
+```
+# one-time: neural training needs PyTorch (CPU works; an NVIDIA GPU is much faster)
+pip install torch
+
+# 1. feed anything: a folder may mix text, md, pdf, docx, pptx, json/jsonl, images, gifs, videos
+python -m core_organs.hojaiga_ml_engine brain ingest  D:\datasets\biology
+
+# 2. train our own neural cortex on the same data (tokenizer is learned from your data first)
+python -m core_organs.hojaiga_ml_engine brain train --data D:\datasets\biology --size small --epochs 3
+#    sizes: tiny (~6M params, CPU) · small (~17M, RTX 3050) · base (~37M, 8 GB) · large (~110M, 16-24 GB)
+#    re-running train continues from the checkpoint and mixes in a replay sample of older data
+
+# 3. ask: every layer runs; --trace shows what each layer did
+python -m core_organs.hojaiga_ml_engine brain ask "How does sperm travel to the urethra?" --trace
+
+# 4. teach it: wrong answers are never repeated, corrections are remembered
+python -m core_organs.hojaiga_ml_engine brain feedback <thought-id> bad --correct "..." --intent explanation
+
+# 5. animated lesson from a textbook page, storybook, image or video
+python -m core_organs.hojaiga_ml_engine brain render chapter3.md --out chapter3.html --subject biology --grade 8
+python -m core_organs.hojaiga_ml_engine brain render storybook.pdf --out story.html --mode story
+python -m core_organs.hojaiga_ml_engine brain render photo.jpg --out traced.html
+#    in the page: 3D button = living 3D model (drag/zoom, zoom in to read details) · Hologram = 4 views for a pyramid
+
+# 6. leave it learning all night (ingest → train → reindex → self-study → distill, repeated)
+python -m core_organs.hojaiga_ml_engine brain overnight --data D:\datasets --hours 8 --loop [--teacher]
+
+# 7. see the architecture and the brain's state
+python -m core_organs.hojaiga_ml_engine brain diagram --out hojaiga_brain.html
+python -m core_organs.hojaiga_ml_engine brain status
+```
+
+### Dataset formats it understands (no conversion needed)
+| You give | It learns |
+|---|---|
+| `.txt .md .html .csv .json` and code files | language + knowledge chunks + concept graph + relations |
+| `.pdf .docx .pptx` | same, if `pypdf` / `python-docx` / `python-pptx` are installed |
+| `image.png` + `image.txt` (same name) | image ↔ caption (diagrams, photos, screenshots) |
+| `clip.mp4` + `clip.srt`/`.txt` | video frames ↔ transcript (needs `opencv-python` or ffmpeg; `.gif` works with Pillow alone) |
+| `.jsonl` rows `{"question","answer"}`, `{"messages":[...]}`, `{"text"}`, `{"image","caption"}` | Q&A (also trains the verifier head), chat distillation, captions |
+
+### The brain's layers (`All codes/core_organs/hojaiga_ml_engine.py`, Part B)
+| Layer | Brain analogue | Algorithm |
+|---|---|---|
+| L1 Filter | thalamus | normalisation, PII/secret redaction, SimHash near-duplicate, entropy quality gate, TF-IDF salience |
+| L2 Know | hippocampus | BM25 + our own dense embeddings + organ_08 memory, reciprocal rank fusion |
+| L3 Understand | Wernicke / temporal | online Naive Bayes intent, RAKE key-phrases, relation extraction, concept linking |
+| L4 Reason | prefrontal | personalized PageRank over the concept graph, forward chaining over triples, exact calculator with physical constants |
+| L5 Think | default-mode network | competing candidates (recall, extractive MMR, relational, calculator, memory, own generator, optional teacher), learned value function |
+| L6 Answer | Broca | intent-shaped composition (steps / bullets / prose), sources |
+| L7 Verify | anterior cingulate | grounding, self-consistency, negation contradiction, own verifier head, past-failure check, Platt-calibrated confidence → think again if unsure |
+| L8 Learn | basal ganglia | online logistic updates to value + calibration, Naive Bayes intent update, failure memory, corrections promoted to knowledge |
+| Neural cortex | cortex | own BPE tokenizer · patch-transformer vision encoder (images + video frames) · prefix-LM decoder · language / embedding / verifier heads · replay buffer against forgetting |
+
+### Verified in the build environment (CPU, 4 Nov 2026)
+- Tiny cortex (5.3M params) trained from scratch on a mixed sample (text, 40 captioned diagrams, a GIF clip,
+  Q&A): about 5 minutes of CPU training. It then captioned **unseen** images correctly ("A blue triangle drawn
+  on a white background") and the clip exactly ("A yellow ball moves from left to right across a dark sky").
+- Raw generation from such a small model still memorises: asked "What gas do plants absorb?" it returned
+  another fact from the same data. The layered brain answered correctly from grounded recall instead.
+  Real fluency needs much more data and GPU time.
+- Suite tests NI1, BR1, RN1 pass: all 8 layers run, answers are grounded, the calculator wins on math, a
+  corrected answer is recalled (also for a paraphrase) and the refuted one is never repeated; textbook and story
+  pages render to the right scene types.
+- `brain overnight` completes a full cycle (ingest → train → reindex → consolidate → distill).
+
+Industry research and positioning: `INDUSTRY_GAPS_AND_POSITIONING.md`.
+
 ## 1. Built so far (branch `natural-intelligence-core`)
 
 | Piece | Where | What it does |
