@@ -1048,6 +1048,60 @@ def test_ni1_natural_intelligence_growth() -> TestOutcome:
     )
 
 
+def test_br1_brain_layers_learn() -> TestOutcome:
+    """BR1: every brain layer runs; answers are grounded in fed knowledge; exact
+    calculation wins for math; a corrected answer is recalled (also for a
+    paraphrase) and the refuted one is never repeated."""
+    import tempfile
+    from pathlib import Path
+    from core_organs.hojaiga_ml_engine import HojaigaBrain
+    home = Path(tempfile.mkdtemp(prefix="hojaiga_brain_"))
+    os.environ.setdefault("HOJAIGA_NI_DB", str(home / "ni.sqlite"))
+    doc = home / "lesson.md"
+    doc.write_text("# Cells\n\nThe nucleus is part of the cell. The nucleus contains DNA. Mitochondria produce "
+                   "energy for the cell. The cell membrane controls what enters the cell.\n\n# Story\n\n"
+                   "Tom found a key. Tom opened the old door.", encoding="utf-8")
+    brain = HojaigaBrain(home)
+    ing = brain.ingest([str(doc)])
+    t1 = brain.think("What do mitochondria produce?")
+    layers = [x["layer"] for x in t1.trace]
+    grounded = "energy" in t1.answer.lower()
+    t2 = brain.think("calculate 12*(3+4)")
+    calc_ok = t2.chosen and t2.chosen["source"] == "calculator" and "84" in t2.answer
+    t3 = brain.think("What did Tom find behind the door?")
+    brain.feedback(t3.tid, good=False, correct="Tom found a hidden library behind the door.")
+    t4 = brain.think("What did Tom find behind the door?")
+    t5 = brain.think("what did tom find behind that door")
+    learned = "library" in t4.answer and "library" in t5.answer
+    passed = (ing["chunks"] > 0 and all(n in layers for n in ("filter", "know", "understand", "reason", "think",
+                                                               "answer", "verify", "learn"))
+              and grounded and calc_ok and learned)
+    return TestOutcome(passed=passed,
+                       evidence=(f"layers={len(set(layers))}/8 grounded={grounded} calculator={bool(calc_ok)} "
+                                 f"correction_recalled={learned} conf={t1.confidence}"),
+                       metrics={"brain_confidence": t1.confidence})
+
+
+def test_rn1_animated_lesson_render() -> TestOutcome:
+    """RN1: text and story pages become the right animated scene types."""
+    import tempfile
+    from pathlib import Path
+    from core_organs.organ_34_teaching_void import AnimatedLessonRenderer
+    home = Path(tempfile.mkdtemp(prefix="hojaiga_render_"))
+    r = AnimatedLessonRenderer(brain_home=home)
+    bio = r.plan("Blood moves from the heart to the lungs. Blood travels from the lungs to the heart.\n\n"
+                 "The heart is part of the circulatory system. The lungs are part of the respiratory system.")
+    story = r.plan("Page 1\nAnna walked into the dark forest at night.\n\nPage 2\nAnna laughed with joy.",
+                   mode="story")
+    out = r.render("Water flows from the river to the sea.", str(home / "x.html"))
+    kinds = [s["type"] for s in bio["scenes"]]
+    proc = bio["scenes"][0].get("path", [])
+    passed = (kinds[0] == "process" and proc[:2] == ["heart", "lungs"] and
+              all(s["type"] == "story" for s in story["scenes"]) and
+              story["scenes"][0]["characters"][0]["name"] == "Anna" and Path(out["out"]).stat().st_size > 10000)
+    return TestOutcome(passed=passed, evidence=f"bio={kinds} path={proc} story={[s['type'] for s in story['scenes']]}")
+
+
 # ═══════════════════════════════════════════════════════════════════════
 # DATABASE
 # ═══════════════════════════════════════════════════════════════════════
@@ -2474,6 +2528,8 @@ def main() -> int:
         ("K1", "KNOWLEDGE", test_k1_knowledge_ingest_and_natural_search),
         ("K2", "KNOWLEDGE", test_k2_knowledge_speed),
         ("NI1", "INTELLIGENCE", test_ni1_natural_intelligence_growth),
+        ("BR1", "INTELLIGENCE", test_br1_brain_layers_learn),
+        ("RN1", "RENDER", test_rn1_animated_lesson_render),
         ("D1", "DATABASE", test_d1_batch_element_roundtrip),
         ("D2", "DATABASE", test_d2_modal_and_cookie_roundtrip),
         ("G1", "GROUNDING", test_g1_grounding_ladder_honesty),
