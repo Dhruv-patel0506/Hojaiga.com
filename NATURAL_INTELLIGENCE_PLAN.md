@@ -7,8 +7,22 @@ brain is the **student that becomes independent**.
 
 ## 0. Morning quickstart: feed data, train, ask, render
 
-All commands run from `All codes` (Windows: activate the venv first, see `hojaiga-environment-rules`).
-The brain lives in `storage/brain` (change it with `--home` or `HOJAIGA_BRAIN_HOME`).
+**Windows, simplest:** `All codes\brain.bat` sets the venv, PYTHONPATH and storage paths for you
+(brain in `D:\new_automation\storage\brain`; override with `HOJAIGA_ROOT` / `HOJAIGA_BRAIN_HOME`).
+
+```
+brain.bat pipeline --data D:\datasets\biology --size small     # EVERYTHING: ingest → train → layers → eval
+brain.bat finetune --data D:\datasets\gmail --name gmail       # LoRA adapter on top of the trained base
+brain.bat --adapter gmail ask "Reply to the last message from Rahul"
+brain.bat eval --data D:\datasets\biology\qa.jsonl             # accuracy, F1, calibration, by question type
+brain.bat train-layers --data D:\datasets\biology\qa.jsonl     # train layers 3/5/7/8, held-out before/after
+brain.bat merge-adapter gmail                                  # bake an adapter into the base (backup kept)
+```
+The brain is also wired into the LLM gateway (`organ_37`): every organ's question goes to the brain first and
+is answered natively when its confidence ≥ `HOJAIGA_BRAIN_GATEWAY_CONF` (0.8); JSON/structured roles and
+creative requests skip it. Turn off with `HOJAIGA_BRAIN_GATEWAY=0`.
+
+Manual equivalents (from `All codes`, venv active):
 
 ```
 # one-time: neural training needs PyTorch (CPU works; an NVIDIA GPU is much faster)

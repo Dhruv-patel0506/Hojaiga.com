@@ -357,7 +357,7 @@ from pathlib import Path as _BPath
 
 BRAIN_HOME = _BPath(os.environ.get("HOJAIGA_BRAIN_HOME", os.path.join("storage", "brain")))
 
-_B_WORD = _b_re.compile(r"[A-Za-z0-9][A-Za-z0-9'\-]*")
+_B_WORD = _b_re.compile(r"\d+(?:\.\d+)+|[A-Za-z0-9][A-Za-z0-9'\-]*")
 _B_SENT = _b_re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9\"'(\[])|\n{2,}")
 _B_STOP = frozenset("""a an the and or but if then else of to in on at by for with from as is are was were be been
 being am do does did doing have has had having it its this that these those there here i me my we our you your he
@@ -397,6 +397,8 @@ def b_stem(w: str) -> str:
         if w.endswith(suf) and len(w) - len(suf) >= 3:
             w = w[: -len(suf)] + ("y" if suf in ("ies", "ied") else "")
             break
+    if w.endswith("e") and len(w) > 4:      # mature/matures, produce/produces → same stem
+        w = w[:-1]
     return w[:7]
 
 
@@ -915,15 +917,84 @@ if _HAS_TORCH:
             return ids
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Fine-tuning: LoRA adapters written from scratch (no external library)
+#   W·x  →  W·x + (alpha/r)·B·A·x      W frozen, only A (r×in) and B (out×r) train.
+# One small adapter file per subject / app / customer; the base never changes.
+# ─────────────────────────────────────────────────────────────────────────────
+
+LORA_TARGETS = ("qkv", "proj", "mlp.0", "mlp.2")
+
+if _HAS_TORCH:
+
+    class LoRALinear(nn.Module):
+        def __init__(self, base: "nn.Linear", rank: int = 8, alpha: float = 16.0, dropout: float = 0.05):
+            super().__init__()
+            self.base = base
+            for p_ in self.base.parameters():
+                p_.requires_grad_(False)
+            self.rank, self.alpha = rank, alpha
+            self.scale = alpha / rank
+            self.lora_A = nn.Parameter(torch.empty(rank, base.in_features))
+            self.lora_B = nn.Parameter(torch.zeros(base.out_features, rank))   # starts as a no-op
+            nn.init.kaiming_uniform_(self.lora_A, a=math.sqrt(5))
+            self.drop = nn.Dropout(dropout)
+
+        def forward(self, x):
+            return self.base(x) + (self.drop(x) @ self.lora_A.T @ self.lora_B.T) * self.scale
+
+        def merged(self) -> "nn.Linear":
+            with torch.no_grad():
+                self.base.weight += (self.lora_B @ self.lora_A) * self.scale
+            for p_ in self.base.parameters():
+                p_.requires_grad_(True)
+            return self.base
+
+
+def apply_lora(model, rank: int = 8, alpha: float = 16.0, include_vision: bool = True) -> int:
+    """Wrap every attention/MLP linear layer in a LoRA adapter. Returns trainable parameter count."""
+    for p_ in model.parameters():
+        p_.requires_grad_(False)
+    blocks = list(model.blocks) + (list(model.vision.blocks) if include_vision else [])
+    for blk in blocks:
+        for name in LORA_TARGETS:
+            parent, attr = (blk.mlp, int(name.split(".")[1])) if name.startswith("mlp.") else (blk, name)
+            layer = parent[attr] if isinstance(attr, int) else getattr(parent, attr)
+            if isinstance(layer, LoRALinear):
+                continue
+            wrapped = LoRALinear(layer, rank, alpha)
+            if isinstance(attr, int):
+                parent[attr] = wrapped
+            else:
+                setattr(parent, attr, wrapped)
+    for head in (model.embed_head, model.verify_head):   # small task heads adapt fully
+        for p_ in head.parameters():
+            p_.requires_grad_(True)
+    return sum(p_.numel() for p_ in model.parameters() if p_.requires_grad)
+
+
+def lora_state(model) -> dict:
+    return {k: v.detach().cpu() for k, v in model.state_dict().items()
+            if "lora_" in k or k.startswith(("embed_head.", "verify_head."))}
+
+
+def merge_lora(model) -> None:
+    for module in list(model.modules()):
+        for name, child in list(module.named_children()):
+            if isinstance(child, LoRALinear):
+                setattr(module, name, child.merged()) if not name.isdigit() else module.__setitem__(int(name), child.merged())
+
+
 class CortexRuntime:
     """Loads the trained network + tokenizer for the thinking layers (lazy, optional)."""
 
-    def __init__(self, home: _BPath = BRAIN_HOME):
+    def __init__(self, home: _BPath = BRAIN_HOME, adapter: Optional[str] = None):
         self.home = _BPath(home)
         self.model = None
         self.tok: Optional[BrainTokenizer] = None
         self.device = "cpu"
         self._tried = False
+        self.adapter = adapter or os.environ.get("HOJAIGA_BRAIN_ADAPTER") or None
 
     @property
     def ckpt(self) -> _BPath:
@@ -940,6 +1011,11 @@ class CortexRuntime:
             self.tok = BrainTokenizer.load(self.home / "cortex" / "tokenizer.json")
             self.model = HojaigaCortexNet(CortexConfig(**state["config"]))
             self.model.load_state_dict(state["model"])
+            if self.adapter:
+                ad = torch.load(self.home / "cortex" / "adapters" / f"{self.adapter}.pt", map_location="cpu",
+                                weights_only=False)
+                apply_lora(self.model, ad["rank"], ad["alpha"], ad["include_vision"])
+                self.model.load_state_dict(ad["state"], strict=False)
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
             self.model.to(self.device).eval()
         except Exception as exc:
@@ -1127,7 +1203,11 @@ class CortexTrainer:
     # -- training ------------------------------------------------------------
     def train(self, data_paths, epochs: int = 3, batch: int = 16, lr: float = 3e-4, max_steps: int = 0,
               max_minutes: float = 0.0, replay_ratio: float = 0.25, retokenize: bool = False,
-              log_every: int = 20) -> dict:
+              log_every: int = 20, adapter: Optional[str] = None, rank: int = 8, alpha: float = 16.0,
+              freeze_vision: bool = False) -> dict:
+        """Full training, or (adapter="name") LoRA fine-tuning on top of the frozen base."""
+        if adapter and not (self.dir / "model.pt").exists():
+            raise RuntimeError("fine-tuning needs a trained base: run `brain train` first")
         reader = DatasetReader()
         items = reader.read(data_paths)
         if not items:
@@ -1152,21 +1232,47 @@ class CortexTrainer:
         model = HojaigaCortexNet(cfg)
         if state:
             model.load_state_dict(state["model"])
+        ad_path = self.dir / "adapters" / f"{adapter}.pt" if adapter else None
+        ad_state = None
+        if adapter:
+            ad_state = torch.load(ad_path, map_location="cpu", weights_only=False) if ad_path.exists() else None
+            if ad_state:
+                rank, alpha, freeze_vision = ad_state["rank"], ad_state["alpha"], not ad_state["include_vision"]
+            n_train = apply_lora(model, rank, alpha, include_vision=not freeze_vision)
+            if ad_state:
+                model.load_state_dict(ad_state["state"], strict=False)
+            logger.info("fine-tuning adapter '%s': rank %d, %.2fM trainable of %.1fM", adapter, rank,
+                        n_train / 1e6, model.num_params() / 1e6)
+        elif freeze_vision:
+            for p_ in model.vision.parameters():
+                p_.requires_grad_(False)
         model.to(self.device)
+        trainable = [p_ for p_ in model.parameters() if p_.requires_grad]
 
         replay = [BrainItem(r["source"], text=r.get("text") or "", image=r.get("image"), video=r.get("video"),
                             question=r.get("question"), answer=r.get("answer")) for r in self._replay_load()]
         examples = self._examples(items, tok, cfg.context)
+        if adapter and replay_ratio == 0.25:
+            replay_ratio = 0.6          # fine-tuning on little data needs more rehearsal of the old
         if replay and replay_ratio > 0:
             rex = self._examples(replay, tok, cfg.context)
             _b_random.shuffle(rex)
-            examples += rex[: int(len(examples) * replay_ratio) + 1]
+            # rehearse old examples of the same kinds as the new data first (images ↔ images ...)
+            kind = lambda e: "video" if e.get("video") else "image" if e.get("image") else "text"
+            new_kinds = _b_collections.Counter(kind(e) for e in examples)
+            budget = int(len(examples) * replay_ratio) + 1
+            picked = []
+            for kd, cnt in new_kinds.most_common():
+                same = [e for e in rex if kind(e) == kd]
+                picked += same[: int(budget * cnt / len(examples)) + 1]
+            rest = [e for e in rex if e not in picked]
+            examples += picked + rest[: max(0, budget - len(picked))]
         _b_random.shuffle(examples)
         n_val = max(1, len(examples) // 20) if len(examples) > 20 else 0
         val, train_ex = examples[:n_val], examples[n_val:]
 
-        opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=0.05, betas=(0.9, 0.95))
-        if state and "optim" in state:
+        opt = torch.optim.AdamW(trainable, lr=lr, weight_decay=0.0 if adapter else 0.05, betas=(0.9, 0.95))
+        if state and "optim" in state and not adapter and not freeze_vision:
             try:
                 opt.load_state_dict(state["optim"])
                 for g in opt.param_groups:
@@ -1185,7 +1291,8 @@ class CortexTrainer:
         logger.info("cortex: %.1fM params, %d train / %d val examples, %d steps on %s",
                     model.num_params() / 1e6, len(train_ex), len(val), total, self.device)
 
-        step, t0, last = int(state.get("step", 0)) if state else 0, time.time(), {}
+        step, t0, last = (int((ad_state or {}).get("step", 0)) if adapter else
+                          int(state.get("step", 0)) if state else 0), time.time(), {}
         start_step = step
         done = False
         for ep in range(epochs if not max_steps else 10_000):
@@ -1223,7 +1330,7 @@ class CortexTrainer:
                 opt.zero_grad(set_to_none=True)
                 scaler.scale(loss).backward()
                 scaler.unscale_(opt)
-                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                torch.nn.utils.clip_grad_norm_(trainable, 1.0)
                 scaler.step(opt)
                 scaler.update()
                 sched.step()
@@ -1233,7 +1340,7 @@ class CortexTrainer:
                     msg = " ".join(f"{k}={v:.3f}" for k, v in parts.items())
                     print(f"[cortex] step {step} epoch {ep + 1} {msg} lr={sched.get_last_lr()[0]:.2e}", flush=True)
                 if step % 500 == 0:
-                    self._save(model, opt, cfg, step, ckpt_path)
+                    self._save_any(model, opt, cfg, step, ckpt_path, adapter, rank, alpha, freeze_vision)
                 if (max_steps and step - start_step >= max_steps) or \
                         (max_minutes and (time.time() - t0) / 60 >= max_minutes):
                     done = True
@@ -1241,9 +1348,12 @@ class CortexTrainer:
             if done:
                 break
         val_ppl = self._evaluate(model, val, cfg, tok) if val else None
-        self._save(model, opt, cfg, step, ckpt_path)
-        self._replay_update(items)
-        report = {"steps": step - start_step, "total_steps": step, "params_m": round(model.num_params() / 1e6, 2),
+        self._save_any(model, opt, cfg, step, ckpt_path, adapter, rank, alpha, freeze_vision)
+        if not adapter:
+            self._replay_update(items)
+        report = {"mode": f"lora:{adapter}" if adapter else "full", "steps": step - start_step, "total_steps": step,
+                  "params_m": round(model.num_params() / 1e6, 2),
+                  "trainable_m": round(sum(p_.numel() for p_ in trainable) / 1e6, 3),
                   "train_examples": len(train_ex), "val_perplexity": val_ppl, "last_losses": last,
                   "minutes": round((time.time() - t0) / 60, 2), "device": self.device,
                   "skipped_files": reader.skipped[:20], "ts": time.time()}
@@ -1264,6 +1374,33 @@ class CortexTrainer:
                                          ignore_index=tok.PAD))
             n += 1
         return round(math.exp(min(20.0, tot / max(n, 1))), 2)
+
+    def _save_any(self, model, opt, cfg, step, ckpt_path, adapter, rank, alpha, freeze_vision) -> None:
+        if not adapter:
+            return self._save(model, opt, cfg, step, ckpt_path)
+        d = self.dir / "adapters"
+        d.mkdir(parents=True, exist_ok=True)
+        tmp = d / f"{adapter}.tmp"
+        torch.save({"state": lora_state(model), "rank": rank, "alpha": alpha, "include_vision": not freeze_vision,
+                    "step": step, "base_config": cfg.__dict__, "saved": time.time()}, tmp)
+        tmp.replace(d / f"{adapter}.pt")
+
+    def merge_adapter(self, adapter: str) -> dict:
+        """Bake an adapter into the base model permanently (base is backed up first)."""
+        ckpt = self.dir / "model.pt"
+        state = torch.load(ckpt, map_location="cpu", weights_only=False)
+        ad = torch.load(self.dir / "adapters" / f"{adapter}.pt", map_location="cpu", weights_only=False)
+        model = HojaigaCortexNet(CortexConfig(**state["config"]))
+        model.load_state_dict(state["model"])
+        apply_lora(model, ad["rank"], ad["alpha"], ad["include_vision"])
+        model.load_state_dict(ad["state"], strict=False)
+        merge_lora(model)
+        backup = ckpt.with_name(f"model.before_{adapter}.pt")
+        _b_shutil.copy2(ckpt, backup)
+        state["model"] = model.state_dict()
+        state.pop("optim", None)
+        torch.save(state, ckpt)
+        return {"merged": adapter, "backup": str(backup)}
 
     def _save(self, model, opt, cfg, step, path) -> None:
         tmp = path.with_suffix(".tmp")
@@ -1774,14 +1911,21 @@ class ThinkLayer(BrainLayer):
         qw = {b_stem(w): t.idf.get(w, 1.0) for w in b_content(t.clean)}
         qtot = sum(qw.values()) or 1.0
 
+        subj = [c for c in t.concepts[:3] if c]
+
         def rel(s):
             words = set(b_content(s))
             stems = {b_stem(w) for w in words}
             a = sum(v for c, v in act.items() if set(c.split()) <= words)
-            return sum(v for w, v in qw.items() if w in stems) / qtot + 0.1 * a
+            r = sum(v for w, v in qw.items() if w in stems) / qtot + 0.1 * a
+            if t.intent == "definition" and any(_b_re.match(rf"(?:the |an? )?{_b_re.escape(c)}s?\b", s, _b_re.I)
+                                                 for c in subj):
+                r += 0.3            # "The uterus is ..." answers "What is the uterus?"
+            return r
         picked = []
         pool = sorted(sents, key=lambda x: -(rel(x[0]) + 2 * x[1]))[:40]
-        floor = 0.6 * max(rel(x[0]) for x in pool)
+        tight = t.intent in ("fact", "definition", "calculation")
+        floor = (0.85 if tight else 0.6) * max(rel(x[0]) for x in pool)
         while pool and len(picked) < n_sent:
             best = max(pool, key=lambda x: 0.7 * (rel(x[0]) + 2 * x[1]) -
                        0.3 * max([b_jaccard(x[0], p[0]) for p in picked] or [0]))
@@ -1794,17 +1938,26 @@ class ThinkLayer(BrainLayer):
             picked.sort(key=lambda x: (x[2], x[3]))
         return " ".join(p[0] for p in picked)
 
+    _VERBS = {"is_a": "is a kind of", "part_of": "is part of", "has_part": "includes", "causes": "leads to",
+              "flows_to": "moves to", "converts": "becomes", "connects": "connects to",
+              "located_in": "is located in", "also_called": "is called", "is": "is"}
+
     def _relational(self, t: Thought) -> Optional[str]:
-        rows = self.brain.store.triples_about(t.concepts[:6], limit=30)
-        lines = []
+        """Facts from the relation store that answer *this* question: a triple must cover most of
+        the question's content words (subject + relation + object), at most two are used."""
+        rows = self.brain.store.triples_about(t.concepts[:6], limit=60)
+        qstems = b_stems(t.clean)
+        if not qstems:
+            return None
+        scored = []
         for r in rows:
-            if r["s"] in t.concepts[:6] or r["o"] in t.concepts[:6]:
-                verb = {"is_a": "is a kind of", "part_of": "is part of", "has_part": "includes", "causes": "leads to",
-                        "flows_to": "moves to", "converts": "becomes", "connects": "connects to",
-                        "located_in": "is located in", "also_called": "is also called", "is": "is"}.get(r["r"], r["r"])
-                lines.append(f"{r['s'].capitalize()} {verb} {r['o']}.")
-        lines = list(dict.fromkeys(lines))[:5]
-        if t.inferences:
+            sent = f"{r['s']} {self._VERBS.get(r['r'], r['r'])} {r['o']}"
+            cover = len(qstems & b_stems(sent)) / len(qstems)
+            if cover >= 0.5:
+                scored.append((cover + 0.05 * r["n"], sent[0].upper() + sent[1:] + "."))
+        scored.sort(key=lambda x: -x[0])
+        lines = list(dict.fromkeys(s_ for _, s_ in scored))[:2]
+        if t.inferences and t.intent in ("explanation", "procedure"):
             lines.append("Chain: " + t.inferences[0])
         return " ".join(lines) if lines else None
 
@@ -2106,11 +2259,11 @@ class HojaigaBrain:
               LearnLayer]
 
     def __init__(self, home: _BPath = BRAIN_HOME, confidence_threshold: Optional[float] = None,
-                 max_rounds: int = 2):
+                 max_rounds: int = 2, adapter: Optional[str] = None):
         self.home = _BPath(home)
         self.home.mkdir(parents=True, exist_ok=True)
         self.store = BrainStore(self.home)
-        self.cortex = CortexRuntime(self.home)
+        self.cortex = CortexRuntime(self.home, adapter=adapter)
         self.value = ValueFunction(self.home)
         self.calibrator = Calibrator(self.home)
         self.intents = IntentModel(self.home)
@@ -2120,9 +2273,11 @@ class HojaigaBrain:
         self.layers = {cls.name: cls(self) for cls in self.LAYERS}
 
     # -- perception of new material ------------------------------------------
-    def ingest(self, paths, chunk_chars: int = 900) -> dict:
+    def ingest(self, paths, chunk_chars: int = 900, exclude_questions: Optional[set] = None) -> dict:
         reader = DatasetReader()
         items = reader.read(paths)
+        if exclude_questions:      # keep held-out test questions out of memory
+            items = [it for it in items if not (it.question and it.question in exclude_questions)]
         rep = {"items": len(items), "chunks": 0, "duplicates": 0, "media_without_text": 0}
         for it in items:
             text = it.text or ""
@@ -2242,6 +2397,109 @@ class HojaigaBrain:
                 pass
             out["learned_correction"] = True
         return out
+
+    # -- measuring and training the thinking layers from labelled data ----------
+    @staticmethod
+    def answer_f1(pred: str, gold: str) -> float:
+        p, g = [b_stem(w) for w in b_content(pred)], [b_stem(w) for w in b_content(gold)]
+        if not p or not g:
+            return 0.0
+        common = sum((_b_collections.Counter(p) & _b_collections.Counter(g)).values())
+        if common == 0:
+            return 0.0
+        prec, rec = common / len(p), common / len(g)
+        return 2 * prec * rec / (prec + rec)
+
+    @staticmethod
+    def _qa_items(paths) -> list[BrainItem]:
+        return [it for it in DatasetReader().read(paths) if it.question and it.answer]
+
+    def evaluate(self, paths, limit: int = 0, threshold: float = 0.5, allow_teacher: bool = False,
+                 learn: bool = False) -> dict:
+        """Ask every question of a Q&A dataset and score the brain against the gold answers.
+
+        correct = token-F1 ≥ threshold (or the gold answer appears verbatim). Reports accuracy,
+        mean F1, calibration error (ECE), and accuracy by intent and by answer strategy.
+        With learn=True every result is fed back (value function, calibration, failure memory,
+        corrections) — this is how layers 3/5/7/8 are trained from data.
+        """
+        items = self._qa_items(paths)
+        if limit:
+            items = items[:limit]
+        if not items:
+            raise RuntimeError("no question/answer pairs found (need question+answer, prompt+response or messages)")
+        rows, t0 = [], time.time()
+        for it in items:
+            t = self.think(it.question, allow_teacher=allow_teacher)
+            pred = t.chosen["text"] if t.chosen else ""
+            f1 = self.answer_f1(pred, it.answer)
+            ok = f1 >= threshold or (it.answer.strip().lower() in pred.lower() and len(it.answer) > 3)
+            rows.append({"q": it.question, "gold": it.answer, "pred": pred, "f1": round(f1, 3), "correct": ok,
+                         "confidence": t.confidence, "intent": t.intent,
+                         "strategy": t.chosen["source"] if t.chosen else "none", "tid": t.tid})
+            if learn:
+                self.feedback(t.tid, ok, correct=None if ok else it.answer)
+        n = len(rows)
+        bins = [[] for _ in range(10)]
+        for r in rows:
+            bins[min(9, int(r["confidence"] * 10))].append(r)
+        ece = sum(len(b) / n * abs(sum(x["correct"] for x in b) / len(b) - sum(x["confidence"] for x in b) / len(b))
+                  for b in bins if b)
+
+        def group(key):
+            g: dict[str, list] = {}
+            for r in rows:
+                g.setdefault(r[key], []).append(r["correct"])
+            return {k: {"n": len(v), "accuracy": round(sum(v) / len(v), 3)} for k, v in g.items()}
+        report = {"questions": n, "accuracy": round(sum(r["correct"] for r in rows) / n, 3),
+                  "mean_f1": round(sum(r["f1"] for r in rows) / n, 3),
+                  "mean_confidence": round(sum(r["confidence"] for r in rows) / n, 3),
+                  "calibration_error": round(ece, 3), "by_intent": group("intent"), "by_strategy": group("strategy"),
+                  "seconds_per_question": round((time.time() - t0) / n, 3), "learned": learn,
+                  "wrong_examples": [{k: r[k] for k in ("q", "gold", "pred")} for r in rows if not r["correct"]][:5]}
+        out = self.home / "evals"
+        out.mkdir(exist_ok=True)
+        (out / f"eval_{int(time.time())}.json").write_text(json.dumps({"report": report, "rows": rows}, indent=1),
+                                                           encoding="utf-8")
+        return report
+
+    @staticmethod
+    def split_qa(items: list, holdout: float = 0.2, seed: int = 7) -> tuple[list, list]:
+        items = list(items)
+        _b_random.Random(seed).shuffle(items)
+        k = max(1, int(len(items) * holdout))
+        return items[:k], items[k:]
+
+    def train_layers(self, paths, epochs: int = 2, holdout: float = 0.2, seed: int = 7) -> dict:
+        """Train the thinking layers on Q&A data and prove it on held-out questions.
+
+        The dataset is split; the train part is ingested as knowledge and run through the brain
+        with feedback for `epochs` passes (value function, calibration, intent model, failure
+        memory and corrections all learn); the held-out part is scored before and after.
+        """
+        items = self._qa_items(paths)
+        if len(items) < 5:
+            raise RuntimeError("need at least 5 question/answer pairs")
+        test, train = self.split_qa(items, holdout, seed)
+        tmp = self.home / "evals"
+        tmp.mkdir(exist_ok=True)
+
+        def dump(rows, name):
+            pth = tmp / name
+            pth.write_text("\n".join(json.dumps({"question": r.question, "answer": r.answer}) for r in rows),
+                           encoding="utf-8")
+            return str(pth)
+        train_p, test_p = dump(train, "_train.jsonl"), dump(test, "_holdout.jsonl")
+        before = self.evaluate([test_p])
+        epochs_rep = []
+        for ep in range(epochs):
+            epochs_rep.append(self.evaluate([train_p], learn=True)["accuracy"])
+        after = self.evaluate([test_p])
+        return {"train_questions": len(train), "holdout_questions": len(test),
+                "train_accuracy_per_epoch": epochs_rep,
+                "holdout_before": {k_: before[k_] for k_ in ("accuracy", "mean_f1", "calibration_error")},
+                "holdout_after": {k_: after[k_] for k_ in ("accuracy", "mean_f1", "calibration_error")},
+                "value_feedback": self.value.model.n, "calibration_feedback": self.calibrator.model.n}
 
     def status(self) -> dict:
         s = self.store
@@ -2421,10 +2679,54 @@ def _brain_overnight(args) -> None:
             break
 
 
+def brain_pipeline(home: _BPath, data: list[str], size: str = "small", minutes: float = 0.0, epochs: int = 3,
+                   batch: int = 16, finetune: Optional[str] = None, holdout: float = 0.2) -> dict:
+    """One dataset folder in → a trained, measured brain out.
+
+    1 ingest (knowledge, concept graph, relations) → 2 train the neural cortex (or LoRA fine-tune
+    an adapter when a base exists and `finetune` is given) → 3 re-embed knowledge with the new
+    network → 4 train the thinking layers on any Q&A pairs, held-out before/after → 5 full eval.
+    """
+    rep: dict[str, Any] = {"data": data, "started": time.time()}
+    brain = HojaigaBrain(home)
+    qa = HojaigaBrain._qa_items(data)
+    held = {it.question for it in HojaigaBrain.split_qa(qa, holdout)[0]} if len(qa) >= 5 else set()
+    print("[1/5] ingesting ...", flush=True)
+    rep["ingest"] = brain.ingest(data, exclude_questions=held)
+    rep["ingest"]["held_out_questions"] = len(held)
+    if _HAS_TORCH:
+        base = (home / "cortex" / "model.pt").exists()
+        mode = "finetune" if (finetune and base) else "train"
+        print(f"[2/5] {mode} neural cortex ...", flush=True)
+        tr = CortexTrainer(home, size=size)
+        rep["cortex"] = tr.train(data, epochs=epochs, batch=batch, max_minutes=minutes,
+                                 adapter=finetune if mode == "finetune" else None,
+                                 lr=1e-3 if mode == "finetune" else 3e-4)
+        brain = HojaigaBrain(home, adapter=finetune if mode == "finetune" else None)
+        print("[3/5] re-embedding knowledge ...", flush=True)
+        rep["reindexed"] = brain.reindex()
+    else:
+        rep["cortex"] = "skipped: PyTorch not installed (pip install torch)"
+    if len(qa) >= 5:
+        print(f"[4/5] training thinking layers on {len(qa)} Q&A pairs ...", flush=True)
+        rep["layers"] = brain.train_layers(data, epochs=2, holdout=holdout)
+        print("[5/5] evaluating ...", flush=True)
+        ev = brain.evaluate(data)
+        rep["eval"] = {"note": "all Q&A incl. trained ones; the honest score is layers.holdout_after",
+                       **{k: ev[k] for k in ("questions", "accuracy", "mean_f1", "calibration_error", "by_intent")}}
+    else:
+        rep["layers"] = rep["eval"] = "skipped: add question/answer pairs (jsonl) to train and measure the layers"
+    rep["finished"] = time.time()
+    (home / "pipeline_report.json").write_text(json.dumps(rep, indent=1, default=str), encoding="utf-8")
+    return rep
+
+
 def brain_cli(argv: list[str]) -> int:
     ap = _b_argparse.ArgumentParser(prog="python -m core_organs.hojaiga_ml_engine brain",
                                     description="Hojaiga Brain — layered natural intelligence")
     ap.add_argument("--home", default=str(BRAIN_HOME), help="brain folder (default storage/brain)")
+    ap.add_argument("--adapter", default=os.environ.get("HOJAIGA_BRAIN_ADAPTER"),
+                    help="use a fine-tuned adapter (see `finetune`)")
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("ingest", help="read files/folders into long-term knowledge")
     p.add_argument("paths", nargs="+")
@@ -2440,6 +2742,37 @@ def brain_cli(argv: list[str]) -> int:
     p.add_argument("--device", default="auto")
     p.add_argument("--retokenize", action="store_true")
     p.add_argument("--no-ingest", action="store_true", help="train only; do not add to knowledge store")
+    p = sub.add_parser("finetune", help="LoRA fine-tune the trained cortex on new data into a named adapter")
+    p.add_argument("--data", nargs="+", required=True)
+    p.add_argument("--name", required=True, help="adapter name, e.g. biology, gmail, customer-x")
+    p.add_argument("--rank", type=int, default=8)
+    p.add_argument("--alpha", type=float, default=16.0)
+    p.add_argument("--epochs", type=int, default=3)
+    p.add_argument("--batch", type=int, default=16)
+    p.add_argument("--lr", type=float, default=1e-3)
+    p.add_argument("--minutes", type=float, default=0.0)
+    p.add_argument("--freeze-vision", action="store_true", help="adapt language layers only")
+    p.add_argument("--device", default="auto")
+    p.add_argument("--no-ingest", action="store_true")
+    p = sub.add_parser("merge-adapter", help="bake an adapter into the base model (backs up first)")
+    p.add_argument("name")
+    sub.add_parser("adapters", help="list fine-tuned adapters")
+    p = sub.add_parser("eval", help="score the brain on a question/answer dataset")
+    p.add_argument("--data", nargs="+", required=True)
+    p.add_argument("--limit", type=int, default=0)
+    p.add_argument("--teacher", action="store_true")
+    p = sub.add_parser("train-layers", help="train the thinking layers on Q&A data; reports held-out accuracy")
+    p.add_argument("--data", nargs="+", required=True)
+    p.add_argument("--epochs", type=int, default=2)
+    p.add_argument("--holdout", type=float, default=0.2)
+    p = sub.add_parser("pipeline", help="EVERYTHING from one dataset: ingest, train/fine-tune, layers, eval")
+    p.add_argument("--data", nargs="+", required=True)
+    p.add_argument("--size", default="small", choices=list(CORTEX_SIZES))
+    p.add_argument("--minutes", type=float, default=0.0, help="cap on neural training time")
+    p.add_argument("--epochs", type=int, default=3)
+    p.add_argument("--batch", type=int, default=16)
+    p.add_argument("--finetune", help="fine-tune into this adapter name instead of full training")
+    p.add_argument("--holdout", type=float, default=0.2)
     p = sub.add_parser("ask", help="think through all layers and answer")
     p.add_argument("question", nargs="+")
     p.add_argument("--teacher", action="store_true", help="allow an external teacher when unsure")
@@ -2486,8 +2819,35 @@ def brain_cli(argv: list[str]) -> int:
             max_minutes=args.minutes, retokenize=args.retokenize)
         print(json.dumps(rep, indent=2, default=str))
         print(json.dumps({"reindexed_chunks": HojaigaBrain(home).reindex()}))
+    elif args.cmd == "pipeline":
+        rep = brain_pipeline(home, args.data, args.size, args.minutes, args.epochs, args.batch, args.finetune,
+                             args.holdout)
+        print(json.dumps({k: rep[k] for k in ("ingest", "layers", "eval")}, indent=2, default=str))
+        if isinstance(rep.get("cortex"), dict):
+            print(json.dumps({k: rep["cortex"].get(k) for k in ("mode", "steps", "val_perplexity", "minutes")}))
+        print(f"full report: {home / 'pipeline_report.json'}")
+    elif args.cmd == "finetune":
+        if not args.no_ingest:
+            print(json.dumps({"ingest": HojaigaBrain(home).ingest(args.data)}, indent=2))
+        rep = CortexTrainer(home, device=args.device).train(
+            args.data, epochs=args.epochs, batch=args.batch, lr=args.lr, max_minutes=args.minutes,
+            adapter=args.name, rank=args.rank, alpha=args.alpha, freeze_vision=args.freeze_vision)
+        print(json.dumps(rep, indent=2, default=str))
+        print(f"use it with:  brain --adapter {args.name} ask \"...\"   (or set HOJAIGA_BRAIN_ADAPTER={args.name})")
+    elif args.cmd == "merge-adapter":
+        print(json.dumps(CortexTrainer(home).merge_adapter(args.name), indent=2))
+    elif args.cmd == "adapters":
+        d = home / "cortex" / "adapters"
+        names = sorted(f.stem for f in d.glob("*.pt")) if d.exists() else []
+        print(json.dumps({"adapters": names}, indent=2))
+    elif args.cmd == "eval":
+        print(json.dumps(HojaigaBrain(home, adapter=args.adapter).evaluate(
+            args.data, limit=args.limit, allow_teacher=args.teacher), indent=2))
+    elif args.cmd == "train-layers":
+        print(json.dumps(HojaigaBrain(home, adapter=args.adapter).train_layers(
+            args.data, epochs=args.epochs, holdout=args.holdout), indent=2))
     elif args.cmd == "ask":
-        t = HojaigaBrain(home).think(" ".join(args.question), allow_teacher=args.teacher)
+        t = HojaigaBrain(home, adapter=args.adapter).think(" ".join(args.question), allow_teacher=args.teacher)
         print(t.answer)
         print(f"\n[confidence {t.confidence} · intent {t.intent} · strategy "
               f"{t.chosen['source'] if t.chosen else '-'} · thought {t.tid}]")
@@ -2501,14 +2861,14 @@ def brain_cli(argv: list[str]) -> int:
     elif args.cmd == "reindex":
         print(json.dumps({"reindexed_chunks": HojaigaBrain(home).reindex()}))
     elif args.cmd == "generate":
-        rt = CortexRuntime(home)
+        rt = CortexRuntime(home, adapter=args.adapter)
         if not rt.available():
             print("neural cortex not trained yet: brain train --data <folder>")
             return 1
         for g in rt.answer(" ".join(args.prompt), samples=1, max_new=200):
             print(g)
     elif args.cmd == "describe":
-        rt = CortexRuntime(home)
+        rt = CortexRuntime(home, adapter=args.adapter)
         if not rt.available():
             print("neural cortex not trained yet: brain train --data <folder>")
             return 1

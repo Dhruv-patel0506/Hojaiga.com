@@ -543,6 +543,31 @@ class LLMGateway:
             raise LLMGatewayError("Claude declined this request")
         return "".join(b.text for b in resp.content if b.type == "text")
 
+    _STRUCTURED = ("json", "schema", "step list", "steps array", "return only", "output format", "```")
+
+    def _call_brain(self, system: str, prompt: str, temperature: float, timeout: float) -> str:
+        """Our own layered brain (hojaiga_ml_engine) answers first when it is confident.
+
+        Skipped for structured-output roles (compiler JSON, schemas) and creative requests:
+        the brain answers knowledge questions, it does not emit machine formats.
+        """
+        role = (system or "").lower()
+        if temperature >= 0.7 or any(k in role for k in self._STRUCTURED):
+            return ""
+        if getattr(self, "_brain", None) is None:
+            from core_organs.hojaiga_ml_engine import HojaigaBrain
+            self._brain = HojaigaBrain()
+            if self._brain.store.count("chunk") == 0:
+                logger.info("Gateway: brain has no knowledge yet (brain ingest <folder>); skipping")
+        if self._brain.store.count("chunk") == 0:
+            return ""
+        t = self._brain.think(prompt)
+        need = float(os.environ.get("HOJAIGA_BRAIN_GATEWAY_CONF", "0.8"))
+        logger.info("Gateway: brain confidence %.2f (needs %.2f) via %s", t.confidence, need,
+                    t.chosen["source"] if t.chosen else "-")
+        self.last_brain_thought = t.tid
+        return t.answer if (t.chosen and t.confidence >= need) else ""
+
     def _teachers(self):
         """Every model this gateway can learn from, in the order to try them.
 
@@ -551,6 +576,8 @@ class LLMGateway:
         HOJAIGA_TEACHER_ORDER (comma list of names) pins an order.
         """
         local = [("ollama:" + self.brain_model, self._call_ollama)]
+        if os.environ.get("HOJAIGA_BRAIN_GATEWAY", "1") != "0":
+            local.insert(0, ("hojaiga-brain", self._call_brain))
         external = []
         if self.anthropic_key or os.environ.get("HOJAIGA_CLAUDE_ENABLE") == "1":
             external.append(("claude:" + self.claude_model, self._call_claude))
@@ -650,6 +677,12 @@ class LLMGateway:
         """Tell the brain whether the last answer worked (raises/erodes confidence)."""
         cortex = self._cortex()
         mid = memory_id or getattr(self, "last_memory_id", None)
+        tid = getattr(self, "last_brain_thought", None)
+        if tid and getattr(self, "_brain", None) is not None:
+            try:
+                self._brain.feedback(tid, success)       # trains the brain's value + calibration layers
+            except Exception as e:
+                logger.debug("brain feedback skipped: %s", e)
         return cortex.feedback(mid, success) if (cortex and mid) else None
 
     def execute_small_inference(self, system: str, prompt: str,

@@ -1102,6 +1102,69 @@ def test_rn1_animated_lesson_render() -> TestOutcome:
     return TestOutcome(passed=passed, evidence=f"bio={kinds} path={proc} story={[s['type'] for s in story['scenes']]}")
 
 
+def test_ft1_cortex_train_and_lora_finetune() -> TestOutcome:
+    """FT1: our own network trains from scratch, a LoRA adapter fine-tunes on new data
+    without touching the base file, and the adapter loads back for inference."""
+    import hashlib
+    import json
+    import tempfile
+    from pathlib import Path
+    try:
+        import torch  # noqa: F401
+    except Exception:
+        return TestOutcome(passed=False, env_blocked=True, evidence="PyTorch not installed (pip install torch)")
+    from core_organs.hojaiga_ml_engine import CortexTrainer, CortexRuntime
+    home = Path(tempfile.mkdtemp(prefix="hojaiga_ft_"))
+    base_dir, new_dir = home / "base", home / "new"
+    base_dir.mkdir()
+    new_dir.mkdir()
+    (base_dir / "a.txt").write_text("The heart pumps blood through the body. " * 30, encoding="utf-8")
+    (new_dir / "b.jsonl").write_text("\n".join(json.dumps({"question": f"What does organ {i} do?",
+                                                           "answer": f"Organ {i} filters the blood."})
+                                               for i in range(12)), encoding="utf-8")
+    tr = CortexTrainer(home / "brain", size="tiny", vocab_size=400)
+    r1 = tr.train([str(base_dir)], epochs=2, batch=4, max_steps=30, log_every=1000)
+    ck = home / "brain" / "cortex" / "model.pt"
+    h1 = hashlib.md5(ck.read_bytes()).hexdigest()
+    r2 = CortexTrainer(home / "brain").train([str(new_dir)], epochs=2, batch=4, max_steps=20, adapter="organs",
+                                             rank=4, log_every=1000)
+    h2 = hashlib.md5(ck.read_bytes()).hexdigest()
+    rt = CortexRuntime(home / "brain", adapter="organs")
+    loaded = rt.available() and isinstance(rt.verify("What does organ 3 do?", "", "Organ 3 filters."), float)
+    passed = (r1["steps"] > 0 and r2["mode"] == "lora:organs" and r2["trainable_m"] < r1["params_m"] / 5
+              and h1 == h2 and loaded)
+    return TestOutcome(passed=passed, evidence=(f"base {r1['params_m']}M params, adapter trains {r2['trainable_m']}M; "
+                                                f"base file unchanged={h1 == h2}; adapter loads={loaded}"))
+
+
+def test_ev1_eval_and_layer_training() -> TestOutcome:
+    """EV1: the brain is scored on Q&A data and its thinking layers learn from it."""
+    import json
+    import tempfile
+    from pathlib import Path
+    from core_organs.hojaiga_ml_engine import HojaigaBrain
+    home = Path(tempfile.mkdtemp(prefix="hojaiga_ev_"))
+    (home / "book.md").write_text("Rivers flow into the sea. The Nile is the longest river in Africa. "
+                                  "Rain fills rivers in spring. Deltas form where rivers meet the sea.",
+                                  encoding="utf-8")
+    qa = [("Where do rivers flow?", "Rivers flow into the sea."),
+          ("What is the longest river in Africa?", "The Nile is the longest river in Africa."),
+          ("What fills rivers in spring?", "Rain fills rivers in spring."),
+          ("Where do deltas form?", "Deltas form where rivers meet the sea."),
+          ("calculate 6*7", "42"), ("what is 9 plus 10", "19")]
+    (home / "qa.jsonl").write_text("\n".join(json.dumps({"question": q, "answer": a}) for q, a in qa),
+                                   encoding="utf-8")
+    brain = HojaigaBrain(home / "brain")
+    brain.ingest([str(home / "book.md")])
+    ev = brain.evaluate([str(home / "qa.jsonl")])
+    tl = brain.train_layers([str(home / "qa.jsonl")], epochs=1, holdout=0.34)
+    passed = ev["accuracy"] >= 0.8 and tl["value_feedback"] > 0 and "holdout_after" in tl
+    return TestOutcome(passed=passed, evidence=(f"accuracy {ev['accuracy']} f1 {ev['mean_f1']} ECE "
+                                                f"{ev['calibration_error']}; layers learned from "
+                                                f"{tl['value_feedback']} feedback events"),
+                       metrics={"brain_eval_accuracy": ev["accuracy"]})
+
+
 # ═══════════════════════════════════════════════════════════════════════
 # DATABASE
 # ═══════════════════════════════════════════════════════════════════════
@@ -2530,6 +2593,8 @@ def main() -> int:
         ("NI1", "INTELLIGENCE", test_ni1_natural_intelligence_growth),
         ("BR1", "INTELLIGENCE", test_br1_brain_layers_learn),
         ("RN1", "RENDER", test_rn1_animated_lesson_render),
+        ("FT1", "INTELLIGENCE", test_ft1_cortex_train_and_lora_finetune),
+        ("EV1", "INTELLIGENCE", test_ev1_eval_and_layer_training),
         ("D1", "DATABASE", test_d1_batch_element_roundtrip),
         ("D2", "DATABASE", test_d2_modal_and_cookie_roundtrip),
         ("G1", "GROUNDING", test_g1_grounding_ladder_honesty),
