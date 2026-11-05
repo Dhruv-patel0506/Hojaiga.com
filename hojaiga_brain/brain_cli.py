@@ -8,6 +8,7 @@ import numpy as np
 
 from brain.config import BrainSystemConfig, LLMConfig
 from brain.curiosity_and_langchain import HojaigaExecutiveBrain
+from brain.dataset_hub_loader import DynamicHubDatasetStreamer
 from brain.tokenizer_and_llm import HAS_TORCH
 from brain.universal_renderer import HojaigaUniversalRenderer
 
@@ -85,6 +86,12 @@ def main() -> None:
     p_ingest = sub.add_parser("ingest", help="Feed ANY dataset file or directory (text, JSON, CSV, images, UI, video)")
     p_ingest.add_argument("path", type=str)
 
+    p_hf = sub.add_parser("import-hf", help="Stream ANY Hugging Face dataset directly into LLM, VLM & Hippocampus RAG")
+    p_hf.add_argument("repo_id", type=str, help="Hugging Face dataset repo ID (e.g. Voxel51/WaveUI-25k)")
+    p_hf.add_argument("--config", type=str, default=None, help="Optional dataset subset/config name")
+    p_hf.add_argument("--split", type=str, default="train", help="Dataset split")
+    p_hf.add_argument("--max-samples", type=int, default=500, help="Number of samples to stream in this batch")
+
     p_ask = sub.add_parser("ask", help="Run any query, workflow, or screen path through the 8 cortical layers")
     p_ask.add_argument("input", type=str)
     p_ask.add_argument("--image", type=str, default="", help="Optional path to UI screenshot, diagram, or photo")
@@ -102,6 +109,12 @@ def main() -> None:
 
     if args.cmd == "ingest":
         res = brain.feed_dataset(args.path)
+        print(json.dumps(res, indent=2, ensure_ascii=False))
+    elif args.cmd == "import-hf":
+        streamer = DynamicHubDatasetStreamer(brain)
+        res = streamer.import_from_huggingface(
+            repo_id=args.repo_id, config_name=args.config, split=args.split, max_samples=args.max_samples
+        )
         print(json.dumps(res, indent=2, ensure_ascii=False))
     elif args.cmd == "ask":
         media = None

@@ -2,6 +2,7 @@
 REM ==================================================================
 REM  Hojaiga Brain (Windows launcher)
 REM    brain.bat ingest D:\datasets\biology
+REM    brain.bat import-hf Voxel51/WaveUI-25k --max-samples 2000
 REM    brain.bat ask "What is a zygote?"
 REM    brain.bat ask "What is the next step in this screen?" --image screen.png
 REM    brain.bat overnight --epochs 3

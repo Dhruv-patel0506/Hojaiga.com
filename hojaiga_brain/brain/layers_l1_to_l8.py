@@ -462,8 +462,10 @@ class Layer6BrocaAnswer:
     diffing whenever fed `<raw_draft, polished_text>` pairs or user corrections.
     """
 
-    def __init__(self):
+    def __init__(self, max_span_words: int = 12):
         self.learned_span_edits: Dict[str, str] = {}
+        # long enough for typical filler openers ("In today's fast-paced world, it is important to note that")
+        self.max_span_words = max_span_words
 
     def learn_from_edit_pair(self, raw_draft: str, polished_text: str) -> List[Tuple[str, str]]:
         w_raw = raw_draft.split()
@@ -471,7 +473,7 @@ class Layer6BrocaAnswer:
         matcher = difflib.SequenceMatcher(None, w_raw, w_pol)
         discovered: List[Tuple[str, str]] = []
         for tag, i1, i2, j1, j2 in matcher.get_opcodes():
-            if tag in ("replace", "delete") and 1 <= (i2 - i1) <= 6 and (j2 - j1) <= 6:
+            if tag in ("replace", "delete") and 1 <= (i2 - i1) <= self.max_span_words and (j2 - j1) <= 6:
                 src_span = " ".join(w_raw[i1:i2]).strip()
                 dst_span = " ".join(w_pol[j1:j2]).strip()
                 if len(src_span) >= 4 and src_span.lower() != dst_span.lower():

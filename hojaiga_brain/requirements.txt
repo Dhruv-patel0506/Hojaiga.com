@@ -1,10 +1,16 @@
-# core (enough for every command: NumPy engine)
+# core: every command works with just these (NumPy engine)
 numpy>=1.26
-pillow>=10.0
+Pillow>=10.0
 # neural engine (RTX 3050: install the CUDA build from pytorch.org)
 torch>=2.3
-# optional
-requests>=2.31          # local Ollama teacher
-anthropic>=0.40         # Claude teacher (only used until a domain graduates)
-opencv-python>=4.9      # .mp4/.mov video ingestion (GIF works without it)
-pytest>=8.0             # brain.bat test
+# video files (.mp4/.mov/.avi); GIFs work without it
+opencv-python>=4.9
+# `brain_cli.py import-hf` (Hugging Face streaming)
+datasets>=2.19
+# Claude teacher, used only until a domain graduates
+anthropic>=0.40
+# listed by the blueprint; no module imports it yet (the controller is plain Python)
+langgraph>=0.2
+# optional: local Ollama teacher, test runner
+requests>=2.31
+pytest>=8.0

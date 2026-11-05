@@ -3,7 +3,7 @@ import csv
 import io
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from brain.layers_l1_to_l8 import (
@@ -62,7 +62,11 @@ class UniversalDatasetIngestor:
             return self._ingest_structured_record(target, source_uri=hint or "memory_dict")
 
         path = Path(str(target))
-        if path.is_dir():
+        try:                                   # long raw text is not a path (ENAMETOOLONG)
+            is_dir, is_file = path.is_dir(), path.is_file()
+        except (OSError, ValueError):
+            is_dir = is_file = False
+        if is_dir:
             summary: Dict[str, int] = {"files_processed": 0, "episodes_added": 0, "interfaces_learned": 0}
             for child in sorted(path.rglob("*")):
                 if child.is_file():
@@ -72,7 +76,7 @@ class UniversalDatasetIngestor:
                     summary["interfaces_learned"] += res.get("interfaces_learned", 0)
             self.l2.save()
             return summary
-        if path.is_file():
+        if is_file:
             res = self.ingest_file(path)
             self.l2.save()
             return res
@@ -95,7 +99,8 @@ class UniversalDatasetIngestor:
         raw_text = file_path.read_text(encoding="utf-8", errors="ignore")
         return self._ingest_text_stream(raw_text, source_uri=str(file_path))
 
-    def _ingest_text_stream(self, text: str, source_uri: str) -> Dict[str, Any]:
+    def _ingest_text_stream(self, text: str, source_uri: str,
+                            metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         chunks = [c.strip() for c in text.split("\n\n") if len(c.strip()) > 15] or [text.strip()]
         self.tokenizer.train_incremental(chunks, max_new_merges=250)
         added = 0
@@ -114,6 +119,7 @@ class UniversalDatasetIngestor:
                 source_uri=source_uri,
                 continuous_value=max(wq, 0.65),
                 triples=triples,
+                metadata=metadata,
             )
             self.replay_buffer.append(
                 {"prompt": " ".join(l1_out["salient_terms"][:4]), "response": chunk, "value": wq, "surprise": surprise}
@@ -160,7 +166,7 @@ class UniversalDatasetIngestor:
                 for i in range(len(v) - 1):
                     triples.append((v[i].lower(), f"seq_{k}", v[i + 1].lower()))
 
-        serialized = json.dumps(rec, ensure_ascii=False)
+        serialized = json.dumps(rec, ensure_ascii=False, default=str)
         l1_out = self.l1.process(serialized)
         triples.extend(self.l3.extract_distributional_relations(serialized, l1_out["salience_map"]))
         _, cluster_sig, surprise = self.l2.ingest_episode(
