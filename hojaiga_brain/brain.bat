@@ -3,6 +3,9 @@ REM ==================================================================
 REM  Hojaiga Brain (Windows launcher)
 REM    brain.bat ingest D:\datasets\biology
 REM    brain.bat import-hf Voxel51/WaveUI-25k --max-samples 2000
+REM    brain.bat belt D:\datasets\company_data          (full conveyor: clean, ML, DL, LLM/VLM, RAG)
+REM    brain.bat serve --port 8765                       (always-on controller + inbox learning)
+REM    brain.bat task "classify: my parcel never arrived"
 REM    brain.bat ask "What is a zygote?"
 REM    brain.bat ask "What is the next step in this screen?" --image screen.png
 REM    brain.bat overnight --epochs 3

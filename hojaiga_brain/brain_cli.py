@@ -92,6 +92,23 @@ def main() -> None:
     p_hf.add_argument("--split", type=str, default="train", help="Dataset split")
     p_hf.add_argument("--max-samples", type=int, default=500, help="Number of samples to stream in this batch")
 
+    p_belt = sub.add_parser("belt", help="Conveyor belt: ingest → clean → ML → DL → algorithms → LLM/VLM → RAG → report")
+    p_belt.add_argument("paths", nargs="+")
+    p_belt.add_argument("--train-llm", action="store_true", help="also train the neural LLM at the end")
+
+    p_cls = sub.add_parser("classify", help="Classify text with the classifier the belt trained")
+    p_cls.add_argument("text", type=str)
+
+    p_task = sub.add_parser("task", help="Give the controller any request; it routes it to a skill")
+    p_task.add_argument("text", type=str)
+    p_task.add_argument("--path", default=None)
+    p_task.add_argument("--image", default=None)
+
+    p_serve = sub.add_parser("serve", help="Always-on controller: HTTP API + inbox learning + consolidation")
+    p_serve.add_argument("--port", type=int, default=8765)
+    p_serve.add_argument("--inbox", default=None, help="folder to drop new datasets into (default workspace/inbox)")
+    p_serve.add_argument("--consolidate-minutes", type=float, default=60.0)
+
     p_ask = sub.add_parser("ask", help="Run any query, workflow, or screen path through the 8 cortical layers")
     p_ask.add_argument("input", type=str)
     p_ask.add_argument("--image", type=str, default="", help="Optional path to UI screenshot, diagram, or photo")
@@ -116,6 +133,22 @@ def main() -> None:
             repo_id=args.repo_id, config_name=args.config, split=args.split, max_samples=args.max_samples
         )
         print(json.dumps(res, indent=2, ensure_ascii=False))
+    elif args.cmd == "belt":
+        from brain.conveyor.belt import ConveyorBelt
+        print(json.dumps(ConveyorBelt(brain, train_llm=args.train_llm).run(args.paths), indent=2, default=str))
+    elif args.cmd == "classify":
+        from brain.conveyor.belt import classify_text
+        print(json.dumps(classify_text(brain.cfg.workspace_dir, args.text) or
+                         {"error": "no classifier yet: run `belt` on labeled data first"}, indent=2))
+    elif args.cmd == "task":
+        from brain.controller import NaturalIntelligenceController
+        req = {"text": args.text, **({"path": args.path} if args.path else {}), **({"image": args.image} if args.image else {})}
+        print(json.dumps(NaturalIntelligenceController(brain).handle(req), indent=2, default=str))
+    elif args.cmd == "serve":
+        from brain.controller import NaturalIntelligenceController
+        ctrl = NaturalIntelligenceController(brain, inbox=Path(args.inbox) if args.inbox else None)
+        print(f"Hojaiga controller on http://127.0.0.1:{args.port}  (inbox: {ctrl.inbox})", flush=True)
+        ctrl.serve(port=args.port, consolidate_every_s=args.consolidate_minutes * 60)
     elif args.cmd == "ask":
         media = None
         if args.image and Path(args.image).exists():
