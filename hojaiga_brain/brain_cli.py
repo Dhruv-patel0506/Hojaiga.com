@@ -109,6 +109,25 @@ def main() -> None:
     p_serve.add_argument("--inbox", default=None, help="folder to drop new datasets into (default workspace/inbox)")
     p_serve.add_argument("--consolidate-minutes", type=float, default=60.0)
 
+    sub.add_parser("init", help="Create an empty brain workspace and show what will live where")
+
+    p_tr = sub.add_parser("train", help="Train the multimodal network (text+image+video+audio) from zero / resume")
+    p_tr.add_argument("paths", nargs="+")
+    p_tr.add_argument("--size", default="small", choices=["tiny", "small", "base"])
+    p_tr.add_argument("--epochs", type=int, default=3)
+    p_tr.add_argument("--batch", type=int, default=8)
+    p_tr.add_argument("--lr", type=float, default=3e-4)
+    p_tr.add_argument("--minutes", type=float, default=0.0, help="stop after this many minutes (0 = no limit)")
+
+    p_desc = sub.add_parser("describe", help="Describe an image, video or audio file with the trained network")
+    p_desc.add_argument("media")
+    p_gen = sub.add_parser("generate", help="Continue text with the trained network")
+    p_gen.add_argument("prompt")
+    p_srch = sub.add_parser("search", help="Rank media files by similarity to a text query (cross-modal)")
+    p_srch.add_argument("query")
+    p_srch.add_argument("media", nargs="+")
+    sub.add_parser("models", help="AI models the brain governs and their switchboard beliefs")
+
     p_ask = sub.add_parser("ask", help="Run any query, workflow, or screen path through the 8 cortical layers")
     p_ask.add_argument("input", type=str)
     p_ask.add_argument("--image", type=str, default="", help="Optional path to UI screenshot, diagram, or photo")
@@ -133,6 +152,45 @@ def main() -> None:
             repo_id=args.repo_id, config_name=args.config, split=args.split, max_samples=args.max_samples
         )
         print(json.dumps(res, indent=2, ensure_ascii=False))
+    elif args.cmd == "init":
+        ws = brain.cfg.workspace_dir
+        layout = {
+            "checkpoints/": "tokenizer + main LLM weights (after overnight)",
+            "omni/": "multimodal network trained from zero (after train)",
+            "rag_store/": "hippocampus: every remembered episode",
+            "episodic_db/": "learned layer state: failures, graduation, writing edits, replay",
+            "ui_topologies/": "vision weights + interfaces the brain recognises",
+            "inner_brain/": "the brain inside the brain: its memory and distilled LLM",
+            "controller/": "switchboard (model governance), router, audit log",
+            "conveyor_reports/": "one report + charts per dataset run",
+            "models/": "classifiers the conveyor trained",
+            "inbox/": "drop datasets here while `serve` is running",
+        }
+        for d in layout:
+            (ws / d).mkdir(parents=True, exist_ok=True)
+        print(json.dumps({"workspace": str(ws.resolve()), "episodes": len(brain.l2.episodes),
+                          "vocab": len(brain.tokenizer.token_to_id), "layout": layout,
+                          "next": ["brain_cli.py belt <data>", "brain_cli.py train <data>", "brain_cli.py serve"]},
+                         indent=2))
+    elif args.cmd in ("train", "describe", "generate", "search"):
+        from brain.omni.trainer import OmniTrainer
+        tr = OmniTrainer(brain, size=getattr(args, "size", "small"))
+        if args.cmd == "train":
+            print(json.dumps(tr.train(args.paths, epochs=args.epochs, batch=args.batch, lr=args.lr,
+                                      max_minutes=args.minutes), indent=2, default=str))
+        elif not (brain.cfg.workspace_dir / "omni" / "omni.pt").exists():
+            print(json.dumps({"error": "the multimodal network is not trained yet: run `train <data>` first"}))
+        elif args.cmd == "describe":
+            print(json.dumps({"media": args.media, "description": tr.describe(args.media)}, indent=2))
+        elif args.cmd == "generate":
+            print(json.dumps({"prompt": args.prompt, "continuation": tr.generate(args.prompt)}, indent=2))
+        else:
+            print(json.dumps({"query": args.query, "ranked": tr.search(args.query, args.media, top_k=len(args.media))},
+                             indent=2))
+    elif args.cmd == "models":
+        from brain.controller import NaturalIntelligenceController
+        ctrl = NaturalIntelligenceController(brain)
+        print(json.dumps(ctrl.handle({"skill": "models", "text": "report"})["result"], indent=2, default=str))
     elif args.cmd == "belt":
         from brain.conveyor.belt import ConveyorBelt
         print(json.dumps(ConveyorBelt(brain, train_llm=args.train_llm).run(args.paths), indent=2, default=str))

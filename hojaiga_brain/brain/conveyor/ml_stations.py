@@ -282,14 +282,123 @@ def macro_f1(y: np.ndarray, p: np.ndarray) -> float:
     return float(np.mean(f))
 
 
-def cross_validate(make_model, X: np.ndarray, y: np.ndarray, k: int = 5) -> Dict[str, float]:
+def cross_validate(make_model, X: np.ndarray, y: np.ndarray, k: int = 5, return_preds: bool = False) -> Dict[str, Any]:
     k = max(2, min(k, int(min(Counter(y.tolist()).values()))))
     preds = np.empty_like(y)
     for test in stratified_folds(y, k):
         train = np.setdiff1d(np.arange(len(y)), test)
         preds[test] = make_model().fit(X[train], y[train]).predict(X[test])
-    return {"accuracy": round(float((preds == y).mean()), 3), "macro_f1": round(macro_f1(y, preds), 3),
-            "folds": k}
+    out = {"accuracy": round(float((preds == y).mean()), 3), "macro_f1": round(macro_f1(y, preds), 3), "folds": k}
+    if return_preds:
+        out["_preds"] = preds
+    return out
+
+
+try:
+    from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
+    from sklearn.svm import LinearSVC
+    HAS_SKLEARN = True
+except ImportError:
+    HAS_SKLEARN = False
+
+
+def model_zoo(n_samples: int) -> Dict[str, Any]:
+    """Supervised models compared on every labelled task (scikit-learn ones when installed)."""
+    zoo: Dict[str, Any] = {"naive_bayes": MultinomialNB, "logistic_regression": SoftmaxRegression}
+    if HAS_SKLEARN:
+        zoo["random_forest"] = lambda: RandomForestClassifier(n_estimators=200, random_state=0, n_jobs=-1)
+        zoo["linear_svm"] = lambda: LinearSVC(C=1.0, random_state=0)
+        if n_samples <= 5000:
+            zoo["gradient_boosting"] = lambda: GradientBoostingClassifier(random_state=0)
+    return zoo
+
+
+def compare_models(X: np.ndarray, y: np.ndarray, nonneg: bool = True) -> Dict[str, Any]:
+    """Stratified k-fold for every model in the zoo; the best by macro-F1 is selected."""
+    results: Dict[str, Any] = {}
+    preds: Dict[str, np.ndarray] = {}
+    for name, make in model_zoo(len(y)).items():
+        if name == "naive_bayes" and not nonneg:
+            continue
+        try:
+            r = cross_validate(make, X, y, return_preds=True)
+            preds[name] = r.pop("_preds")
+            results[name] = r
+        except Exception as exc:
+            results[name] = {"error": str(exc)}
+    ok = {k: v for k, v in results.items() if "macro_f1" in v}
+    best = max(ok, key=lambda k: (ok[k]["macro_f1"], ok[k]["accuracy"])) if ok else None
+    return {"models": results, "best_model": best, "_best_preds": preds.get(best)}
+
+
+def confusion(y: np.ndarray, p: np.ndarray) -> Tuple[List[str], np.ndarray]:
+    labels = sorted(set(y.tolist()) | set(p.tolist()))
+    idx = {l: i for i, l in enumerate(labels)}
+    m = np.zeros((len(labels), len(labels)), dtype=int)
+    for a, b in zip(y, p):
+        m[idx[a], idx[b]] += 1
+    return labels, m
+
+
+def render_charts(out_prefix: Path, comparisons: Dict[str, Dict[str, Any]], X_topics: Optional[np.ndarray],
+                  topic_labels: Optional[np.ndarray], conf: Optional[Tuple[str, List[str], np.ndarray]]) -> List[str]:
+    """Model comparison bars, a 2-D topic map (SVD projection) and the best model's confusion matrix."""
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+    except ImportError:
+        return []
+    files = []
+    if comparisons:
+        fig, ax = plt.subplots(figsize=(8, 4))
+        tasks = list(comparisons)
+        names = sorted({m for c in comparisons.values() for m in c["models"] if "macro_f1" in c["models"][m]})
+        w = 0.8 / max(len(names), 1)
+        for j, n in enumerate(names):
+            vals = [comparisons[t]["models"].get(n, {}).get("macro_f1", 0) for t in tasks]
+            ax.bar(np.arange(len(tasks)) + j * w, vals, w, label=n)
+        ax.set_xticks(np.arange(len(tasks)) + w * (len(names) - 1) / 2, tasks)
+        ax.set_ylim(0, 1.05)
+        ax.set_ylabel("macro-F1 (k-fold)")
+        ax.set_title("Model comparison per task")
+        ax.legend(fontsize=8, loc="upper left", bbox_to_anchor=(1.01, 1))
+        fig.tight_layout()
+        f = f"{out_prefix}_models.png"
+        fig.savefig(f, dpi=110)
+        plt.close(fig)
+        files.append(f)
+    if X_topics is not None and topic_labels is not None and len(X_topics) >= 3:
+        Xc = X_topics - X_topics.mean(0)
+        U, S, _ = np.linalg.svd(Xc, full_matrices=False)
+        xy = U[:, :2] * S[:2]
+        fig, ax = plt.subplots(figsize=(6, 5))
+        sc = ax.scatter(xy[:, 0], xy[:, 1], c=topic_labels, cmap="tab10", s=18)
+        ax.set_title("Discovered topics (2-D projection)")
+        fig.colorbar(sc, ax=ax, label="cluster")
+        fig.tight_layout()
+        f = f"{out_prefix}_topics.png"
+        fig.savefig(f, dpi=110)
+        plt.close(fig)
+        files.append(f)
+    if conf is not None:
+        title, labels, m = conf
+        fig, ax = plt.subplots(figsize=(1.2 + 0.6 * len(labels), 1 + 0.6 * len(labels)))
+        ax.imshow(m, cmap="Blues")
+        ax.set_xticks(range(len(labels)), labels, rotation=45, ha="right")
+        ax.set_yticks(range(len(labels)), labels)
+        for i in range(len(labels)):
+            for j in range(len(labels)):
+                ax.text(j, i, int(m[i, j]), ha="center", va="center", fontsize=8)
+        ax.set_xlabel("predicted")
+        ax.set_ylabel("true")
+        ax.set_title(title)
+        fig.tight_layout()
+        f = f"{out_prefix}_confusion.png"
+        fig.savefig(f, dpi=110)
+        plt.close(fig)
+        files.append(f)
+    return files
 
 
 # ─────────────────────────────────────────────────────────────── 5. deep learning

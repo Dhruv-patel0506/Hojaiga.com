@@ -31,6 +31,7 @@ from typing import Any, Callable, Dict, List, Optional
 import numpy as np
 
 from brain.conveyor.belt import ConveyorBelt, classify_text
+from brain.governor import ModelGovernor
 from brain.inner_brain import DualBrain
 
 
@@ -89,8 +90,10 @@ class SkillRouter:
 class NaturalIntelligenceController:
     def __init__(self, brain, inbox: Optional[Path] = None):
         self.brain = brain
-        self.dual = DualBrain(brain)
         self.ws = brain.cfg.workspace_dir
+        self.governor = ModelGovernor(self.ws / "controller" / "switchboard.sqlite")
+        self.dual = DualBrain(brain, governor=self.governor)
+        self._omni = None
         self.inbox = Path(inbox) if inbox else self.ws / "inbox"
         self.inbox.mkdir(parents=True, exist_ok=True)
         (self.ws / "inbox_done").mkdir(parents=True, exist_ok=True)
@@ -102,6 +105,55 @@ class NaturalIntelligenceController:
         self.audit_path.parent.mkdir(parents=True, exist_ok=True)
         self.last_consolidation = time.time()
         self._register_builtins()
+        self._register_models()
+
+    # ------------------------------------------------------------------ models the brain governs
+    def _register_models(self) -> None:
+        """Internal networks always; outside models only when they are configured/reachable."""
+        import os
+        self.governor.register(DualBrain.MAIN_WORLD, ["answer"],
+                               lambda q: self.brain.run_cognitive_cycle(q)["answer"], kind="internal")
+        if (self.ws / "omni" / "omni.pt").exists():
+            for mod in ("image", "video", "audio"):
+                self.governor.register(f"hojaiga-omni:{mod}", [f"describe_{mod}"],
+                                       lambda path: self.omni().describe(path), kind="internal")
+            self.governor.register("hojaiga-omni:text", ["generate"], lambda p: self.omni().generate(p), kind="internal")
+        model = os.environ.get("HOJAIGA_OLLAMA_MODEL")
+        if model:
+            self.governor.register(f"ollama:{model}", ["answer"], lambda q, m=model: self._ollama(m, q),
+                                   kind="local", cost=0.05)
+        if os.environ.get("ANTHROPIC_API_KEY"):
+            self.governor.register("claude", ["answer", "describe_image"], self._claude, kind="external", cost=1.0)
+
+    def register_model(self, name: str, capabilities: List[str], invoke: Callable[..., Any], kind: str = "external",
+                       cost: float = 0.0) -> None:
+        """Plug any AI model into the brain's governance (HTTP model, RPA model, vendor API...)."""
+        self.governor.register(name, capabilities, invoke, kind=kind, cost=cost)
+
+    def omni(self):
+        if self._omni is None:
+            from brain.omni.trainer import OmniTrainer
+            self._omni = OmniTrainer(self.brain)
+        return self._omni
+
+    @staticmethod
+    def _ollama(model: str, prompt: str) -> str:
+        import os
+        import requests
+        url = os.environ.get("HOJAIGA_OLLAMA_URL", "http://127.0.0.1:11434/api/chat")
+        r = requests.post(url, json={"model": model, "stream": False,
+                                     "messages": [{"role": "user", "content": prompt}]}, timeout=120)
+        r.raise_for_status()
+        return r.json()["message"]["content"]
+
+    @staticmethod
+    def _claude(prompt: str) -> str:
+        import os
+        import anthropic
+        resp = anthropic.Anthropic().messages.create(
+            model=os.environ.get("HOJAIGA_TEACHER_MODEL", "claude-opus-5-5"), max_tokens=2000,
+            messages=[{"role": "user", "content": prompt}])
+        return "".join(getattr(b, "text", "") for b in resp.content if getattr(b, "type", "") == "text")
 
     # ------------------------------------------------------------------ skills
     def register_skill(self, name: str, description: str, run: Callable[[Dict[str, Any]], Any],
@@ -122,6 +174,32 @@ class NaturalIntelligenceController:
                             lambda p: self._render(p))
         self.register_skill("consolidate", "consolidate sleep train distill improve model memory overnight",
                             lambda p: self.consolidate(epochs=int(p.get("epochs", 1))))
+        self.register_skill("train_omni", "train the multimodal network from zero on images video audio text folder",
+                            lambda p: self._train_omni(p))
+        self.register_skill("describe_media", "describe what is in this photo picture video clip sound audio recording",
+                            lambda p: self._describe(p["media"]))
+        self.register_skill("models", "which AI models are governed switchboard model performance report",
+                            lambda p: {**self.governor.report(),
+                                       "chart": self.governor.plot(self.ws / "controller" / "switchboard.png")})
+
+    def _train_omni(self, p: Dict[str, Any]) -> Dict[str, Any]:
+        from brain.omni.trainer import OmniTrainer
+        tr = OmniTrainer(self.brain, size=p.get("size", "small"))
+        rep = tr.train([p["path"]], epochs=int(p.get("epochs", 3)), max_minutes=float(p.get("minutes", 0)))
+        self._omni = tr
+        self._register_models()
+        return rep
+
+    def _describe(self, media: str) -> Dict[str, Any]:
+        from brain.conveyor.ingest_clean import IMAGE_EXTS, VIDEO_EXTS
+        ext = Path(media).suffix.lower()
+        mod = "image" if ext in IMAGE_EXTS else "video" if ext in VIDEO_EXTS else "audio"
+        card = self.governor.choose(f"describe_{mod}", f"describe:{mod}")
+        if card is None:
+            return {"error": "no model can describe this yet: train one with the train_omni skill"}
+        t0 = time.time()
+        out = card.invoke(media)
+        return {"model": card.name, "description": out, "latency": round(time.time() - t0, 3)}
 
     def _scan(self, image_path: str) -> Dict[str, Any]:
         from PIL import Image
@@ -216,7 +294,8 @@ class NaturalIntelligenceController:
                 "pending_approvals": list(self.pending), "self_reliance": self.dual.self_reliance(),
                 "inner_memory": len(self.dual.inner.memory), "main_memory": len(self.brain.l2.episodes),
                 "failures_remembered": len(self.brain.l8.failure_memory),
-                "known_interfaces": len(self.brain.vlm.known_interfaces), "llm_trained": self.brain.llm_trained}
+                "known_interfaces": len(self.brain.vlm.known_interfaces), "llm_trained": self.brain.llm_trained,
+                "governed_models": list(self.governor.models), "omni_trained": (self.ws / "omni" / "omni.pt").exists()}
 
     def serve(self, host: str = "127.0.0.1", port: int = 8765, consolidate_every_s: float = 3600.0,
               poll_s: float = 10.0, block: bool = True):

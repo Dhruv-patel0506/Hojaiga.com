@@ -17,6 +17,7 @@ TEXT_EXTS = {".txt", ".md", ".rst", ".html", ".htm", ".xml", ".tex", ".log", ".p
 RECORD_EXTS = {".json", ".jsonl", ".csv", ".tsv"}
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".bmp", ".webp", ".tif", ".tiff"}
 VIDEO_EXTS = {".gif", ".mp4", ".mov", ".avi", ".mkv", ".webm"}
+AUDIO_EXTS = {".wav", ".mp3", ".m4a", ".flac", ".ogg", ".aac", ".wma", ".opus"}
 
 
 @dataclass
@@ -25,7 +26,7 @@ class Item:
     `media` is an image/video path; `label` is filled in by label discovery."""
     item_id: str
     source: str
-    modality: str                       # text | record | image | video
+    modality: str                       # text | record | image | video | audio
     text: str = ""
     record: Dict[str, Any] = field(default_factory=dict)
     media: Optional[str] = None
@@ -73,6 +74,8 @@ def ingest_folder(paths: List[str]) -> Tuple[List[Item], Dict[str, Any]]:
             try:
                 if ext in IMAGE_EXTS:
                     items.append(Item(f"{f}", str(f), "image", media=str(f), meta={"folder": f.parent.name}))
+                elif ext in AUDIO_EXTS:
+                    items.append(Item(f"{f}", str(f), "audio", media=str(f), meta={"folder": f.parent.name}))
                 elif ext in VIDEO_EXTS:
                     items.append(Item(f"{f}", str(f), "video", media=str(f), meta={"folder": f.parent.name}))
                 elif ext in RECORD_EXTS:
@@ -159,6 +162,13 @@ def clean_items(items: List[Item], l1) -> Tuple[List[Item], Dict[str, Any]]:
             if it.modality == "record" and not it.text and not it.record:
                 drop("empty_record")
                 continue
+        elif it.modality == "audio":
+            from brain.omni.audio import load_audio
+            x = load_audio(it.media)
+            if x is None or len(x) < 3200:                  # unreadable or shorter than 0.2 s
+                drop("unreadable_or_short_audio")
+                continue
+            it.meta["seconds"] = round(len(x) / 16000, 2)
         elif it.modality == "image":
             try:
                 from PIL import Image

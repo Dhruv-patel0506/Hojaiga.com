@@ -163,10 +163,66 @@ class InnerBrain:
 class DualBrain:
     """Ask flow: inner → (confident? done : main) → distill. A LangGraph graph when available."""
 
-    def __init__(self, main_brain, inner: Optional[InnerBrain] = None):
+    MAIN_WORLD = "hojaiga-main-brain"
+
+    def __init__(self, main_brain, inner: Optional[InnerBrain] = None, governor=None, max_worlds: int = 3):
         self.main = main_brain
         self.inner = inner or InnerBrain(main_brain.cfg.workspace_dir / "inner_brain", main_brain.l2.compute_embedding)
+        self.governor = governor
+        self.max_worlds = max_worlds
+        self.worlds = None
+        if governor is not None:
+            from brain.parallel_worlds import ParallelWorlds
+            self.worlds = ParallelWorlds(governor, embed=main_brain.l2.compute_embedding)
         self.graph = self._build_graph() if HAS_LANGGRAPH else None
+
+    def topic_domain(self, question: str) -> str:
+        """Nearest discovered knowledge domain (read-only: asking does not create domains)."""
+        cl = self.main.l2.domain_clusterer
+        if not cl.centroids:
+            return "answer:general"
+        q = self.main.l2.compute_embedding(question)
+        cid = max(cl.centroids, key=lambda c: float(np.dot(q, cl.centroids[c])))
+        return f"answer:{cid}"
+
+    def _deliberate(self, question: str, media=None) -> Dict[str, Any]:
+        """Slow path: play the question out in parallel worlds and keep the best outcome."""
+        from brain.parallel_worlds import World
+        domain = self.topic_domain(question)
+        episodes = [ep for ep, _ in self.main.l2.retrieve_rrf(question, top_k=4)]
+
+        def ground(text: str) -> float:
+            return self.main.l7.check_grounding(text, episodes) if episodes else 0.4
+
+        def main_score(r: Dict[str, Any]) -> float:
+            v = r["verification"]
+            return v["calibrated_confidence"] * (1.0 if v["passes_verification"] else 0.5)
+
+        worlds = [World(self.MAIN_WORLD, lambda: self.main.run_cognitive_cycle(question, media_payload=media),
+                        main_score, text_of=lambda r: r["answer"].split(" [Sources:")[0])]
+        for cand in self.governor.rank("answer", domain, explore=True):
+            if cand["model"] == self.MAIN_WORLD or len(worlds) >= self.max_worlds:
+                continue
+            card = self.governor.models[cand["model"]]
+            worlds.append(World(card.name, (lambda c=card: c.invoke(question)), lambda t: ground(str(t)),
+                                text_of=lambda t: str(t), cost=card.cost))
+        res = self.worlds.explore(domain, worlds)
+        if res["chosen"] == self.MAIN_WORLD:
+            main_result = res["outcome"]
+        else:
+            chosen = next(w for w in res["worlds"] if w["world"] == res["chosen"])
+            ok = chosen["evidence"] >= 0.6
+            main_result = {"answer": chosen["text"], "value_tier": "GOOD" if ok else "BAD",
+                           "verification": {"passes_verification": ok, "calibrated_confidence": chosen["evidence"],
+                                            "grounding": chosen["evidence"]}}
+            if ok:            # a better world's answer becomes knowledge of the main brain too
+                self.main.l2.ingest_episode(chosen["text"], modality="world_distilled", source_uri=res["chosen"],
+                                            continuous_value=0.85)
+                self.main.l2.save()
+        main_result["worlds"] = res["worlds"]
+        main_result["chosen_world"] = res["chosen"]
+        main_result["domain"] = domain
+        return main_result
 
     # nodes ---------------------------------------------------------------------------------
     def _n_inner(self, s: Dict[str, Any]) -> Dict[str, Any]:
@@ -174,6 +230,8 @@ class DualBrain:
         return {"inner_hit": hit}
 
     def _n_main(self, s: Dict[str, Any]) -> Dict[str, Any]:
+        if self.worlds is not None:
+            return {"main_result": self._deliberate(s["question"], s.get("media"))}
         return {"main_result": self.main.run_cognitive_cycle(s["question"], media_payload=s.get("media"))}
 
     def _n_distill(self, s: Dict[str, Any]) -> Dict[str, Any]:
@@ -221,8 +279,14 @@ class DualBrain:
         else:
             self.inner.stats["main_answers"] += 1
             r = state["main_result"]
-            out = {"answer": r["answer"], "answered_by": "main_brain", "value_tier": r["value_tier"],
-                   "verification": r["verification"], "distilled_into_inner": state.get("distilled")}
+            chosen = r.get("chosen_world", self.MAIN_WORLD)
+            out = {"answer": r["answer"], "answered_by": "main_brain" if chosen == self.MAIN_WORLD else chosen,
+                   "value_tier": r["value_tier"], "verification": r["verification"],
+                   "distilled_into_inner": state.get("distilled")}
+            if "worlds" in r:
+                out["worlds"] = [{k: w[k] for k in ("world", "evidence", "agreement", "prior", "eu", "latency", "error")
+                                  if k in w} for w in r["worlds"]]
+                out["domain"] = r["domain"]
         self.inner.save()
         out["self_reliance"] = self.self_reliance()
         out["ms"] = round((time.time() - t0) * 1000, 1)

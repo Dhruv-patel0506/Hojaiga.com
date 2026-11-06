@@ -3,13 +3,16 @@ numpy>=1.26
 Pillow>=10.0
 # neural engine (RTX 3050: install the CUDA build from pytorch.org)
 torch>=2.3
-# video files (.mp4/.mov/.avi); GIFs work without it
+# video files (.mp4/.mov/.avi); GIFs work without it. Audio other than WAV needs ffmpeg on PATH
 opencv-python>=4.9
+# conveyor model zoo (random forest, SVM, gradient boosting) and report/training charts
+scikit-learn>=1.4
+matplotlib>=3.8
 # `brain_cli.py import-hf` (Hugging Face streaming)
 datasets>=2.19
 # Claude teacher, used only until a domain graduates
 anthropic>=0.40
-# listed by the blueprint; no module imports it yet (the controller is plain Python)
+# orchestration: the conveyor belt and the inner-brain ask flow run as LangGraph graphs when installed
 langgraph>=0.2
 # optional: local Ollama teacher, test runner
 requests>=2.31

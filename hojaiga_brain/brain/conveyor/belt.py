@@ -112,6 +112,20 @@ class ConveyorBelt:
             vecs.append(np.concatenate([0.5 * v, ml.image_features(arr)]).astype(np.float32))
         ctx["image_items"], ctx["X_img"] = imgs, (np.stack(vecs) if vecs else None)
         rep["image_vectors"] = len(vecs)
+        from brain.omni.audio import load_audio, mfcc_features
+        auds, avecs = [], []
+        for it in ctx["items"]:
+            if it.modality == "audio":
+                x = load_audio(it.media)
+                if x is not None:
+                    auds.append(it)
+                    avecs.append(mfcc_features(x))
+        if avecs:
+            A = np.stack(avecs)
+            ctx["audio_stats"] = (A.mean(0), A.std(0) + 1e-6)
+            A = (A - ctx["audio_stats"][0]) / ctx["audio_stats"][1]          # standardise MFCC features
+        ctx["audio_items"], ctx["X_audio"] = auds, (A if avecs else None)
+        rep["audio_vectors"] = len(avecs)
         ctx["report"]["vectorize"] = rep
 
     def _labels(self, ctx: Dict[str, Any]) -> None:
@@ -128,12 +142,13 @@ class ConveyorBelt:
                 if it.modality == "record" and field in it.record:
                     it.label = str(it.record[field]).strip().lower()
         ctx["label_field"] = field
-        imgs: List[Item] = ctx.get("image_items", [])
-        folders = [it.meta.get("folder") for it in imgs]
-        counts = {f: folders.count(f) for f in set(folders)}
-        if len(counts) >= 2 and min(counts.values()) >= 2:
-            for it in imgs:
-                it.label = it.meta["folder"]
+        for key in ("image_items", "audio_items"):
+            media: List[Item] = ctx.get(key, [])
+            folders = [it.meta.get("folder") for it in media]
+            counts = {f: folders.count(f) for f in set(folders)}
+            if len(counts) >= 2 and min(counts.values()) >= 2:
+                for it in media:
+                    it.label = it.meta["folder"]
 
     def st_classical_ml(self, ctx: Dict[str, Any]) -> None:
         self._labels(ctx)
@@ -145,11 +160,14 @@ class ConveyorBelt:
         labeled = [i for i, it in enumerate(ctx.get("text_items", [])) if it.label]
         if len(labeled) >= 6:
             X, y = ctx["X_tfidf"][labeled], np.array([ctx["text_items"][i].label for i in labeled])
+            cmp_ = ml.compare_models(X, y)
+            ctx.setdefault("comparisons", {})["text"] = cmp_
+            ctx["confusion"] = (f"text: {cmp_['best_model']}", *ml.confusion(y, cmp_["_best_preds"])) \
+                if cmp_["_best_preds"] is not None else None
             rep["text_classification"] = {
                 "label_field": ctx["label_field"], "label_candidates": ctx["label_candidates"],
                 "classes": sorted(set(y.tolist())), "samples": len(y),
-                "naive_bayes": ml.cross_validate(ml.MultinomialNB, X, y),
-                "logistic_regression": ml.cross_validate(ml.SoftmaxRegression, X, y),
+                **cmp_["models"], "best_model": cmp_["best_model"],
             }
             model = ml.SoftmaxRegression().fit(X, y)
             ml.save_classifier(self.brain.cfg.workspace_dir / "models" / "text_classifier.json",
@@ -158,8 +176,17 @@ class ConveyorBelt:
         img_lab = [i for i, it in enumerate(ctx.get("image_items", [])) if it.label]
         if len(img_lab) >= 6:
             X, y = ctx["X_img"][img_lab], np.array([ctx["image_items"][i].label for i in img_lab])
+            cmp_ = ml.compare_models(X, y, nonneg=bool((X >= 0).all()))
+            ctx.setdefault("comparisons", {})["image"] = cmp_
             rep["image_classification"] = {"classes": sorted(set(y.tolist())), "samples": len(y),
-                                           "logistic_regression": ml.cross_validate(ml.SoftmaxRegression, X, y)}
+                                           **cmp_["models"], "best_model": cmp_["best_model"]}
+        aud_lab = [i for i, it in enumerate(ctx.get("audio_items", [])) if it.label]
+        if len(aud_lab) >= 6:
+            X, y = ctx["X_audio"][aud_lab], np.array([ctx["audio_items"][i].label for i in aud_lab])
+            cmp_ = ml.compare_models(X, y, nonneg=False)
+            ctx.setdefault("comparisons", {})["audio"] = cmp_
+            rep["audio_classification"] = {"classes": sorted(set(y.tolist())), "samples": len(y),
+                                           **cmp_["models"], "best_model": cmp_["best_model"]}
         ctx["report"]["classical_ml"] = rep
 
     def st_deep_learning(self, ctx: Dict[str, Any]) -> None:
@@ -175,6 +202,10 @@ class ConveyorBelt:
         if len(img_lab) >= 10:
             y = np.array([ctx["image_items"][i].label for i in img_lab])
             rep["mlp_image"] = ml.holdout_accuracy(ml.MLPClassifier, ctx["X_img"][img_lab], y)
+        aud_lab = [i for i, it in enumerate(ctx.get("audio_items", [])) if it.label]
+        if len(aud_lab) >= 10:
+            y = np.array([ctx["audio_items"][i].label for i in aud_lab])
+            rep["mlp_audio"] = ml.holdout_accuracy(ml.MLPClassifier, ctx["X_audio"][aud_lab], y)
         ctx["report"]["deep_learning"] = rep
 
     def st_algorithms(self, ctx: Dict[str, Any]) -> None:
@@ -237,6 +268,10 @@ class ConveyorBelt:
         rep["finished"] = time.time()
         out = self.brain.cfg.workspace_dir / "conveyor_reports"
         out.mkdir(parents=True, exist_ok=True)
+        topics = ctx.get("topics") or {}
+        rep["charts"] = ml.render_charts(out / f"run_{int(rep['finished'])}", ctx.get("comparisons", {}),
+                                         ctx.get("X_tfidf") if "labels" in topics else None,
+                                         topics.get("labels"), ctx.get("confusion"))
         path = out / f"run_{int(rep['finished'])}.json"
         path.write_text(json.dumps(rep, indent=1, default=str), encoding="utf-8")
         rep["report_file"] = str(path)
