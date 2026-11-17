@@ -34,6 +34,7 @@ import re
 import json
 import time
 import uuid
+import contextlib
 import ctypes
 import hashlib
 import logging
@@ -133,6 +134,7 @@ BRAINS_CHAT_URL = os.environ.get("HOJAIGA_BRAIN_URL", "http://127.0.0.1:11434/ap
 JUDGE_MODEL = os.environ.get("HOJAIGA_JUDGE_MODEL", "qwen2.5:7b")
 JUDGE_TIMEOUT_S = float(os.environ.get("HOJAIGA_JUDGE_TIMEOUT_S", "12"))
 MAX_JUDGE_ELEMENTS = 8
+TEACH_MAX_CONTROLS = int(os.environ.get("HOJAIGA_TEACH_MAX_CONTROLS", "60"))   # the teacher sees this many ranked controls (and the window picture)
 INVALID_CHOICE_LIMIT = 3
 CHECKPOINT_DIR = os.path.join(os.environ.get("TEMP", "."), "hojaiga_desktop_checkpoints")
 
@@ -148,6 +150,7 @@ READY_BACKOFF_MAX_S = float(os.environ.get("HOJAIGA_READY_BACKOFF_MAX_S", "1.5")
 # pushed out by READY_GRACE_S at a time, never past READY_HARD_CAP_S. Measured on this host: Steam shows a 199x34
 # update splash for ~39 s, then a login window from a DIFFERENT process 12 s later; a flat 10 s gave up on it.
 READY_GRACE_S = float(os.environ.get("HOJAIGA_READY_GRACE_S", "12"))
+READY_WAKE_S = float(os.environ.get("HOJAIGA_READY_WAKE_S", "6"))   # a packaged window still on its splash after this long is shown once (no focus) to lay out
 READY_HARD_CAP_S = float(os.environ.get("HOJAIGA_READY_HARD_CAP_S", "90"))
 READY_RICH_ELEMENTS = 8        # a window with this many controls is a real UI, not a splash: no stability poll needed
 
@@ -2014,9 +2017,73 @@ class ConstrainedJudge:
                     "element_index": top[1], "element": top[2].as_dict(), "decisive": True}
         return None
 
+    _picker_state: Dict[str, Any] = {"checked": 0.0, "up": False}
+
+    def _ask_trained_picker(self, goal: str, ranked: List[Tuple[int, "GroundedElement"]], app_hint: str) -> Optional[Dict[str, Any]]:
+        """The locally TRAINED adapter (mind.picker) gets the first word when HOJAIGA_PICKER_URL is set and the server answers. Its answer is checked (an index inside the list, a verb that exists);
+        anything else - server down, bad index, no answer - returns None and the existing judge decides exactly as before."""
+        if not os.environ.get("HOJAIGA_PICKER_URL"):
+            return None
+        try:
+            from core_organs.mind import picker as PK
+            st = self._picker_state
+            if time.time() - st["checked"] > 30:
+                st.update(checked=time.time(), up=PK.available())
+            if not st["up"]:
+                return None
+            shortlist = ranked[:40]
+            els = [{"role": e.role or "control", "name": (e.name or "")[:80]} for _i, e in shortlist]
+            ans = PK.ask(f"desktop:{app_hint}", els, goal)
+            if not ans:
+                return None
+            idx = ans["target_id"] - 1 if ans["action"] in ("click", "confirm") else -1
+            if idx < 0:
+                return None
+            el = shortlist[idx][1]
+            dec = {"choice": idx, "verb": "click", "text": "", "why": "trained adapter pick", "element": el.as_dict(), "element_index": shortlist[idx][0], "picker": True}
+            if ans["action"] == "confirm":
+                dec["picker_confirm"] = {"risk": ans.get("text"), "does": ans.get("verify_expectation")}
+            return dec
+        except Exception as exc:                                    # the adapter is an extra opinion, never a dependency
+            logger.debug("[judge] trained picker failed: %s", exc)
+            return None
+
     def decide(self, goal: str, elements: List[GroundedElement],
                app_hint: str = "", history: List[str] = None,
                pro_hint: Optional[Dict[str, Any]] = None, use_decisive: bool = True) -> Optional[Dict[str, Any]]:
+        """The natural brain decides; while it is not ready a teacher (Claude on the user's key, else a free hosted model) is consulted and the brain checks
+        and keeps what it says (mind.brain). A deterministic fast-path answer is the brain's own and never costs a teacher call."""
+        fast = self.decisive(goal, elements, pro_hint) if use_decisive else None
+        if fast is not None:
+            return fast
+        local = self._decide_local(goal, elements, app_hint, history, pro_hint, use_decisive=False)
+        try:
+            from core_organs.mind import brain as BR
+            md = BR.mode()
+            if md == "off" or not elements:
+                return local
+            mine = (str(local.get("verb", "")), str((local.get("element") or {}).get("name", ""))) if local and not local.get("invalid") else None
+            if md == "local" and mine is not None:
+                local["brain_id"] = BR.record(app_hint, goal, [(e.role, e.name) for e in elements[:1]], None, mine, "brain")
+                return local
+            ranked = [e for _i, e in self.rank_candidates(goal, elements, pro_hint)][:TEACH_MAX_CONTROLS]
+            shown = ranked or list(elements[:TEACH_MAX_CONTROLS])
+            t = BR.teach(goal, app_hint, [(e.role, e.name) for e in shown], _window_png_b64(shown[0].hwnd))
+            if t is None:
+                return local
+            el = shown[t["index"]]
+            verb = {"done": "done", "type": "type", "key": "key"}.get(t["verb"], "click")
+            dec = {"choice": t["index"], "verb": verb, "text": t.get("text", ""), "why": f"teacher {t['who']}: {t.get('why', '')}"[:200], "element": el.as_dict(),
+                   "element_index": elements.index(el), "teacher": t["who"]}
+            dec["brain_id"] = BR.record(app_hint, goal, [(e.role, e.name) for e in shown], t, mine, t["who"])
+            return dec
+        except Exception as exc:                                    # the brain's own answer stands whenever the teacher path fails
+            logger.debug("[judge] teacher path failed: %s", exc)
+            return local
+
+    def _decide_local(self, goal: str, elements: List[GroundedElement],
+                      app_hint: str = "", history: List[str] = None,
+                      pro_hint: Optional[Dict[str, Any]] = None, use_decisive: bool = True) -> Optional[Dict[str, Any]]:
         fast = self.decisive(goal, elements, pro_hint) if use_decisive else None
         if fast is not None:
             return fast
@@ -2025,6 +2092,9 @@ class ConstrainedJudge:
         orig_index = [i for i, _e in ranked[:MAX_JUDGE_ELEMENTS]]
         if not picks:
             return None
+        trained = self._ask_trained_picker(goal, ranked, app_hint)
+        if trained is not None:
+            return trained
         lines = []
         for i, e in enumerate(picks):
             cx, cy = e.center
@@ -2082,7 +2152,13 @@ class ConstrainedJudge:
             idx = int(decision.get("choice", -1))
             verb = str(decision.get("verb", "")).lower().strip()
             if 0 <= idx < len(picks) and verb == "type" and picks[idx].role not in self._TEXT_ROLES:
-                if self._wants_text(goal):
+                if self._wants_text(goal) and not any(p.role in self._TEXT_ROLES for p in picks):
+                    # The goal types and the window has NO text box at all (Calculator): the app takes the keys itself. Typing is sent to
+                    # the window as characters and the verifier judges what changed. Live Nov-02: 'type 7 + 5 =' was rejected three times
+                    # as 'type on a non-editable control' and went to a human; posted characters gave 'Display is 12'.
+                    decision["keys_to_window"] = True
+                    decision["coerced"] = "type into the window: no text box on screen, the app takes the keys itself"
+                elif self._wants_text(goal):
                     return {"invalid": True, "raw": decision, "why": "type on a non-editable control"}
                 # The goal never asked for typing and the element is a plain control: the model picked the right
                 # control and the wrong verb (a low-trust 'distilled' hint said "type" and it echoed it). That is
@@ -2301,6 +2377,22 @@ def _uia_dispatch(elem: GroundedElement, verb: str, text: str):
     except Exception as exc:
         logger.debug("[act] uia worker failed: %s", exc)
         return None, 0
+
+
+def _window_png_b64(hwnd: int, max_side: int = 1568) -> str:
+    """The window's own pixels (PrintWindow ladder, never the screen around it) as base64 PNG for the teacher; '' when it cannot be captured."""
+    try:
+        import base64
+        import io
+        img = hin.capture_window_robust(_root_of(hwnd))[0] if hwnd else None
+        if img is None:
+            return ""
+        img.thumbnail((max_side, max_side))
+        buf = io.BytesIO()
+        img.convert("RGB").save(buf, format="PNG")
+        return base64.b64encode(buf.getvalue()).decode("ascii")
+    except Exception:
+        return ""
 
 
 def _root_of(hwnd: int) -> int:
@@ -3433,8 +3525,14 @@ class DesktopAutonomyLoop:
             offered = [e for e in elements if (e.name or "").strip().lower() not in spent and _not_chrome(e)
                        and not (e.role in ("menuitem", "button", "listitem", "splitbutton") and is_account_control(e.name, goal))] \
                       or [e for e in elements if _not_chrome(e)]
+        _typed = re.match(r"""^\s*type\s+["“']([^"”']+)["”'](?:\s+(?:in|into)\s+.{1,60})?\s*$""", goal or "", re.I)   # 'in calculation field': a place the window does not have
         if not offered:                                     # still only chrome (or nothing): not a decision the judge may be asked to make
             decision = {"invalid": True, "raw": "", "why": "nothing but the window's title-bar buttons is on screen: no control to press for this goal"}
+        elif _typed and len(elements) >= READY_RICH_ELEMENTS and not any(e.role in self.judge._TEXT_ROLES for e in elements):   # a laid-out UI with no text box, never a half-loaded shell
+            # a typing goal in a window with NO text box anywhere (Calculator): the app takes the keys itself, so there is no control to choose and
+            # the judge must not be asked (live Nov-02: it clicked the display pane '0' five times, UNDELIVERABLE each time, then BLOCKED)
+            decision = {"element_index": 0, "verb": "type", "text": _typed.group(1), "keys_to_window": True,
+                        "coerced": "type into the window: no text box on screen, the app takes the keys itself"}
         else:
             decision = self.judge.decide(goal, offered, app_hint=app_hint, history=self._history,
                                          pro_hint=pro)
@@ -3460,7 +3558,10 @@ class DesktopAutonomyLoop:
         elem = elements[decision["element_index"]]
         verb = decision["verb"]
         text = str(decision.get("text", ""))
-        if verb == "type" and text and "text_contains" not in step_expect:
+        keys_mode = bool(decision.get("keys_to_window")) and verb == "type"
+        if keys_mode:                                                          # the app SHOWS a result, not the keys typed ('7+5=' -> 12): the step passes on a
+            step_expect = {k: v for k, v in (step_expect or {}).items() if k != "text_contains"}   # visible change, and the run's proof judges the result
+        if verb == "type" and text and "text_contains" not in step_expect and not keys_mode:
             # A typed payload is verified by CONTENT, not by a hash: the text the judge actually
             # delivered becomes the postcondition, so a keystroke that landed cannot be called
             # NO_CHANGE (which used to make the ladder type it again) and text that went into the
@@ -3491,6 +3592,24 @@ class DesktopAutonomyLoop:
             self.trace.append(entry)
             return self._step_result(entry)
 
+        # Consequence gate (mind.consequence): money / publish / delete / sign-out / consent / install, a password typed by a script, a chord that closes the session.
+        # The person is told WHAT it does and what to do instead; the answer has to come from them (allow_destructive), never from the model.
+        try:
+            if os.environ.get("HOJAIGA_CONSEQUENCE_GATE", "1") == "0":
+                raise RuntimeError("gate switched off")
+            from core_organs.mind import consequence as _CQ
+            _cq = _CQ.assess_step(verb, elem.name, goal=goal, typed_text=text if verb == "type" else "", field=elem.name, chord=text if verb in ("key", "shortcut") else "", role=elem.role)
+            if verb == "click" and decision.get("picker_confirm") and _cq["gate"] == "allow":
+                _cq = {"gate": "confirm", "question": f"The trained model flagged '{elem.name[:40]}' as {decision['picker_confirm'].get('risk')}: {decision['picker_confirm'].get('does')}"}
+        except Exception:
+            _cq = {"gate": "allow"}
+        if _cq.get("gate") == "block" or (_cq.get("gate") == "confirm" and not allow_destructive):
+            self.awaiting_human = True
+            self.capsule_cb("input_needed", _cq["question"][:140])
+            entry = StepTrace(goal, elem.name, verb, "HITL", "consequence", _cq["question"][:300], ladder["tiers_ran"])
+            self.trace.append(entry)
+            return self._step_result(entry)
+
         if verb == "type" and path_m and _is_name_box_element(elem, hwnd):
             text = path_m.group(0)             # the goal's own path, verbatim (a model typed just the file's base name)
         self._typed_into = elem if verb == "type" else None
@@ -3513,7 +3632,11 @@ class DesktopAutonomyLoop:
                 return self._step_result(entry, elements=elements)
             if gate is not None and gate["repaired"]:
                 self._history.append(f"mode repaired via {gate['repaired']} before '{elem.name}'")
-        ok, method = _act_on_element(elem, verb, text)
+        if keys_mode:                                                          # the characters go to the app's window, not into one control
+            ok, method = hin.post_text(hwnd, text)
+            method = f"keys-to-window:{method}"
+        else:
+            ok, method = _act_on_element(elem, verb, text)
         if not ok:
             # Delivery itself failed, so nothing that the UI does afterwards may be read as success.
             # A real run once "PASSed" a type whose window had already gone (UNDELIVERABLE), because
@@ -3538,7 +3661,7 @@ class DesktopAutonomyLoop:
 
         # NO_CHANGE retry ladder through organ_24 RecoveryEngine sequence:
         # wait/reinvoke -> PostMessage -> physical click
-        if verdict == "NO_CHANGE" and ok:
+        if verdict == "NO_CHANGE" and ok and not keys_mode:                    # keys sent again would be typed twice
             # 1. Brief wait + re-invoke
             time.sleep(0.3)
             _act_on_element(elem, "invoke" if verb == "click" else verb, text)
@@ -3670,6 +3793,12 @@ class DesktopAutonomyLoop:
             self._opened_not_done.pop(goal, None)
         self._history.append(f"{verb} '{elem.name}' -> {verdict}")
         entry = StepTrace(goal, elem.name, verb, verdict, method, evidence, ladder["tiers_ran"])
+        if decision.get("brain_id"):                                        # the proven result goes back to the brain's ledger (and, for a teacher step, into the knowledge base)
+            try:
+                from core_organs.mind import brain as BR
+                BR.outcome(decision["brain_id"], verdict, evidence)
+            except Exception:
+                pass
         self.trace.append(entry)
         self._write_checkpoint(entry)
         return self._step_result(entry, elements=after_elements, goal_done=goal_done)
@@ -3926,6 +4055,7 @@ class DesktopAutonomyLoop:
         delay = READY_BACKOFF_S
         hwnd, elements, report = None, [], {}
         last_sig, last_cpu, stable, extended = None, 0.0, 0, 0.0
+        woken = False
         while True:
             self._hold_hidden(app_hint)
             hwnd, elements, report = self.grounding.ground(
@@ -3949,6 +4079,8 @@ class DesktopAutonomyLoop:
                 # empty pane; so keep waiting for real content until the hard cap.
                 if hin.is_xaml_host(_root_of(hwnd)) and not self._xaml_has_content(elements) and time.time() < hard:
                     deadline = max(deadline, min(hard, time.time() + READY_GRACE_S))
+                    if not woken and time.time() - t0 > READY_WAKE_S:
+                        woken = self._wake_packaged(hwnd, app_hint)
                 else:
                     break
             if time.time() >= deadline:
@@ -3969,6 +4101,43 @@ class DesktopAutonomyLoop:
                     app_hint or "?", hwnd or 0, len(elements or []), report["ready_wait_s"], extended,
                     READY_RICH_ELEMENTS, report.get("reason", ""), report.get("tiers_ran", ""))
         return hwnd, elements, report
+
+    def _wake_packaged(self, hwnd: int, app_hint: str) -> bool:
+        """A packaged (XAML) app started minimized never draws its interface: it stays on its splash with ~3 controls (measured Nov-02: Calculator
+        3 controls after a 90 s wait in 4 of 6 runs, 41 controls in 1.5 s in the others; the same was measured for the recorder, local_recorder.py).
+        OUR window only: it is shown once WITHOUT activation (no focus is taken), given a few seconds to lay out, then put away again so the
+        run continues parked. Returns True once tried, so it happens at most once per wait."""
+        try:
+            from core_organs import background_window as bw
+            root = _root_of(hwnd)
+            if not (bw.is_ours(root) or (app_hint or "").lower() in self._launched_apps):
+                return True
+            sess = self._held.pop(root, None) or self._held.pop(hwnd, None)
+            if sess is not None:
+                with contextlib.suppress(Exception):
+                    sess.__exit__(None, None, None)
+            ctypes.windll.user32.ShowWindow(root, 4)                   # SW_SHOWNOACTIVATE
+            import ctypes.wintypes
+            r = ctypes.wintypes.RECT()
+            ctypes.windll.user32.GetWindowRect(root, ctypes.byref(r))
+            vx, vy = ctypes.windll.user32.GetSystemMetrics(76), ctypes.windll.user32.GetSystemMetrics(77)          # the virtual screen (all monitors)
+            vw, vh = ctypes.windll.user32.GetSystemMetrics(78), ctypes.windll.user32.GetSystemMetrics(79)
+            if r.right <= vx or r.left >= vx + vw or r.bottom <= vy or r.top >= vy + vh or r.right - r.left < 200:
+                # shown where it was parked = still on no monitor, and a XAML app does not draw there (live Nov-02: woken 4 times, 3 controls each time)
+                ctypes.windll.user32.SetWindowPos(root, 0, vx + 40, vy + 40, max(400, r.right - r.left), max(500, r.bottom - r.top), 0x0004 | 0x0010)  # NOZORDER|NOACTIVATE
+                logger.info("[ready] %s: the parked window was off every monitor (%d,%d,%d,%d): moved on screen to lay out", app_hint, r.left, r.top, r.right, r.bottom)
+            end = time.time() + 6.0
+            while time.time() < end:
+                time.sleep(0.5)
+                els = self.grounding._walk_uia(root) if HAS_UIA else []
+                if self._xaml_has_content(els):
+                    break
+            logger.info("[ready] %s: woke the packaged window hwnd=%s (shown without focus to lay out its interface)", app_hint, root)
+            ctypes.windll.user32.ShowWindow(root, 7)                   # SW_SHOWMINNOACTIVE: away again, the loop re-parks it
+            time.sleep(0.2)
+        except Exception as exc:
+            logger.info("[ready] %s: wake failed: %s", app_hint, exc)
+        return True
 
     @staticmethod
     def _xaml_has_content(elements) -> bool:

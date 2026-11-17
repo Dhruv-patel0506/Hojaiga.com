@@ -262,8 +262,9 @@ def build_design(be: ScriptedBackend, design: Dict[str, Any], shapes: Dict[str, 
     a wrong result is rolled back to the scene before it and made once more with a correction."""
     br = be.bridge
     prior = be.scene()
-    off = _free_offset(prior, design)
-    lift = -min(BP.part_box(p)[0][2] for p in design["parts"])                    # the lowest point of the whole object sits on the ground (a global shift, parts keep their places)
+    scene = bool(design.get("scene"))                                                # a piece of a scene is placed EXACTLY where its data says (it shares one coordinate system with the other pieces): no "beside everything", no "lowest point on the ground"
+    off = [0.0, 0.0, 0.0] if scene else _free_offset(prior, design)
+    lift = 0.0 if scene else -min(BP.part_box(p)[0][2] for p in design["parts"])  # the lowest point of the whole object sits on the ground (a global shift, parts keep their places)
     steps: List[Dict[str, Any]] = []
     made: List[str] = []
     for p in design["parts"]:
@@ -580,6 +581,10 @@ class AppIntelligenceEngine:
         adapter = self.adapter_dir or newest_adapter()
 
         def call(image: Any, som: Dict[str, Any], app_key: str, goal: str, controls: Any = None, hint: str = "") -> Any:
+            if os.environ.get("HOJAIGA_VIDEO_GRAPH") == "1":                                  # offline video graph (harvest.consolidate): extra hint only; unchanged when the flag is off
+                with contextlib.suppress(Exception):
+                    from core_organs.harvest import video_graph_live as VGL
+                    hint = VGL.augment(hint, image, app_key, goal, som=som, controls=controls)
             if "g" not in holder:
                 from core_organs import vision_ground as VG
                 vg = VG.VisionGrounder(self, app_key)
@@ -810,14 +815,18 @@ class AppTeachingAutomationSection:
                     known = OK.compile_design(task, sorted(shapes))
                     if known:
                         kd, kp = BP.validate_design(known["design"], sorted(shapes))
-                        if not kp:
+                        if not kp and not known.get("scene"):                                     # gravity (settle) drops a part onto the ground: right for a chair, wrong for a piece of a scene whose ground is another piece
                             BP.settle(kd)
                         kp = kp +BP.critic(kd) + BP.quantity_problems(task, [p["name"] for p in kd["parts"]], kd) + OK.role_critic(task, kd)
+                        if known.get("scene"):                                                    # a scene (terrain, forest, a cabin on the terrain) is MADE of separate things standing on a ground that is not in this piece: connectivity, "lowest part at z=0", overlap of ground patches and the 40 m size sanity do not apply to it
+                            kp = [x for x in kp if not re.search(r"touches no other part|rests on the ground|use real-world metres|fill the same place|edge, not the opposite side", x)]
                         if kp or not kd["parts"]:
                             known = None                                                      # the compiled design failed its own critics: the model plans it instead
                         else:
                             exact_design = True                                               # compiled from verified proportions: not re-planned by the picture reader
                             design, probs, planner = kd, [], {"source": "object_knowledge", "category": known["category"], "dims": known["dims"], "notes": known["notes"], "attempts": []}
+                            if known.get("scene"):
+                                design["scene"] = True
                             st["note"] = f"compiled a {known['category']} from stored part roles {known['dims']} (no model call)"
                 if exact:
                     design, probs, planner = exact["design"], [], {"source": "recipe", "attempts": []}

@@ -44,6 +44,7 @@ Dependencies: scrapegraphai, logging, typing, pandas...
 from __future__ import annotations
 
 import logging
+import os
 import json
 import time
 from typing import Dict, Any, Optional, List, Set, Tuple
@@ -55,7 +56,7 @@ logger = logging.getLogger("hojaiga.organ13.scrapegraphai")
 
 # Soft import for ScrapeGraphAI
 try:
-    from scrapegraphai.graphs import SmartScraperGraph, SearchGraph, ScraperGraph
+    from scrapegraphai.graphs import SmartScraperGraph, SearchGraph, SmartScraperLiteGraph as ScraperGraph   # 2.x: ScraperGraph became SmartScraperLiteGraph
     from scrapegraphai.nodes import FetchNode, ParseNode, GenerateAnswerNode
     _HAS_SCRAPEGRAPHAI = True
 except ImportError:
@@ -162,7 +163,20 @@ class ScrapeGraphAIIntegration:
             return
         
         logger.info("[ScrapeGraphAI] ScrapeGraphAI integration initialized")
-    
+
+    def _llm_config(self) -> Dict[str, Any]:
+        """The model the scraper thinks with: a free hosted model through the gateway (budgeted, credentials never sent) when a key exists and
+        HOJAIGA_SCRAPE_LLM is not 'local'; else the local Ollama model as before."""
+        if os.environ.get("HOJAIGA_SCRAPE_LLM", "auto").lower() != "local":
+            try:
+                from core_organs import organ_37_llm_gateway as GW
+                inst = GW.langchain_chat()
+                if inst is not None:
+                    return {"model_instance": inst, "model_tokens": 100000}
+            except Exception as exc:
+                logger.debug(f"[ScrapeGraphAI] hosted model unavailable: {exc}")
+        return {"model": "ollama/qwen2.5:3b", "temperature": 0.1, "format": "json", "base_url": self.ollama_url}
+
     def start(self) -> None:
         """Start the ScrapeGraphAI integration."""
         if self._running:
@@ -242,12 +256,7 @@ class ScrapeGraphAIIntegration:
         try:
             # Configure graph
             graph_config = {
-                "llm": {
-                    "model": "ollama/qwen2.5:3b",
-                    "temperature": 0.1,
-                    "format": "json",
-                    "base_url": self.ollama_url
-                },
+                "llm": self._llm_config(),
                 "verbose": True,
                 "headless": True
             }
@@ -292,12 +301,7 @@ class ScrapeGraphAIIntegration:
         try:
             # Configure graph
             graph_config = {
-                "llm": {
-                    "model": "ollama/qwen2.5:3b",
-                    "temperature": 0.1,
-                    "format": "json",
-                    "base_url": self.ollama_url
-                },
+                "llm": self._llm_config(),
                 "verbose": True,
                 "headless": True
             }
@@ -342,12 +346,7 @@ class ScrapeGraphAIIntegration:
         try:
             # Configure graph
             graph_config = {
-                "llm": {
-                    "model": "ollama/qwen2.5:3b",
-                    "temperature": 0.1,
-                    "format": "json",
-                    "base_url": self.ollama_url
-                },
+                "llm": self._llm_config(),
                 "verbose": True,
                 "headless": True
             }

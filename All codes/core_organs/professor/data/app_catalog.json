@@ -1,0 +1,1178 @@
+{
+ "_comment": "Applications whose user guides the corpus builder looks for. name = what people call it (search query); key = the application key scans use (process-stem based); processes = executable names; company = search context for ambiguous one-word names; seeds = OFFICIAL documentation roots (each is fetched and only used if it answers HTTP 200 - they are pointers to real vendor docs, never content). tier 1-3 = the test tiers. Edit freely.",
+ "apps": [
+  {
+   "name": "Calculator",
+   "key": "calculator",
+   "tier": 1,
+   "processes": [
+    "CalculatorApp.exe",
+    "calc.exe"
+   ],
+   "company": "Microsoft",
+   "seeds": [
+    {
+     "url": "https://support.microsoft.com/en-us/windows/apps/use-the-calculator-in-windows",
+     "depth": 1,
+     "pages": 25,
+     "scope": "/en-us/windows/"
+    }
+   ]
+  },
+  {
+   "name": "Notepad",
+   "key": "notepad",
+   "tier": 1,
+   "processes": [
+    "notepad.exe"
+   ],
+   "company": "Microsoft",
+   "seeds": [
+    {
+     "url": "https://support.microsoft.com/en-us/windows/apps/help-in-notepad",
+     "depth": 1,
+     "pages": 25,
+     "scope": "/en-us/windows/"
+    },
+    {
+     "url": "https://support.microsoft.com/en-us/windows/enhance-your-writing-with-ai-in-notepad-4088b954-c97b-46dc-813f-959be01746d5",
+     "depth": 1,
+     "pages": 25,
+     "scope": "/en-us/windows/"
+    },
+    {
+     "url": "https://learn.microsoft.com/en-us/windows/client-management/manage-notepad",
+     "depth": 0,
+     "pages": 1
+    }
+   ]
+  },
+  {
+   "name": "Paint",
+   "key": "mspaint",
+   "tier": 1,
+   "processes": [
+    "mspaint.exe",
+    "PaintApp.exe"
+   ],
+   "company": "Microsoft",
+   "seeds": [
+    {
+     "url": "https://support.microsoft.com/en-us/windows/open-microsoft-paint-ead1dc5c-abc4-fd2c-d81e-ebb013fbc113",
+     "depth": 1,
+     "pages": 25,
+     "scope": "/en-us/windows/"
+    },
+    {
+     "url": "https://support.microsoft.com/en-us/windows/help-in-paint-d62e155a-1775-6da4-0862-62a3e9e5a511",
+     "depth": 1,
+     "pages": 30,
+     "scope": "/en-us/windows/"
+    },
+    {
+     "url": "https://support.microsoft.com/en-us/windows/ai/ai-apps/use-copilot-pc-features-in-paint",
+     "depth": 1,
+     "pages": 25,
+     "scope": "/en-us/windows/"
+    },
+    {
+     "url": "https://support.microsoft.com/en-us/windows/get-microsoft-paint-a6b9578c-ed1c-5b09-0699-4ed8115f9aa9",
+     "depth": 0,
+     "pages": 1
+    },
+    {
+     "url": "https://www.digitalcitizen.life/paint-windows-11/",
+     "depth": 0,
+     "pages": 1
+    },
+    {
+     "url": "https://pureinfotech.com/use-image-layers-paint-windows-11/",
+     "depth": 0,
+     "pages": 1
+    },
+    {
+     "url": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+     "depth": 0,
+     "pages": 1
+    },
+    {
+     "url": "https://winaero.com/the-full-list-of-keyboard-shortcut-for-microsoft-paint",
+     "depth": 0,
+     "pages": 1
+    }
+   ]
+  },
+  {
+   "name": "Google Chrome",
+   "key": "chrome",
+   "tier": 1,
+   "processes": [
+    "chrome.exe"
+   ],
+   "company": "Google",
+   "seeds": [
+    "https://support.google.com/chrome/answer/2364824?hl=en&co=GENIE.Platform%3DDesktop",
+    "https://support.google.com/chrome/answer/2391819?hl=en&co=GENIE.Platform%3DDesktop",
+    "https://support.google.com/chrome/"
+   ]
+  },
+  {
+   "name": "Microsoft Word",
+   "key": "winword",
+   "tier": 2,
+   "processes": [
+    "WINWORD.EXE"
+   ],
+   "company": "Microsoft",
+   "seeds": [
+    {
+     "url": "https://support.microsoft.com/en-us/word/",
+     "depth": 1,
+     "pages": 60,
+     "scope": "/en-us/"
+    },
+    {
+     "url": "https://support.microsoft.com/en-us/word/training/learn-more-about-word",
+     "depth": 1,
+     "pages": 30,
+     "scope": "/en-us/"
+    },
+    {
+     "url": "https://support.microsoft.com/en-us/word/training/create-a-document-in-word",
+     "depth": 0,
+     "pages": 1
+    },
+    {
+     "url": "https://support.microsoft.com/en-us/office/word-for-new-users-cace0fd8-eed9-4aa2-b3c6-07d39895886c",
+     "depth": 0,
+     "pages": 1
+    }
+   ]
+  },
+  {
+   "name": "Microsoft PowerPoint",
+   "key": "powerpnt",
+   "tier": 2,
+   "processes": [
+    "POWERPNT.EXE"
+   ],
+   "company": "Microsoft",
+   "seeds": [
+    {
+     "url": "https://support.microsoft.com/en-us/office/powerpoint-help-5395bb85-eb6f-47fa-b5af-52996bac819e",
+     "depth": 1,
+     "pages": 40,
+     "scope": "/en-us/"
+    },
+    {
+     "url": "https://support.microsoft.com/en-us/powerpoint/training/learn-more-about-powerpoint",
+     "depth": 1,
+     "pages": 30,
+     "scope": "/en-us/"
+    },
+    {
+     "url": "https://support.microsoft.com/en-us/office/basic-tasks-for-creating-a-powerpoint-presentation-efbbc1cd-c5f1-4264-b48e-c8a7b0334e36",
+     "depth": 0,
+     "pages": 1
+    },
+    {
+     "url": "https://support.microsoft.com/en-us/accessibility/powerpoint/use-keyboard-shortcuts-to-create-powerpoint-presentations",
+     "depth": 0,
+     "pages": 1
+    }
+   ]
+  },
+  {
+   "name": "WhatsApp",
+   "key": "whatsapp",
+   "tier": 2,
+   "processes": [
+    "WhatsApp.Root.exe",
+    "WhatsApp.exe"
+   ],
+   "company": "WhatsApp",
+   "seeds": [
+    {
+     "url": "https://faq.whatsapp.com/",
+     "depth": 1,
+     "pages": 50
+    }
+   ]
+  },
+  {
+   "name": "Windows Settings",
+   "key": "systemsettings",
+   "tier": 2,
+   "processes": [
+    "SystemSettings.exe"
+   ],
+   "company": "Microsoft",
+   "seeds": [
+    {
+     "url": "https://support.microsoft.com/en-us/accessibility/windows/understand-and-explore-windows-settings",
+     "depth": 1,
+     "pages": 25,
+     "scope": "/en-us/accessibility/windows/"
+    },
+    {
+     "url": "https://support.microsoft.com/en-us/accessibility/windows/use-a-screen-reader-to-explore-and-navigate-settings-in-windows",
+     "depth": 1,
+     "pages": 25,
+     "scope": "/en-us/accessibility/windows/"
+    },
+    {
+     "url": "https://support.microsoft.com/en-us/windows/power-settings-in-windows-11-0d6a2b6b-2e87-4611-9980-ac9ea2175734",
+     "depth": 1,
+     "pages": 25,
+     "scope": "/en-us/windows/"
+    },
+    {
+     "url": "https://support.microsoft.com/en-us/windows/change-default-apps-in-windows",
+     "depth": 1,
+     "pages": 25,
+     "scope": "/en-us/windows/"
+    }
+   ]
+  },
+  {
+   "name": "Discord",
+   "key": "discord",
+   "tier": 3,
+   "processes": [
+    "Discord.exe"
+   ],
+   "company": "Discord",
+   "seeds": [
+    "https://support.discord.com/hc/en-us"
+   ]
+  },
+  {
+   "name": "Visual Studio Code",
+   "key": "code",
+   "tier": 3,
+   "processes": [
+    "Code.exe"
+   ],
+   "company": "Microsoft",
+   "seeds": [
+    "https://code.visualstudio.com/docs"
+   ]
+  },
+  {
+   "name": "Blender",
+   "key": "blender",
+   "tier": 3,
+   "processes": [
+    "blender.exe"
+   ],
+   "company": "Blender Foundation",
+   "seeds": [
+    "https://docs.blender.org/manual/en/latest/"
+   ]
+  },
+  {
+   "name": "OBS Studio",
+   "key": "obs64",
+   "tier": 3,
+   "processes": [
+    "obs64.exe"
+   ],
+   "company": "OBS Project",
+   "seeds": [
+    "https://obsproject.com/kb/"
+   ]
+  },
+  {
+   "name": "Microsoft Excel",
+   "key": "excel",
+   "tier": 0,
+   "processes": [
+    "EXCEL.EXE"
+   ],
+   "company": "Microsoft"
+  },
+  {
+   "name": "Microsoft Outlook",
+   "key": "outlook",
+   "tier": 0,
+   "processes": [
+    "OUTLOOK.EXE"
+   ],
+   "company": "Microsoft"
+  },
+  {
+   "name": "Microsoft OneNote",
+   "key": "onenote",
+   "tier": 0,
+   "processes": [
+    "ONENOTE.EXE"
+   ],
+   "company": "Microsoft"
+  },
+  {
+   "name": "Microsoft Teams",
+   "key": "teams",
+   "tier": 0,
+   "processes": [
+    "ms-teams.exe",
+    "Teams.exe"
+   ],
+   "company": "Microsoft",
+   "seeds": [
+    "https://support.microsoft.com/en-us/teams"
+   ]
+  },
+  {
+   "name": "Microsoft Edge",
+   "key": "msedge",
+   "tier": 0,
+   "processes": [
+    "msedge.exe"
+   ],
+   "company": "Microsoft",
+   "seeds": [
+    "https://support.microsoft.com/en-us/microsoft-edge"
+   ]
+  },
+  {
+   "name": "Mozilla Firefox",
+   "key": "firefox",
+   "tier": 0,
+   "processes": [
+    "firefox.exe"
+   ],
+   "company": "Mozilla",
+   "seeds": [
+    "https://support.mozilla.org/en-US/products/firefox"
+   ]
+  },
+  {
+   "name": "Brave Browser",
+   "key": "brave",
+   "tier": 0,
+   "processes": [
+    "brave.exe"
+   ],
+   "company": "Brave",
+   "seeds": [
+    "https://support.brave.com/hc/en-us"
+   ]
+  },
+  {
+   "name": "Opera",
+   "key": "opera",
+   "tier": 0,
+   "processes": [
+    "opera.exe"
+   ],
+   "company": "Opera",
+   "seeds": [
+    "https://help.opera.com/en/latest/"
+   ]
+  },
+  {
+   "name": "Zoom",
+   "key": "zoom",
+   "tier": 0,
+   "processes": [
+    "Zoom.exe"
+   ],
+   "company": "Zoom",
+   "seeds": [
+    "https://support.zoom.com/hc/en"
+   ]
+  },
+  {
+   "name": "Slack",
+   "key": "slack",
+   "tier": 0,
+   "processes": [
+    "slack.exe"
+   ],
+   "company": "Slack",
+   "seeds": [
+    "https://slack.com/help"
+   ]
+  },
+  {
+   "name": "Telegram Desktop",
+   "key": "telegram",
+   "tier": 0,
+   "processes": [
+    "Telegram.exe"
+   ],
+   "company": "Telegram",
+   "seeds": [
+    "https://telegram.org/faq"
+   ]
+  },
+  {
+   "name": "Signal",
+   "key": "signal",
+   "tier": 0,
+   "processes": [
+    "Signal.exe"
+   ],
+   "company": "Signal",
+   "seeds": [
+    "https://support.signal.org/hc/en-us"
+   ]
+  },
+  {
+   "name": "Skype",
+   "key": "skype",
+   "tier": 0,
+   "processes": [
+    "Skype.exe"
+   ],
+   "company": "Microsoft"
+  },
+  {
+   "name": "Spotify",
+   "key": "spotify",
+   "tier": 0,
+   "processes": [
+    "Spotify.exe"
+   ],
+   "company": "Spotify",
+   "seeds": [
+    "https://support.spotify.com/us/"
+   ]
+  },
+  {
+   "name": "VLC media player",
+   "key": "vlc",
+   "tier": 0,
+   "processes": [
+    "vlc.exe"
+   ],
+   "company": "VideoLAN",
+   "seeds": [
+    "https://docs.videolan.org/vlc-user/"
+   ]
+  },
+  {
+   "name": "Windows Photos",
+   "key": "photos",
+   "tier": 0,
+   "processes": [
+    "Microsoft.Photos.exe"
+   ],
+   "company": "Microsoft"
+  },
+  {
+   "name": "Windows Calculator",
+   "key": "calculator",
+   "tier": 0,
+   "processes": [
+    "CalculatorApp.exe"
+   ],
+   "company": "Microsoft"
+  },
+  {
+   "name": "File Explorer",
+   "key": "explorer",
+   "tier": 0,
+   "processes": [
+    "explorer.exe"
+   ],
+   "company": "Microsoft"
+  },
+  {
+   "name": "Task Manager",
+   "key": "taskmgr",
+   "tier": 0,
+   "processes": [
+    "Taskmgr.exe"
+   ],
+   "company": "Microsoft"
+  },
+  {
+   "name": "Snipping Tool",
+   "key": "snippingtool",
+   "tier": 0,
+   "processes": [
+    "SnippingTool.exe"
+   ],
+   "company": "Microsoft"
+  },
+  {
+   "name": "Windows Terminal",
+   "key": "windowsterminal",
+   "tier": 0,
+   "processes": [
+    "WindowsTerminal.exe"
+   ],
+   "company": "Microsoft",
+   "seeds": [
+    "https://learn.microsoft.com/en-us/windows/terminal/"
+   ]
+  },
+  {
+   "name": "PowerToys",
+   "key": "powertoys",
+   "tier": 0,
+   "processes": [
+    "PowerToys.exe"
+   ],
+   "company": "Microsoft",
+   "seeds": [
+    "https://learn.microsoft.com/en-us/windows/powertoys/"
+   ]
+  },
+  {
+   "name": "Notepad++",
+   "key": "notepad++",
+   "tier": 0,
+   "processes": [
+    "notepad++.exe"
+   ],
+   "company": "Notepad++",
+   "seeds": [
+    "https://npp-user-manual.org/"
+   ]
+  },
+  {
+   "name": "Sublime Text",
+   "key": "sublime_text",
+   "tier": 0,
+   "processes": [
+    "sublime_text.exe"
+   ],
+   "company": "Sublime HQ",
+   "seeds": [
+    "https://www.sublimetext.com/docs/"
+   ]
+  },
+  {
+   "name": "PyCharm",
+   "key": "pycharm64",
+   "tier": 0,
+   "processes": [
+    "pycharm64.exe"
+   ],
+   "company": "JetBrains",
+   "seeds": [
+    "https://www.jetbrains.com/help/pycharm/"
+   ]
+  },
+  {
+   "name": "IntelliJ IDEA",
+   "key": "idea64",
+   "tier": 0,
+   "processes": [
+    "idea64.exe"
+   ],
+   "company": "JetBrains",
+   "seeds": [
+    "https://www.jetbrains.com/help/idea/"
+   ]
+  },
+  {
+   "name": "Android Studio",
+   "key": "studio64",
+   "tier": 0,
+   "processes": [
+    "studio64.exe"
+   ],
+   "company": "Google",
+   "seeds": [
+    "https://developer.android.com/studio/intro"
+   ]
+  },
+  {
+   "name": "GitHub Desktop",
+   "key": "githubdesktop",
+   "tier": 0,
+   "processes": [
+    "GitHubDesktop.exe"
+   ],
+   "company": "GitHub",
+   "seeds": [
+    "https://docs.github.com/en/desktop"
+   ]
+  },
+  {
+   "name": "Docker Desktop",
+   "key": "docker_desktop",
+   "tier": 0,
+   "processes": [
+    "Docker Desktop.exe"
+   ],
+   "company": "Docker",
+   "seeds": [
+    "https://docs.docker.com/desktop/"
+   ]
+  },
+  {
+   "name": "Postman",
+   "key": "postman",
+   "tier": 0,
+   "processes": [
+    "Postman.exe"
+   ],
+   "company": "Postman",
+   "seeds": [
+    "https://learning.postman.com/docs/"
+   ]
+  },
+  {
+   "name": "Figma",
+   "key": "figma",
+   "tier": 0,
+   "processes": [
+    "Figma.exe"
+   ],
+   "company": "Figma",
+   "seeds": [
+    "https://help.figma.com/hc/en-us"
+   ]
+  },
+  {
+   "name": "GIMP",
+   "key": "gimp",
+   "tier": 0,
+   "processes": [
+    "gimp-2.10.exe",
+    "gimp-3.exe"
+   ],
+   "company": "GIMP",
+   "seeds": [
+    "https://docs.gimp.org/en/"
+   ]
+  },
+  {
+   "name": "Inkscape",
+   "key": "inkscape",
+   "tier": 0,
+   "processes": [
+    "inkscape.exe"
+   ],
+   "company": "Inkscape",
+   "seeds": [
+    "https://inkscape-manuals.readthedocs.io/en/latest/"
+   ]
+  },
+  {
+   "name": "Krita",
+   "key": "krita",
+   "tier": 0,
+   "processes": [
+    "krita.exe"
+   ],
+   "company": "KDE",
+   "seeds": [
+    "https://docs.krita.org/en/"
+   ]
+  },
+  {
+   "name": "Audacity",
+   "key": "audacity",
+   "tier": 0,
+   "processes": [
+    "Audacity.exe"
+   ],
+   "company": "Audacity",
+   "seeds": [
+    "https://manual.audacityteam.org/"
+   ]
+  },
+  {
+   "name": "HandBrake",
+   "key": "handbrake",
+   "tier": 0,
+   "processes": [
+    "HandBrake.exe"
+   ],
+   "company": "HandBrake",
+   "seeds": [
+    "https://handbrake.fr/docs/en/latest/"
+   ]
+  },
+  {
+   "name": "DaVinci Resolve",
+   "key": "resolve",
+   "tier": 0,
+   "processes": [
+    "Resolve.exe"
+   ],
+   "company": "Blackmagic Design"
+  },
+  {
+   "name": "Adobe Photoshop",
+   "key": "photoshop",
+   "tier": 0,
+   "processes": [
+    "Photoshop.exe"
+   ],
+   "company": "Adobe",
+   "seeds": [
+    "https://helpx.adobe.com/photoshop/user-guide.html"
+   ]
+  },
+  {
+   "name": "Adobe Illustrator",
+   "key": "illustrator",
+   "tier": 0,
+   "processes": [
+    "Illustrator.exe"
+   ],
+   "company": "Adobe",
+   "seeds": [
+    "https://helpx.adobe.com/illustrator/user-guide.html"
+   ]
+  },
+  {
+   "name": "Adobe Premiere Pro",
+   "key": "premiere_pro",
+   "tier": 0,
+   "processes": [
+    "Adobe Premiere Pro.exe"
+   ],
+   "company": "Adobe",
+   "seeds": [
+    "https://helpx.adobe.com/premiere-pro/user-guide.html"
+   ]
+  },
+  {
+   "name": "Adobe Acrobat",
+   "key": "acrobat",
+   "tier": 0,
+   "processes": [
+    "Acrobat.exe"
+   ],
+   "company": "Adobe",
+   "seeds": [
+    "https://helpx.adobe.com/acrobat/user-guide.html"
+   ]
+  },
+  {
+   "name": "LibreOffice Writer",
+   "key": "soffice",
+   "tier": 0,
+   "processes": [
+    "soffice.exe",
+    "soffice.bin"
+   ],
+   "company": "The Document Foundation",
+   "seeds": [
+    "https://help.libreoffice.org/latest/en-US/text/swriter/main0000.html"
+   ]
+  },
+  {
+   "name": "LibreOffice Calc",
+   "key": "libreoffice_calc",
+   "tier": 0,
+   "processes": [],
+   "company": "The Document Foundation",
+   "seeds": [
+    "https://help.libreoffice.org/latest/en-US/text/scalc/main0000.html"
+   ]
+  },
+  {
+   "name": "LibreOffice Impress",
+   "key": "libreoffice_impress",
+   "tier": 0,
+   "processes": [],
+   "company": "The Document Foundation",
+   "seeds": [
+    "https://help.libreoffice.org/latest/en-US/text/simpress/main0000.html"
+   ]
+  },
+  {
+   "name": "7-Zip",
+   "key": "7zfm",
+   "tier": 0,
+   "processes": [
+    "7zFM.exe"
+   ],
+   "company": "Igor Pavlov"
+  },
+  {
+   "name": "WinRAR",
+   "key": "winrar",
+   "tier": 0,
+   "processes": [
+    "WinRAR.exe"
+   ],
+   "company": "RARLAB"
+  },
+  {
+   "name": "qBittorrent",
+   "key": "qbittorrent",
+   "tier": 0,
+   "processes": [
+    "qbittorrent.exe"
+   ],
+   "company": "qBittorrent",
+   "seeds": [
+    "https://github.com/qbittorrent/qBittorrent/wiki"
+   ]
+  },
+  {
+   "name": "Steam",
+   "key": "steam",
+   "tier": 0,
+   "processes": [
+    "steam.exe"
+   ],
+   "company": "Valve",
+   "seeds": [
+    "https://help.steampowered.com/en/"
+   ]
+  },
+  {
+   "name": "Epic Games Launcher",
+   "key": "epicgameslauncher",
+   "tier": 0,
+   "processes": [
+    "EpicGamesLauncher.exe"
+   ],
+   "company": "Epic Games"
+  },
+  {
+   "name": "Notion",
+   "key": "notion",
+   "tier": 0,
+   "processes": [
+    "Notion.exe"
+   ],
+   "company": "Notion",
+   "seeds": [
+    "https://www.notion.com/help"
+   ]
+  },
+  {
+   "name": "Obsidian",
+   "key": "obsidian",
+   "tier": 0,
+   "processes": [
+    "Obsidian.exe"
+   ],
+   "company": "Obsidian",
+   "seeds": [
+    "https://help.obsidian.md/"
+   ]
+  },
+  {
+   "name": "Evernote",
+   "key": "evernote",
+   "tier": 0,
+   "processes": [
+    "Evernote.exe"
+   ],
+   "company": "Evernote"
+  },
+  {
+   "name": "Dropbox",
+   "key": "dropbox",
+   "tier": 0,
+   "processes": [
+    "Dropbox.exe"
+   ],
+   "company": "Dropbox",
+   "seeds": [
+    "https://help.dropbox.com/"
+   ]
+  },
+  {
+   "name": "Google Drive",
+   "key": "googledrivefs",
+   "tier": 0,
+   "processes": [
+    "GoogleDriveFS.exe"
+   ],
+   "company": "Google",
+   "seeds": [
+    "https://support.google.com/drive/"
+   ]
+  },
+  {
+   "name": "Mozilla Thunderbird",
+   "key": "thunderbird",
+   "tier": 0,
+   "processes": [
+    "thunderbird.exe"
+   ],
+   "company": "Mozilla",
+   "seeds": [
+    "https://support.mozilla.org/en-US/products/thunderbird"
+   ]
+  },
+  {
+   "name": "PuTTY",
+   "key": "putty",
+   "tier": 0,
+   "processes": [
+    "putty.exe"
+   ],
+   "company": "PuTTY",
+   "seeds": [
+    "https://the.earth.li/~sgtatham/putty/latest/htmldoc/"
+   ]
+  },
+  {
+   "name": "WinSCP",
+   "key": "winscp",
+   "tier": 0,
+   "processes": [
+    "WinSCP.exe"
+   ],
+   "company": "WinSCP",
+   "seeds": [
+    "https://winscp.net/eng/docs/start"
+   ]
+  },
+  {
+   "name": "FileZilla",
+   "key": "filezilla",
+   "tier": 0,
+   "processes": [
+    "filezilla.exe"
+   ],
+   "company": "FileZilla",
+   "seeds": [
+    "https://wiki.filezilla-project.org/Documentation"
+   ]
+  },
+  {
+   "name": "Wireshark",
+   "key": "wireshark",
+   "tier": 0,
+   "processes": [
+    "Wireshark.exe"
+   ],
+   "company": "Wireshark Foundation",
+   "seeds": [
+    "https://www.wireshark.org/docs/wsug_html_chunked/"
+   ]
+  },
+  {
+   "name": "VirtualBox",
+   "key": "virtualbox",
+   "tier": 0,
+   "processes": [
+    "VirtualBox.exe"
+   ],
+   "company": "Oracle",
+   "seeds": [
+    "https://www.virtualbox.org/manual/"
+   ]
+  },
+  {
+   "name": "Unity Hub",
+   "key": "unity_hub",
+   "tier": 0,
+   "processes": [
+    "Unity Hub.exe"
+   ],
+   "company": "Unity",
+   "seeds": [
+    "https://docs.unity3d.com/hub/manual/"
+   ]
+  },
+  {
+   "name": "Godot Engine",
+   "key": "godot",
+   "tier": 0,
+   "processes": [
+    "Godot.exe"
+   ],
+   "company": "Godot",
+   "seeds": [
+    "https://docs.godotengine.org/en/stable/"
+   ]
+  },
+  {
+   "name": "AutoCAD",
+   "key": "acad",
+   "tier": 0,
+   "processes": [
+    "acad.exe"
+   ],
+   "company": "Autodesk"
+  },
+  {
+   "name": "SketchUp",
+   "key": "sketchup",
+   "tier": 0,
+   "processes": [
+    "SketchUp.exe"
+   ],
+   "company": "Trimble",
+   "seeds": [
+    "https://help.sketchup.com/en"
+   ]
+  },
+  {
+   "name": "FreeCAD",
+   "key": "freecad",
+   "tier": 0,
+   "processes": [
+    "FreeCAD.exe"
+   ],
+   "company": "FreeCAD",
+   "seeds": [
+    "https://wiki.freecad.org/Main_Page"
+   ]
+  },
+  {
+   "name": "Zotero",
+   "key": "zotero",
+   "tier": 0,
+   "processes": [
+    "zotero.exe"
+   ],
+   "company": "Zotero",
+   "seeds": [
+    "https://www.zotero.org/support/"
+   ]
+  },
+  {
+   "name": "Anki",
+   "key": "anki",
+   "tier": 0,
+   "processes": [
+    "anki.exe"
+   ],
+   "company": "Anki",
+   "seeds": [
+    "https://docs.ankiweb.net/"
+   ]
+  },
+  {
+   "name": "calibre",
+   "key": "calibre",
+   "tier": 0,
+   "processes": [
+    "calibre.exe"
+   ],
+   "company": "Kovid Goyal",
+   "seeds": [
+    "https://manual.calibre-ebook.com/"
+   ]
+  },
+  {
+   "name": "Foxit PDF Reader",
+   "key": "foxitpdfreader",
+   "tier": 0,
+   "processes": [
+    "FoxitPDFReader.exe"
+   ],
+   "company": "Foxit"
+  },
+  {
+   "name": "SumatraPDF",
+   "key": "sumatrapdf",
+   "tier": 0,
+   "processes": [
+    "SumatraPDF.exe"
+   ],
+   "company": "Sumatra",
+   "seeds": [
+    "https://www.sumatrapdfreader.org/docs/Introduction"
+   ]
+  },
+  {
+   "name": "IrfanView",
+   "key": "i_view64",
+   "tier": 0,
+   "processes": [
+    "i_view64.exe"
+   ],
+   "company": "Irfan Skiljan"
+  },
+  {
+   "name": "ShareX",
+   "key": "sharex",
+   "tier": 0,
+   "processes": [
+    "ShareX.exe"
+   ],
+   "company": "ShareX",
+   "seeds": [
+    "https://getsharex.com/docs"
+   ]
+  },
+  {
+   "name": "AnyDesk",
+   "key": "anydesk",
+   "tier": 0,
+   "processes": [
+    "AnyDesk.exe"
+   ],
+   "company": "AnyDesk"
+  },
+  {
+   "name": "TeamViewer",
+   "key": "teamviewer",
+   "tier": 0,
+   "processes": [
+    "TeamViewer.exe"
+   ],
+   "company": "TeamViewer"
+  },
+  {
+   "name": "RStudio",
+   "key": "rstudio",
+   "tier": 0,
+   "processes": [
+    "rstudio.exe"
+   ],
+   "company": "Posit",
+   "seeds": [
+    "https://docs.posit.co/ide/user/"
+   ]
+  },
+  {
+   "name": "MATLAB",
+   "key": "matlab",
+   "tier": 0,
+   "processes": [
+    "MATLAB.exe"
+   ],
+   "company": "MathWorks",
+   "seeds": [
+    "https://www.mathworks.com/help/matlab/"
+   ]
+  },
+  {
+   "name": "Anaconda Navigator",
+   "key": "anaconda_navigator",
+   "tier": 0,
+   "processes": [],
+   "company": "Anaconda",
+   "seeds": [
+    "https://docs.anaconda.com/navigator/"
+   ]
+  },
+  {
+   "name": "Tableau Desktop",
+   "key": "tableau",
+   "tier": 0,
+   "processes": [
+    "tableau.exe"
+   ],
+   "company": "Tableau"
+  },
+  {
+   "name": "Camtasia",
+   "key": "camtasia",
+   "tier": 0,
+   "processes": [
+    "CamtasiaStudio.exe"
+   ],
+   "company": "TechSmith"
+  },
+  {
+   "name": "Clipchamp",
+   "key": "clipchamp",
+   "tier": 0,
+   "processes": [
+    "Clipchamp.exe"
+   ],
+   "company": "Microsoft"
+  }
+ ],
+ "_provenance": "tier 1-2 seeds: official pages located with a web search on 2026-10-10 (not written by the Professor); each is fetched at run time and ignored unless it answers HTTP 200"
+}

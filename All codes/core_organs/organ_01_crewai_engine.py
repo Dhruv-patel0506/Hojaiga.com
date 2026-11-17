@@ -4067,6 +4067,25 @@ if _HAS_CREWAI:
                     tab_str = f" [Tab: {tab}]" if tab else ""
                     output_lines.append(f"  * Group '{grp}'{tab_str}: {ctrl_sample}")
 
+            # ---- KNOWLEDGE QUALITY: what the system has actually SEEN this app DO (observed behavior,
+            # not surface listing), and what the resumable background learner is doing about the rest.
+            # Pure counts from the behavior DB; a low number is printed as low - never a fake score.
+            try:
+                from core_organs import organ_48_app_behavior_model as _b48
+                _q = _b48.knowledge_quality(_b48.get_model(), _b48._app_key(resolved_name))
+                output_lines.append("")
+                output_lines.append("APP KNOWLEDGE QUALITY (observed, not just listed):")
+                output_lines.append(f"  * {_q.get('one_line')}")
+                _lz = result.get("learn") or {}
+                if _lz.get("started"):
+                    output_lines.append(f"  * behavior learning: RUNNING in background (invisible, resumable, "
+                                        f"~{_lz.get('budget_s', '?')}s; dialogs get opened, read and closed again) - "
+                                        f"scan this app again later for deeper knowledge")
+                elif _lz:
+                    output_lines.append(f"  * behavior learning: {_lz.get('status', 'unknown')} ({_lz.get('why', '')})")
+            except Exception as _qe:
+                logger.debug(f"[SCAN] knowledge quality unavailable: {_qe}")
+
             output_lines.append("")
             output_lines.append(f"Found {len(ui_elements)} interactive UI elements:")
 
@@ -4255,7 +4274,18 @@ class CrewAIEngine:
         vision_precision_endpoint = os.environ.get("HOJAIGA_VISION_PRECISION_ENDPOINT", "")
         
         # Force Ollama backend for now to ensure CrewAI initializes properly
-        if _HAS_CREWAI:
+        route = None
+        if _HAS_CREWAI and crewai_backend in ("", "auto", "cloud"):
+            try:                                                   # a free hosted model (Gemini / Groq / OpenAI ... through the gateway's key list) when one has a key
+                from core_organs import organ_37_llm_gateway as _GW
+                route = _GW.litellm_route()
+            except Exception as e:
+                logger.debug(f"[CrewAI] hosted route unavailable: {e}")
+        if _HAS_CREWAI and route:
+            self._llm = LLM(model=route["model"], api_key=route["api_key"], base_url=route["base_url"],
+                            timeout=self._llm_timeout, max_retries=self._llm_max_retries)
+            logger.info(f"[CrewAI] Using hosted provider {route['provider']} ({route['model']})")
+        elif _HAS_CREWAI:
             self._llm = LLM(
                 model=f"ollama/{self.model_name}",
                 base_url=self.ollama_url,

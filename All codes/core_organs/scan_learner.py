@@ -28,7 +28,7 @@ import logging
 import os
 import threading
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger("hojaiga.scan_learner")
 
@@ -114,6 +114,84 @@ def learn_in_background(target: str, hwnd: int, *, model=None, budget_s: Optiona
             "budget_s": budget}
 
 
+def _clear_startup_modals(bm, model, m63, hwnd: int, key: str, stats: Dict[str, Any]) -> None:
+    """Apps often open a MODAL first (crash prompt, updater, license). Measured production bug on OBS
+    Studio: the learner's frontier snapshot saw ONLY the dialog's OK button (1 row) and learning
+    'converged' on almost nothing. Capture whatever is already open AS KNOWLEDGE (its schema is real
+    knowledge), then dismiss it with Escape/WM_CLOSE - never by pressing its buttons - so the app
+    underneath can be learned. Covers classic OWNED popups AND same-process UNOWNED top-levels:
+    Qt shows startup 'Error'/'Welcome' modals with owner=0, which owner-based detection misses (measured)."""
+    base = list(bm._open_popups(hwnd))
+    try:
+        import win32gui, win32process
+        r = win32gui.GetWindowRect(hwnd)
+        main_area = max(1, (r[2] - r[0]) * (r[3] - r[1]))
+        pid = win32process.GetWindowThreadProcessId(hwnd)[1]
+        rejected: List[str] = []
+
+        def _cb(h, acc):
+            if h == hwnd:
+                return
+            try:
+                if win32process.GetWindowThreadProcessId(h)[1] != pid:
+                    return
+                rr = win32gui.GetWindowRect(h)
+                area = (rr[2] - rr[0]) * (rr[3] - rr[1])
+                if area <= 0 or area >= main_area:               # nothing as big as the app itself
+                    return
+                vis = bool(win32gui.IsWindowVisible(h))
+                ttl = win32gui.GetWindowText(h) or ""
+                cls = win32gui.GetClassName(h) or ""
+                # a dialog to capture/close: visible and NAMED, or an unmistakable dialog class.
+                # (measured: OBS's startup QMessageBox was missed by a visible+title filter)
+                if not (vis and ttl) and cls not in ("#32770", "#32768") and "messagebox" not in cls.lower():
+                    if len(rejected) < 12:                        # honest breadcrumb of what we waved past
+                        rejected.append(f"{cls[:26]}|'{ttl[:16]}'|vis={int(vis)}|a={area}")
+                    return
+                acc.append(h)
+            except Exception:  # noqa: BLE001
+                pass
+        sib: List[int] = []
+        win32gui.EnumWindows(_cb, sib)
+        if rejected:
+            stats["sib_rejected"] = rejected
+        for w in sib:
+            if w not in base:
+                base.append(w)
+    except Exception:  # noqa: BLE001
+        pass
+    if not base:
+        return
+    try:
+        got = m63.capture_dialogs(model, key, base, via="(already open when learning began)")
+        stats["pre_modals"] = [g["title"] for g in got] or [bm._win_title(w) or bm._win_class(w) for w in base]
+    except Exception as exc:  # noqa: BLE001
+        stats["pre_modals"] = f"{bm._win_title(base[0]) or bm._win_class(base[0])} (capture error: {type(exc).__name__})"
+    from core_organs import headless_input as hin
+    import ctypes
+    deadline = time.time() + 3.0
+    alive, first = list(base), True
+    while alive and time.time() < deadline:
+        for w in alive:
+            try:
+                if first:
+                    hin.post_key_combo(w, "escape")
+                else:
+                    ctypes.windll.user32.PostMessageW(w, 0x0010, 0, 0)     # WM_CLOSE
+            except Exception:  # noqa: BLE001
+                pass
+        first = False
+        time.sleep(0.5)
+        try:
+            import win32gui
+            alive = [w for w in alive if win32gui.IsWindow(w)]
+        except Exception:  # noqa: BLE001
+            alive = []
+    stats["pre_modals_closed"] = not alive
+    if not alive:
+        time.sleep(0.6)          # let the app underneath lay out
+
+
 def _run(target: str, hwnd: int, key: str, vh: str, budget_s: float) -> None:
     from core_organs import organ_48_app_behavior_model as bm
     model = bm.BehaviorModel(bm.DB_PATH)          # own sqlite connection: this is another thread
@@ -128,6 +206,17 @@ def _run(target: str, hwnd: int, key: str, vh: str, budget_s: float) -> None:
         stats["idle_wait_s"] = round(waited, 1)
         model.set_learn_state(key, vh, "learning", budget_s=budget_s, stats=stats)
         from core_organs import organ_63_app_mastery as m63
+        # ---- startup-modal hygiene (measured on OBS Studio 2026-10-07): see _clear_startup_modals.
+        # Repeated as a short watch: measured, OBS's crash prompt appears ~5 s AFTER the scan returns,
+        # so a one-shot check at learner start sees nothing (sib_rejected breadcrumb proved the race) and
+        # the poisoned snapshot follows. Three passes, 4 s apart; a pass with nothing open costs ~ms.
+        try:
+            for _hp in range(3):
+                _clear_startup_modals(bm, model, m63, hwnd, key, stats)
+                if _hp < 2:
+                    time.sleep(4.0)
+        except Exception as exc:  # noqa: BLE001
+            stats["pre_modals"] = f"error: {type(exc).__name__}: {str(exc)[:100]}"
         # cooperative pause gate handed to the prober: between EVERY probe, if a human has taken over the
         # machine we wait (bounded) for quiet and, if they keep it busy past the cap, stop THIS run politely.
         # The frontier is persisted, so the next pass resumes exactly where we stopped. This closes the gap the
@@ -156,11 +245,32 @@ def _run(target: str, hwnd: int, key: str, vh: str, budget_s: float) -> None:
                      frontier=known.get("frontier"))
         if errors:
             stats["run_errors"] = [str(e)[:160] for e in errors][:3]
-        status_txt = "complete" if out.get("converged") else "partial"
+        # what HALTED each pass, honestly (budget / exhausted / user-active / circuit: the explore()
+        # unwind-failure rail): a stopped run says WHY in the persisted state, not just "partial".
+        stats["stopped"] = [((r.get("explore") or {}).get("stopped") or r.get("stopped") or "") for r in runs][:RUNS + 1]
+        stats["unwind_failures"] = [((r.get("explore") or {}).get("unwind_failures") or {}) for r in runs][:RUNS + 1]
+        # ---- paths & recipes: join the dialogs THIS learning actually observed into reachable step-paths
+        # (organ_48.compose_paths reads ONLY observed rows; nothing is invented), then record the scorecard.
+        try:
+            comp = bm.compose_paths(model, key)
+            stats["paths_composed"] = comp.get("composed")
+            if comp.get("skipped"):
+                stats["paths_skipped"] = comp["skipped"][:4]
+        except Exception as exc:  # noqa: BLE001
+            stats["paths_composed"] = f"error: {type(exc).__name__}: {str(exc)[:100]}"
+        try:
+            stats["quality"] = bm.knowledge_quality(model, key).get("one_line")
+        except Exception as exc:  # noqa: BLE001
+            stats["quality"] = f"error: {type(exc).__name__}"
+        # A pass blocked by a startup modal we could not dismiss (organ_63's guard) says nothing about the
+        # APP - its snapshot was the dialog's - so the state must stay resumable: 'complete' would make
+        # learn_in_background decline this version forever (measured on OBS: 1-row poisoned frontier).
+        blocked = [str(r.get("exploration_blocked")) for r in runs if r.get("exploration_blocked")]
+        if blocked:
+            stats["exploration_blocked"] = blocked[:2]
+        status_txt = "complete" if (out.get("converged") and not blocked) else "partial"
         model.set_learn_state(key, vh, status_txt, budget_s=budget_s, stats=stats)
-        logger.info("[scan-learner] %s: %s (%s commands, %s learned, %s transitions)",
-                    key, status_txt, known.get("commands"), known.get("commands_learned"),
-                    known.get("transitions"))
+        logger.info("[scan-learner] %s: %s (%s)", key, status_txt, stats.get("quality"))
     except Exception as exc:  # noqa: BLE001
         stats["error"] = f"{type(exc).__name__}: {str(exc)[:180]}"
         try:

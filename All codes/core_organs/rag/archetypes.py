@@ -42,7 +42,7 @@ def _A(aid, label, signals, roles, grammar, keys, traps, templates, train, test)
 
 
 ARCHETYPES: List[Dict[str, Any]] = [
-    _A("word_processor", "Document / word processor", "font paragraph styles heading page layout references review mailings margins spelling bold italic", "document edit",
+    _A("word_processor", "Document / word processor", "document font paragraph styles heading page layout references review mailings margins spelling bold italic rich richtext richedit", "document edit",
        ["open or create", "type body text", "apply style / format", "insert object", "review", "save / export"], {"bold": "Ctrl+B", "italic": "Ctrl+I", "print": "Ctrl+P"},
        ["accept all changes", "reject all", "mail merge send"], ["type {text}", "make the first line a heading", "save as {file}"],
        "Word,Writer,Google Docs,Pages,WordPad,AbiWord,WPS Writer", "OnlyOffice Docs,Scrivener,Zoho Writer"),
@@ -74,7 +74,7 @@ ARCHETYPES: List[Dict[str, Any]] = [
        ["pick tool", "drag on canvas", "label", "connect", "export"], {"rectangle": "R", "arrow": "A", "text": "T"},
        ["clear canvas", "reset the canvas"], ["draw a {shape} and label it {text}", "connect {a} to {b}"],
        "Excalidraw,draw.io,Miro,Whimsical,Lucidchart,Microsoft Whiteboard,FigJam", "tldraw,Mural,Jamboard"),
-    _A("3d_modeler", "3D modeling / animation", "viewport mesh object modifier material vertex edge face render scene outliner properties timeline", "pane viewport",
+    _A("3d_modeler", "3D modeling / animation", "viewport mesh object modifier material vertex edge face render scene outliner properties timeline transform gizmo perspective", "pane viewport",
        ["add object", "transform", "edit mesh", "material", "render"], {"move": "G", "rotate": "R", "scale": "S", "extrude": "E"},
        ["delete all", "clear scene", "apply all modifiers"], ["add a cube", "move it up {n}", "render the scene"],
        "Blender,Maya,3ds Max,Cinema 4D,SketchUp,Houdini,ZBrush", "Modo,Wings 3D,Rhino"),
@@ -130,7 +130,7 @@ ARCHETYPES: List[Dict[str, Any]] = [
        ["connect", "browse schema", "write query", "run", "export"], {"run": "F5", "new query": "Ctrl+N"},
        ["drop", "truncate", "delete from", "update without where"], ["run the query {text}", "export the result"],
        "SSMS,DBeaver,pgAdmin,MySQL Workbench,DataGrip,TablePlus,HeidiSQL", "Beekeeper,Navicat,DB Browser for SQLite"),
-    _A("note_taking", "Notes / knowledge base", "notebook notes page section tag checklist pin new note search sync outline", "list edit",
+    _A("note_taking", "Notes / knowledge base", "notebook notes page section tag checklist pin new note search sync outline markdown vault backlink contenteditable", "list edit",
        ["new note", "type", "organize", "search"], {"new note": "Ctrl+N", "search": "Ctrl+E"},
        ["empty trash", "delete notebook", "share publicly"], ["add a note {text}", "find the note about {text}"],
        "OneNote,Evernote,Notion,Obsidian,Sticky Notes,Joplin,Bear", "Simplenote,Standard Notes,Apple Notes"),
@@ -218,6 +218,36 @@ class ArchetypeRouter:
                     score[a["id"]] += 0.5
         return sorted(score.items(), key=lambda kv: -kv[1])[:top]
 
+    def assess(self, signature: Dict[str, Any], top: int = 3) -> Dict[str, Any]:
+        """Describe routing evidence without pretending a relative score is a probability.
+
+        ``classify`` must keep returning a ranked list for callers that need to
+        compare all 25 classes. A ranked list alone is unsafe for first-contact
+        automation, though: one generic word can force a top-ranked class. This
+        companion assessment reports whether there are enough class-specific
+        scanned-control words and separation from the runner-up to use the
+        class's *non-executable* skeleton. It never approves an action.
+        """
+        ranked = self.classify(signature, max(2, top))
+        if not ranked:
+            return {"status": "insufficient", "ranked": [], "supporting_signals": [], "margin": 0.0}
+        top_id, first = ranked[0]
+        second = ranked[1][1] if len(ranked) > 1 else 0.0
+        words = set(self.words(signature))
+        hits = sorted(words & set(BY_ID[top_id]["signals"]))
+        margin = max(0.0, (first - second) / max(abs(first), 1e-9))
+        # Two discriminative control words with reasonable separation are
+        # required for a first-contact class skeleton. A single unique word is
+        # retained as a weak candidate for tutoring/audit, never an executable
+        # decision. The thresholds are routing policy, not calibration claims.
+        if len(hits) >= 2 and margin >= 0.20:
+            status = "candidate"
+        elif hits and margin >= 0.35:
+            status = "weak_candidate"
+        else:
+            status = "ambiguous" if hits else "insufficient"
+        return {"status": status, "ranked": ranked[:top], "supporting_signals": hits, "margin": round(margin, 4)}
+
 
 def _norm_name(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "", (s or "").lower())
@@ -229,15 +259,17 @@ def hint(app: str, goal: str, rag_has_pathway: bool, signature: Optional[Dict[st
     if rag_has_pathway:
         return None
     r = router or ArchetypeRouter()
-    ranked = r.classify(signature or {"app": app, "title": app, "controls": []}, top=2)
-    if not ranked or ranked[0][1] <= 0.0:
+    assessment = r.assess(signature or {"app": app, "title": app, "controls": []}, top=2)
+    ranked = assessment["ranked"]
+    if assessment["status"] not in ("candidate", "weak_candidate") or not ranked or ranked[0][1] <= 0.0:
         return None
     a = BY_ID[ranked[0][0]]
     g = _toks(goal)
     template = max(a["templates"], key=lambda t: len(set(_toks(re.sub(r"\{[^}]*\}", " ", t))) & set(g)) if g else 0)
     return {"source": "archetype", "confidence": 0.45, "archetype": a["id"], "runner_up": ranked[1][0] if len(ranked) > 1 else "",
             "phases": a["grammar"], "keys": {**_STD_KEYS, **a["keys"]}, "traps": sorted(set(a["traps"]) | set(_UNIVERSAL_TRAPS)),
-            "closest_template": template, "note": "skeleton only: every step must resolve to a control that exists in this app's scan"}
+            "closest_template": template, "routing_status": assessment["status"], "routing_margin": assessment["margin"],
+            "note": "skeleton only: every step must resolve to a control that exists in this app's scan"}
 
 
 def is_trap(archetype_id: str, control_name: str) -> bool:

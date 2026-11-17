@@ -95,6 +95,28 @@ def build_card(target: str, hwnd: int = 0, *, model=None, scan: Optional[Dict[st
     except Exception:  # noqa: BLE001
         pass
 
+    # ---- ribbon: the app's tab/group structure (any-app contract). Prefer this run's reveal report; otherwise
+    # read the persisted layout so a warm card still advertises the ribbon. Never a guess - only what was walked.
+    try:
+        _rib = (scan or {}).get("ribbon")
+        if not isinstance(_rib, dict) or not _rib.get("present"):
+            from core_organs import fast_scan as _fs
+            _rt, _rg = _fs._ribbon_from_layout(model, key)
+            _rib = {"present": bool(_rt or _rg), "tabs": _rt, "groups": _rg}
+        _tabs: List[str] = []
+        _groups: Dict[str, Any] = {}
+        _tv = _rib.get("tabs")
+        _gv = _rib.get("groups")
+        if isinstance(_tv, list):
+            _tabs = [str(t) for t in _tv]
+        if isinstance(_gv, dict):
+            _groups = dict(_gv)
+        if _rib.get("present") and (_tabs or _groups):
+            map_info["ribbon"] = {"present": True, "n_tabs": len(_tabs), "n_groups": len(_groups),
+                                  "tabs": _tabs[:32], "coverage": _rib.get("coverage")}
+    except Exception:  # noqa: BLE001
+        pass
+
     # ---- pixel grounding: addressable OCR/vision rows (the tree-blind app's fallback, plan section B) ----
     pixels: Dict[str, int] = {}
     try:

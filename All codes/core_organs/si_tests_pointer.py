@@ -389,19 +389,23 @@ def run_pr76() -> "TestOutcome":
         with open(path, "w", encoding="utf-8") as fh:
             json.dump({"old_a": {"posted_pointer": False, "touch_moves_cursor": False}, "old_b": {"touch_moves_cursor": True}}, fh)
         la, lb = PT.load_traits("old_a"), PT.load_traits("old_b")
-        # 6 an empty ladder says WHY
+        # 6 an empty ladder says WHY (both routes measured NOT to work by the application itself)
         PT.save_trait("n6", "posted", "ignored")
-        PT.save_trait("n6", "shim", "unavailable")
+        PT.save_trait("n6", "shim", "ignored")
         v6 = PT.VirtualPointer(0, "n6", NS(allowed=True, owned=True, why_not=lambda: ""), allow_touch=False)
         v6.allowed = lambda: (True, "")
         r6 = v6.perform(sc, "click", verify=lambda: True)
+        # 7 a persisted 'unavailable' is not held against the application: it only ever meant a dependency was missing HERE at the time; it is re-probed, never closes the ladder from the file
+        PT.save_trait("n7", "shim", "unavailable")
+        reprobed = "shim" not in PT.load_traits("n7")
         checks = {"no_effect_anywhere_teaches_nothing": r1.ok is False and r1b.ok is False and learned_none == {},
                   "contrast_needs_two_observations": a.ok and a.route == "shim" and after_one.get("posted") is None and b.ok and after_two.get("posted") == "ignored" and after_two.get("shim") == "ok",
                   "a_route_that_worked_is_kept": n3.get("posted") == "ok",
                   "caller_no_effect_demotes_for_the_session": order_after[:2] == ["shim", "posted"],
                   "session_demotion_is_not_persisted": persisted_n4.get("posted") in (None, "delivered", "ok") and "ignored" not in persisted_n4.values(),
                   "legacy_facts_honoured": la.get("posted") == "ignored" and la.get("touch") == "ok" and lb.get("touch") == "moves_cursor",
-                  "empty_ladder_gives_the_reason": (not r6.ok) and "posted: ignored" in r6.note and "shim: unavailable" in r6.note}
+                  "empty_ladder_gives_the_reason": (not r6.ok) and "posted: ignored" in r6.note and "shim: ignored" in r6.note,
+                  "stale_unavailable_is_reprobed": reprobed}
         return _verdict(checks, f"a.tried={a.tried}; after_two={after_two}; r6={r6.note[:100]}")
     finally:
         CFG.DATA_DIR = old

@@ -37,6 +37,7 @@ if _IS_WINDOWS:
     _k32 = ctypes.WinDLL("kernel32", use_last_error=True)
     _dwm = ctypes.WinDLL("dwmapi", use_last_error=True)
     _H = ctypes.c_void_p
+    _initial_desktop = _u32.GetThreadDesktop(_k32.GetCurrentThreadId())
 
     _u32.PostMessageW.argtypes = [_H, wt.UINT, wt.WPARAM, wt.LPARAM]
     _u32.PostMessageW.restype = wt.BOOL
@@ -564,27 +565,68 @@ def post_scroll(hwnd: int, sx: int, sy: int, clicks: int) -> Tuple[bool, str]:
 _EDIT_CLASSES = ("edit", "richedit", "scintilla", "tedit", "textbox")
 
 
+class _GUITHREADINFO(ctypes.Structure):
+    _fields_ = [
+        ("cbSize", wt.DWORD),
+        ("flags", wt.DWORD),
+        ("hwndActive", wt.HWND),
+        ("hwndFocus", wt.HWND),
+        ("hwndCapture", wt.HWND),
+        ("hwndMenuOwner", wt.HWND),
+        ("hwndMoveSize", wt.HWND),
+        ("hwndCaret", wt.HWND),
+        ("rcCaret", wt.RECT),
+    ]
+
+
 def post_text(hwnd: int, text: str) -> Tuple[bool, str]:
     if not _IS_WINDOWS:
         return False, f"{UNDELIVERABLE}: non-windows"
     if not is_alive(hwnd):
         return False, f"{UNDELIVERABLE}: window gone"
-    cls = _class_name(hwnd).lower()
+    target = hwnd
+    cls = _class_name(target).lower()
+    if cls == "applicationframewindow":
+        sink = _u32.FindWindowExW(hwnd, 0, "Windows.UI.Core.CoreWindow", None) or _u32.FindWindowExW(hwnd, 0, "ApplicationFrameInputSinkWindow", None)
+        if sink:
+            target = sink
+            cls = _class_name(target).lower()
+    if not any(c in cls for c in _EDIT_CLASSES):
+        try:
+            tid = _u32.GetWindowThreadProcessId(hwnd, None)
+            gui = _GUITHREADINFO()
+            gui.cbSize = ctypes.sizeof(_GUITHREADINFO)
+            if _u32.GetGUIThreadInfo(tid, ctypes.byref(gui)) and gui.hwndFocus and is_alive(gui.hwndFocus):
+                target = gui.hwndFocus
+                cls = _class_name(target).lower()
+        except Exception:
+            pass
     if any(c in cls for c in _EDIT_CLASSES):
-        res = ctypes.c_size_t(0)
-        buf = ctypes.create_unicode_buffer(text)
-        ret = _u32.SendMessageTimeoutW(hwnd, EM_REPLACESEL, 1, ctypes.addressof(buf),
-                                       SMTO_ABORTIFHUNG, 800, ctypes.byref(res))
-        if ret:
-            return True, f"em_replacesel->{_class_name(hwnd)}"
-    # Generic: per-character WM_CHAR to this exact HWND (works on custom/owner-drawn editors).
+        # EM_REPLACESEL passes its lParam as a POINTER, which SendMessage does NOT marshal
+        # across process boundaries -> a foreign editor reads garbage (Scintilla inserted
+        # only the first char). Use it only when the edit lives in OUR process; otherwise
+        # fall through to the value-based WM_CHAR path, which is safe cross-process.
+        try:
+            _pid = wt.DWORD(0)
+            _u32.GetWindowThreadProcessId(target, ctypes.byref(_pid))
+            same_process = (_pid.value == os.getpid())
+        except Exception:
+            same_process = False
+        if same_process:
+            res = ctypes.c_size_t(0)
+            buf = ctypes.create_unicode_buffer(text)
+            ret = _u32.SendMessageTimeoutW(target, EM_REPLACESEL, 1, ctypes.addressof(buf),
+                                           SMTO_ABORTIFHUNG, 800, ctypes.byref(res))
+            if ret:
+                return True, f"em_replacesel->{_class_name(target)}"
+    # Generic: per-character WM_CHAR to target HWND (works on custom/owner-drawn editors).
     delivered = 0
     for ch in text:
-        if _u32.PostMessageW(hwnd, WM_CHAR, ord(ch), 1):
+        if _u32.PostMessageW(target, WM_CHAR, ord(ch), 1):
             delivered += 1
     if delivered == len(text) and text:
-        return True, f"postmessage-wm_char->{_class_name(hwnd)} ({delivered} chars)"
-    return False, f"{UNDELIVERABLE}: could not post characters to {_class_name(hwnd)}"
+        return True, f"postmessage-wm_char->{_class_name(target)} ({delivered} chars)"
+    return False, f"{UNDELIVERABLE}: could not post characters to {_class_name(target)}"
 
 
 def parse_combo(combo: str) -> Optional[List[int]]:
@@ -619,6 +661,10 @@ def post_vk_chord(hwnd: int, vks: List[int], label: str = "") -> Tuple[bool, str
     """Post a chord of virtual-key codes (modifiers first) to ``hwnd`` - see post_key_combo."""
     if not _IS_WINDOWS or not is_alive(hwnd):
         return False, f"{UNDELIVERABLE}: window unavailable"
+    if _class_name(hwnd).lower() == "applicationframewindow":
+        sink = _u32.FindWindowExW(hwnd, 0, "Windows.UI.Core.CoreWindow", None) or _u32.FindWindowExW(hwnd, 0, "ApplicationFrameInputSinkWindow", None)
+        if sink:
+            hwnd = sink
     combo = label or "+".join(hex(v) for v in vks)
     mods = [v for v in vks if v in _MODS]
     keys = [v for v in vks if v not in _MODS] or [mods.pop()]  # lone modifier press
@@ -895,6 +941,95 @@ def _dap_print(hwnd: int):
         return None, f"dap-print-error: {type(exc).__name__}: {exc}"
 
 
+# ---------------------------------------------------------------------------
+# Off-screen isolation (Phase-2 screen-steal fix, validated by probe_offscreen_capture.py)
+# ---------------------------------------------------------------------------
+# Windows DWM keeps a restored window's backing buffer and PrintWindow(PW_RENDERFULLCONTENT)
+# reads from that buffer -- so a window moved to NEGATIVE coordinates renders real pixels while
+# never appearing on the user's monitor. The shell Virtual-Desktops COM is unavailable on this
+# build (REGDB_E_CLASSNOTREG) and Win32 CreateDesktop would yank the whole screen, so off-screen
+# parking is the reliable way to actuate + screenshot WITHOUT stealing the user's display.
+OFFSCREEN_X = -4000
+OFFSCREEN_Y = -4000
+# SWP flags that stop Windows snapping / docking / z-ordering / focus-stealing a parked window.
+SWP_NOSIZE, SWP_NOZORDER, SWP_NOACTIVATE = 0x0001, 0x0004, 0x0010
+
+
+def offscreen_enabled() -> bool:
+    """Off-screen isolation is ON by default; HOJAIGA_OFFSCREEN=0 falls back to the old
+    on-screen restore (kept as an escape hatch, not the default)."""
+    return os.environ.get("HOJAIGA_OFFSCREEN", "1").strip().lower() not in ("0", "false", "no", "off")
+
+
+def park_offscreen(hwnd: int, w: int = 1000, h: int = 700) -> bool:
+    """Move a (restored) window fully off the visible desktop without activating it. Size is
+    preserved by reading the current rect when it is sane. Returns True if the window ended up
+    at negative coordinates. Client-relative posted messages and PrintWindow both keep working
+    here, which is the whole point."""
+    if not _IS_WINDOWS or not is_alive(hwnd):
+        return False
+    r = wt.RECT()
+    if _u32.GetWindowRect(hwnd, ctypes.byref(r)) and (r.right - r.left) > 50:
+        w, h = r.right - r.left, r.bottom - r.top
+    _u32.SetWindowPos(hwnd, 0, OFFSCREEN_X, OFFSCREEN_Y, int(w), int(h),
+                      SWP_NOZORDER | SWP_NOACTIVATE)
+    rr = wt.RECT()
+    _u32.GetWindowRect(hwnd, ctypes.byref(rr))
+    return rr.right < 0
+
+
+_parked_placements: dict = {}
+
+
+def isolate_offscreen(hwnd: int) -> bool:
+    """Prepare a window for off-screen actuation + capture: if it is iconic, restore it but
+    DIRECT it off-screen (via its normal position) so there is no on-desktop flash; if it is
+    already restored, move it off-screen. Records the original placement for release_isolation.
+    Safe to call once per run; idempotent."""
+    if not _IS_WINDOWS or not is_alive(hwnd) or not offscreen_enabled():
+        return False
+    _parked_placements.setdefault(hwnd, _get_placement(hwnd))
+    if _u32.IsIconic(hwnd):
+        p = _get_placement(hwnd)
+        if p is not None:
+            w = p.rcNormalPosition.right - p.rcNormalPosition.left
+            h = p.rcNormalPosition.bottom - p.rcNormalPosition.top
+            w = w if w > 50 else 1000
+            h = h if h > 50 else 700
+            p.rcNormalPosition = wt.RECT(OFFSCREEN_X, OFFSCREEN_Y,
+                                         OFFSCREEN_X + w, OFFSCREEN_Y + h)
+            p.showCmd = 1  # SW_SHOWNORMAL (restored, not minimized)
+            _u32.SetWindowPlacement(hwnd, ctypes.byref(p))
+        _u32.ShowWindow(hwnd, 4)  # SW_SHOWNOACTIVATE
+        return park_offscreen(hwnd)
+    return park_offscreen(hwnd)
+
+
+def release_isolation(hwnd: int) -> None:
+    """Bring a window we parked back onto the visible desktop (100,100) or restore the exact
+    prior state, so nothing is ever left orphaned in coordinate limbo (teardown safety)."""
+    if not _IS_WINDOWS or not is_alive(hwnd):
+        return
+    orig = _parked_placements.pop(hwnd, None)
+    if orig is not None:
+        _u32.SetWindowPlacement(hwnd, ctypes.byref(orig))
+    else:
+        _u32.SetWindowPos(hwnd, 0, 100, 100, 0, 0,
+                          SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE)
+
+
+def _release_all_parked() -> None:
+    for h in list(_parked_placements):
+        try:
+            release_isolation(h)
+        except Exception:  # noqa: BLE001
+            pass
+
+
+import atexit
+atexit.register(_release_all_parked)
+
+
 def _hand_back_focus(was_fg: int) -> None:
     """Give foreground back to whatever held it before we acted. SetForegroundWindow alone is refused
     when the caller is not the foreground process (Windows' focus lock), so we brief the CURRENT
@@ -915,6 +1050,61 @@ def _hand_back_focus(was_fg: int) -> None:
             _u32.AttachThreadInput(my_tid, other_tid, False)
 
 
+def _last_input_ms() -> int:
+    """Milliseconds since the last physical keyboard/mouse input (0 = just now)."""
+    try:
+        class LASTINPUTINFO(ctypes.Structure):
+            _fields_ = [("cbSize", wt.UINT), ("dwTime", wt.DWORD)]
+        lii = LASTINPUTINFO()
+        lii.cbSize = ctypes.sizeof(LASTINPUTINFO)
+        if _u32.GetLastInputInfo(ctypes.byref(lii)):
+            return int(_k32.GetTickCount() - lii.dwTime) & 0xFFFFFFFF
+    except Exception:
+        pass
+    return 10 ** 9
+
+
+def foreground_pulse(hwnd: int, action, settle_ms: int = 45, idle_guard_ms: int = 300):
+    """Off-screen MICRO-FOCUS PULSE. UWP/WinUI (CoreWindow) routes WM_CHAR / XAML input only
+    when its window truly holds foreground, but OFF-SCREEN PARKING does not need the window on
+    the monitor: a window at (-4000,-4000) can be foreground and stay invisible. We give it
+    ~settle_ms of real focus, run `action` (the Invoke / keystroke that arms the operator),
+    then hand focus straight back to whatever held it. Human-idle guarded: if the user typed
+    within idle_guard_ms we wait out that gap first, so the pulse never eats a live keystroke.
+    The window is NEVER moved onto the visible desktop."""
+    if not callable(action):
+        return None
+    if not _IS_WINDOWS or not is_alive(hwnd):
+        return action()
+    try:
+        idle = _last_input_ms()
+        if idle < idle_guard_ms:
+            time.sleep((idle_guard_ms - idle) / 1000.0 + 0.05)
+    except Exception:
+        pass
+    tgt = int(hwnd)
+    prev = int(_u32.GetForegroundWindow() or 0)
+    if prev == tgt:
+        return action()
+    other_tid = _u32.GetWindowThreadProcessId(prev or tgt, None)
+    my_tid = _k32.GetCurrentThreadId()
+    attached = bool(_u32.AttachThreadInput(my_tid, other_tid, True))   # cross the focus lock
+    try:
+        _u32.BringWindowToTop(tgt)
+        _u32.SetForegroundWindow(tgt)
+        _u32.SetActiveWindow(tgt)
+        time.sleep(settle_ms / 1000.0)
+        result = action()
+        time.sleep(settle_ms / 1000.0)
+    finally:
+        if prev:
+            _u32.SetForegroundWindow(prev)
+            _u32.SetActiveWindow(prev)
+        if attached:
+            _u32.AttachThreadInput(my_tid, other_tid, False)
+    return result
+
+
 def _restore_capture_rehide(hwnd: int):
     """Rung 3 - restore -> capture -> re-hide, preserving the exact prior state. Only ever runs for a
     window WE find minimized, and it always returns the window to iconic (placement restored).
@@ -926,7 +1116,23 @@ def _restore_capture_rehide(hwnd: int):
     was_fg = int(_u32.GetForegroundWindow() or 0)
     placement = _get_placement(hwnd)
     img, why = None, "restore-failed"
+    offscreen = offscreen_enabled()
     try:
+        if offscreen and placement is not None:
+            # Direct the restore OFF-SCREEN before showing, so the window never flashes on the
+            # user's desktop: it restores straight into the negative-coordinate backing buffer.
+            w = placement.rcNormalPosition.right - placement.rcNormalPosition.left
+            h = placement.rcNormalPosition.bottom - placement.rcNormalPosition.top
+            p2 = _WINDOWPLACEMENT()
+            p2.length = ctypes.sizeof(_WINDOWPLACEMENT)
+            p2.flags = placement.flags
+            p2.showCmd = 1
+            p2.ptMinPos = placement.ptMinPos
+            p2.ptMaxPos = placement.ptMaxPos
+            p2.rcNormalPosition = wt.RECT(OFFSCREEN_X, OFFSCREEN_Y,
+                                          OFFSCREEN_X + (w if w > 50 else 1000),
+                                          OFFSCREEN_Y + (h if h > 50 else 700))
+            _u32.SetWindowPlacement(hwnd, ctypes.byref(p2))
         _u32.ShowWindow(hwnd, 4)                          # SW_SHOWNOACTIVATE: show WITHOUT stealing focus
         deadline = time.time() + 3.0
         ready = False
@@ -938,6 +1144,8 @@ def _restore_capture_rehide(hwnd: int):
                     break
             time.sleep(0.05)
         if ready:
+            if offscreen:
+                park_offscreen(hwnd)                       # guarantee negative coords before capture
             time.sleep(0.25)                              # let the first frame paint
             img, why = capture_window(hwnd)
     finally:
@@ -1092,3 +1300,23 @@ def on_input_desktop() -> bool:
         return same
     except Exception:
         return False
+
+
+def initial_desktop() -> Any:
+    return _initial_desktop if _IS_WINDOWS else None
+
+
+def ensure_input_desktop() -> bool:
+    """If this thread is not on the interactive input desktop (e.g. spawned on a sandbox desktop), switch it to Default."""
+    if on_input_desktop():
+        return True
+    if not _IS_WINDOWS:
+        return True
+    try:
+        hdesk = _u32.OpenDesktopW("Default", 0, False, 0x01FF)
+        if hdesk:
+            return bool(_u32.SetThreadDesktop(hdesk))
+    except Exception:
+        pass
+    return False
+

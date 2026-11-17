@@ -1,0 +1,21 @@
+HOJAIGA - Self-learning Windows automation agent (independent research project)        Aug 2026 - Nov 2026
+Python, UI Automation, Win32, Qwen3-VL, QLoRA, RAG, CrewAI, LangChain, Playwright, Claude / Gemini / Groq APIs
+
+- Designed and built a multi-layer desktop agent (about 230k lines of Python, 107 commits, 29 test suites) that learns
+  unseen Windows apps from their binaries and live interface (UI Automation trees, PE resources, type libraries) and
+  carries out multi-app tasks with verified results.
+- Mapped PowerPoint's complete ribbon (about 360 controls, 980 menu items, 10 dialogs) in about 5 minutes; read a
+  never-launched program's menus and keyboard shortcuts straight from its executable in about 1 second.
+- Built a background "virtual mouse" (click, drag, scroll, gestures) that drives WinForms, WPF, Blender and WinUI apps
+  without moving the user's cursor.
+- Added proof-before-done verification (saved-file read-back plus a vision judge) and a consequence gate for pay, send
+  and delete actions; cross-app tasks verified cell by cell (Excel to PowerPoint 24/24, web to Excel 40/40).
+- Fine-tuned and evaluated Qwen3-VL (2B and 4B, QLoRA) on a 6 GB GPU against 630 held-out items; found that narrow
+  training data caused forgetting (fine-tuned 39% vs base 53%) and redesigned the system as teacher and student: a
+  hosted model teaches, a local verifier keeps only proven steps and switches API use off as it learns.
+- Integrated CrewAI, LangChain, ScrapeGraphAI and Playwright behind one budgeted model gateway; federated RAG over five
+  knowledge stores.
+
+SHORT VERSION (one line, for a projects list):
+Hojaiga - self-learning Windows automation agent: learns apps from their binaries and live UI, acts through a
+background virtual mouse, proves every result; 230k lines of Python, open-sourced as a research release (2026).

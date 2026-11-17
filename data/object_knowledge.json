@@ -1,119 +1,6002 @@
 {
  "_about": "Object knowledge store (repeat levels: N = compartments, N+1 boards: a bottom, N-1 between, a top): real-world object categories as PART ROLES with dimension ranges [min, max, typical] in metres and the formulas that place every part. Written as data so new categories need no code. Sizes follow common ergonomic / furniture standards (seat height ~0.45 m, dining table ~0.75 m, desk ~0.74 m, bookcase depth 0.25-0.35 m, shelf thickness 0.02-0.03 m). Sources: general woodworking / furniture-design conventions (no text copied); licence: facts, none claimed.",
- "wood": [0.55, 0.38, 0.22],
+ "wood": [
+  0.55,
+  0.38,
+  0.22
+ ],
  "categories": {
   "chair": {
-   "keywords": ["chair", "armchair", "dining chair"],
-   "dims": {"W": [0.40, 0.55, 0.45], "D": [0.40, 0.55, 0.45], "H": [0.85, 1.05, 0.92]},
-   "params": {"seat_h": [0.42, 0.48, 0.45], "t": [0.03, 0.04, 0.03], "leg": [0.035, 0.05, 0.04]},
+   "keywords": [
+    "chair",
+    "armchair",
+    "dining chair"
+   ],
+   "dims": {
+    "W": [
+     0.4,
+     0.55,
+     0.45
+    ],
+    "D": [
+     0.4,
+     0.55,
+     0.45
+    ],
+    "H": [
+     0.85,
+     1.05,
+     0.92
+    ]
+   },
+   "params": {
+    "seat_h": [
+     0.42,
+     0.48,
+     0.45
+    ],
+    "t": [
+     0.03,
+     0.04,
+     0.03
+    ],
+    "leg": [
+     0.035,
+     0.05,
+     0.04
+    ]
+   },
    "parts": [
-    {"name": "seat", "shape": "cube", "size": ["W", "D", "t"], "at": ["0", "0", "seat_h - t/2"]},
-    {"name": "leg{i}", "repeat": "corners_front", "shape": "cube", "size": ["leg", "leg", "seat_h - t"], "at": ["SX*(W/2 - leg/2)", "SY*(D/2 - leg/2)", "(seat_h - t)/2"]},
-    {"name": "rearleg{i}", "repeat": "sides", "shape": "cube", "size": ["leg", "leg", "seat_h - t"], "at": ["SX*(W/2 - leg/2)", "-(D/2 - leg/2)", "(seat_h - t)/2"]},
-    {"name": "rearpost{i}", "repeat": "sides", "shape": "cube", "size": ["leg", "leg", "H - seat_h"], "at": ["SX*(W/2 - leg/2)", "-(D/2 - leg/2)", "seat_h + (H - seat_h)/2"]},
-    {"name": "backrest_slat_top", "shape": "cube", "size": ["W - 2*leg", "t", "0.14"], "at": ["0", "-(D/2 - t/2)", "H - 0.10"]},
-    {"name": "backrest_slat_low", "shape": "cube", "size": ["W - 2*leg", "t", "0.10"], "at": ["0", "-(D/2 - t/2)", "H - 0.30"]}
+    {
+     "name": "seat",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "t"
+     ],
+     "at": [
+      "0",
+      "0",
+      "seat_h - t/2"
+     ]
+    },
+    {
+     "name": "leg{i}",
+     "repeat": "corners_front",
+     "shape": "cube",
+     "size": [
+      "leg",
+      "leg",
+      "seat_h - t"
+     ],
+     "at": [
+      "SX*(W/2 - leg/2)",
+      "SY*(D/2 - leg/2)",
+      "(seat_h - t)/2"
+     ]
+    },
+    {
+     "name": "rearleg{i}",
+     "repeat": "sides",
+     "shape": "cube",
+     "size": [
+      "leg",
+      "leg",
+      "seat_h - t"
+     ],
+     "at": [
+      "SX*(W/2 - leg/2)",
+      "-(D/2 - leg/2)",
+      "(seat_h - t)/2"
+     ]
+    },
+    {
+     "name": "rearpost{i}",
+     "repeat": "sides",
+     "shape": "cube",
+     "size": [
+      "leg",
+      "leg",
+      "H - seat_h"
+     ],
+     "at": [
+      "SX*(W/2 - leg/2)",
+      "-(D/2 - leg/2)",
+      "seat_h + (H - seat_h)/2"
+     ]
+    },
+    {
+     "name": "backrest_slat_top",
+     "shape": "cube",
+     "size": [
+      "W - 2*leg",
+      "t",
+      "0.14"
+     ],
+     "at": [
+      "0",
+      "-(D/2 - t/2)",
+      "H - 0.10"
+     ]
+    },
+    {
+     "name": "backrest_slat_low",
+     "shape": "cube",
+     "size": [
+      "W - 2*leg",
+      "t",
+      "0.10"
+     ],
+     "at": [
+      "0",
+      "-(D/2 - t/2)",
+      "H - 0.30"
+     ]
+    }
    ]
   },
   "stool": {
-   "keywords": ["stool"],
-   "dims": {"W": [0.30, 0.40, 0.34], "D": [0.30, 0.40, 0.34], "H": [0.40, 0.75, 0.46]},
-   "params": {"t": [0.03, 0.04, 0.035], "leg": [0.03, 0.045, 0.035]},
+   "keywords": [
+    "stool"
+   ],
+   "dims": {
+    "W": [
+     0.3,
+     0.4,
+     0.34
+    ],
+    "D": [
+     0.3,
+     0.4,
+     0.34
+    ],
+    "H": [
+     0.4,
+     0.75,
+     0.46
+    ]
+   },
+   "params": {
+    "t": [
+     0.03,
+     0.04,
+     0.035
+    ],
+    "leg": [
+     0.03,
+     0.045,
+     0.035
+    ]
+   },
    "parts": [
-    {"name": "seat", "shape": "cylinder", "size": ["W", "D", "t"], "at": ["0", "0", "H - t/2"]},
-    {"name": "leg{i}", "repeat": "corners", "shape": "cylinder", "size": ["leg", "leg", "H - t"], "at": ["SX*(W/2 - leg*1.5)", "SY*(D/2 - leg*1.5)", "(H - t)/2"]}
+    {
+     "name": "seat",
+     "shape": "cylinder",
+     "size": [
+      "W",
+      "D",
+      "t"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H - t/2"
+     ]
+    },
+    {
+     "name": "leg{i}",
+     "repeat": "corners",
+     "shape": "cylinder",
+     "size": [
+      "leg",
+      "leg",
+      "H - t"
+     ],
+     "at": [
+      "SX*(W/2 - leg*1.5)",
+      "SY*(D/2 - leg*1.5)",
+      "(H - t)/2"
+     ]
+    }
    ]
   },
   "table": {
-   "keywords": ["dining table", "table"],
-   "dims": {"W": [1.20, 2.00, 1.60], "D": [0.70, 1.00, 0.90], "H": [0.72, 0.78, 0.75]},
-   "params": {"t": [0.03, 0.05, 0.04], "leg": [0.06, 0.09, 0.07]},
+   "keywords": [
+    "dining table",
+    "table"
+   ],
+   "dims": {
+    "W": [
+     1.2,
+     2.0,
+     1.6
+    ],
+    "D": [
+     0.7,
+     1.0,
+     0.9
+    ],
+    "H": [
+     0.72,
+     0.78,
+     0.75
+    ]
+   },
+   "params": {
+    "t": [
+     0.03,
+     0.05,
+     0.04
+    ],
+    "leg": [
+     0.06,
+     0.09,
+     0.07
+    ]
+   },
    "parts": [
-    {"name": "top", "shape": "cube", "size": ["W", "D", "t"], "at": ["0", "0", "H - t/2"]},
-    {"name": "leg{i}", "repeat": "corners", "shape": "cube", "size": ["leg", "leg", "H - t"], "at": ["SX*(W/2 - leg/2 - 0.04)", "SY*(D/2 - leg/2 - 0.04)", "(H - t)/2"]}
+    {
+     "name": "top",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "t"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H - t/2"
+     ]
+    },
+    {
+     "name": "leg{i}",
+     "repeat": "corners",
+     "shape": "cube",
+     "size": [
+      "leg",
+      "leg",
+      "H - t"
+     ],
+     "at": [
+      "SX*(W/2 - leg/2 - 0.04)",
+      "SY*(D/2 - leg/2 - 0.04)",
+      "(H - t)/2"
+     ]
+    }
    ]
   },
   "desk": {
-   "keywords": ["desk", "writing desk", "office desk"],
-   "dims": {"W": [1.10, 1.60, 1.30], "D": [0.55, 0.75, 0.65], "H": [0.72, 0.76, 0.74]},
-   "params": {"t": [0.025, 0.04, 0.03], "leg": [0.04, 0.07, 0.05]},
+   "keywords": [
+    "desk",
+    "writing desk",
+    "office desk"
+   ],
+   "dims": {
+    "W": [
+     1.1,
+     1.6,
+     1.3
+    ],
+    "D": [
+     0.55,
+     0.75,
+     0.65
+    ],
+    "H": [
+     0.72,
+     0.76,
+     0.74
+    ]
+   },
+   "params": {
+    "t": [
+     0.025,
+     0.04,
+     0.03
+    ],
+    "leg": [
+     0.04,
+     0.07,
+     0.05
+    ]
+   },
    "parts": [
-    {"name": "top", "shape": "cube", "size": ["W", "D", "t"], "at": ["0", "0", "H - t/2"]},
-    {"name": "leg{i}", "repeat": "corners", "shape": "cube", "size": ["leg", "leg", "H - t"], "at": ["SX*(W/2 - leg/2 - 0.03)", "SY*(D/2 - leg/2 - 0.03)", "(H - t)/2"]},
-    {"name": "modesty_panel", "shape": "cube", "size": ["W - 2*leg - 0.06", "0.02", "0.30"], "at": ["0", "-(D/2 - leg/2 - 0.03)", "H - t - 0.15"]}
+    {
+     "name": "top",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "t"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H - t/2"
+     ]
+    },
+    {
+     "name": "leg{i}",
+     "repeat": "corners",
+     "shape": "cube",
+     "size": [
+      "leg",
+      "leg",
+      "H - t"
+     ],
+     "at": [
+      "SX*(W/2 - leg/2 - 0.03)",
+      "SY*(D/2 - leg/2 - 0.03)",
+      "(H - t)/2"
+     ]
+    },
+    {
+     "name": "modesty_panel",
+     "shape": "cube",
+     "size": [
+      "W - 2*leg - 0.06",
+      "0.02",
+      "0.30"
+     ],
+     "at": [
+      "0",
+      "-(D/2 - leg/2 - 0.03)",
+      "H - t - 0.15"
+     ]
+    }
    ]
   },
   "coffee table": {
-   "keywords": ["coffee table", "side table"],
-   "dims": {"W": [0.80, 1.20, 1.00], "D": [0.45, 0.70, 0.55], "H": [0.38, 0.48, 0.42]},
-   "params": {"t": [0.03, 0.05, 0.04], "leg": [0.04, 0.07, 0.05]},
+   "keywords": [
+    "coffee table",
+    "side table"
+   ],
+   "dims": {
+    "W": [
+     0.8,
+     1.2,
+     1.0
+    ],
+    "D": [
+     0.45,
+     0.7,
+     0.55
+    ],
+    "H": [
+     0.38,
+     0.48,
+     0.42
+    ]
+   },
+   "params": {
+    "t": [
+     0.03,
+     0.05,
+     0.04
+    ],
+    "leg": [
+     0.04,
+     0.07,
+     0.05
+    ]
+   },
    "parts": [
-    {"name": "top", "shape": "cube", "size": ["W", "D", "t"], "at": ["0", "0", "H - t/2"]},
-    {"name": "leg{i}", "repeat": "corners", "shape": "cube", "size": ["leg", "leg", "H - t"], "at": ["SX*(W/2 - leg/2 - 0.03)", "SY*(D/2 - leg/2 - 0.03)", "(H - t)/2"]}
+    {
+     "name": "top",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "t"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H - t/2"
+     ]
+    },
+    {
+     "name": "leg{i}",
+     "repeat": "corners",
+     "shape": "cube",
+     "size": [
+      "leg",
+      "leg",
+      "H - t"
+     ],
+     "at": [
+      "SX*(W/2 - leg/2 - 0.03)",
+      "SY*(D/2 - leg/2 - 0.03)",
+      "(H - t)/2"
+     ]
+    }
    ]
   },
   "bookshelf": {
-   "keywords": ["bookshelf", "bookcase", "shelving unit", "shelf unit", "shelves"],
-   "dims": {"W": [0.70, 1.20, 0.90], "D": [0.25, 0.38, 0.30], "H": [1.20, 2.00, 1.80]},
-   "params": {"t": [0.018, 0.03, 0.022], "N": [2, 7, 4]},
+   "keywords": [
+    "bookshelf",
+    "bookcase",
+    "shelving unit",
+    "shelf unit",
+    "shelves"
+   ],
+   "dims": {
+    "W": [
+     0.7,
+     1.2,
+     0.9
+    ],
+    "D": [
+     0.25,
+     0.38,
+     0.3
+    ],
+    "H": [
+     1.2,
+     2.0,
+     1.8
+    ]
+   },
+   "params": {
+    "t": [
+     0.018,
+     0.03,
+     0.022
+    ],
+    "N": [
+     2,
+     7,
+     4
+    ]
+   },
    "parts": [
-    {"name": "side{i}", "repeat": "sides", "shape": "cube", "size": ["t", "D", "H"], "at": ["SX*(W/2 - t/2)", "0", "H/2"]},
-    {"name": "shelf{i}", "repeat": "levels", "count": "N + 1", "shape": "cube", "size": ["W - 2*t", "D - 0.012", "t"], "at": ["0", "0.006", "0.06 + t/2 + K*(H - 0.06 - t)/N"]},
-    {"name": "back_panel", "shape": "cube", "size": ["W - 0.004", "0.008", "H - 0.04"], "at": ["0", "-(D/2 - 0.004)", "H/2 + 0.01"]}
+    {
+     "name": "side{i}",
+     "repeat": "sides",
+     "shape": "cube",
+     "size": [
+      "t",
+      "D",
+      "H"
+     ],
+     "at": [
+      "SX*(W/2 - t/2)",
+      "0",
+      "H/2"
+     ]
+    },
+    {
+     "name": "shelf{i}",
+     "repeat": "levels",
+     "count": "N + 1",
+     "shape": "cube",
+     "size": [
+      "W - 2*t",
+      "D - 0.012",
+      "t"
+     ],
+     "at": [
+      "0",
+      "0.006",
+      "0.06 + t/2 + K*(H - 0.06 - t)/N"
+     ]
+    },
+    {
+     "name": "back_panel",
+     "shape": "cube",
+     "size": [
+      "W - 0.004",
+      "0.008",
+      "H - 0.04"
+     ],
+     "at": [
+      "0",
+      "-(D/2 - 0.004)",
+      "H/2 + 0.01"
+     ]
+    }
    ]
   },
   "bed": {
-   "keywords": ["bed"],
-   "dims": {"W": [0.90, 1.60, 1.40], "D": [1.90, 2.10, 2.00], "H": [0.45, 0.60, 0.50]},
-   "params": {"leg": [0.05, 0.08, 0.06], "t": [0.18, 0.25, 0.20], "head_h": [0.75, 1.10, 0.95]},
+   "keywords": [
+    "bed"
+   ],
+   "dims": {
+    "W": [
+     0.9,
+     1.6,
+     1.4
+    ],
+    "D": [
+     1.9,
+     2.1,
+     2.0
+    ],
+    "H": [
+     0.45,
+     0.6,
+     0.5
+    ]
+   },
+   "params": {
+    "leg": [
+     0.05,
+     0.08,
+     0.06
+    ],
+    "t": [
+     0.18,
+     0.25,
+     0.2
+    ],
+    "head_h": [
+     0.75,
+     1.1,
+     0.95
+    ]
+   },
    "parts": [
-    {"name": "frame", "shape": "cube", "size": ["W", "D", "0.06"], "at": ["0", "0", "H - t - 0.03"]},
-    {"name": "mattress", "shape": "cube", "size": ["W - 0.06", "D - 0.10", "t"], "at": ["0", "0.02", "H - t/2"]},
-    {"name": "leg{i}", "repeat": "corners", "shape": "cube", "size": ["leg", "leg", "H - t - 0.06"], "at": ["SX*(W/2 - leg/2)", "SY*(D/2 - leg/2)", "(H - t - 0.06)/2"]},
-    {"name": "headboard", "shape": "cube", "size": ["W - 2*leg", "0.05", "head_h"], "at": ["0", "-(D/2 - 0.025)", "head_h/2"]}
+    {
+     "name": "frame",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "0.06"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H - t - 0.03"
+     ]
+    },
+    {
+     "name": "mattress",
+     "shape": "cube",
+     "size": [
+      "W - 0.06",
+      "D - 0.10",
+      "t"
+     ],
+     "at": [
+      "0",
+      "0.02",
+      "H - t/2"
+     ]
+    },
+    {
+     "name": "leg{i}",
+     "repeat": "corners",
+     "shape": "cube",
+     "size": [
+      "leg",
+      "leg",
+      "H - t - 0.06"
+     ],
+     "at": [
+      "SX*(W/2 - leg/2)",
+      "SY*(D/2 - leg/2)",
+      "(H - t - 0.06)/2"
+     ]
+    },
+    {
+     "name": "headboard",
+     "shape": "cube",
+     "size": [
+      "W - 2*leg",
+      "0.05",
+      "head_h"
+     ],
+     "at": [
+      "0",
+      "-(D/2 - 0.025)",
+      "head_h/2"
+     ]
+    }
    ]
   },
   "cabinet": {
-   "keywords": ["cabinet", "cupboard", "sideboard", "dresser"],
-   "dims": {"W": [0.60, 1.40, 0.90], "D": [0.35, 0.55, 0.45], "H": [0.70, 1.00, 0.85]},
-   "params": {"t": [0.018, 0.03, 0.02], "leg": [0.04, 0.06, 0.05], "foot": [0.08, 0.12, 0.10]},
+   "keywords": [
+    "cabinet",
+    "cupboard",
+    "sideboard",
+    "dresser"
+   ],
+   "dims": {
+    "W": [
+     0.6,
+     1.4,
+     0.9
+    ],
+    "D": [
+     0.35,
+     0.55,
+     0.45
+    ],
+    "H": [
+     0.7,
+     1.0,
+     0.85
+    ]
+   },
+   "params": {
+    "t": [
+     0.018,
+     0.03,
+     0.02
+    ],
+    "leg": [
+     0.04,
+     0.06,
+     0.05
+    ],
+    "foot": [
+     0.08,
+     0.12,
+     0.1
+    ]
+   },
    "parts": [
-    {"name": "side{i}", "repeat": "sides", "shape": "cube", "size": ["t", "D", "H - foot"], "at": ["SX*(W/2 - t/2)", "0", "foot + (H - foot)/2"]},
-    {"name": "top", "shape": "cube", "size": ["W", "D", "t"], "at": ["0", "0", "H - t/2"]},
-    {"name": "bottom", "shape": "cube", "size": ["W - 2*t", "D", "t"], "at": ["0", "0", "foot + t/2"]},
-    {"name": "back_panel", "shape": "cube", "size": ["W - 2*t", "0.008", "H - foot - t"], "at": ["0", "-(D/2 - 0.004)", "foot + (H - foot)/2"]},
-    {"name": "door{i}", "repeat": "sides", "shape": "cube", "size": ["(W - 2*t)/2 - 0.004", "0.018", "H - foot - 2*t"], "at": ["SX*((W - 2*t)/4)", "D/2 - 0.009", "foot + (H - foot)/2"]},
-    {"name": "foot{i}", "repeat": "corners", "shape": "cube", "size": ["leg", "leg", "foot"], "at": ["SX*(W/2 - leg/2 - 0.02)", "SY*(D/2 - leg/2 - 0.02)", "foot/2"]}
+    {
+     "name": "side{i}",
+     "repeat": "sides",
+     "shape": "cube",
+     "size": [
+      "t",
+      "D",
+      "H - foot"
+     ],
+     "at": [
+      "SX*(W/2 - t/2)",
+      "0",
+      "foot + (H - foot)/2"
+     ]
+    },
+    {
+     "name": "top",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "t"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H - t/2"
+     ]
+    },
+    {
+     "name": "bottom",
+     "shape": "cube",
+     "size": [
+      "W - 2*t",
+      "D",
+      "t"
+     ],
+     "at": [
+      "0",
+      "0",
+      "foot + t/2"
+     ]
+    },
+    {
+     "name": "back_panel",
+     "shape": "cube",
+     "size": [
+      "W - 2*t",
+      "0.008",
+      "H - foot - t"
+     ],
+     "at": [
+      "0",
+      "-(D/2 - 0.004)",
+      "foot + (H - foot)/2"
+     ]
+    },
+    {
+     "name": "door{i}",
+     "repeat": "sides",
+     "shape": "cube",
+     "size": [
+      "(W - 2*t)/2 - 0.004",
+      "0.018",
+      "H - foot - 2*t"
+     ],
+     "at": [
+      "SX*((W - 2*t)/4)",
+      "D/2 - 0.009",
+      "foot + (H - foot)/2"
+     ]
+    },
+    {
+     "name": "foot{i}",
+     "repeat": "corners",
+     "shape": "cube",
+     "size": [
+      "leg",
+      "leg",
+      "foot"
+     ],
+     "at": [
+      "SX*(W/2 - leg/2 - 0.02)",
+      "SY*(D/2 - leg/2 - 0.02)",
+      "foot/2"
+     ]
+    }
    ]
   },
   "bench": {
-   "keywords": ["bench"],
-   "dims": {"W": [0.90, 1.80, 1.20], "D": [0.30, 0.45, 0.38], "H": [0.42, 0.50, 0.46]},
-   "params": {"t": [0.035, 0.05, 0.04], "leg": [0.05, 0.08, 0.06]},
+   "keywords": [
+    "bench"
+   ],
+   "dims": {
+    "W": [
+     0.9,
+     1.8,
+     1.2
+    ],
+    "D": [
+     0.3,
+     0.45,
+     0.38
+    ],
+    "H": [
+     0.42,
+     0.5,
+     0.46
+    ]
+   },
+   "params": {
+    "t": [
+     0.035,
+     0.05,
+     0.04
+    ],
+    "leg": [
+     0.05,
+     0.08,
+     0.06
+    ]
+   },
    "parts": [
-    {"name": "seat", "shape": "cube", "size": ["W", "D", "t"], "at": ["0", "0", "H - t/2"]},
-    {"name": "leg{i}", "repeat": "corners", "shape": "cube", "size": ["leg", "leg", "H - t"], "at": ["SX*(W/2 - leg/2 - 0.05)", "SY*(D/2 - leg/2 - 0.03)", "(H - t)/2"]}
+    {
+     "name": "seat",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "t"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H - t/2"
+     ]
+    },
+    {
+     "name": "leg{i}",
+     "repeat": "corners",
+     "shape": "cube",
+     "size": [
+      "leg",
+      "leg",
+      "H - t"
+     ],
+     "at": [
+      "SX*(W/2 - leg/2 - 0.05)",
+      "SY*(D/2 - leg/2 - 0.03)",
+      "(H - t)/2"
+     ]
+    }
    ]
   },
   "desk lamp": {
-   "keywords": ["desk lamp", "table lamp", "lamp"],
-   "dims": {"W": [0.14, 0.24, 0.18], "D": [0.14, 0.24, 0.18], "H": [0.35, 0.55, 0.45]},
-   "params": {"base_t": [0.015, 0.025, 0.02], "pole": [0.012, 0.02, 0.015], "shade_h": [0.10, 0.16, 0.13]},
+   "keywords": [
+    "desk lamp",
+    "table lamp",
+    "lamp"
+   ],
+   "dims": {
+    "W": [
+     0.14,
+     0.24,
+     0.18
+    ],
+    "D": [
+     0.14,
+     0.24,
+     0.18
+    ],
+    "H": [
+     0.35,
+     0.55,
+     0.45
+    ]
+   },
+   "params": {
+    "base_t": [
+     0.015,
+     0.025,
+     0.02
+    ],
+    "pole": [
+     0.012,
+     0.02,
+     0.015
+    ],
+    "shade_h": [
+     0.1,
+     0.16,
+     0.13
+    ]
+   },
    "parts": [
-    {"name": "base", "shape": "cylinder", "size": ["W", "D", "base_t"], "at": ["0", "0", "base_t/2"], "color": [0.35, 0.35, 0.38]},
-    {"name": "pole", "shape": "cylinder", "size": ["pole", "pole", "H - base_t - shade_h*0.6"], "at": ["0", "0", "base_t + (H - base_t - shade_h*0.6)/2"], "color": [0.35, 0.35, 0.38]},
-    {"name": "shade", "shape": "cone", "size": ["W*1.1", "D*1.1", "shade_h"], "at": ["0", "0", "H - shade_h/2"], "color": [0.9, 0.85, 0.6]}
+    {
+     "name": "base",
+     "shape": "cylinder",
+     "size": [
+      "W",
+      "D",
+      "base_t"
+     ],
+     "at": [
+      "0",
+      "0",
+      "base_t/2"
+     ],
+     "color": [
+      0.35,
+      0.35,
+      0.38
+     ]
+    },
+    {
+     "name": "pole",
+     "shape": "cylinder",
+     "size": [
+      "pole",
+      "pole",
+      "H - base_t - shade_h*0.6"
+     ],
+     "at": [
+      "0",
+      "0",
+      "base_t + (H - base_t - shade_h*0.6)/2"
+     ],
+     "color": [
+      0.35,
+      0.35,
+      0.38
+     ]
+    },
+    {
+     "name": "shade",
+     "shape": "cone",
+     "size": [
+      "W*1.1",
+      "D*1.1",
+      "shade_h"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H - shade_h/2"
+     ],
+     "color": [
+      0.9,
+      0.85,
+      0.6
+     ]
+    }
    ]
   },
   "floor lamp": {
-   "keywords": ["floor lamp", "standing lamp"],
-   "dims": {"W": [0.25, 0.40, 0.30], "D": [0.25, 0.40, 0.30], "H": [1.40, 1.70, 1.55]},
-   "params": {"base_t": [0.02, 0.03, 0.025], "pole": [0.02, 0.03, 0.025], "shade_h": [0.22, 0.32, 0.27]},
+   "keywords": [
+    "floor lamp",
+    "standing lamp"
+   ],
+   "dims": {
+    "W": [
+     0.25,
+     0.4,
+     0.3
+    ],
+    "D": [
+     0.25,
+     0.4,
+     0.3
+    ],
+    "H": [
+     1.4,
+     1.7,
+     1.55
+    ]
+   },
+   "params": {
+    "base_t": [
+     0.02,
+     0.03,
+     0.025
+    ],
+    "pole": [
+     0.02,
+     0.03,
+     0.025
+    ],
+    "shade_h": [
+     0.22,
+     0.32,
+     0.27
+    ]
+   },
    "parts": [
-    {"name": "base", "shape": "cylinder", "size": ["W", "D", "base_t"], "at": ["0", "0", "base_t/2"], "color": [0.35, 0.35, 0.38]},
-    {"name": "pole", "shape": "cylinder", "size": ["pole", "pole", "H - base_t - shade_h*0.6"], "at": ["0", "0", "base_t + (H - base_t - shade_h*0.6)/2"], "color": [0.35, 0.35, 0.38]},
-    {"name": "shade", "shape": "cone", "size": ["W*1.1", "D*1.1", "shade_h"], "at": ["0", "0", "H - shade_h/2"], "color": [0.9, 0.85, 0.6]}
+    {
+     "name": "base",
+     "shape": "cylinder",
+     "size": [
+      "W",
+      "D",
+      "base_t"
+     ],
+     "at": [
+      "0",
+      "0",
+      "base_t/2"
+     ],
+     "color": [
+      0.35,
+      0.35,
+      0.38
+     ]
+    },
+    {
+     "name": "pole",
+     "shape": "cylinder",
+     "size": [
+      "pole",
+      "pole",
+      "H - base_t - shade_h*0.6"
+     ],
+     "at": [
+      "0",
+      "0",
+      "base_t + (H - base_t - shade_h*0.6)/2"
+     ],
+     "color": [
+      0.35,
+      0.35,
+      0.38
+     ]
+    },
+    {
+     "name": "shade",
+     "shape": "cone",
+     "size": [
+      "W*1.1",
+      "D*1.1",
+      "shade_h"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H - shade_h/2"
+     ],
+     "color": [
+      0.9,
+      0.85,
+      0.6
+     ]
+    }
    ]
+  },
+  "minecraft terrain": {
+   "keywords": [
+    "minecraft terrain",
+    "minecraft ground"
+   ],
+   "dims": {
+    "W": [
+     4,
+     48,
+     48
+    ],
+    "D": [
+     4,
+     48,
+     48
+    ],
+    "H": [
+     3,
+     60,
+     26
+    ]
+   },
+   "params": {
+    "g": [
+     14,
+     14,
+     14
+    ]
+   },
+   "parts": [
+    {
+     "name": "stone_layer",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "8"
+     ],
+     "at": [
+      "0",
+      "0",
+      "g + (-10)"
+     ],
+     "color": [
+      0.5,
+      0.5,
+      0.52
+     ]
+    },
+    {
+     "name": "dirt_left",
+     "shape": "cube",
+     "size": [
+      "W*0.38",
+      "D",
+      "4"
+     ],
+     "at": [
+      "-W*0.31",
+      "0",
+      "g + (-4)"
+     ],
+     "color": [
+      0.45,
+      0.31,
+      0.19
+     ]
+    },
+    {
+     "name": "dirt_right",
+     "shape": "cube",
+     "size": [
+      "W*0.5",
+      "D",
+      "4"
+     ],
+     "at": [
+      "W*0.25",
+      "0",
+      "g + (-4)"
+     ],
+     "color": [
+      0.45,
+      0.31,
+      0.19
+     ]
+    },
+    {
+     "name": "river_bed",
+     "shape": "cube",
+     "size": [
+      "W*0.12",
+      "D",
+      "4"
+     ],
+     "at": [
+      "-W*0.06",
+      "0",
+      "g + (-4)"
+     ],
+     "color": [
+      0.76,
+      0.7,
+      0.5
+     ]
+    },
+    {
+     "name": "grass_left",
+     "shape": "cube",
+     "size": [
+      "W*0.38",
+      "D",
+      "2"
+     ],
+     "at": [
+      "-W*0.31",
+      "0",
+      "g + (-1)"
+     ],
+     "color": [
+      0.36,
+      0.65,
+      0.22
+     ]
+    },
+    {
+     "name": "grass_right",
+     "shape": "cube",
+     "size": [
+      "W*0.5",
+      "D",
+      "2"
+     ],
+     "at": [
+      "W*0.25",
+      "0",
+      "g + (-1)"
+     ],
+     "color": [
+      0.36,
+      0.65,
+      0.22
+     ]
+    },
+    {
+     "name": "water",
+     "shape": "cube",
+     "size": [
+      "W*0.12",
+      "D",
+      "1.6"
+     ],
+     "at": [
+      "-W*0.06",
+      "0",
+      "g + (-1.2)"
+     ],
+     "color": [
+      0.2,
+      0.4,
+      0.9
+     ]
+    },
+    {
+     "name": "dark_patch{i}",
+     "repeat": "corners",
+     "shape": "cube",
+     "size": [
+      "W*0.07",
+      "D*0.07",
+      "0.12"
+     ],
+     "at": [
+      "SX*W*0.33",
+      "SY*D*0.27",
+      "g + (0.06)"
+     ],
+     "color": [
+      0.3,
+      0.58,
+      0.18
+     ]
+    },
+    {
+     "name": "light_patch{i}",
+     "repeat": "corners",
+     "shape": "cube",
+     "size": [
+      "W*0.06",
+      "D*0.06",
+      "0.12"
+     ],
+     "at": [
+      "SX*W*0.2",
+      "SY*D*0.1",
+      "g + (0.06)"
+     ],
+     "color": [
+      0.46,
+      0.73,
+      0.3
+     ]
+    },
+    {
+     "name": "bridge_deck",
+     "shape": "cube",
+     "size": [
+      "W*0.2",
+      "3",
+      "0.5"
+     ],
+     "at": [
+      "-W*0.06",
+      "-D*0.1",
+      "g + (0.25)"
+     ],
+     "color": [
+      0.55,
+      0.38,
+      0.2
+     ]
+    },
+    {
+     "name": "bridge_rail_a",
+     "shape": "cube",
+     "size": [
+      "W*0.2",
+      "0.3",
+      "1"
+     ],
+     "at": [
+      "-W*0.06",
+      "-D*0.1 - 1.3",
+      "g + (1)"
+     ],
+     "color": [
+      0.4,
+      0.27,
+      0.13
+     ]
+    },
+    {
+     "name": "bridge_rail_b",
+     "shape": "cube",
+     "size": [
+      "W*0.2",
+      "0.3",
+      "1"
+     ],
+     "at": [
+      "-W*0.06",
+      "-D*0.1 + 1.3",
+      "g + (1)"
+     ],
+     "color": [
+      0.4,
+      0.27,
+      0.13
+     ]
+    },
+    {
+     "name": "hill_a{i}",
+     "repeat": "levels",
+     "count": "3",
+     "shape": "cube",
+     "size": [
+      "W*0.22*(1 - K*0.25)",
+      "D*0.22*(1 - K*0.25)",
+      "3"
+     ],
+     "at": [
+      "-W*0.3",
+      "-D*0.28",
+      "g + (1.5 + 3*K)"
+     ],
+     "color": [
+      0.33,
+      0.62,
+      0.2
+     ]
+    },
+    {
+     "name": "hill_b{i}",
+     "repeat": "levels",
+     "count": "2",
+     "shape": "cube",
+     "size": [
+      "W*0.12*(1 - K*0.3)",
+      "D*0.12*(1 - K*0.3)",
+      "2"
+     ],
+     "at": [
+      "-W*0.22",
+      "D*0.12",
+      "g + (1 + 2*K)"
+     ],
+     "color": [
+      0.33,
+      0.62,
+      0.2
+     ]
+    },
+    {
+     "name": "path_a",
+     "shape": "cube",
+     "size": [
+      "2.4",
+      "D*0.12",
+      "0.12"
+     ],
+     "at": [
+      "W*0.3",
+      "-D*0.28 - 5 - D*0.06",
+      "g + (0.06)"
+     ],
+     "color": [
+      0.58,
+      0.58,
+      0.6
+     ]
+    },
+    {
+     "name": "flower_a",
+     "shape": "cube",
+     "size": [
+      "0.5",
+      "0.5",
+      "0.9"
+     ],
+     "at": [
+      "-W*0.36",
+      "-D*0.12",
+      "g + (0.45)"
+     ],
+     "color": [
+      0.9,
+      0.15,
+      0.15
+     ]
+    },
+    {
+     "name": "flower_b",
+     "shape": "cube",
+     "size": [
+      "0.5",
+      "0.5",
+      "0.9"
+     ],
+     "at": [
+      "-W*0.33",
+      "-D*0.14",
+      "g + (0.45)"
+     ],
+     "color": [
+      0.95,
+      0.85,
+      0.1
+     ]
+    },
+    {
+     "name": "flower_c",
+     "shape": "cube",
+     "size": [
+      "0.5",
+      "0.5",
+      "0.9"
+     ],
+     "at": [
+      "-W*0.3",
+      "D*0.02",
+      "g + (0.45)"
+     ],
+     "color": [
+      0.9,
+      0.4,
+      0.7
+     ]
+    }
+   ],
+   "scene": true
+  },
+  "minecraft mountain": {
+   "keywords": [
+    "minecraft mountain"
+   ],
+   "dims": {
+    "W": [
+     4,
+     48,
+     48
+    ],
+    "D": [
+     4,
+     48,
+     48
+    ],
+    "H": [
+     3,
+     60,
+     26
+    ]
+   },
+   "params": {
+    "g": [
+     14,
+     14,
+     14
+    ]
+   },
+   "parts": [
+    {
+     "name": "mountain_found",
+     "shape": "cube",
+     "size": [
+      "W*0.26",
+      "D*0.26",
+      "g"
+     ],
+     "at": [
+      "W*0.3",
+      "D*0.3",
+      "g/2"
+     ],
+     "color": [
+      0.5,
+      0.5,
+      0.52
+     ]
+    },
+    {
+     "name": "mountain_rock{i}",
+     "repeat": "levels",
+     "count": "6",
+     "shape": "cube",
+     "size": [
+      "W*0.26*(1 - K*0.13)",
+      "D*0.26*(1 - K*0.13)",
+      "3"
+     ],
+     "at": [
+      "W*0.3",
+      "D*0.3",
+      "g + (1.5 + 3*K)"
+     ],
+     "color": [
+      0.52,
+      0.52,
+      0.54
+     ]
+    },
+    {
+     "name": "mountain_snow{i}",
+     "repeat": "levels",
+     "count": "2",
+     "shape": "cube",
+     "size": [
+      "W*0.26*(1 - (K + 6)*0.13)",
+      "D*0.26*(1 - (K + 6)*0.13)",
+      "3"
+     ],
+     "at": [
+      "W*0.3",
+      "D*0.3",
+      "g + (1.5 + 3*(K + 6))"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    }
+   ],
+   "scene": true
+  },
+  "minecraft west forest": {
+   "keywords": [
+    "minecraft west forest"
+   ],
+   "dims": {
+    "W": [
+     4,
+     48,
+     48
+    ],
+    "D": [
+     4,
+     48,
+     48
+    ],
+    "H": [
+     3,
+     60,
+     26
+    ]
+   },
+   "params": {
+    "g": [
+     14,
+     14,
+     14
+    ]
+   },
+   "parts": [
+    {
+     "name": "tree1_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 7"
+     ],
+     "at": [
+      "-W*0.42",
+      "D*0.3",
+      "(g + 7)/2"
+     ],
+     "color": [
+      0.4,
+      0.27,
+      0.13
+     ]
+    },
+    {
+     "name": "tree1_leaf_a",
+     "shape": "cube",
+     "size": [
+      "6",
+      "6",
+      "2"
+     ],
+     "at": [
+      "-W*0.42",
+      "D*0.3",
+      "g + (6.5)"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.15
+     ]
+    },
+    {
+     "name": "tree1_leaf_b",
+     "shape": "cube",
+     "size": [
+      "6",
+      "6",
+      "2"
+     ],
+     "at": [
+      "-W*0.42",
+      "D*0.3",
+      "g + (8.5)"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.15
+     ]
+    },
+    {
+     "name": "tree1_leaf_c",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "2"
+     ],
+     "at": [
+      "-W*0.42",
+      "D*0.3",
+      "g + (10.5)"
+     ],
+     "color": [
+      0.24,
+      0.56,
+      0.18
+     ]
+    },
+    {
+     "name": "tree1_leaf_d",
+     "shape": "cube",
+     "size": [
+      "2",
+      "2",
+      "1.5"
+     ],
+     "at": [
+      "-W*0.42",
+      "D*0.3",
+      "g + (12.25)"
+     ],
+     "color": [
+      0.24,
+      0.56,
+      0.18
+     ]
+    },
+    {
+     "name": "tree2_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 7"
+     ],
+     "at": [
+      "-W*0.3",
+      "D*0.4",
+      "(g + 7)/2"
+     ],
+     "color": [
+      0.4,
+      0.27,
+      0.13
+     ]
+    },
+    {
+     "name": "tree2_leaf_a",
+     "shape": "cube",
+     "size": [
+      "6",
+      "6",
+      "2"
+     ],
+     "at": [
+      "-W*0.3",
+      "D*0.4",
+      "g + (6.5)"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.15
+     ]
+    },
+    {
+     "name": "tree2_leaf_b",
+     "shape": "cube",
+     "size": [
+      "6",
+      "6",
+      "2"
+     ],
+     "at": [
+      "-W*0.3",
+      "D*0.4",
+      "g + (8.5)"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.15
+     ]
+    },
+    {
+     "name": "tree2_leaf_c",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "2"
+     ],
+     "at": [
+      "-W*0.3",
+      "D*0.4",
+      "g + (10.5)"
+     ],
+     "color": [
+      0.24,
+      0.56,
+      0.18
+     ]
+    },
+    {
+     "name": "tree2_leaf_d",
+     "shape": "cube",
+     "size": [
+      "2",
+      "2",
+      "1.5"
+     ],
+     "at": [
+      "-W*0.3",
+      "D*0.4",
+      "g + (12.25)"
+     ],
+     "color": [
+      0.24,
+      0.56,
+      0.18
+     ]
+    },
+    {
+     "name": "tree3_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 7"
+     ],
+     "at": [
+      "-W*0.2",
+      "D*0.3",
+      "(g + 7)/2"
+     ],
+     "color": [
+      0.4,
+      0.27,
+      0.13
+     ]
+    },
+    {
+     "name": "tree3_leaf_a",
+     "shape": "cube",
+     "size": [
+      "6",
+      "6",
+      "2"
+     ],
+     "at": [
+      "-W*0.2",
+      "D*0.3",
+      "g + (6.5)"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.15
+     ]
+    },
+    {
+     "name": "tree3_leaf_b",
+     "shape": "cube",
+     "size": [
+      "6",
+      "6",
+      "2"
+     ],
+     "at": [
+      "-W*0.2",
+      "D*0.3",
+      "g + (8.5)"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.15
+     ]
+    },
+    {
+     "name": "tree3_leaf_c",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "2"
+     ],
+     "at": [
+      "-W*0.2",
+      "D*0.3",
+      "g + (10.5)"
+     ],
+     "color": [
+      0.24,
+      0.56,
+      0.18
+     ]
+    },
+    {
+     "name": "tree3_leaf_d",
+     "shape": "cube",
+     "size": [
+      "2",
+      "2",
+      "1.5"
+     ],
+     "at": [
+      "-W*0.2",
+      "D*0.3",
+      "g + (12.25)"
+     ],
+     "color": [
+      0.24,
+      0.56,
+      0.18
+     ]
+    },
+    {
+     "name": "tree4_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 7"
+     ],
+     "at": [
+      "-W*0.4",
+      "-D*0.05",
+      "(g + 7)/2"
+     ],
+     "color": [
+      0.4,
+      0.27,
+      0.13
+     ]
+    },
+    {
+     "name": "tree4_leaf_a",
+     "shape": "cube",
+     "size": [
+      "6",
+      "6",
+      "2"
+     ],
+     "at": [
+      "-W*0.4",
+      "-D*0.05",
+      "g + (6.5)"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.15
+     ]
+    },
+    {
+     "name": "tree4_leaf_b",
+     "shape": "cube",
+     "size": [
+      "6",
+      "6",
+      "2"
+     ],
+     "at": [
+      "-W*0.4",
+      "-D*0.05",
+      "g + (8.5)"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.15
+     ]
+    },
+    {
+     "name": "tree4_leaf_c",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "2"
+     ],
+     "at": [
+      "-W*0.4",
+      "-D*0.05",
+      "g + (10.5)"
+     ],
+     "color": [
+      0.24,
+      0.56,
+      0.18
+     ]
+    },
+    {
+     "name": "tree4_leaf_d",
+     "shape": "cube",
+     "size": [
+      "2",
+      "2",
+      "1.5"
+     ],
+     "at": [
+      "-W*0.4",
+      "-D*0.05",
+      "g + (12.25)"
+     ],
+     "color": [
+      0.24,
+      0.56,
+      0.18
+     ]
+    }
+   ],
+   "scene": true
+  },
+  "minecraft east forest": {
+   "keywords": [
+    "minecraft east forest"
+   ],
+   "dims": {
+    "W": [
+     4,
+     48,
+     48
+    ],
+    "D": [
+     4,
+     48,
+     48
+    ],
+    "H": [
+     3,
+     60,
+     26
+    ]
+   },
+   "params": {
+    "g": [
+     14,
+     14,
+     14
+    ]
+   },
+   "parts": [
+    {
+     "name": "tree5_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 7"
+     ],
+     "at": [
+      "W*0.08",
+      "D*0.42",
+      "(g + 7)/2"
+     ],
+     "color": [
+      0.4,
+      0.27,
+      0.13
+     ]
+    },
+    {
+     "name": "tree5_leaf_a",
+     "shape": "cube",
+     "size": [
+      "6",
+      "6",
+      "2"
+     ],
+     "at": [
+      "W*0.08",
+      "D*0.42",
+      "g + (6.5)"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.15
+     ]
+    },
+    {
+     "name": "tree5_leaf_b",
+     "shape": "cube",
+     "size": [
+      "6",
+      "6",
+      "2"
+     ],
+     "at": [
+      "W*0.08",
+      "D*0.42",
+      "g + (8.5)"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.15
+     ]
+    },
+    {
+     "name": "tree5_leaf_c",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "2"
+     ],
+     "at": [
+      "W*0.08",
+      "D*0.42",
+      "g + (10.5)"
+     ],
+     "color": [
+      0.24,
+      0.56,
+      0.18
+     ]
+    },
+    {
+     "name": "tree5_leaf_d",
+     "shape": "cube",
+     "size": [
+      "2",
+      "2",
+      "1.5"
+     ],
+     "at": [
+      "W*0.08",
+      "D*0.42",
+      "g + (12.25)"
+     ],
+     "color": [
+      0.24,
+      0.56,
+      0.18
+     ]
+    },
+    {
+     "name": "tree6_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 7"
+     ],
+     "at": [
+      "W*0.1",
+      "-D*0.05",
+      "(g + 7)/2"
+     ],
+     "color": [
+      0.4,
+      0.27,
+      0.13
+     ]
+    },
+    {
+     "name": "tree6_leaf_a",
+     "shape": "cube",
+     "size": [
+      "6",
+      "6",
+      "2"
+     ],
+     "at": [
+      "W*0.1",
+      "-D*0.05",
+      "g + (6.5)"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.15
+     ]
+    },
+    {
+     "name": "tree6_leaf_b",
+     "shape": "cube",
+     "size": [
+      "6",
+      "6",
+      "2"
+     ],
+     "at": [
+      "W*0.1",
+      "-D*0.05",
+      "g + (8.5)"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.15
+     ]
+    },
+    {
+     "name": "tree6_leaf_c",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "2"
+     ],
+     "at": [
+      "W*0.1",
+      "-D*0.05",
+      "g + (10.5)"
+     ],
+     "color": [
+      0.24,
+      0.56,
+      0.18
+     ]
+    },
+    {
+     "name": "tree6_leaf_d",
+     "shape": "cube",
+     "size": [
+      "2",
+      "2",
+      "1.5"
+     ],
+     "at": [
+      "W*0.1",
+      "-D*0.05",
+      "g + (12.25)"
+     ],
+     "color": [
+      0.24,
+      0.56,
+      0.18
+     ]
+    },
+    {
+     "name": "tree7_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 7"
+     ],
+     "at": [
+      "W*0.45",
+      "-D*0.05",
+      "(g + 7)/2"
+     ],
+     "color": [
+      0.4,
+      0.27,
+      0.13
+     ]
+    },
+    {
+     "name": "tree7_leaf_a",
+     "shape": "cube",
+     "size": [
+      "6",
+      "6",
+      "2"
+     ],
+     "at": [
+      "W*0.45",
+      "-D*0.05",
+      "g + (6.5)"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.15
+     ]
+    },
+    {
+     "name": "tree7_leaf_b",
+     "shape": "cube",
+     "size": [
+      "6",
+      "6",
+      "2"
+     ],
+     "at": [
+      "W*0.45",
+      "-D*0.05",
+      "g + (8.5)"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.15
+     ]
+    },
+    {
+     "name": "tree7_leaf_c",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "2"
+     ],
+     "at": [
+      "W*0.45",
+      "-D*0.05",
+      "g + (10.5)"
+     ],
+     "color": [
+      0.24,
+      0.56,
+      0.18
+     ]
+    },
+    {
+     "name": "tree7_leaf_d",
+     "shape": "cube",
+     "size": [
+      "2",
+      "2",
+      "1.5"
+     ],
+     "at": [
+      "W*0.45",
+      "-D*0.05",
+      "g + (12.25)"
+     ],
+     "color": [
+      0.24,
+      0.56,
+      0.18
+     ]
+    },
+    {
+     "name": "tree8_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 7"
+     ],
+     "at": [
+      "W*0.12",
+      "-D*0.4",
+      "(g + 7)/2"
+     ],
+     "color": [
+      0.4,
+      0.27,
+      0.13
+     ]
+    },
+    {
+     "name": "tree8_leaf_a",
+     "shape": "cube",
+     "size": [
+      "6",
+      "6",
+      "2"
+     ],
+     "at": [
+      "W*0.12",
+      "-D*0.4",
+      "g + (6.5)"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.15
+     ]
+    },
+    {
+     "name": "tree8_leaf_b",
+     "shape": "cube",
+     "size": [
+      "6",
+      "6",
+      "2"
+     ],
+     "at": [
+      "W*0.12",
+      "-D*0.4",
+      "g + (8.5)"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.15
+     ]
+    },
+    {
+     "name": "tree8_leaf_c",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "2"
+     ],
+     "at": [
+      "W*0.12",
+      "-D*0.4",
+      "g + (10.5)"
+     ],
+     "color": [
+      0.24,
+      0.56,
+      0.18
+     ]
+    },
+    {
+     "name": "tree8_leaf_d",
+     "shape": "cube",
+     "size": [
+      "2",
+      "2",
+      "1.5"
+     ],
+     "at": [
+      "W*0.12",
+      "-D*0.4",
+      "g + (12.25)"
+     ],
+     "color": [
+      0.24,
+      0.56,
+      0.18
+     ]
+    }
+   ],
+   "scene": true
+  },
+  "minecraft cabin": {
+   "keywords": [
+    "minecraft cabin"
+   ],
+   "dims": {
+    "W": [
+     4,
+     48,
+     48
+    ],
+    "D": [
+     4,
+     48,
+     48
+    ],
+    "H": [
+     3,
+     60,
+     26
+    ]
+   },
+   "params": {
+    "g": [
+     14,
+     14,
+     14
+    ]
+   },
+   "parts": [
+    {
+     "name": "cabin_found",
+     "shape": "cube",
+     "size": [
+      "14",
+      "10",
+      "g"
+     ],
+     "at": [
+      "W*0.3",
+      "-D*0.28",
+      "g/2"
+     ],
+     "color": [
+      0.45,
+      0.31,
+      0.19
+     ]
+    },
+    {
+     "name": "cabin_floor",
+     "shape": "cube",
+     "size": [
+      "14",
+      "10",
+      "0.4"
+     ],
+     "at": [
+      "W*0.3",
+      "-D*0.28",
+      "g + (0.2)"
+     ],
+     "color": [
+      0.62,
+      0.45,
+      0.3
+     ]
+    },
+    {
+     "name": "cabin_wall_front",
+     "shape": "cube",
+     "size": [
+      "14",
+      "0.4",
+      "6"
+     ],
+     "at": [
+      "W*0.3",
+      "-D*0.28 - 4.8",
+      "g + (3.4)"
+     ],
+     "color": [
+      0.72,
+      0.55,
+      0.33
+     ]
+    },
+    {
+     "name": "cabin_wall_back",
+     "shape": "cube",
+     "size": [
+      "14",
+      "0.4",
+      "6"
+     ],
+     "at": [
+      "W*0.3",
+      "-D*0.28 + 4.8",
+      "g + (3.4)"
+     ],
+     "color": [
+      0.72,
+      0.55,
+      0.33
+     ]
+    },
+    {
+     "name": "cabin_wall_left",
+     "shape": "cube",
+     "size": [
+      "0.4",
+      "10",
+      "6"
+     ],
+     "at": [
+      "W*0.3 - 6.8",
+      "-D*0.28",
+      "g + (3.4)"
+     ],
+     "color": [
+      0.72,
+      0.55,
+      0.33
+     ]
+    },
+    {
+     "name": "cabin_wall_right",
+     "shape": "cube",
+     "size": [
+      "0.4",
+      "10",
+      "6"
+     ],
+     "at": [
+      "W*0.3 + 6.8",
+      "-D*0.28",
+      "g + (3.4)"
+     ],
+     "color": [
+      0.72,
+      0.55,
+      0.33
+     ]
+    },
+    {
+     "name": "cabin_door",
+     "shape": "cube",
+     "size": [
+      "2",
+      "0.2",
+      "4"
+     ],
+     "at": [
+      "W*0.3",
+      "-D*0.28 - 5.05",
+      "g + (2.4)"
+     ],
+     "color": [
+      0.35,
+      0.22,
+      0.1
+     ]
+    },
+    {
+     "name": "cabin_window_a",
+     "shape": "cube",
+     "size": [
+      "2.4",
+      "0.2",
+      "2.4"
+     ],
+     "at": [
+      "W*0.3 - 4",
+      "-D*0.28 - 5.05",
+      "g + (3.8)"
+     ],
+     "color": [
+      0.6,
+      0.8,
+      0.95
+     ]
+    },
+    {
+     "name": "cabin_window_b",
+     "shape": "cube",
+     "size": [
+      "2.4",
+      "0.2",
+      "2.4"
+     ],
+     "at": [
+      "W*0.3 + 4",
+      "-D*0.28 - 5.05",
+      "g + (3.8)"
+     ],
+     "color": [
+      0.6,
+      0.8,
+      0.95
+     ]
+    },
+    {
+     "name": "cabin_roof{i}",
+     "repeat": "levels",
+     "count": "3",
+     "shape": "cube",
+     "size": [
+      "16 - 5*K",
+      "12",
+      "2.5"
+     ],
+     "at": [
+      "W*0.3",
+      "-D*0.28",
+      "g + (7.65 + 2.5*K)"
+     ],
+     "color": [
+      0.55,
+      0.2,
+      0.15
+     ]
+    },
+    {
+     "name": "cabin_chimney",
+     "shape": "cube",
+     "size": [
+      "1.6",
+      "1.6",
+      "3.2"
+     ],
+     "at": [
+      "W*0.3 + 7",
+      "-D*0.28 + 2",
+      "g + (10.5)"
+     ],
+     "color": [
+      0.5,
+      0.5,
+      0.52
+     ]
+    },
+    {
+     "name": "pumpkin",
+     "shape": "cube",
+     "size": [
+      "1.4",
+      "1.4",
+      "1.4"
+     ],
+     "at": [
+      "W*0.3 - 7.7",
+      "-D*0.28 - 3",
+      "g + (0.7)"
+     ],
+     "color": [
+      0.9,
+      0.5,
+      0.1
+     ]
+    }
+   ],
+   "scene": true
+  },
+  "minecraft desert": {
+   "keywords": [
+    "minecraft desert",
+    "minecraft desert tile"
+   ],
+   "dims": {
+    "W": [
+     4,
+     48,
+     48
+    ],
+    "D": [
+     4,
+     48,
+     48
+    ],
+    "H": [
+     3,
+     60,
+     26
+    ]
+   },
+   "params": {
+    "g": [
+     14,
+     14,
+     14
+    ]
+   },
+   "parts": [
+    {
+     "name": "stone_layer",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "8"
+     ],
+     "at": [
+      "W",
+      "0",
+      "g + (-10)"
+     ],
+     "color": [
+      0.5,
+      0.5,
+      0.52
+     ]
+    },
+    {
+     "name": "mid_layer",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "4"
+     ],
+     "at": [
+      "W",
+      "0",
+      "g + (-4)"
+     ],
+     "color": [
+      0.85,
+      0.75,
+      0.5
+     ]
+    },
+    {
+     "name": "top_layer",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "2"
+     ],
+     "at": [
+      "W",
+      "0",
+      "g + (-1)"
+     ],
+     "color": [
+      0.93,
+      0.85,
+      0.55
+     ]
+    },
+    {
+     "name": "dune_a{i}",
+     "shape": "cube",
+     "size": [
+      "W*0.3*(1 - K*0.3)",
+      "D*0.22*(1 - K*0.3)",
+      "2.5"
+     ],
+     "at": [
+      "W + W*0.18",
+      "-D*0.22",
+      "g + (1.25 + 2.5*K)"
+     ],
+     "color": [
+      0.93,
+      0.85,
+      0.55
+     ],
+     "repeat": "levels",
+     "count": "3"
+    },
+    {
+     "name": "dune_b{i}",
+     "shape": "cube",
+     "size": [
+      "W*0.22*(1 - K*0.35)",
+      "D*0.2*(1 - K*0.35)",
+      "2.5"
+     ],
+     "at": [
+      "W - W*0.2",
+      "-D*0.3",
+      "g + (1.25 + 2.5*K)"
+     ],
+     "color": [
+      0.93,
+      0.85,
+      0.55
+     ],
+     "repeat": "levels",
+     "count": "2"
+    },
+    {
+     "name": "oasis_water",
+     "shape": "cube",
+     "size": [
+      "W*0.16",
+      "D*0.12",
+      "0.15"
+     ],
+     "at": [
+      "W + W*0.25",
+      "D*0.28",
+      "g + 0.08"
+     ],
+     "color": [
+      0.2,
+      0.45,
+      0.9
+     ]
+    }
+   ],
+   "scene": true
+  },
+  "minecraft desert landmarks": {
+   "keywords": [
+    "minecraft desert landmarks",
+    "minecraft pyramid"
+   ],
+   "dims": {
+    "W": [
+     4,
+     48,
+     48
+    ],
+    "D": [
+     4,
+     48,
+     48
+    ],
+    "H": [
+     3,
+     60,
+     26
+    ]
+   },
+   "params": {
+    "g": [
+     14,
+     14,
+     14
+    ]
+   },
+   "parts": [
+    {
+     "name": "pyramid_found",
+     "shape": "cube",
+     "size": [
+      "W*0.28",
+      "D*0.28",
+      "g"
+     ],
+     "at": [
+      "W - W*0.15",
+      "D*0.15",
+      "g/2"
+     ],
+     "color": [
+      0.85,
+      0.75,
+      0.5
+     ]
+    },
+    {
+     "name": "pyramid{i}",
+     "shape": "cube",
+     "size": [
+      "W*0.28*(1 - K*0.11)",
+      "D*0.28*(1 - K*0.11)",
+      "3"
+     ],
+     "at": [
+      "W - W*0.15",
+      "D*0.15",
+      "g + (1.5 + 3*K)"
+     ],
+     "color": [
+      0.88,
+      0.78,
+      0.5
+     ],
+     "repeat": "levels",
+     "count": "8"
+    },
+    {
+     "name": "pyramid_door",
+     "shape": "cube",
+     "size": [
+      "2",
+      "0.3",
+      "3"
+     ],
+     "at": [
+      "W - W*0.15",
+      "D*0.15 - W*0.14",
+      "g + 1.5"
+     ],
+     "color": [
+      0.2,
+      0.15,
+      0.1
+     ]
+    },
+    {
+     "name": "cactus1_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 5"
+     ],
+     "at": [
+      "W + W*0.38",
+      "D*-0.05",
+      "(g + 5)/2"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.2
+     ]
+    },
+    {
+     "name": "cactus1_arm",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "1.8"
+     ],
+     "at": [
+      "W + W*0.38 + 1.2",
+      "D*-0.05",
+      "g + 3.4"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.2
+     ]
+    },
+    {
+     "name": "cactus2_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 5"
+     ],
+     "at": [
+      "W + W*0.1",
+      "D*0.3",
+      "(g + 5)/2"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.2
+     ]
+    },
+    {
+     "name": "cactus2_arm",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "1.8"
+     ],
+     "at": [
+      "W + W*0.1 + 1.2",
+      "D*0.3",
+      "g + 3.4"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.2
+     ]
+    },
+    {
+     "name": "cactus3_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 5"
+     ],
+     "at": [
+      "W + W*0.42",
+      "D*0.4",
+      "(g + 5)/2"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.2
+     ]
+    },
+    {
+     "name": "cactus3_arm",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "1.8"
+     ],
+     "at": [
+      "W + W*0.42 + 1.2",
+      "D*0.4",
+      "g + 3.4"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.2
+     ]
+    },
+    {
+     "name": "cactus4_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 5"
+     ],
+     "at": [
+      "W + W*0.15",
+      "D*-0.38",
+      "(g + 5)/2"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.2
+     ]
+    },
+    {
+     "name": "cactus4_arm",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "1.8"
+     ],
+     "at": [
+      "W + W*0.15 + 1.2",
+      "D*-0.38",
+      "g + 3.4"
+     ],
+     "color": [
+      0.2,
+      0.5,
+      0.2
+     ]
+    },
+    {
+     "name": "palm1_trunk",
+     "shape": "cube",
+     "size": [
+      "0.9",
+      "0.9",
+      "g + 6"
+     ],
+     "at": [
+      "W + W*0.2",
+      "D*0.3",
+      "(g + 6)/2"
+     ],
+     "color": [
+      0.5,
+      0.35,
+      0.2
+     ]
+    },
+    {
+     "name": "palm1_leaf",
+     "shape": "cube",
+     "size": [
+      "5",
+      "5",
+      "1"
+     ],
+     "at": [
+      "W + W*0.2",
+      "D*0.3",
+      "g + 6.5"
+     ],
+     "color": [
+      0.25,
+      0.55,
+      0.2
+     ]
+    },
+    {
+     "name": "palm2_trunk",
+     "shape": "cube",
+     "size": [
+      "0.9",
+      "0.9",
+      "g + 6"
+     ],
+     "at": [
+      "W + W*0.3",
+      "D*0.26",
+      "(g + 6)/2"
+     ],
+     "color": [
+      0.5,
+      0.35,
+      0.2
+     ]
+    },
+    {
+     "name": "palm2_leaf",
+     "shape": "cube",
+     "size": [
+      "5",
+      "5",
+      "1"
+     ],
+     "at": [
+      "W + W*0.3",
+      "D*0.26",
+      "g + 6.5"
+     ],
+     "color": [
+      0.25,
+      0.55,
+      0.2
+     ]
+    }
+   ],
+   "scene": true
+  },
+  "minecraft snow": {
+   "keywords": [
+    "minecraft snow",
+    "minecraft snow tile"
+   ],
+   "dims": {
+    "W": [
+     4,
+     48,
+     48
+    ],
+    "D": [
+     4,
+     48,
+     48
+    ],
+    "H": [
+     3,
+     60,
+     26
+    ]
+   },
+   "params": {
+    "g": [
+     14,
+     14,
+     14
+    ]
+   },
+   "parts": [
+    {
+     "name": "stone_layer",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "8"
+     ],
+     "at": [
+      "-W",
+      "0",
+      "g + (-10)"
+     ],
+     "color": [
+      0.5,
+      0.5,
+      0.52
+     ]
+    },
+    {
+     "name": "mid_layer",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "4"
+     ],
+     "at": [
+      "-W",
+      "0",
+      "g + (-4)"
+     ],
+     "color": [
+      0.45,
+      0.31,
+      0.19
+     ]
+    },
+    {
+     "name": "top_layer",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "2"
+     ],
+     "at": [
+      "-W",
+      "0",
+      "g + (-1)"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    },
+    {
+     "name": "ice_lake",
+     "shape": "cube",
+     "size": [
+      "W*0.26",
+      "D*0.2",
+      "0.2"
+     ],
+     "at": [
+      "-W - W*0.12",
+      "D*0.22",
+      "g + 0.1"
+     ],
+     "color": [
+      0.6,
+      0.85,
+      0.95
+     ]
+    },
+    {
+     "name": "snow_hill{i}",
+     "shape": "cube",
+     "size": [
+      "W*0.24*(1 - K*0.3)",
+      "D*0.2*(1 - K*0.3)",
+      "2.5"
+     ],
+     "at": [
+      "-W + W*0.2",
+      "-D*0.25",
+      "g + (1.25 + 2.5*K)"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ],
+     "repeat": "levels",
+     "count": "3"
+    },
+    {
+     "name": "igloo_found",
+     "shape": "cube",
+     "size": [
+      "8",
+      "8",
+      "g"
+     ],
+     "at": [
+      "-W + W*0.28",
+      "D*0.2",
+      "g/2"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    },
+    {
+     "name": "igloo_low",
+     "shape": "cube",
+     "size": [
+      "8",
+      "8",
+      "3"
+     ],
+     "at": [
+      "-W + W*0.28",
+      "D*0.2",
+      "g + 1.5"
+     ],
+     "color": [
+      0.92,
+      0.95,
+      1.0
+     ]
+    },
+    {
+     "name": "igloo_top",
+     "shape": "cube",
+     "size": [
+      "5",
+      "5",
+      "2"
+     ],
+     "at": [
+      "-W + W*0.28",
+      "D*0.2",
+      "g + 4"
+     ],
+     "color": [
+      0.92,
+      0.95,
+      1.0
+     ]
+    },
+    {
+     "name": "igloo_door",
+     "shape": "cube",
+     "size": [
+      "2",
+      "0.3",
+      "2.4"
+     ],
+     "at": [
+      "-W + W*0.28",
+      "D*0.2 - 4.1",
+      "g + 1.2"
+     ],
+     "color": [
+      0.2,
+      0.22,
+      0.3
+     ]
+    }
+   ],
+   "scene": true
+  },
+  "minecraft snow forest north": {
+   "keywords": [
+    "minecraft snow forest north"
+   ],
+   "dims": {
+    "W": [
+     4,
+     48,
+     48
+    ],
+    "D": [
+     4,
+     48,
+     48
+    ],
+    "H": [
+     3,
+     60,
+     26
+    ]
+   },
+   "params": {
+    "g": [
+     14,
+     14,
+     14
+    ]
+   },
+   "parts": [
+    {
+     "name": "spruce1_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 4.3"
+     ],
+     "at": [
+      "-W + W*0.08",
+      "D*0.38",
+      "(g + 4.3)/2"
+     ],
+     "color": [
+      0.35,
+      0.24,
+      0.12
+     ]
+    },
+    {
+     "name": "spruce1_a",
+     "shape": "cube",
+     "size": [
+      "7",
+      "7",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.08",
+      "D*0.38",
+      "g + 3.5"
+     ],
+     "color": [
+      0.1,
+      0.35,
+      0.2
+     ]
+    },
+    {
+     "name": "spruce1_b",
+     "shape": "cube",
+     "size": [
+      "5.5",
+      "5.5",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.08",
+      "D*0.38",
+      "g + 5.1"
+     ],
+     "color": [
+      0.1,
+      0.38,
+      0.22
+     ]
+    },
+    {
+     "name": "spruce1_c",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.08",
+      "D*0.38",
+      "g + 6.7"
+     ],
+     "color": [
+      0.12,
+      0.4,
+      0.24
+     ]
+    },
+    {
+     "name": "spruce1_d",
+     "shape": "cube",
+     "size": [
+      "2.5",
+      "2.5",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.08",
+      "D*0.38",
+      "g + 8.3"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    },
+    {
+     "name": "spruce1_e",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "1.4"
+     ],
+     "at": [
+      "-W + W*0.08",
+      "D*0.38",
+      "g + 9.8"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    },
+    {
+     "name": "spruce2_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 4.3"
+     ],
+     "at": [
+      "-W + W*0.2",
+      "D*0.34",
+      "(g + 4.3)/2"
+     ],
+     "color": [
+      0.35,
+      0.24,
+      0.12
+     ]
+    },
+    {
+     "name": "spruce2_a",
+     "shape": "cube",
+     "size": [
+      "7",
+      "7",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.2",
+      "D*0.34",
+      "g + 3.5"
+     ],
+     "color": [
+      0.1,
+      0.35,
+      0.2
+     ]
+    },
+    {
+     "name": "spruce2_b",
+     "shape": "cube",
+     "size": [
+      "5.5",
+      "5.5",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.2",
+      "D*0.34",
+      "g + 5.1"
+     ],
+     "color": [
+      0.1,
+      0.38,
+      0.22
+     ]
+    },
+    {
+     "name": "spruce2_c",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.2",
+      "D*0.34",
+      "g + 6.7"
+     ],
+     "color": [
+      0.12,
+      0.4,
+      0.24
+     ]
+    },
+    {
+     "name": "spruce2_d",
+     "shape": "cube",
+     "size": [
+      "2.5",
+      "2.5",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.2",
+      "D*0.34",
+      "g + 8.3"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    },
+    {
+     "name": "spruce2_e",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "1.4"
+     ],
+     "at": [
+      "-W + W*0.2",
+      "D*0.34",
+      "g + 9.8"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    },
+    {
+     "name": "spruce3_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 4.3"
+     ],
+     "at": [
+      "-W + W*0.38",
+      "D*0.4",
+      "(g + 4.3)/2"
+     ],
+     "color": [
+      0.35,
+      0.24,
+      0.12
+     ]
+    },
+    {
+     "name": "spruce3_a",
+     "shape": "cube",
+     "size": [
+      "7",
+      "7",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.38",
+      "D*0.4",
+      "g + 3.5"
+     ],
+     "color": [
+      0.1,
+      0.35,
+      0.2
+     ]
+    },
+    {
+     "name": "spruce3_b",
+     "shape": "cube",
+     "size": [
+      "5.5",
+      "5.5",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.38",
+      "D*0.4",
+      "g + 5.1"
+     ],
+     "color": [
+      0.1,
+      0.38,
+      0.22
+     ]
+    },
+    {
+     "name": "spruce3_c",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.38",
+      "D*0.4",
+      "g + 6.7"
+     ],
+     "color": [
+      0.12,
+      0.4,
+      0.24
+     ]
+    },
+    {
+     "name": "spruce3_d",
+     "shape": "cube",
+     "size": [
+      "2.5",
+      "2.5",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.38",
+      "D*0.4",
+      "g + 8.3"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    },
+    {
+     "name": "spruce3_e",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "1.4"
+     ],
+     "at": [
+      "-W + W*0.38",
+      "D*0.4",
+      "g + 9.8"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    },
+    {
+     "name": "spruce4_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 4.3"
+     ],
+     "at": [
+      "-W + W*0.45",
+      "D*0.1",
+      "(g + 4.3)/2"
+     ],
+     "color": [
+      0.35,
+      0.24,
+      0.12
+     ]
+    },
+    {
+     "name": "spruce4_a",
+     "shape": "cube",
+     "size": [
+      "7",
+      "7",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.45",
+      "D*0.1",
+      "g + 3.5"
+     ],
+     "color": [
+      0.1,
+      0.35,
+      0.2
+     ]
+    },
+    {
+     "name": "spruce4_b",
+     "shape": "cube",
+     "size": [
+      "5.5",
+      "5.5",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.45",
+      "D*0.1",
+      "g + 5.1"
+     ],
+     "color": [
+      0.1,
+      0.38,
+      0.22
+     ]
+    },
+    {
+     "name": "spruce4_c",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.45",
+      "D*0.1",
+      "g + 6.7"
+     ],
+     "color": [
+      0.12,
+      0.4,
+      0.24
+     ]
+    },
+    {
+     "name": "spruce4_d",
+     "shape": "cube",
+     "size": [
+      "2.5",
+      "2.5",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.45",
+      "D*0.1",
+      "g + 8.3"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    },
+    {
+     "name": "spruce4_e",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "1.4"
+     ],
+     "at": [
+      "-W + W*0.45",
+      "D*0.1",
+      "g + 9.8"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    }
+   ],
+   "scene": true
+  },
+  "minecraft snow forest south": {
+   "keywords": [
+    "minecraft snow forest south"
+   ],
+   "dims": {
+    "W": [
+     4,
+     48,
+     48
+    ],
+    "D": [
+     4,
+     48,
+     48
+    ],
+    "H": [
+     3,
+     60,
+     26
+    ]
+   },
+   "params": {
+    "g": [
+     14,
+     14,
+     14
+    ]
+   },
+   "parts": [
+    {
+     "name": "spruce5_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 4.3"
+     ],
+     "at": [
+      "-W + W*0.08",
+      "D*-0.4",
+      "(g + 4.3)/2"
+     ],
+     "color": [
+      0.35,
+      0.24,
+      0.12
+     ]
+    },
+    {
+     "name": "spruce5_a",
+     "shape": "cube",
+     "size": [
+      "7",
+      "7",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.08",
+      "D*-0.4",
+      "g + 3.5"
+     ],
+     "color": [
+      0.1,
+      0.35,
+      0.2
+     ]
+    },
+    {
+     "name": "spruce5_b",
+     "shape": "cube",
+     "size": [
+      "5.5",
+      "5.5",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.08",
+      "D*-0.4",
+      "g + 5.1"
+     ],
+     "color": [
+      0.1,
+      0.38,
+      0.22
+     ]
+    },
+    {
+     "name": "spruce5_c",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.08",
+      "D*-0.4",
+      "g + 6.7"
+     ],
+     "color": [
+      0.12,
+      0.4,
+      0.24
+     ]
+    },
+    {
+     "name": "spruce5_d",
+     "shape": "cube",
+     "size": [
+      "2.5",
+      "2.5",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.08",
+      "D*-0.4",
+      "g + 8.3"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    },
+    {
+     "name": "spruce5_e",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "1.4"
+     ],
+     "at": [
+      "-W + W*0.08",
+      "D*-0.4",
+      "g + 9.8"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    },
+    {
+     "name": "spruce6_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 4.3"
+     ],
+     "at": [
+      "-W + W*0.32",
+      "D*-0.42",
+      "(g + 4.3)/2"
+     ],
+     "color": [
+      0.35,
+      0.24,
+      0.12
+     ]
+    },
+    {
+     "name": "spruce6_a",
+     "shape": "cube",
+     "size": [
+      "7",
+      "7",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.32",
+      "D*-0.42",
+      "g + 3.5"
+     ],
+     "color": [
+      0.1,
+      0.35,
+      0.2
+     ]
+    },
+    {
+     "name": "spruce6_b",
+     "shape": "cube",
+     "size": [
+      "5.5",
+      "5.5",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.32",
+      "D*-0.42",
+      "g + 5.1"
+     ],
+     "color": [
+      0.1,
+      0.38,
+      0.22
+     ]
+    },
+    {
+     "name": "spruce6_c",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.32",
+      "D*-0.42",
+      "g + 6.7"
+     ],
+     "color": [
+      0.12,
+      0.4,
+      0.24
+     ]
+    },
+    {
+     "name": "spruce6_d",
+     "shape": "cube",
+     "size": [
+      "2.5",
+      "2.5",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.32",
+      "D*-0.42",
+      "g + 8.3"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    },
+    {
+     "name": "spruce6_e",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "1.4"
+     ],
+     "at": [
+      "-W + W*0.32",
+      "D*-0.42",
+      "g + 9.8"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    },
+    {
+     "name": "spruce7_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 4.3"
+     ],
+     "at": [
+      "-W + W*0.1",
+      "D*-0.1",
+      "(g + 4.3)/2"
+     ],
+     "color": [
+      0.35,
+      0.24,
+      0.12
+     ]
+    },
+    {
+     "name": "spruce7_a",
+     "shape": "cube",
+     "size": [
+      "7",
+      "7",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.1",
+      "D*-0.1",
+      "g + 3.5"
+     ],
+     "color": [
+      0.1,
+      0.35,
+      0.2
+     ]
+    },
+    {
+     "name": "spruce7_b",
+     "shape": "cube",
+     "size": [
+      "5.5",
+      "5.5",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.1",
+      "D*-0.1",
+      "g + 5.1"
+     ],
+     "color": [
+      0.1,
+      0.38,
+      0.22
+     ]
+    },
+    {
+     "name": "spruce7_c",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.1",
+      "D*-0.1",
+      "g + 6.7"
+     ],
+     "color": [
+      0.12,
+      0.4,
+      0.24
+     ]
+    },
+    {
+     "name": "spruce7_d",
+     "shape": "cube",
+     "size": [
+      "2.5",
+      "2.5",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.1",
+      "D*-0.1",
+      "g + 8.3"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    },
+    {
+     "name": "spruce7_e",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "1.4"
+     ],
+     "at": [
+      "-W + W*0.1",
+      "D*-0.1",
+      "g + 9.8"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    },
+    {
+     "name": "spruce8_trunk",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "g + 4.3"
+     ],
+     "at": [
+      "-W + W*0.44",
+      "D*-0.3",
+      "(g + 4.3)/2"
+     ],
+     "color": [
+      0.35,
+      0.24,
+      0.12
+     ]
+    },
+    {
+     "name": "spruce8_a",
+     "shape": "cube",
+     "size": [
+      "7",
+      "7",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.44",
+      "D*-0.3",
+      "g + 3.5"
+     ],
+     "color": [
+      0.1,
+      0.35,
+      0.2
+     ]
+    },
+    {
+     "name": "spruce8_b",
+     "shape": "cube",
+     "size": [
+      "5.5",
+      "5.5",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.44",
+      "D*-0.3",
+      "g + 5.1"
+     ],
+     "color": [
+      0.1,
+      0.38,
+      0.22
+     ]
+    },
+    {
+     "name": "spruce8_c",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.44",
+      "D*-0.3",
+      "g + 6.7"
+     ],
+     "color": [
+      0.12,
+      0.4,
+      0.24
+     ]
+    },
+    {
+     "name": "spruce8_d",
+     "shape": "cube",
+     "size": [
+      "2.5",
+      "2.5",
+      "1.6"
+     ],
+     "at": [
+      "-W + W*0.44",
+      "D*-0.3",
+      "g + 8.3"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    },
+    {
+     "name": "spruce8_e",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "1.2",
+      "1.4"
+     ],
+     "at": [
+      "-W + W*0.44",
+      "D*-0.3",
+      "g + 9.8"
+     ],
+     "color": [
+      0.95,
+      0.97,
+      1.0
+     ]
+    }
+   ],
+   "scene": true
+  },
+  "minecraft village": {
+   "keywords": [
+    "minecraft village",
+    "minecraft village tile"
+   ],
+   "dims": {
+    "W": [
+     4,
+     48,
+     48
+    ],
+    "D": [
+     4,
+     48,
+     48
+    ],
+    "H": [
+     3,
+     60,
+     26
+    ]
+   },
+   "params": {
+    "g": [
+     14,
+     14,
+     14
+    ]
+   },
+   "parts": [
+    {
+     "name": "stone_layer",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "8"
+     ],
+     "at": [
+      "0",
+      "D",
+      "g + (-10)"
+     ],
+     "color": [
+      0.5,
+      0.5,
+      0.52
+     ]
+    },
+    {
+     "name": "mid_layer",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "4"
+     ],
+     "at": [
+      "0",
+      "D",
+      "g + (-4)"
+     ],
+     "color": [
+      0.45,
+      0.31,
+      0.19
+     ]
+    },
+    {
+     "name": "top_layer",
+     "shape": "cube",
+     "size": [
+      "W",
+      "D",
+      "2"
+     ],
+     "at": [
+      "0",
+      "D",
+      "g + (-1)"
+     ],
+     "color": [
+      0.36,
+      0.65,
+      0.22
+     ]
+    },
+    {
+     "name": "path_a",
+     "shape": "cube",
+     "size": [
+      "W*0.7",
+      "2.4",
+      "0.12"
+     ],
+     "at": [
+      "0",
+      "D + D*0.02",
+      "g + 0.06"
+     ],
+     "color": [
+      0.58,
+      0.58,
+      0.6
+     ]
+    },
+    {
+     "name": "path_b",
+     "shape": "cube",
+     "size": [
+      "2.4",
+      "D*0.7",
+      "0.12"
+     ],
+     "at": [
+      "0",
+      "D",
+      "g + 0.06"
+     ],
+     "color": [
+      0.58,
+      0.58,
+      0.6
+     ]
+    },
+    {
+     "name": "well_found",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "g"
+     ],
+     "at": [
+      "W*0.2",
+      "D + D*0.25",
+      "g/2"
+     ],
+     "color": [
+      0.5,
+      0.5,
+      0.52
+     ]
+    },
+    {
+     "name": "well_ring",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "1"
+     ],
+     "at": [
+      "W*0.2",
+      "D + D*0.25",
+      "g + 0.5"
+     ],
+     "color": [
+      0.55,
+      0.55,
+      0.57
+     ]
+    },
+    {
+     "name": "well_water",
+     "shape": "cube",
+     "size": [
+      "2.4",
+      "2.4",
+      "0.2"
+     ],
+     "at": [
+      "W*0.2",
+      "D + D*0.25",
+      "g + 1.05"
+     ],
+     "color": [
+      0.2,
+      0.4,
+      0.9
+     ]
+    }
+   ],
+   "scene": true
+  },
+  "minecraft village houses": {
+   "keywords": [
+    "minecraft village houses"
+   ],
+   "dims": {
+    "W": [
+     4,
+     48,
+     48
+    ],
+    "D": [
+     4,
+     48,
+     48
+    ],
+    "H": [
+     3,
+     60,
+     26
+    ]
+   },
+   "params": {
+    "g": [
+     14,
+     14,
+     14
+    ]
+   },
+   "parts": [
+    {
+     "name": "house1_body",
+     "shape": "cube",
+     "size": [
+      "10",
+      "8",
+      "g + 6"
+     ],
+     "at": [
+      "W*-0.3",
+      "D + D*0.3",
+      "(g + 6)/2"
+     ],
+     "color": [
+      0.72,
+      0.55,
+      0.33
+     ]
+    },
+    {
+     "name": "house1_roof1",
+     "shape": "cube",
+     "size": [
+      "11.4",
+      "9.4",
+      "2"
+     ],
+     "at": [
+      "W*-0.3",
+      "D + D*0.3",
+      "g + 7"
+     ],
+     "color": [
+      0.55,
+      0.2,
+      0.15
+     ]
+    },
+    {
+     "name": "house1_roof2",
+     "shape": "cube",
+     "size": [
+      "7",
+      "9.4",
+      "2"
+     ],
+     "at": [
+      "W*-0.3",
+      "D + D*0.3",
+      "g + 9"
+     ],
+     "color": [
+      0.55,
+      0.2,
+      0.15
+     ]
+    },
+    {
+     "name": "house1_door",
+     "shape": "cube",
+     "size": [
+      "2",
+      "0.3",
+      "4"
+     ],
+     "at": [
+      "W*-0.3",
+      "D + D*0.3 - 4.1",
+      "g + 2"
+     ],
+     "color": [
+      0.3,
+      0.2,
+      0.1
+     ]
+    },
+    {
+     "name": "house1_window",
+     "shape": "cube",
+     "size": [
+      "2.2",
+      "0.3",
+      "2.2"
+     ],
+     "at": [
+      "W*-0.3 + 3.2",
+      "D + D*0.3 - 4.1",
+      "g + 3.6"
+     ],
+     "color": [
+      0.6,
+      0.8,
+      0.95
+     ]
+    },
+    {
+     "name": "house2_body",
+     "shape": "cube",
+     "size": [
+      "10",
+      "8",
+      "g + 6"
+     ],
+     "at": [
+      "W*0.3",
+      "D + D*0.3",
+      "(g + 6)/2"
+     ],
+     "color": [
+      0.82,
+      0.82,
+      0.8
+     ]
+    },
+    {
+     "name": "house2_roof1",
+     "shape": "cube",
+     "size": [
+      "11.4",
+      "9.4",
+      "2"
+     ],
+     "at": [
+      "W*0.3",
+      "D + D*0.3",
+      "g + 7"
+     ],
+     "color": [
+      0.25,
+      0.3,
+      0.45
+     ]
+    },
+    {
+     "name": "house2_roof2",
+     "shape": "cube",
+     "size": [
+      "7",
+      "9.4",
+      "2"
+     ],
+     "at": [
+      "W*0.3",
+      "D + D*0.3",
+      "g + 9"
+     ],
+     "color": [
+      0.25,
+      0.3,
+      0.45
+     ]
+    },
+    {
+     "name": "house2_door",
+     "shape": "cube",
+     "size": [
+      "2",
+      "0.3",
+      "4"
+     ],
+     "at": [
+      "W*0.3",
+      "D + D*0.3 - 4.1",
+      "g + 2"
+     ],
+     "color": [
+      0.3,
+      0.2,
+      0.1
+     ]
+    },
+    {
+     "name": "house2_window",
+     "shape": "cube",
+     "size": [
+      "2.2",
+      "0.3",
+      "2.2"
+     ],
+     "at": [
+      "W*0.3 + 3.2",
+      "D + D*0.3 - 4.1",
+      "g + 3.6"
+     ],
+     "color": [
+      0.6,
+      0.8,
+      0.95
+     ]
+    },
+    {
+     "name": "house3_body",
+     "shape": "cube",
+     "size": [
+      "10",
+      "8",
+      "g + 6"
+     ],
+     "at": [
+      "W*-0.3",
+      "D + D*-0.3",
+      "(g + 6)/2"
+     ],
+     "color": [
+      0.35,
+      0.25,
+      0.15
+     ]
+    },
+    {
+     "name": "house3_roof1",
+     "shape": "cube",
+     "size": [
+      "11.4",
+      "9.4",
+      "2"
+     ],
+     "at": [
+      "W*-0.3",
+      "D + D*-0.3",
+      "g + 7"
+     ],
+     "color": [
+      0.2,
+      0.4,
+      0.2
+     ]
+    },
+    {
+     "name": "house3_roof2",
+     "shape": "cube",
+     "size": [
+      "7",
+      "9.4",
+      "2"
+     ],
+     "at": [
+      "W*-0.3",
+      "D + D*-0.3",
+      "g + 9"
+     ],
+     "color": [
+      0.2,
+      0.4,
+      0.2
+     ]
+    },
+    {
+     "name": "house3_door",
+     "shape": "cube",
+     "size": [
+      "2",
+      "0.3",
+      "4"
+     ],
+     "at": [
+      "W*-0.3",
+      "D + D*-0.3 - 4.1",
+      "g + 2"
+     ],
+     "color": [
+      0.3,
+      0.2,
+      0.1
+     ]
+    },
+    {
+     "name": "house3_window",
+     "shape": "cube",
+     "size": [
+      "2.2",
+      "0.3",
+      "2.2"
+     ],
+     "at": [
+      "W*-0.3 + 3.2",
+      "D + D*-0.3 - 4.1",
+      "g + 3.6"
+     ],
+     "color": [
+      0.6,
+      0.8,
+      0.95
+     ]
+    }
+   ],
+   "scene": true
+  },
+  "minecraft village farm": {
+   "keywords": [
+    "minecraft village farm"
+   ],
+   "dims": {
+    "W": [
+     4,
+     48,
+     48
+    ],
+    "D": [
+     4,
+     48,
+     48
+    ],
+    "H": [
+     3,
+     60,
+     26
+    ]
+   },
+   "params": {
+    "g": [
+     14,
+     14,
+     14
+    ]
+   },
+   "parts": [
+    {
+     "name": "crop1",
+     "shape": "cube",
+     "size": [
+      "W*0.1",
+      "D*0.1",
+      "0.8"
+     ],
+     "at": [
+      "W*0.28",
+      "D + D*-0.25",
+      "g + 0.4"
+     ],
+     "color": [
+      0.4,
+      0.55,
+      0.15
+     ]
+    },
+    {
+     "name": "crop2",
+     "shape": "cube",
+     "size": [
+      "W*0.1",
+      "D*0.1",
+      "0.8"
+     ],
+     "at": [
+      "W*0.28",
+      "D + D*-0.38",
+      "g + 0.4"
+     ],
+     "color": [
+      0.55,
+      0.45,
+      0.15
+     ]
+    },
+    {
+     "name": "crop3",
+     "shape": "cube",
+     "size": [
+      "W*0.1",
+      "D*0.1",
+      "0.8"
+     ],
+     "at": [
+      "W*0.4",
+      "D + D*-0.25",
+      "g + 0.4"
+     ],
+     "color": [
+      0.4,
+      0.55,
+      0.15
+     ]
+    },
+    {
+     "name": "crop4",
+     "shape": "cube",
+     "size": [
+      "W*0.1",
+      "D*0.1",
+      "0.8"
+     ],
+     "at": [
+      "W*0.4",
+      "D + D*-0.38",
+      "g + 0.4"
+     ],
+     "color": [
+      0.3,
+      0.5,
+      0.1
+     ]
+    },
+    {
+     "name": "scarecrow_pole",
+     "shape": "cube",
+     "size": [
+      "0.5",
+      "0.5",
+      "2.6"
+     ],
+     "at": [
+      "W*0.34",
+      "D + D*-0.31",
+      "g + 1.3"
+     ],
+     "color": [
+      0.5,
+      0.35,
+      0.2
+     ]
+    },
+    {
+     "name": "scarecrow_arms",
+     "shape": "cube",
+     "size": [
+      "2.4",
+      "0.4",
+      "0.4"
+     ],
+     "at": [
+      "W*0.34",
+      "D + D*-0.31",
+      "g + 2.4"
+     ],
+     "color": [
+      0.8,
+      0.7,
+      0.3
+     ]
+    },
+    {
+     "name": "scarecrow_head",
+     "shape": "cube",
+     "size": [
+      "0.9",
+      "0.9",
+      "0.9"
+     ],
+     "at": [
+      "W*0.34",
+      "D + D*-0.31",
+      "g + 3.4"
+     ],
+     "color": [
+      0.9,
+      0.6,
+      0.15
+     ]
+    }
+   ],
+   "scene": true
+  },
+  "tree": {
+   "keywords": [
+    "tree",
+    "oak tree",
+    "broadleaf tree"
+   ],
+   "dims": {
+    "W": [
+     0.8,
+     12,
+     3.5
+    ],
+    "D": [
+     0.8,
+     12,
+     3.5
+    ],
+    "H": [
+     1.5,
+     30,
+     5
+    ]
+   },
+   "params": {
+    "tr": [
+     0.08,
+     0.14,
+     0.11
+    ]
+   },
+   "parts": [
+    {
+     "name": "trunk",
+     "shape": "cylinder",
+     "size": [
+      "W*tr",
+      "D*tr",
+      "H*0.5"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H*0.25"
+     ],
+     "color": [
+      0.36,
+      0.24,
+      0.13
+     ]
+    },
+    {
+     "name": "crown",
+     "shape": "sphere",
+     "size": [
+      "W",
+      "D",
+      "H*0.6"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H*0.68"
+     ],
+     "color": [
+      0.2,
+      0.55,
+      0.2
+     ]
+    }
+   ]
+  },
+  "low poly tree": {
+   "keywords": [
+    "low poly tree",
+    "lowpoly tree",
+    "pine tree",
+    "fir tree",
+    "christmas tree",
+    "conifer"
+   ],
+   "dims": {
+    "W": [
+     0.8,
+     10,
+     2.6
+    ],
+    "D": [
+     0.8,
+     10,
+     2.6
+    ],
+    "H": [
+     1.5,
+     30,
+     5
+    ]
+   },
+   "params": {
+    "N": [
+     3,
+     3,
+     3
+    ]
+   },
+   "parts": [
+    {
+     "name": "trunk",
+     "shape": "cylinder",
+     "size": [
+      "W*0.14",
+      "D*0.14",
+      "H*0.3"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H*0.15"
+     ],
+     "color": [
+      0.36,
+      0.24,
+      0.13
+     ]
+    },
+    {
+     "name": "canopy{i}",
+     "repeat": "levels",
+     "count": "3",
+     "shape": "cone",
+     "size": [
+      "W*(1 - 0.26*K)",
+      "D*(1 - 0.26*K)",
+      "H*0.233"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H*0.3 + H*0.1165 + H*0.233*K"
+     ],
+     "color": [
+      0.16,
+      0.45,
+      0.18
+     ]
+    }
+   ]
+  },
+  "person": {
+   "keywords": [
+    "person",
+    "human",
+    "human figure",
+    "man",
+    "woman",
+    "character",
+    "figure of a person",
+    "people"
+   ],
+   "dims": {
+    "W": [
+     0.35,
+     0.55,
+     0.46
+    ],
+    "D": [
+     0.18,
+     0.32,
+     0.24
+    ],
+    "H": [
+     1.4,
+     2.0,
+     1.75
+    ]
+   },
+   "parts": [
+    {
+     "name": "head",
+     "shape": "sphere",
+     "size": [
+      "H*0.13",
+      "H*0.14",
+      "H*0.15"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H*0.925"
+     ],
+     "color": [
+      0.87,
+      0.68,
+      0.55
+     ]
+    },
+    {
+     "name": "neck",
+     "shape": "cylinder",
+     "size": [
+      "H*0.05",
+      "H*0.05",
+      "H*0.05"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H*0.845"
+     ],
+     "color": [
+      0.87,
+      0.68,
+      0.55
+     ]
+    },
+    {
+     "name": "torso",
+     "shape": "cube",
+     "size": [
+      "W*0.8",
+      "D",
+      "H*0.3"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H*0.67"
+     ],
+     "color": [
+      0.2,
+      0.45,
+      0.8
+     ]
+    },
+    {
+     "name": "hips",
+     "shape": "cube",
+     "size": [
+      "W*0.72",
+      "D*0.95",
+      "H*0.07"
+     ],
+     "at": [
+      "0",
+      "0",
+      "H*0.49"
+     ],
+     "color": [
+      0.18,
+      0.2,
+      0.35
+     ]
+    },
+    {
+     "name": "leg_left",
+     "shape": "cylinder",
+     "size": [
+      "H*0.075",
+      "H*0.075",
+      "H*0.46"
+     ],
+     "at": [
+      "-W*0.19",
+      "0",
+      "H*0.23"
+     ],
+     "color": [
+      0.18,
+      0.2,
+      0.35
+     ]
+    },
+    {
+     "name": "leg_right",
+     "shape": "cylinder",
+     "size": [
+      "H*0.075",
+      "H*0.075",
+      "H*0.46"
+     ],
+     "at": [
+      "W*0.19",
+      "0",
+      "H*0.23"
+     ],
+     "color": [
+      0.18,
+      0.2,
+      0.35
+     ]
+    },
+    {
+     "name": "arm_left",
+     "shape": "cylinder",
+     "size": [
+      "H*0.055",
+      "H*0.055",
+      "H*0.36"
+     ],
+     "at": [
+      "-W*0.5",
+      "0",
+      "H*0.64"
+     ],
+     "color": [
+      0.2,
+      0.45,
+      0.8
+     ]
+    },
+    {
+     "name": "arm_right",
+     "shape": "cylinder",
+     "size": [
+      "H*0.055",
+      "H*0.055",
+      "H*0.36"
+     ],
+     "at": [
+      "W*0.5",
+      "0",
+      "H*0.64"
+     ],
+     "color": [
+      0.2,
+      0.45,
+      0.8
+     ]
+    },
+    {
+     "name": "hand_left",
+     "shape": "sphere",
+     "size": [
+      "H*0.05",
+      "H*0.05",
+      "H*0.06"
+     ],
+     "at": [
+      "-W*0.5",
+      "0",
+      "H*0.44"
+     ],
+     "color": [
+      0.87,
+      0.68,
+      0.55
+     ]
+    },
+    {
+     "name": "hand_right",
+     "shape": "sphere",
+     "size": [
+      "H*0.05",
+      "H*0.05",
+      "H*0.06"
+     ],
+     "at": [
+      "W*0.5",
+      "0",
+      "H*0.44"
+     ],
+     "color": [
+      0.87,
+      0.68,
+      0.55
+     ]
+    },
+    {
+     "name": "shoe_left",
+     "shape": "cube",
+     "size": [
+      "H*0.06",
+      "H*0.14",
+      "H*0.04"
+     ],
+     "at": [
+      "-W*0.19",
+      "-D*0.15",
+      "H*0.02"
+     ],
+     "color": [
+      0.15,
+      0.12,
+      0.1
+     ]
+    },
+    {
+     "name": "shoe_right",
+     "shape": "cube",
+     "size": [
+      "H*0.06",
+      "H*0.14",
+      "H*0.04"
+     ],
+     "at": [
+      "W*0.19",
+      "-D*0.15",
+      "H*0.02"
+     ],
+     "color": [
+      0.15,
+      0.12,
+      0.1
+     ]
+    }
+   ]
+  },
+  "minecraft person": {
+   "keywords": [
+    "minecraft person",
+    "minecraft human",
+    "minecraft player",
+    "minecraft steve",
+    "minecraft character",
+    "block person"
+   ],
+   "dims": {
+    "W": [
+     0.5,
+     48,
+     48
+    ],
+    "D": [
+     0.5,
+     48,
+     48
+    ],
+    "H": [
+     1,
+     60,
+     26
+    ]
+   },
+   "params": {
+    "g": [
+     14,
+     14,
+     14
+    ]
+   },
+   "parts": [
+    {
+     "name": "mc_leg_left",
+     "shape": "cube",
+     "size": [
+      "0.5",
+      "0.5",
+      "1.5"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (-0.25)",
+      "-D*0.28 - 9 + (0)",
+      "g + (0.75)"
+     ],
+     "color": [
+      0.18,
+      0.2,
+      0.35
+     ]
+    },
+    {
+     "name": "mc_leg_right",
+     "shape": "cube",
+     "size": [
+      "0.5",
+      "0.5",
+      "1.5"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (0.25)",
+      "-D*0.28 - 9 + (0)",
+      "g + (0.75)"
+     ],
+     "color": [
+      0.18,
+      0.2,
+      0.35
+     ]
+    },
+    {
+     "name": "mc_torso",
+     "shape": "cube",
+     "size": [
+      "1",
+      "0.5",
+      "1.5"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (0)",
+      "-D*0.28 - 9 + (0)",
+      "g + (2.25)"
+     ],
+     "color": [
+      0.1,
+      0.65,
+      0.65
+     ]
+    },
+    {
+     "name": "mc_arm_left",
+     "shape": "cube",
+     "size": [
+      "0.5",
+      "0.5",
+      "1.5"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (-0.75)",
+      "-D*0.28 - 9 + (0)",
+      "g + (2.25)"
+     ],
+     "color": [
+      0.87,
+      0.68,
+      0.55
+     ]
+    },
+    {
+     "name": "mc_head",
+     "shape": "cube",
+     "size": [
+      "1",
+      "1",
+      "1"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (0)",
+      "-D*0.28 - 9 + (0)",
+      "g + (3.5)"
+     ],
+     "color": [
+      0.87,
+      0.68,
+      0.55
+     ]
+    },
+    {
+     "name": "mc_hair",
+     "shape": "cube",
+     "size": [
+      "1.04",
+      "1.04",
+      "0.3"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (0)",
+      "-D*0.28 - 9 + (0.02)",
+      "g + (3.88)"
+     ],
+     "color": [
+      0.25,
+      0.16,
+      0.08
+     ]
+    },
+    {
+     "name": "mc_eye_left",
+     "shape": "cube",
+     "size": [
+      "0.18",
+      "0.05",
+      "0.14"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (-0.22)",
+      "-D*0.28 - 9 + (-0.52)",
+      "g + (3.55)"
+     ],
+     "color": [
+      0.25,
+      0.3,
+      0.8
+     ]
+    },
+    {
+     "name": "mc_eye_right",
+     "shape": "cube",
+     "size": [
+      "0.18",
+      "0.05",
+      "0.14"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (0.22)",
+      "-D*0.28 - 9 + (-0.52)",
+      "g + (3.55)"
+     ],
+     "color": [
+      0.25,
+      0.3,
+      0.8
+     ]
+    },
+    {
+     "name": "mc_arm_right",
+     "shape": "cube",
+     "size": [
+      "0.5",
+      "0.5",
+      "1.5"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (0.75)",
+      "-D*0.28 - 9 + (0)",
+      "g + (2.25)"
+     ],
+     "color": [
+      0.87,
+      0.68,
+      0.55
+     ]
+    }
+   ],
+   "scene": true
+  },
+  "minecraft lumberjack": {
+   "keywords": [
+    "minecraft lumberjack",
+    "minecraft woodcutter",
+    "minecraft person chopping a tree",
+    "person chopping a tree",
+    "chopping a tree",
+    "minecraft person at work"
+   ],
+   "dims": {
+    "W": [
+     0.5,
+     48,
+     48
+    ],
+    "D": [
+     0.5,
+     48,
+     48
+    ],
+    "H": [
+     1,
+     60,
+     26
+    ]
+   },
+   "params": {
+    "g": [
+     14,
+     14,
+     14
+    ]
+   },
+   "parts": [
+    {
+     "name": "mc_leg_left",
+     "shape": "cube",
+     "size": [
+      "0.5",
+      "0.5",
+      "1.5"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (-0.25)",
+      "-D*0.28 - 9 + (0)",
+      "g + (0.75)"
+     ],
+     "color": [
+      0.18,
+      0.2,
+      0.35
+     ]
+    },
+    {
+     "name": "mc_leg_right",
+     "shape": "cube",
+     "size": [
+      "0.5",
+      "0.5",
+      "1.5"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (0.25)",
+      "-D*0.28 - 9 + (0)",
+      "g + (0.75)"
+     ],
+     "color": [
+      0.18,
+      0.2,
+      0.35
+     ]
+    },
+    {
+     "name": "mc_torso",
+     "shape": "cube",
+     "size": [
+      "1",
+      "0.5",
+      "1.5"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (0)",
+      "-D*0.28 - 9 + (0)",
+      "g + (2.25)"
+     ],
+     "color": [
+      0.1,
+      0.65,
+      0.65
+     ]
+    },
+    {
+     "name": "mc_arm_left",
+     "shape": "cube",
+     "size": [
+      "0.5",
+      "0.5",
+      "1.5"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (-0.75)",
+      "-D*0.28 - 9 + (0)",
+      "g + (2.25)"
+     ],
+     "color": [
+      0.87,
+      0.68,
+      0.55
+     ]
+    },
+    {
+     "name": "mc_head",
+     "shape": "cube",
+     "size": [
+      "1",
+      "1",
+      "1"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (0)",
+      "-D*0.28 - 9 + (0)",
+      "g + (3.5)"
+     ],
+     "color": [
+      0.87,
+      0.68,
+      0.55
+     ]
+    },
+    {
+     "name": "mc_hair",
+     "shape": "cube",
+     "size": [
+      "1.04",
+      "1.04",
+      "0.3"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (0)",
+      "-D*0.28 - 9 + (0.02)",
+      "g + (3.88)"
+     ],
+     "color": [
+      0.25,
+      0.16,
+      0.08
+     ]
+    },
+    {
+     "name": "mc_eye_left",
+     "shape": "cube",
+     "size": [
+      "0.18",
+      "0.05",
+      "0.14"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (-0.22)",
+      "-D*0.28 - 9 + (-0.52)",
+      "g + (3.55)"
+     ],
+     "color": [
+      0.25,
+      0.3,
+      0.8
+     ]
+    },
+    {
+     "name": "mc_eye_right",
+     "shape": "cube",
+     "size": [
+      "0.18",
+      "0.05",
+      "0.14"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (0.22)",
+      "-D*0.28 - 9 + (-0.52)",
+      "g + (3.55)"
+     ],
+     "color": [
+      0.25,
+      0.3,
+      0.8
+     ]
+    },
+    {
+     "name": "mc_arm_right_raised",
+     "shape": "cube",
+     "size": [
+      "0.5",
+      "0.5",
+      "1.5"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (0.75)",
+      "-D*0.28 - 9 + (0)",
+      "g + (3.75)"
+     ],
+     "color": [
+      0.87,
+      0.68,
+      0.55
+     ]
+    },
+    {
+     "name": "axe_handle",
+     "shape": "cube",
+     "size": [
+      "0.18",
+      "0.18",
+      "1.8"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (0.75)",
+      "-D*0.28 - 9 + (-0.1)",
+      "g + (5.4)"
+     ],
+     "color": [
+      0.45,
+      0.3,
+      0.15
+     ]
+    },
+    {
+     "name": "axe_blade",
+     "shape": "cube",
+     "size": [
+      "0.9",
+      "0.15",
+      "0.6"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (1.15)",
+      "-D*0.28 - 9 + (-0.1)",
+      "g + (6.0)"
+     ],
+     "color": [
+      0.7,
+      0.72,
+      0.75
+     ]
+    },
+    {
+     "name": "work_tree_trunk",
+     "shape": "cube",
+     "size": [
+      "1",
+      "1",
+      "6"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (2.2)",
+      "-D*0.28 - 9 + (2.4)",
+      "g + (3)"
+     ],
+     "color": [
+      0.36,
+      0.24,
+      0.13
+     ]
+    },
+    {
+     "name": "work_tree_leaf_0",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "2"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (2.2)",
+      "-D*0.28 - 9 + (2.4)",
+      "g + (6.5)"
+     ],
+     "color": [
+      0.2,
+      0.55,
+      0.2
+     ]
+    },
+    {
+     "name": "work_tree_leaf_1",
+     "shape": "cube",
+     "size": [
+      "4",
+      "4",
+      "2"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (2.2)",
+      "-D*0.28 - 9 + (2.4)",
+      "g + (8.5)"
+     ],
+     "color": [
+      0.2,
+      0.55,
+      0.2
+     ]
+    },
+    {
+     "name": "work_tree_leaf_2",
+     "shape": "cube",
+     "size": [
+      "3",
+      "3",
+      "2"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (2.2)",
+      "-D*0.28 - 9 + (2.4)",
+      "g + (10.5)"
+     ],
+     "color": [
+      0.2,
+      0.55,
+      0.2
+     ]
+    },
+    {
+     "name": "work_tree_leaf_3",
+     "shape": "cube",
+     "size": [
+      "1.6",
+      "1.6",
+      "1.4"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (2.2)",
+      "-D*0.28 - 9 + (2.4)",
+      "g + (12.2)"
+     ],
+     "color": [
+      0.2,
+      0.55,
+      0.2
+     ]
+    },
+    {
+     "name": "log_0",
+     "shape": "cube",
+     "size": [
+      "2.4",
+      "0.6",
+      "0.6"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (-2.6)",
+      "-D*0.28 - 9 + (-1.0)",
+      "g + (0.3)"
+     ],
+     "color": [
+      0.36,
+      0.24,
+      0.13
+     ]
+    },
+    {
+     "name": "log_1",
+     "shape": "cube",
+     "size": [
+      "2.4",
+      "0.6",
+      "0.6"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (-2.6)",
+      "-D*0.28 - 9 + (-0.30000000000000004)",
+      "g + (0.3)"
+     ],
+     "color": [
+      0.36,
+      0.24,
+      0.13
+     ]
+    },
+    {
+     "name": "log_2",
+     "shape": "cube",
+     "size": [
+      "2.4",
+      "0.6",
+      "0.6"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (-2.6)",
+      "-D*0.28 - 9 + (0.3999999999999999)",
+      "g + (0.3)"
+     ],
+     "color": [
+      0.36,
+      0.24,
+      0.13
+     ]
+    },
+    {
+     "name": "log_3",
+     "shape": "cube",
+     "size": [
+      "2.4",
+      "0.6",
+      "0.6"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (-2.6)",
+      "-D*0.28 - 9 + (-1.0)",
+      "g + (0.8999999999999999)"
+     ],
+     "color": [
+      0.36,
+      0.24,
+      0.13
+     ]
+    },
+    {
+     "name": "log_4",
+     "shape": "cube",
+     "size": [
+      "2.4",
+      "0.6",
+      "0.6"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (-2.6)",
+      "-D*0.28 - 9 + (-0.30000000000000004)",
+      "g + (0.8999999999999999)"
+     ],
+     "color": [
+      0.36,
+      0.24,
+      0.13
+     ]
+    },
+    {
+     "name": "campfire_stones",
+     "shape": "cube",
+     "size": [
+      "1.6",
+      "1.6",
+      "0.3"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (-1)",
+      "-D*0.28 - 9 + (-3.2)",
+      "g + (0.15)"
+     ],
+     "color": [
+      0.5,
+      0.5,
+      0.52
+     ]
+    },
+    {
+     "name": "campfire_logs",
+     "shape": "cube",
+     "size": [
+      "1.2",
+      "0.3",
+      "0.3"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (-1)",
+      "-D*0.28 - 9 + (-3.2)",
+      "g + (0.45)"
+     ],
+     "color": [
+      0.36,
+      0.24,
+      0.13
+     ]
+    },
+    {
+     "name": "campfire_flame",
+     "shape": "cube",
+     "size": [
+      "0.6",
+      "0.6",
+      "0.9"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (-1)",
+      "-D*0.28 - 9 + (-3.2)",
+      "g + (1.0)"
+     ],
+     "color": [
+      1.0,
+      0.55,
+      0.1
+     ]
+    },
+    {
+     "name": "campfire_flame_core",
+     "shape": "cube",
+     "size": [
+      "0.3",
+      "0.3",
+      "0.5"
+     ],
+     "at": [
+      "W*0.3 - 3.5 + (-1)",
+      "-D*0.28 - 9 + (-3.2)",
+      "g + (1.35)"
+     ],
+     "color": [
+      1.0,
+      0.85,
+      0.2
+     ]
+    }
+   ],
+   "scene": true
   }
  }
 }

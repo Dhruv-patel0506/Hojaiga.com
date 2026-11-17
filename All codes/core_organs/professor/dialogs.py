@@ -229,6 +229,14 @@ def write_fixture(path: str, ext: str, hint: str = "") -> None:
             w.setsampwidth(2)
             w.setframerate(8000)
             w.writeframes(b"".join(struct.pack("<h", int(8000 * math.sin(2 * math.pi * 440 * i / 8000))) for i in range(4000)))
+    elif e in ("ttf", "otf", "woff", "fon"):
+        import shutil
+        font_src = os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "Fonts", "arial.ttf")
+        if os.path.isfile(font_src):
+            shutil.copyfile(font_src, path)
+        else:
+            with open(path, "wb") as fh:
+                fh.write(b"\x00\x01\x00\x00" + b"\x00" * 60)
     elif e == "zip":
         with zipfile.ZipFile(path, "w") as z:
             z.writestr("fixture.txt", FIXTURE_NOTE)
@@ -873,6 +881,9 @@ class DialogDriver:
 # step wording that belongs to a file dialog: what a guide says once the dialog is open
 FILE_STEP_RX = re.compile(r"(?i)(\b(file name|filename|folder|directory|browse|save in|save as type|file type|files of type|where to save|where you want to save)\b|\b(?:choose|select|pick|browse to|specify)\s+(?:a|the|your)\s+(?:save |file |folder |install )?location\b|"
                           r"\b(choose|select|pick)\s+(?:a|the)\s+(?:file\s+)?format\b|"
+                          r"\b(?:choose|select|pick|save as)\s+(?:the\s+)?(?:\*\*)?(?:[\w\s]{1,25}?\s+)?(?:template|format|extension|file type|file format|\.potx|\.pptx|\.docx|\.pdf|\.png|\.jpg|\.csv|\.txt)\b|"
+                          r"\b(?:select|click|open|choose)\s+(?:the\s+)?(?:\*\*)?(?:personal|templates|documents|downloads|desktop|this pc|recent)\b(?:\*\*)?|"
+                          r"\b(?:printer|paper size|orientation|print settings)\b|"
                           r"\b(choose|select|pick|find|locate|navigate to|go to|open|double-?click)\b[^.>()]{0,40}\b(files?(?!\s+(?:menu|tab|button))|images?|pictures?|photos?|documents?|folders?|csv|spreadsheet|pdf)\b|"
                           r"\b(click|press|select|choose)\b[^.>]{0,12}\b(open|save|select folder|upload|insert|import|export)\b|"
                           r"\b(type|enter|name)\b[^.>]{0,30}\b(file|document|image) name\b|\bname (your|the) (file|document|image)\b)")

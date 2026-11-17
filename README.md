@@ -1,184 +1,64 @@
-# Hojaiga — The Autonomous Facility (Visual World)
+# Hojaiga
 
-A read-only, "Sims-like" visualization of the Hojaiga runtime: a Python
-adapter that taps the CNS EventBus and a React/TypeScript canvas app that
-turns Hojaiga events into agents walking around a pixel facility.
+**A Windows assistant that learns any app on its own, does real work in it, and proves the result.**
+Independent research project by Dhruv Patel, August to November 2026. **Archived:** this repository is kept as a public record of the work. Take anything useful.
 
-This was built and **tested inside a sandbox that does not have access to
-your local `D:\new_automation\...` machine**, your `pixel-agents` clone, or
-`organ_02_cns_single_file.py`. Section 1 below explains exactly what that
-means for you before you run this for real.
+<p align="center"><img src="media/hojaiga_world_build.gif" width="360" alt="A Minecraft-style world built in Blender by Hojaiga"></p>
 
----
+## The idea
 
-## 0. What's in this delivery
+Most automation needs a custom integration for every program. Much of the software people use, especially older Windows programs inside companies, has no API. People still learn those programs by looking at them and trying things.
 
-```
-observability/
-  organ_99_visual_adapter.py   # Organ 99 — CNS bridge + WebSocket broadcaster
-  requirements.txt
-  pytest.ini
-  conftest.py
-  tests/
-    test_sanitize.py           # credential/secret redaction
-    test_snapshot.py           # WORLD_SNAPSHOT shape
-    test_server.py             # reconnection, event forwarding, read-only isolation
+Hojaiga was meant to be an **automation operating system for Windows**: hand it any application and it learns how that application works, from the program's own files and from its screen, then does the task in a background window without touching your mouse, and proves the result before it says "done". It could also teach: point at the right button and explain it.
 
-visual_world/
-  (Vite + React + TypeScript project)
-  src/world/grid.ts            # facility floor plan (rooms, corridors, security spur)
-  src/world/zones.ts           # organ-id -> physical desk mapping
-  src/world/pathfinding.ts     # A*, grid-agnostic
-  src/world/agentEngine.ts     # pure event -> agent-state reducer (the actual "brain")
-  src/ws/useHojaigaSocket.ts   # WebSocket client, reconnect + snapshot resume
-  src/engine/FacilityCanvas.tsx
-  src/components/HUD.tsx, EventLog.tsx
-  src/tests/                   # pathfinding, event-mapping, reconnection tests
-```
+**The niche:** Windows-native and any app, its own intelligence running on your machine (no paid model API, your data stays local), background work, and proof with an audit trail.
 
-Both halves were actually installed, type-checked, built, and run in this
-environment — not just written. **23/23 frontend tests pass
-(`vitest`), 16/16 backend tests pass (`pytest`)**, `tsc -b` and
-`vite build` both succeed, and `organ_99_visual_adapter.py --mock` was run
-live against a real WebSocket client to confirm the wire format actually
-works end to end.
+## How it was built
 
----
+It started as a written blueprint: an operating system of **15 organs in 7 layers** (Core Intelligence, Knowledge & Decision, Execution, Platform, UI, Runtime, External), with a local LLM as the brain. The specs are in `architechure standards-oragn files/`. In code it grew to **more than 60 organ modules** in `All codes/core_organs/`, about 230k lines of Python and 29 test suites:
 
-## 1. Three things this build could NOT verify against your real system
+- **Learning an app from its files:** menus, shortcuts and dialogs read from the executable (PE resources), Office object models from type libraries, UI words from Store apps, strings from .NET and Electron apps.
+- **Learning it from the screen:** UI Automation trees, every menu and safe dialog opened and closed, vision for apps that draw their own interface.
+- **Acting without your mouse:** a virtual mouse and keyboard for WinForms, WPF, WinUI and Blender; Office through its object model; the web through Playwright.
+- **Proof:** a task is DONE only when the saved file (read back) or the final window (judged by a vision model) shows the result.
+- **Safety:** pay, send, delete, install and sign-in controls stop and ask first.
 
-**1. `organ_02_cns_single_file.py` was never available to me.** The brief
-names `connect_to_organ` as (probably) the entry point, so
-`organ_99_visual_adapter.py` calls exactly that — but the function's real
-signature, and the real shape of `EventEnvelope`, are unverified guesses.
-Everything that touches the live CNS is isolated in one function,
-`connect_real_cns()`, with `ASSUMPTION FLAGGED FOR REVIEW` comments. If the
-real API differs, that's the only function you (or I, if you paste in the
-relevant code) need to change — the WebSocket server, snapshot builder, and
-sanitizer are written against a small `CNSHandle` protocol, not against
-organ_02's concrete API.
+| Measured on one laptop | Result |
+|---|---|
+| PowerPoint full ribbon map | 11 tabs, ~360 controls, ~980 menu items in ~5 min |
+| A program that was never opened | menus and shortcuts read from its file in ~1 s |
+| Excel table into PowerPoint, invisible | 24 of 24 cells verified from the saved files |
+| Blender object from one sentence | table, chair, bookshelf, lamp built and checked from three views |
 
-**2. The `pixel-agents` repo wasn't reachable either** (not uploaded, and a
-web search turned up nothing matching `webview-ui/src/office`), so the
-canvas engine here is an original implementation — a tile grid, A*
-pathfinder, and sprite/HUD renderer — rather than an adaptation of that
-codebase's actual rendering code. If you can share that repo (or the
-specific files under `webview-ui/src/office`), I can rework
-`src/engine/FacilityCanvas.tsx` to match its patterns.
+## Competitors, and credit
 
-**3. I don't have access to your local filesystem.** I can't write directly
-to `D:\new_automation\...` — everything above was built in an isolated
-Linux sandbox and is being handed to you as files to place yourself, at:
-- `D:\new_automation\All codes\observability\organ_99_visual_adapter.py`
-- `D:\new_automation\visual_world\` (the whole `visual_world/` folder)
+- **HeyClicky** (Clicky, by Farza, open source under MIT: https://github.com/farzaa/clicky) is an AI teacher that sees your screen, talks and points. In October I built Hojaiga's teaching layer ("Professor") for Windows after studying Clicky. On that experience HeyClicky is the direct competitor, and the better product.
+- **RPA tools** (UiPath, Power Automate) automate reliably but need a recorded flow per app.
+- **Hosted computer-use agents** from the big AI labs reason well over screenshots, from the cloud and per call.
+- **Microsoft UFO** (MIT) was studied for how one task is handed between apps. OmniParser's icon detector (MIT) and Qwen3-VL models are used inside.
+- Much of the code was written with AI coding assistants (Claude Code, Gemini).
 
-If you're doing this integration locally and want an assistant that can
-read/write those paths directly and run the real servers, **Claude Code**
-(desktop, VS Code, or terminal) is a better fit for the next step than this
-chat — it operates on your actual filesystem.
+## Why it stopped
 
-None of this blocked building a complete, runnable, tested scaffold — it
-just means the one CNS-facing function needs a final pass once you can
-share `organ_02_cns_single_file.py` (even just the `connect_to_organ`
-signature and `EventEnvelope` class would do it).
+The core bet was that Hojaiga could have **its own intelligence**, without a large hosted model. On a 6 GB laptop GPU it could not: the local 4B model found the right spot on professional app screenshots 12.5% of the time, and fine-tuning it on my own data made it worse overall (39% against 53% on 630 held-out items). Every gain came from structure and verification, not from the local model. The teaching experience I most wanted already exists in HeyClicky, built on much larger models.
 
----
+So the project ends in the form that works: the verified local core plus a **teacher**. A large model (Claude on the user's own key, or a free Gemini / Groq / OpenAI / NVIDIA model) proposes each step, the local "brain" checks it against the controls really on screen, keeps only proven steps, and switches the teacher off once it agrees often enough (`All codes/core_organs/mind/brain.py`, `organ_37_llm_gateway.py`).
 
-## 2. Startup instructions
+## Videos and pictures
 
-### Backend (Organ 99)
+- [A world built in Blender by Hojaiga (12 s)](media/hojaiga_world_build.mp4): every object built and rendered through Blender's own commands; the world's design was written by hand as data.
+- [The video-editing route (9 s)](media/hojaiga_video_edit.mp4): asked to "cut the silences and filler words" from a test clip, Hojaiga made this edit with captions and checked it.
+- [Blender deep scan, 288 controls found](media/fig_scan.jpg) · [Excel task proven from the saved file](media/fig_excel.jpg) · [Blender table, three views](media/fig_table.jpg)
+- Honest failures: [the flowchart that Paint mis-drew](media/fig_flow.jpg) · [a Calculator task the proof step refused](media/fig_calc.jpg)
 
-```bash
-cd observability
-pip install -r requirements.txt
+## Full report
 
-# Option A — against your real CNS (once connect_real_cns() is reconciled
-# against your actual organ_02_cns_single_file.py):
-#   1. Copy organ_99_visual_adapter.py next to organ_02_cns_single_file.py
-#      (or put its directory on PYTHONPATH).
-python organ_99_visual_adapter.py
+`reports/hojaiga_closing/HOJAIGA_REPORT.html` (download and open in a browser): the idea and business, the organ blueprint, methods, results, failures, the exit build, timeline, and videos.
 
-# Option B — frontend development without a live CNS:
-python organ_99_visual_adapter.py --mock
-```
+## Run it
 
-Run the backend tests:
+1. Windows 11 and Python 3.13. Create `hojaiga_env` in this folder and install the packages the modules ask for.
+2. Copy `.env.example` to `.env` and add one key.
+3. `hojaiga.bat "open notepad, type hello and save as C:\temp\hello.txt"`
 
-```bash
-cd observability
-pytest -v
-```
-
-### Frontend (visual_world)
-
-```bash
-cd visual_world
-npm install
-npm run dev        # http://localhost:5173, connects to ws://127.0.0.1:8080
-```
-
-Run the frontend tests / typecheck / production build:
-
-```bash
-npm test            # vitest — 23 tests
-npx tsc -b           # typecheck
-npm run build        # production bundle
-```
-
-If your adapter runs somewhere other than `127.0.0.1:8080`, copy
-`.env.example` to `.env.local` and set `VITE_HOJAIGA_WS_URL`.
-
----
-
-## 3. How the absolute rules were kept
-
-1. **Read-only, always.** `organ_99_visual_adapter.py`'s `CNSHandle`
-   protocol has exactly five methods: `subscribe`, three `get_*` reads, and
-   `close` — no write/command surface (asserted by
-   `test_cns_handle_protocol_has_no_write_or_command_surface`). Inbound
-   WebSocket frames from the React app are read and discarded on purpose
-   (`test_server_ignores_inbound_client_messages`); there is no code path
-   from the browser back into Hojaiga or into
-   `organ_19_chrome_cdp_runtime.py`.
-2. **Hojaiga's core organs were never touched.** Nothing here imports,
-   patches, or vendors `organ_01_brain.py`, `organ_02_cns_single_file.py`,
-   `organ_19_chrome_cdp_runtime.py`, or `organ_38_task_orchestrator.py` —
-   `organ_02` is only ever `import`-ed, read-only, from the one connector
-   function.
-3. **Secrets are stripped before they exist in the UI.** `sanitize_payload`
-   recursively redacts key-name patterns (`api_key`, `token`, `secret`,
-   `cookie`, `authorization`, `credential`, etc. — see
-   `SENSITIVE_KEY_MARKERS` in `organ_99_visual_adapter.py`) and truncates
-   oversized strings (e.g. base64 screenshots), before anything is
-   JSON-serialized to a client.
-4. **No fake work.** `agentEngine.ts`'s `applyHojaigaEvent` is a pure
-   reducer driven only by real `EventEnvelope`s off the WebSocket — there
-   is no `setTimeout`-driven task simulation anywhere. The only timer-based
-   loop is the render-frame *interpolation* between tiles a real event
-   already committed an agent to (ambient idle animation, not fake task
-   execution, as the brief allows).
-5. **Reconnects resume from a fresh snapshot.** Every new WebSocket
-   connection — including a reconnect after a refresh — gets its own
-   `WORLD_SNAPSHOT` first (`test_reconnecting_client_gets_a_fresh_snapshot`,
-   plus the frontend's own reconnect+resume test). The client never trusts
-   stale local state across a reconnect.
-
----
-
-## 4. Design notes worth knowing
-
-- The facility floor plan (`world/grid.ts`) is a real walled tile grid, not
-  just a waypoint graph: Execution Floor and Browser Lab have a short
-  direct corridor, and the Security Checkpoint room is only reachable via
-  two narrow spurs. A `SECURITY_CHECK` event routes the agent through the
-  turnstile as an explicit, physically-real detour (two chained A* legs),
-  exactly as the brief specifies — it's not a shortest-path fluke.
-- `agentEngine.ts` is intentionally a pure function
-  (`(state, event) -> state`), decoupled from rendering. That's what makes
-  it possible to unit-test all six event mappings without a browser or a
-  live socket.
-- Visual language: dark control-room palette, per-zone accent colors that
-  only render at full strength once that zone's lights are on
-  (`EVENT_ORGAN_CONNECTED` / `EVENT_CNS_STARTED`), monospace organ-ID
-  badges at each desk (`ORG-38`, `ORG-07`, …) matching Hojaiga's own
-  numbering convention, and a subtle scanline overlay on the canvas.
+The paths assume the project lives in `D:\new_automation` (set `HOJAIGA_ROOT` to change that). Offline tests: `python -m core_organs.si_tests_mind` from `All codes` (22 groups, 365 checks).

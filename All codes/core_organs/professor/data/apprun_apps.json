@@ -1,0 +1,18 @@
+{
+  "_about": "WHICH applications the harness is asked to run, in which tier, and what part of the guide a scenario cares about. This is the user's test plan, not behaviour: nothing here changes how an application is driven (launching, state protection, routes and safety are derived from the application itself).",
+  "apps": [
+    {"key": "calculator",     "name": "calculator",         "tier": 0, "vision_verify": true},
+    {"key": "notepad",        "name": "notepad",            "tier": 0, "vision_verify": true},
+    {"key": "mspaint",        "name": "paint",              "tier": 1, "vision_verify": true},
+    {"key": "chrome",         "name": "chrome",             "tier": 1, "vision_verify": true, "focus": "profile|account|customi[sz]e|theme|homepage|startup|default browser|settings", "scenario": "chrome profile"},
+    {"key": "winword",        "name": "word",               "tier": 1},
+    {"key": "powerpnt",       "name": "powerpoint",         "tier": 1},
+    {"key": "whatsapp",       "name": "whatsapp",           "tier": 2, "mode": "navigate"},
+    {"key": "chrome_tabs",    "name": "chrome",             "tier": 2, "guide_key": "chrome", "vision_verify": true, "focus": "\\btabs?\\b|window|reload|back|forward|bookmark|history|search", "scenario": "chrome tabs"},
+    {"key": "systemsettings", "name": "settings",           "tier": 2, "mode": "navigate"},
+    {"key": "discord",        "name": "discord",            "tier": 2, "mode": "navigate"},
+    {"key": "code",           "name": "visual studio code", "tier": 3},
+    {"key": "blender",        "name": "blender",            "tier": 3},
+    {"key": "obs64",          "name": "obs studio",         "tier": 3}
+  ]
+}

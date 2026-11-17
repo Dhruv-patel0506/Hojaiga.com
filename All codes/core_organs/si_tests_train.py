@@ -206,6 +206,29 @@ def run_tr3() -> "TestOutcome":
         return _verdict(checks, f"read={s['read']} valid={s['valid']} train={s['train']} eval={s['eval']} rejected={[r['problems'][0][:30] for r in s['rejected']]}")
 
 
+def run_tr3b() -> "TestOutcome":
+    """TR3b: bounded eval is deterministic and does not become a source-order sample."""
+    T = _T()
+    rows = []
+    for app, action, n in (("calc", "click", 4), ("calc", "hotkey", 2), ("editor", "click", 3), ("browser", "type", 1)):
+        for i in range(n):
+            rows.append({"messages": [
+                {"role": "system", "content": [{"type": "text", "text": "system"}]},
+                {"role": "user", "content": [{"type": "text", "text": "goal"}]},
+                {"role": "assistant", "content": [{"type": "text", "text": json.dumps([{ "action": action }])}]},
+            ], "meta": {"app_key": app, "pair_id": f"{app}-{action}-{i}"}})
+    one = T.balanced_eval_slice(rows, max_examples=4, seed=7)
+    two = T.balanced_eval_slice(rows, max_examples=4, seed=7)
+    all_rows = T.balanced_eval_slice(rows, max_examples=0, seed=7)
+    keys = [r["meta"]["pair_id"] for r in one]
+    group = lambda r: r["meta"]["app_key"] + "::" + json.loads(r["messages"][2]["content"][0]["text"])[0]["action"]
+    checks = {"bounded_slice_has_requested_size": len(one) == 4,
+              "slice_is_reproducible": keys == [r["meta"]["pair_id"] for r in two],
+              "first_pass_covers_distinct_groups": len({group(r) for r in one}) == 4,
+              "zero_means_full_eval": all_rows == rows}
+    return _verdict(checks, f"selected={keys}")
+
+
 def run_tr4() -> "TestOutcome":
     """TR4: label masking and the collator"""
     T = _T()
@@ -437,6 +460,7 @@ def run_tr10() -> "TestOutcome":
     one_group, none = TQ.split_by_video(pairs[:2], 0.5, 1)
     gold_click, gold_key, gold_type = {"action": "click", "target_id": 7}, {"action": "hotkey", "hotkey": "alt+2"}, {"action": "type", "text": "hi"}
     p = TQ.parse_action
+    pd = TQ.parse_action_detail
     checks = {"a_split_gives_an_eval_set_of_about_the_asked_size": 2 <= len(ev) <= 6 and len(tr) + len(ev) == len(pairs),
               "a_control_never_straddles_train_and_eval": not (groups_tr & groups_ev) and all(sum(1 for q in ev if TQ._group_of(q) == g) == 2 for g in groups_ev),
               "videos_still_split_by_video": {q["meta"]["video_id"].split("@")[0] for q in tv}.isdisjoint({q["meta"]["video_id"].split("@")[0] for q in evv}) and len(evv) > 0,
@@ -447,6 +471,7 @@ def run_tr10() -> "TestOutcome":
                                                                          and p('[{"step": 1, "action": "hotkey", "target_id": null, "hotkey": "alt+2", "text": null, "verify_expectation": "the scr')["hotkey"] == "alt+2"
                                                                          and p('[{"step": 1, "action": "type", "target_id": null, "hotkey": null, "text": "hi there", "verify_ex')["text"] == "hi there"
                                                                          and p('[{"step": 1, "action": "click", "target_id": null, "ver') is None and p('[{"step": 1, "act') is None,
+              "strict_json_does_not_credit_recovery_from_a_truncated_reply": pd('[{"action":"click","target_id":7}]')[1] and not pd('[{"action":"click","target_id":7,"verify_expectation":"cut')[1],
               "exact_needs_the_right_target": TQ.score_action(p('[{"action":"click","target_id":7}]'), gold_click) == {"valid": True, "action": True, "exact": True}
                                               and TQ.score_action(p('[{"action":"click","target_id":8}]'), gold_click) == {"valid": True, "action": True, "exact": False},
               "right_kind_wrong_answer_and_wrong_kind": TQ.score_action({"action": "hotkey", "hotkey": "ctrl+s"}, gold_click) == {"valid": True, "action": False, "exact": False},
@@ -454,11 +479,11 @@ def run_tr10() -> "TestOutcome":
               "type_compares_the_text": TQ.score_action({"action": "type", "text": " hi "}, gold_type)["exact"] and not TQ.score_action({"action": "type", "text": "ho"}, gold_type)["exact"],
               "invalid_output_scores_zero": TQ.score_action(None, gold_click) == {"valid": False, "action": False, "exact": False},
               "summary_is_rates": TQ.summarize_scores([{"valid": True, "action": True, "exact": True}, {"valid": True, "action": False, "exact": False}, {"valid": False, "action": False, "exact": False}, {"valid": True, "action": True, "exact": False}])
-                                  == {"n": 4, "valid_json": 0.75, "action_kind": 0.5, "exact": 0.25}}
+                                  == {"n": 4, "valid_json": 0.75, "recoverable_action": 0.75, "action_kind": 0.5, "exact": 0.25}}
     return _verdict(checks, f"eval={len(ev)} of {len(pairs)} ({len(groups_ev)} controls held out)")
 
 
-TESTS = [("TR1", run_tr1), ("TR2", run_tr2), ("TR3", run_tr3), ("TR4", run_tr4), ("TR5", run_tr5), ("TR6", run_tr6), ("TR7", run_tr7), ("TR8", run_tr8), ("TR9", run_tr9), ("TR10", run_tr10)]
+TESTS = [("TR1", run_tr1), ("TR2", run_tr2), ("TR3", run_tr3), ("TR3B", run_tr3b), ("TR4", run_tr4), ("TR5", run_tr5), ("TR6", run_tr6), ("TR7", run_tr7), ("TR8", run_tr8), ("TR9", run_tr9), ("TR10", run_tr10)]
 
 if __name__ == "__main__":
     only = [a.upper() for a in sys.argv[1:]]

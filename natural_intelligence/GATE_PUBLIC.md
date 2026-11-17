@@ -1,0 +1,15 @@
+# Manager gate on public agent outcomes (SWE-agent trajectories)
+2026-11-08 02:10
+
+tasks used 350, runs 3937
+
+```
+records 3937  PASS 594  FAIL 3343  (majority-class accuracy 0.849)
+gate  : accuracy 0.843   AUROC 0.519
+base  : per-app pass-rate AUROC 0.540   (the thing the gate must beat to justify itself)
+proceed threshold (precision >= 0.9, >= 8 cases): none reached -> the gate would never say proceed
+```
+
+baseline per-agent pass-rate AUROC 0.377   per-repo pass-rate AUROC 0.478
+
+transfer SWE -> user's manager ledger (143 records, 38 PASS): AUROC 0.484  (0.5 = no transfer)

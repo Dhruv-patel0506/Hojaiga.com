@@ -2558,3 +2558,71 @@ def run_pcc_plan_harvest(TestOutcome):
     finally:
         mdl.close()
         _rm_db(dbp)
+
+
+def run_ribbon_opener(TestOutcome):
+    """RIBBON + CHILD-WINDOW-OPENER knowledge (any-app contract). Part 1 proves the scanner's ribbon readback:
+    once organ_50's reveal has persisted every tab's buttons into bm_layout (via 'tab:<name>'), the scan rebuilds
+    the full ribbon (all tabs + each group under the tab that shows it) - not just the tab that happened to be
+    active - and the capability card advertises it. Part 2 proves the classifier now recognises a control that
+    opens a CHILD WINDOW even when it does NOT look like a menu: modal-picker names ('Options', 'Browse...',
+    'Import', 'Save As', 'About') become 'opener' (full window poll + probed even when a document is dirty),
+    while verbs that act INLINE on user content (Paste, Cut, Find, Rename, Delete) stay 'button' - never probed
+    blind on a dirty document - and the plain-button window poll was lengthened off the 0.7 s that missed slow
+    cold-start dialogs."""
+    from core_organs import fast_scan as fs, organ_50_layout_map as lm
+    from core_organs import organ_63_app_mastery as m63, capability_card as cc
+    mdl, dbp = _model()
+    key = "ribbonapp"
+    checks: Dict[str, bool] = {}
+    try:
+        # --- Part 1: ribbon readback from the persisted layout (the reveal already ran in a real scan) ---
+        mdl._conn.executescript(lm.LAYOUT_SCHEMA)
+        rows = [("Home", "tabitem", "static", "ribbon", "select"),
+                ("Insert", "tabitem", "static", "ribbon", "select"),
+                ("View", "tabitem", "static", "ribbon", "select"),
+                ("Paste", "button", "tab:Home", "Clipboard", "invoke"),
+                ("Cut", "button", "tab:Home", "Clipboard", "invoke"),
+                ("Pictures", "button", "tab:Insert", "Images", "invoke"),
+                ("Screenshot", "button", "tab:Insert", "Symbols", "invoke")]
+        for i, (nm, role, via, region, pats) in enumerate(rows):
+            mdl._conn.execute(
+                "INSERT INTO bm_layout (ctrl_id, app_key, region_name, role, name, patterns, via) VALUES (?,?,?,?,?,?,?)",
+                (f"c{i}", key, region, role, nm, pats, via))
+        mdl._conn.commit()
+        tabs, groups = fs._ribbon_from_layout(mdl, key)
+        checks["every ribbon tab is known, not just the active one"] = (tabs == ["Home", "Insert", "View"])
+        checks["each revealed group maps to the tab that shows it"] = (
+            groups.get("Clipboard", {}).get("tab") == "Home"
+            and groups.get("Images", {}).get("tab") == "Insert")
+        checks["ribbon buttons are grouped under their section"] = (
+            "Paste" in groups.get("Clipboard", {}).get("controls", [])
+            and "Pictures" in groups.get("Images", {}).get("controls", []))
+
+        # --- the capability card advertises the ribbon (from this run's scan report AND from persisted layout) ---
+        card_scan = cc.build_card(key, 0, model=mdl,
+                                  scan={"ribbon": {"present": True, "tabs": tabs, "groups": groups,
+                                                   "coverage": "all tabs revealed"}})
+        r1 = (card_scan.get("map") or {}).get("ribbon") or {}
+        checks["the capability card surfaces the ribbon from the scan report"] = (
+            r1.get("present") is True and r1.get("n_tabs") == 3 and r1.get("n_groups") == 3)
+        card_persist = cc.build_card(key, 0, model=mdl, scan={})       # no scan ribbon: read persisted layout
+        r2 = (card_persist.get("map") or {}).get("ribbon") or {}
+        checks["a warm card still advertises the ribbon from persisted knowledge"] = (
+            r2.get("present") is True and r2.get("n_tabs") == 3)
+
+        # --- Part 2: child-window-opener classification ---
+        openers = ["Options…", "Browse...", "Import", "Export", "Save As", "Settings", "About", "Customize", "Properties"]
+        inline = ["Paste", "Cut", "Copy", "Bold", "Find", "Find Next", "Rename", "Delete", "Undo", "Redo", "New", "Open", "Home", "View"]
+        checks["modal-picker controls are recognised as window openers"] = all(
+            m63._looks_like_opener(n) for n in openers)
+        checks["inline action verbs are NOT mislabelled openers (never probed on a dirty doc)"] = not any(
+            m63._looks_like_opener(n) for n in inline)
+        checks["an empty name is not an opener"] = (m63._looks_like_opener("") is False)
+        checks["the plain-button window poll is lengthened past the 0.7 s that missed slow dialogs"] = (
+            m63.BUTTON_WINDOW_POLL_S >= 1.0)
+        return _verdict(TestOutcome, checks,
+                        extra=f"tabs={tabs} groups={list(groups)} opener_poll={m63.BUTTON_WINDOW_POLL_S}s")
+    finally:
+        mdl.close()
+        _rm_db(dbp)

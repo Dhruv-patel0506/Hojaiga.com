@@ -12,6 +12,7 @@ membership in `live` (the commands present in the current UI state). Nothing unr
 from __future__ import annotations
 
 import difflib
+from collections import Counter
 import math
 import re
 from dataclasses import dataclass
@@ -76,6 +77,7 @@ class Lexicon:
         self.st = st
         self.db = st.sql("lexicon")
         self._idf: Dict[str, Tuple[int, Dict[str, float], float]] = {}
+        self._aix: Dict[str, Tuple[int, Any]] = {}                      # app -> (generation, alias index): built once, not per resolve
 
     # ---- writes -------------------------------------------------------------------------------------------------------------------------------------
     def add_command(self, app_key: str, label: str, archetype: str = "", source: str = "registry", trust: str = "catalog") -> str:
@@ -163,6 +165,24 @@ class Lexicon:
         r = self.db.one("SELECT label FROM commands WHERE command_id=?", (cid,))
         return r["label"] if r else cid.split(":", 1)[-1]
 
+    def _alias_index(self, app_key: str) -> Tuple[Dict[str, List[Dict[str, Any]]], Dict[str, Set[str]], Dict[str, Set[str]]]:
+        """(rows by surface, token set of each surface, token -> surfaces holding it), rebuilt only when the app's aliases change. resolve() re-tokenised every alias on
+        every call: 642,064 tokenisations for 30 manual pages (Oct-28, after 18,609 Office object-model members were filed); now only aliases sharing a word are checked."""
+        g = self.st.gen(f"lexicon:{app_key}")
+        hit = self._aix.get(app_key)
+        if hit and hit[0] == g:
+            return hit[1]
+        by_surface: Dict[str, List[Dict[str, Any]]] = {}
+        for r in self.db.rows("SELECT surface_norm, command_id, kind, trust, n_seen FROM aliases WHERE app_key=?", (app_key,)):
+            by_surface.setdefault(r["surface_norm"], []).append(r)
+        tok_of = {sf: set(toks(sf)) for sf in by_surface}
+        holders: Dict[str, Set[str]] = {}
+        for sf, ts in tok_of.items():
+            for t in ts:
+                holders.setdefault(t, set()).add(sf)
+        self._aix[app_key] = (g, (by_surface, tok_of, holders))
+        return by_surface, tok_of, holders
+
     def _idf_table(self, app_key: str) -> Tuple[Dict[str, float], float]:
         g = self.st.gen(f"lexicon:{app_key}")
         hit = self._idf.get(app_key)
@@ -190,10 +210,7 @@ class Lexicon:
             if cid not in found or score > found[cid].score:
                 found[cid] = Match(cid, round(score, 4), kind, surf, trust)
 
-        rows = self.db.rows("SELECT surface_norm, command_id, kind, trust, n_seen FROM aliases WHERE app_key=?", (app_key,))
-        by_surface: Dict[str, List[Dict[str, Any]]] = {}
-        for r in rows:
-            by_surface.setdefault(r["surface_norm"], []).append(r)
+        by_surface, tok_of, holders = self._alias_index(app_key)
         # 1. exact surface, 2. menu-path leaf
         for key, score in ((s, 1.0), (surface(text.split(">")[-1]), 0.95)):
             for r in by_surface.get(key, ()):
@@ -203,8 +220,8 @@ class Lexicon:
         if qt:
             idf, default = self._idf_table(app_key)
             qw = sum(idf.get(t, default) for t in qt) or 1.0
-            for surf, lst in by_surface.items():
-                at = set(toks(surf))
+            for surf in set().union(*(holders.get(t, set()) for t in qt)):                 # only aliases sharing a word with the text can be contained in it
+                at, lst = tok_of[surf], by_surface[surf]
                 if not at or not at <= qt:
                     continue
                 cov = sum(idf.get(t, default) for t in at) / qw
@@ -214,9 +231,9 @@ class Lexicon:
         if qt:
             idf, default = self._idf_table(app_key)
             owners: Dict[str, Set[str]] = {}
-            for surf, lst in by_surface.items():
-                for t in set(toks(surf)) & qt:
-                    owners.setdefault(t, set()).update(r["command_id"] for r in lst)
+            for t in qt:
+                for surf in holders.get(t, ()):
+                    owners.setdefault(t, set()).update(r["command_id"] for r in by_surface[surf])
             for t, cids in owners.items():
                 if len(cids) == 1 and idf.get(t, default) >= C.UNIQUE_TOKEN_MIN_IDF:
                     cid = next(iter(cids))
@@ -225,9 +242,13 @@ class Lexicon:
                         put(cid, C.UNIQUE_TOKEN_SCORE, "synonym", t, row["trust"] if row else "seed")
         # 4. fuzzy, only when nothing else matched (a spelling variant)
         if not found and len(s) >= 4:
+            sc = Counter(s)
             for surf, lst in by_surface.items():
                 if abs(len(surf) - len(s)) > 4:
                     continue
+                n = len(s) + len(surf)                                          # difflib's own upper bounds first (same verdicts): the full ratio over every alias
+                if 2.0 * min(len(s), len(surf)) / n < C.FUZZY_RESOLVE or 2.0 * sum((sc & Counter(surf)).values()) / n < C.FUZZY_RESOLVE:
+                    continue                                                    # was half of a manual import's time (Oct-28: 115k comparisons for 120 pages)
                 ratio = difflib.SequenceMatcher(None, s, surf).ratio()
                 if ratio >= C.FUZZY_RESOLVE:
                     for r in lst:

@@ -762,6 +762,12 @@ class Router:
         procs.sort(key=lambda e: (len(e.payload["steps"]), -e.payload["grounded_ratio"]))      # shortest, best-grounded first: basics before advanced
         ret.evidence += procs
         if not procs:
-            ret.gaps.append("no_procedures_for_topic")
+            # A vendor overview may teach a useful concept without containing
+            # a runnable numbered workflow. Show that cited material to the
+            # tutor, but never turn it into a plan or executable route.
+            docs = self._probe(ret.trace, "curriculum_docs", r.proc.query, app, topic, q.app_version, live, 8, default=[])
+            ret.evidence += docs
+            if not docs:
+                ret.gaps.append("no_procedures_for_topic")
             ret.explore_targets = r.proc.explore_targets(app)
         ret.trace.append({"probe": "coverage", "ms": 0.0, "hits": r.graph.stats(app)["nodes"], "why": f"graph={r.graph.stats(app)} commands={r.lex.n_commands(app)}"})

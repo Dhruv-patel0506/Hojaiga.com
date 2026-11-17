@@ -113,6 +113,13 @@ hojaiga_sweep_result.json
 /_*.err
 /_*.log
 data/escalations/
+
+# video harvest media: gigabytes per hour-long video, all regenerable from the source URL
+/video_dataset/*/frames_raw/
+/video_dataset/*/video/
+/video_dataset/*/audio/
+/video_dataset/*/captions/
+/video_dataset/*/asr/
 All codes/after_menu.png
 All codes/before_menu.png
 All codes/full_after_click.png
@@ -120,3 +127,7 @@ All codes/full_after_click.png
 # federated RAG storage root default (vectors, SQLite indexes, blobs): large, machine-local, rebuildable
 data/ai_root/
 data/rag_root.txt
+data/vault/
+
+# downloads delivered for integration (sources recorded in each SOURCE.txt), never committed
+data/inbox/

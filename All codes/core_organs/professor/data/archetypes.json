@@ -1,0 +1,675 @@
+{
+  "_comment": "Software ARCHETYPES (categories, never application names - law L3). Each carries the evidence that identifies it (words found in menu verbs and area captions, layout facts) and the BLUEPRINT the Professor reasons with once it knows the kind: where properties live, where structure lives, the usual pipeline. Edit freely; no code change needed.",
+  "archetypes": [
+    {
+      "id": "spatial_3d",
+      "name": "Spatial / 3D (CAD, modelling, DCC)",
+      "verbs": [
+        "render",
+        "mesh",
+        "modifier",
+        "vertex",
+        "vertices",
+        "edge",
+        "face",
+        "extrude",
+        "bevel",
+        "subdivide",
+        "material",
+        "shading",
+        "sculpt",
+        "uv",
+        "camera",
+        "light",
+        "rig",
+        "bone",
+        "armature",
+        "curve",
+        "scene",
+        "object",
+        "transform",
+        "boolean",
+        "sketch",
+        "constraint",
+        "assembly",
+        "revolve",
+        "loft"
+      ],
+      "regions": [
+        "viewport",
+        "3d viewport",
+        "outliner",
+        "properties",
+        "gizmo",
+        "timeline",
+        "scene collection",
+        "modifiers",
+        "shader",
+        "node editor",
+        "tool shelf",
+        "model tree"
+      ],
+      "layout": [
+        "center_canvas",
+        "right_panel"
+      ],
+      "entities": [
+        "meshes",
+        "curves",
+        "vertices / edges / faces",
+        "modifiers",
+        "materials",
+        "cameras",
+        "lights"
+      ],
+      "pipeline": [
+        "create a primitive",
+        "transform it",
+        "deform or modify",
+        "assign a material",
+        "light and frame",
+        "render or export"
+      ],
+      "properties_live": "the properties / inspector panel on the right, for the active selection",
+      "structure_lives": "the outliner / scene or model tree (top right or left)",
+      "lifecycle": "new scene -> build -> save the project file -> render / export"
+    },
+    {
+      "id": "temporal_media",
+      "name": "Temporal media (video editing, audio workstation)",
+      "verbs": [
+        "clip",
+        "track",
+        "trim",
+        "split",
+        "ripple",
+        "keyframe",
+        "transition",
+        "effect",
+        "render",
+        "export",
+        "mix",
+        "mute",
+        "solo",
+        "record",
+        "sequence",
+        "timeline",
+        "marker",
+        "grade",
+        "color",
+        "proxy",
+        "bounce",
+        "quantize",
+        "midi",
+        "plugin",
+        "automation"
+      ],
+      "regions": [
+        "timeline",
+        "tracks",
+        "playhead",
+        "program monitor",
+        "source monitor",
+        "mixer",
+        "effects",
+        "media pool",
+        "project panel",
+        "waveform",
+        "piano roll",
+        "transport"
+      ],
+      "layout": [
+        "bottom_panel",
+        "center_canvas"
+      ],
+      "entities": [
+        "tracks",
+        "clips",
+        "keyframes",
+        "effects",
+        "markers"
+      ],
+      "pipeline": [
+        "import media",
+        "slice and arrange on the timeline",
+        "grade or mix",
+        "add effects and transitions",
+        "export"
+      ],
+      "properties_live": "the effect controls / inspector for the selected clip",
+      "structure_lives": "the project / media bin and the timeline tracks",
+      "lifecycle": "new project -> import -> edit -> save project -> export"
+    },
+    {
+      "id": "canvas_layout",
+      "name": "Canvas and layout (slides, design, whiteboard)",
+      "verbs": [
+        "slide",
+        "layout",
+        "theme",
+        "shape",
+        "text box",
+        "align",
+        "distribute",
+        "group",
+        "arrange",
+        "frame",
+        "artboard",
+        "layer",
+        "fill",
+        "stroke",
+        "font",
+        "animation",
+        "transition",
+        "present",
+        "master",
+        "component",
+        "export",
+        "design",
+        "insert",
+        "picture",
+        "smartart"
+      ],
+      "regions": [
+        "slide",
+        "slides",
+        "thumbnails",
+        "artboard",
+        "canvas",
+        "layers",
+        "format",
+        "design",
+        "notes",
+        "inspector",
+        "properties",
+        "assets"
+      ],
+      "layout": [
+        "center_canvas",
+        "left_panel",
+        "ribbon"
+      ],
+      "entities": [
+        "slides / frames",
+        "shapes",
+        "text containers",
+        "images",
+        "layers"
+      ],
+      "pipeline": [
+        "create a frame or slide",
+        "add content",
+        "style and align",
+        "present or export"
+      ],
+      "properties_live": "the format / style inspector (right) or the ribbon tab for the selection",
+      "structure_lives": "the slide sorter or layer list (left)",
+      "lifecycle": "new file -> compose -> save -> present / export"
+    },
+    {
+      "id": "document_text",
+      "name": "Document and text (word processor, notes)",
+      "verbs": [
+        "paragraph",
+        "style",
+        "heading",
+        "font",
+        "bold",
+        "italic",
+        "spelling",
+        "grammar",
+        "review",
+        "track changes",
+        "comment",
+        "mail merge",
+        "references",
+        "table of contents",
+        "page layout",
+        "margins",
+        "header",
+        "footer",
+        "find",
+        "replace",
+        "word count",
+        "word wrap",
+        "page setup",
+        "headings",
+        "lists",
+        "print",
+        "undo",
+        "redo",
+        "writing tools",
+        "rewrite",
+        "summarize",
+        "link",
+        "strikethrough"
+      ],
+      "regions": [
+        "document",
+        "navigation pane",
+        "ruler",
+        "page",
+        "styles",
+        "outline",
+        "review",
+        "plain text",
+        "characters",
+        "line ending",
+        "encoding",
+        "status bar",
+        "text editor"
+      ],
+      "layout": [
+        "ribbon",
+        "center_canvas"
+      ],
+      "entities": [
+        "paragraphs",
+        "styles",
+        "tables",
+        "images",
+        "comments"
+      ],
+      "pipeline": [
+        "write",
+        "structure with headings",
+        "format with styles",
+        "review",
+        "export or print"
+      ],
+      "properties_live": "the ribbon (Home / Layout) and the Styles pane for the selected text",
+      "structure_lives": "the navigation / outline pane",
+      "lifecycle": "new document -> write -> format -> review -> save / export"
+    },
+    {
+      "id": "spreadsheet_data",
+      "name": "Spreadsheet and grid",
+      "verbs": [
+        "formula",
+        "function",
+        "sum",
+        "pivot",
+        "chart",
+        "filter",
+        "sort",
+        "cell",
+        "sheet",
+        "range",
+        "validation",
+        "conditional formatting",
+        "macro",
+        "freeze panes",
+        "data",
+        "named range"
+      ],
+      "regions": [
+        "formula bar",
+        "name box",
+        "sheet tabs",
+        "column",
+        "row",
+        "cells",
+        "grid",
+        "pivot"
+      ],
+      "layout": [
+        "ribbon",
+        "center_canvas",
+        "bottom_panel"
+      ],
+      "entities": [
+        "cells",
+        "ranges",
+        "sheets",
+        "formulas",
+        "charts",
+        "pivot tables"
+      ],
+      "pipeline": [
+        "enter data",
+        "write formulas",
+        "filter and sort",
+        "summarise (pivot / chart)",
+        "share / export"
+      ],
+      "properties_live": "the ribbon and the formula bar for the selected cell",
+      "structure_lives": "the sheet tabs at the bottom",
+      "lifecycle": "new workbook -> data -> analysis -> save"
+    },
+    {
+      "id": "crud_records",
+      "name": "Records and forms (ERP, CRM, database tools)",
+      "verbs": [
+        "new record",
+        "save record",
+        "search",
+        "filter",
+        "query",
+        "report",
+        "view",
+        "field",
+        "column",
+        "table",
+        "relation",
+        "import",
+        "export",
+        "assign",
+        "status",
+        "approve",
+        "invoice",
+        "customer",
+        "order",
+        "run query"
+      ],
+      "regions": [
+        "filter",
+        "search",
+        "records",
+        "list",
+        "detail",
+        "form",
+        "navigation",
+        "sidebar",
+        "grid",
+        "query"
+      ],
+      "layout": [
+        "left_panel",
+        "center_canvas",
+        "right_panel"
+      ],
+      "entities": [
+        "records",
+        "fields",
+        "views",
+        "relations"
+      ],
+      "pipeline": [
+        "query or filter",
+        "open a record",
+        "edit fields",
+        "commit the change",
+        "report / export"
+      ],
+      "properties_live": "the detail form / inspector of the selected record",
+      "structure_lives": "the navigation sidebar and the list view",
+      "lifecycle": "log in -> find -> open -> edit -> save"
+    },
+    {
+      "id": "code_ide",
+      "name": "Code editor / IDE",
+      "verbs": [
+        "debug",
+        "run",
+        "build",
+        "refactor",
+        "commit",
+        "branch",
+        "terminal",
+        "extensions",
+        "go to definition",
+        "find in files",
+        "breakpoint",
+        "format document",
+        "source control",
+        "problems",
+        "output"
+      ],
+      "regions": [
+        "explorer",
+        "editor",
+        "terminal",
+        "problems",
+        "source control",
+        "extensions",
+        "debug console",
+        "output",
+        "minimap",
+        "activity bar"
+      ],
+      "layout": [
+        "left_panel",
+        "center_canvas",
+        "bottom_panel"
+      ],
+      "entities": [
+        "files",
+        "symbols",
+        "breakpoints",
+        "branches",
+        "extensions"
+      ],
+      "pipeline": [
+        "open a folder",
+        "edit files",
+        "run / debug",
+        "commit"
+      ],
+      "properties_live": "the settings editor and the status bar (language, encoding, branch)",
+      "structure_lives": "the explorer / outline in the left side bar",
+      "lifecycle": "open folder -> edit -> run -> commit"
+    },
+    {
+      "id": "raster_editor",
+      "name": "Image / raster editor",
+      "verbs": [
+        "brush",
+        "layer",
+        "mask",
+        "filter",
+        "adjust",
+        "curves",
+        "levels",
+        "crop",
+        "select",
+        "lasso",
+        "clone",
+        "heal",
+        "blend",
+        "opacity",
+        "canvas size",
+        "image size",
+        "gradient",
+        "eraser",
+        "export as"
+      ],
+      "regions": [
+        "layers",
+        "history",
+        "brushes",
+        "tools",
+        "swatches",
+        "channels",
+        "navigator",
+        "toolbox"
+      ],
+      "layout": [
+        "left_panel",
+        "center_canvas",
+        "right_panel"
+      ],
+      "entities": [
+        "layers",
+        "masks",
+        "selections",
+        "brushes",
+        "adjustments"
+      ],
+      "pipeline": [
+        "open or create an image",
+        "select",
+        "edit on layers",
+        "adjust",
+        "export"
+      ],
+      "properties_live": "the options bar (top) and the properties panel (right)",
+      "structure_lives": "the layers panel (right)",
+      "lifecycle": "open -> edit non-destructively -> export"
+    },
+    {
+      "id": "browser_web",
+      "name": "Web browser / web app",
+      "verbs": [
+        "back",
+        "forward",
+        "reload",
+        "bookmark",
+        "history",
+        "downloads",
+        "extensions",
+        "new tab",
+        "incognito",
+        "zoom",
+        "developer tools",
+        "find in page"
+      ],
+      "regions": [
+        "address bar",
+        "tab strip",
+        "bookmarks",
+        "omnibox",
+        "tabs"
+      ],
+      "layout": [
+        "tab_strip",
+        "center_canvas"
+      ],
+      "entities": [
+        "tabs",
+        "pages",
+        "bookmarks",
+        "downloads"
+      ],
+      "pipeline": [
+        "open a page",
+        "interact with the page",
+        "save / bookmark"
+      ],
+      "properties_live": "the page itself and the site-settings icon in the address bar",
+      "structure_lives": "the tab strip",
+      "lifecycle": "open -> browse -> close"
+    },
+    {
+      "id": "file_manager",
+      "name": "File manager",
+      "verbs": [
+        "copy",
+        "paste",
+        "cut",
+        "move",
+        "rename",
+        "delete",
+        "new folder",
+        "sort",
+        "view",
+        "properties",
+        "extract",
+        "share",
+        "open with"
+      ],
+      "regions": [
+        "navigation pane",
+        "address bar",
+        "details",
+        "quick access",
+        "this pc",
+        "folders",
+        "preview pane"
+      ],
+      "layout": [
+        "left_panel",
+        "center_canvas"
+      ],
+      "entities": [
+        "files",
+        "folders",
+        "drives"
+      ],
+      "pipeline": [
+        "navigate",
+        "select",
+        "copy / move / rename",
+        "open"
+      ],
+      "properties_live": "the details / preview pane and the Properties dialog",
+      "structure_lives": "the navigation tree on the left",
+      "lifecycle": "browse -> act on files"
+    },
+    {
+      "id": "terminal_console",
+      "name": "Terminal / console",
+      "verbs": [
+        "paste",
+        "copy",
+        "split pane",
+        "new tab",
+        "profile",
+        "clear",
+        "find",
+        "settings"
+      ],
+      "regions": [
+        "prompt",
+        "shell",
+        "console",
+        "terminal",
+        "command line"
+      ],
+      "layout": [
+        "center_canvas"
+      ],
+      "entities": [
+        "sessions",
+        "commands",
+        "panes"
+      ],
+      "pipeline": [
+        "type a command",
+        "read the output",
+        "repeat"
+      ],
+      "properties_live": "the settings / profile of the terminal",
+      "structure_lives": "the tab strip",
+      "lifecycle": "open -> work -> close"
+    },
+    {
+      "id": "settings_form",
+      "name": "Dialog / settings form",
+      "verbs": [
+        "ok",
+        "cancel",
+        "apply",
+        "browse",
+        "default",
+        "advanced",
+        "options",
+        "preferences",
+        "next",
+        "back",
+        "finish"
+      ],
+      "regions": [
+        "dialog",
+        "options",
+        "general",
+        "advanced"
+      ],
+      "layout": [
+        "dialog"
+      ],
+      "entities": [
+        "options",
+        "fields",
+        "choices"
+      ],
+      "pipeline": [
+        "read the options",
+        "change values",
+        "confirm with OK / Apply or back out with Cancel"
+      ],
+      "properties_live": "the fields in the dialog itself",
+      "structure_lives": "the category list or tabs on the left / top",
+      "lifecycle": "open -> change -> confirm or cancel"
+    }
+  ]
+}

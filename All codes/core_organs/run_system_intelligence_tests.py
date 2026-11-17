@@ -1298,6 +1298,7 @@ test_nolm_behavior = _kn("run_nolm_fast_path", "NO-LLM-PATH (any-app contract C)
 test_drwe_behavior = _kn("run_drwe_draw_target", "DRAW-EFFECTIVE (any-app contract D): a stroke with hwnd=None resolves the window under the point to its top-level frame (never the physical pointer, an unresolvable point returns 0 = refused); the draw contract reports delivered/effective/changed_pixels honestly")
 test_upt1_behavior = _kn("run_upt1_unattended_proof", "UNATTENDED-PROOF (any-app contract E): day_runner chains a zero-intervention scenario set (one per surface class) through the real router + persistence - the cold pass needs the 7B on every goal, the warm pass reuses the persisted knowledge so every goal is handled by the rules rail with ZERO real 7B calls and lower latency, and DONE only counts when an independent verifier re-reads the stored rows")
 test_pcc_behavior = _kn("run_pcc_plan_harvest", "PLAN-HARVEST (any-app contract C.2): a verified loop trace becomes a replayable zero-LLM plan ONLY when every step is an unambiguous postcondition-PASSed click/press (a type/launch/scroll or non-PASS step declines), the stored plan is served with zero big-model calls, and a replay that reports INEFFECTIVE falls back rather than faking a pass")
+test_rob_behavior = _kn("run_ribbon_opener", "RIBBON + OPENER (any-app contract): the scanner rebuilds the FULL ribbon from the revealed layout (every tab + each group's buttons, not just the active tab) and the capability card advertises it; a control that opens a CHILD WINDOW is recognised even without a menu look (modal-picker names -> 'opener'), while inline verbs (Paste/Cut/Find/Rename) stay safe 'button's and the plain-button window poll is lengthened past the 0.7s that missed slow dialogs")
 
 
 def test_min1_behavior() -> TestOutcome:
@@ -2632,6 +2633,7 @@ def main() -> int:
         ("DRWE", "ANYAPP", test_drwe_behavior),
         ("UPT1", "ANYAPP", test_upt1_behavior),
         ("PCC", "ANYAPP", test_pcc_behavior),
+        ("ROB", "ANYAPP", test_rob_behavior),
         # LAST on purpose: the defect this guards is process-history dependent (the same captures pass in a fresh
         # process), so the soak has to run on a process that already did a full day of scanning and acting.
         ("EYE1", "HEADLESS", test_eye1_capture_soak),

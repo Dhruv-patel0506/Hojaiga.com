@@ -137,7 +137,7 @@ def gate_plans(plans: List[lf.AppPlan], *, model, run_id: str, task: str, allow_
     unless explicitly allowed; each removed goal is queued for a human with its context and the rest of the task goes on."""
     queued, kept = 0, 0
     for plan in plans:
-        new_goals, new_strength, new_expect = [], [], {}
+        new_goals, new_strength, new_expect, new_steps = [], [], {}, []
         for gi, goal in enumerate(plan.goals):
             risk = model.classify_risk_of(goal) if hasattr(model, "classify_risk_of") else _classify(goal)
             if risk == "E2" and not allow_destructive:
@@ -154,8 +154,12 @@ def gate_plans(plans: List[lf.AppPlan], *, model, run_id: str, task: str, allow_
                 new_expect[len(new_goals)] = plan.expect_map[gi]
             new_goals.append(goal)
             new_strength.append(plan.strength[gi] if gi < len(plan.strength) else "weak")
+            if gi < len(getattr(plan, "steps", []) or []):
+                new_steps.append(plan.steps[gi])                  # the model's steps stay aligned with the goals that render them
             kept += 1
         plan.goals, plan.strength, plan.expect_map = new_goals, new_strength, new_expect
+        if getattr(plan, "steps", None):
+            plan.steps = new_steps
     chain.mark("D3.gate", "risk gate (reversible runs, irreversible queues)",
                "ESCALATED" if queued else "PASS",
                f"{kept} goal(s) cleared, {queued} irreversible goal(s) queued for a human"

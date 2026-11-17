@@ -1,0 +1,1020 @@
+{
+ "version": 1,
+ "note": "Signatures describe LIBRARIES and OS APIs (what a DLL or an imported function means), never applications. 're' is matched against the lower-case file name; 'api' entries against imported function names. The learning loop may append entries.",
+ "libs": [
+  {
+   "re": "^qt(5|6)?core(d)?\\.dll$|^qtcore4\\.dll$",
+   "area": "ui",
+   "label": "Qt",
+   "meaning": "Qt application framework (C++ widgets/QML, signals and slots, event loop)",
+   "lang": "C++"
+  },
+  {
+   "re": "^qt(5|6)?qml(d)?\\.dll$|^qt(5|6)?quick(d)?\\.dll$",
+   "area": "scripting",
+   "label": "QML/Qt Quick",
+   "meaning": "declarative QML user interface with an embedded JavaScript engine"
+  },
+  {
+   "re": "^qt(5|6)?webengine",
+   "area": "ui",
+   "label": "Qt WebEngine",
+   "meaning": "embedded Chromium browser inside a Qt application"
+  },
+  {
+   "re": "^wxmsw\\d+",
+   "area": "ui",
+   "label": "wxWidgets",
+   "meaning": "wxWidgets cross-platform GUI toolkit (C++)",
+   "lang": "C++"
+  },
+  {
+   "re": "^libgtk-\\d|^gtk-\\d",
+   "area": "ui",
+   "label": "GTK",
+   "meaning": "GTK toolkit (GLib object system)",
+   "lang": "C"
+  },
+  {
+   "re": "^sdl2?(_\\w+)?\\.dll$",
+   "area": "ui",
+   "label": "SDL",
+   "meaning": "SDL window/input/audio layer (custom-drawn interface, often games and media tools)"
+  },
+  {
+   "re": "^glfw3?\\.dll$",
+   "area": "ui",
+   "label": "GLFW",
+   "meaning": "GLFW OpenGL/Vulkan window and input library (custom-drawn interface)"
+  },
+  {
+   "re": "^flutter_windows\\.dll$",
+   "area": "ui",
+   "label": "Flutter",
+   "meaning": "Flutter engine (Dart UI drawn with Skia/Impeller)",
+   "lang": "Dart"
+  },
+  {
+   "re": "^libcef\\.dll$",
+   "area": "ui",
+   "label": "CEF",
+   "meaning": "Chromium Embedded Framework: web UI inside a native shell"
+  },
+  {
+   "re": "^webview2loader\\.dll$|^msedgewebview2",
+   "area": "ui",
+   "label": "WebView2",
+   "meaning": "Microsoft Edge WebView2: web UI inside a native shell"
+  },
+  {
+   "re": "^jvm\\.dll$|^libjvm",
+   "area": "runtime",
+   "label": "Java VM",
+   "meaning": "Java virtual machine (JVM) hosted in-process",
+   "lang": "Java"
+  },
+  {
+   "re": "^tk\\d+t?\\.dll$|^tcl\\d+t?\\.dll$",
+   "area": "ui",
+   "label": "Tcl/Tk",
+   "meaning": "Tcl/Tk interpreter and toolkit",
+   "lang": "Tcl"
+  },
+  {
+   "re": "^presentationframework\\.dll$|^presentationcore\\.dll$|^wpfgfx",
+   "area": "ui",
+   "label": "WPF",
+   "meaning": "Windows Presentation Foundation (XAML, retained-mode DirectX rendering)",
+   "lang": "C#"
+  },
+  {
+   "re": "^system\\.windows\\.forms\\.dll$",
+   "area": "ui",
+   "label": "WinForms",
+   "meaning": "Windows Forms (managed wrapper over Win32 controls)",
+   "lang": "C#"
+  },
+  {
+   "re": "^microsoft\\.ui\\.xaml\\.dll$|^microsoft\\.windowsappruntime",
+   "area": "ui",
+   "label": "WinUI 3",
+   "meaning": "WinUI 3 / Windows App SDK (XAML, composition)"
+  },
+  {
+   "re": "^mfc\\d+u?d?\\.dll$",
+   "area": "ui",
+   "label": "MFC",
+   "meaning": "Microsoft Foundation Classes (classic Win32 document/view)",
+   "lang": "C++"
+  },
+  {
+   "re": "^(vcl|rtl)\\d+\\.bpl$|^borlndmm\\.dll$",
+   "area": "ui",
+   "label": "Delphi VCL",
+   "meaning": "Embarcadero Delphi/C++Builder VCL",
+   "lang": "Delphi"
+  },
+  {
+   "re": "^fltk",
+   "area": "ui",
+   "label": "FLTK",
+   "meaning": "FLTK lightweight toolkit"
+  },
+  {
+   "re": "^imgui",
+   "area": "ui",
+   "label": "Dear ImGui",
+   "meaning": "immediate-mode GUI drawn by the application itself"
+  },
+  {
+   "re": "^d3d9\\.dll$",
+   "area": "graphics",
+   "label": "Direct3D 9",
+   "meaning": "Direct3D 9 rendering"
+  },
+  {
+   "re": "^d3d1[01](_\\d)?\\.dll$|^d3d11\\.dll$",
+   "area": "graphics",
+   "label": "Direct3D 10/11",
+   "meaning": "Direct3D 10/11 GPU rendering"
+  },
+  {
+   "re": "^d3d12(core)?\\.dll$",
+   "area": "graphics",
+   "label": "Direct3D 12",
+   "meaning": "Direct3D 12 GPU rendering"
+  },
+  {
+   "re": "^dxgi\\.dll$",
+   "area": "graphics",
+   "label": "DXGI",
+   "meaning": "DXGI swap chains / adapters (GPU-composited output, screen duplication)"
+  },
+  {
+   "re": "^d2d1\\.dll$|^dwrite\\.dll$",
+   "area": "graphics",
+   "label": "Direct2D/DirectWrite",
+   "meaning": "hardware-accelerated 2-D drawing and text"
+  },
+  {
+   "re": "^opengl32\\.dll$|^glu32\\.dll$",
+   "area": "graphics",
+   "label": "OpenGL",
+   "meaning": "OpenGL rendering (custom-drawn viewport)"
+  },
+  {
+   "re": "^libgles?v2\\.dll$|^libegl\\.dll$",
+   "area": "graphics",
+   "label": "ANGLE",
+   "meaning": "ANGLE (OpenGL ES on Direct3D), used by Chromium-based and some Qt/Skia apps"
+  },
+  {
+   "re": "^vulkan-1\\.dll$",
+   "area": "graphics",
+   "label": "Vulkan",
+   "meaning": "Vulkan GPU API"
+  },
+  {
+   "re": "^glew32\\.dll$|^glad",
+   "area": "graphics",
+   "label": "OpenGL loader",
+   "meaning": "OpenGL extension loader"
+  },
+  {
+   "re": "^skia",
+   "area": "graphics",
+   "label": "Skia",
+   "meaning": "Skia 2-D graphics library"
+  },
+  {
+   "re": "^cairo",
+   "area": "graphics",
+   "label": "Cairo",
+   "meaning": "Cairo 2-D vector graphics"
+  },
+  {
+   "re": "^freetype",
+   "area": "graphics",
+   "label": "FreeType",
+   "meaning": "FreeType font rasteriser (application draws its own text)"
+  },
+  {
+   "re": "^harfbuzz",
+   "area": "graphics",
+   "label": "HarfBuzz",
+   "meaning": "complex-script text shaping"
+  },
+  {
+   "re": "^gdiplus\\.dll$",
+   "area": "graphics",
+   "label": "GDI+",
+   "meaning": "GDI+ drawing"
+  },
+  {
+   "re": "^opencv_(world|core|imgproc)\\d*",
+   "area": "imaging",
+   "label": "OpenCV",
+   "meaning": "computer vision / image processing library"
+  },
+  {
+   "re": "^libpng\\d*|^png\\d*\\.dll$",
+   "area": "imaging",
+   "label": "libpng",
+   "meaning": "PNG images"
+  },
+  {
+   "re": "^libjpeg|^jpeg\\d*\\.dll$|^turbojpeg",
+   "area": "imaging",
+   "label": "libjpeg",
+   "meaning": "JPEG images"
+  },
+  {
+   "re": "^libtiff|^tiff\\.dll$",
+   "area": "imaging",
+   "label": "libtiff",
+   "meaning": "TIFF images"
+  },
+  {
+   "re": "^libwebp",
+   "area": "imaging",
+   "label": "libwebp",
+   "meaning": "WebP images"
+  },
+  {
+   "re": "^openexr|^ilmimf|^iex|^imath",
+   "area": "imaging",
+   "label": "OpenEXR",
+   "meaning": "OpenEXR high-dynamic-range images (VFX / rendering pipelines)"
+  },
+  {
+   "re": "^openimageio|^oiio",
+   "area": "imaging",
+   "label": "OpenImageIO",
+   "meaning": "OpenImageIO image I/O for many professional formats"
+  },
+  {
+   "re": "^lcms2?\\.dll$",
+   "area": "imaging",
+   "label": "LittleCMS",
+   "meaning": "ICC colour management"
+  },
+  {
+   "re": "^opencolorio|^ocio",
+   "area": "imaging",
+   "label": "OpenColorIO",
+   "meaning": "OpenColorIO colour pipeline (film/VFX)"
+  },
+  {
+   "re": "^mmdevapi\\.dll$|^audioses\\.dll$|^audioeng\\.dll$",
+   "area": "audio",
+   "label": "WASAPI",
+   "meaning": "WASAPI low-latency audio"
+  },
+  {
+   "re": "^dsound\\.dll$",
+   "area": "audio",
+   "label": "DirectSound",
+   "meaning": "DirectSound audio"
+  },
+  {
+   "re": "^xaudio2_\\d\\.dll$",
+   "area": "audio",
+   "label": "XAudio2",
+   "meaning": "XAudio2 game audio"
+  },
+  {
+   "re": "^asio|bassasio|^asio4all",
+   "area": "audio",
+   "label": "ASIO",
+   "meaning": "ASIO professional low-latency audio driver interface"
+  },
+  {
+   "re": "^portaudio",
+   "area": "audio",
+   "label": "PortAudio",
+   "meaning": "PortAudio cross-platform audio I/O"
+  },
+  {
+   "re": "^rtaudio",
+   "area": "audio",
+   "label": "RtAudio",
+   "meaning": "RtAudio real-time audio I/O"
+  },
+  {
+   "re": "^bass(mix|fx|enc|midi|wasapi|asio)?\\.dll$|^bass_",
+   "area": "audio",
+   "label": "BASS",
+   "meaning": "BASS audio library (playback, mixing, effects)"
+  },
+  {
+   "re": "^fmod(ex)?(64)?\\.dll$|^fmodstudio",
+   "area": "audio",
+   "label": "FMOD",
+   "meaning": "FMOD audio engine"
+  },
+  {
+   "re": "^openal32\\.dll$|^soft_oal",
+   "area": "audio",
+   "label": "OpenAL",
+   "meaning": "OpenAL positional audio"
+  },
+  {
+   "re": "^libsndfile|^sndfile",
+   "area": "audio",
+   "label": "libsndfile",
+   "meaning": "reading/writing audio files"
+  },
+  {
+   "re": "^libogg|^libvorbis|^libopus|^libflac|^flac",
+   "area": "audio",
+   "label": "Xiph codecs",
+   "meaning": "Ogg/Vorbis/Opus/FLAC audio codecs"
+  },
+  {
+   "re": "^libmp3lame|^lame_enc|^mpg123|^libmpg123",
+   "area": "audio",
+   "label": "MP3 codec",
+   "meaning": "MP3 encode/decode"
+  },
+  {
+   "re": "^soundtouch|^libsoundtouch",
+   "area": "audio",
+   "label": "SoundTouch",
+   "meaning": "tempo / pitch change (time-stretching): typical of DJ and music software"
+  },
+  {
+   "re": "^rubberband|^librubberband",
+   "area": "audio",
+   "label": "Rubber Band",
+   "meaning": "high-quality time-stretch / pitch-shift"
+  },
+  {
+   "re": "^chromaprint|^libchromaprint",
+   "area": "audio",
+   "label": "Chromaprint",
+   "meaning": "audio fingerprinting"
+  },
+  {
+   "re": "^keyfinder|^libkeyfinder",
+   "area": "audio",
+   "label": "KeyFinder",
+   "meaning": "musical key detection (DJ harmonic mixing)"
+  },
+  {
+   "re": "^taglib|^libtag",
+   "area": "audio",
+   "label": "TagLib",
+   "meaning": "audio metadata tags (music library management)"
+  },
+  {
+   "re": "^portmidi|^rtmidi|^libportmidi",
+   "area": "input",
+   "label": "MIDI",
+   "meaning": "MIDI controller input/output"
+  },
+  {
+   "re": "^hidapi|^libhidapi",
+   "area": "input",
+   "label": "HID",
+   "meaning": "raw USB HID devices (controllers, surfaces)"
+  },
+  {
+   "re": "^libusb|^winusb\\.dll$",
+   "area": "input",
+   "label": "USB",
+   "meaning": "direct USB device access"
+  },
+  {
+   "re": "^vst3|^vstsdk|^vst2",
+   "area": "plugin_host",
+   "label": "VST",
+   "meaning": "VST audio plugin hosting"
+  },
+  {
+   "re": "^jack(64)?\\.dll$|^libjack",
+   "area": "audio",
+   "label": "JACK",
+   "meaning": "JACK audio routing"
+  },
+  {
+   "re": "^avcodec-?\\d*",
+   "area": "video",
+   "label": "FFmpeg libavcodec",
+   "meaning": "audio/video codecs (decode/encode)"
+  },
+  {
+   "re": "^avformat-?\\d*",
+   "area": "video",
+   "label": "FFmpeg libavformat",
+   "meaning": "container formats (mp4, mkv, mov, flv...)"
+  },
+  {
+   "re": "^avfilter-?\\d*|^swscale-?\\d*|^swresample-?\\d*|^avutil-?\\d*",
+   "area": "video",
+   "label": "FFmpeg support",
+   "meaning": "FFmpeg filters, scaling, resampling"
+  },
+  {
+   "re": "^x264|^libx264|^x265|^libx265|^libvpx|^aom|^dav1d|^openh264",
+   "area": "video",
+   "label": "software video codecs",
+   "meaning": "software H.264/H.265/VP9/AV1 encode/decode"
+  },
+  {
+   "re": "^nvEncodeAPI|^nvcuvid|^nvEnc",
+   "area": "video",
+   "label": "NVENC",
+   "meaning": "NVIDIA hardware video encode/decode"
+  },
+  {
+   "re": "^amfrt|^amf-",
+   "area": "video",
+   "label": "AMF",
+   "meaning": "AMD hardware video encode"
+  },
+  {
+   "re": "^libmfx|^mfx",
+   "area": "video",
+   "label": "Quick Sync",
+   "meaning": "Intel hardware video encode"
+  },
+  {
+   "re": "^mfplat\\.dll$|^mfreadwrite\\.dll$|^mf\\.dll$",
+   "area": "video",
+   "label": "Media Foundation",
+   "meaning": "Windows Media Foundation capture/playback"
+  },
+  {
+   "re": "^libvlc|^libvlccore",
+   "area": "video",
+   "label": "libVLC",
+   "meaning": "VLC media engine"
+  },
+  {
+   "re": "^gstreamer-1|^libgst",
+   "area": "video",
+   "label": "GStreamer",
+   "meaning": "GStreamer media pipelines"
+  },
+  {
+   "re": "^mfcaptureengine|^ksuser\\.dll$|^ksproxy",
+   "area": "video",
+   "label": "capture devices",
+   "meaning": "camera / capture-card access"
+  },
+  {
+   "re": "^libcurl|^curl\\.dll$",
+   "area": "network",
+   "label": "libcurl",
+   "meaning": "HTTP(S)/FTP client"
+  },
+  {
+   "re": "^libssl|^ssleay32|^libcrypto|^libeay32",
+   "area": "crypto",
+   "label": "OpenSSL",
+   "meaning": "TLS and cryptography"
+  },
+  {
+   "re": "^nghttp2",
+   "area": "network",
+   "label": "nghttp2",
+   "meaning": "HTTP/2"
+  },
+  {
+   "re": "^libwebsockets|^websocketpp",
+   "area": "network",
+   "label": "WebSocket",
+   "meaning": "WebSocket server/client (remote control APIs)"
+  },
+  {
+   "re": "^libzmq|^zmq",
+   "area": "network",
+   "label": "ZeroMQ",
+   "meaning": "message queue IPC"
+  },
+  {
+   "re": "^grpc|^libprotobuf",
+   "area": "network",
+   "label": "gRPC/Protobuf",
+   "meaning": "RPC and protocol buffers"
+  },
+  {
+   "re": "^libsodium",
+   "area": "crypto",
+   "label": "libsodium",
+   "meaning": "modern cryptography"
+  },
+  {
+   "re": "^winhttp\\.dll$",
+   "area": "network",
+   "label": "WinHTTP",
+   "meaning": "HTTP via Windows"
+  },
+  {
+   "re": "^wininet\\.dll$",
+   "area": "network",
+   "label": "WinINet",
+   "meaning": "HTTP/FTP via Internet Explorer stack"
+  },
+  {
+   "re": "^python\\d{2,3}(_d)?\\.dll$|^libpython",
+   "area": "scripting",
+   "label": "Python",
+   "meaning": "embedded Python interpreter (scriptable / plugin API in Python)",
+   "lang": "Python"
+  },
+  {
+   "re": "^lua(5\\d*|jit)?\\.dll$|^lua5\\.\\d",
+   "area": "scripting",
+   "label": "Lua",
+   "meaning": "embedded Lua scripting",
+   "lang": "Lua"
+  },
+  {
+   "re": "^mono(-2\\.0)?(-sgen)?\\.dll$|^mono-2",
+   "area": "scripting",
+   "label": "Mono",
+   "meaning": "embedded Mono/.NET runtime (C# scripting)",
+   "lang": "C#"
+  },
+  {
+   "re": "^coreclr\\.dll$|^hostfxr\\.dll$|^hostpolicy\\.dll$",
+   "area": "runtime",
+   "label": ".NET (CoreCLR)",
+   "meaning": ".NET 5+ runtime",
+   "lang": "C#"
+  },
+  {
+   "re": "^mscoree\\.dll$",
+   "area": "runtime",
+   "label": ".NET Framework",
+   "meaning": ".NET Framework CLR host",
+   "lang": "C#"
+  },
+  {
+   "re": "^node\\.dll$|^libnode",
+   "area": "scripting",
+   "label": "Node.js",
+   "meaning": "embedded Node.js (JavaScript)",
+   "lang": "JavaScript"
+  },
+  {
+   "re": "^v8(_\\w+)?\\.dll$|^libv8",
+   "area": "scripting",
+   "label": "V8",
+   "meaning": "V8 JavaScript engine"
+  },
+  {
+   "re": "^mozjs|^js\\d+\\.dll$",
+   "area": "scripting",
+   "label": "SpiderMonkey",
+   "meaning": "SpiderMonkey JavaScript engine"
+  },
+  {
+   "re": "^duktape|^quickjs|^chakra",
+   "area": "scripting",
+   "label": "JS engine",
+   "meaning": "embedded JavaScript engine"
+  },
+  {
+   "re": "^perl\\d+\\.dll$",
+   "area": "scripting",
+   "label": "Perl",
+   "meaning": "embedded Perl",
+   "lang": "Perl"
+  },
+  {
+   "re": "^ruby\\d*\\.dll$|^x64-msvcrt-ruby",
+   "area": "scripting",
+   "label": "Ruby",
+   "meaning": "embedded Ruby",
+   "lang": "Ruby"
+  },
+  {
+   "re": "^angelscript",
+   "area": "scripting",
+   "label": "AngelScript",
+   "meaning": "AngelScript embedded scripting"
+  },
+  {
+   "re": "^sqlite3?\\.dll$|^libsqlite",
+   "area": "storage",
+   "label": "SQLite",
+   "meaning": "embedded SQL database (project/library/state storage)"
+  },
+  {
+   "re": "^leveldb|^rocksdb|^lmdb",
+   "area": "storage",
+   "label": "key-value store",
+   "meaning": "embedded key-value database"
+  },
+  {
+   "re": "^libpq|^libmysql|^mysqlclient",
+   "area": "storage",
+   "label": "SQL client",
+   "meaning": "client for PostgreSQL/MySQL servers"
+  },
+  {
+   "re": "^zlib1?\\.dll$|^libz",
+   "area": "compression",
+   "label": "zlib",
+   "meaning": "deflate compression (project files, zip-based formats)"
+  },
+  {
+   "re": "^libzstd|^zstd|^liblzma|^lzma|^libbz2|^bz2",
+   "area": "compression",
+   "label": "compression",
+   "meaning": "zstd/lzma/bzip2 compression"
+  },
+  {
+   "re": "^minizip|^libarchive|^7z\\.dll$",
+   "area": "compression",
+   "label": "archives",
+   "meaning": "zip/7z archive handling"
+  },
+  {
+   "re": "^libxml2|^expat|^libexpat|^msxml\\d",
+   "area": "document",
+   "label": "XML",
+   "meaning": "XML parsing"
+  },
+  {
+   "re": "^pdfium|^mupdf|^libpoppler|^poppler",
+   "area": "document",
+   "label": "PDF",
+   "meaning": "PDF rendering/parsing"
+  },
+  {
+   "re": "^icu(uc|in|dt|i18n)\\d*\\.dll$|^icuuc",
+   "area": "document",
+   "label": "ICU",
+   "meaning": "Unicode text, collation, locale handling"
+  },
+  {
+   "re": "^hunspell|^libhunspell|^nuspell",
+   "area": "document",
+   "label": "spell check",
+   "meaning": "spelling dictionaries (text editing)"
+  },
+  {
+   "re": "^mso\\d*\\.dll$|^mso20win32client\\.dll$|^oart\\.dll$",
+   "area": "document",
+   "label": "Office shared",
+   "meaning": "Microsoft Office shared runtime (ribbon, COM object model)"
+  },
+  {
+   "re": "^libusd|^usd_|^pxr|^usd\\.dll$",
+   "area": "3d",
+   "label": "USD",
+   "meaning": "Universal Scene Description (3-D scene interchange)"
+  },
+  {
+   "re": "^alembic",
+   "area": "3d",
+   "label": "Alembic",
+   "meaning": "Alembic baked-animation interchange"
+  },
+  {
+   "re": "^assimp",
+   "area": "3d",
+   "label": "Assimp",
+   "meaning": "import of many 3-D model formats"
+  },
+  {
+   "re": "^openvdb",
+   "area": "3d",
+   "label": "OpenVDB",
+   "meaning": "sparse volumetric data (smoke/fire/fluid)"
+  },
+  {
+   "re": "^embree\\d*",
+   "area": "3d",
+   "label": "Embree",
+   "meaning": "CPU ray-tracing kernels"
+  },
+  {
+   "re": "^openimagedenoise",
+   "area": "3d",
+   "label": "OIDN",
+   "meaning": "AI denoising of rendered images"
+  },
+  {
+   "re": "^optix",
+   "area": "3d",
+   "label": "OptiX",
+   "meaning": "NVIDIA OptiX GPU ray tracing"
+  },
+  {
+   "re": "^opensubdiv",
+   "area": "3d",
+   "label": "OpenSubdiv",
+   "meaning": "subdivision surfaces (modelling)"
+  },
+  {
+   "re": "^physx|^bullet|^btcollision|^libbullet",
+   "area": "3d",
+   "label": "physics",
+   "meaning": "rigid-body physics simulation"
+  },
+  {
+   "re": "^fbxsdk|^libfbxsdk",
+   "area": "3d",
+   "label": "FBX",
+   "meaning": "Autodesk FBX import/export"
+  },
+  {
+   "re": "^tkernel|^tkbrep|^tkmesh|^tkstep|^occt",
+   "area": "3d",
+   "label": "OpenCascade",
+   "meaning": "CAD kernel (B-rep solids, STEP/IGES)"
+  },
+  {
+   "re": "^vtk",
+   "area": "3d",
+   "label": "VTK",
+   "meaning": "scientific visualisation"
+  },
+  {
+   "re": "^tbb(12|malloc|malloc_proxy)?\\.dll$",
+   "area": "compute",
+   "label": "oneTBB",
+   "meaning": "task-parallel threading (heavy CPU workloads)"
+  },
+  {
+   "re": "^vcomp\\d+\\.dll$|^libomp|^libgomp",
+   "area": "compute",
+   "label": "OpenMP",
+   "meaning": "OpenMP parallel loops"
+  },
+  {
+   "re": "^cudart64_\\d+|^nvcuda\\.dll$|^cublas|^cufft|^nvrtc",
+   "area": "compute",
+   "label": "CUDA",
+   "meaning": "NVIDIA CUDA GPU compute"
+  },
+  {
+   "re": "^cudnn",
+   "area": "ai",
+   "label": "cuDNN",
+   "meaning": "GPU deep-learning primitives"
+  },
+  {
+   "re": "^onnxruntime",
+   "area": "ai",
+   "label": "ONNX Runtime",
+   "meaning": "neural-network inference (ONNX)"
+  },
+  {
+   "re": "^openvino",
+   "area": "ai",
+   "label": "OpenVINO",
+   "meaning": "Intel neural-network inference"
+  },
+  {
+   "re": "^torch_cpu|^torch_cuda|^c10(_cuda)?\\.dll$",
+   "area": "ai",
+   "label": "PyTorch",
+   "meaning": "PyTorch tensor/NN runtime"
+  },
+  {
+   "re": "^tensorflow",
+   "area": "ai",
+   "label": "TensorFlow",
+   "meaning": "TensorFlow runtime"
+  },
+  {
+   "re": "^directml\\.dll$",
+   "area": "ai",
+   "label": "DirectML",
+   "meaning": "DirectML GPU inference"
+  },
+  {
+   "re": "^ggml|^llama",
+   "area": "ai",
+   "label": "ggml/llama.cpp",
+   "meaning": "local large-language-model inference"
+  },
+  {
+   "re": "^opencl\\.dll$",
+   "area": "compute",
+   "label": "OpenCL",
+   "meaning": "OpenCL compute"
+  },
+  {
+   "re": "^xinput\\d_\\d|^xinput9_1_0",
+   "area": "input",
+   "label": "XInput",
+   "meaning": "game-controller input"
+  },
+  {
+   "re": "^dinput8?\\.dll$",
+   "area": "input",
+   "label": "DirectInput",
+   "meaning": "joystick / controller input"
+  },
+  {
+   "re": "^wintab32\\.dll$",
+   "area": "input",
+   "label": "Wintab",
+   "meaning": "pressure-sensitive pen tablets (drawing/painting)"
+  },
+  {
+   "re": "^openxr_loader|^openvr_api",
+   "area": "input",
+   "label": "VR",
+   "meaning": "virtual-reality runtime"
+  },
+  {
+   "re": "^steam_api(64)?\\.dll$",
+   "area": "system",
+   "label": "Steamworks",
+   "meaning": "Steam integration"
+  },
+  {
+   "re": "^vcruntime140(_1)?\\.dll$|^msvcp140|^ucrtbase\\.dll$|^concrt140",
+   "area": "runtime",
+   "label": "MSVC C/C++ runtime",
+   "meaning": "built with Microsoft Visual C++ 2015+",
+   "lang": "C++"
+  },
+  {
+   "re": "^msvcp(60|70|71|80|90|100|110|120)\\.dll$|^msvcr(70|71|80|90|100|110|120)\\.dll$",
+   "area": "runtime",
+   "label": "older MSVC runtime",
+   "meaning": "built with an older Microsoft Visual C++",
+   "lang": "C++"
+  },
+  {
+   "re": "^libstdc\\+\\+-6\\.dll$|^libgcc_s_|^libwinpthread",
+   "area": "runtime",
+   "label": "MinGW GCC runtime",
+   "meaning": "built with MinGW-w64 GCC",
+   "lang": "C++"
+  },
+  {
+   "re": "^msvbvm60\\.dll$",
+   "area": "runtime",
+   "label": "VB6 runtime",
+   "meaning": "Visual Basic 6",
+   "lang": "VB6"
+  },
+  {
+   "re": "^uiautomationcore\\.dll$|^oleacc\\.dll$",
+   "area": "system",
+   "label": "accessibility",
+   "meaning": "implements or consumes UI Automation / MSAA accessibility"
+  },
+  {
+   "re": "^dwmapi\\.dll$",
+   "area": "system",
+   "label": "DWM",
+   "meaning": "desktop-composition aware (glass, thumbnails, window attributes)"
+  },
+  {
+   "re": "^wtsapi32\\.dll$",
+   "area": "system",
+   "label": "sessions",
+   "meaning": "aware of user sessions (lock/switch)"
+  },
+  {
+   "re": "^setupapi\\.dll$|^cfgmgr32\\.dll$",
+   "area": "system",
+   "label": "device enumeration",
+   "meaning": "enumerates hardware devices"
+  },
+  {
+   "re": "^bthprops\\.cpl$|^wlanapi\\.dll$",
+   "area": "system",
+   "label": "wireless",
+   "meaning": "Bluetooth / Wi-Fi APIs"
+  },
+  {
+   "re": "^taskschd\\.dll$",
+   "area": "system",
+   "label": "scheduler",
+   "meaning": "Windows Task Scheduler (updaters, background jobs)"
+  }
+ ],
+ "api": [
+  {
+   "re": "^RegisterHotKey$",
+   "area": "input",
+   "label": "global hotkeys",
+   "meaning": "registers system-wide hotkeys that work while the app is in the background"
+  },
+  {
+   "re": "^SetWindowsHookEx[AW]$",
+   "area": "input",
+   "label": "input hooks",
+   "meaning": "installs keyboard/mouse/message hooks"
+  },
+  {
+   "re": "^(GetAsyncKeyState|GetKeyboardState)$",
+   "area": "input",
+   "label": "key polling",
+   "meaning": "polls the keyboard state directly (games, tools that ignore posted keys)"
+  },
+  {
+   "re": "^(SendInput|keybd_event|mouse_event)$",
+   "area": "input",
+   "label": "synthetic input",
+   "meaning": "can synthesise keyboard/mouse input (macros, remote control)"
+  },
+  {
+   "re": "^(DragAcceptFiles|RegisterDragDrop|DoDragDrop)$",
+   "area": "input",
+   "label": "drag and drop",
+   "meaning": "accepts or starts OLE/shell drag and drop (files can be dropped onto it)"
+  },
+  {
+   "re": "^(midiIn|midiOut)(Open|Message|Start)$",
+   "area": "input",
+   "label": "Windows MIDI",
+   "meaning": "talks to MIDI devices directly"
+  },
+  {
+   "re": "^(waveOutOpen|waveInOpen)$",
+   "area": "audio",
+   "label": "Windows waveform audio",
+   "meaning": "legacy waveform audio output/capture"
+  },
+  {
+   "re": "^(OpenClipboard|SetClipboardData|GetClipboardData)$",
+   "area": "system",
+   "label": "clipboard",
+   "meaning": "reads/writes the clipboard"
+  },
+  {
+   "re": "^(CreateNamedPipe[AW]|ConnectNamedPipe)$",
+   "area": "system",
+   "label": "named pipes",
+   "meaning": "serves an IPC channel over named pipes (external control possible)"
+  },
+  {
+   "re": "^(CreateFileMapping[AW]|MapViewOfFile)$",
+   "area": "system",
+   "label": "shared memory",
+   "meaning": "uses shared memory (IPC with helper processes/plugins)"
+  },
+  {
+   "re": "^(WSAStartup|bind|listen|accept)$",
+   "area": "network",
+   "label": "sockets",
+   "meaning": "opens network sockets (may expose a server/remote-control port)"
+  },
+  {
+   "re": "^(InternetOpen[AW]|WinHttpOpen|HttpSendRequest[AW])$",
+   "area": "network",
+   "label": "HTTP client",
+   "meaning": "makes HTTP requests (updates, cloud features, telemetry)"
+  },
+  {
+   "re": "^(CoCreateInstance|CoRegisterClassObject)$",
+   "area": "system",
+   "label": "COM",
+   "meaning": "creates or serves COM objects (automation possible)"
+  },
+  {
+   "re": "^(PrintWindow|BitBlt|GetDIBits|DwmGetDxSharedSurface)$",
+   "area": "graphics",
+   "label": "screen/window capture",
+   "meaning": "captures window or screen pixels"
+  },
+  {
+   "re": "^(RegisterRawInputDevices|GetRawInputData)$",
+   "area": "input",
+   "label": "raw input",
+   "meaning": "reads raw HID input (ignores posted messages)"
+  },
+  {
+   "re": "^(AllocConsole|AttachConsole)$",
+   "area": "system",
+   "label": "console",
+   "meaning": "can show a console window (command-line mode)"
+  },
+  {
+   "re": "^(CreateMutex[AW]|OpenMutex[AW])$",
+   "area": "system",
+   "label": "single instance",
+   "meaning": "uses a named mutex (single-instance behaviour, 'already running' handling)"
+  },
+  {
+   "re": "^(RegisterWindowMessage[AW])$",
+   "area": "system",
+   "label": "custom messages",
+   "meaning": "registers custom window messages (inter-process commands)"
+  },
+  {
+   "re": "^(EnumDisplayMonitors|SetThreadDpiAwarenessContext|SetProcessDpiAwareness)$",
+   "area": "ui",
+   "label": "DPI/monitor aware",
+   "meaning": "handles multiple monitors / DPI scaling"
+  },
+  {
+   "re": "^(SHGetKnownFolderPath|SHGetFolderPath[AW])$",
+   "area": "system",
+   "label": "known folders",
+   "meaning": "reads/writes under Documents/AppData (user data locations)"
+  }
+ ]
+}

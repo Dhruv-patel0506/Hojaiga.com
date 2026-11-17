@@ -31,7 +31,9 @@ from .paths import harvest_dir
 
 # Illustrated how-to / documentation sites that put a screenshot under each numbered step. DATA, not logic: the search is restricted to one host at a time (`site:`), and a page is kept only if its CONTENT
 # is about the app and made of instructions (relevant()), so a host that has nothing on the app costs one search and yields nothing.
-DOC_HOSTS = ("wikihow.com", "support.microsoft.com", "learn.microsoft.com", "howtogeek.com", "geeksforgeeks.org", "helpx.adobe.com", "support.apple.com", "docs.github.com")
+DOC_HOSTS = ("wikihow.com", "support.microsoft.com", "learn.microsoft.com", "howtogeek.com", "geeksforgeeks.org", "helpx.adobe.com", "support.apple.com", "docs.github.com", "support.discord.com", "code.visualstudio.com", "faq.whatsapp.com")
+OFFICIAL_DOC_HOSTS = ("support.microsoft.com", "learn.microsoft.com", "helpx.adobe.com", "support.apple.com", "docs.github.com", "obsproject.com", "support.discord.com", "code.visualstudio.com", "faq.whatsapp.com")
+THIRD_PARTY_DOC_HOSTS = ("wikihow.com", "howtogeek.com", "geeksforgeeks.org")
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36 HojaigaResearch/1.0"
 COOLDOWN_S = 1800.0
 MIN_GAP_S = 1.2
@@ -42,6 +44,7 @@ _engine_down: Dict[str, float] = {}
 _last_request = [0.0]
 _robots: Dict[str, Optional[urllib.robotparser.RobotFileParser]] = {}
 VIDEO_HOSTS_OK = ("archive.org", "wikimedia.org", "wikipedia.org", "learn.microsoft.com", "docs.microsoft.com", "github.com", "githubusercontent.com", "vimeo.com", "dailymotion.com")
+_RECOVERY_REFERENCE = re.compile(r"\b(fix|troubleshoot(?:ing)?|repair|recover|reset|won['’]t\s+(?:open|start|work)|not\s+working)\b", re.I)
 
 
 # ------------------------------------------------------------------------------------------------------------------------------------ polite fetching
@@ -307,6 +310,32 @@ def relevant(html: str, steps: Sequence[Dict[str, Any]], app_name: str) -> bool:
     return hits >= max(3, int(0.4 * len(steps)))
 
 
+def document_about_app(html: str, app_name: str) -> bool:
+    """Whether a documentation page is clearly about the requested application.
+
+    Official references frequently explain a command or concept without a
+    numbered, screenshot-heavy tutorial.  They are valuable to the tutor, but
+    they are not procedures.  This narrower acceptance check lets those pages
+    enter the cited document index without granting them an execution route.
+    """
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(html, "lxml")
+    title = soup.title.get_text(" ", strip=True) if soup.title else ""
+    headings = " ".join(h.get_text(" ", strip=True) for h in soup.find_all(["h1", "h2"], limit=8))
+    head = (title + " " + headings + " " + soup.get_text(" ", strip=True)[:3000]).lower()
+    words = [word for word in re.findall(r"[a-z0-9]+", app_name.lower()) if len(word) > 2]
+    return bool(words) and all(word in head for word in words)
+
+
+def document_text(html: str, limit: int = 80_000) -> str:
+    """Extract readable documentation text; navigation and scripts are not knowledge."""
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(html, "lxml")
+    for tag in soup(["script", "style", "nav", "footer", "aside", "form", "noscript"]):
+        tag.decompose()
+    return re.sub(r"\s+", " ", soup.get_text(" ", strip=True)).strip()[:limit]
+
+
 def _goal_of(step: Dict[str, Any]) -> str:
     t = step["text"]
     t = re.sub(r"^\s*(step\s*\d+[:.)-]?|\d+[.)])\s*", "", t, flags=re.I)
@@ -365,14 +394,75 @@ def pairs_from_steps(app_key: str, steps: Sequence[Dict[str, Any]], source_url: 
     return rep
 
 
-def feed_rag(rag: Any, app_key: str, app_name: str, steps: Sequence[Dict[str, Any]], url: str, title: str) -> Dict[str, int]:
-    """Steps -> Sub-RAG 3 (procedure + chunks); key combos the text names -> Sub-RAG 4 (hotkeys, trust 'web')."""
-    n = {"procedures": 0, "hotkeys": 0}
-    if rag is None or not steps:
+def source_trust(url: str) -> str:
+    """Return the evidence trust level for a harvested page.
+
+    A procedure found on a vendor documentation host is still only a hypothesis
+    until it succeeds on the live app, but it is stronger teaching evidence than
+    a third-party tutorial.  Execution promotion remains governed by the normal
+    two-distinct-runs rule in the RAG; this function never makes a web action
+    executable by itself.
+    """
+    host = urllib.parse.urlparse(url).netloc.lower().split(":")[0]
+    if any(host == h or host.endswith("." + h) for h in OFFICIAL_DOC_HOSTS):
+        return "official_doc"
+    if any(host == h or host.endswith("." + h) for h in THIRD_PARTY_DOC_HOSTS):
+        return "web"
+    # Vendor documentation normally lives under one of these names (for
+    # example docs.slack.com and manual.audacityteam.org).  It is still merely
+    # teaching evidence, so a mistaken classification cannot auto-execute.
+    subdomain = host.split(".", 1)[0]
+    return "official_doc" if subdomain in {"docs", "support", "help", "manual", "learn", "developer", "documentation"} else "web"
+
+
+def teaching_source_allowed(url: str) -> bool:
+    """Allow vendor docs and our explicitly reviewed tutorial hosts only.
+
+    Search rankings are not a quality signal.  In particular, a page that
+    merely contains the product name and numbered download/install instructions
+    must not become knowledge about how to operate the product.  Vendor
+    documentation is recognised by ``source_trust``; independent material is
+    limited to the small, reviewable ``THIRD_PARTY_DOC_HOSTS`` set.
+    """
+    if source_trust(url) == "official_doc":
+        return True
+    host = urllib.parse.urlparse(url).netloc.lower().split(":")[0]
+    return any(host == h or host.endswith("." + h) for h in THIRD_PARTY_DOC_HOSTS)
+
+
+def is_recovery_reference(title: str, text: str, url: str = "") -> bool:
+    """Whether a page is support/recovery material rather than a task tutorial.
+
+    Recovery articles can be excellent tutoring context, but their numbered
+    instructions may include reset, uninstall, or other high-impact actions.
+    They must never seed a generic execution procedure or visual action pair.
+    """
+    head = " ".join((title or "", (text or "")[:1400], url or ""))
+    return bool(_RECOVERY_REFERENCE.search(head))
+
+
+def feed_rag(rag: Any, app_key: str, app_name: str, steps: Sequence[Dict[str, Any]], url: str, title: str, document_text: str = "") -> Dict[str, int]:
+    """Write cited teaching text and procedural hypotheses to the RAG.
+
+    Earlier versions retained only the extracted procedure.  That was enough to
+    replay a known task, but not enough for the tutor to answer a nearby
+    question such as why a control exists or what a setting changes.  Keeping
+    the source document as app-scoped chunks gives the teacher retrievable,
+    cited context while the compact procedure still serves the executor.
+    """
+    n = {"documents": 0, "procedures": 0, "hotkeys": 0}
+    if rag is None or (not steps and not document_text):
         return n
-    with contextlib.suppress(Exception):
-        r = rag.proc.ingest_procedure(app_key, (title or f"How to use {app_name}")[:160], [{"text": s["text"], "route_hint": "observe"} for s in steps[:25]], url, trust="web")
-        n["procedures"] += r.inserted + r.updated
+    trust = source_trust(url)
+    if document_text:
+        with contextlib.suppress(Exception):
+            d = rag.proc.ingest_document(app_key, document_text, url, kind="manual" if trust == "official_doc" else "web_doc",
+                                         title=(title or f"How to use {app_name}")[:160], trust=trust)
+            n["documents"] += d.inserted + d.updated
+    if steps:
+        with contextlib.suppress(Exception):
+            r = rag.proc.ingest_procedure(app_key, (title or f"How to use {app_name}")[:160], [{"text": s["text"], "route_hint": "observe"} for s in steps[:25]], url, trust=trust)
+            n["procedures"] += r.inserted + r.updated
     with contextlib.suppress(Exception):
         from . import bridge as BR
         rows = []
@@ -385,24 +475,38 @@ def feed_rag(rag: Any, app_key: str, app_name: str, steps: Sequence[Dict[str, An
     return n
 
 
-def harvest_app(app_name: str, root: str = "", rag: Any = None, max_pages: int = 4, max_pairs: int = 12, write_pairs: bool = True, log: Any = None, with_clips: bool = True, with_open_video: bool = False, app_key: str = "") -> Dict[str, Any]:
-    """One app through the web chain: search -> illustrated pages -> RAG + pairs; clips on pages that have them. Speed and counts are returned."""
+def harvest_app(app_name: str, root: str = "", rag: Any = None, max_pages: int = 4, max_pairs: int = 12, write_pairs: bool = True, log: Any = None, with_clips: bool = True, with_open_video: bool = False, app_key: str = "", source_urls: Sequence[str] = ()) -> Dict[str, Any]:
+    """One app through the web chain: vetted URLs/search -> RAG + bounded visual pairs.
+
+    ``source_urls`` is a small, cited source registry supplied by the curriculum.
+    It is not an action catalogue: these pages still enter only as teaching
+    evidence or unverified procedures and must pass live verification before an
+    executor can reuse a route.
+    """
     from . import free_master_harvester as M
     root = root or harvest_dir()[0]
     app_key = app_key or M.app_key_of(app_name)                          # a caller may file the knowledge under a domain key ('web:<host>' / 'webapp:<host>')
     t0 = time.time()
-    rep: Dict[str, Any] = {"app": app_key, "pages": 0, "steps": 0, "procedures": 0, "hotkeys": 0, "images": 0, "pairs": 0, "clips_found": 0, "engine": "", "urls": []}
-    queries = [f"{app_name} tutorial site:{h}" for h in DOC_HOSTS] + [f"{app_name} keyboard shortcuts"]
+    rep: Dict[str, Any] = {"app": app_key, "pages": 0, "steps": 0, "procedures": 0, "hotkeys": 0, "images": 0, "pairs": 0, "clips_found": 0, "engine": "", "urls": [], "sources": []}
+    # Ask for the vendor/project documentation before looking for illustrated
+    # third-party tutorials.  Search results remain only *teaching evidence*;
+    # live verification is still required before an action becomes executable.
+    queries = [f"{app_name} official documentation getting started"] + [f"{app_name} tutorial site:{h}" for h in DOC_HOSTS] + [f"{app_name} keyboard shortcuts"]
     seen_urls = set()
     if rag is None:
         with contextlib.suppress(Exception):
             from core_organs import rag as _R
             rag = _R.get_rag()
     out_rows: List[Dict[str, Any]] = []
-    for q in queries:
+    source_batches: List[Tuple[str, List[Dict[str, str]]]] = []
+    direct = [{"title": f"{app_name} official documentation", "url": str(url)} for url in source_urls if str(url).startswith(("https://", "http://"))]
+    if direct:
+        source_batches.append(("curriculum_seed", direct))
+    source_batches.extend((q, []) for q in queries)
+    for q, seeded_results in source_batches:
         if rep["pages"] >= max_pages:
             break
-        sr = search(q)
+        sr = {"engine": "curriculum_seed", "results": seeded_results, "tried": []} if seeded_results else search(q)
         rep["engine"] = rep["engine"] or sr["engine"]
         if not sr["results"]:
             rep.setdefault("search_failed", sr["tried"])
@@ -412,27 +516,42 @@ def harvest_app(app_name: str, root: str = "", rag: Any = None, max_pages: int =
             host = urllib.parse.urlparse(u).netloc
             if u in seen_urls or rep["pages"] >= max_pages or re.search(r"(youtube\.com|youtu\.be|pinterest|facebook|twitter|x\.com|reddit\.com|quora)", host):
                 continue
+            if not teaching_source_allowed(u):
+                continue
             seen_urls.add(u)
             st, html = get(u)
             if st != 200 or not html:
                 continue
             steps = parse_steps(html, u)
             clips = parse_clips(html, u)
-            if len(steps) < 3 or not relevant(html, steps, app_name):
+            recovery_reference = is_recovery_reference(res["title"], html, u)
+            is_step_tutorial = len(steps) >= 3 and relevant(html, steps, app_name) and not recovery_reference
+            is_reference = source_trust(u) == "official_doc" and document_about_app(html, app_name)
+            if not is_step_tutorial and not is_reference:
+                continue
+            text = document_text(html)
+            if not text:
                 continue
             rep["clips_found"] += len(clips)
-            if clips and with_clips:                                         # Source A: the page's own screen recordings, with the text above each as its transcript
+            if is_step_tutorial and clips and with_clips:                    # Source A: the page's own screen recordings, with the text above each as its transcript
                 with contextlib.suppress(Exception):
                     from . import multi_source_video as MS
                     cr = MS.harvest_page_clips(app_name, u, html, root, rag, max_clips=2)
                     rep["clip_pairs"] = rep.get("clip_pairs", 0) + cr["pairs"]
             rep["pages"] += 1
             rep["urls"].append(u)
+            rep["sources"].append({
+                "url": u,
+                "trust": source_trust(u),
+                "admitted_as": "recovery_reference" if recovery_reference else "numbered_tutorial" if is_step_tutorial else "official_reference",
+                "discovered_by": "curriculum_seed" if q == "curriculum_seed" else "search",
+            })
             rep["steps"] += len(steps)
-            fr = feed_rag(rag, app_key, app_name, steps, u, res["title"])
+            fr = feed_rag(rag, app_key, app_name, steps if is_step_tutorial else [], u, res["title"], text)
+            rep["documents"] = rep.get("documents", 0) + fr["documents"]
             rep["procedures"] += fr["procedures"]
             rep["hotkeys"] += fr["hotkeys"]
-            if write_pairs and any(s["imgs"] for s in steps):
+            if is_step_tutorial and write_pairs and any(s["imgs"] for s in steps):
                 pr = pairs_from_steps(app_key, steps, u, root, max_pairs=max_pairs)
                 rep["images"] += pr["images"]
                 out_rows += pr["rows"]

@@ -12,6 +12,7 @@ rag.tools -- maintenance and exchange (DESIGN.md sections 8-10): everything that
 """
 from __future__ import annotations
 
+import contextlib
 import io
 import json
 import os
@@ -21,7 +22,7 @@ import sqlite3
 import time
 import uuid
 import zipfile
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from . import config as C
 from . import lt
@@ -311,8 +312,9 @@ def self_doc(rag, app_key: str, run_id: str = "", limit: int = 400) -> Dict[str,
 
 
 # ---- importers --------------------------------------------------------------------------------------------------------------------------------------
-def import_manuals(rag, path: str = "") -> Dict[str, Any]:
-    """The Professor's manuals.db (docs + chunks) -> Sub-RAG 3. Idempotent (chunk ids are content hashes)."""
+def import_manuals(rag, path: str = "", batch: int = 120) -> Dict[str, Any]:
+    """The Professor's manuals.db (docs + chunks) -> Sub-RAG 3. Idempotent (chunk ids are content hashes). Pages are written `batch` at a time (one table write and one
+    embedding request per group): one write per page cost ~0.13 s and embedded a chunk or two at a time (Oct-28 import of 19,554 Office reference pages)."""
     if not path:
         from core_organs.professor.knowledge.manual_rag import MANUAL_DB
         path = MANUAL_DB
@@ -321,13 +323,23 @@ def import_manuals(rag, path: str = "") -> Dict[str, Any]:
     db = sqlite3.connect(path)
     db.row_factory = sqlite3.Row
     n_docs = n_chunks = 0
+    group: List[Tuple[str, str, str, str, str]] = []
+
+    def flush() -> int:
+        if not group:
+            return 0
+        rep = rag.proc.ingest_documents(group)
+        group.clear()
+        return rep.inserted + rep.updated
     for d in db.execute("SELECT id, app, title, source, kind FROM docs").fetchall():
         text = "\n\n".join(r["text"] for r in db.execute("SELECT text FROM chunks WHERE doc=? ORDER BY ord", (d["id"],)))
         if not text.strip():
             continue
-        rep = rag.proc.ingest_document(d["app"] or "", text, d["source"] or f"doc:{d['id']}", kind="manual", title=d["title"] or "", trust="official_doc", build_procedures=False)
+        group.append((d["app"] or "", text, d["source"] or f"doc:{d['id']}", "manual", "official_doc"))
         n_docs += 1
-        n_chunks += rep.inserted + rep.updated
+        if len(group) >= max(1, batch):
+            n_chunks += flush()
+    n_chunks += flush()
     db.close()
     return {"docs": n_docs, "chunks": n_chunks}
 

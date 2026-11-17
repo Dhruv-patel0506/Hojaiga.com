@@ -594,6 +594,314 @@ def teach_proof(case: Dict[str, Any], log: Callable[[str], None], max_beats: int
     return res
 
 
+# ---- public benchmark tasks as our bench (OSWorld: Apache-2.0, 101 multi-app tasks; Windows Agent Arena: MIT, 154 Windows tasks) ---------------------------------
+# Their apps are mapped to the ones on this machine (LibreOffice -> Office), their home-folder paths to a sandbox folder per task; each keeps its input files (URLs) and
+# its checker (function + expected result) so a run can be scored the benchmark's own way. 'runnable' = every app it needs exists here and nothing needs a shell / cloud drive.
+BENCH_APPS = {"libreoffice_calc": "Excel", "libreoffice_writer": "Word", "libreoffice_impress": "PowerPoint", "chrome": "Chrome", "msedge": "Edge", "vs_code": "VS Code",
+              "vscode": "VS Code", "notepad": "Notepad", "microsoft_paint": "Paint", "windows_calc": "Calculator", "file_explorer": "File Explorer", "vlc": "VLC",
+              "settings": "Settings", "clock": "Clock", "pdf": "PDF", "libreoffice calc": "Excel", "libreoffice-calc": "Excel", "libreoffice writer": "Word",
+              "libreoffice-writer": "Word", "libreoffice impress": "PowerPoint", "libreoffice-impress": "PowerPoint", "google-chrome": "Chrome", "browser": "Chrome"}
+BENCH_WORDS = [(r"LibreOffice\s+Calc", "Excel"), (r"LibreOffice\s+Writer", "Word"), (r"LibreOffice\s+Impress", "PowerPoint"), (r"\bCalc\b", "Excel"), (r"\bWriter\b", "Word"),
+               (r"\bImpress\b", "PowerPoint"), (r"\.odt\b", ".docx"), (r"\.ods\b", ".xlsx"), (r"\.odp\b", ".pptx")]
+BENCH_CHECKS = {"compare_table", "compare_docx_files", "compare_text_file", "exact_match", "check_include_exclude", "compare_pdfs", "compare_docx_tables", "compare_pptx_files",
+                "check_list", "compare_csv", "is_in_list", "match_in_list"}
+BENCH_FILE = os.path.join(r"D:\new_automation\data", "eval", "bench_tasks.json")
+SANDBOX = os.path.join(r"D:\new_automation\data", "bench")
+
+
+def bench_task(raw: Dict[str, Any], source: str, domain: str) -> Dict[str, Any]:
+    """One benchmark task in our form: instruction with this machine's apps and a sandbox folder, apps, inputs to fetch, the checker, whether it can run here."""
+    apps_raw = [a.lower() for a in raw.get("related_apps", [])]
+    apps = [BENCH_APPS[a] for a in apps_raw if a in BENCH_APPS]
+    box = os.path.join(SANDBOX, str(raw.get("id", ""))[:40])
+    text = raw.get("instruction", "")
+    for rx, to in BENCH_WORDS:
+        text = re.sub(rx, to, text, flags=re.I)
+    text = re.sub(r"(?i)\blibre\s*office\s+(Excel|Word|PowerPoint)\b", r"\1", text)                   # 'Libreoffice Calc file' -> 'Excel file', not 'Libreoffice Excel file'
+    text = re.sub(r"~/(?:Desktop|Documents|Downloads)?/?", box.replace("\\", "\\\\") + "\\\\", text)
+    inputs = [{"url": f.get("url", ""), "path": os.path.join(box, os.path.basename(f.get("path", "") or f.get("url", "")))}
+              for c in raw.get("config", []) if c.get("type") == "download" for f in (c.get("parameters") or {}).get("files", [])]
+    ev = raw.get("evaluator") or {}
+    funcs = ev.get("func") if isinstance(ev.get("func"), list) else [ev.get("func")]
+    setup, untranslated = translate_setup(raw.get("config", []), box)
+    blockers = sorted({a for a in apps_raw if a not in BENCH_APPS and a not in BENCH_NOT_APPS} | set(untranslated))
+    return {"id": raw.get("id"), "source": source, "domain": domain, "instruction": text, "original": raw.get("instruction", ""), "apps": apps, "multi_app": len(set(apps)) > 1,
+            "inputs": inputs, "setup": setup, "sandbox": box, "checker": {"func": funcs, "expected": ev.get("expected"), "result": ev.get("result")},
+            "checker_known": all(f in BENCH_CHECKS for f in funcs if f), "blockers": blockers, "runnable": bool(apps) and not blockers}
+
+
+BENCH_NOT_APPS = {"os"}                                                                            # 'os' names the shell, not an app: its steps are judged one by one below
+_LAUNCH_APPS = {"google-chrome": "Chrome", "chrome": "Chrome", "msedge": "Edge", "edge": "Edge", "code": "VS Code", "vlc": "VLC", "nautilus": "File Explorer", "libreoffice": "", "soffice": ""}
+
+
+def _box_path(p: str, box: str) -> str:
+    """A Linux path of the benchmark machine -> the same place inside this task's sandbox folder."""
+    p = re.sub(r"^(?:/home/user|~)/?|^[A-Za-z]:[\\/]Users[\\/][^\\/]+[\\/]?", "", (p or "").strip().strip("'\""))
+    return os.path.join(box, *[x for x in re.split(r"[\\/]", p) if x and x != ".."]) if p else box
+
+
+def translate_setup(config: Sequence[Dict[str, Any]], box: str) -> Tuple[List[Dict[str, Any]], List[str]]:
+    """A benchmark's Ubuntu set-up steps -> this machine's ([actions], [what cannot be translated]). Actions: mkdir, extract (tar / zip), remove, open (a file or folder with
+    its app), launch (an app, optionally with a path). Window-focusing clicks and desktop settings are no-ops here (our runner prepares its own windows); package installs,
+    shell scripts, terminals and cloud drives are not translated and keep the task out of the runnable set."""
+    acts: List[Dict[str, Any]] = []
+    bad: List[str] = []
+    for c in config or []:
+        t, p = c.get("type", ""), c.get("parameters") or {}
+        if t in ("download", "sleep", "activate_window", "close_window", "chrome_open_tabs"):
+            if t == "chrome_open_tabs":
+                acts.append({"op": "open_urls", "urls": list(p.get("urls_to_open") or [])})
+            continue                                                                               # downloads are the task's 'inputs'
+        if t == "open":
+            acts.append({"op": "open", "path": _box_path(p.get("path", ""), box)})
+            continue
+        if t in ("googledrive", "login"):
+            bad.append(t)
+            continue
+        cmd = p.get("command")
+        s = " ".join(cmd) if isinstance(cmd, list) else str(cmd or "")
+        s = re.sub(r"^\s*(?:/bin/bash|bash|sh|cmd(?:\.exe)?\s+/c|powershell(?:\.exe)?\s+-command)\s+(?:-c\s+)?", "", s, flags=re.I).strip().strip("'\"")
+        if re.match(r"^python3?\s+-c\b", s):                                                       # one python snippet: a focusing click / hotkey is a no-op here; anything else is not run
+            if not re.search(r"pyautogui|time\.sleep", s) or re.search(r"open\(|subprocess|os\.system|requests", s):
+                bad.append("python")
+            continue
+        for part in [x.strip() for x in re.split(r"\s*(?:&&|;)\s*", s) if x.strip()]:
+            w = part.split()
+            head = re.sub(r"^.*/", "", w[0]) if w else ""
+            if re.match(r"^[A-Z_]+=", head):                                                       # VLC_VERBOSE=-1 vlc ...: an environment prefix
+                w = w[1:]
+                head = re.sub(r"^.*/", "", w[0]) if w else ""
+            if head.lower() in ("socat", "gsettings", "export", "xdotool", "wmctrl", "sleep", "cd", "timeout"):
+                continue                                                                           # port relays, desktop settings, focusing clicks: nothing to do here
+            if head == "mkdir":
+                acts += [{"op": "mkdir", "path": _box_path(a, box)} for a in w[1:] if not a.startswith("-")]
+            elif head == "tar":
+                arch = next((a for a in w[1:] if not a.startswith("-") and re.search(r"\.tar(\.\w+)?$|\.tgz$", a)), "")
+                dest = w[w.index("-C") + 1] if "-C" in w[:-1] else os.path.dirname(arch)
+                acts.append({"op": "extract", "path": _box_path(arch, box), "to": _box_path(dest, box)}) if arch else bad.append("tar")
+            elif head == "unzip":
+                arch = next((a for a in w[1:] if not a.startswith("-") and a.endswith(".zip")), "")
+                dest = w[w.index("-d") + 1] if "-d" in w[:-1] else os.path.dirname(arch)
+                acts.append({"op": "extract", "path": _box_path(arch, box), "to": _box_path(dest, box)}) if arch else bad.append("unzip")
+            elif head == "rm":
+                acts += [{"op": "remove", "path": _box_path(a, box)} for a in w[1:] if not a.startswith("-")]
+            elif head in ("cp", "mv") and len([a for a in w[1:] if not a.startswith("-")]) == 2:
+                src, dst = [a for a in w[1:] if not a.startswith("-")]
+                acts.append({"op": head, "path": _box_path(src, box), "to": _box_path(dst, box)})
+            elif head.lower() in ("start", "explorer", "explorer.exe", "xdg-open") and len(w) > 1:
+                arg = next((a for a in w[1:] if not a.startswith(("/", "-")) and a.strip('"')), "")
+                acts.append({"op": "open", "path": _box_path(arg, box)}) if arg and not arg.startswith("http") else (acts.append({"op": "open_urls", "urls": [arg]}) if arg else bad.append(head))
+            elif head in _LAUNCH_APPS:
+                args = [a for a in w[1:] if not a.startswith("-")]
+                kind = next((k for k in ("calc", "writer", "impress") if f"--{k}" in part), "")
+                app = _LAUNCH_APPS[head] or {"calc": "Excel", "writer": "Word", "impress": "PowerPoint"}.get(kind, "")
+                if args and not args[0].startswith("http"):
+                    acts.append({"op": "open", "path": _box_path(args[0], box), "app": app})
+                elif app:
+                    acts.append({"op": "launch", "app": app, "urls": [a for a in args if a.startswith("http")]})
+                else:
+                    bad.append(head)
+            else:
+                bad.append(head or t)                                                              # sudo apt, ./setup.sh, chmod, gnome-terminal, thunderbird, gimp ...
+    return acts, sorted(set(bad))
+
+
+# ---- which tasks to run: random, hard, unseen first (a fixed nightly set lets the code fit those tasks instead of getting general)
+EASY_APPS = {"Notepad", "Calculator", "Clock", "Settings"}                                        # their mechanics are a subset of Excel / PowerPoint / VS Code tasks
+BENCH_LEDGER = os.path.join(r"D:\new_automation\data", "eval", "bench_ledger.jsonl")
+
+
+def bench_ledger() -> Dict[str, List[Dict[str, Any]]]:
+    out: Dict[str, List[Dict[str, Any]]] = {}
+    with contextlib.suppress(Exception):
+        for line in open(BENCH_LEDGER, encoding="utf-8"):
+            r = json.loads(line)
+            out.setdefault(r["id"], []).append(r)
+    return out
+
+
+def sample_hard_suite(n_multi: int = 5, n_single: int = 5, seed: Optional[int] = None, tasks: Optional[List[Dict[str, Any]]] = None,
+                      ledger: Optional[Dict[str, List[Dict[str, Any]]]] = None) -> List[Dict[str, Any]]:
+    """A random suite of runnable tasks: n_multi multi-app ones and n_single single-app ones from hard apps (never a task whose only app is an easy one),
+    tasks never run before first, then those not yet passed; a passed task is drawn only when nothing else is left. seed=None draws a new suite each run."""
+    import random
+    rnd = random.Random(seed)
+    pool = [t for t in (tasks if tasks is not None else json.load(open(BENCH_FILE, encoding="utf-8"))) if t.get("runnable")]
+    led = ledger if ledger is not None else bench_ledger()
+
+    def rank(t: Dict[str, Any]) -> int:
+        runs = led.get(t["id"], [])
+        return 0 if not runs else (2 if any(r.get("passed") for r in runs) else 1)
+    pick: List[Dict[str, Any]] = []
+    for want, n in ((True, n_multi), (False, n_single)):
+        cand = [t for t in pool if t["multi_app"] == want and (want or not set(t["apps"]) <= EASY_APPS)]
+        rnd.shuffle(cand)
+        pick += sorted(cand, key=rank)[:n]
+    return pick
+
+
+# ---- the benchmark's own checkers (the common ones), on files in the task's sandbox
+def _bench_file(spec: Any, task: Dict[str, Any], fetch: Optional[Callable[[str, str], bool]] = None) -> str:
+    """A checker's 'result' / 'expected' file: a path on the benchmark machine -> the sandbox; a cloud file -> fetched into the sandbox's 'expected' folder."""
+    import urllib.request
+    if not isinstance(spec, dict):
+        return ""
+    if spec.get("type") == "cloud_file":
+        url = spec.get("path", "")
+        dest = os.path.join(task["sandbox"], "expected", os.path.basename(url.split("?")[0]) or "expected")
+        if not os.path.isfile(dest):
+            os.makedirs(os.path.dirname(dest), exist_ok=True)
+            (fetch or (lambda u, p: bool(urllib.request.urlretrieve(u, p))))(url, dest)
+        return dest
+    if spec.get("type") in ("vm_file", "file"):
+        return _box_path(spec.get("path", ""), task["sandbox"])
+    return ""
+
+
+def _table(path: str) -> List[List[str]]:
+    import openpyxl
+    wb = openpyxl.load_workbook(path, data_only=True)
+    return [[("" if v is None else str(int(v) if isinstance(v, float) and v.is_integer() else v)).strip() for v in row] for ws in wb.worksheets for row in ws.iter_rows(values_only=True)]
+
+
+def _doc_text(path: str) -> str:
+    if path.lower().endswith(".docx"):
+        import docx
+        return "\n".join(p.text for p in docx.Document(path).paragraphs).strip()
+    return open(path, encoding="utf-8", errors="replace").read().strip()
+
+
+def check_bench(task: Dict[str, Any], fetch: Optional[Callable[[str, str], bool]] = None) -> Dict[str, Any]:
+    """{'scored': bool, 'passed': bool, 'why'}: the task's own checker where we implement it (compare_table, compare_docx_files, compare_text_file, check_include_exclude,
+    exact_match against a rule); anything else is reported unscored, never guessed."""
+    ck = task.get("checker") or {}
+    funcs = [f for f in ck.get("func") or [] if f]
+    if len(funcs) != 1:
+        return {"scored": False, "passed": False, "why": f"checker {funcs} is not implemented here"}
+    f = funcs[0]
+    res, exp = ck.get("result"), ck.get("expected")
+    try:
+        got = _bench_file(res, task, fetch)
+        if f in ("compare_table", "compare_docx_files", "compare_text_file"):
+            want = _bench_file(exp, task, fetch)
+            if not (got and os.path.isfile(got)):
+                return {"scored": True, "passed": False, "why": f"the result file {got or res} was not made"}
+            if f == "compare_table":
+                trim = lambda t: [r for r in ([c for c in row] for row in t) if any(r)]
+                ok = trim(_table(got)) == trim(_table(want))
+            else:
+                ok = re.sub(r"\s+", " ", _doc_text(got)) == re.sub(r"\s+", " ", _doc_text(want))
+            return {"scored": True, "passed": ok, "why": "identical to the expected file" if ok else "differs from the expected file"}
+        if f == "check_include_exclude" and isinstance(exp, dict):
+            rules = (exp.get("rules") or {})
+            text = _doc_text(got) if got and os.path.isfile(got) else str(task.get("answer", ""))
+            ok = all(s in text for s in rules.get("include", [])) and not any(s in text for s in rules.get("exclude", []))
+            return {"scored": True, "passed": ok, "why": f"include {rules.get('include', [])} / exclude {rules.get('exclude', [])}"}
+        if f == "exact_match" and isinstance(exp, dict) and isinstance(exp.get("rules"), dict):
+            val = _doc_text(got).strip() if got and os.path.isfile(got) else str(task.get("answer", "")).strip()
+            ok = val == str(exp["rules"].get("expected", "")).strip()
+            return {"scored": True, "passed": ok, "why": f"got {val[:60]!r}"}
+    except Exception as e:
+        return {"scored": True, "passed": False, "why": f"checker error {type(e).__name__}: {str(e)[:120]}"}
+    return {"scored": False, "passed": False, "why": f"checker {f} is not implemented here"}
+
+
+def record_bench(task: Dict[str, Any], verdict: Dict[str, Any], status: str = "") -> None:
+    os.makedirs(os.path.dirname(BENCH_LEDGER), exist_ok=True)
+    with open(BENCH_LEDGER, "a", encoding="utf-8") as fh:
+        fh.write(json.dumps({"id": task["id"], "when": time.strftime("%Y-%m-%d %H:%M:%S"), "status": status, "scored": verdict.get("scored"),
+                             "passed": bool(verdict.get("passed")), "why": verdict.get("why", "")[:200]}) + "\n")
+
+
+def video_bench(video: str, request: str = "make a short, clean highlight of this with captions", person: str = "bench", n: int = 3,
+                out_dir: str = "", edit_options: Optional[Callable[..., Dict[str, Any]]] = None) -> Dict[str, Any]:
+    """The video-editing bench task. Taste is the person's, so there is no one right edit: the task passes when every option renders and passes its own check
+    (it plays, its length is its plan's, captions exist when asked), the options really DIFFER (length or what is kept), and the run ends asking the person to
+    choose (NEEDS_CHOICE) rather than claiming one edit is right. Recorded in the bench ledger like any other task."""
+    if edit_options is None:
+        from core_organs.harvest import video_pipeline as VP
+        edit_options = VP.edit_options
+    out_dir = out_dir or os.path.join(SANDBOX, "video_" + time.strftime("%Y%m%d_%H%M%S"))
+    r = edit_options(request, [video], out_dir, n=n, person=person)
+    opts = r.get("options") or []
+    done = [o for o in opts if o.get("status") == "DONE"]
+    lengths = sorted({round(float(o.get("seconds_long") or 0), 1) for o in done})
+    differ = len(done) >= 2 and (len(lengths) >= 2 or len({o.get("request") for o in done}) == len(done))
+    passed = bool(done) and len(done) == len(opts) and differ and r.get("status") == "NEEDS_CHOICE"
+    why = (f"{len(done)}/{len(opts)} options rendered and checked, lengths {lengths}, " + ("they differ" if differ else "they do NOT differ") +
+           (", ends with the person's choice" if r.get("status") == "NEEDS_CHOICE" else f"; status {r.get('status')}"))
+    verdict = {"scored": True, "passed": passed, "why": why}
+    record_bench({"id": "video_edit_options"}, verdict, r.get("status", ""))
+    return {**verdict, "report": r}
+
+
+def apply_setup(task: Dict[str, Any], fetch: Optional[Callable[[str, str], bool]] = None, opener: Optional[Callable[[str, str], Any]] = None) -> List[str]:
+    """Run a task's translated set-up inside its sandbox: fetch its inputs, then the actions. Every path is checked to stay inside the sandbox. Returns what happened."""
+    import shutil
+    import tarfile
+    import zipfile
+    import urllib.request
+    box = os.path.abspath(task["sandbox"])
+    inside = lambda p: os.path.abspath(p) == box or os.path.abspath(p).startswith(box + os.sep)
+    os.makedirs(box, exist_ok=True)
+    log: List[str] = []
+    for f in task.get("inputs", []):
+        if not inside(f["path"]):
+            log.append(f"refused input outside the sandbox: {f['path']}")
+            continue
+        os.makedirs(os.path.dirname(f["path"]), exist_ok=True)
+        ok = (fetch or (lambda u, p: bool(urllib.request.urlretrieve(u, p))))(f["url"], f["path"])
+        log.append(f"input {os.path.basename(f['path'])}: {'ok' if ok else 'FAILED'}")
+    for a in task.get("setup", []):
+        paths = [a[k] for k in ("path", "to") if a.get(k)]
+        if any(not inside(p) for p in paths):
+            log.append(f"refused {a['op']} outside the sandbox")
+            continue
+        try:
+            if a["op"] == "mkdir":
+                os.makedirs(a["path"], exist_ok=True)
+            elif a["op"] == "extract":
+                os.makedirs(a["to"], exist_ok=True)
+                if a["path"].endswith(".zip"):
+                    with zipfile.ZipFile(a["path"]) as z:
+                        for m in z.namelist():
+                            if inside(os.path.join(a["to"], m)):
+                                z.extract(m, a["to"])
+                else:
+                    with tarfile.open(a["path"]) as t:
+                        t.extractall(a["to"], members=[m for m in t.getmembers() if inside(os.path.join(a["to"], m.name)) and not (m.issym() or m.islnk())])
+            elif a["op"] == "remove":
+                shutil.rmtree(a["path"], ignore_errors=True) if os.path.isdir(a["path"]) else (os.remove(a["path"]) if os.path.exists(a["path"]) else None)
+            elif a["op"] in ("cp", "mv"):
+                (shutil.copy2 if a["op"] == "cp" else shutil.move)(a["path"], a["to"])
+            elif a["op"] in ("open", "launch", "open_urls") and opener is not None:
+                opener(a["op"], a.get("path") or a.get("app") or ",".join(a.get("urls", [])))
+            log.append(f"{a['op']} ok")
+        except Exception as e:
+            log.append(f"{a['op']} FAILED: {type(e).__name__}: {str(e)[:80]}")
+    return log
+
+
+def import_bench(osworld_zip: str = r"D:\new_automation\data\inbox\4_1_osworld\OSWorld-main.zip",
+                 waa_zip: str = r"D:\new_automation\data\inbox\4_2_windows_agent_arena\WindowsAgentArena-main.zip", out: str = BENCH_FILE) -> Dict[str, Any]:
+    """Both task sets -> data/eval/bench_tasks.json. The archives are data: only their task JSON is read, nothing in them is run."""
+    import zipfile
+    tasks: List[Dict[str, Any]] = []
+    for path, marker, source in ((osworld_zip, "/evaluation_examples/examples/", "osworld"), (waa_zip, "/evaluation_examples_windows/examples/", "windows_agent_arena")):
+        if not os.path.isfile(path):
+            continue
+        with zipfile.ZipFile(path) as z:
+            for n in z.namelist():
+                if marker in n and n.endswith(".json"):
+                    with contextlib.suppress(Exception):
+                        tasks.append(bench_task(json.loads(z.read(n)), source, n.split(marker)[1].split("/")[0]))
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    json.dump(tasks, open(out, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
+    summ = {"tasks": len(tasks), "multi_app": sum(t["multi_app"] for t in tasks), "runnable": sum(t["runnable"] for t in tasks),
+            "runnable_multi_app": sum(t["runnable"] and t["multi_app"] for t in tasks), "checker_known": sum(t["checker_known"] for t in tasks), "file": out}
+    return summ
+
+
 def live_guard() -> None:
     """Live runs open real windows on the person's own screen. They never start unless the person has said so: HOJAIGA_ALLOW_LIVE=1 is set by them (or by an assistant they told to run it), never by default."""
     if os.environ.get("HOJAIGA_ALLOW_LIVE") != "1":

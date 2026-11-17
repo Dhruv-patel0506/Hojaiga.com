@@ -251,8 +251,49 @@ def load_pairs(jsonl: str, grounded_only: bool = True) -> Tuple[List[Dict[str, A
     return rows, stats
 
 
+ACTION_JOBS = ("ground", "decide")                                       # jobs whose answer is ONE on-screen action from a numbered element list
+ACTIONS = ("click", "hotkey", "type", "confirm", "replan", "ask", "done")
+JSON_JOBS = {"plan": "steps", "judge": "items", "draw": "strokes", "point": "point", "route": "parts", "video": ""}   # answers that must be one JSON object (key it must hold)
+
+
+def validate_job_pair(rec: Dict[str, Any], root: str) -> List[str]:
+    """Checks for the jobs that are NOT one on-screen action (spec section 2: see, plan, judge, teach, video, draw, point, route, general): each keeps its OWN answer
+    format. Oct-29: wrapping every answer as 'type it into element #1' so the action validator passed taught a model to answer everything as an action."""
+    probs = []
+    msgs = rec.get("messages") or []
+    if [m.get("role") for m in msgs] != ["system", "user", "assistant"]:
+        return ["roles must be system, user, assistant"]
+    job = (rec.get("meta") or {}).get("job", "")
+    if not (rec.get("meta") or {}).get("verified_by"):
+        probs.append("no meta.verified_by: a label with no proof is not trained on")
+    for c in msgs[1].get("content") or []:
+        if c.get("type") == "image":
+            p = c.get("image", "")
+            if not os.path.isfile(p if os.path.isabs(p) else os.path.join(root, p)):
+                probs.append(f"image missing: {p}")
+    ans = "".join(c.get("text", "") for c in msgs[2].get("content") or [] if c.get("type") == "text").strip()
+    if not ans:
+        return probs + ["empty answer"]
+    if job in JSON_JOBS:
+        try:
+            d = json.loads(ans)
+            if not isinstance(d, dict) or (JSON_JOBS[job] and JSON_JOBS[job] not in d):
+                probs.append(f"a {job} answer must be one JSON object holding '{JSON_JOBS[job]}'")
+        except ValueError as exc:
+            probs.append(f"a {job} answer is not JSON ({exc})")
+    if job == "teach":
+        n_ev = len(re.findall(r"^\[(\d{1,2})\]", "".join(c.get("text", "") for c in msgs[1].get("content") or [] if c.get("type") == "text"), re.M))
+        cites = [int(x) for x in re.findall(r"\[(\d{1,2})\]", ans)]
+        if not ans.upper().startswith("NOT IN EVIDENCE") and (not cites or any(x < 1 or x > n_ev for x in cites)):
+            probs.append("a teach answer must cite evidence that exists, or say NOT IN EVIDENCE")
+    return probs
+
+
 def validate_pair(rec: Dict[str, Any], root: str, require_ui: bool = True) -> List[str]:
-    """Problems that would make a pair useless or harmful for training ([] = fine)."""
+    """Problems that would make a pair useless or harmful for training ([] = fine). A pair whose meta.job is not an action job is checked by its own job's rules."""
+    job = (rec.get("meta") or {}).get("job", "")
+    if job and job not in ACTION_JOBS:
+        return validate_job_pair(rec, root)
     probs = []
     if require_ui and rec.get("meta", {}).get("ui_frames") is not True:
         probs.append("frames not verified as a software UI (a talking head labelled 'click profile' teaches the model to click faces)")
@@ -262,8 +303,10 @@ def validate_pair(rec: Dict[str, Any], root: str, require_ui: bool = True) -> Li
     user, asst = msgs[1].get("content") or [], msgs[2].get("content") or []
     imgs = [c for c in user if c.get("type") == "image"]
     v2 = rec.get("meta", {}).get("prompt_version") == 2                     # prompt format v2: the full picture first, then up to four zoomed strip crops
-    if (not v2 and len(imgs) != 1) or (v2 and not 1 <= len(imgs) <= 5):
-        probs.append("exactly one image expected" if not v2 else "a v2 prompt has the picture plus at most four strip crops")
+    if job == "decide" and not imgs:
+        pass                                                                # a decision can be made from the element list alone (the web-explore rows)
+    elif (not v2 and len(imgs) != 1) or (v2 and not 1 <= len(imgs) <= 5):
+        probs.append("exactly one image expected" if not v2 else None)
     else:
         for im in imgs:
             p = im.get("image", "")
@@ -277,10 +320,13 @@ def validate_pair(rec: Dict[str, Any], root: str, require_ui: bool = True) -> Li
         if not isinstance(acts, list) or not acts:
             raise ValueError("empty")
         a = acts[0]
-        if a.get("action") not in ("click", "hotkey", "type"):
+        if a.get("action") not in (ACTIONS if job == "decide" else ("click", "hotkey", "drag", "type")):
             probs.append(f"unknown action {a.get('action')!r}")
         if a.get("action") == "click" and a.get("target_id") is None:
             probs.append("click without a target_id")
+        ids = {int(x) for c in user if c.get("type") == "text" for x in re.findall(r"^#(\d+)\b", c.get("text", ""), re.M)}
+        if a.get("target_id") is not None and ids and int(a["target_id"]) not in ids:
+            probs.append(f"target_id {a['target_id']} is not in the element list")
         if a.get("action") == "hotkey" and not a.get("hotkey"):
             probs.append("hotkey without keys")
     except Exception as exc:
@@ -545,6 +591,23 @@ def memory_callback(every: int = 10):
     return _Mem()
 
 
+def latest_checkpoint(out_dir: str, max_steps: int) -> str:
+    """The newest checkpoint-N of this run that belongs to the same plan (its trainer_state has the same max_steps) and still has its optimizer, else ''."""
+    best, path = -1, ""
+    for d in os.listdir(out_dir) if os.path.isdir(out_dir) else []:
+        m = re.match(r"checkpoint-(\d+)$", d)
+        p = os.path.join(out_dir, d)
+        if not m or not os.path.isfile(os.path.join(p, "optimizer.pt")):
+            continue
+        try:
+            st = json.load(open(os.path.join(p, "trainer_state.json"), encoding="utf-8"))
+        except Exception:
+            continue
+        if int(st.get("max_steps") or 0) == int(max_steps) and int(m.group(1)) > best:
+            best, path = int(m.group(1)), p
+    return path
+
+
 def run_training(model, collate_fn, train_rows: Sequence[Dict[str, Any]], cfg: TrainConfig, out_dir: str, optim: Optional[str] = None, eval_rows: Sequence[Dict[str, Any]] = (), **args_extra) -> Dict[str, Any]:
     """The training loop (transformers.Trainer): the same code path the real model uses, so it can be exercised on a tiny model."""
     from transformers import Trainer
@@ -552,7 +615,8 @@ def run_training(model, collate_fn, train_rows: Sequence[Dict[str, Any]], cfg: T
     trainer = (make_trainer_class() if cfg.slice_logits else Trainer)(model=model, args=args, train_dataset=ListDataset(train_rows), eval_dataset=ListDataset(eval_rows) if eval_rows else None, data_collator=collate_fn)
     trainer.add_callback(memory_callback(10))
     t0 = time.time()
-    res = trainer.train()
+    resume = latest_checkpoint(out_dir, cfg.max_steps) if os.environ.get("HOJAIGA_TRAIN_RESUME", "1") != "0" else ""
+    res = trainer.train(resume_from_checkpoint=resume or None)                                        # an interrupted run continues (round 3 stopped at 200/700 with its optimizer saved)
     model.save_pretrained(os.path.join(out_dir, "adapter"))
     losses = [h["loss"] for h in trainer.state.log_history if "loss" in h]
     return {"train_seconds": round(time.time() - t0, 1), "steps": trainer.state.global_step, "first_loss": losses[0] if losses else None, "last_loss": losses[-1] if losses else None,
@@ -586,6 +650,16 @@ def train(cfg: TrainConfig, force: bool = False, jsonl: str = "", root: str = ""
     collate = VLMCollator(proc, root, cfg.max_pixels, cfg.max_seq_length, pad_id=getattr(tok, "pad_token_id", 0) or 0)
     rows = [json.loads(l) for l in open(os.path.join(run_dir, "train.jsonl"), encoding="utf-8")]
     ev = [json.loads(l) for l in open(os.path.join(run_dir, "eval.jsonl"), encoding="utf-8")]
+    if presplit_dir:                                                # a presplit set is checked too (Oct-29: 544k presplit rows went in unchecked, most of them template copies)
+        bad: Dict[str, int] = {}
+        def _ok(r: Dict[str, Any]) -> bool:
+            p = validate_pair(r, root, cfg.require_ui_gate and (r.get("meta") or {}).get("job", "") in ("", "ground"))
+            for x in p[:1]:
+                bad[x.split(":")[0][:60]] = bad.get(x.split(":")[0][:60], 0) + 1
+            return not p
+        rows, ev = [r for r in rows if _ok(r)], [r for r in ev if _ok(r)]
+        out["rejected_by_check"] = bad
+        print(f"[train] presplit check: {len(rows)} train / {len(ev)} eval pass; rejected: {bad}", flush=True)
     kept, dropped = [], 0
     for r in rows:                                                  # the estimate under-counts some multi-image rows (measured: 2087 and 2472 tokens against 2048): the real tokenizer decides
         try:
@@ -603,19 +677,27 @@ def train(cfg: TrainConfig, force: bool = False, jsonl: str = "", root: str = ""
 
 
 # ---- evaluation ------------------------------------------------------------------------------------------------------------------------------------
-def parse_action(text: str) -> Optional[Dict[str, Any]]:
-    """The first action of a model's reply ('[{"step": 1, "action": ...}]', possibly wrapped in a code fence or prose), or None when it is not an action. A reply CUT OFF in the free-text
-    verify_expectation (measured live: the action fields come first and the expectation can run past the token budget) still yields its action: the fields before the cut are read directly."""
-    m = re.search(r"\[.*\]", text or "", re.S)
-    if m:
+def parse_action_detail(text: str) -> Tuple[Optional[Dict[str, Any]], bool]:
+    """Return ``(first_action, strict_json)`` for a model reply.
+
+    The recovery path deliberately accepts a response cut off in the free-text
+    ``verify_expectation`` after all action fields have arrived. That is useful
+    for a guarded executor, but must not be reported as valid JSON during model
+    evaluation.  ``strict_json`` therefore records a successfully decoded JSON
+    action list, independently of whether an action can be recovered.
+    """
+    raw = text or ""
+    decoder = json.JSONDecoder()
+    for match in re.finditer(r"\[", raw):
         try:
-            arr = json.loads(m.group(0))
-            return arr[0] if isinstance(arr, list) and arr and isinstance(arr[0], dict) else None
-        except Exception:
-            pass
+            arr, _ = decoder.raw_decode(raw[match.start():])
+        except (json.JSONDecodeError, ValueError):
+            continue
+        if isinstance(arr, list) and arr and isinstance(arr[0], dict):
+            return arr[0], True
     kind = re.search(r'"action"\s*:\s*"(click|hotkey|type)"', text or "")
     if not kind:
-        return None
+        return None, False
     out: Dict[str, Any] = {"step": 1, "action": kind.group(1), "target_id": None, "hotkey": None, "text": None}
     tid = re.search(r'"target_id"\s*:\s*(\d+)', text)
     if tid:
@@ -625,8 +707,13 @@ def parse_action(text: str) -> Optional[Dict[str, Any]]:
         if mm:
             out[k] = mm.group(1)
     if out["action"] == "click" and out["target_id"] is None:
-        return None
-    return out
+        return None, False
+    return out, False
+
+
+def parse_action(text: str) -> Optional[Dict[str, Any]]:
+    """Compatibility wrapper for callers that only need a recoverable action."""
+    return parse_action_detail(text)[0]
 
 
 def _norm_keys(k: Any) -> str:
@@ -646,11 +733,56 @@ def score_action(pred: Optional[Dict[str, Any]], gold: Dict[str, Any]) -> Dict[s
 
 def summarize_scores(rows: Sequence[Dict[str, bool]]) -> Dict[str, Any]:
     n = max(len(rows), 1)
-    return {"n": len(rows), "valid_json": round(sum(r["valid"] for r in rows) / n, 3), "action_kind": round(sum(r["action"] for r in rows) / n, 3), "exact": round(sum(r["exact"] for r in rows) / n, 3)}
+    # Old callers only supply ``valid``; use it as a compatibility fallback.
+    # Evaluations add strict_json, so their published valid_json metric is
+    # genuinely syntactic JSON validity rather than regex recovery rate.
+    return {"n": len(rows), "valid_json": round(sum(r.get("strict_json", r["valid"]) for r in rows) / n, 3),
+            "recoverable_action": round(sum(r["valid"] for r in rows) / n, 3),
+            "action_kind": round(sum(r["action"] for r in rows) / n, 3), "exact": round(sum(r["exact"] for r in rows) / n, 3)}
+
+
+def balanced_eval_slice(rows: Sequence[Dict[str, Any]], max_examples: int = 0, seed: int = 3407) -> List[Dict[str, Any]]:
+    """A deterministic, app-and-action-balanced evaluation slice.
+
+    Evaluating every held-out visual interaction can be slow on a laptop GPU.
+    A prefix is a misleading shortcut because harvest order clusters near-
+    duplicate frames from the same app.  This round-robins stable
+    ``app_key/action`` groups so a bounded smoke evaluation measures a broad
+    cross-section.  ``max_examples=0`` always means the complete held-out set.
+    """
+    if max_examples <= 0 or max_examples >= len(rows):
+        return list(rows)
+    groups: Dict[str, List[Dict[str, Any]]] = {}
+    for row in rows:
+        meta = row.get("meta", {})
+        try:
+            action = json.loads(row["messages"][2]["content"][0]["text"])[0].get("action", "unknown")
+        except Exception:
+            action = "unknown"
+        key = f"{meta.get('app_key', 'unknown')}::{action}"
+        groups.setdefault(key, []).append(row)
+    keys = sorted(groups)
+    random.Random(seed).shuffle(keys)
+    positions = {key: 0 for key in keys}
+    out: List[Dict[str, Any]] = []
+    while len(out) < max_examples:
+        added = False
+        for key in keys:
+            i = positions[key]
+            if i >= len(groups[key]):
+                continue
+            out.append(groups[key][i])
+            positions[key] = i + 1
+            added = True
+            if len(out) >= max_examples:
+                break
+        if not added:
+            break
+    return out
 
 
 def evaluate_run(run_dir: str, model_id: str, cfg: Optional[TrainConfig] = None, root: str = "", max_new_tokens: int = 160, eval_file: str = "eval.jsonl", adapter_dir: str = "", with_base: bool = True,
-                 report_name: str = "eval_report.json") -> Dict[str, Any]:
+                 report_name: str = "eval_report.json", max_examples: int = 0, eval_seed: int = 3407) -> Dict[str, Any]:
     """Held-out pairs (run_dir/eval.jsonl): the BASE model (same 4-bit load) and base + the trained adapter, greedy decoding, scored with score_action. The honest question: did the adapter learn
     anything the base model did not already do? (Held-out = controls the adapter never saw a label for, on layouts it has seen.)"""
     import torch
@@ -658,7 +790,8 @@ def evaluate_run(run_dir: str, model_id: str, cfg: Optional[TrainConfig] = None,
     from transformers import AutoProcessor, BitsAndBytesConfig, Qwen3VLForConditionalGeneration
     cfg = cfg or TrainConfig(model=model_id)
     root = root or default_root()
-    rows = [json.loads(l) for l in open(os.path.join(run_dir, eval_file), encoding="utf-8")]
+    all_rows = [json.loads(l) for l in open(os.path.join(run_dir, eval_file), encoding="utf-8")]
+    rows = balanced_eval_slice(all_rows, max_examples=max_examples, seed=eval_seed)
     bf16 = torch.cuda.is_bf16_supported()
     bnb = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=torch.bfloat16 if bf16 else torch.float16, llm_int8_skip_modules=["visual", "lm_head"])
     model = Qwen3VLForConditionalGeneration.from_pretrained(model_id, quantization_config=bnb, device_map={"": 0}, dtype=torch.bfloat16 if bf16 else torch.float16)
@@ -676,11 +809,16 @@ def evaluate_run(run_dir: str, model_id: str, cfg: Optional[TrainConfig] = None,
             with torch.no_grad():
                 out = m.generate(**enc, max_new_tokens=max_new_tokens, do_sample=False)
             text = proc.batch_decode(out[:, enc["input_ids"].shape[1]:], skip_special_tokens=True)[0]
-            sc = score_action(parse_action(text), gold)
+            pred, strict_json = parse_action_detail(text)
+            sc = score_action(pred, gold)
+            sc["strict_json"] = strict_json
             scores.append(sc)
             samples.append({"goal": [c.get("text", "") for c in r["messages"][1]["content"] if c.get("type") == "text"][-1].split("Goal: ")[-1][:70], "gold": {k: gold.get(k) for k in ("action", "target_id", "hotkey", "text")}, "reply": text[:200], **sc})
         return {"scores": summarize_scores(scores), "samples": samples, "tag": tag}
-    res = {"base": run(model, "base")} if with_base else {}
+    res: Dict[str, Any] = {"selection": {"available": len(all_rows), "selected": len(rows), "max_examples": max_examples, "seed": eval_seed,
+                                           "strategy": "full held-out set" if len(rows) == len(all_rows) else "deterministic round-robin by app_key/action"}}
+    if with_base:
+        res["base"] = run(model, "base")
     adapter = adapter_dir or os.path.join(run_dir, "adapter")
     if os.path.isdir(adapter):
         tuned = PeftModel.from_pretrained(model, adapter)
@@ -733,6 +871,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     ap.add_argument("--backend", default="auto")
     ap.add_argument("--seq", type=int, default=2048)
     ap.add_argument("--rank", type=int, default=16)
+    ap.add_argument("--alpha", type=int, default=0, help="LoRA alpha (0 = the rank)")
+    ap.add_argument("--max-pixels", type=int, default=0, help="largest image size in pixels (0 = 448x448); screens need about 1024x768 to keep their text readable")
+    ap.add_argument("--lr", type=float, default=0.0)
+    ap.add_argument("--warmup", type=int, default=0)
     ap.add_argument("--steps", type=int, default=300)
     ap.add_argument("--jsonl", default="")
     ap.add_argument("--run", default="")
@@ -746,8 +888,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     ap.add_argument("--adapter", default="", help="evaluate this adapter directory instead of <run>/adapter")
     ap.add_argument("--no-base", action="store_true")
     ap.add_argument("--report", default="eval_report.json")
+    ap.add_argument("--max-examples", type=int, default=0, help="evaluate this many app/action-balanced held-out examples; 0 means all")
+    ap.add_argument("--eval-seed", type=int, default=3407, help="deterministic seed for a bounded evaluation slice")
+    ap.add_argument("--max-new-tokens", type=int, default=160, help="greedy decoding cap per held-out example")
     a = ap.parse_args(argv)
-    cfg = TrainConfig(model=a.model, backend=a.backend, max_seq_length=a.seq, lora_r=a.rank, lora_alpha=a.rank, max_steps=a.steps, grounded_only=not a.all_pairs, require_ui_gate=not a.allow_unchecked_frames, min_examples=a.min_examples, finetune_vision=a.vision)
+    cfg = TrainConfig(model=a.model, backend=a.backend, max_seq_length=a.seq, lora_r=a.rank, lora_alpha=a.alpha or a.rank, max_steps=a.steps, grounded_only=not a.all_pairs, require_ui_gate=not a.allow_unchecked_frames, min_examples=a.min_examples, finetune_vision=a.vision)
+    cfg.max_pixels = a.max_pixels or cfg.max_pixels
+    cfg.lr = a.lr or cfg.lr
+    cfg.warmup_steps = a.warmup or cfg.warmup_steps
     if a.cmd == "preflight":
         out = preflight(cfg)
     elif a.cmd == "prepare":
@@ -755,8 +903,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     elif a.cmd == "train":
         out = train(cfg, a.force, a.jsonl, presplit_dir=a.presplit)
     elif a.cmd == "evaluate":
-        res = evaluate_run(a.run, cfg.model, cfg, eval_file=a.eval_file, adapter_dir=a.adapter, with_base=not a.no_base, report_name=a.report)
-        out = {k: v["scores"] for k, v in res.items()}
+        res = evaluate_run(a.run, cfg.model, cfg, eval_file=a.eval_file, adapter_dir=a.adapter, with_base=not a.no_base, report_name=a.report,
+                           max_examples=a.max_examples, eval_seed=a.eval_seed, max_new_tokens=a.max_new_tokens)
+        out = {"selection": res["selection"], **{k: v["scores"] for k, v in res.items() if isinstance(v, dict) and "scores" in v}}
     else:
         out = export_plan(a.run or os.path.join(default_root(), "training", "runs"), a.model)
     print(json.dumps(out, indent=2, default=str))

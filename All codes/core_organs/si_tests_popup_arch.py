@@ -51,6 +51,8 @@ def run_ar46() -> "TestOutcome":
     checks["hint_is_archetype_labelled_and_capped"] = bool(h) and h["source"] == "archetype" and h["confidence"] <= 0.45 and h["phases"]
     checks["hint_withheld_when_rag_has_pathway"] = A.hint("X", "y", True, sheet) is None
     checks["email_send_is_a_trap_calculator_equals_is_not"] = A.is_trap("email_client", "Send") and not A.is_trap("calculator", "Equals")
+    uncertain = {"app": "", "title": "", "controls": [("node", "Node"), ("button", "Queue Prompt")]}
+    checks["ambiguous_first_contact_has_no_skeleton"] = r.assess(uncertain)["status"] == "ambiguous" and A.hint("Unknown", "run it", False, uncertain, r) is None
     return _verdict(checks)
 
 

@@ -67,7 +67,7 @@ import time
 import socket
 import subprocess
 import requests
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 
 logger = logging.getLogger("hojaiga.organ37.llm_gateway")
 
@@ -99,12 +99,13 @@ CLOUD_PROVIDERS = [  # (name, key names, chat URL, default model, reads images)
     ("nvidia", ("NVIDIA_API_KEY", "NVIDIA_API_KEY_1", "NVIDIA_API_KEY_2"), "https://integrate.api.nvidia.com/v1/chat/completions", "nvidia/nemotron-3.5-super-vl-120b-a12b", False),   # Oct-27: the /models list names models this account gets 404 for; this one answered
     ("nvidia_eye", ("NVIDIA_API_KEY", "NVIDIA_API_KEY_1", "NVIDIA_API_KEY_2"), "https://integrate.api.nvidia.com/v1/chat/completions", "nvidia/nemotron-3.5-super-vl-120b-a12b", True),
     ("openrouter", ("OPENROUTER_API_KEY", "OPENROUTER_API_KEY_1", "OPENROUTER_API_KEY_2"), "https://openrouter.ai/api/v1/chat/completions", "openrouter/free", False),
+    ("openai", ("OPENAI_API_KEY", "OPENAI_API_KEY_1", "OPENAI_API_KEY_2"), "https://api.openai.com/v1/chat/completions", "gpt-4o-mini", True),   # trial credits; HOJAIGA_OPENAI_MODEL from cloud_models("openai")
 ]
 _COOL: Dict[str, float] = {}           # provider -> time it may be asked again (after a 429 / failure / an empty budget)
 # Never cause a 429: a provider is asked only while its budget has room. The budget is what the provider itself reports (x-ratelimit-remaining-* headers, e.g. Groq
 # free = 1,000 requests/day and 8,000 tokens/minute, measured Oct-27) and, for providers that report nothing, a per-minute cap HOJAIGA_<NAME>_RPM (the defaults are
 # deliberately low starting points). When every provider is out of budget the caller stays on the local model, which has no limit.
-CLOUD_RPM_DEFAULT = {"gemini": 8, "groq": 25, "nvidia": 30, "nvidia_eye": 30, "openrouter": 15}
+CLOUD_RPM_DEFAULT = {"gemini": 8, "groq": 25, "nvidia": 30, "nvidia_eye": 30, "openrouter": 15, "openai": 20, "claude": 30}
 _SENT: Dict[str, list] = {}           # provider -> send times in the last minute
 _RESERVE = 2                          # keep this many requests unused in the provider's own count
 # decisions repeat (the same screen, the same question): an answer is reused instead of asked again -- the cheapest call is the one not made
@@ -130,7 +131,8 @@ def env_keys(refresh: bool = False) -> Dict[str, str]:
                         out.setdefault(k.strip(), v.strip().strip('"').strip("'"))
         except OSError:
             pass
-    out.update({k: v for k, v in os.environ.items() if k.startswith(("HOJAIGA_", "GEMINI_", "GOOGLE_API", "NVIDIA_", "GROQ_", "OPENROUTER_"))})
+    out.update({k: v for k, v in os.environ.items() if k.startswith(("HOJAIGA_", "GEMINI_", "GOOGLE_API", "NVIDIA_", "GROQ_", "OPENROUTER_", "OPENAI_API_KEY", "CLAUDE_API_KEY"))})
+    # never ANTHROPIC_*: in a developer shell those are the coding tool's own credentials, not the key a Hojaiga user pays with
     _ENV_CACHE.clear()
     _ENV_CACHE.update(out)
     return out
@@ -257,6 +259,104 @@ def cloud_chat(system: str, prompt: str, images_b64: Optional[list] = None, temp
             _COOL[name] = time.time() + 300
             logger.warning("Gateway: cloud %s failed (%s); trying the next provider", name, type(exc).__name__)
     return None
+
+
+# ---- the teacher: Claude on the USER'S own key -------------------------------------------------------------------------------------------------------------
+# The person who runs Hojaiga pays for it with their own Anthropic key (HOJAIGA_CLAUDE_KEY or CLAUDE_API_KEY in .env). It sees the screen and decides a step; the
+# natural brain (mind.brain) watches, checks and learns, and turns it off when it is ready. A daily spend cap (HOJAIGA_CLAUDE_BUDGET_USD, default 2) stops it cold.
+CLAUDE_PRICE = {"claude-opus-5-5": (4.0, 20.0), "claude-sonnet-5-5": (2.0, 10.0), "claude-haiku-5-5": (0.10, 0.50), "claude-fable-5-1": (10.0, 50.0)}   # $ per 1M in / out
+_CLAUDE_SPEND: Dict[str, float] = {}   # 'YYYY-MM-DD' -> dollars
+
+
+def claude_key() -> str:
+    k = env_keys()
+    return k.get("HOJAIGA_CLAUDE_KEY") or k.get("CLAUDE_API_KEY") or ""
+
+
+def claude_spent_today() -> float:
+    return round(_CLAUDE_SPEND.get(time.strftime("%Y-%m-%d"), 0.0), 4)
+
+
+def claude_chat(system: str, prompt: str, images_b64: Optional[list] = None, max_tokens: int = 2000, private: bool = False) -> Optional[str]:
+    """One Claude call (official SDK) on the user's key; None when there is no key, the SDK is missing, the budget is spent, or the prompt is private."""
+    key = claude_key()
+    if not key or not cloud_ok_for(system + "\n" + prompt, private):
+        return None
+    keys = env_keys()
+    model = keys.get("HOJAIGA_CLAUDE_MODEL") or "claude-opus-5-5"
+    cap = float(keys.get("HOJAIGA_CLAUDE_BUDGET_USD") or 2.0)
+    day = time.strftime("%Y-%m-%d")
+    if _CLAUDE_SPEND.get(day, 0.0) >= cap or not _has_budget("claude", time.time()) or _COOL.get("claude", 0) > time.time():
+        return None
+    try:
+        import anthropic
+    except ImportError:
+        logger.warning("Gateway: the 'anthropic' package is not installed; the Claude teacher is off")
+        return None
+    content: list = [{"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": b.split(",", 1)[-1]}} for b in (images_b64 or [])]
+    content.append({"type": "text", "text": prompt})
+    # explicit key AND address: a developer shell's ANTHROPIC_API_KEY / ANTHROPIC_BASE_URL must never be picked up instead of the user's own
+    client = anthropic.Anthropic(api_key=key, base_url=keys.get("HOJAIGA_CLAUDE_BASE_URL") or "https://api.anthropic.com", max_retries=1, timeout=90.0)
+    t0 = time.time()
+    _SENT.setdefault("claude", []).append(t0)
+    _CALLS["cloud"] += 1
+    try:
+        resp = client.beta.messages.create(model=model, max_tokens=max_tokens, system=system, messages=[{"role": "user", "content": content}],
+                                           output_config={"effort": keys.get("HOJAIGA_CLAUDE_EFFORT") or "medium"},
+                                           betas=["server-side-fallback-2026-07-01"], fallbacks="default")
+    except anthropic.RateLimitError as e:
+        _COOL["claude"] = time.time() + max(60.0, _seconds(e.response.headers.get("retry-after", "")))
+        return None
+    except anthropic.APIStatusError as e:
+        _COOL["claude"] = time.time() + (60 if e.status_code >= 500 else 600)
+        logger.warning("Gateway: Claude %s: %s", e.status_code, str(e.message)[:160])
+        return None
+    except anthropic.APIConnectionError:
+        _COOL["claude"] = time.time() + 60
+        return None
+    u = resp.usage
+    pin, pout = CLAUDE_PRICE.get(model, (0.0, 0.0))
+    _CLAUDE_SPEND[day] = _CLAUDE_SPEND.get(day, 0.0) + ((u.input_tokens or 0) * pin + (u.output_tokens or 0) * pout) / 1e6
+    if resp.stop_reason == "refusal":
+        return None
+    text = "".join(b.text for b in resp.content if b.type == "text").strip()
+    LAST_CLOUD.clear()
+    LAST_CLOUD.update({"provider": "claude", "model": resp.model, "seconds": round(time.time() - t0, 2), "spent_today_usd": claude_spent_today()})
+    return text or None
+
+
+def teacher_chat(system: str, prompt: str, images_b64: Optional[list] = None, max_tokens: int = 1500, private: bool = False) -> Tuple[Optional[str], str]:
+    """(answer, who). The strongest teacher that may answer: Claude on the user's key first, then the free hosted models (an eye when there is a picture)."""
+    order = [s.strip() for s in (env_keys().get("HOJAIGA_TEACHER_ORDER") or "claude,cloud").split(",") if s.strip()]
+    for who in order:
+        if who == "claude":
+            ans = claude_chat(system, prompt, images_b64, max_tokens=max_tokens, private=private)
+        else:
+            ans = cloud_chat(system, prompt, images_b64, temperature=0.1, max_tokens=max_tokens, private=private)
+            who = LAST_CLOUD.get("provider", "cloud")
+        if ans:
+            return ans, who
+    return None, ""
+
+
+def langchain_chat(need_images: bool = False, temperature: float = 0.1) -> Any:
+    """A LangChain chat model on the first free provider that has a key and budget (OpenAI-compatible endpoint), for CrewAI tools, ScrapeGraphAI and
+    LangChain chains; None when there is none (the caller stays local)."""
+    provs = cloud_providers(need_images=need_images)
+    if not provs:
+        return None
+    from langchain_openai import ChatOpenAI
+    name, key, url, model = provs[0]
+    return ChatOpenAI(model=model, api_key=key, base_url=url.rsplit("/chat/completions", 1)[0], temperature=temperature, timeout=120, max_retries=1)
+
+
+def litellm_route() -> Optional[Dict[str, str]]:
+    """{'model', 'api_key', 'base_url'} for CrewAI's LLM (litellm's OpenAI-compatible route) on the first free provider; None when there is none."""
+    provs = cloud_providers()
+    if not provs:
+        return None
+    name, key, url, model = provs[0]
+    return {"model": "openai/" + model, "api_key": key, "base_url": url.rsplit("/chat/completions", 1)[0], "provider": name}
 
 
 def cloud_models(name: str) -> list:

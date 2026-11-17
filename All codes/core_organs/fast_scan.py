@@ -181,7 +181,7 @@ def deep_scan(target: str, model=None, *, budget_s: float = 10.0, vision: bool =
     # (the runaway cost - historically 20s + 15s hardcodes inside universal_scan) is capped to a slice of this
     # budget. `within_budget` is measured against the EFFECTIVE budget and the report states base/effective and
     # whether it was extended - honestly, never a hidden overrun. Knobs: HOJAIGA_SCAN_BUDGET_BASE_S/_MAX_S/_READY_FRAC.
-    _base = max(float(budget_s), float(os.environ.get("HOJAIGA_SCAN_BUDGET_BASE_S", "15")))
+    _base = max(float(budget_s), float(os.environ.get("HOJAIGA_SCAN_BUDGET_BASE_S", "35")))
     _hardmax = max(_base, float(os.environ.get("HOJAIGA_SCAN_BUDGET_MAX_S", "30")))
     budget = min(_base, _hardmax)
     _rfrac = min(0.8, max(0.2, float(os.environ.get("HOJAIGA_SCAN_BUDGET_READY_FRAC", "0.55"))))
@@ -332,6 +332,27 @@ def deep_scan(target: str, model=None, *, budget_s: float = 10.0, vision: bool =
             except Exception as exc:  # noqa: BLE001
                 rep["learn"] = {"started": False, "status": "error",
                                 "why": f"{type(exc).__name__}: {str(exc)[:120]}"}
+        # ---- ribbon surfaced on the MODERN report too (not only the legacy shape): the reveal (organ_50)
+        # persisted every tab's buttons into bm_layout, so read them back here and record what the scan KNOWS
+        # about this app's ribbon: its tabs, the groups under each revealed tab, and whether only the active tab
+        # was seen (deepen off / no reveal). The capability card and the brain read this, not a guess.
+        try:
+            _rt, _rg = _ribbon_from_layout(model, key)
+            _dpn = ((rep.get("layout") or {}).get("deepen") or {})
+            _rev = int(_dpn.get("tabs_visited") or 0) if isinstance(_dpn, dict) else 0
+            if _rt or _rg:
+                # Honest coverage: the reveal tags each harvested group with the tab it came from, so count the
+                # DISTINCT tabs that yielded buttons. Fall back to that count when the layout's own tabs_visited
+                # stat was not recorded this build (the groups are the ground truth of what was actually revealed).
+                _tab_sources = {str((g or {}).get("tab") or "") for g in (_rg or {}).values()} - {""}
+                _covered = max(_rev, len(_tab_sources))
+                rep["ribbon"] = {"present": True, "tabs": _rt, "n_tabs": len(_rt),
+                                 "groups": _rg, "n_groups": len(_rg),
+                                 "revealed_tabs": _covered,
+                                 "coverage": (f"{_covered} ribbon tab(s) of buttons revealed"
+                                              if _covered > 1 else "active tab only (no reveal)")}
+        except Exception as exc:  # noqa: BLE001
+            rep["ribbon"] = {"present": False, "why": f"{type(exc).__name__}: {str(exc)[:100]}"}
         try:
             from core_organs import capability_card
             rep["capability"] = capability_card.build_card(target, hwnd, model=model, scan=rep)

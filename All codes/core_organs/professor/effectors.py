@@ -247,11 +247,33 @@ class Effector:
         return self._rec("text", hin.post_text(self.hwnd, text))
 
     @_guarded
-    def insert_text(self, text: str, deadline_s: float = 2.5) -> Tuple[bool, str]:
+    def insert_text(self, text: str, deadline_s: float = 6.0) -> Tuple[bool, str]:
         """Type into the window's main editor through UI Automation (ValuePattern, appending): for toolkits that ignore posted characters (XAML / WinUI measured on Notepad). No focus, no keystrokes."""
         g = self._gate("insert_text")
         if g:
             return g
+        # Direct execution on caller thread to avoid COM apartment cross-thread RPC deadlock
+        try:
+            from core_organs import fast_uia
+            nodes = fast_uia.snapshot(self.hwnd, timeout_ms=3000) or []
+            def _is_ed(n) -> bool:
+                w, h = n.rect[2] - n.rect[0], n.rect[3] - n.rect[1]
+                return n.ctype == "DocumentControl" or (n.ctype == "EditControl" and w * h >= 40000 and h >= 60)
+            cands = [n for n in nodes if "value" in (n.pats or []) and _is_ed(n) and n.enabled and not n.offscreen and n.rect[2] > n.rect[0]]
+            if cands:
+                def _rk(n):
+                    try:
+                        foc = bool(n.ctrl.HasKeyboardFocus)
+                    except Exception:
+                        foc = False
+                    return (1 if foc else 0, (n.rect[2] - n.rect[0]) * (n.rect[3] - n.rect[1]))
+                best = max(cands, key=_rk)
+                vp = pattern_of(best.ctrl, "Value")
+                if vp is not None and not vp.IsReadOnly:
+                    vp.SetValue((vp.Value or "") + text)
+                    return self._rec("insert_text", (True, f"UIA SetValue (append {len(text)} chars to '{best.name or best.ctype}')"))
+        except Exception:
+            pass
         result: dict = {}
 
         def work() -> None:
@@ -329,7 +351,7 @@ class Effector:
         return self._rec(f"pointer {verb}", (r.ok, f"virtual mouse ({r.route}): {r.note}" if r.ok else r.why))
 
     @_guarded
-    def node(self, node: Any, deadline_s: float = 1.5) -> Tuple[bool, str]:
+    def node(self, node: Any, deadline_s: float = 2.5) -> Tuple[bool, str]:
         """Activate a UI Automation node (a fast_uia.Node): a Win32 button gets BM_CLICK; else the control's own pattern (Invoke / Toggle / SelectionItem / ExpandCollapse)
         on a worker thread; else a posted click at its centre."""
         name = getattr(node, "name", "") or "?"
@@ -346,30 +368,35 @@ class Effector:
             _u.GetClassNameW(h, c, 128)
             if re.search(r"button", c.value, re.I):
                 return self._rec(f"node {name}", (bool(_u.PostMessageW(h, BM_CLICK, 0, 0)), f"BM_CLICK -> {c.value}"))
+        # NO caller-thread shortcut here: a pattern call can block forever (measured: a modal handler), and this UIA build has no
+        # transaction timeout - the worker deadline below is the ONLY rail. The cross-apartment risk is met by the worker initializing
+        # its own COM (UIAutomationInitializerInThread); a pointer it cannot use simply raises 'UIA error', and the posted click follows.
         result: dict = {}
 
         def work() -> None:
             try:
-                ctrl = node.ctrl
-                have = set(getattr(node, "pats", []) or [])
-                for pname, call, label, need in (("Invoke", "Invoke", "Invoke", "invoke"), ("Toggle", "Toggle", "Toggle", "toggle"), ("SelectionItem", "Select", "Select", "select"),
-                                                 ("ExpandCollapse", "Expand", "Expand", "expand")):
-                    if have and need not in have:
-                        continue
-                    p = pattern_of(ctrl, pname)
-                    if p is not None:
-                        getattr(p, call)()
-                        result["how"] = f"UIA {label}"
-                        return
-                try:                                                         # many XAML flyout items expose no standard pattern, only the legacy 'default action' (Press / Select)
-                    lp = pattern_of(ctrl, "LegacyIAccessible")
-                    if lp is not None and getattr(lp, "DefaultAction", ""):
-                        lp.DoDefaultAction()
-                        result["how"] = f"UIA LegacyIAccessible.DoDefaultAction ({lp.DefaultAction})"
-                        return
-                except Exception:
-                    pass
-                result["how"] = "no usable UIA pattern"
+                import uiautomation as _ua
+                with _ua.UIAutomationInitializerInThread():
+                    ctrl = node.ctrl
+                    have = set(getattr(node, "pats", []) or [])
+                    for pname, call, label, need in (("Invoke", "Invoke", "Invoke", "invoke"), ("Toggle", "Toggle", "Toggle", "toggle"), ("SelectionItem", "Select", "Select", "select"),
+                                                     ("ExpandCollapse", "Expand", "Expand", "expand")):
+                        if have and need not in have:
+                            continue
+                        p = pattern_of(ctrl, pname)
+                        if p is not None:
+                            getattr(p, call)()
+                            result["how"] = f"UIA {label}"
+                            return
+                    try:                                                         # many XAML flyout items expose no standard pattern, only the legacy 'default action' (Press / Select)
+                        lp = pattern_of(ctrl, "LegacyIAccessible")
+                        if lp is not None and getattr(lp, "DefaultAction", ""):
+                            lp.DoDefaultAction()
+                            result["how"] = f"UIA LegacyIAccessible.DoDefaultAction ({lp.DefaultAction})"
+                            return
+                    except Exception:
+                        pass
+                    result["how"] = "no usable UIA pattern"
             except Exception as exc:
                 result["how"] = f"UIA error {type(exc).__name__}"
 
@@ -394,16 +421,26 @@ class Effector:
         g = self._gate(f"set_value {name}")
         if g:
             return g
+        # Direct execution on caller thread
+        try:
+            p = pattern_of(node.ctrl, "Value")
+            if p is not None:
+                p.SetValue(text)
+                return self._rec(f"set_value {name}", (True, "UIA SetValue"))
+        except Exception:
+            pass
         result: dict = {}
 
         def work() -> None:
             try:
-                p = pattern_of(node.ctrl, "Value")
-                if p is None:
-                    result["how"] = "no value pattern"
-                    return
-                p.SetValue(text)
-                result["how"] = "UIA SetValue"
+                import uiautomation as _ua
+                with _ua.UIAutomationInitializerInThread():
+                    p = pattern_of(node.ctrl, "Value")
+                    if p is None:
+                        result["how"] = "no value pattern"
+                        return
+                    p.SetValue(text)
+                    result["how"] = "UIA SetValue"
             except Exception as exc:
                 result["how"] = f"UIA error {type(exc).__name__}"
 
@@ -420,16 +457,26 @@ class Effector:
         g = self._gate(f"deselect {name}")
         if g:
             return g
+        # Direct execution on caller thread
+        try:
+            p = pattern_of(node.ctrl, "SelectionItem")
+            if p is not None:
+                p.RemoveFromSelection()
+                return self._rec(f"deselect {name}", (True, "UIA RemoveFromSelection"))
+        except Exception:
+            pass
         result: dict = {}
 
         def work() -> None:
             try:
-                p = pattern_of(node.ctrl, "SelectionItem")
-                if p is None:
-                    result["how"] = "no selection pattern"
-                    return
-                p.RemoveFromSelection()
-                result["how"] = "UIA RemoveFromSelection"
+                import uiautomation as _ua
+                with _ua.UIAutomationInitializerInThread():
+                    p = pattern_of(node.ctrl, "SelectionItem")
+                    if p is None:
+                        result["how"] = "no selection pattern"
+                        return
+                    p.RemoveFromSelection()
+                    result["how"] = "UIA RemoveFromSelection"
             except Exception as exc:
                 result["how"] = f"UIA error {type(exc).__name__}"
 

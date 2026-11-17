@@ -79,6 +79,7 @@ HWND_TOPMOST, HWND_NOTOPMOST = wt.HWND(-1), wt.HWND(-2)
 SWP_NOSIZE, SWP_NOMOVE, SWP_NOZORDER, SWP_NOACTIVATE, SWP_SHOWWINDOW = 0x1, 0x2, 0x4, 0x10, 0x40
 GWL_EXSTYLE, WS_EX_LAYERED, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TRANSPARENT = -20, 0x80000, 0x08000000, 0x80, 0x20
 LWA_ALPHA = 0x2
+class_dbl: Dict[Any, bool] = {}                                             # per-child-window cache: does its class ask for double-click messages (CS_DBLCLKS)? Measured once per window (PostedRoute.deliver)
 
 
 # ------------------------------------------------------------------------------------------------------------- traits (shared file with professor.gestures)
@@ -99,7 +100,8 @@ def load_traits(app_key: str) -> Dict[str, Any]:
         t["posted"] = "ok" if app["posted_pointer"] else "ignored"
     if "touch" not in t and app.get("touch_moves_cursor") is not None:
         t["touch"] = "moves_cursor" if app["touch_moves_cursor"] else "ok"
-    return t
+    # 'unavailable' means a DEPENDENCY was missing at the time of measurement (an uninstalled shim library), not that the application refused: the environment changes, so it is re-probed every run, never held against
+    return {r: v for r, v in t.items() if v != "unavailable"}
 
 
 def save_trait(app_key: str, route: str, value: Any) -> None:
@@ -197,13 +199,19 @@ def s_flick(x: float, y: float, direction: str = "right", distance: float = 240.
     return s_drag(pts, button, (), ms / 1000.0, press_dwell=0.02, end_dwell=0.0)
 
 
-def s_drop(src: Tuple[float, float], dst: Tuple[float, float], hover: float = 0.35, button: str = "left", mods: Sequence[str] = ()) -> Script:
-    """Drag-and-drop: press on the source, move past the drag threshold, glide to the target, stay over it (drag-over feedback is delivered while the pointer rests), release."""
+def s_drop(src: Tuple[float, float], dst: Tuple[float, float], hover: float = 0.35, button: str = "left", mods: Sequence[str] = (), target_width: float = 24.0) -> Script:
+    """Drag-and-drop: press on the source, move past the drag threshold, glide to the target, stay over it (drag-over feedback is delivered while the pointer rests), release.
+    The glide SPANS what Fitts's law says a movement of this distance to a target this wide takes (professor.pointing.fitts_seconds, whose parameters the motor model refines from measured
+    movements) - so the learned timing drives the real gesture, and every measured travel in turn refines it. Hand-like: the path is eased at both ends; steps share the span."""
+    from .pointing import fitts_seconds
     m = tuple(mods)
     first = (src[0] + 9 * (1 if dst[0] >= src[0] else -1), src[1] + 4 * (1 if dst[1] >= src[1] else -1))
     sc: Script = [Ev("move", src[0], src[1], mods=m), Ev("down", src[0], src[1], button, m, dt=0.06), Ev("move", first[0], first[1], button, m, dt=0.08)]
-    for x, y in glide(first, dst):
-        sc.append(Ev("move", x, y, button, m, dt=0.016))
+    path = glide(first, dst)
+    span = fitts_seconds(math.hypot(dst[0] - first[0], dst[1] - first[1]), target_width)
+    step_dt = max(0.004, span / max(1, len(path)))
+    for x, y in path:
+        sc.append(Ev("move", x, y, button, m, dt=step_dt))
     sc.append(Ev("move", dst[0], dst[1], button, m, dt=hover))
     sc.append(Ev("up", dst[0], dst[1], button, m, dt=0.05))
     return sc
@@ -518,8 +526,8 @@ class PostedRoute:
         mods_all = {m for e in script for m in e.mods}
         ok = True
         n = 0
-        class_dbl: Dict[int, bool] = {}
-        ctx = key_state(self.top, [m for m in mods_all if m in ("shift", "ctrl", "alt")]) if (self.agent is None or not self.agent.attached) else _Null()
+        btns_down = [e.button for e in script if e.kind == "down" and e.button in ("left", "right", "middle")]
+        ctx = key_state(self.top, [m for m in mods_all if m in ("shift", "ctrl", "alt")] + btns_down[:1]) if (self.agent is None or not self.agent.attached) else _Null()
         with ctx:
             t_next = time.perf_counter()
             for e in script:
@@ -711,6 +719,9 @@ class TouchRoute:
         user_busy = False
         try:
             from core_organs.background_window import user_idle_ms
+            t_wait_end = time.time() + 2.0
+            while user_idle_ms() < 1200 and time.time() < t_wait_end:
+                time.sleep(0.2)
             user_busy = user_idle_ms() < 1200
         except Exception:
             pass
@@ -732,6 +743,9 @@ class TouchRoute:
                 if not g_ok:
                     return Delivery(False, "refused: " + g_why)
             ok_all = True
+            gl, gt, gr, gb = window_rect(self.top)
+            cursor0 = cursor_pos()
+            person_moved = False
             with PointerInjector("touch") as pi:
                 if not any(e.kind == "down" for e in script):
                     return Delivery(False, "touch needs a press")
@@ -742,10 +756,11 @@ class TouchRoute:
                     w = t_next - time.perf_counter()
                     if w > 0:
                         time.sleep(w)
+                    cur = cursor_pos()                                           # synthetic touch never moves the cursor (measured): if it moved, it is the PERSON -- they win, at once
+                    if cur != cursor0 and (gl <= cur[0] <= gr and gt <= cur[1] <= gb):
+                        person_moved = True
+                        break
                     x, y = int(round(e.x + ox)), int(round(e.y + oy))
-            gl, gt, gr, gb = window_rect(self.top)
-            cursor0 = cursor_pos()
-            person_moved = False
                     if e.kind == "down":
                         ok_all &= pi.frame(x, y, "down")
                         down = True
@@ -759,10 +774,6 @@ class TouchRoute:
                     pi.frame(int(round(last[0] + ox)), int(round(last[1] + oy)), "up")        # the contact is always lifted before the window goes back
             if person_moved:
                 return Delivery(False, "the person is using the mouse / keyboard right now: the ghost window was withdrawn the moment their cursor moved")
-                    cur = cursor_pos()                                           # synthetic touch never moves the cursor (measured): if it moved, it is the PERSON -- they win, at once
-                    if cur != cursor0 and (gl <= cur[0] <= gr and gt <= cur[1] <= gb):
-                        person_moved = True
-                        break
             time.sleep(0.15)
         return Delivery(ok_all, "synthetic touch on a ghost window")
 
@@ -1006,6 +1017,10 @@ class VirtualPointer:
                 self.agent.release()
             return res
         res.note = "no route this application accepts could perform the gesture" if res.tried else "no route is open for this gesture: " + self.why_no_route(script)
+        if res.tried:                                                            # every route that WAS tried failed too: say which ones stand closed now, same as the empty ladder does
+            bits = self.why_no_route(script)
+            if bits:
+                res.note = f"{res.note}: {bits}"
         if not res.tried:
             res.tried.append(res.note)
         return res
@@ -1077,8 +1092,8 @@ class VirtualPointer:
     def flick(self, x: float, y: float, direction: str = "right", distance: float = 240.0, ms: float = 90.0, verify: Optional[Callable[[], Optional[bool]]] = None) -> PointerResult:
         return self.perform(s_flick(x, y, direction, distance, ms), f"flick-{direction}", verify)
 
-    def drag_drop(self, src: Tuple[float, float], dst: Tuple[float, float], mods: Sequence[str] = (), verify: Optional[Callable[[], Optional[bool]]] = None) -> PointerResult:
-        return self.perform(s_drop(src, dst, mods=mods), "drag-drop", verify)
+    def drag_drop(self, src: Tuple[float, float], dst: Tuple[float, float], mods: Sequence[str] = (), verify: Optional[Callable[[], Optional[bool]]] = None, target_width: float = 24.0) -> PointerResult:
+        return self.perform(s_drop(src, dst, mods=mods, target_width=target_width), "drag-drop", verify)
 
     def wheel(self, x: float, y: float, clicks: float = 1.0, horizontal: bool = False, mods: Sequence[str] = (), verify: Optional[Callable[[], Optional[bool]]] = None) -> PointerResult:
         return self.perform(s_wheel(x, y, clicks, horizontal, mods), "wheel-h" if horizontal else "wheel", verify, effect_expected=verify is not None)

@@ -2748,6 +2748,150 @@ def _explore_e1_impl(model: BehaviorModel, app_name: str, hwnd: int, *, max_acti
 
 
 # ===========================================================================
+# 9b. Path composer — turn OBSERVED dialogs into reachable recipes (bm_templates)
+# ===========================================================================
+
+def _slug(s: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", (s or "").lower()).strip("-")[:40] or "x"
+
+
+def _opener_label(via: str) -> str:
+    """The learner stores a dialog's `via` as the frontier PATH ('Sources Toolbar > Add', and deeper
+    surfaces carry an '@tab:X@ ' / '@via:X@ ' context prefix). The control itself is the LAST segment."""
+    v = (via or "").strip()
+    while v.startswith("@"):
+        _, _, rest = v.partition("@ ")          # drop one context prefix, keep the real path
+        v = rest.strip()
+    seg = [s.strip() for s in v.split(">") if s.strip()]
+    return seg[-1] if seg else v
+
+
+def compose_paths(model, app_name: str, *, max_items: int = 24) -> Dict[str, Any]:
+    """Compose step-path RECIPE templates purely from what was actually observed: a live dialog
+    (bm_dialogs source 'live*', captured while open by the learner) is joined to the command that
+    opened it (`via`) and to its selectable items (list/tree/menu/tab entries) and close button.
+    One template per (opener, item): open -> select the item -> leave without committing. Every
+    step carries a machine-checkable postcondition (the gate's law), so the runner can VERIFY each
+    hop instead of hoping. Nothing here invents: if no dialog was observed, nothing is composed.
+    `catalog` trust: composed paths earn `learned` only by a real successful run (TemplateRunner
+    promotes on PASS). Safe to call repeatedly (INSERT OR REPLACE keyed by app+name)."""
+    from core_organs import knowledge_store as ks
+    ks.ensure(model)
+    key = _app_key(app_name)
+    out: Dict[str, Any] = {"composed": 0, "dialogs_used": 0, "skipped": []}
+    try:
+        rows = model._conn.execute(
+            "SELECT * FROM bm_dialogs WHERE app_key=? AND source LIKE 'live%' AND via IS NOT NULL AND via<>''"
+            " ORDER BY ts DESC", (key,)).fetchall()
+    except Exception as exc:  # noqa: BLE001
+        return {"composed": 0, "error": f"dialog read: {type(exc).__name__}"}
+    cmds: Dict[str, Any] = {}
+    for c in sorted(model.commands(key, limit=6000), key=lambda x: 0 if x.get("menu_id") else 1):
+        if c.get("name"):
+            cmds.setdefault(_norm(c["name"]), c)     # menu-derived opener wins name ties (it carries menu_id)
+    for d in rows:
+        try:
+            controls = json.loads(d["controls_json"] or "[]")
+        except Exception:
+            continue
+        label = _opener_label(d["via"])              # stored via = frontier PATH; the control is its last segment
+        # selectable content: the things a user would PICK inside this dialog (list/tree/menu entries;
+        # dialog tabs are selected by the ladder's own label matching when a later step needs them)
+        items, seen = [], set()
+        for c in controls:
+            if c.get("kind") in ("listitem", "treeitem", "menuitem") and c.get("name"):
+                nm = str(c["name"]).strip()
+                if 2 <= len(nm) <= 80 and _norm(nm) not in seen:
+                    seen.add(_norm(nm))
+                    items.append(nm)
+        opener = cmds.get(_norm(label))
+        if not items:
+            out["skipped"].append(f"'{d['title'][:40]}': no selectable items observed")
+            continue
+        if opener is None:
+            out["skipped"].append(f"'{d['title'][:40]}': opener '{label[:40]}' is not a known command")
+            continue
+        if (opener.get("risk") or "") == "E2":
+            out["skipped"].append(f"'{d['title'][:40]}': opener is E2, never composed into a path")
+            continue
+        title = (d["title"] or "").strip()
+        tsnip = title[:30].lower()
+        menu_id = opener.get("menu_id")
+        verb = "menu" if (opener.get("menu_path") and menu_id not in (None, "", 0)) else "invoke"
+        out["dialogs_used"] += 1
+        for nm in items[:max_items]:
+            do2 = [{"verb": "invoke", "name": nm}]
+            steps = [
+                {"id": "open", "goal": f"open '{title or label}'",
+                 "do": [{"verb": verb, "name": label, "path": opener.get("menu_path", ""),
+                         "menu_id": menu_id, "alt_key": opener.get("shortcut", "")}],
+                 "post": [{"kind": "window_opened", "title_contains": tsnip}],
+                 "risk": opener.get("risk") if opener.get("risk") in ("E0", "E1") else "E1",
+                 "unwind": "escape/WM_CLOSE (verified in probe)"},
+                {"id": f"choose-{_slug(nm)}", "goal": f"select '{nm}' in '{title or label}'",
+                 "do": do2,
+                 "post": [{"kind": "element_present", "name": nm.lower()}],
+                 "risk": "E1", "retries": 1},
+                {"id": "close", "goal": "close the dialog without committing",
+                 "do": [{"verb": "key", "keys": "ESC"}],
+                 "post": [{"kind": "window_closed"}], "risk": "E0", "retries": 1},
+            ]
+            tpl = {"name": f"{_slug(label)}--{_slug(nm)}",
+                   "aliases": [f"{nm} via {label}", f"open {nm}", f"add {nm}"],
+                   "steps": steps,
+                   "seed_note": f"composed from observed dialog '{title[:60]}' ({d['dialog_id']}) "
+                                f"via '{label[:40]}'; validated by the probe that captured it, "
+                                f"promotion to learned needs a real run"}
+            try:
+                model.upsert_template(key, tpl, source="catalog")
+                out["composed"] += 1
+            except Exception as exc:  # noqa: BLE001
+                out["skipped"].append(f"template '{tpl['name']}': {type(exc).__name__}: {str(exc)[:80]}")
+    out["skipped"] = out["skipped"][:8]
+    return out
+
+
+def knowledge_quality(model, app_key: str) -> Dict[str, Any]:
+    """The scorecard that separates KNOWING HOW an app works from LISTING its surface: how many
+    commands were actually OBSERVED (probed with a verified unwind), transitions recorded, dialogs
+    whose contents were mapped, recipes composed, and what the frontier still has unopened. Pure
+    counts from the DB — no blend score, nothing invented; a low number is reported as low."""
+    from core_organs import knowledge_store as ks
+    ks.ensure(model)
+    c = model._conn
+    q: Dict[str, Any] = {}
+    try:
+        r = c.execute("SELECT COUNT(*) tot, SUM(CASE WHEN source='learned' THEN 1 ELSE 0 END) learned,"
+                      " SUM(CASE WHEN (successes+failures)>0 THEN 1 ELSE 0 END) probed,"
+                      " SUM(CASE WHEN risk='E1' THEN 1 ELSE 0 END) e1"
+                      " FROM bm_commands WHERE app_key=? AND stale=0", (app_key,)).fetchone()
+        q["commands"], q["learned"] = int(r["tot"] or 0), int(r["learned"] or 0)
+        q["commands_probed"] = int(r["probed"] or 0)
+        q["e1_commands"] = int(r["e1"] or 0)
+        q["transitions"] = c.execute(
+            "SELECT COUNT(*) n FROM bm_transitions WHERE app_key=?", (app_key,)).fetchone()["n"]
+        q["dialogs_mapped"] = c.execute(
+            "SELECT COUNT(*) n FROM bm_dialogs WHERE app_key=? AND source LIKE 'live%'", (app_key,)).fetchone()["n"]
+        q["dialog_controls"] = c.execute(
+            "SELECT COALESCE(SUM(n_controls),0) n FROM bm_dialogs WHERE app_key=? AND source LIKE 'live%'",
+            (app_key,)).fetchone()["n"]
+        q["recipes"] = c.execute(
+            "SELECT COUNT(*) n FROM bm_templates WHERE app_key=? AND seed_note LIKE 'composed%'", (app_key,)).fetchone()["n"]
+        fr = c.execute("SELECT status, COUNT(*) n FROM bm_frontier WHERE app_key=? GROUP BY status",
+                      (app_key,)).fetchall()
+        q["frontier"] = {r2["status"]: r2["n"] for r2 in fr}
+        q["surfaces_unopened"] = q["frontier"].get("open", 0)
+    except Exception as exc:  # noqa: BLE001
+        q["error"] = f"{type(exc).__name__}: {str(exc)[:120]}"
+    q["one_line"] = (
+        f"{q.get('learned', 0)}/{q.get('commands', 0)} commands OBSERVED (not just listed), "
+        f"{q.get('transitions', 0)} transitions, {q.get('dialogs_mapped', 0)} dialogs mapped "
+        f"({q.get('dialog_controls', 0)} controls inside them), {q.get('recipes', 0)} step-recipes composed, "
+        f"{q.get('surfaces_unopened', 0)} surfaces still unopened")
+    return q
+
+
+# ===========================================================================
 # 10. Template runner — verified step graph; the LLM only picks among parsed elements
 # ===========================================================================
 

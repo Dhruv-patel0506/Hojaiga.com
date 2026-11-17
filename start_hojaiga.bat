@@ -54,7 +54,7 @@ if not exist "%VISION_GGUF%" (
     set "VISION_NGL=24"
 )
 echo   [..] Starting llama-server on port 8081: %VISION_GGUF% -ngl %VISION_NGL%
-start /min "" "C:\Users\dhruv\AppData\Local\Microsoft\WinGet\Packages\ggml.llamacpp_Microsoft.Winget.Source_8wekyb3d8bbwe\llama-server.exe" --model "%VISION_GGUF%" --mmproj "%VISION_MMPROJ%" --port 8081 --ctx-size 4096 -ngl %VISION_NGL% -t 8 -tb 8 -fa on -np 1 --image-min-tokens 1024 --host 0.0.0.0
+start /min "" "C:\Users\dhruv\AppData\Local\Microsoft\WinGet\Packages\ggml.llamacpp_Microsoft.Winget.Source_8wekyb3d8bbwe\llama-server.exe" --model "%VISION_GGUF%" --mmproj "%VISION_MMPROJ%" --port 8081 --ctx-size 4096 -ngl %VISION_NGL% -t 8 -tb 8 -fa on -np 1 --image-min-tokens 1024 --host 127.0.0.1
 echo   [..] Waiting for vision server to load model...
 ping -n 35 127.0.0.1 >nul
 echo   [OK] Vision server started on port 8081.

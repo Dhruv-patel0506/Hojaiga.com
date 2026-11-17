@@ -14,6 +14,7 @@ interpreter (numbers, + - * / **, min / max / abs, the dimension names, SX / SY 
 from __future__ import annotations
 
 import ast
+import contextlib
 import json
 import math
 import operator
@@ -29,11 +30,18 @@ _OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul, as
 _FUNCS = {"min": min, "max": max, "abs": abs}
 
 
+GENERATED = os.path.join(DATA, "object_knowledge_generated.json")      # categories WRITTEN BY THE SYSTEM (world_designer: Qwen's own recipes and the scene pieces compiled from its plans), merged under the hand-made ones
+
+
 def store() -> Dict[str, Any]:
     try:
-        mt = os.path.getmtime(STORE)
+        mt = (os.path.getmtime(STORE), os.path.getmtime(GENERATED) if os.path.isfile(GENERATED) else 0.0)
         if _CACHE.get("mt") != mt:
-            _CACHE["data"], _CACHE["mt"] = json.load(open(STORE, encoding="utf-8")), mt
+            data = json.load(open(STORE, encoding="utf-8"))
+            if os.path.isfile(GENERATED):
+                with contextlib.suppress(Exception):
+                    data = {**data, "categories": {**json.load(open(GENERATED, encoding="utf-8")).get("categories", {}), **data.get("categories", {})}}
+            _CACHE["data"], _CACHE["mt"] = data, mt
         return _CACHE["data"]
     except Exception:
         return {"categories": {}}
@@ -185,12 +193,12 @@ def compile_design(task: str, shapes: Sequence[str]) -> Optional[Dict[str, Any]]
                 notes.append(f"{spec.get('name')}: {e}")
                 continue
             shape = spec.get("shape", "cube")
-            if shape not in shapes:
-                shape = "cube" if "cube" in shapes else (shapes[0] if shapes else shape)
+            if shape not in shapes:                                                           # the app's own name for it first ('sphere' is Blender's 'uv_sphere': live Oct-27 heads came out as cubes)
+                shape = next((s for s in sorted(shapes) if shape in s.split("_")), "cube" if "cube" in shapes else (shapes[0] if shapes else shape))
             parts.append({"name": spec["name"].replace("{i}", str(int(r.get("i", 1)))), "shape": shape, "size": [round(x, 4) for x in size], "at": [round(x, 4) for x in at],
                           "rotate": [0.0, 0.0, 0.0], "color": list(spec.get("color", wood))})
     design = {"object": cname, "parts": parts}
-    return {"design": design, "category": cname, "dims": {k: round(v, 3) for k, v in dims.items()}, "params": {k: round(v, 3) for k, v in params.items()}, "notes": notes}
+    return {"design": design, "category": cname, "dims": {k: round(v, 3) for k, v in dims.items()}, "params": {k: round(v, 3) for k, v in params.items()}, "notes": notes, "scene": bool(cat.get("scene"))}
 
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------ the critic

@@ -3298,6 +3298,11 @@ try:                                                                            
     OFFLINE = OFFLINE + _DIRECTIVE_TESTS
 except Exception:                                                                          # noqa: BLE001
     pass
+try:                                                                                       # multi-video consolidation (harvest.consolidate) + the flag-gated live video-graph bridge
+    from si_tests_consolidate import TESTS as _CONSOLIDATE_TESTS
+    OFFLINE = OFFLINE + _CONSOLIDATE_TESTS
+except Exception:                                                                          # noqa: BLE001
+    pass
 LIVE = [("PL1", run_pl1), ("PL2", run_pl2), ("PL3", run_pl3), ("PL4", run_pl4), ("PL5", run_pl5), ("PL6", run_pl6), ("PV1", run_pv1), ("PV2", run_pv2), ("PL7", run_pl7), ("PL8", run_pl8), ("PL9", run_pl9), ("PL10", run_pl10), ("PL11", run_pl11), ("PL12", run_pl12), ("PL13", run_pl13), ("PL14", run_pl14)]
 
 

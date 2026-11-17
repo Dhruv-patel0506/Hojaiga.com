@@ -61,7 +61,7 @@ SHORTCUT_QUERY_BOOST = 2.5
 
 # ---- retrieval --------------------------------------------------------------------------------------------------------------------------------------
 IVF_PQ_MIN_ROWS = 20_000          # a flat vector scan costs ~3 us/row (measured: 160 ms at 50k x 768-d); past this size the ANN index (tools.build_ann) is what keeps a query under budget
-CHUNK_QUALITY = {"auto_caption": 0.5, "manual_caption": 0.7, "official_doc": 0.9, "self_doc": 0.8, "manual": 0.9, "guide": 0.8, "web_doc": 0.6}
+CHUNK_QUALITY = {"auto_caption": 0.5, "manual_caption": 0.7, "source_digest": 0.65, "official_doc": 0.9, "self_doc": 0.8, "manual": 0.9, "guide": 0.8, "web_doc": 0.6}
 FUZZY_RESOLVE = 0.88
 EXPLORE_TARGET_MIN_SOURCES = 3
 ICON_DHASH_MAX_BITS = 12           # a dHash hit is accepted only if the 256-bit distance is this small

@@ -90,6 +90,7 @@ class LayoutMapper:
         self._seen: set = set()
         self._root = None
         self._live: Dict[str, Any] = {}                 # ctrl_id -> snapshot Node / live control (for deepening)
+        self._live_snap: Dict[str, Any] = {}            # ctrl_id -> the node list that Node came from (parent chains)
         self.win = (0, 0, 1, 1)
         self.stats: Dict[str, Any] = {"deepen": {}, "skipped": []}
 
@@ -216,6 +217,7 @@ class LayoutMapper:
                                  "TreeControl", "DocumentControl", "PaneControl", "SplitButtonControl",
                                  "ComboBoxControl", "ButtonControl", "MenuItemControl") or "scroll" in pats:
                         self._live[cid] = n
+                        self._live_snap[cid] = nodes          # remember THIS snapshot: parent-chain checks
             sub = path + ([label] if label and kind else [])
             for c in reversed(n.children):
                 stack.append((c, crid, sub))
@@ -357,9 +359,18 @@ class LayoutMapper:
                 try:
                     ctl.GetSelectionItemPattern().Select()
                     self._settle()
+                    before = set(self._live)
                     new = self._walk(root, via=f"tab:{meta['name'][:40]}")
                     total += 1
                     self.budget.credit(new)
+                    # reveal THIS tab's galleries while the tab is ACTIVE: measured on PowerPoint, after the
+                    # tab strip is restored, Office virtualizes other tabs' controls and their cached UIA
+                    # elements raise COM 'unable to invoke subscribers' on Expand - fresh nodes from the walk
+                    # just done are live and expand fine.
+                    try:
+                        self._deepen_dropdowns(root, restrict_cids=set(self._live) - before)
+                    except Exception as exc:
+                        logger.debug("per-tab gallery reveal failed: %s", exc)
                 except Exception as exc:
                     logger.debug("tab deepen failed: %s", exc)
             try:                                                         # unwind: restore the original tab
@@ -398,26 +409,49 @@ class LayoutMapper:
                 logger.debug("tree deepen failed: %s", exc)
         self.stats["deepen"]["tree_nodes_expanded"] = done
 
-    def _deepen_dropdowns(self, root) -> None:
+    def _in_menubar(self, cid) -> bool:
+        """True when this node lives under a classic MenuBarControl in ITS OWN snapshot (the E0 crawler's
+        job). Ribbon-internal menu items (Office 'More Options' / 'Change Case' galleries) are NOT: they
+        are MenuItemControls inside the ribbon pane, and expanding them is reversible."""
+        node = self._live.get(cid)
+        nodes = self._live_snap.get(cid) or []
+        p = getattr(node, "parent", -1)
+        hops = 0
+        while isinstance(p, int) and 0 <= p < len(nodes) and hops < 12:
+            if nodes[p].ctype == "MenuBarControl":
+                return True
+            p = nodes[p].parent
+            hops += 1
+        return False
+
+    def _deepen_dropdowns(self, root, restrict_cids: Optional[set] = None) -> None:
         """Ribbon dropdowns, split buttons, combo boxes, galleries: anything that exposes ExpandCollapse
         and is currently collapsed. Expand it, harvest the popup it opens (one bulk snapshot), close it
-        again. Menu-bar menus are the E0 crawler's job; nothing is invoked, only expanded."""
+        again. Menu-bar menus are the E0 crawler's job; nothing is invoked, only expanded.
+        `restrict_cids` limits the pass to controls registered since a point in time - used by
+        _deepen_tabs to reveal each tab's galleries while that tab is ACTIVE (see measurement there)."""
         from core_organs import fast_uia
         from core_organs import organ_48_app_behavior_model as bm
         done = opened = 0
         cands = []
         for cid, node in list(self._live.items()):
+            if restrict_cids is not None and cid not in restrict_cids:
+                continue
             if not isinstance(node, fast_uia.Node):
                 continue
             if "expand" not in node.pats or node.expand_state != 0 or not node.enabled:
                 continue
             if node.ctype not in ("SplitButtonControl", "ComboBoxControl", "ButtonControl", "MenuItemControl"):
                 continue
-            if node.ctype == "MenuItemControl":
-                continue                                    # menu bar: E0 crawl
+            if node.ctype == "MenuItemControl" and self._in_menubar(cid):
+                continue                                    # classic menu bar: E0 crawl
             if any(a in (node.name or "").lower() for a in AVOID_NAMES):
                 continue
             cands.append((cid, node))
+        # ribbon GALLERIES first: MenuItem/SplitButton reveals carry the knowledge users ask for ("Change
+        # Case", "More Options" ...); plain combos are cheap value lists. Measured on PowerPoint: a bounded
+        # pass spent its whole dropdown budget on account/QAT/search flyouts and never reached a gallery.
+        cands.sort(key=lambda t: 0 if t[1].ctype in ("MenuItemControl", "SplitButtonControl") else 1)
         # time scales with the observed frontier: ~1.3 s per candidate still to open (capped), not a fixed cap
         self.budget.soft = max(self.budget.soft, self.budget.elapsed() + min(1.3 * len(cands), 70.0))
         for cid, node in cands[:80]:
@@ -469,8 +503,8 @@ class LayoutMapper:
                 done += 1
             except Exception as exc:
                 logger.debug("dropdown deepen failed: %s", exc)
-        self.stats["deepen"]["dropdowns_candidates"] = len(cands)
-        self.stats["deepen"]["dropdowns_opened"] = opened
+        self.stats["deepen"]["dropdowns_candidates"] = self.stats["deepen"].get("dropdowns_candidates", 0) + len(cands)
+        self.stats["deepen"]["dropdowns_opened"] = self.stats["deepen"].get("dropdowns_opened", 0) + opened
 
     def _deepen_scroll(self, root) -> None:
         """Page through scrollable containers (virtualised rows exist only when scrolled to)."""
@@ -647,8 +681,12 @@ def save_pixels(model, app_key: str, win: Tuple[int, int, int, int],
         rel = _rel(bbox, win) if win[2] > win[0] and win[3] > win[1] else (0.0, 0.0, 0.0, 0.0)
         cid = _hash("pixel", via, name.lower(), int(rel[0] * 100), int(rel[1] * 100))
         try:
+            # explicit column list: bm_layout gained help/accel after this call was written, so a positional
+            # VALUES(...) of 24 would be rejected against the 26-column table (silently -> 0 rows persisted).
             model._conn.execute(
-                "INSERT OR REPLACE INTO bm_layout VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                "INSERT OR REPLACE INTO bm_layout (ctrl_id, app_key, region_id, region_kind, region_name, role,"
+                " name, automation_id, cls, x0, y0, x1, y1, rx0, ry0, rx1, ry1, enabled, offscreen, patterns,"
+                " path, via, version_hash, ts) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (cid, app_key, "pixel", "pixel", via, e.get("role", "") or via, name[:200],
                  "", "", *bbox, *rel, 1, 0, "", "", via, version_hash, now))
             n += 1

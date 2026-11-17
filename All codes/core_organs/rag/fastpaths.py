@@ -264,6 +264,64 @@ class FastPaths:
         self.st.bump(f"fast:{r['app_key']}")
         return vals
 
+    # ---- proof from outside the executor (harvest.shortcut_verify): the same overlay observe() writes, addressed by row ------------------------------------
+    def find(self, app_key: str, task_pattern: str, payload: str) -> Optional[Dict[str, Any]]:
+        """The row for this app + goal + payload (e.g. 'Zen mode', 'alt+z') with the learning overlay applied, or None."""
+        rows = self._overlay(lt.fetch(self.st, "fast_paths", f"app_key = {lt.q(app_key)} AND task_pattern = {lt.q(task_pattern)}", 200))
+        return next((r for r in rows if r.get("payload") == payload), None)
+
+    def set_verified(self, fid: str, verified: bool, run_id: str = "") -> bool:
+        """Mark ONE existing row proven (or not proven) through the mutable overlay in learn.db: the Lance row and its id do not change, so nothing is duplicated. Proven = verified, trust
+        'verified', one more ok run recorded under `run_id`; not proven = verified False, trust back to 'web'."""
+        r = self.get(fid)
+        if not r:
+            return False
+        with self.db.lock:
+            self.db.execute("INSERT OR IGNORE INTO fast_stats(fast_id) VALUES(?)", (fid,))
+            if verified:
+                runs = list(r.get("ok_runs") or [])
+                if run_id and run_id not in runs:
+                    runs.append(run_id)
+                self.db.execute("UPDATE fast_stats SET verified=1, trust_override='verified', n_ok=n_ok+1, consecutive_fail=0, last_ok_ts=?, ok_runs_json=? WHERE fast_id=?",
+                                (time.time(), json.dumps(runs[-20:]), fid))
+            else:
+                self.db.execute("UPDATE fast_stats SET verified=0, trust_override='web' WHERE fast_id=?", (fid,))
+            self.db.commit()
+        self.st.bump(f"fast:{r['app_key']}")
+        return True
+
+    def annotate(self, fid: str, context: str) -> int:
+        """Rewrite the free-text `context` of one row (a static column: an ingest-time correction, e.g. 'REFUTED live ...'). The row id stays."""
+        n = lt.update(self.st, "fast_paths", f"fast_id = {lt.q(fid)}", {"context": context})
+        r = self.get(fid)
+        if r:
+            self.st.bump(f"fast:{r['app_key']}")
+        return n
+
+    def rename(self, fid: str, task_pattern: str) -> int:
+        """Correct the goal text of ONE existing row (e.g. an OCR slip 'CopytoclipboardasPNG' -> 'Copy to clipboard as PNG'). The row id, its verified state and its counts stay; the text index is updated."""
+        n = lt.update(self.st, "fast_paths", f"fast_id = {lt.q(fid)}", {"task_pattern": task_pattern})
+        r = self.get(fid)
+        if r:
+            self.st.bump(f"fast:{r['app_key']}")
+        return n
+
+    def forget_rows(self, fids: Iterable[str]) -> int:
+        """Delete specific rows (Lance + text index), nothing else: for undoing an ingest that made duplicates. Returns the number removed."""
+        ids = [f for f in fids if f]
+        if not ids or not self.st.count("fast_paths"):
+            return 0
+        where = "fast_id IN (" + ", ".join(lt.q(i) for i in ids) + ")"
+        apps = {r["app_key"] for r in lt.fetch(self.st, "fast_paths", where, len(ids) + 5)}
+        n = int(self.st.table("fast_paths").count_rows(where))
+        if n:
+            from . import schemas as S
+            self.st.table("fast_paths").delete(where)
+            self.st.text.heal("fast_paths", S.KEYS["fast_paths"], S.FTS_TEXT["fast_paths"], lt._cols("fast_paths"))
+            for a in apps:
+                self.st.bump(f"fast:{a}")
+        return n
+
     def count(self, app_key: str) -> int:
         return int(self.st.table("fast_paths").count_rows(lt.where_app(app_key))) if self.st.count("fast_paths") else 0
 

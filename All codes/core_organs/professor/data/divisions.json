@@ -1,0 +1,55 @@
+{
+  "_comment": "The seven sub-divisions of the Hojaiga system, taken from the layer folders in 'architechure standards-oragn files' (Core Intelligence, Knowledge & Decision, Execution, Platform, Runtime, UI Layer, External). Used to organise ANY ingested repository into the same structural frame. 'signals' are path/identifier keywords the heuristic classifier scores; edit freely, no code change needed.",
+  "source": "architechure standards-oragn files/*",
+  "divisions": [
+    {
+      "id": "core_intelligence",
+      "name": "Core Intelligence",
+      "organs": ["Organ 01 Brain", "Organ 02 CNS", "Organ 03 Memory"],
+      "role": "reasoning, planning, orchestration, message routing, state and memory",
+      "signals": ["brain", "planner", "planning", "reason", "orchestrat", "scheduler", "dispatch", "router", "bus", "broker", "event", "state", "store", "memory", "session", "context", "core", "kernel", "engine", "model", "scene", "document", "project", "database", "db", "cache"]
+    },
+    {
+      "id": "knowledge_decision",
+      "name": "Knowledge & Decision Layer",
+      "organs": ["Organ 04 Knowledge", "Organ 05 Controllers", "Organ 06 Automation"],
+      "role": "what the system knows, the rules it applies, controllers that turn intent into operations, automation of the application",
+      "signals": ["knowledge", "registry", "catalog", "schema", "rules", "policy", "controller", "manager", "service", "command", "operator", "action", "handler", "workflow", "macro", "script", "automation", "tool", "preset", "template", "config", "settings", "preferences"]
+    },
+    {
+      "id": "execution",
+      "name": "Execution Layer",
+      "organs": ["Organ 07 Security", "Organ 08 Learning", "Organ 09 Infrastructure"],
+      "role": "doing the work safely: permissions, validation, learning from outcomes, files, processes, resources, logging",
+      "signals": ["security", "auth", "permission", "sandbox", "validate", "verify", "encrypt", "license", "learn", "train", "metric", "telemetry", "log", "infra", "resource", "thread", "process", "io", "file", "fs", "filesystem", "storage", "save", "load", "export", "import", "render", "compute", "gpu", "worker", "job", "queue"]
+    },
+    {
+      "id": "platform",
+      "name": "Platform Layer",
+      "organs": ["Organ 10 Agents", "Organ 11 Interface", "Organ 12 Integration"],
+      "role": "agents, plugin and extension surfaces, public APIs, integration with other software",
+      "signals": ["agent", "plugin", "addon", "extension", "module", "api", "sdk", "binding", "bridge", "adapter", "integration", "webhook", "rest", "rpc", "ipc", "com", "interop", "python", "scripting", "automation", "cli", "command_line"]
+    },
+    {
+      "id": "runtime",
+      "name": "Runtime",
+      "organs": ["Runtime 14 LLM Runtime"],
+      "role": "the execution substrate: engine loop, model/inference runtime, hardware acceleration, memory management",
+      "signals": ["runtime", "inference", "llm", "gpu", "cuda", "vulkan", "opengl", "directx", "metal", "shader", "vm", "interpreter", "compiler", "jit", "loop", "frame", "tick", "gc", "allocator", "pool", "backend", "driver"]
+    },
+    {
+      "id": "ui_layer",
+      "name": "UI Layer",
+      "organs": ["Organ 13 Interface Layer"],
+      "role": "everything the human touches: windows, panels, menus, toolbars, buttons, dialogs, shortcuts, themes, localisation",
+      "signals": ["ui", "gui", "view", "widget", "panel", "menu", "toolbar", "ribbon", "button", "dialog", "window", "screen", "page", "component", "layout", "theme", "style", "icon", "tooltip", "keymap", "shortcut", "i18n", "locale", "translation", "xaml", "qml", "css", "html", "react", "swiftui", "tray", "overlay", "render_ui", "interface"]
+    },
+    {
+      "id": "external",
+      "name": "External",
+      "organs": ["External 15 External Connectors"],
+      "role": "boundary to the outside world: network, cloud services, file formats, OS and hardware abstraction, third-party software",
+      "signals": ["connector", "network", "http", "https", "socket", "websocket", "cloud", "oauth", "sync", "upload", "download", "email", "smtp", "format", "codec", "parser", "serializer", "driver", "usb", "bluetooth", "audio", "video", "device", "win32", "native", "ffi", "vendor", "third_party", "thirdparty", "external", "extern"]
+    }
+  ]
+}

@@ -1,92 +1,122 @@
-p = r"D:\new_automation\All codes\core_organs\background_window.py"
-s = open(p, encoding="utf-8").read()
+import ast
+import io
+
+# ---------------------------------------------------------------- effectors: a focus WATCH thread + final hand-back
+P = "D:/new_automation/All codes/core_organs/professor/effectors.py"
+s = io.open(P, "r", encoding="utf-8").read()
 
 
-def rep(old, new, label):
+def rep(old, new):
     global s
-    if old not in s:
-        print("MISSING:", label)
-        raise SystemExit(1)
+    assert old in s, old[:70]
     s = s.replace(old, new, 1)
-    print("ok:", label)
 
 
-# 1. idle helper + policy constant
-rep('''CONCEAL_FLYOUTS = os.environ.get("HOJAIGA_CONCEAL_FLYOUTS", "1") != "0"''',
-    '''FOCUS_IDLE_MS = int(os.environ.get("HOJAIGA_FOCUS_IDLE_MS", "1500"))     # the user counts as PRESENT if they touched the keyboard / mouse this recently
+rep("import functools\nimport re\n", "import contextlib\nimport functools\nimport re\n")
+rep('''    def _return_focus(self, was: int) -> None:''', '''    # ---- the focus WATCH: while the Professor is probing / executing, a small thread notices the moment the target's process takes the foreground (toolkits activate themselves
+    #      a little AFTER the message, longer under load) and hands it back to the user's window; it never fights the user (input within the last 300 ms = the user did it)
+    def _user_busy(self) -> bool:
+        try:
+            from core_organs.background_window import user_idle_ms
+            return user_idle_ms() < 300
+        except Exception:
+            return False
 
+    def restore_user_focus(self) -> bool:
+        """Hand the foreground back to the user's window if the target's process holds it right now. True when it was handed back."""
+        try:
+            tpid = self._pid(self.hwnd)
+            cur = _fg()
+            back = self.user_fg
+            if not cur or not tpid or self._pid(cur) != tpid or not back or not _fgu.IsWindow(back) or _fgu.IsIconic(back) or self._pid(back) == tpid:
+                return False
+            from core_organs import headless_input as hin
+            hin._hand_back_focus(back)
+            self.focus_returns += 1
+            self.log.append((time.time(), "focus returned", _fg() == back, f"foreground handed back to {back} (watch)"))
+            return True
+        except Exception:
+            return False
 
-def user_idle_ms() -> int:
-    """Milliseconds since the last REAL input event (GetLastInputInfo): a read-only question, nothing is sent."""
-    try:
-        class _LII(ctypes.Structure):
-            _fields_ = [("cbSize", ctypes.c_uint), ("dwTime", ctypes.c_uint)]
-        li = _LII()
-        li.cbSize = ctypes.sizeof(_LII)
-        if ctypes.windll.user32.GetLastInputInfo(ctypes.byref(li)):
-            return int((ctypes.windll.kernel32.GetTickCount() - li.dwTime) & 0xFFFFFFFF)
-    except Exception:
-        pass
-    return 0                                                  # unknown: assume the user IS there (the safe answer)
-
-
-CONCEAL_FLYOUTS = os.environ.get("HOJAIGA_CONCEAL_FLYOUTS", "1") != "0"''', "idle helper")
-
-# 2. the hold-focus decision
-rep('''        ours = fg == self.hwnd or holds_app_focus(fg, self.hwnd, self.pid)
-        if ours:
-            tgt = self.user_fg or _last_user_fg''', '''        ours = fg == self.hwnd or holds_app_focus(fg, self.hwnd, self.pid)
-        if ours and user_idle_ms() > FOCUS_IDLE_MS:
-            # Nobody is at the keyboard: a WinUI app that takes the foreground when its flyout opens misdirects no keystroke, and giving the foreground
-            # back deactivates the window, which dismisses the very menu being read (measured: a Paint menu crawl returned 13-28 commands instead of 41,
-            # File came back EMPTY; with the hand-back off: 41 of 41, four runs of four, and 30% faster). The hand-back is immediate the moment a person
-            # touches the keyboard or mouse, and always happens when the session ends.
-            self.fg_deferred += 1
+    @contextlib.contextmanager
+    def focus_watch(self, interval: float = 0.05):
+        if not (self.allowed and self.keep_focus):
+            yield self
             return
-        if ours:
-            tgt = self.user_fg or _last_user_fg''', "defer when idle")
+        stop = threading.Event()
+        self._note_user_window(_fg())
 
-rep('''        self._concealed: Dict[int, bool] = {}''', '''        self.fg_deferred = 0
-        self._concealed: Dict[int, bool] = {}''', "counter")
+        def loop() -> None:
+            last = 0.0
+            while not stop.wait(interval):
+                try:
+                    cur = _fg()
+                    if cur and self._pid(cur) == self._pid(self.hwnd):
+                        if time.time() - last > 0.2 and not self._user_busy():
+                            self.restore_user_focus()
+                            last = time.time()
+                    else:
+                        self._note_user_window(cur)
+                except Exception:
+                    pass
 
-# 3. restore focus at session end
-rep('''    def halt(self) -> None:
-        self._halt.set()
+        th = threading.Thread(target=loop, name="effector-focus-watch", daemon=True)
+        th.start()
+        try:
+            yield self
+        finally:
+            stop.set()
+            th.join(1.0)
+            time.sleep(0.15)
+            self.restore_user_focus()
+
+    def _return_focus(self, was: int) -> None:''')
+ast.parse(s)
+io.open(P, "w", encoding="utf-8", newline="\n").write(s)
+
+# ---------------------------------------------------------------- probe: run under the focus watch; mask the caption strip in pixel comparisons
+P = "D:/new_automation/All codes/core_organs/professor/probe.py"
+s = io.open(P, "r", encoding="utf-8").read()
+rep('''    if a.image is not None and b.image is not None and a.image.size == b.image.size:
+        fr = changed_fraction(a.image, b.image, cell=8, thresh=10.0)
+        if fr > pixel_tol:
+            out.append(f"pixels {fr:.4f} > {pixel_tol}")
+    return out''', '''    if a.image is not None and b.image is not None and a.image.size == b.image.size:
+        fr = changed_fraction(_below_caption(a.image), _below_caption(b.image), cell=8, thresh=10.0)
+        if fr > pixel_tol:
+            out.append(f"pixels {fr:.4f} > {pixel_tol}")
+    return out''')
+rep('''    if a.image is not None and b.image is not None and a.image.size == b.image.size:
+        d.pixel_fraction = round(changed_fraction(a.image, b.image, cell=8, thresh=10.0), 5)
+        d.pixel_boxes = [bx.to_list() for bx in changed_boxes(a.image, b.image, cell=8, thresh=10.0)[:8]]
+    return d''', '''    if a.image is not None and b.image is not None and a.image.size == b.image.size:
+        ia, ib = _below_caption(a.image), _below_caption(b.image)
+        d.pixel_fraction = round(changed_fraction(ia, ib, cell=8, thresh=10.0), 5)
+        off = a.image.height - ia.height
+        d.pixel_boxes = [[bx.x1, bx.y1 + off, bx.x2, bx.y2 + off] for bx in changed_boxes(ia, ib, cell=8, thresh=10.0)[:8]]
+    return d''')
+rep('''# -------------------------------------------------------------------------------------------------------------- delta
+@dataclass
+class Delta:''', '''CAPTION_ROWS = 24                       # snapshot pictures are half size: ~48 real pixels = the title bar, whose active / inactive painting flips with focus and says nothing about the app
 
 
-class _Parked:''', '''    def restore_focus(self) -> None:
-        """Session end: if the app still holds the foreground (the idle policy let it), give it back to what the user had."""
-        fg = _u32.GetForegroundWindow()
-        if not fg or not (fg == self.hwnd or holds_app_focus(fg, self.hwnd, self.pid)):
-            return
-        tgt = self.user_fg or _last_user_fg
-        if not (tgt and _u32.IsWindow(tgt) and not _u32.IsIconic(tgt) and _pid(tgt) != self.pid):
-            tgt = next_user_window(self.pid) or int(_u32.FindWindowW("Shell_TrayWnd", None) or 0)
-        if tgt:
-            self._give_focus(tgt, fg)
-
-    def halt(self) -> None:
-        self._halt.set()
+def _below_caption(img: Image.Image) -> Image.Image:
+    if img.height <= CAPTION_ROWS * 3:
+        return img
+    return img.crop((0, CAPTION_ROWS, img.width, img.height))
 
 
-class _Parked:''', "restore_focus")
+# -------------------------------------------------------------------------------------------------------------- delta
+@dataclass
+class Delta:''')
+rep('''        t_start = time.time()
+        rep = ProbeReport(dry_run=not self.fx.allowed)''', '''        t_start = time.time()
+        with self.fx.focus_watch():
+            return self._run(hyps, t_start)
 
-rep('''        if p.guard is not None:
-            time.sleep(0.05)
-            p.guard.halt()
-            p.guard.join(timeout=1.0)
-        return True
-    except Exception:
-        return False''', '''        if p.guard is not None:
-            try:
-                p.guard.restore_focus()
-            except Exception:
-                pass
-            time.sleep(0.05)
-            p.guard.halt()
-            p.guard.join(timeout=1.0)
-        return True
-    except Exception:
-        return False''', "exit restore")
-open(p, "w", encoding="utf-8").write(s)
-print("chr8:", s.count(chr(8)))
+    def _run(self, hyps: Optional[Sequence[Hypothesis]], t_start: float) -> ProbeReport:
+        from core_organs import fast_uia
+        rep = ProbeReport(dry_run=not self.fx.allowed)''')
+ast.parse(s)
+io.open(P, "w", encoding="utf-8", newline="\n").write(s)
+print("focus watch + caption mask patched")

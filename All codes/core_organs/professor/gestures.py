@@ -16,6 +16,7 @@ The virtual cursor (overlay) glides along the same path whichever route delivers
 
 from __future__ import annotations
 
+import contextlib
 import ctypes
 import ctypes.wintypes as wt
 import json
@@ -92,7 +93,7 @@ def gesture_route(app_key: str) -> str:
     p = t.get("pointer", {}) or {}
     if p.get("shim") == "ok":
         return "posted pointer messages with the in-process pointer agent"
-    if p.get("posted") == "ok" or t.get("posted_pointer") is True:
+    if p.get("posted") in ("ok", "delivered") or t.get("posted_pointer") is True:
         return "posted pointer messages"
     if p.get("touch") == "ok" or t.get("touch_moves_cursor") is False:
         return "synthetic touch on the visible owned window (teaching / visible mode)"
@@ -125,6 +126,104 @@ def path_for(kind: str, surface: Tuple[int, int, int, int], n: int = 32) -> List
     if kind == "flick":
         return [(l + 0.35 * w, t + 0.5 * h), (l + 0.65 * w, t + 0.5 * h)]
     return [(l + w / 2, t + h / 2)]
+
+
+# ------------------------------------------------------------------------------------------------------------- drawings
+# A 'draw' step used to end as DELEGATED (nothing drawn, reported done). A drawing is now a list of strokes in a 0..100 box: plain geometry for the
+# shapes geometry names, the model's sketch for anything else ('a house', 'a smiley'), scaled into the canvas keeping its proportions.
+SKETCH_SYSTEM = ("You draw with a pen. Plan a simple line drawing of the thing asked as strokes in a 0..100 box (x right, y down), each stroke a list of "
+                 "[x, y] points the pen passes through without lifting; use enough points for curves; at most 12 strokes. Reply JSON only: {\"strokes\": [[[x, y], ...], ...]}.")
+
+
+def shape_strokes(what: str) -> List[List[Tuple[float, float]]]:
+    """Strokes for the shapes geometry names; [] for anything else."""
+    import re
+    t = (what or "").lower()
+    ring = lambda rx, ry, n=48: [(50 + rx * math.cos(2 * math.pi * i / n), 50 + ry * math.sin(2 * math.pi * i / n)) for i in range(n + 1)]
+    if re.search(r"\b(circle|round|ring|dot)\b", t):
+        return [ring(40, 40)]
+    if re.search(r"\b(ellipse|oval)\b", t):
+        return [ring(45, 28)]
+    if re.search(r"\bsquare\b", t):
+        return [[(10, 10), (90, 10), (90, 90), (10, 90), (10, 10)]]
+    if re.search(r"\b(rectangle|box)\b", t):
+        return [[(5, 25), (95, 25), (95, 75), (5, 75), (5, 25)]]
+    if re.search(r"\btriangle\b", t):
+        return [[(50, 8), (92, 88), (8, 88), (50, 8)]]
+    if re.search(r"\bstar\b", t):
+        pts = [(50 + (42 if i % 2 == 0 else 17) * math.sin(math.pi * i / 5), 52 - (42 if i % 2 == 0 else 17) * math.cos(math.pi * i / 5)) for i in range(11)]
+        return [pts]
+    if re.search(r"\b(line|stroke)\b", t) and not re.search(r"\b(drawing|sketch|of)\b", t):
+        return [[(10, 50), (90, 50)]]
+    if re.search(r"\b(wave|zigzag|squiggle)\b", t):
+        return [[(5 + 90 * i / 31, 50 + 20 * math.sin(i / 2.5)) for i in range(32)]]
+    return []
+
+
+QUICKDRAW_DIR = os.environ.get("HOJAIGA_QUICKDRAW", r"D:\new_automation\data\inbox\6_1_quickdraw")
+
+
+def quickdraw_strokes(what: str, folder: str = "", pick: int = -1, scan: int = 400) -> List[List[Tuple[float, float]]]:
+    """A real human sketch of the thing named (Google Quick, Draw!, CC BY 4.0, simplified strokes in a 0..255 box): the category whose name is in the request (the longest
+    such name wins: 'light bulb' over 'bulb'), one of the first `scan` drawings the game recognised, scaled to 0..100 keeping its proportions. [] when no category matches."""
+    import random
+    import re
+    folder = folder or QUICKDRAW_DIR
+    if not os.path.isdir(folder):
+        return []
+    text = " " + re.sub(r"[^a-z ]+", " ", (what or "").lower()) + " "
+    cats = sorted((f[:-7] for f in os.listdir(folder) if f.endswith(".ndjson")), key=len, reverse=True)
+    cat = next((c for c in cats if f" {c.replace('_', ' ')} " in text or f" {c.replace('_', ' ')}s " in text), "")
+    if not cat:
+        return []
+    rows = []
+    with open(os.path.join(folder, cat + ".ndjson"), encoding="utf-8") as fh:
+        for i, line in enumerate(fh):
+            if i >= scan:
+                break
+            with contextlib.suppress(Exception):
+                d = json.loads(line)
+                if d.get("recognized") and d.get("drawing"):
+                    rows.append(d["drawing"])
+    if not rows:
+        return []
+    drawing = rows[pick % len(rows)] if pick >= 0 else random.choice(rows)
+    xs = [x for st in drawing for x in st[0]]
+    ys = [y for st in drawing for y in st[1]]
+    side = max(max(xs) - min(xs), max(ys) - min(ys), 1)
+    return [[(100.0 * (x - min(xs)) / side, 100.0 * (y - min(ys)) / side) for x, y in zip(st[0], st[1])] for st in drawing if len(st[0]) >= 2]
+
+
+def sketch_strokes(what: str, ask: Optional[Callable[[str, str], Optional[str]]] = None) -> List[List[Tuple[float, float]]]:
+    """Geometry first; then a real human sketch of the named thing (Quick, Draw!); otherwise the model's line drawing (validated: numbers inside the box, at least two points a stroke)."""
+    s = shape_strokes(what) or quickdraw_strokes(what)
+    if s:
+        return s
+    import re
+    if ask is None:
+        from core_organs.mind import app_qa as QA
+        ask = lambda system, prompt: QA.ask_llm(prompt, system, timeout=120, max_tokens=1500)
+    raw = ask(SKETCH_SYSTEM, f"Draw: {what}\nJSON:") or ""
+    m = re.search(r"\{.*\}", raw, re.S)
+    try:
+        d = json.loads(m.group(0)) if m else {}
+    except ValueError:
+        return []
+    out = []
+    for st in (d.get("strokes") or [])[:12]:
+        pts = [(min(100.0, max(0.0, float(p[0]))), min(100.0, max(0.0, float(p[1])))) for p in st if isinstance(p, (list, tuple)) and len(p) >= 2
+               and all(isinstance(v, (int, float)) for v in p[:2])]
+        if len(pts) >= 2:
+            out.append(pts)
+    return out
+
+
+def fit_strokes(strokes: Sequence[Sequence[Tuple[float, float]]], surface: Tuple[int, int, int, int], margin: float = 0.18) -> List[List[Tuple[float, float]]]:
+    """0..100 strokes into the middle of the surface, same scale on both axes (a circle stays a circle), with a margin."""
+    l, t, r, b = surface
+    side = min(r - l, b - t) * (1 - 2 * margin)
+    ox, oy = (l + r) / 2 - side / 2, (t + b) / 2 - side / 2
+    return [[(ox + side * x / 100.0, oy + side * y / 100.0) for x, y in st] for st in strokes]
 
 
 ACTIONABLE_ROLES = ("button", "hyperlink", "menuitem", "listitem", "edit", "combobox", "checkbox", "radiobutton", "tabitem", "splitbutton", "slider", "spinner", "treeitem", "scrollbar", "menu", "toolbar", "text")
@@ -256,6 +355,32 @@ class GestureDriver:
                 after = sc.digest()
             return None if after is None else after != before
         return check
+
+    def draw(self, what: str, ask: Optional[Callable[[str, str], Optional[str]]] = None, strokes: Optional[Sequence[Sequence[Tuple[float, float]]]] = None) -> GestureResult:
+        """Draw `what` on the canvas: every stroke through the virtual mouse, then the surface's pixels must have changed (the picture itself is judged later)."""
+        if not self.fx.allowed:
+            return GestureResult(False, why="refused: " + self.fx.why_not())
+        plan = list(strokes) if strokes is not None else sketch_strokes(what, ask)
+        if not plan:
+            return GestureResult(False, why=f"no drawing could be planned for '{what[:60]}'")
+        nodes = self.nodes_fn()
+        r = wt.RECT()
+        _u.GetWindowRect(self.hwnd, ctypes.byref(r))
+        surface, how_s = surface_of(nodes, (r.left, r.top, r.right, r.bottom))
+        self._nodes, self._surface = nodes, surface
+        vp = self.pointer()
+        before = _pixels(self.hwnd, surface)
+        routes, tried = [], []
+        for st in fit_strokes(plan, surface):
+            pr = vp.stroke(st, duration=max(0.4, min(2.0, len(st) * 0.03)))
+            routes.append(pr.route)
+            tried += list(getattr(pr, "tried", []) or [])[:2]
+            if not pr.ok:
+                return GestureResult(False, pr.route, f"stroke {len(routes)} of {len(plan)} was not delivered: {pr.why}", 0.0, tried)
+        time.sleep(0.4)
+        ch = _changed(before, _pixels(self.hwnd, surface))
+        ok = ch > 0.002
+        return GestureResult(ok, routes[-1] if routes else "", f"{len(plan)} stroke(s) on the {how_s} surface; {ch:.3%} of it changed", ch, tried)
 
     def perform(self, kind: str, why: str = "") -> GestureResult:
         if not self.fx.allowed:

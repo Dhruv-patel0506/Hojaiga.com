@@ -1,0 +1,15 @@
+{
+  "_doc": "Host-API introspection recipes. A recipe is chosen by EVIDENCE about the program (exe name or files in its install tree), never by a hard-coded app list in code. The script runs INSIDE the program's own runtime, headless, in a separate invisible process; it never touches the user's running instance.",
+  "recipes": [
+    {
+      "id": "bpy",
+      "runtime": "embedded Python (bpy)",
+      "match": {"exe_regex": "^blender(-launcher)?\\.exe$", "files_any": ["scripts/modules/bpy_types.py", "*/scripts/modules/bpy_types.py"]},
+      "script": "recipe_bpy.py",
+      "command": ["{exe}", "-b", "--factory-startup", "--python", "{script}", "--", "{out}"],
+      "timeout_s": 90,
+      "route_effector": "api_operator",
+      "call_template": "bpy.ops.{id}()"
+    }
+  ]
+}

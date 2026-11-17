@@ -247,6 +247,10 @@ def run_rg5() -> "TestOutcome":
     from core_organs.rag.types import Query
     with _Env() as R:
         _seed_two_apps(R)
+        R.lex.set_app("docapp", archetype="chat")
+        R.proc.ingest_document("docapp", "# Overview\nDocApp basics use channels to organize conversations.",
+                               "https://support.example.test/docapp", "manual", title="DocApp overview",
+                               trust="official_doc", build_procedures=False)
         ac = R.retrieve(Query(text="how do I extrude", app_key="autocad", mode="tutor"))
         ac_ex = R.retrieve(Query(text="what is extrude", app_key="autocad", mode="tutor"))
         apps = {e.app_key for e in ac.evidence + ac_ex.evidence}
@@ -254,6 +258,7 @@ def run_rg5() -> "TestOutcome":
         fc = R.retrieve(Query(text="how do I extrude", app_key="freecad", mode="tutor"))
         fc_ex = R.retrieve(Query(text="what is extrude", app_key="freecad", mode="tutor"))
         bl = R.retrieve(Query(text="how do I extrude", app_key="blender", mode="tutor"))
+        docs_only = R.retrieve(Query(text="teach me DocApp basics", app_key="docapp", mode="tutor"))
         borrowed_plans = [p for p in fc.plans if p.origin == "borrowed"]
         borrowed_ev = [e for e in fc_ex.evidence if e.borrowed_from]
         checks = {"autocad_evidence_is_autocad_only": apps <= {"autocad"} and bool(apps),
@@ -262,7 +267,8 @@ def run_rg5() -> "TestOutcome":
                   "sparse_app_borrows_from_archetype_sibling": bool(borrowed_plans) and any("borrowed_from:autocad" == g for g in fc.gaps),
                   "borrowed_plan_is_probe_only": all(s.probe for p in borrowed_plans for s in p.steps) and all(p.grounded_ratio == 0.0 for p in borrowed_plans),
                   "borrowed_evidence_tagged_and_discounted": all(e.trust == "borrowed" and e.borrowed_from == "autocad" and e.confidence <= 0.5 for e in borrowed_ev) and bool(borrowed_ev),
-                  "never_borrows_across_archetypes": not any(p.origin == "borrowed" and any(s.args.get("borrowed_from") == "blender" for s in p.steps) for p in fc.plans)}
+                  "never_borrows_across_archetypes": not any(p.origin == "borrowed" and any(s.args.get("borrowed_from") == "blender" for s in p.steps) for p in fc.plans),
+                  "official_reference_can_teach_without_becoming_a_plan": bool(docs_only.evidence) and all(e.trust == "official_doc" for e in docs_only.evidence) and not docs_only.plans}
         return _verdict(checks, f"apps={apps} fc_origins={[p.origin for p in fc.plans]}")
 
 

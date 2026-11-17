@@ -242,6 +242,21 @@ class Procedures:
                 chunks.append(c)
         return self._finish(app_key, chunks, title, build_procedures)
 
+    def ingest_documents(self, docs: Sequence[Tuple[str, str, str, str, str]], version: str = "") -> UpsertReport:
+        """Many documents (app_key, text, source_ref, kind, trust) written per app in ONE table write instead of one per document: a manual import spent ~0.13 s per page
+        in the per-document write alone (Oct-28). No procedures are built (a reference page has no task to name one)."""
+        by_app: Dict[str, List[Dict[str, Any]]] = {}
+        for app_key, text, source_ref, kind, trust in docs:
+            for i, (heading, body) in enumerate(chunk_document(text)):
+                c = self._make_chunk(app_key, version, kind if kind in C.CHUNK_QUALITY else "web_doc", f"{source_ref}#{heading or i}", heading, body, trust)
+                if c:
+                    by_app.setdefault(app_key, []).append(c)
+        tot = UpsertReport(self.name, 0, 0, 0, [])
+        for app_key, chunks in by_app.items():
+            r = self._finish(app_key, chunks, "", False)
+            tot = UpsertReport(self.name, tot.inserted + r.inserted, tot.updated + r.updated, tot.skipped + r.skipped, list(tot.degraded) + list(r.degraded))
+        return tot
+
     def ingest_procedure(self, app_key: str, goal: str, steps: Sequence[Dict[str, Any]], source_ref: str, version: str = "", trust: str = "learned",
                          procedure_id: str = "", grounded_ratio: Optional[float] = None) -> UpsertReport:
         """A structured procedure (guide workflow, verified skill, crawl path). Steps: {text, command_id?, route_hint?, chord?, target?}."""

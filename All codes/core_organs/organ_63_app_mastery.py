@@ -334,6 +334,28 @@ def _is_menubar_item(nodes, n) -> bool:
     return False
 
 
+# A control that spawns a NEW window when invoked (a dialog / picker / child window), not one that acts inline.
+# UIA carries no "opens a window" flag, so we go past the ellipsis convention - but ONLY to names that almost
+# certainly open a MODAL we can simply close (options, a file picker, Save As). We deliberately EXCLUDE verbs that
+# act inline on user content (edit, add, rename, delete, paste, find): an "opener" is probed even when the document
+# is not pristine, so mis-labelling a mutating button as an opener could change the user's data. Sticking to modal
+# picker words keeps that bypass safe; every other button still gets the (lengthened) window poll as a "button".
+_DIALOG_INTENT = re.compile(
+    r"(?:\.\.\.|…)\s*$"                                             # classic "Open…" promise
+    r"|\b(?:options?|settings|preferences|properties|customize|configure|"
+    r"import|export|browse|save as|save a copy|save in|about|view code|"
+    r"more (?:options|commands|actions|settings)|command bar|"
+    r"open (?:a |an |the )?(?:folder|file|location|document))\b", re.I)
+# How long an ordinary (non-ellipsis) button is polled for a child window to appear. 0.7 s missed slow cold-start
+# dialogs (COM/WebView2) and logged them as no_effect; the learner runs invisibly, so a touch longer is free.
+BUTTON_WINDOW_POLL_S = float(os.environ.get("HOJAIGA_LEARN_BUTTON_WINDOW_S", "1.2"))
+
+
+def _looks_like_opener(name: str, ctype: str = "") -> bool:
+    """True when invoking this control is expected to open a NEW modal window / picker (safe to close)."""
+    return bool(_DIALOG_INTENT.search((name or "").strip()))
+
+
 def populate_frontier(model, app_key: str, hwnd: int, nodes, version_hash: str = "", *, max_new: int = 400) -> Dict[str, int]:
     """Turn a snapshot into frontier rows (idempotent). Destructive-looking controls are recorded as `unsafe` immediately:
     knowing that they exist, and that they are never explored, is knowledge too."""
@@ -360,7 +382,7 @@ def populate_frontier(model, app_key: str, hwnd: int, nodes, version_hash: str =
         elif "expand" in pats and n.expand_state == 0 and n.ctype not in ("MenuItemControl", "TreeItemControl"):
             kind = "expander"
         elif n.ctype in ("ButtonControl", "MenuItemControl", "SplitButtonControl") and "invoke" in pats:
-            kind = "opener" if re.search(r"(\.\.\.|…)\s*$", name) else "button"
+            kind = "opener" if _looks_like_opener(name, n.ctype) else "button"
         if not kind:
             continue
         personal = ks.redact(name) != name
@@ -648,8 +670,10 @@ class Prober:
         before_names = _names(main) | _names(extra)
         ok, how = self.invoke_node(node)
         r.effector = how
-        # an ellipsis control promises a dialog: wait for it. An unknown button usually acts inline: look briefly.
-        deadline = time.time() + (2.5 if row["kind"] == "opener" else 0.7)
+        # an ellipsis/dialog-intent control promises a window: wait for it. An unknown button usually acts inline,
+        # but a slow cold-start dialog (COM/WebView2) can take >0.7 s to appear - poll a touch longer so it is
+        # still caught and recorded as a window, not wrongly written off as "no effect".
+        deadline = time.time() + (2.5 if row["kind"] == "opener" else BUTTON_WINDOW_POLL_S)
         new_hwnds: List[int] = []
         while ok and time.time() < deadline:
             time.sleep(0.1)
@@ -1430,6 +1454,181 @@ def master(target: str, *, model=None, budget_s: float = 90.0, runs: int = 1, fr
                 with bw.BackgroundSession(hwnd):
                     time.sleep(0.6)
                     main, extra = _snap_all(hwnd)
+                    # ---- startup-modal guard (measured on OBS Studio 2026-10-08: its crash prompt appears
+                    # AFTER the scan returned; UIA then shows the app's controls but DISABLED - populate
+                    # filters disabled nodes, so the frontier got ONE row, the dialog's OK button, and
+                    # learning 'converged' on nothing). Trigger: almost no ENABLED operables, or a visible
+                    # message-box class in the tree. Then capture the dialog as knowledge, dismiss it
+                    # (Escape/WM_CLOSE, never its buttons) and re-snapshot. Costs ~ms when nothing matches.
+                    _en_ops = {_norm(n.name) for n in main + extra
+                               if n.name and n.enabled and n.ctype in _OPERABLE and _norm(n.name) != "pop-uphost"}
+                    _dlg = any("messagebox" in (getattr(n, "cls", "") or "").lower() or
+                               (getattr(n, "cls", "") or "") == "#32770" for n in main + extra)
+                    if len(_en_ops) < 5 or _dlg:
+                        try:
+                            from core_organs import scan_learner as _sl
+                            from core_organs import organ_63_app_mastery as _self
+                            from core_organs import headless_input as _hin
+                            _hs: Dict[str, Any] = {}
+                            logger.info("m63 modal-guard FIRED for %s: enabled_ops=%d dialog_class=%s nodes=%d",
+                                        key, len(_en_ops), _dlg, len(main) + len(extra))
+                            _sl._clear_startup_modals(bm, model, _self, hwnd, key, _hs)
+                            if not _hs.get("pre_modals"):
+                                # EnumWindows can pass over a Qt modal entirely (measured v10: only an
+                                # invisible _q_titlebar was listed). TWO more Win32 ways to reach THE window
+                                # that has the input: GW_ENABLEDPOPUP (the enabled popup a top-level owns)
+                                # and each of this pid's threads' queued focus window. Escape -> WM_CLOSE,
+                                # never a button; every handle found is captured as knowledge first.
+                                try:
+                                    import win32process
+                                    _u = ctypes.windll.user32
+                                    pid = win32process.GetWindowThreadProcessId(hwnd)[1]
+                                    _cands, _seen2 = [], set()
+
+                                    def _addw(w, trust=False):
+                                        try:
+                                            w = int(w or 0)
+                                            if w and w != hwnd and w not in _seen2 and _u.IsWindow(w):
+                                                if win32process.GetWindowThreadProcessId(w)[1] != pid:
+                                                    return
+                                                _buf = ctypes.create_unicode_buffer(256)
+                                                _u.GetClassNameW(w, _buf, 256)
+                                                _tbuf = ctypes.create_unicode_buffer(256)
+                                                _u.GetWindowTextW(w, _tbuf, 256)
+                                                # A handle GW_ENABLEDPOPUP / GetGUIThreadInfo names IS the app's
+                                                # own popup/input window: accept it hidden too (BackgroundSession
+                                                # may have parked the dialog, so 'visible' is not a criterion -
+                                                # measured v10: everything of OBS's modal looked invisible here).
+                                                # Only untrusted extras must pass the dialog-ish bar.
+                                                if not trust and not (bool(_u.IsWindowVisible(w)) and _tbuf.value):
+                                                    return
+                                                _seen2.add(w)
+                                                _cands.append(w)
+                                        except Exception:  # noqa: BLE001
+                                            pass
+                                    _addw(_u.GetWindow(hwnd, 6), trust=True)     # GW_ENABLEDPOPUP
+                                    class _GT(ctypes.Structure):
+                                        _fields_ = [("cbSize", ctypes.c_uint32), ("flags", ctypes.c_uint32),
+                                                    ("hwndFocus", ctypes.c_void_p), ("hwndActive", ctypes.c_void_p),
+                                                    ("hwndAttach", ctypes.c_void_p), ("hwndRDPAttach", ctypes.c_void_p),
+                                                    ("hwndMenuOwner", ctypes.c_void_p), ("hwndMoveSize", ctypes.c_void_p),
+                                                    ("hwndCaret", ctypes.c_void_p), ("rcCaret", ctypes.c_long * 4)]
+                                    _gi = _GT()
+                                    _gi.cbSize = ctypes.sizeof(_GT)
+                                    _k32 = ctypes.windll.kernel32
+                                    _th = _k32.CreateToolhelp32Snapshot(2, pid)   # TH32CS_SNAPTHREAD=2
+                                    class _TE(ctypes.Structure):
+                                        _fields_ = [("dwSize", ctypes.c_uint32), ("cntUsage", ctypes.c_uint32),
+                                                    ("th32ThreadID", ctypes.c_uint32), ("th32OwnerPid", ctypes.c_uint32),
+                                                    ("tpcPri", ctypes.c_int32), ("th32Flags", ctypes.c_uint32),
+                                                    ("th32Priority", ctypes.c_uint32), ("th32PriClassBase", ctypes.c_int32),
+                                                    ("dwFlags", ctypes.c_uint32), ("szTh32Thread", ctypes.c_wchar * 32)]
+                                    _te = _TE()
+                                    _te.dwSize = ctypes.sizeof(_TE)
+                                    if _th not in (-1, 0) and _k32.Thread32First(_th, ctypes.byref(_te)):
+                                        _tried = 0
+                                        while _tried < 512:                        # the walk spans ALL threads: filter, never stop
+                                            _tried += 1
+                                            if _te.th32OwnerPid == pid:
+                                                _gi.cbSize = ctypes.sizeof(_GT)
+                                                if _u.GetGUIThreadInfo(_te.th32ThreadID, ctypes.byref(_gi)):
+                                                    _addw(_gi.hwndFocus, trust=True)
+                                                    _addw(_gi.hwndActive, trust=True)
+                                                    _addw(_gi.hwndRDPAttach)
+                                            if not _k32.Thread32Next(_th, ctypes.byref(_te)):
+                                                break
+                                    if _th not in (-1, 0):
+                                        _k32.CloseHandle(_th)
+                                    for _gw in _cands[:4]:
+                                        _hs.setdefault("gui_popups", []).append(
+                                            f"{bm._win_class(_gw) or ''}|'{(bm._win_title(_gw) or '')[:24]}'|{int(_u.IsWindowVisible(_gw))}")
+                                        try:
+                                            capture_dialogs(model, key, [_gw], via="(modal found via enabled-popup/gui-focus)")
+                                        except Exception:  # noqa: BLE001
+                                            pass
+                                        try:
+                                            _hin.post_key_combo(_gw, "escape")
+                                        except Exception:  # noqa: BLE001
+                                            pass
+                                        _gd = time.time() + 2.5
+                                        while time.time() < _gd and _u.IsWindow(_gw):
+                                            _u.PostMessageW(_gw, 0x0010, 0, 0)
+                                            time.sleep(0.4)
+                                        _hs["gui_popup_closed"] = f"{_gw} gone={not _u.IsWindow(_gw)}"
+                                        if not _u.IsWindow(_gw):
+                                            time.sleep(0.6)
+                                            break
+                                except Exception as exc:  # noqa: BLE001
+                                    _hs["gui_popup"] = f"error {type(exc).__name__}: {str(exc)[:80]}"
+                            if not _hs.get("pre_modals") and "gui_popup_closed" not in _hs:
+                                # the Win32 walk can still miss a Qt dialog (parked, titleless, helper pid):
+                                # UIA SAW the dialog class in this snapshot, so resolve ITS native window from
+                                # the node and dismiss that handle directly - Escape then WM_CLOSE, never a button.
+                                for n in main + extra:
+                                    _c = (getattr(n, "cls", "") or "").lower()
+                                    if "messagebox" not in _c and _c != "#32770":
+                                        continue
+                                    ctl, dh, hops = getattr(n, "ctrl", None), 0, 0
+                                    while ctl is not None and hops < 8:
+                                        try:
+                                            dh = int(ctl.NativeWindowHandle or 0)
+                                        except Exception:  # noqa: BLE001
+                                            dh = 0
+                                        if dh:
+                                            break
+                                        try:
+                                            ctl = ctl.GetParent()
+                                        except Exception:  # noqa: BLE001
+                                            break
+                                        hops += 1
+                                    if dh and dh != hwnd:
+                                        try:
+                                            capture_dialogs(model, key, [dh], via="(open at rest when learning began)")
+                                            _hin.post_key_combo(dh, "escape")
+                                            _dl = time.time() + 2.5
+                                            while time.time() < _dl and ctypes.windll.user32.IsWindow(dh):
+                                                ctypes.windll.user32.PostMessageW(dh, 0x0010, 0, 0)
+                                                time.sleep(0.4)
+                                            _hs["uia_dialog"] = f"{bm._win_title(dh) or bm._win_class(dh)} closed={not ctypes.windll.user32.IsWindow(dh)}"
+                                            break
+                                        except Exception as exc:  # noqa: BLE001
+                                            _hs["uia_dialog"] = f"error {type(exc).__name__}"
+                            logger.info("m63 modal-guard detail for %s: %s", key, json.dumps(_hs, default=str)[:240])
+                            main, extra = _snap_all(hwnd)
+                            _en2 = {_norm(n.name) for n in main + extra
+                                    if n.name and n.enabled and n.ctype in _OPERABLE and _norm(n.name) != "pop-uphost"}
+                            logger.info("m63 modal-guard AFTER for %s: enabled_ops=%d nodes=%d", key, len(_en2),
+                                        len(main) + len(extra))
+                            _dlg2 = any("messagebox" in (getattr(n, "cls", "") or "").lower() for n in main + extra)
+                            if _dlg2:
+                                rep["exploration_blocked"] = "a startup dialog survived the dismiss attempt"
+                        except Exception as exc:  # noqa: BLE001
+                            logger.info("m63 modal-guard FAILED: %s: %s", type(exc).__name__, str(exc)[:140])
+                    else:
+                        logger.debug("m63 modal-guard not needed: enabled_ops=%d", len(_en_ops))
+                    if rep.get("exploration_blocked"):
+                        # A modal survived every dismiss attempt (Win32 saw nothing, the UIA handle walk failed -
+                        # measured on OBS's Qt crash prompt). Probing now would press a DIALOG's buttons and
+                        # 'converge' on a 1-row frontier: refuse honestly instead and LEAVE THE APP ALONE. The
+                        # learner persists this as partial (NEVER complete for a blocked run) and re-arms on the
+                        # next scan - resumable by design; the later converge check honours this flag too.
+                        rep["stopped"] = "exploration blocked"
+                        rep["phases"]["state_s"] = round(time.time() - t, 1)
+                        try:
+                            from core_organs import command_registry as cr
+                            rep["registry"] = cr.refresh_profile(model, key)
+                        except Exception:  # noqa: BLE001
+                            pass
+                        after = measure(model, key)
+                        rep["known"] = after
+                        rep["gain"] = _delta(before, after)
+                        rep["elapsed_s"] = round(time.time() - t_run, 1)
+                        ks.log_run(model, run_id, key, run_no, "blocked", {"gain": rep["gain"],
+                                                                           "reason": rep["exploration_blocked"]})
+                        if launched:                       # never strand a window we launched with a modal up
+                            rep["closed"] = us.close_window(hwnd, discard_unsaved=True)
+                        out["runs"].append(rep)
+                        continue
                     state = derive_state(main + extra)
                     rep["state_vars"] = record_state_vars(model, key, state)
                     pristine, why = is_pristine(hwnd, main)
@@ -1511,12 +1710,14 @@ def master(target: str, *, model=None, budget_s: float = 90.0, runs: int = 1, fr
                         rep["closed"] = "terminated-hung-launched-process"
                 except Exception:
                     pass
-        # converged: nothing left open, or this run learned (almost) nothing
+        # converged: nothing left open, or this run learned (almost) nothing - but NEVER while a pass was
+        # blocked by a modal we could not dismiss: the frontier it saw was the dialog's, not the app's.
         new_items = sum(max(0, v) for k, v in rep["gain"].items() if k in ("commands", "dialogs", "regions", "statevars", "transitions"))
         last_new = new_items
         open_left = after["frontier"]["by_status"].get("open", 0)
         if not open_left or new_items <= 2:
-            out["converged"] = True
+            if not any(r.get("exploration_blocked") for r in out["runs"]):
+                out["converged"] = True
             break
     out["known"] = measure(model, key)
     out.setdefault("converged", False)

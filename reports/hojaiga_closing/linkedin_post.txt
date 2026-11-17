@@ -1,0 +1,24 @@
+For the last 12 weeks I built Hojaiga: a Windows assistant meant to learn any app on its own and then do real work in it. Open the app, understand its menus, do the task, and prove the result before saying "done".
+
+Today I'm closing it as a research project and opening it to anyone who wants to continue it.
+
+What I built (Aug to Nov 2026, solo, with AI coding assistants):
+- A scanner that learns an app from its own files and its live interface. PowerPoint's full ribbon (about 360 controls and 980 menu items) mapped in about 5 minutes; a program that was never opened had its menus and shortcuts read from its executable in about 1 second.
+- A "virtual mouse" that clicks, drags and scrolls inside apps without moving the user's real cursor.
+- A proof step: a task only counts as done when the saved file or the window shows the result. Example: a table moved from Excel into PowerPoint, 24 of 24 cells verified.
+- A safety layer that stops and asks before paying, sending or deleting anything.
+- 107 commits, about 230k lines of Python, 29 test suites.
+
+What I learned:
+Small local models (2 to 8B parameters on a 6 GB laptop GPU) were not enough to be both the eyes and the brain. My fine-tuned 4B model scored 39% on held-out tests against 53% for the untouched base model: it got better at choosing actions and worse at seeing. Structure (UI trees, reverse engineering, Office's object model) made things reliable where it existed, and broke on modern apps.
+
+What finally worked was a hybrid. A strong hosted model, on the user's own API key, teaches; the local "brain" checks every step, keeps only what was proven, and turns the API off as it learns. That is the version I'm releasing.
+
+Credit where it's due: in October I built Hojaiga's teaching layer (see the screen, point at the button, explain it) after studying Clicky, the open-source AI teacher by Farza. Clicky, now HeyClicky, does that experience better than I could on my own, so instead of competing I'm stopping here and sharing what I built and measured.
+
+Full write-up with diagrams, results and failures: [link to report]
+Code: [link to repo]
+
+If you work on computer-use agents, take whatever is useful.
+
+#AI #ComputerUse #Automation #OpenSource #BuildInPublic
