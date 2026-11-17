@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Machine Learning with Python: Interactive Lab</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--ink:#1d2433;--mu:#5b6475;--bd:#dde2ec;--ac:#3b5bdb;--ok:#2f9e44;--bad:#e03131;--code:#1e2230}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1220;--card:#181c30;--ink:#e8eaf6;--mu:#9aa3bf;--bd:#2c3252;--ac:#818cf8;--code:#0a0d18}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,sans-serif}
+main{max-width:960px;margin:0 auto;padding:16px}
+h1{font-size:1.7rem;margin:8px 0 4px}
+h2{font-size:1.3rem;margin:0 0 8px}
+h3{font-size:1.02rem;margin:14px 0 6px}
+section{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px;margin:18px 0;scroll-margin-top:10px}
+nav{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--bd)}
+nav a{font-size:13px;padding:4px 10px;border:1px solid var(--bd);border-radius:999px;color:var(--ink);text-decoration:none;background:var(--card)}
+pre{background:var(--code);color:#dfe6f7;padding:12px;border-radius:8px;overflow-x:auto;font:13px/1.5 ui-monospace,Consolas,monospace;margin:8px 0}
+pre.out{background:#e7f5e9;color:#1c4d2a}
+@media (prefers-color-scheme:dark){pre.out{background:#12301f;color:#bff0cf}}
+button{font:inherit;padding:6px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--ink);cursor:pointer}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+input[type=range]{width:200px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.plot{width:100%;max-width:440px;height:auto;background:#fafbfd;border:1px solid var(--bd);border-radius:8px}
+@media (prefers-color-scheme:dark){.plot{background:#11152a}}
+.info{font:14px ui-monospace,Consolas,monospace;background:var(--bg);padding:8px 10px;border-radius:8px;margin:6px 0}
+.note{color:var(--mu);font-size:14px}
+.tip{border-left:4px solid var(--ac);padding:6px 10px;background:var(--bg);border-radius:6px;margin:8px 0;font-size:15px}
+table{border-collapse:collapse;margin:6px 0;font-size:14px}
+td,th{border:1px solid var(--bd);padding:5px 9px;text-align:left}
+.q{border:1px solid var(--bd);border-radius:10px;padding:12px;margin:10px 0}
+.opt{display:block;width:100%;text-align:left;margin:4px 0}
+.opt.ok{background:#d3f9d8;border-color:var(--ok)}
+.opt.bad{background:#ffe3e3;border-color:var(--bad)}
+.why{font-size:14px;color:var(--mu);margin-top:6px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:720px){.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<h1>Machine Learning with Python: Interactive Lab</h1>
+<p class="note">Notes, code, live visualizations, and a quiz that changes every time. Work through the sections in order, or jump with the menu.</p>
+<nav>
+  <a href="#py">Python</a><a href="#np">NumPy</a><a href="#pd">Pandas</a><a href="#mpl">Matplotlib</a>
+  <a href="#types">ML types</a><a href="#math">Math</a><a href="#lin">Linear regression</a><a href="#log">Logistic</a>
+  <a href="#tree">Decision tree</a><a href="#forest">Random forest</a><a href="#knn">KNN</a><a href="#nb">Naive Bayes</a>
+  <a href="#svm">SVM</a><a href="#km">K-means</a><a href="#hc">Hierarchical</a><a href="#ap">Apriori</a><a href="#quiz">Quiz</a>
+</nav>
+
+<section id="py">
+<h2>1. Python refresher</h2>
+<p>Machine learning in Python uses a few core habits: lists for collections, list comprehensions for transforming them, and functions for reusable steps. Only basic Python is needed.</p>
+<pre>nums = [3, 7, 10]
+squares = [n**2 for n in nums]
+print(squares)</pre>
+<pre class="out">[9, 49, 100]</pre>
+</section>
+
+<section id="np">
+<h2>2. NumPy: arrays for fast maths</h2>
+<p>NumPy stores numbers in arrays. Operations apply to every element at once, with no loop needed. This is the base for almost every other library here.</p>
+<pre>import numpy as np
+a = np.array([1, 2, 3, 4])
+print(a.shape)     # (4,)
+print(a.mean())    # 2.5
+print(a * 2)       # every element doubled</pre>
+<pre class="out">(4,)
+2.5
+[2 4 6 8]</pre>
+</section>
+
+<section id="pd">
+<h2>3. Pandas: tables (DataFrames)</h2>
+<p>A DataFrame is a table with named columns. Machine learning datasets usually arrive as one, and you split it into features (inputs, X) and the target (output, y).</p>
+<pre>import pandas as pd
+df = pd.DataFrame({"hours": [1, 2, 3, 4], "passed": [0, 0, 1, 1]})
+X = df[["hours"]]     # features
+y = df["passed"]      # target
+print(df.shape)</pre>
+<pre class="out">(4, 2)</pre>
+</section>
+
+<section id="mpl">
+<h2>4. Matplotlib: seeing the data</h2>
+<p>Plot the data before modelling. A scatter plot shows whether a straight line makes sense, and outliers stand out immediately.</p>
+<pre>import matplotlib.pyplot as plt
+plt.scatter(X, y)
+plt.xlabel("hours studied")
+plt.ylabel("passed")
+plt.show()</pre>
+</section>
+
+<section id="types">
+<h2>5. Types of machine learning</h2>
+<table>
+<tr><th>Type</th><th>Data has labels?</th><th>Goal</th><th>Examples</th></tr>
+<tr><td>Supervised: regression</td><td>Yes, numbers</td><td>Predict a number</td><td>Linear regression</td></tr>
+<tr><td>Supervised: classification</td><td>Yes, categories</td><td>Predict a class</td><td>Logistic regression, trees, KNN, Naive Bayes, SVM</td></tr>
+<tr><td>Unsupervised: clustering</td><td>No</td><td>Find groups</td><td>K-means, hierarchical</td></tr>
+<tr><td>Unsupervised: association</td><td>No</td><td>Find items that occur together</td><td>Apriori</td></tr>
+</table>
+<p class="tip">Train/test split keeps an honest score. Fit the model on the training part, and measure accuracy on the test part it has never seen.</p>
+<pre>from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</pre>
+</section>
+
+<section id="math">
+<h2>6. The maths you will meet</h2>
+<ul>
+<li><b>Error:</b> prediction minus true value.</li>
+<li><b>Mean squared error (MSE):</b> average of the squared errors. Lower is better.</li>
+<li><b>Gradient:</b> the slope of the loss. Stepping against it moves downhill.</li>
+<li><b>Probability:</b> numbers between 0 and 1. Bayes' rule updates a probability with new evidence.</li>
+<li><b>Distance:</b> Euclidean distance between points, the square root of summed squared differences.</li>
+</ul>
+</section>
+
+<section id="lin">
+<h2>7. Linear regression and gradient descent</h2>
+<p>A line <code>y = w·x + b</code> is fitted by making the MSE as small as possible. Use the sliders to fit by hand, or let gradient descent walk downhill on its own.</p>
+<div class="grid2">
+<div>
+<svg id="linSvg" class="plot" viewBox="0 0 400 300"></svg>
+<div class="info" id="linInfo"></div>
+</div>
+<div>
+<div class="row">w <input type="range" id="wS" min="0" max="4" step="0.01" value="0.5"><span id="wV"></span></div>
+<div class="row">b <input type="range" id="bS" min="-3" max="3" step="0.01" value="0.2"><span id="bV"></span></div>
+<div class="row">learning rate <input type="range" id="lr" min="0.001" max="0.03" step="0.001" value="0.01"><span id="lrV"></span></div>
+<div class="row"><button class="p" id="gd">Run gradient descent</button><button id="cf">Show exact fit</button></div>
+<div class="info" id="gdLog">Press run to watch the line settle.</div>
+<div class="info" id="cfInfo"></div>
+</div>
+</div>
+<pre>from sklearn.linear_model import LinearRegression
+model = LinearRegression().fit(X, y)
+print(model.coef_, model.intercept_)   # slope w and intercept b</pre>
+<p class="note">Gradient step: w ← w − lr × ∂MSE/∂w, and b is updated the same way. Each step moves both values a little toward the lowest loss.</p>
+</section>
+
+<section id="log">
+<h2>8. Logistic regression for classification</h2>
+<p>Logistic regression feeds a straight-line score into the sigmoid, which squashes any number into a probability between 0 and 1. Predict class 1 when the probability is at least 0.5.</p>
+<div class="grid2">
+<div><svg id="logSvg" class="plot" viewBox="0 0 400 260"></svg></div>
+<div>
+<div class="row">weight w <input type="range" id="lw" min="-3" max="3" step="0.05" value="1.5"><span id="lwV"></span></div>
+<div class="row">bias b <input type="range" id="lbS" min="-6" max="6" step="0.1" value="-3"><span id="lbV"></span></div>
+<div class="info" id="logInfo"></div>
+</div>
+</div>
+<pre>from sklearn.linear_model import LogisticRegression
+clf = LogisticRegression().fit(X, y)
+print(clf.predict_proba(X)[:3])</pre>
+</section>
+
+<section id="tree">
+<h2>9. Decision trees</h2>
+<p>A tree asks a question at each node, such as "is hours ≤ 5?", and splits the data. A good split leaves each side as pure as possible. Impurity is measured with Gini: 0 means pure, 0.5 means a 50/50 mix.</p>
+<svg id="treeSvg" class="plot" viewBox="0 0 440 120" style="max-width:100%"></svg>
+<div class="row">threshold <input type="range" id="thr" min="2.5" max="11.5" step="0.5" value="5.5"><span id="thrV"></span></div>
+<div class="info" id="treeInfo"></div>
+<div class="row"><button id="bestT" class="p">Find the best split</button></div>
+<div class="info" id="bestInfo"></div>
+<pre>from sklearn.tree import DecisionTreeClassifier
+tree = DecisionTreeClassifier(max_depth=3).fit(X, y)</pre>
+</section>
+
+<section id="forest">
+<h2>10. Random forest</h2>
+<p>A forest trains many trees, each on a bootstrap sample: rows drawn with replacement. Rows never drawn are "out-of-bag". The forest's prediction is the majority vote of all trees.</p>
+<div class="row"><button class="p" id="boot">Draw 4 bootstrap samples</button></div>
+<div id="bootOut"></div>
+<pre>from sklearn.ensemble import RandomForestClassifier
+forest = RandomForestClassifier(n_estimators=100).fit(X, y)</pre>
+</section>
+
+<section id="knn">
+<h2>11. K-nearest neighbours (KNN)</h2>
+<p>KNN has no training step. To classify a new point, measure its distance to every training point, take the k closest, and vote. Click the chart to place a new point.</p>
+<div class="grid2">
+<div><svg id="knnSvg" class="plot" viewBox="0 0 400 400" style="cursor:crosshair"></svg></div>
+<div>
+<div class="row">k <input type="range" id="kS" min="1" max="7" step="1" value="3"><span id="kV"></span></div>
+<div class="info" id="knnInfo">Click anywhere on the chart.</div>
+</div>
+</div>
+<pre>from sklearn.neighbors import KNeighborsClassifier
+knn = KNeighborsClassifier(n_neighbors=3).fit(X, y)</pre>
+</section>
+
+<section id="nb">
+<h2>12. Naive Bayes</h2>
+<p>Naive Bayes multiplies the prior probability of each class by the probability of each observed word, assuming the words are independent given the class. Then it normalizes the two scores.</p>
+<table>
+<tr><th></th><th>Spam</th><th>Not spam</th></tr>
+<tr><td>Prior P(class)</td><td>0.4</td><td>0.6</td></tr>
+<tr><td>P("free" | class)</td><td>0.6</td><td>0.1</td></tr>
+<tr><td>P("meeting" | class)</td><td>0.1</td><td>0.5</td></tr>
+</table>
+<div class="row"><label><input type="checkbox" id="wFree" checked> contains "free"</label><label><input type="checkbox" id="wMeet"> contains "meeting"</label></div>
+<div class="info" id="nbInfo"></div>
+<pre>from sklearn.naive_bayes import MultinomialNB
+nb = MultinomialNB().fit(X_counts, y)</pre>
+</section>
+
+<section id="svm">
+<h2>13. Support vector machines</h2>
+<p>An SVM looks for the line with the widest margin between two classes. The margin width is 2 / ‖w‖, so a smaller weight vector gives a wider margin. Points on the margin edges are the support vectors.</p>
+<div class="grid2">
+<div><svg id="svmSvg" class="plot" viewBox="0 0 360 300"></svg></div>
+<div>
+<div class="row">w₁ <input type="range" id="w1" min="-2" max="2" step="0.1" value="1"><span id="w1V"></span></div>
+<div class="row">w₂ <input type="range" id="w2" min="-2" max="2" step="0.1" value="0"><span id="w2V"></span></div>
+<div class="row">b <input type="range" id="sb" min="-8" max="2" step="0.1" value="-2"><span id="sbV"></span></div>
+<div class="info" id="svmInfo"></div>
+</div>
+</div>
+<pre>from sklearn.svm import SVC
+svm = SVC(kernel="linear").fit(X, y)</pre>
+</section>
+
+<section id="km">
+<h2>14. K-means clustering</h2>
+<p>K-means picks k centres, assigns each point to its nearest centre, moves each centre to the mean of its points, and repeats until nothing changes.</p>
+<div class="grid2">
+<div><svg id="kmSvg" class="plot" viewBox="0 0 360 300"></svg></div>
+<div>
+<div class="row"><button class="p" id="kmStep">Next iteration</button><button id="kmReset">Reset</button></div>
+<div class="info" id="kmInfo"></div>
+</div>
+</div>
+<pre>from sklearn.cluster import KMeans
+km = KMeans(n_clusters=2, random_state=0).fit(X)
+print(km.labels_)</pre>
+</section>
+
+<section id="hc">
+<h2>15. Hierarchical clustering</h2>
+<p>Hierarchical clustering starts with every point alone and repeatedly merges the two closest clusters. Single linkage measures the distance between clusters by their closest members.</p>
+<div class="row"><button class="p" id="hcStep">Merge next pair</button><button id="hcReset">Reset</button></div>
+<div class="info" id="hcInfo"></div>
+<pre>from sklearn.cluster import AgglomerativeClustering
+hc = AgglomerativeClustering(n_clusters=2, linkage="single").fit(X)</pre>
+</section>
+
+<section id="ap">
+<h2>16. Apriori: items bought together</h2>
+<p>Support is the fraction of transactions containing an itemset. Apriori keeps only itemsets whose support meets a minimum, and it only extends sets that were already frequent.</p>
+<div class="row">minimum count <input type="range" id="minSup" min="1" max="5" step="1" value="3"><span id="minSupV"></span></div>
+<div class="info" id="apInfo"></div>
+<pre>from mlxtend.frequent_patterns import apriori
+frequent = apriori(onehot_df, min_support=0.6, use_colnames=True)</pre>
+</section>
+
+<section id="quiz">
+<h2>17. Quiz</h2>
+<p class="note">Every question is generated fresh from random data, so the numbers and answer choices change every time. Answers are computed by the same formulas taught above.</p>
+<div class="row"><button class="p" id="newQuiz">New questions</button><span class="info" id="score">Score: 0 / 0</span></div>
+<div id="quizBox"></div>
+</section>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, a, p) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+const clear = s => { s.innerHTML = ""; };
+const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const bindRange = (id, vid, f) => { const r = $("#" + id), v = $("#" + vid), go = () => { v.textContent = (+r.value).toFixed(2); f(+r.value); }; r.addEventListener("input", go); go(); };
+
+/* ---------- 7. Linear regression ---------- */
+const LX = [1, 2, 3, 4, 5, 6], LY = [2.1, 3.9, 6.2, 7.8, 10.1, 12.2];
+const mse = (w, b) => LX.reduce((s, x, i) => s + (w * x + b - LY[i]) ** 2, 0) / LX.length;
+const grad = (w, b) => { let dw = 0, db = 0; LX.forEach((x, i) => { const e = w * x + b - LY[i]; dw += e * x; db += e; }); return [2 * dw / LX.length, 2 * db / LX.length]; };
+function drawLin(w, b) {
+  const s = $("#linSvg"); clear(s); const W = 400, H = 300, P = 30;
+  const X = x => P + x / 7 * (W - 2 * P), Y = y => H - P - y / 14 * (H - 2 * P);
+  el("line", { x1: P, y1: H - P, x2: W - P, y2: H - P, stroke: "#999" }, s);
+  el("line", { x1: P, y1: P, x2: P, y2: H - P, stroke: "#999" }, s);
+  LX.forEach((x, i) => el("line", { x1: X(x), y1: Y(x * w + b), x2: X(x), y2: Y(LY[i]), stroke: "#e03131", "stroke-dasharray": "3 3" }, s));
+  el("line", { x1: X(0), y1: Y(b), x2: X(7), y2: Y(7 * w + b), stroke: "#e8590c", "stroke-width": 3 }, s);
+  LX.forEach((x, i) => el("circle", { cx: X(x), cy: Y(LY[i]), r: 5, fill: "#3b5bdb" }, s));
+  $("#linInfo").textContent = `w = ${w.toFixed(2)}, b = ${b.toFixed(2)}, MSE = ${mse(w, b).toFixed(3)}`;
+}
+bindRange("wS", "wV", w => drawLin(w, +$("#bS").value));
+bindRange("bS", "bV", b => drawLin(+$("#wS").value, b));
+bindRange("lr", "lrV", () => {});
+let gdT = null;
+$("#gd").onclick = () => {
+  clearInterval(gdT); let w = 0, b = 0, step = 0; const lr = +$("#lr").value;
+  gdT = setInterval(() => {
+    for (let k = 0; k < 8; k++) { const [dw, db] = grad(w, b); w -= lr * dw; b -= lr * db; step++; }
+    $("#wS").value = w; $("#bS").value = b; $("#wV").textContent = w.toFixed(2); $("#bV").textContent = b.toFixed(2);
+    drawLin(w, b); $("#gdLog").textContent = `step ${step}: loss ${mse(w, b).toFixed(4)}`;
+    if (step >= 400) clearInterval(gdT);
+  }, 50);
+};
+$("#cf").onclick = () => {
+  const n = LX.length, mx = LX.reduce((a, b) => a + b) / n, my = LY.reduce((a, b) => a + b) / n;
+  const w = LX.reduce((s, x, i) => s + (x - mx) * (LY[i] - my), 0) / LX.reduce((s, x) => s + (x - mx) ** 2, 0);
+  const b = my - w * mx;
+  $("#wS").value = w; $("#bS").value = b; $("#wV").textContent = w.toFixed(2); $("#bV").textContent = b.toFixed(2);
+  drawLin(w, b); $("#cfInfo").textContent = `Exact least squares: w = ${w.toFixed(3)}, b = ${b.toFixed(3)}, MSE = ${mse(w, b).toFixed(3)}`;
+};
+drawLin(0.5, 0.2);
+
+/* ---------- 8. Logistic ---------- */
+const sig = z => 1 / (1 + Math.exp(-z));
+function drawLog(w, b) {
+  const s = $("#logSvg"); clear(s); const W = 400, H = 260, P = 30;
+  const X = x => P + (x + 6) / 12 * (W - 2 * P), Y = p => H - P - p * (H - 2 * P);
+  el("line", { x1: P, y1: Y(0), x2: W - P, y2: Y(0), stroke: "#999" }, s);
+  el("line", { x1: P, y1: Y(0), x2: P, y2: Y(1), stroke: "#999" }, s);
+  el("line", { x1: P, y1: Y(0.5), x2: W - P, y2: Y(0.5), stroke: "#2f9e44", "stroke-dasharray": "4 4" }, s);
+  let d = "";
+  for (let x = -6; x <= 6; x += 0.1) d += (d ? "L" : "M") + X(x).toFixed(1) + " " + Y(sig(w * x + b)).toFixed(1);
+  el("path", { d, fill: "none", stroke: "#3b5bdb", "stroke-width": 3 }, s);
+  if (Math.abs(w) > 1e-6) { const xb = -b / w; el("line", { x1: X(xb), y1: Y(0), x2: X(xb), y2: Y(1), stroke: "#e8590c", "stroke-dasharray": "3 3" }, s); }
+  $("#logInfo").textContent = Math.abs(w) > 1e-6
+    ? `Boundary at x = ${(-b / w).toFixed(2)}. Above it, class 1 is predicted. Sigmoid(0) = 0.5.`
+    : "w = 0 gives a flat probability: no boundary.";
+}
+bindRange("lw", "lwV", w => drawLog(w, +$("#lbS").value));
+bindRange("lbS", "lbV", b => drawLog(+$("#lw").value, b));
+
+/* ---------- 9. Decision tree ---------- */
+const TX = [2, 3, 5, 6, 8, 9, 11, 12], TY = [0, 0, 0, 1, 1, 1, 0, 1];
+const gini = ys => { if (!ys.length) return 0; const p = ys.reduce((a, b) => a + b, 0) / ys.length; return 1 - (p * p + (1 - p) * (1 - p)); };
+function split(t) {
+  const L = TY.filter((_, i) => TX[i] <= t), R = TY.filter((_, i) => TX[i] > t);
+  return { L, R, g: (L.length * gini(L) + R.length * gini(R)) / TX.length };
+}
+function drawTree(t) {
+  const s = $("#treeSvg"); clear(s); const X = x => 20 + (x - 1) / 13 * 400;
+  el("line", { x1: 20, y1: 60, x2: 420, y2: 60, stroke: "#999" }, s);
+  TX.forEach((x, i) => el("circle", { cx: X(x), cy: 60, r: 9, fill: TY[i] ? "#e8590c" : "#3b5bdb", stroke: "#fff", "stroke-width": 2 }, s));
+  el("line", { x1: X(t), y1: 10, x2: X(t), y2: 110, stroke: "#2f9e44", "stroke-width": 3, "stroke-dasharray": "5 3" }, s);
+  el("text", { x: 20, y: 110, "font-size": 11, fill: "#5b6475" }, s).textContent = "blue = class 0, orange = class 1";
+  const r = split(t);
+  $("#treeInfo").textContent = `Split at x ≤ ${t}: left ${r.L.length} pts (Gini ${gini(r.L).toFixed(3)}), right ${r.R.length} pts (Gini ${gini(r.R).toFixed(3)}), weighted Gini = ${r.g.toFixed(3)}`;
+}
+bindRange("thr", "thrV", t => drawTree(t));
+$("#bestT").onclick = () => {
+  let best = null;
+  for (let t = 2.5; t <= 11.5; t += 0.5) { const r = split(t); if (!best || r.g < best.g) best = { t, g: r.g }; }
+  $("#thr").value = best.t; $("#thrV").textContent = best.t.toFixed(2); drawTree(best.t);
+  $("#bestInfo").textContent = `Lowest weighted Gini: ${best.g.toFixed(3)} at threshold ${best.t}. The tree picks this kind of split at every node.`;
+};
+
+/* ---------- 10. Random forest ---------- */
+$("#boot").onclick = () => {
+  let h = ""; const n = 8;
+  for (let t = 1; t <= 4; t++) {
+    const pick = Array.from({ length: n }, () => rnd(0, n - 1));
+    const used = [...new Set(pick)].sort((a, b) => a - b), oob = [...Array(n).keys()].filter(i => !used.includes(i));
+    h += `<div class="info"><b>Tree ${t}</b> sample rows: [${pick.join(", ")}]<br>unique rows used: ${used.length} of ${n} · out-of-bag rows: [${oob.join(", ") || "none"}]</div>`;
+  }
+  $("#bootOut").innerHTML = h + `<p class="note">On average about 63% of rows appear in each bootstrap sample, so each tree sees a slightly different dataset. That variety is what makes the vote strong.</p>`;
+};
+
+/* ---------- 11. KNN ---------- */
+const KP = [[1, 2, 0], [2, 1, 0], [2, 3, 0], [3, 2, 0], [1, 4, 0], [3.5, 4.5, 0], [6, 6, 1], [7, 5, 1], [6, 8, 1], [8, 7, 1], [7, 3, 1], [5, 7.5, 1]];
+let knnQ = null;
+function drawKnn() {
+  const s = $("#knnSvg"); clear(s); const k = +$("#kS").value, X = x => x / 10 * 400, Y = y => 400 - y / 10 * 400;
+  for (let g = 0; g <= 10; g += 2) { el("line", { x1: X(g), y1: 0, x2: X(g), y2: 400, stroke: "#e6e9f0" }, s); el("line", { x1: 0, y1: Y(g), x2: 400, y2: Y(g), stroke: "#e6e9f0" }, s); }
+  let info = "Click anywhere on the chart.";
+  if (knnQ) {
+    const d = KP.map(p => ({ p, d: Math.hypot(p[0] - knnQ[0], p[1] - knnQ[1]) })).sort((a, b) => a.d - b.d);
+    const near = d.slice(0, k); near.forEach(o => el("line", { x1: X(knnQ[0]), y1: Y(knnQ[1]), x2: X(o.p[0]), y2: Y(o.p[1]), stroke: "#868e96", "stroke-dasharray": "4 3" }, s));
+    const votes = [0, 0]; near.forEach(o => votes[o.p[2]]++);
+    const label = votes[0] === votes[1] ? "tie" : (votes[1] > votes[0] ? "orange" : "blue");
+    el("circle", { cx: X(knnQ[0]), cy: Y(knnQ[1]), r: 9, fill: "none", stroke: "#2f9e44", "stroke-width": 3 }, s);
+    info = `Query (${knnQ[0].toFixed(1)}, ${knnQ[1].toFixed(1)}). ${k} nearest: ${near.map(o => `(${o.p[0]},${o.p[1]}) d=${o.d.toFixed(2)}`).join(", ")}. Votes: blue ${votes[0]}, orange ${votes[1]} → predicted <b>${label}</b>.`;
+  }
+  KP.forEach(p => el("circle", { cx: X(p[0]), cy: Y(p[1]), r: 7, fill: p[2] ? "#e8590c" : "#3b5bdb", stroke: "#fff", "stroke-width": 2 }, s));
+  $("#kV").textContent = k; $("#knnInfo").innerHTML = info;
+}
+$("#knnSvg").addEventListener("click", e => { const r = e.currentTarget.getBoundingClientRect(); knnQ = [((e.clientX - r.left) / r.width) * 10, 10 - ((e.clientY - r.top) / r.height) * 10]; drawKnn(); });
+$("#kS").addEventListener("input", drawKnn); drawKnn();
+
+/* ---------- 12. Naive Bayes ---------- */
+function drawNB() {
+  const P = { s: 0.4, h: 0.6 }, lf = { s: 0.6, h: 0.1 }, lm = { s: 0.1, h: 0.5 };
+  const f = $("#wFree").checked, m = $("#wMeet").checked;
+  const sc = { s: P.s * (f ? lf.s : 1 - lf.s) * (m ? lm.s : 1 - lm.s), h: P.h * (f ? lf.h : 1 - lf.h) * (m ? lm.h : 1 - lm.h) };
+  const ps = sc.s / (sc.s + sc.h);
+  $("#nbInfo").innerHTML = `Spam score = 0.4 × ${f ? 0.6 : 0.4} × ${m ? 0.1 : 0.9} = ${sc.s.toFixed(4)}<br>Not-spam score = 0.6 × ${f ? 0.1 : 0.9} × ${m ? 0.5 : 0.5} = ${sc.h.toFixed(4)}<br>P(spam | words) = <b>${ps.toFixed(3)}</b> → ${ps >= 0.5 ? "SPAM" : "NOT SPAM"}`;
+}
+["wFree", "wMeet"].forEach(id => $("#" + id).addEventListener("change", drawNB)); drawNB();
+
+/* ---------- 13. SVM ---------- */
+const POS = [[3, 3], [4, 4], [4, 2], [5, 3]], NEG = [[1, 1], [0, 2], [1, 3], [0, 0]];
+function drawSvm() {
+  const s = $("#svmSvg"); clear(s); const w1 = +$("#w1").value, w2 = +$("#w2").value, b = +$("#sb").value;
+  $("#w1V").textContent = w1.toFixed(1); $("#w2V").textContent = w2.toFixed(1); $("#sbV").textContent = b.toFixed(1);
+  const W = 360, H = 300, X = x => 20 + x / 6 * (W - 40), Y = y => H - 20 - y / 6 * (H - 40);
+  const f = (x, y) => w1 * x + w2 * y + b;
+  // draw lines f = c for c = -1, 0, 1 by sampling the x range
+  const draw = c => {
+    const pts = [];
+    if (Math.abs(w2) > 1e-6) { pts.push([0, (c - b - w1 * 0) / w2], [6, (c - b - w1 * 6) / w2]); }
+    else if (Math.abs(w1) > 1e-6) { const x = (c - b) / w1; pts.push([x, 0], [x, 6]); }
+    if (pts.length === 2) el("line", { x1: X(pts[0][0]), y1: Y(pts[0][1]), x2: X(pts[1][0]), y2: Y(pts[1][1]), stroke: c === 0 ? "#2f9e44" : "#adb5bd", "stroke-width": c === 0 ? 3 : 1.5, "stroke-dasharray": c === 0 ? "" : "5 4" }, s);
+  };
+  draw(-1); draw(0); draw(1);
+  POS.forEach(p => el("circle", { cx: X(p[0]), cy: Y(p[1]), r: 6, fill: "#e8590c" }, s));
+  NEG.forEach(p => el("circle", { cx: X(p[0]), cy: Y(p[1]), r: 6, fill: "#3b5bdb" }, s));
+  const norm = Math.hypot(w1, w2);
+  const wrong = [...POS.map(p => f(...p) > 0), ...NEG.map(p => f(...p) < 0)].filter(v => !v).length;
+  $("#svmInfo").textContent = norm < 1e-6 ? "w = 0 cannot separate anything." :
+    `Margin width = 2/‖w‖ = ${(2 / norm).toFixed(3)}. Misclassified points: ${wrong}. Green = boundary, dashed = margin edges.`;
+}
+["w1", "w2", "sb"].forEach(id => $("#" + id).addEventListener("input", drawSvm)); drawSvm();
+
+/* ---------- 14. K-means ---------- */
+const KM = [[1, 1], [1.5, 2], [1, 2], [6, 6], [5.5, 6.5], [6.5, 5.5], [3.5, 3.5]];
+let kmC, kmIt, kmDone;
+const kmInit = () => { kmC = [[1, 1], [6, 6]]; kmIt = 0; kmDone = false; kmDraw(null); };
+function kmDraw(assign) {
+  const s = $("#kmSvg"); clear(s); const W = 360, H = 300, X = x => 20 + x / 7 * (W - 40), Y = y => H - 20 - y / 7 * (H - 40);
+  KM.forEach((p, i) => el("circle", { cx: X(p[0]), cy: Y(p[1]), r: 6, fill: assign ? ["#3b5bdb", "#e8590c"][assign[i]] : "#868e96" }, s));
+  kmC.forEach((c, j) => el("rect", { x: X(c[0]) - 7, y: Y(c[1]) - 7, width: 14, height: 14, fill: ["#3b5bdb", "#e8590c"][j], stroke: "#000" }, s));
+  $("#kmInfo").textContent = `Iteration ${kmIt}. Centres: ${kmC.map(c => `(${c[0].toFixed(2)}, ${c[1].toFixed(2)})`).join(" ")}` + (kmDone ? " → converged, nothing moved." : "");
+}
+$("#kmStep").onclick = () => {
+  if (kmDone) return;
+  const assign = KM.map(p => { const d = kmC.map(c => Math.hypot(p[0] - c[0], p[1] - c[1])); return d[0] <= d[1] ? 0 : 1; });
+  const newC = kmC.map((_, j) => { const pts = KM.filter((_, i) => assign[i] === j); return [pts.reduce((a, p) => a + p[0], 0) / pts.length, pts.reduce((a, p) => a + p[1], 0) / pts.length]; });
+  kmIt++; kmDone = newC.every((c, j) => Math.abs(c[0] - kmC[j][0]) < 1e-9 && Math.abs(c[1] - kmC[j][1]) < 1e-9);
+  kmC = newC; kmDraw(assign);
+};
+$("#kmReset").onclick = kmInit; kmInit();
+
+/* ---------- 15. Hierarchical ---------- */
+let hcClusters, hcLog;
+const hcReset = () => { hcClusters = [[1], [2], [5], [6], [9], [10]].map(a => a.slice()); hcLog = []; hcShow(); };
+const hcName = c => `{${c.join(", ")}}`;
+function hcShow() {
+  $("#hcInfo").innerHTML = `Current clusters: ${hcClusters.map(hcName).join(" ")}<br>` + (hcLog.length ? hcLog.map((l, i) => `${i + 1}. ${l}`).join("<br>") : "No merges yet. Points are 1, 2, 5, 6, 9, 10.");
+}
+$("#hcStep").onclick = () => {
+  if (hcClusters.length <= 1) { hcShow(); return; }
+  let best = null;
+  for (let i = 0; i < hcClusters.length; i++) for (let j = i + 1; j < hcClusters.length; j++) {
+    const d = Math.min(...hcClusters[i].flatMap(a => hcClusters[j].map(b => Math.abs(a - b))));
+    if (!best || d < best.d) best = { i, j, d };
+  }
+  const merged = [...hcClusters[best.i], ...hcClusters[best.j]];
+  hcLog.push(`merge ${hcName(hcClusters[best.i])} + ${hcName(hcClusters[best.j])} at single-linkage distance ${best.d}`);
+  hcClusters = hcClusters.filter((_, k) => k !== best.i && k !== best.j); hcClusters.push(merged); hcShow();
+};
+$("#hcReset").onclick = hcReset; hcReset();
+
+/* ---------- 16. Apriori ---------- */
+const TR = [["bread", "milk"], ["bread", "diaper", "beer", "eggs"], ["milk", "diaper", "beer", "cola"], ["bread", "milk", "diaper", "beer"], ["bread", "milk", "diaper", "cola"]];
+function drawAp() {
+  const m = +$("#minSup").value; $("#minSupV").textContent = m;
+  const items = [...new Set(TR.flat())].sort();
+  const one = items.map(it => [it, TR.filter(t => t.includes(it)).length]).filter(x => x[1] >= m);
+  const pairs = [];
+  for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) {
+    const c = TR.filter(t => t.includes(items[i]) && t.includes(items[j])).length;
+    if (c >= m) pairs.push([items[i] + " + " + items[j], c]);
+  }
+  $("#apInfo").innerHTML = `Minimum count ${m} of ${TR.length} transactions.<br><b>Frequent single items:</b> ${one.map(x => `${x[0]} (${x[1]})`).join(", ") || "none"}<br><b>Frequent pairs:</b> ${pairs.map(x => `${x[0]} (${x[1]})`).join(", ") || "none"}`;
+}
+$("#minSup").addEventListener("input", drawAp); drawAp();
+
+/* ---------- 17. Quiz (fresh every time) ---------- */
+function mk(text, correct, wrong, why) {
+  const all = shuffle([correct, ...wrong]);
+  return { text, opts: all, ans: all.indexOf(correct), why };
+}
+function numQ(text, val, fmt, why, deltas) {
+  const c = fmt(val), set = new Set([c]), w = [];
+  for (const d of deltas) { const s = fmt(Math.abs(val + d)); if (!set.has(s)) { set.add(s); w.push(s); } if (w.length === 3) break; }
+  return mk(text, c, w, why);
+}
+const f2 = v => v.toFixed(2), f3 = v => v.toFixed(3), fi = v => String(v);
+function qMSE() {
+  const xs = [rnd(1, 5), rnd(1, 5), rnd(2, 6), rnd(3, 7)].map(x => x), ys = xs.map(() => rnd(1, 9));
+  const w = rnd(0, 8) / 4, b = rnd(-2, 2);
+  const e = xs.reduce((s, x, i) => s + (w * x + b - ys[i]) ** 2, 0) / xs.length;
+  return numQ(`Data x = [${xs}], y = [${ys}]. For the line y = ${w}·x + (${b}), what is the MSE?`, e, f2,
+    "MSE = average of (prediction − actual)². Compute each squared error, then divide by the number of points.", [0.5, -0.4, 1.2, -0.8]);
+}
+function qSig() {
+  const z = rnd(-6, 6) / 2;
+  return numQ(`What is the sigmoid σ(z) = 1 / (1 + e^(−z)) when z = ${z}?`, sig(z), f3,
+    "Sigmoid(0) = 0.5. Large positive z gives values near 1, large negative z gives values near 0.", [0.1, -0.15, 0.25, -0.3]);
+}
+function qGini() {
+  const a = rnd(1, 7), b = rnd(1, 7), n = a + b, p = a / n;
+  return numQ(`A node holds ${a} samples of class 0 and ${b} of class 1. What is its Gini impurity?`, 1 - (p * p + (1 - p) * (1 - p)), f3,
+    "Gini = 1 − Σ pᵢ². Pure nodes give 0; an even 50/50 split gives 0.5.", [0.1, -0.2, 0.25, -0.05]);
+}
+function qKNN() {
+  const cols = ["Red", "Blue"], pts = [];
+  while (pts.length < 5) { const d = rnd(1, 9); if (!pts.some(p => p.d === d)) pts.push({ d, c: cols[rnd(0, 1)] }); }
+  pts.sort((a, b) => a.d - b.d); const near = pts.slice(0, 3);
+  const r = near.filter(p => p.c === "Red").length, bl = 3 - r;
+  const winner = r > bl ? "Red" : "Blue";
+  const desc = pts.map(p => `distance ${p.d}: ${p.c}`).join(", ");
+  return mk(`With k = 3, a new point has neighbours at these distances: ${desc}. Which class is predicted?`, winner, ["Blue", "Red", "Cannot decide"].filter(x => x !== winner).slice(0, 2).concat(["Cannot decide"]).filter((v, i, a) => a.indexOf(v) === i).slice(0, 3),
+    "KNN takes the 3 nearest points (smallest distances) and predicts the majority class among them.");
+}
+function qApri() {
+  const items = ["A", "B", "C", "D", "E"], T = [];
+  for (let i = 0; i < 6; i++) T.push(shuffle(items).slice(0, rnd(2, 3)));
+  const pairs = [["A", "B"], ["A", "C"], ["B", "D"], ["C", "E"]], [x, y] = pairs[rnd(0, pairs.length - 1)];
+  const c = T.filter(t => t.includes(x) && t.includes(y)).length;
+  return numQ(`Six transactions: ${T.map(t => "{" + t.join(",") + "}").join(" ")}. How many transactions contain both ${x} and ${y}?`, c, fi,
+    "Support count of an itemset = number of transactions that contain every item in it.", [1, -1, 2, -2]);
+}
+const CONCEPTS = [
+  ["Which algorithm groups unlabeled data?", "K-means", ["Linear regression", "Decision tree", "KNN"], "K-means is unsupervised: it finds clusters without labels."],
+  ["Which quantity does basic linear regression minimise?", "Mean squared error", ["Accuracy", "Entropy", "Support count"], "Least squares minimises the sum of squared errors."],
+  ["A random forest combines:", "Many decision trees by voting or averaging", ["One very deep neural network", "Apriori rules", "A single SVM kernel"], "Bagging many trees on bootstrap samples gives the forest."],
+  ["The sigmoid function outputs values:", "Between 0 and 1", ["Between −1 and 1", "Any real number", "Only integers"], "Sigmoid squashes any input into the (0, 1) range."],
+  ["Naive Bayes assumes that:", "Features are independent given the class", ["Features are always normal", "Data has no labels", "Trees are used"], "The 'naive' part is treating features as independent."],
+  ["The margin width of a linear SVM equals:", "2 / ‖w‖", ["‖w‖ / 2", "2 × ‖w‖", "1 / ‖w‖²"], "The margin between the two margin edges is 2/‖w‖."],
+  ["In Apriori, the support of an itemset is:", "Fraction of transactions containing it", ["Number of items in one transaction", "Confidence of a rule", "Distance between clusters"], "Support = transactions containing the itemset ÷ all transactions."],
+  ["Which split criterion does a classification tree commonly use?", "Gini impurity or entropy", ["Euclidean distance only", "Mean of the target", "Principal components"], "Trees pick splits that make child nodes purer."]
+];
+function qConcept() { const c = CONCEPTS[rnd(0, CONCEPTS.length - 1)]; return mk(c[0], c[1], c[2], c[3]); }
+let QZ = [], score = 0, total = 0;
+function renderQuiz() {
+  const box = $("#quizBox"); box.innerHTML = "";
+  QZ.forEach((q, qi) => {
+    const d = document.createElement("div"); d.className = "q";
+    d.innerHTML = `<b>${qi + 1}. ${q.text}</b>`;
+    q.opts.forEach((o, oi) => {
+      const b = document.createElement("button"); b.className = "opt"; b.textContent = o;
+      b.onclick = () => {
+        if (q.done) return; q.done = true; total++;
+        if (oi === q.ans) { score++; b.classList.add("ok"); } else { b.classList.add("bad"); d.querySelectorAll(".opt")[q.ans].classList.add("ok"); }
+        w.textContent = (oi === q.ans ? "Correct. " : "Not quite. ") + q.why;
+        $("#score").textContent = `Score: ${score} / ${total}`;
+      };
+      d.appendChild(b);
+    });
+    const w = document.createElement("div"); w.className = "why"; d.appendChild(w);
+    box.appendChild(d);
+  });
+}
+function newQuiz() {
+  QZ = [qMSE(), qSig(), qGini(), qKNN(), qApri(), qConcept()];
+  score = 0; total = 0; $("#score").textContent = "Score: 0 / 0"; renderQuiz();
+}
+$("#newQuiz").onclick = newQuiz; newQuiz();
+</script>
+</body>
+</html>

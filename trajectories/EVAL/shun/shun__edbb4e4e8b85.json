@@ -1,0 +1,55 @@
+{
+   "app_metadata": {
+      "app_name": "shun",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure shun on a Windows system",
+   "prerequisite_state": "No application is open, and the user is on a Windows system with PowerShell available.",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Run the installation script using PowerShell",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The installation process of shun begins, and the application window appears."
+      }
+   ],
+   "_meta": {
+      "source_app": "shun",
+      "app_key": "shun",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "shun (瞬)",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:27:46Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

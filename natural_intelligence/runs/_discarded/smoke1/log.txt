@@ -1,0 +1,20 @@
+02:25:24 NI run smoke1 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=0.2 smoke=False
+02:25:24 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+02:25:24 [data] text/ag_news: n=2000 C=4 D=2048 shards=2
+02:25:31 [text/ag_news] vote=0.727 uniform=0.727 best1=0.734 n_val=579 vram=0.09GB 7s
+02:25:31 [data] graph/proteins: n=1113 C=2 D=26 shards=1
+02:25:33 [graph/proteins] vote=0.816 uniform=0.816 best1=0.804 n_val=353 vram=0.05GB 2s
+02:25:33 [data] graph/mutag: n=188 C=2 D=34 shards=1
+02:25:35 [graph/mutag] vote=0.881 uniform=0.881 best1=0.895 n_val=67 vram=0.02GB 2s
+02:25:35 [data] image/cifar10: n=1000 C=10 D=384 shards=1
+02:25:36 [image/cifar10] vote=0.403 uniform=0.403 best1=0.410 n_val=288 vram=0.03GB 2s
+02:25:36 [data] audio/urbansound8k: n=1000 C=10 D=134 shards=1
+02:25:38 [audio/urbansound8k] vote=0.909 uniform=0.909 best1=0.935 n_val=309 vram=0.03GB 2s
+02:25:41 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 1596, "n_val": 343, "base_rate": 0.705539345741272, "inner": {"auc": 0.7523729645691842, "ece": 0.2034459128411101, "brier": 0.21695804595947266, "acc80": 0.8029196858406067}, "outer_conf": {"auc": 0.8345061778905163, "ece": 0.09773881981046137, "brier": 0.1565554141998291, "acc80": 0.8138686418533325}}
+02:25:41 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+02:25:43 [text/ag_news] vote=0.735 uniform=0.735 best1=0.754 n_val=582 vram=0.09GB 2s | grade=0.840 inner_auc=0.825 vs conf_auc=0.813
+02:25:45 [graph/proteins] vote=0.739 uniform=0.739 best1=0.774 n_val=337 vram=0.05GB 2s | grade=0.852 inner_auc=n/a vs conf_auc=n/a
+02:25:47 [graph/mutag] vote=0.885 uniform=0.885 best1=0.904 n_val=52 vram=0.02GB 2s | grade=0.932 inner_auc=n/a vs conf_auc=n/a
+02:25:49 [image/cifar10] vote=0.403 uniform=0.403 best1=0.410 n_val=290 vram=0.03GB 2s | grade=0.798 inner_auc=n/a vs conf_auc=n/a
+02:25:52 [audio/urbansound8k] vote=0.910 uniform=0.910 best1=0.920 n_val=299 vram=0.03GB 2s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+02:25:52 RUN COMPLETE

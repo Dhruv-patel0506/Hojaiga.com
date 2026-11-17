@@ -1,0 +1,37 @@
+{
+   "title": "星阙 Horosa 5.5.1 用户手册",
+   "version": "5.5.1",
+   "sections": [
+      {
+         "title": "一、产品概述",
+         "content": "星阙 Horosa 是一个多功能的占星与命理软件，支持多种占星技法、命理流派、卜筮方法及风水等。"
+      },
+      {
+         "title": "二、安装与启动",
+         "content": "1. 从官网下载最新版本的安装包，双击安装程序进行安装。\n2. 安装完成后，双击桌面快捷方式或从开始菜单启动软件。\n3. 首次启动时，软件会自动检测并安装必要的依赖库。"
+      },
+      {
+         "title": "三、功能介绍",
+         "content": "1. **占星技法**：支持传统占星、现代占星、紫微斗数、印占、七政、希腊星术、命理技法、卜筮技法、风水技法等。\n2. **命盘管理**：支持命盘、事盘、合盘、辅盘、数算等。\n3. **卜筮技法**：支持奇门遁甲、六壬、六爻、太乙神数、宿占、统摄法、皇极经世、五兆、太玄、金口诀、地占、塔罗等。\n4. **工具工作台**：支持 AI 分析、天文馆、黄历、数据库、玄学史、辅助参考等。"
+      },
+      {
+         "title": "四、网页版一键启动(从源码)",
+         "content": "1. **启动**：双击仓库里的 `local\\\\[Horosa_Local_Windows.bat]` —— 有现成构建产物时几秒即开浏览器;首次运行自动补齐内置 Python / Java / Node 运行时并构建(Mongo / Redis 对本产品是可选依赖,默认跳过)。默认在 `127.0.0.1` 上起 网页 `8000` / 排盘 `8899` / 后端 `9999`,端口被占会自动换用空闲口。\n2. **停止**：回到启动时的控制台窗口按 Enter,或直接关闭它(脚本只回收带本产品指纹的进程,绝不误伤其它软件)。设 `HOROSA_NO_BROWSER=1` 可不自动开浏览器。\n3. **首次运行 SmartScreen**：未签名脚本可能触发 Windows 提示,选「更多信息 → 仍要运行」即可。\n4. **Git Bash / WSL 用户**：也可用产品源里的 `start_horosa_local.sh` / `stop_horosa_local.sh`(同一套服务,跨平台)。"
+      }
+   ],
+   "_meta": {
+      "source_app": "Horosa",
+      "app_key": "horosa",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "星阙 Horosa",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:24:36Z",
+      "schema_warnings": [
+         "empty_or_missing_trajectory",
+         "no_high_level_task"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

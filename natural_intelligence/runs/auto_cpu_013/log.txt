@@ -1,0 +1,474 @@
+17:05:16 NI run auto_cpu_013 on CPU; hours=2.0 smoke=False
+17:05:16 explicit task list: ['enc/text/emotion']
+17:05:16 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+17:05:16 [data] enc/text/emotion: n=20000 C=6 D=384 shards=1
+17:05:41 [enc/text/emotion] vote=0.752 uniform=0.752 best1=0.741 n_val=6024 vram=0.00GB 25s
+17:05:52 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 6024, "n_val": 1217, "base_rate": 0.7567789554595947, "inner": {"auc": 0.7947369193297532, "ece": 0.038680075735906747, "brier": 0.14923657476902008, "acc80": 0.8345323801040649}, "outer_conf": {"auc": 0.7701088710860697, "ece": 0.15404189889217462, "brier": 0.17862306535243988, "acc80": 0.8365878462791443}}
+17:05:52 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+17:06:19 [enc/text/emotion] vote=0.749 uniform=0.749 best1=0.752 n_val=6040 vram=0.00GB 28s | grade=0.858 inner_auc=0.820 vs conf_auc=0.788
+17:06:27 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+17:07:03 [enc/text/emotion] vote=0.758 uniform=0.757 best1=0.754 n_val=5944 vram=0.00GB 36s | grade=0.855 inner_auc=0.814 vs conf_auc=0.786
+17:07:12 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+17:07:45 [enc/text/emotion] vote=0.751 uniform=0.748 best1=0.740 n_val=5865 vram=0.00GB 34s | grade=0.858 inner_auc=0.792 vs conf_auc=0.772
+17:07:53 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+17:08:28 [enc/text/emotion] vote=0.745 uniform=0.745 best1=0.747 n_val=6087 vram=0.00GB 35s | grade=0.876 inner_auc=0.826 vs conf_auc=0.809
+17:08:36 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+17:09:00 [enc/text/emotion] vote=0.752 uniform=0.747 best1=0.740 n_val=5985 vram=0.00GB 24s | grade=0.877 inner_auc=0.823 vs conf_auc=0.801
+17:09:06 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+17:09:33 [enc/text/emotion] vote=0.757 uniform=0.749 best1=0.751 n_val=5991 vram=0.00GB 27s | grade=0.881 inner_auc=0.800 vs conf_auc=0.778
+17:09:40 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+17:10:10 [enc/text/emotion] vote=0.754 uniform=0.752 best1=0.749 n_val=6010 vram=0.00GB 30s | grade=0.885 inner_auc=0.789 vs conf_auc=0.763
+17:10:16 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+17:10:45 [enc/text/emotion] vote=0.755 uniform=0.750 best1=0.748 n_val=6023 vram=0.00GB 29s | grade=0.887 inner_auc=0.813 vs conf_auc=0.796
+17:10:51 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+17:11:17 [enc/text/emotion] vote=0.749 uniform=0.745 best1=0.743 n_val=5967 vram=0.00GB 26s | grade=0.887 inner_auc=0.798 vs conf_auc=0.786
+17:11:24 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+17:11:53 [enc/text/emotion] vote=0.751 uniform=0.750 best1=0.746 n_val=6017 vram=0.00GB 29s | grade=0.889 inner_auc=0.828 vs conf_auc=0.814
+17:11:59 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+17:12:24 [enc/text/emotion] vote=0.745 uniform=0.743 best1=0.745 n_val=6001 vram=0.00GB 26s | grade=0.891 inner_auc=0.829 vs conf_auc=0.806
+17:12:30 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+17:12:58 [enc/text/emotion] vote=0.761 uniform=0.761 best1=0.750 n_val=6002 vram=0.00GB 28s | grade=0.875 inner_auc=0.789 vs conf_auc=0.769
+17:13:07 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+17:13:41 [enc/text/emotion] vote=0.754 uniform=0.756 best1=0.744 n_val=5973 vram=0.00GB 34s | grade=0.883 inner_auc=0.808 vs conf_auc=0.785
+17:13:50 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+17:14:25 [enc/text/emotion] vote=0.751 uniform=0.749 best1=0.743 n_val=6091 vram=0.00GB 35s | grade=0.896 inner_auc=0.804 vs conf_auc=0.769
+17:14:33 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+17:15:09 [enc/text/emotion] vote=0.748 uniform=0.749 best1=0.742 n_val=5960 vram=0.00GB 36s | grade=0.896 inner_auc=0.820 vs conf_auc=0.801
+17:15:19 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+17:16:02 [enc/text/emotion] vote=0.753 uniform=0.749 best1=0.749 n_val=5970 vram=0.00GB 43s | grade=0.883 inner_auc=0.798 vs conf_auc=0.775
+17:16:13 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+17:16:56 [enc/text/emotion] vote=0.748 uniform=0.743 best1=0.742 n_val=6032 vram=0.00GB 42s | grade=0.894 inner_auc=0.823 vs conf_auc=0.793
+17:17:08 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+17:17:58 [enc/text/emotion] vote=0.760 uniform=0.762 best1=0.755 n_val=5981 vram=0.00GB 50s | grade=0.884 inner_auc=0.800 vs conf_auc=0.773
+17:18:08 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+17:18:51 [enc/text/emotion] vote=0.746 uniform=0.751 best1=0.744 n_val=6002 vram=0.00GB 42s | grade=0.889 inner_auc=0.825 vs conf_auc=0.795
+17:19:01 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+17:20:02 [enc/text/emotion] vote=0.746 uniform=0.750 best1=0.741 n_val=6028 vram=0.00GB 61s | grade=0.890 inner_auc=0.811 vs conf_auc=0.782
+17:20:23 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+17:22:05 [enc/text/emotion] vote=0.742 uniform=0.746 best1=0.738 n_val=6114 vram=0.00GB 103s | grade=0.889 inner_auc=0.807 vs conf_auc=0.787
+17:22:44 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+17:25:10 [enc/text/emotion] vote=0.756 uniform=0.756 best1=0.751 n_val=5938 vram=0.00GB 146s | grade=0.883 inner_auc=0.833 vs conf_auc=0.802
+17:25:56 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+17:29:25 [enc/text/emotion] vote=0.747 uniform=0.745 best1=0.743 n_val=6151 vram=0.00GB 209s | grade=0.897 inner_auc=0.818 vs conf_auc=0.790
+17:30:14 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+17:33:11 [enc/text/emotion] vote=0.756 uniform=0.757 best1=0.754 n_val=5965 vram=0.00GB 177s | grade=0.898 inner_auc=0.806 vs conf_auc=0.778
+17:33:54 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+17:36:32 [enc/text/emotion] vote=0.736 uniform=0.740 best1=0.734 n_val=6073 vram=0.00GB 158s | grade=0.887 inner_auc=0.825 vs conf_auc=0.798
+17:37:03 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+17:38:52 [enc/text/emotion] vote=0.743 uniform=0.746 best1=0.739 n_val=5924 vram=0.00GB 108s | grade=0.891 inner_auc=0.818 vs conf_auc=0.786
+17:39:18 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+17:41:09 [enc/text/emotion] vote=0.744 uniform=0.748 best1=0.740 n_val=6012 vram=0.00GB 111s | grade=0.897 inner_auc=0.800 vs conf_auc=0.774
+17:41:32 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+17:43:01 [enc/text/emotion] vote=0.759 uniform=0.753 best1=0.755 n_val=5949 vram=0.00GB 89s | grade=0.892 inner_auc=0.820 vs conf_auc=0.800
+17:43:25 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+17:45:31 [enc/text/emotion] vote=0.746 uniform=0.748 best1=0.745 n_val=5946 vram=0.00GB 127s | grade=0.891 inner_auc=0.812 vs conf_auc=0.787
+17:45:59 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+17:47:52 [enc/text/emotion] vote=0.743 uniform=0.742 best1=0.742 n_val=5977 vram=0.00GB 113s | grade=0.895 inner_auc=0.815 vs conf_auc=0.787
+17:48:17 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+17:50:05 [enc/text/emotion] vote=0.748 uniform=0.741 best1=0.745 n_val=5953 vram=0.00GB 108s | grade=0.900 inner_auc=0.811 vs conf_auc=0.780
+17:50:30 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+17:52:16 [enc/text/emotion] vote=0.751 uniform=0.753 best1=0.750 n_val=5938 vram=0.00GB 106s | grade=0.899 inner_auc=0.798 vs conf_auc=0.770
+17:52:48 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+17:54:53 [enc/text/emotion] vote=0.745 uniform=0.742 best1=0.738 n_val=6023 vram=0.00GB 126s | grade=0.899 inner_auc=0.806 vs conf_auc=0.782
+17:55:17 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+17:57:08 [enc/text/emotion] vote=0.747 uniform=0.745 best1=0.744 n_val=5951 vram=0.00GB 111s | grade=0.899 inner_auc=0.830 vs conf_auc=0.787
+17:57:47 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+17:59:36 [enc/text/emotion] vote=0.743 uniform=0.750 best1=0.744 n_val=6059 vram=0.00GB 109s | grade=0.893 inner_auc=0.795 vs conf_auc=0.765
+17:59:58 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+18:01:54 [enc/text/emotion] vote=0.748 uniform=0.750 best1=0.746 n_val=5952 vram=0.00GB 116s | grade=0.893 inner_auc=0.828 vs conf_auc=0.782
+18:02:28 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+18:04:22 [enc/text/emotion] vote=0.753 uniform=0.758 best1=0.751 n_val=6085 vram=0.00GB 114s | grade=0.898 inner_auc=0.828 vs conf_auc=0.807
+18:04:47 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+18:06:21 [enc/text/emotion] vote=0.752 uniform=0.747 best1=0.751 n_val=5876 vram=0.00GB 94s | grade=0.899 inner_auc=0.825 vs conf_auc=0.804
+18:06:45 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+18:08:25 [enc/text/emotion] vote=0.750 uniform=0.746 best1=0.747 n_val=6056 vram=0.00GB 101s | grade=0.900 inner_auc=0.795 vs conf_auc=0.767
+18:08:59 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+18:10:31 [enc/text/emotion] vote=0.750 uniform=0.751 best1=0.747 n_val=5956 vram=0.00GB 92s | grade=0.900 inner_auc=0.813 vs conf_auc=0.778
+18:10:47 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+18:11:50 [enc/text/emotion] vote=0.749 uniform=0.745 best1=0.745 n_val=6047 vram=0.00GB 63s | grade=0.900 inner_auc=0.798 vs conf_auc=0.779
+18:12:03 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+18:12:55 [enc/text/emotion] vote=0.741 uniform=0.745 best1=0.738 n_val=5997 vram=0.00GB 52s | grade=0.895 inner_auc=0.831 vs conf_auc=0.805
+18:13:10 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+18:14:17 [enc/text/emotion] vote=0.747 uniform=0.750 best1=0.747 n_val=6075 vram=0.00GB 67s | grade=0.896 inner_auc=0.818 vs conf_auc=0.781
+18:14:32 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+18:15:39 [enc/text/emotion] vote=0.751 uniform=0.749 best1=0.749 n_val=5929 vram=0.00GB 66s | grade=0.895 inner_auc=0.814 vs conf_auc=0.797
+18:15:54 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+18:16:48 [enc/text/emotion] vote=0.746 uniform=0.752 best1=0.745 n_val=6057 vram=0.00GB 53s | grade=0.897 inner_auc=0.826 vs conf_auc=0.785
+18:17:02 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+18:17:57 [enc/text/emotion] vote=0.751 uniform=0.752 best1=0.750 n_val=5902 vram=0.00GB 55s | grade=0.897 inner_auc=0.819 vs conf_auc=0.775
+18:18:15 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+18:19:19 [enc/text/emotion] vote=0.758 uniform=0.759 best1=0.754 n_val=5952 vram=0.00GB 64s | grade=0.898 inner_auc=0.806 vs conf_auc=0.791
+18:19:35 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+18:20:37 [enc/text/emotion] vote=0.758 uniform=0.761 best1=0.754 n_val=5995 vram=0.00GB 61s | grade=0.904 inner_auc=0.823 vs conf_auc=0.788
+18:20:52 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+18:21:45 [enc/text/emotion] vote=0.747 uniform=0.745 best1=0.745 n_val=6007 vram=0.00GB 54s | grade=0.895 inner_auc=0.800 vs conf_auc=0.771
+18:21:58 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+18:23:07 [enc/text/emotion] vote=0.746 uniform=0.749 best1=0.744 n_val=6063 vram=0.00GB 69s | grade=0.897 inner_auc=0.836 vs conf_auc=0.828
+18:23:24 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+18:24:30 [enc/text/emotion] vote=0.741 uniform=0.738 best1=0.740 n_val=5952 vram=0.00GB 66s | grade=0.893 inner_auc=0.807 vs conf_auc=0.785
+23:05:00 NI run auto_cpu_013 on CPU; hours=2.0 smoke=False
+23:05:00 explicit task list: ['enc/text/emotion']
+23:05:04 [resume] from checkpoint: next cycle 51, rounds 51, 52 metric rows, inner net restored
+23:05:04 ===== CYCLE 51 (OUTER-ONLY BOOTSTRAP) =====
+23:05:04 [data] enc/text/emotion: n=20000 C=6 D=384 shards=1
+23:06:03 [enc/text/emotion] vote=0.713 uniform=0.737 best1=0.737 n_val=5952 vram=0.00GB 59s
+23:06:13 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 51, "n_records": 5952, "n_val": 1223, "base_rate": 0.7285363674163818, "inner": {"auc": 0.830747231349641, "ece": 0.04705306745986419, "brier": 0.145005002617836, "acc80": 0.8241308927536011}, "outer_conf": {"auc": 0.7593910997525455, "ece": 0.04909369242259547, "brier": 0.16707219183444977, "acc80": 0.7985684871673584}}
+23:06:13 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+23:07:30 [enc/text/emotion] vote=0.730 uniform=0.730 best1=0.741 n_val=5997 vram=0.00GB 77s | grade=0.883 inner_auc=0.843 vs conf_auc=0.796
+23:07:38 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+23:09:48 [enc/text/emotion] vote=0.731 uniform=0.741 best1=0.743 n_val=5960 vram=0.00GB 130s | grade=0.896 inner_auc=0.837 vs conf_auc=0.780
+23:10:06 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+23:13:33 [enc/text/emotion] vote=0.737 uniform=0.735 best1=0.747 n_val=6033 vram=0.00GB 206s | grade=0.893 inner_auc=0.826 vs conf_auc=0.761
+23:14:02 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+23:18:06 [enc/text/emotion] vote=0.755 uniform=0.746 best1=0.755 n_val=6052 vram=0.00GB 244s | grade=0.891 inner_auc=0.813 vs conf_auc=0.765
+23:18:30 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+23:22:14 [enc/text/emotion] vote=0.742 uniform=0.737 best1=0.747 n_val=5986 vram=0.00GB 225s | grade=0.887 inner_auc=0.835 vs conf_auc=0.773
+23:22:33 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+23:24:41 [enc/text/emotion] vote=0.738 uniform=0.745 best1=0.751 n_val=5990 vram=0.00GB 128s | grade=0.890 inner_auc=0.827 vs conf_auc=0.763
+23:24:46 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+23:25:40 [enc/text/emotion] vote=0.742 uniform=0.744 best1=0.751 n_val=5984 vram=0.00GB 53s | grade=0.891 inner_auc=0.849 vs conf_auc=0.779
+23:25:47 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+23:27:13 [enc/text/emotion] vote=0.730 uniform=0.730 best1=0.742 n_val=5976 vram=0.00GB 86s | grade=0.885 inner_auc=0.831 vs conf_auc=0.759
+23:27:26 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+23:29:42 [enc/text/emotion] vote=0.719 uniform=0.740 best1=0.741 n_val=6030 vram=0.00GB 136s | grade=0.882 inner_auc=0.845 vs conf_auc=0.744
+23:29:54 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+23:31:14 [enc/text/emotion] vote=0.731 uniform=0.738 best1=0.742 n_val=5957 vram=0.00GB 80s | grade=0.886 inner_auc=0.822 vs conf_auc=0.756
+23:31:29 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+23:33:51 [enc/text/emotion] vote=0.724 uniform=0.737 best1=0.749 n_val=5987 vram=0.00GB 143s | grade=0.880 inner_auc=0.846 vs conf_auc=0.762
+23:34:04 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+23:36:17 [enc/text/emotion] vote=0.733 uniform=0.742 best1=0.746 n_val=6024 vram=0.00GB 133s | grade=0.889 inner_auc=0.833 vs conf_auc=0.766
+23:36:34 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+23:38:54 [enc/text/emotion] vote=0.721 uniform=0.737 best1=0.740 n_val=6013 vram=0.00GB 140s | grade=0.879 inner_auc=0.863 vs conf_auc=0.780
+23:39:12 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+23:41:53 [enc/text/emotion] vote=0.721 uniform=0.745 best1=0.746 n_val=6068 vram=0.00GB 161s | grade=0.883 inner_auc=0.830 vs conf_auc=0.744
+23:42:10 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+23:43:20 [enc/text/emotion] vote=0.747 uniform=0.748 best1=0.749 n_val=6088 vram=0.00GB 70s | grade=0.887 inner_auc=0.839 vs conf_auc=0.800
+23:43:30 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+23:45:37 [enc/text/emotion] vote=0.735 uniform=0.740 best1=0.743 n_val=6043 vram=0.00GB 127s | grade=0.889 inner_auc=0.833 vs conf_auc=0.764
+23:45:53 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+23:48:08 [enc/text/emotion] vote=0.725 uniform=0.748 best1=0.748 n_val=5919 vram=0.00GB 135s | grade=0.881 inner_auc=0.845 vs conf_auc=0.751
+23:48:23 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+23:50:22 [enc/text/emotion] vote=0.720 uniform=0.741 best1=0.746 n_val=5928 vram=0.00GB 118s | grade=0.883 inner_auc=0.857 vs conf_auc=0.766
+23:50:39 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+23:53:05 [enc/text/emotion] vote=0.741 uniform=0.744 best1=0.752 n_val=6044 vram=0.00GB 146s | grade=0.884 inner_auc=0.834 vs conf_auc=0.764
+23:53:26 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+23:55:48 [enc/text/emotion] vote=0.735 uniform=0.735 best1=0.745 n_val=6069 vram=0.00GB 142s | grade=0.892 inner_auc=0.813 vs conf_auc=0.746
+23:56:04 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+23:58:31 [enc/text/emotion] vote=0.739 uniform=0.747 best1=0.752 n_val=6061 vram=0.00GB 146s | grade=0.892 inner_auc=0.838 vs conf_auc=0.760
+23:58:45 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+00:01:19 [enc/text/emotion] vote=0.748 uniform=0.744 best1=0.748 n_val=5962 vram=0.00GB 153s | grade=0.895 inner_auc=0.838 vs conf_auc=0.777
+00:01:36 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+00:04:06 [enc/text/emotion] vote=0.726 uniform=0.740 best1=0.747 n_val=6036 vram=0.00GB 150s | grade=0.876 inner_auc=0.869 vs conf_auc=0.762
+00:04:23 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+00:06:48 [enc/text/emotion] vote=0.729 uniform=0.729 best1=0.740 n_val=6007 vram=0.00GB 145s | grade=0.892 inner_auc=0.837 vs conf_auc=0.757
+00:07:04 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+00:09:30 [enc/text/emotion] vote=0.733 uniform=0.736 best1=0.744 n_val=5967 vram=0.00GB 146s | grade=0.892 inner_auc=0.817 vs conf_auc=0.759
+00:09:49 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+00:12:17 [enc/text/emotion] vote=0.733 uniform=0.739 best1=0.750 n_val=5927 vram=0.00GB 148s | grade=0.884 inner_auc=0.842 vs conf_auc=0.774
+00:12:36 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+00:15:01 [enc/text/emotion] vote=0.738 uniform=0.737 best1=0.745 n_val=5963 vram=0.00GB 145s | grade=0.891 inner_auc=0.827 vs conf_auc=0.751
+00:15:17 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+00:17:43 [enc/text/emotion] vote=0.725 uniform=0.735 best1=0.744 n_val=5969 vram=0.00GB 146s | grade=0.875 inner_auc=0.838 vs conf_auc=0.749
+00:17:59 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+00:20:34 [enc/text/emotion] vote=0.733 uniform=0.735 best1=0.748 n_val=5817 vram=0.00GB 155s | grade=0.887 inner_auc=0.826 vs conf_auc=0.775
+00:20:52 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+00:23:19 [enc/text/emotion] vote=0.733 uniform=0.742 best1=0.753 n_val=5939 vram=0.00GB 147s | grade=0.885 inner_auc=0.859 vs conf_auc=0.779
+00:23:37 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+00:26:02 [enc/text/emotion] vote=0.738 uniform=0.741 best1=0.743 n_val=5977 vram=0.00GB 145s | grade=0.890 inner_auc=0.839 vs conf_auc=0.782
+00:26:19 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+00:28:38 [enc/text/emotion] vote=0.722 uniform=0.736 best1=0.745 n_val=5984 vram=0.00GB 139s | grade=0.876 inner_auc=0.860 vs conf_auc=0.756
+00:28:56 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+00:31:16 [enc/text/emotion] vote=0.735 uniform=0.730 best1=0.741 n_val=5955 vram=0.00GB 139s | grade=0.892 inner_auc=0.807 vs conf_auc=0.767
+00:31:29 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+00:32:58 [enc/text/emotion] vote=0.742 uniform=0.731 best1=0.751 n_val=6045 vram=0.00GB 89s | grade=0.891 inner_auc=0.827 vs conf_auc=0.784
+00:33:10 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+00:34:10 [enc/text/emotion] vote=0.707 uniform=0.732 best1=0.748 n_val=6046 vram=0.00GB 59s | grade=0.858 inner_auc=0.872 vs conf_auc=0.751
+00:34:17 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+00:35:11 [enc/text/emotion] vote=0.717 uniform=0.730 best1=0.735 n_val=6009 vram=0.00GB 54s | grade=0.881 inner_auc=0.848 vs conf_auc=0.761
+00:35:16 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+00:36:16 [enc/text/emotion] vote=0.734 uniform=0.742 best1=0.743 n_val=5905 vram=0.00GB 60s | grade=0.883 inner_auc=0.827 vs conf_auc=0.756
+00:36:22 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+00:37:39 [enc/text/emotion] vote=0.721 uniform=0.733 best1=0.742 n_val=5939 vram=0.00GB 77s | grade=0.879 inner_auc=0.840 vs conf_auc=0.745
+00:37:46 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+00:39:46 [enc/text/emotion] vote=0.741 uniform=0.753 best1=0.748 n_val=5937 vram=0.00GB 119s | grade=0.884 inner_auc=0.819 vs conf_auc=0.757
+00:39:51 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+00:40:51 [enc/text/emotion] vote=0.737 uniform=0.740 best1=0.742 n_val=6031 vram=0.00GB 60s | grade=0.893 inner_auc=0.834 vs conf_auc=0.773
+00:40:56 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+00:42:15 [enc/text/emotion] vote=0.716 uniform=0.732 best1=0.742 n_val=6039 vram=0.00GB 79s | grade=0.873 inner_auc=0.861 vs conf_auc=0.760
+00:42:21 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+00:43:57 [enc/text/emotion] vote=0.732 uniform=0.742 best1=0.743 n_val=6069 vram=0.00GB 96s | grade=0.885 inner_auc=0.824 vs conf_auc=0.768
+00:44:04 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+00:44:51 [enc/text/emotion] vote=0.723 uniform=0.741 best1=0.749 n_val=5939 vram=0.00GB 47s | grade=0.882 inner_auc=0.848 vs conf_auc=0.768
+00:44:56 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+00:45:44 [enc/text/emotion] vote=0.730 uniform=0.743 best1=0.748 n_val=6004 vram=0.00GB 47s | grade=0.882 inner_auc=0.850 vs conf_auc=0.782
+00:45:49 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+00:46:38 [enc/text/emotion] vote=0.717 uniform=0.732 best1=0.744 n_val=5976 vram=0.00GB 49s | grade=0.877 inner_auc=0.839 vs conf_auc=0.753
+00:46:44 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+00:47:39 [enc/text/emotion] vote=0.731 uniform=0.745 best1=0.748 n_val=6169 vram=0.00GB 54s | grade=0.885 inner_auc=0.849 vs conf_auc=0.792
+00:47:44 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+00:48:39 [enc/text/emotion] vote=0.737 uniform=0.739 best1=0.749 n_val=6081 vram=0.00GB 55s | grade=0.889 inner_auc=0.836 vs conf_auc=0.769
+00:48:45 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+00:49:39 [enc/text/emotion] vote=0.743 uniform=0.743 best1=0.744 n_val=6038 vram=0.00GB 55s | grade=0.894 inner_auc=0.826 vs conf_auc=0.770
+00:49:47 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+00:50:40 [enc/text/emotion] vote=0.723 uniform=0.741 best1=0.752 n_val=5960 vram=0.00GB 53s | grade=0.875 inner_auc=0.848 vs conf_auc=0.766
+00:50:46 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+00:51:41 [enc/text/emotion] vote=0.713 uniform=0.745 best1=0.746 n_val=6026 vram=0.00GB 55s | grade=0.869 inner_auc=0.842 vs conf_auc=0.721
+00:51:48 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+00:52:45 [enc/text/emotion] vote=0.741 uniform=0.731 best1=0.742 n_val=5984 vram=0.00GB 57s | grade=0.885 inner_auc=0.809 vs conf_auc=0.786
+00:52:53 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+00:53:45 [enc/text/emotion] vote=0.735 uniform=0.732 best1=0.741 n_val=6014 vram=0.00GB 52s | grade=0.889 inner_auc=0.822 vs conf_auc=0.751
+00:53:51 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+00:55:52 [enc/text/emotion] vote=0.726 uniform=0.733 best1=0.743 n_val=6028 vram=0.00GB 121s | grade=0.878 inner_auc=0.830 vs conf_auc=0.733
+00:56:12 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+01:00:49 [enc/text/emotion] vote=0.719 uniform=0.741 best1=0.746 n_val=6001 vram=0.00GB 278s | grade=0.883 inner_auc=0.845 vs conf_auc=0.763
+01:01:28 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+01:06:23 [enc/text/emotion] vote=0.743 uniform=0.742 best1=0.746 n_val=5972 vram=0.00GB 295s | grade=0.888 inner_auc=0.832 vs conf_auc=0.783
+01:06:53 RUN COMPLETE
+14:57:37 NI run auto_cpu_013 on CPU; hours=2.0 smoke=False
+14:57:37 explicit task list: ['enc/text/emotion']
+14:57:51 [resume] from checkpoint: next cycle 107, rounds 107, 108 metric rows, inner net restored
+14:57:51 ===== CYCLE 107 (OUTER-ONLY BOOTSTRAP) =====
+14:57:51 [data] enc/text/emotion: n=20000 C=6 D=384 shards=1
+15:01:23 [enc/text/emotion] vote=0.739 uniform=0.740 best1=0.748 n_val=6009 vram=0.00GB 212s
+15:02:17 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 107, "n_records": 6009, "n_val": 1193, "base_rate": 0.7418273091316223, "inner": {"auc": 0.83115965954949, "ece": 0.04854300284987722, "brier": 0.14156551659107208, "acc80": 0.8375262022018433}, "outer_conf": {"auc": 0.7663860151148286, "ece": 0.03477731887922503, "brier": 0.16074873507022858, "acc80": 0.8071278929710388}}
+15:02:17 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+03:23:57 NI run auto_cpu_013 on CPU; hours=2.0 smoke=False
+03:23:57 explicit task list: ['enc/text/emotion']
+03:24:13 [resume] from checkpoint: next cycle 108, rounds 108, 109 metric rows, inner net restored
+03:24:13 ===== CYCLE 108 (OUTER-ONLY BOOTSTRAP) =====
+03:24:13 [data] enc/text/emotion: n=20000 C=6 D=384 shards=1
+03:28:19 [enc/text/emotion] vote=0.729 uniform=0.743 best1=0.748 n_val=6152 vram=0.00GB 246s
+03:29:20 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 108, "n_records": 6152, "n_val": 1222, "base_rate": 0.7307692170143127, "inner": {"auc": 0.8452366770252929, "ece": 0.03746014196919536, "brier": 0.13747400045394897, "acc80": 0.8290686011314392}, "outer_conf": {"auc": 0.7580948750327607, "ece": 0.03071811863521507, "brier": 0.16562429070472717, "acc80": 0.8024564981460571}}
+03:29:20 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+03:33:52 [enc/text/emotion] vote=0.707 uniform=0.743 best1=0.748 n_val=6016 vram=0.00GB 273s | grade=0.863 inner_auc=0.889 vs conf_auc=0.744
+03:34:27 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+19:01:22 NI run auto_cpu_013 on CPU; hours=2.0 smoke=False
+19:01:22 explicit task list: ['enc/text/emotion']
+19:01:44 [resume] from checkpoint: next cycle 110, rounds 110, 111 metric rows, inner net restored
+19:01:44 ===== CYCLE 110 (OUTER-ONLY BOOTSTRAP) =====
+19:01:44 [data] enc/text/emotion: n=20000 C=6 D=384 shards=1
+19:06:12 [enc/text/emotion] vote=0.716 uniform=0.735 best1=0.735 n_val=6022 vram=0.00GB 268s
+19:07:21 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 110, "n_records": 6022, "n_val": 1198, "base_rate": 0.7128547430038452, "inner": {"auc": 0.8321340068623714, "ece": 0.0481776936984122, "brier": 0.14720173180103302, "acc80": 0.8110647201538086}, "outer_conf": {"auc": 0.7448293938238658, "ece": 0.03834651500135909, "brier": 0.17551419138908386, "acc80": 0.7787056565284729}}
+19:07:21 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+19:12:34 [enc/text/emotion] vote=0.748 uniform=0.746 best1=0.751 n_val=6039 vram=0.00GB 313s | grade=0.883 inner_auc=0.835 vs conf_auc=0.804
+19:13:11 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+19:17:46 [enc/text/emotion] vote=0.731 uniform=0.736 best1=0.745 n_val=5991 vram=0.00GB 275s | grade=0.886 inner_auc=0.847 vs conf_auc=0.770
+19:18:17 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+19:22:41 [enc/text/emotion] vote=0.733 uniform=0.735 best1=0.743 n_val=6063 vram=0.00GB 265s | grade=0.892 inner_auc=0.833 vs conf_auc=0.758
+19:23:13 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+19:27:32 [enc/text/emotion] vote=0.746 uniform=0.738 best1=0.748 n_val=5971 vram=0.00GB 259s | grade=0.890 inner_auc=0.819 vs conf_auc=0.777
+19:27:56 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+19:32:26 [enc/text/emotion] vote=0.737 uniform=0.736 best1=0.746 n_val=6018 vram=0.00GB 269s | grade=0.891 inner_auc=0.824 vs conf_auc=0.784
+19:32:54 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+19:37:19 [enc/text/emotion] vote=0.743 uniform=0.741 best1=0.753 n_val=6064 vram=0.00GB 266s | grade=0.891 inner_auc=0.843 vs conf_auc=0.774
+19:37:51 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+19:42:06 [enc/text/emotion] vote=0.744 uniform=0.724 best1=0.744 n_val=5891 vram=0.00GB 255s | grade=0.897 inner_auc=0.829 vs conf_auc=0.790
+19:42:37 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+19:46:55 [enc/text/emotion] vote=0.724 uniform=0.740 best1=0.743 n_val=6090 vram=0.00GB 257s | grade=0.875 inner_auc=0.864 vs conf_auc=0.772
+19:47:23 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+19:51:58 [enc/text/emotion] vote=0.738 uniform=0.747 best1=0.744 n_val=5984 vram=0.00GB 275s | grade=0.885 inner_auc=0.838 vs conf_auc=0.778
+19:52:26 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+19:56:53 [enc/text/emotion] vote=0.731 uniform=0.747 best1=0.751 n_val=6056 vram=0.00GB 267s | grade=0.881 inner_auc=0.850 vs conf_auc=0.759
+19:57:21 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+20:01:58 [enc/text/emotion] vote=0.718 uniform=0.735 best1=0.743 n_val=6028 vram=0.00GB 278s | grade=0.879 inner_auc=0.838 vs conf_auc=0.757
+20:02:27 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+20:06:47 [enc/text/emotion] vote=0.727 uniform=0.745 best1=0.755 n_val=5938 vram=0.00GB 260s | grade=0.883 inner_auc=0.843 vs conf_auc=0.782
+20:07:23 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+20:11:51 [enc/text/emotion] vote=0.733 uniform=0.734 best1=0.736 n_val=5955 vram=0.00GB 268s | grade=0.890 inner_auc=0.826 vs conf_auc=0.760
+20:12:21 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+20:16:50 [enc/text/emotion] vote=0.723 uniform=0.739 best1=0.740 n_val=6064 vram=0.00GB 269s | grade=0.879 inner_auc=0.843 vs conf_auc=0.749
+20:17:27 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+20:21:51 [enc/text/emotion] vote=0.737 uniform=0.730 best1=0.746 n_val=6025 vram=0.00GB 264s | grade=0.889 inner_auc=0.836 vs conf_auc=0.766
+20:22:24 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+22:52:27 NI run auto_cpu_013 on CPU; hours=2.0 smoke=False
+22:52:27 explicit task list: ['enc/text/emotion']
+22:52:45 [resume] from checkpoint: next cycle 126, rounds 126, 127 metric rows, inner net restored
+22:52:45 ===== CYCLE 126 (OUTER-ONLY BOOTSTRAP) =====
+22:52:45 [data] enc/text/emotion: n=20000 C=6 D=384 shards=1
+22:56:59 [enc/text/emotion] vote=0.727 uniform=0.743 best1=0.749 n_val=5935 vram=0.00GB 254s
+22:58:01 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 126, "n_records": 5935, "n_val": 1188, "base_rate": 0.7483165264129639, "inner": {"auc": 0.824266113892954, "ece": 0.033715389280106485, "brier": 0.14119422435760498, "acc80": 0.8315789699554443}, "outer_conf": {"auc": 0.7329079684437438, "ece": 0.0630661050227756, "brier": 0.16954948008060455, "acc80": 0.8073683977127075}}
+22:58:01 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+23:02:49 [enc/text/emotion] vote=0.742 uniform=0.742 best1=0.743 n_val=6038 vram=0.00GB 288s | grade=0.887 inner_auc=0.826 vs conf_auc=0.755
+23:03:25 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+23:08:20 [enc/text/emotion] vote=0.739 uniform=0.740 best1=0.747 n_val=5988 vram=0.00GB 295s | grade=0.892 inner_auc=0.825 vs conf_auc=0.767
+23:08:56 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+23:14:49 [enc/text/emotion] vote=0.725 uniform=0.737 best1=0.748 n_val=5942 vram=0.00GB 353s | grade=0.877 inner_auc=0.843 vs conf_auc=0.756
+23:15:26 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+23:20:18 [enc/text/emotion] vote=0.737 uniform=0.741 best1=0.746 n_val=6071 vram=0.00GB 292s | grade=0.891 inner_auc=0.829 vs conf_auc=0.767
+23:20:51 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+23:25:09 [enc/text/emotion] vote=0.732 uniform=0.742 best1=0.742 n_val=5966 vram=0.00GB 258s | grade=0.892 inner_auc=0.849 vs conf_auc=0.784
+23:25:43 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+23:29:51 [enc/text/emotion] vote=0.746 uniform=0.752 best1=0.760 n_val=5931 vram=0.00GB 248s | grade=0.887 inner_auc=0.862 vs conf_auc=0.788
+23:30:19 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+23:34:22 [enc/text/emotion] vote=0.739 uniform=0.746 best1=0.748 n_val=5892 vram=0.00GB 242s | grade=0.879 inner_auc=0.831 vs conf_auc=0.741
+23:34:48 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+23:39:00 [enc/text/emotion] vote=0.717 uniform=0.737 best1=0.741 n_val=6008 vram=0.00GB 251s | grade=0.875 inner_auc=0.848 vs conf_auc=0.772
+23:39:25 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+23:43:17 [enc/text/emotion] vote=0.732 uniform=0.743 best1=0.748 n_val=5974 vram=0.00GB 233s | grade=0.880 inner_auc=0.825 vs conf_auc=0.740
+23:43:51 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+23:47:50 [enc/text/emotion] vote=0.737 uniform=0.738 best1=0.746 n_val=5995 vram=0.00GB 239s | grade=0.891 inner_auc=0.859 vs conf_auc=0.782
+23:48:15 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+23:52:20 [enc/text/emotion] vote=0.725 uniform=0.747 best1=0.747 n_val=6023 vram=0.00GB 244s | grade=0.878 inner_auc=0.845 vs conf_auc=0.756
+23:52:51 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+23:56:55 [enc/text/emotion] vote=0.726 uniform=0.753 best1=0.749 n_val=6021 vram=0.00GB 244s | grade=0.881 inner_auc=0.855 vs conf_auc=0.756
+23:57:16 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+00:00:55 [enc/text/emotion] vote=0.701 uniform=0.735 best1=0.739 n_val=6059 vram=0.00GB 219s | grade=0.863 inner_auc=0.862 vs conf_auc=0.756
+00:01:26 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+00:05:31 [enc/text/emotion] vote=0.740 uniform=0.732 best1=0.747 n_val=6063 vram=0.00GB 244s | grade=0.874 inner_auc=0.827 vs conf_auc=0.766
+00:05:57 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+00:10:30 [enc/text/emotion] vote=0.745 uniform=0.738 best1=0.747 n_val=6012 vram=0.00GB 273s | grade=0.898 inner_auc=0.826 vs conf_auc=0.773
+00:11:09 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+00:15:52 [enc/text/emotion] vote=0.723 uniform=0.727 best1=0.745 n_val=5926 vram=0.00GB 283s | grade=0.876 inner_auc=0.848 vs conf_auc=0.771
+00:16:24 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+00:20:43 [enc/text/emotion] vote=0.726 uniform=0.740 best1=0.748 n_val=6001 vram=0.00GB 259s | grade=0.884 inner_auc=0.829 vs conf_auc=0.724
+00:21:14 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+00:25:11 [enc/text/emotion] vote=0.742 uniform=0.740 best1=0.749 n_val=5864 vram=0.00GB 237s | grade=0.893 inner_auc=0.837 vs conf_auc=0.784
+00:25:43 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+00:29:44 [enc/text/emotion] vote=0.732 uniform=0.737 best1=0.733 n_val=6025 vram=0.00GB 241s | grade=0.890 inner_auc=0.823 vs conf_auc=0.760
+00:30:09 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+00:34:16 [enc/text/emotion] vote=0.737 uniform=0.729 best1=0.746 n_val=5935 vram=0.00GB 247s | grade=0.892 inner_auc=0.844 vs conf_auc=0.783
+00:34:44 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+00:38:36 [enc/text/emotion] vote=0.743 uniform=0.740 best1=0.749 n_val=5984 vram=0.00GB 233s | grade=0.891 inner_auc=0.827 vs conf_auc=0.755
+00:39:01 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+00:43:46 [enc/text/emotion] vote=0.737 uniform=0.745 best1=0.747 n_val=6069 vram=0.00GB 285s | grade=0.892 inner_auc=0.830 vs conf_auc=0.763
+00:44:18 ===== CYCLE 149 (OUTER -> INNER -> FEEDBACK) =====
+00:48:55 [enc/text/emotion] vote=0.729 uniform=0.731 best1=0.736 n_val=5924 vram=0.00GB 277s | grade=0.890 inner_auc=0.834 vs conf_auc=0.781
+00:49:26 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+00:54:21 [enc/text/emotion] vote=0.734 uniform=0.740 best1=0.742 n_val=5945 vram=0.00GB 296s | grade=0.893 inner_auc=0.832 vs conf_auc=0.773
+00:54:49 RUN COMPLETE
+21:00:23 NI run auto_cpu_013 on CPU; hours=2.0 smoke=False
+21:00:23 explicit task list: ['enc/text/emotion']
+21:00:35 [resume] from checkpoint: next cycle 151, rounds 151, 152 metric rows, inner net restored
+21:00:35 ===== CYCLE 151 (OUTER-ONLY BOOTSTRAP) =====
+21:00:35 [data] enc/text/emotion: n=20000 C=6 D=384 shards=1
+21:03:08 [enc/text/emotion] vote=0.720 uniform=0.731 best1=0.745 n_val=5970 vram=0.00GB 152s
+21:03:40 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 151, "n_records": 5970, "n_val": 1206, "base_rate": 0.7131011486053467, "inner": {"auc": 0.8480138459470359, "ece": 0.026282199042205193, "brier": 0.13825973868370056, "acc80": 0.8215767741203308}, "outer_conf": {"auc": 0.75401599677376, "ece": 0.043628987907177175, "brier": 0.1725023239850998, "acc80": 0.7852697372436523}}
+21:03:40 ===== CYCLE 152 (OUTER -> INNER -> FEEDBACK) =====
+21:06:52 [enc/text/emotion] vote=0.730 uniform=0.737 best1=0.743 n_val=6112 vram=0.00GB 192s | grade=0.886 inner_auc=0.837 vs conf_auc=0.773
+21:07:10 ===== CYCLE 153 (OUTER -> INNER -> FEEDBACK) =====
+21:10:23 [enc/text/emotion] vote=0.736 uniform=0.741 best1=0.745 n_val=5902 vram=0.00GB 192s | grade=0.888 inner_auc=0.833 vs conf_auc=0.769
+21:10:46 ===== CYCLE 154 (OUTER -> INNER -> FEEDBACK) =====
+21:14:03 [enc/text/emotion] vote=0.739 uniform=0.736 best1=0.741 n_val=6012 vram=0.00GB 196s | grade=0.891 inner_auc=0.832 vs conf_auc=0.785
+21:14:24 ===== CYCLE 155 (OUTER -> INNER -> FEEDBACK) =====
+21:17:47 [enc/text/emotion] vote=0.724 uniform=0.734 best1=0.741 n_val=5884 vram=0.00GB 202s | grade=0.874 inner_auc=0.859 vs conf_auc=0.750
+21:18:14 ===== CYCLE 156 (OUTER -> INNER -> FEEDBACK) =====
+21:21:35 [enc/text/emotion] vote=0.719 uniform=0.740 best1=0.745 n_val=6016 vram=0.00GB 201s | grade=0.883 inner_auc=0.841 vs conf_auc=0.747
+21:21:57 ===== CYCLE 157 (OUTER -> INNER -> FEEDBACK) =====
+21:25:31 [enc/text/emotion] vote=0.717 uniform=0.733 best1=0.738 n_val=5999 vram=0.00GB 215s | grade=0.882 inner_auc=0.853 vs conf_auc=0.772
+21:26:00 ===== CYCLE 158 (OUTER -> INNER -> FEEDBACK) =====
+21:29:15 [enc/text/emotion] vote=0.722 uniform=0.748 best1=0.752 n_val=6039 vram=0.00GB 195s | grade=0.883 inner_auc=0.881 vs conf_auc=0.785
+21:29:44 ===== CYCLE 159 (OUTER -> INNER -> FEEDBACK) =====
+21:33:24 [enc/text/emotion] vote=0.732 uniform=0.737 best1=0.737 n_val=5949 vram=0.00GB 220s | grade=0.888 inner_auc=0.840 vs conf_auc=0.791
+21:33:45 ===== CYCLE 160 (OUTER -> INNER -> FEEDBACK) =====
+21:37:02 [enc/text/emotion] vote=0.747 uniform=0.739 best1=0.751 n_val=5947 vram=0.00GB 197s | grade=0.893 inner_auc=0.828 vs conf_auc=0.790
+21:37:29 ===== CYCLE 161 (OUTER -> INNER -> FEEDBACK) =====
+21:40:57 [enc/text/emotion] vote=0.732 uniform=0.746 best1=0.749 n_val=6031 vram=0.00GB 208s | grade=0.878 inner_auc=0.862 vs conf_auc=0.773
+21:41:24 ===== CYCLE 162 (OUTER -> INNER -> FEEDBACK) =====
+21:44:49 [enc/text/emotion] vote=0.738 uniform=0.740 best1=0.746 n_val=6050 vram=0.00GB 205s | grade=0.889 inner_auc=0.804 vs conf_auc=0.726
+21:45:17 ===== CYCLE 163 (OUTER -> INNER -> FEEDBACK) =====
+21:48:34 [enc/text/emotion] vote=0.726 uniform=0.734 best1=0.748 n_val=6106 vram=0.00GB 197s | grade=0.880 inner_auc=0.835 vs conf_auc=0.747
+21:48:56 ===== CYCLE 164 (OUTER -> INNER -> FEEDBACK) =====
+21:52:30 [enc/text/emotion] vote=0.736 uniform=0.734 best1=0.747 n_val=5934 vram=0.00GB 214s | grade=0.890 inner_auc=0.821 vs conf_auc=0.762
+21:52:56 ===== CYCLE 165 (OUTER -> INNER -> FEEDBACK) =====
+21:56:07 [enc/text/emotion] vote=0.726 uniform=0.738 best1=0.744 n_val=5924 vram=0.00GB 191s | grade=0.878 inner_auc=0.864 vs conf_auc=0.786
+21:56:32 ===== CYCLE 166 (OUTER -> INNER -> FEEDBACK) =====
+22:00:18 [enc/text/emotion] vote=0.739 uniform=0.740 best1=0.746 n_val=6115 vram=0.00GB 227s | grade=0.886 inner_auc=0.838 vs conf_auc=0.780
+22:00:40 ===== CYCLE 167 (OUTER -> INNER -> FEEDBACK) =====
+22:03:55 [enc/text/emotion] vote=0.718 uniform=0.737 best1=0.741 n_val=6000 vram=0.00GB 194s | grade=0.875 inner_auc=0.846 vs conf_auc=0.746
+22:04:18 ===== CYCLE 168 (OUTER -> INNER -> FEEDBACK) =====
+22:07:49 [enc/text/emotion] vote=0.729 uniform=0.742 best1=0.751 n_val=5912 vram=0.00GB 211s | grade=0.878 inner_auc=0.849 vs conf_auc=0.760
+22:08:06 ===== CYCLE 169 (OUTER -> INNER -> FEEDBACK) =====
+22:11:28 [enc/text/emotion] vote=0.742 uniform=0.742 best1=0.752 n_val=6064 vram=0.00GB 202s | grade=0.885 inner_auc=0.822 vs conf_auc=0.749
+22:11:53 ===== CYCLE 170 (OUTER -> INNER -> FEEDBACK) =====
+22:15:15 [enc/text/emotion] vote=0.742 uniform=0.744 best1=0.751 n_val=6077 vram=0.00GB 201s | grade=0.894 inner_auc=0.827 vs conf_auc=0.745
+22:15:34 ===== CYCLE 171 (OUTER -> INNER -> FEEDBACK) =====
+22:19:17 [enc/text/emotion] vote=0.721 uniform=0.747 best1=0.745 n_val=6056 vram=0.00GB 223s | grade=0.875 inner_auc=0.865 vs conf_auc=0.771
+22:19:39 ===== CYCLE 172 (OUTER -> INNER -> FEEDBACK) =====
+22:22:50 [enc/text/emotion] vote=0.742 uniform=0.744 best1=0.752 n_val=5942 vram=0.00GB 190s | grade=0.885 inner_auc=0.848 vs conf_auc=0.784
+22:23:14 ===== CYCLE 173 (OUTER -> INNER -> FEEDBACK) =====
+22:26:54 [enc/text/emotion] vote=0.723 uniform=0.740 best1=0.740 n_val=5976 vram=0.00GB 221s | grade=0.873 inner_auc=0.836 vs conf_auc=0.743
+22:27:18 ===== CYCLE 174 (OUTER -> INNER -> FEEDBACK) =====
+22:30:34 [enc/text/emotion] vote=0.727 uniform=0.741 best1=0.751 n_val=6038 vram=0.00GB 196s | grade=0.882 inner_auc=0.833 vs conf_auc=0.749
+22:30:59 ===== CYCLE 175 (OUTER -> INNER -> FEEDBACK) =====
+22:34:32 [enc/text/emotion] vote=0.740 uniform=0.740 best1=0.748 n_val=5928 vram=0.00GB 214s | grade=0.886 inner_auc=0.830 vs conf_auc=0.779
+22:34:55 ===== CYCLE 176 (OUTER -> INNER -> FEEDBACK) =====
+22:38:18 [enc/text/emotion] vote=0.736 uniform=0.740 best1=0.746 n_val=5896 vram=0.00GB 202s | grade=0.890 inner_auc=0.853 vs conf_auc=0.788
+22:38:42 ===== CYCLE 177 (OUTER -> INNER -> FEEDBACK) =====
+22:42:07 [enc/text/emotion] vote=0.735 uniform=0.738 best1=0.740 n_val=6061 vram=0.00GB 205s | grade=0.894 inner_auc=0.828 vs conf_auc=0.755
+22:42:27 ===== CYCLE 178 (OUTER -> INNER -> FEEDBACK) =====
+22:45:56 [enc/text/emotion] vote=0.726 uniform=0.736 best1=0.750 n_val=6092 vram=0.00GB 209s | grade=0.879 inner_auc=0.861 vs conf_auc=0.766
+22:46:25 ===== CYCLE 179 (OUTER -> INNER -> FEEDBACK) =====
+22:49:41 [enc/text/emotion] vote=0.716 uniform=0.734 best1=0.736 n_val=6055 vram=0.00GB 196s | grade=0.882 inner_auc=0.848 vs conf_auc=0.769
+22:50:03 ===== CYCLE 180 (OUTER -> INNER -> FEEDBACK) =====
+22:53:43 [enc/text/emotion] vote=0.714 uniform=0.728 best1=0.736 n_val=5925 vram=0.00GB 220s | grade=0.885 inner_auc=0.841 vs conf_auc=0.740
+22:54:11 ===== CYCLE 181 (OUTER -> INNER -> FEEDBACK) =====
+22:57:23 [enc/text/emotion] vote=0.736 uniform=0.746 best1=0.750 n_val=6009 vram=0.00GB 192s | grade=0.881 inner_auc=0.851 vs conf_auc=0.788
+22:57:50 ===== CYCLE 182 (OUTER -> INNER -> FEEDBACK) =====
+23:01:29 [enc/text/emotion] vote=0.725 uniform=0.740 best1=0.748 n_val=6036 vram=0.00GB 218s | grade=0.877 inner_auc=0.849 vs conf_auc=0.775
+23:01:50 RUN COMPLETE
+19:48:51 NI run auto_cpu_013 on CPU; hours=2.0 smoke=False
+19:48:51 explicit task list: ['enc/text/emotion']
+19:49:04 [resume] from checkpoint: next cycle 183, rounds 183, 184 metric rows, inner net restored
+19:49:04 ===== CYCLE 183 (OUTER-ONLY BOOTSTRAP) =====
+19:49:04 [data] enc/text/emotion: n=20000 C=6 D=384 shards=1
+19:51:32 [enc/text/emotion] vote=0.738 uniform=0.740 best1=0.751 n_val=6056 vram=0.00GB 148s
+19:52:07 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 183, "n_records": 6056, "n_val": 1227, "base_rate": 0.7074164748191833, "inner": {"auc": 0.8456413745298641, "ece": 0.03074732552166382, "brier": 0.14206171035766602, "acc80": 0.8154944181442261}, "outer_conf": {"auc": 0.768876038150007, "ece": 0.02500990277251871, "brier": 0.1695214956998825, "acc80": 0.772680938243866}}
+19:52:07 ===== CYCLE 184 (OUTER -> INNER -> FEEDBACK) =====
+19:55:39 [enc/text/emotion] vote=0.736 uniform=0.741 best1=0.746 n_val=5956 vram=0.00GB 212s | grade=0.892 inner_auc=0.843 vs conf_auc=0.797
+19:55:59 ===== CYCLE 185 (OUTER -> INNER -> FEEDBACK) =====
+19:59:24 [enc/text/emotion] vote=0.722 uniform=0.735 best1=0.743 n_val=6009 vram=0.00GB 204s | grade=0.878 inner_auc=0.843 vs conf_auc=0.733
+19:59:49 ===== CYCLE 186 (OUTER -> INNER -> FEEDBACK) =====
+20:03:27 [enc/text/emotion] vote=0.744 uniform=0.738 best1=0.753 n_val=6077 vram=0.00GB 218s | grade=0.887 inner_auc=0.847 vs conf_auc=0.775
+20:03:51 ===== CYCLE 187 (OUTER -> INNER -> FEEDBACK) =====
+20:07:15 [enc/text/emotion] vote=0.742 uniform=0.740 best1=0.747 n_val=6009 vram=0.00GB 205s | grade=0.894 inner_auc=0.846 vs conf_auc=0.781
+20:07:43 ===== CYCLE 188 (OUTER -> INNER -> FEEDBACK) =====
+20:11:14 [enc/text/emotion] vote=0.736 uniform=0.748 best1=0.742 n_val=5973 vram=0.00GB 211s | grade=0.891 inner_auc=0.841 vs conf_auc=0.771
+20:11:34 ===== CYCLE 189 (OUTER -> INNER -> FEEDBACK) =====
+20:15:12 [enc/text/emotion] vote=0.738 uniform=0.735 best1=0.750 n_val=5940 vram=0.00GB 218s | grade=0.893 inner_auc=0.838 vs conf_auc=0.779
+20:15:38 ===== CYCLE 190 (OUTER -> INNER -> FEEDBACK) =====
+20:18:59 [enc/text/emotion] vote=0.736 uniform=0.732 best1=0.736 n_val=5992 vram=0.00GB 201s | grade=0.895 inner_auc=0.843 vs conf_auc=0.792
+20:19:27 ===== CYCLE 191 (OUTER -> INNER -> FEEDBACK) =====
+20:23:20 [enc/text/emotion] vote=0.750 uniform=0.743 best1=0.752 n_val=6018 vram=0.00GB 233s | grade=0.893 inner_auc=0.825 vs conf_auc=0.787
+20:23:40 ===== CYCLE 192 (OUTER -> INNER -> FEEDBACK) =====
+20:27:16 [enc/text/emotion] vote=0.743 uniform=0.729 best1=0.747 n_val=5826 vram=0.00GB 216s | grade=0.894 inner_auc=0.821 vs conf_auc=0.781
+20:27:47 ===== CYCLE 193 (OUTER -> INNER -> FEEDBACK) =====
+20:31:27 [enc/text/emotion] vote=0.729 uniform=0.741 best1=0.746 n_val=6002 vram=0.00GB 221s | grade=0.876 inner_auc=0.843 vs conf_auc=0.757
+20:31:51 ===== CYCLE 194 (OUTER -> INNER -> FEEDBACK) =====
+20:35:24 [enc/text/emotion] vote=0.721 uniform=0.739 best1=0.744 n_val=6135 vram=0.00GB 213s | grade=0.883 inner_auc=0.855 vs conf_auc=0.780
+20:35:52 ===== CYCLE 195 (OUTER -> INNER -> FEEDBACK) =====
+20:39:13 [enc/text/emotion] vote=0.730 uniform=0.734 best1=0.750 n_val=5990 vram=0.00GB 201s | grade=0.883 inner_auc=0.845 vs conf_auc=0.775
+20:39:38 ===== CYCLE 196 (OUTER -> INNER -> FEEDBACK) =====
+20:43:18 [enc/text/emotion] vote=0.735 uniform=0.734 best1=0.748 n_val=5947 vram=0.00GB 220s | grade=0.883 inner_auc=0.832 vs conf_auc=0.754
+20:43:49 ===== CYCLE 197 (OUTER -> INNER -> FEEDBACK) =====
+20:47:01 [enc/text/emotion] vote=0.735 uniform=0.743 best1=0.748 n_val=6019 vram=0.00GB 192s | grade=0.895 inner_auc=0.832 vs conf_auc=0.778
+20:47:26 ===== CYCLE 198 (OUTER -> INNER -> FEEDBACK) =====
+20:51:03 [enc/text/emotion] vote=0.719 uniform=0.737 best1=0.739 n_val=6026 vram=0.00GB 217s | grade=0.874 inner_auc=0.854 vs conf_auc=0.757
+20:51:24 ===== CYCLE 199 (OUTER -> INNER -> FEEDBACK) =====
+20:54:49 [enc/text/emotion] vote=0.728 uniform=0.735 best1=0.746 n_val=5989 vram=0.00GB 205s | grade=0.880 inner_auc=0.857 vs conf_auc=0.737
+20:55:19 ===== CYCLE 200 (OUTER -> INNER -> FEEDBACK) =====
+20:59:05 [enc/text/emotion] vote=0.731 uniform=0.735 best1=0.740 n_val=5936 vram=0.00GB 226s | grade=0.895 inner_auc=0.863 vs conf_auc=0.805
+20:59:26 ===== CYCLE 201 (OUTER -> INNER -> FEEDBACK) =====
+21:03:19 [enc/text/emotion] vote=0.728 uniform=0.749 best1=0.746 n_val=6004 vram=0.00GB 233s | grade=0.882 inner_auc=0.835 vs conf_auc=0.743
+21:03:48 ===== CYCLE 202 (OUTER -> INNER -> FEEDBACK) =====
+21:07:17 [enc/text/emotion] vote=0.735 uniform=0.743 best1=0.743 n_val=6096 vram=0.00GB 209s | grade=0.890 inner_auc=0.821 vs conf_auc=0.768
+21:07:39 ===== CYCLE 203 (OUTER -> INNER -> FEEDBACK) =====
+21:11:44 [enc/text/emotion] vote=0.737 uniform=0.739 best1=0.747 n_val=6053 vram=0.00GB 245s | grade=0.892 inner_auc=0.843 vs conf_auc=0.788
+21:12:07 ===== CYCLE 204 (OUTER -> INNER -> FEEDBACK) =====
+21:15:27 [enc/text/emotion] vote=0.721 uniform=0.742 best1=0.745 n_val=6057 vram=0.00GB 200s | grade=0.877 inner_auc=0.849 vs conf_auc=0.787
+21:15:54 ===== CYCLE 205 (OUTER -> INNER -> FEEDBACK) =====
+21:19:58 [enc/text/emotion] vote=0.746 uniform=0.744 best1=0.751 n_val=6026 vram=0.00GB 244s | grade=0.887 inner_auc=0.827 vs conf_auc=0.769
+21:20:18 ===== CYCLE 206 (OUTER -> INNER -> FEEDBACK) =====
+21:24:09 [enc/text/emotion] vote=0.732 uniform=0.741 best1=0.753 n_val=5909 vram=0.00GB 231s | grade=0.877 inner_auc=0.840 vs conf_auc=0.772
+21:24:40 ===== CYCLE 207 (OUTER -> INNER -> FEEDBACK) =====
+21:28:41 [enc/text/emotion] vote=0.751 uniform=0.749 best1=0.751 n_val=6031 vram=0.00GB 241s | grade=0.890 inner_auc=0.833 vs conf_auc=0.795
+21:29:04 ===== CYCLE 208 (OUTER -> INNER -> FEEDBACK) =====
+21:33:07 [enc/text/emotion] vote=0.731 uniform=0.732 best1=0.740 n_val=6018 vram=0.00GB 244s | grade=0.881 inner_auc=0.839 vs conf_auc=0.777
+21:33:35 ===== CYCLE 209 (OUTER -> INNER -> FEEDBACK) =====
+21:37:22 [enc/text/emotion] vote=0.718 uniform=0.733 best1=0.742 n_val=5984 vram=0.00GB 227s | grade=0.879 inner_auc=0.862 vs conf_auc=0.775
+21:37:49 ===== CYCLE 210 (OUTER -> INNER -> FEEDBACK) =====
+21:42:06 [enc/text/emotion] vote=0.737 uniform=0.736 best1=0.747 n_val=6050 vram=0.00GB 258s | grade=0.884 inner_auc=0.847 vs conf_auc=0.776
+21:42:36 ===== CYCLE 211 (OUTER -> INNER -> FEEDBACK) =====
+21:46:13 [enc/text/emotion] vote=0.734 uniform=0.744 best1=0.744 n_val=6007 vram=0.00GB 217s | grade=0.889 inner_auc=0.841 vs conf_auc=0.772
+21:46:42 ===== CYCLE 212 (OUTER -> INNER -> FEEDBACK) =====
+21:50:23 [enc/text/emotion] vote=0.735 uniform=0.738 best1=0.747 n_val=6043 vram=0.00GB 221s | grade=0.893 inner_auc=0.838 vs conf_auc=0.768
+21:50:44 RUN COMPLETE

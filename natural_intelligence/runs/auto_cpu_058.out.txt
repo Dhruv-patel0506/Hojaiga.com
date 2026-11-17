@@ -1,0 +1,179 @@
+17:10:34 NI run auto_cpu_058 on CPU; hours=2.0 smoke=False
+17:10:34 explicit task list: ['enc2/audio/gtzan']
+17:10:34 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+17:10:34 [data] enc2/audio/gtzan: n=999 C=10 D=2304 shards=1
+17:16:46 [enc2/audio/gtzan] vote=0.886 uniform=0.883 best1=0.890 n_val=299 vram=0.00GB 372s
+17:17:08 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 299, "n_val": 69, "base_rate": 0.8695651888847351, "inner": {"auc": 0.8555555555555555, "ece": 0.1132184936516527, "brier": 0.08205940574407578, "acc80": 0.9272727370262146}, "outer_conf": {"auc": 0.8796296296296297, "ece": 0.07831409141637277, "brier": 0.0799189880490303, "acc80": 0.9454545378684998}}
+17:17:08 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+17:25:15 [enc2/audio/gtzan] vote=0.906 uniform=0.899 best1=0.913 n_val=298 vram=0.00GB 487s | grade=0.931 inner_auc=n/a vs conf_auc=n/a
+17:25:29 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+17:34:05 [enc2/audio/gtzan] vote=0.890 uniform=0.890 best1=0.883 n_val=291 vram=0.00GB 516s | grade=0.934 inner_auc=n/a vs conf_auc=n/a
+17:34:21 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+17:41:44 [enc2/audio/gtzan] vote=0.899 uniform=0.906 best1=0.905 n_val=307 vram=0.00GB 443s | grade=0.945 inner_auc=n/a vs conf_auc=n/a
+17:41:59 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+17:49:24 [enc2/audio/gtzan] vote=0.892 uniform=0.885 best1=0.885 n_val=295 vram=0.00GB 445s | grade=0.947 inner_auc=n/a vs conf_auc=n/a
+17:49:43 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+17:59:32 [enc2/audio/gtzan] vote=0.883 uniform=0.879 best1=0.890 n_val=281 vram=0.00GB 589s | grade=0.942 inner_auc=n/a vs conf_auc=n/a
+17:59:54 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+18:09:24 [enc2/audio/gtzan] vote=0.861 uniform=0.864 best1=0.854 n_val=287 vram=0.00GB 570s | grade=0.921 inner_auc=n/a vs conf_auc=n/a
+18:09:48 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+18:18:24 [enc2/audio/gtzan] vote=0.861 uniform=0.858 best1=0.861 n_val=310 vram=0.00GB 516s | grade=0.933 inner_auc=n/a vs conf_auc=n/a
+18:18:46 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+18:26:08 [enc2/audio/gtzan] vote=0.909 uniform=0.905 best1=0.905 n_val=296 vram=0.00GB 441s | grade=0.924 inner_auc=n/a vs conf_auc=n/a
+18:26:34 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+18:35:01 [enc2/audio/gtzan] vote=0.885 uniform=0.895 best1=0.892 n_val=314 vram=0.00GB 507s | grade=0.923 inner_auc=n/a vs conf_auc=n/a
+18:35:26 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+18:43:04 [enc2/audio/gtzan] vote=0.897 uniform=0.877 best1=0.891 n_val=302 vram=0.00GB 458s | grade=0.938 inner_auc=n/a vs conf_auc=n/a
+18:43:31 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+18:51:52 [enc2/audio/gtzan] vote=0.911 uniform=0.915 best1=0.904 n_val=281 vram=0.00GB 501s | grade=0.923 inner_auc=n/a vs conf_auc=n/a
+18:52:17 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+18:58:54 [enc2/audio/gtzan] vote=0.885 uniform=0.878 best1=0.888 n_val=312 vram=0.00GB 397s | grade=0.913 inner_auc=n/a vs conf_auc=n/a
+18:59:19 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+19:08:22 [enc2/audio/gtzan] vote=0.865 uniform=0.873 best1=0.873 n_val=275 vram=0.00GB 543s | grade=0.911 inner_auc=n/a vs conf_auc=n/a
+19:08:51 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+19:17:43 [enc2/audio/gtzan] vote=0.862 uniform=0.876 best1=0.869 n_val=298 vram=0.00GB 533s | grade=0.927 inner_auc=n/a vs conf_auc=n/a
+19:18:12 RUN COMPLETE
+08:52:14 NI run auto_cpu_058 on CPU; hours=2.0 smoke=False
+08:52:14 explicit task list: ['enc2/audio/gtzan']
+08:52:19 [resume] from checkpoint: next cycle 15, rounds 15, 15 metric rows, inner net restored
+08:52:19 ===== CYCLE 15 (OUTER-ONLY BOOTSTRAP) =====
+08:52:19 [data] enc2/audio/gtzan: n=999 C=10 D=2304 shards=1
+09:00:46 [enc2/audio/gtzan] vote=0.884 uniform=0.897 best1=0.881 n_val=302 vram=0.00GB 507s
+09:01:14 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 15, "n_records": 302, "n_val": 63, "base_rate": 0.8730158805847168, "inner": {"auc": 0.990909090909091, "ece": 0.08440560977610331, "brier": 0.04121462628245354, "acc80": 1.0}, "outer_conf": {"auc": 0.990909090909091, "ece": 0.0944269805673569, "brier": 0.04474414885044098, "acc80": 1.0}}
+09:01:14 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+09:10:13 [enc2/audio/gtzan] vote=0.889 uniform=0.873 best1=0.882 n_val=306 vram=0.00GB 539s | grade=0.943 inner_auc=n/a vs conf_auc=n/a
+09:10:30 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+09:18:00 [enc2/audio/gtzan] vote=0.879 uniform=0.872 best1=0.872 n_val=321 vram=0.00GB 449s | grade=0.930 inner_auc=n/a vs conf_auc=n/a
+09:18:20 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+09:27:29 [enc2/audio/gtzan] vote=0.873 uniform=0.873 best1=0.863 n_val=292 vram=0.00GB 549s | grade=0.935 inner_auc=n/a vs conf_auc=n/a
+09:27:48 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+09:35:15 [enc2/audio/gtzan] vote=0.910 uniform=0.890 best1=0.907 n_val=301 vram=0.00GB 446s | grade=0.917 inner_auc=n/a vs conf_auc=n/a
+09:35:38 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+09:44:42 [enc2/audio/gtzan] vote=0.880 uniform=0.848 best1=0.887 n_val=309 vram=0.00GB 544s | grade=0.923 inner_auc=n/a vs conf_auc=n/a
+09:45:04 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+09:53:38 [enc2/audio/gtzan] vote=0.879 uniform=0.879 best1=0.879 n_val=306 vram=0.00GB 514s | grade=0.930 inner_auc=n/a vs conf_auc=n/a
+09:54:00 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+10:01:00 [enc2/audio/gtzan] vote=0.875 uniform=0.897 best1=0.872 n_val=281 vram=0.00GB 419s | grade=0.930 inner_auc=n/a vs conf_auc=n/a
+10:01:19 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+10:09:55 [enc2/audio/gtzan] vote=0.863 uniform=0.866 best1=0.863 n_val=306 vram=0.00GB 515s | grade=0.928 inner_auc=n/a vs conf_auc=n/a
+10:10:19 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+10:18:21 [enc2/audio/gtzan] vote=0.882 uniform=0.875 best1=0.878 n_val=287 vram=0.00GB 482s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+10:18:48 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+10:28:07 [enc2/audio/gtzan] vote=0.883 uniform=0.883 best1=0.890 n_val=291 vram=0.00GB 558s | grade=0.927 inner_auc=n/a vs conf_auc=n/a
+10:28:30 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+10:35:22 [enc2/audio/gtzan] vote=0.875 uniform=0.871 best1=0.885 n_val=295 vram=0.00GB 412s | grade=0.923 inner_auc=n/a vs conf_auc=n/a
+10:35:46 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+10:43:35 [enc2/audio/gtzan] vote=0.882 uniform=0.869 best1=0.875 n_val=289 vram=0.00GB 469s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+10:44:00 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+10:53:11 [enc2/audio/gtzan] vote=0.903 uniform=0.900 best1=0.900 n_val=269 vram=0.00GB 552s | grade=0.922 inner_auc=n/a vs conf_auc=n/a
+10:53:32 RUN COMPLETE
+11:39:07 NI run auto_cpu_058 on CPU; hours=2.0 smoke=False
+11:39:07 explicit task list: ['enc2/audio/gtzan']
+11:39:12 [resume] from checkpoint: next cycle 29, rounds 29, 29 metric rows, inner net restored
+11:39:12 ===== CYCLE 29 (OUTER-ONLY BOOTSTRAP) =====
+11:39:12 [data] enc2/audio/gtzan: n=999 C=10 D=2304 shards=1
+11:43:38 [enc2/audio/gtzan] vote=0.918 uniform=0.915 best1=0.925 n_val=306 vram=0.00GB 266s
+11:44:07 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 29, "n_records": 306, "n_val": 66, "base_rate": 0.9090909361839294, "inner": {"auc": 0.9166666666666666, "ece": 0.062047574556235115, "brier": 0.05951419472694397, "acc80": 0.9807692170143127}, "outer_conf": {"auc": 0.9138888888888889, "ece": 0.07164552852962956, "brier": 0.06210937723517418, "acc80": 0.9807692170143127}}
+11:44:07 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+11:52:00 [enc2/audio/gtzan] vote=0.878 uniform=0.864 best1=0.881 n_val=295 vram=0.00GB 474s | grade=0.908 inner_auc=n/a vs conf_auc=n/a
+11:52:20 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+12:01:57 [enc2/audio/gtzan] vote=0.876 uniform=0.873 best1=0.883 n_val=307 vram=0.00GB 576s | grade=0.936 inner_auc=n/a vs conf_auc=n/a
+12:02:20 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+12:11:22 [enc2/audio/gtzan] vote=0.877 uniform=0.877 best1=0.874 n_val=309 vram=0.00GB 542s | grade=0.939 inner_auc=n/a vs conf_auc=n/a
+12:11:46 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+12:20:47 [enc2/audio/gtzan] vote=0.876 uniform=0.870 best1=0.876 n_val=299 vram=0.00GB 540s | grade=0.944 inner_auc=n/a vs conf_auc=n/a
+12:21:15 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+12:31:35 [enc2/audio/gtzan] vote=0.869 uniform=0.872 best1=0.886 n_val=298 vram=0.00GB 620s | grade=0.917 inner_auc=n/a vs conf_auc=n/a
+12:32:03 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+12:41:36 [enc2/audio/gtzan] vote=0.883 uniform=0.883 best1=0.883 n_val=290 vram=0.00GB 573s | grade=0.932 inner_auc=n/a vs conf_auc=n/a
+12:42:05 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+12:49:09 [enc2/audio/gtzan] vote=0.881 uniform=0.875 best1=0.887 n_val=311 vram=0.00GB 424s | grade=0.929 inner_auc=n/a vs conf_auc=n/a
+12:49:36 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+12:57:42 [enc2/audio/gtzan] vote=0.898 uniform=0.892 best1=0.892 n_val=314 vram=0.00GB 486s | grade=0.927 inner_auc=n/a vs conf_auc=n/a
+12:58:09 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+13:06:35 [enc2/audio/gtzan] vote=0.901 uniform=0.891 best1=0.905 n_val=294 vram=0.00GB 505s | grade=0.914 inner_auc=n/a vs conf_auc=n/a
+13:07:04 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+13:14:52 [enc2/audio/gtzan] vote=0.903 uniform=0.913 best1=0.910 n_val=300 vram=0.00GB 468s | grade=0.953 inner_auc=n/a vs conf_auc=n/a
+13:15:19 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+13:25:10 [enc2/audio/gtzan] vote=0.893 uniform=0.876 best1=0.896 n_val=298 vram=0.00GB 591s | grade=0.928 inner_auc=n/a vs conf_auc=n/a
+13:25:40 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+13:34:41 [enc2/audio/gtzan] vote=0.871 uniform=0.877 best1=0.877 n_val=302 vram=0.00GB 541s | grade=0.926 inner_auc=n/a vs conf_auc=n/a
+13:35:07 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+13:43:24 [enc2/audio/gtzan] vote=0.874 uniform=0.861 best1=0.880 n_val=317 vram=0.00GB 497s | grade=0.931 inner_auc=n/a vs conf_auc=n/a
+13:43:54 RUN COMPLETE
+08:29:52 NI run auto_cpu_058 on CPU; hours=2.0 smoke=False
+08:29:52 explicit task list: ['enc2/audio/gtzan']
+08:30:01 [resume] from checkpoint: next cycle 43, rounds 43, 43 metric rows, inner net restored
+08:30:01 ===== CYCLE 43 (OUTER-ONLY BOOTSTRAP) =====
+08:30:02 [data] enc2/audio/gtzan: n=999 C=10 D=2304 shards=1
+08:37:32 [enc2/audio/gtzan] vote=0.895 uniform=0.892 best1=0.881 n_val=295 vram=0.00GB 451s
+08:37:59 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 43, "n_records": 295, "n_val": 55, "base_rate": 0.8727272748947144, "inner": {"auc": 0.9434523809523809, "ece": 0.08727200952443209, "brier": 0.06299349665641785, "acc80": 0.9545454382896423}, "outer_conf": {"auc": 0.9583333333333334, "ece": 0.11540515910495411, "brier": 0.06036372482776642, "acc80": 0.9772727489471436}}
+08:37:59 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+08:45:30 [enc2/audio/gtzan] vote=0.873 uniform=0.873 best1=0.880 n_val=283 vram=0.00GB 451s | grade=0.930 inner_auc=n/a vs conf_auc=n/a
+08:45:46 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+08:55:46 [enc2/audio/gtzan] vote=0.861 uniform=0.864 best1=0.858 n_val=302 vram=0.00GB 600s | grade=0.913 inner_auc=n/a vs conf_auc=n/a
+08:56:06 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+09:04:01 [enc2/audio/gtzan] vote=0.901 uniform=0.898 best1=0.905 n_val=304 vram=0.00GB 476s | grade=0.930 inner_auc=n/a vs conf_auc=n/a
+09:04:22 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+09:14:29 [enc2/audio/gtzan] vote=0.868 uniform=0.864 best1=0.881 n_val=302 vram=0.00GB 607s | grade=0.917 inner_auc=n/a vs conf_auc=n/a
+09:14:50 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+09:24:35 [enc2/audio/gtzan] vote=0.903 uniform=0.887 best1=0.893 n_val=319 vram=0.00GB 585s | grade=0.927 inner_auc=n/a vs conf_auc=n/a
+09:24:57 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+09:33:08 [enc2/audio/gtzan] vote=0.867 uniform=0.871 best1=0.874 n_val=294 vram=0.00GB 491s | grade=0.911 inner_auc=n/a vs conf_auc=n/a
+09:33:32 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+09:42:09 [enc2/audio/gtzan] vote=0.874 uniform=0.888 best1=0.877 n_val=277 vram=0.00GB 517s | grade=0.916 inner_auc=n/a vs conf_auc=n/a
+09:42:30 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+09:49:49 [enc2/audio/gtzan] vote=0.889 uniform=0.899 best1=0.892 n_val=316 vram=0.00GB 440s | grade=0.926 inner_auc=n/a vs conf_auc=n/a
+09:50:09 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+09:57:12 [enc2/audio/gtzan] vote=0.903 uniform=0.896 best1=0.903 n_val=299 vram=0.00GB 422s | grade=0.943 inner_auc=n/a vs conf_auc=n/a
+09:57:29 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+10:05:06 [enc2/audio/gtzan] vote=0.879 uniform=0.873 best1=0.876 n_val=315 vram=0.00GB 457s | grade=0.914 inner_auc=n/a vs conf_auc=n/a
+10:05:25 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+10:12:14 [enc2/audio/gtzan] vote=0.899 uniform=0.889 best1=0.903 n_val=288 vram=0.00GB 410s | grade=0.928 inner_auc=n/a vs conf_auc=n/a
+10:12:34 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+10:20:00 [enc2/audio/gtzan] vote=0.865 uniform=0.875 best1=0.862 n_val=312 vram=0.00GB 445s | grade=0.922 inner_auc=n/a vs conf_auc=n/a
+10:20:18 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+10:27:51 [enc2/audio/gtzan] vote=0.886 uniform=0.883 best1=0.883 n_val=316 vram=0.00GB 453s | grade=0.912 inner_auc=n/a vs conf_auc=n/a
+10:28:20 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+10:33:49 [enc2/audio/gtzan] vote=0.896 uniform=0.873 best1=0.899 n_val=307 vram=0.00GB 329s | grade=0.926 inner_auc=n/a vs conf_auc=n/a
+10:34:13 RUN COMPLETE
+08:09:57 NI run auto_cpu_058 on CPU; hours=2.0 smoke=False
+08:09:57 explicit task list: ['enc2/audio/gtzan']
+08:10:03 [resume] from checkpoint: next cycle 58, rounds 58, 58 metric rows, inner net restored
+08:10:03 ===== CYCLE 58 (OUTER-ONLY BOOTSTRAP) =====
+08:10:03 [data] enc2/audio/gtzan: n=999 C=10 D=2304 shards=1
+08:18:33 [enc2/audio/gtzan] vote=0.894 uniform=0.901 best1=0.898 n_val=293 vram=0.00GB 510s
+08:18:58 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 58, "n_records": 293, "n_val": 60, "base_rate": 0.8999999761581421, "inner": {"auc": 0.9660493827160493, "ece": 0.07906159510215123, "brier": 0.052135393023490906, "acc80": 1.0}, "outer_conf": {"auc": 0.9660493827160493, "ece": 0.0770630031824112, "brier": 0.04600151255726814, "acc80": 1.0}}
+08:18:58 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+08:26:09 [enc2/audio/gtzan] vote=0.873 uniform=0.862 best1=0.876 n_val=283 vram=0.00GB 431s | grade=0.918 inner_auc=n/a vs conf_auc=n/a
+08:26:24 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+08:34:03 [enc2/audio/gtzan] vote=0.869 uniform=0.862 best1=0.873 n_val=283 vram=0.00GB 459s | grade=0.935 inner_auc=n/a vs conf_auc=n/a
+08:34:19 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+08:41:47 [enc2/audio/gtzan] vote=0.910 uniform=0.907 best1=0.910 n_val=279 vram=0.00GB 447s | grade=0.917 inner_auc=n/a vs conf_auc=n/a
+08:42:03 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+08:50:53 [enc2/audio/gtzan] vote=0.859 uniform=0.862 best1=0.869 n_val=312 vram=0.00GB 530s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+08:51:15 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+08:58:48 [enc2/audio/gtzan] vote=0.907 uniform=0.885 best1=0.907 n_val=313 vram=0.00GB 453s | grade=0.914 inner_auc=n/a vs conf_auc=n/a
+08:59:09 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+09:05:49 [enc2/audio/gtzan] vote=0.881 uniform=0.884 best1=0.884 n_val=294 vram=0.00GB 399s | grade=0.923 inner_auc=n/a vs conf_auc=n/a
+09:06:11 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+09:13:04 [enc2/audio/gtzan] vote=0.882 uniform=0.886 best1=0.875 n_val=289 vram=0.00GB 413s | grade=0.934 inner_auc=n/a vs conf_auc=n/a
+09:13:22 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+09:20:15 [enc2/audio/gtzan] vote=0.885 uniform=0.869 best1=0.885 n_val=305 vram=0.00GB 412s | grade=0.937 inner_auc=n/a vs conf_auc=n/a
+09:20:34 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+09:26:23 [enc2/audio/gtzan] vote=0.864 uniform=0.874 best1=0.877 n_val=301 vram=0.00GB 349s | grade=0.933 inner_auc=n/a vs conf_auc=n/a
+09:26:45 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+09:32:34 [enc2/audio/gtzan] vote=0.876 uniform=0.876 best1=0.890 n_val=282 vram=0.00GB 349s | grade=0.933 inner_auc=n/a vs conf_auc=n/a
+09:32:52 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+09:38:52 [enc2/audio/gtzan] vote=0.866 uniform=0.866 best1=0.866 n_val=321 vram=0.00GB 360s | grade=0.923 inner_auc=n/a vs conf_auc=n/a
+09:39:12 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+09:47:12 [enc2/audio/gtzan] vote=0.887 uniform=0.883 best1=0.897 n_val=282 vram=0.00GB 480s | grade=0.926 inner_auc=n/a vs conf_auc=n/a
+09:47:32 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+09:53:57 [enc2/audio/gtzan] vote=0.861 uniform=0.861 best1=0.858 n_val=303 vram=0.00GB 385s | grade=0.911 inner_auc=n/a vs conf_auc=n/a
+09:54:17 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+10:01:20 [enc2/audio/gtzan] vote=0.890 uniform=0.869 best1=0.887 n_val=291 vram=0.00GB 423s | grade=0.923 inner_auc=n/a vs conf_auc=n/a
+10:01:41 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+10:08:37 [enc2/audio/gtzan] vote=0.867 uniform=0.870 best1=0.874 n_val=301 vram=0.00GB 416s | grade=0.915 inner_auc=n/a vs conf_auc=n/a
+10:08:58 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+10:14:51 [enc2/audio/gtzan] vote=0.866 uniform=0.844 best1=0.863 n_val=314 vram=0.00GB 353s | grade=0.931 inner_auc=n/a vs conf_auc=n/a
+10:15:17 RUN COMPLETE

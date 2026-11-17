@@ -1,0 +1,72 @@
+{
+   "n_rows": 6710,
+   "n_with_files": 1055,
+   "n_attempted": 1048,
+   "fig1_yield": {
+      "poisson_r2": -0.014,
+      "poisson_mae": 1.279
+   },
+   "fig2_error": {
+      "heldout_r2": -0.342,
+      "heldout_mae": 1.281,
+      "heldout_rmse": 2.294,
+      "n": 317
+   },
+   "fig3_ingestion": {
+      "auc": 0.918,
+      "pr_auc": 0.311,
+      "balanced_accuracy": 0.542,
+      "positive_rate": 0.035,
+      "n_test_apps": 1975,
+      "n_rows_te": 1993
+   },
+   "fig4_train_vs_eval": {
+      "train": {
+         "n": 756,
+         "yield": 0.296,
+         "grounded": 0.235,
+         "step_grounding": 0.755
+      },
+      "eval": {
+         "n": 292,
+         "yield": 0.223,
+         "grounded": 0.158,
+         "step_grounding": 0.652
+      }
+   },
+   "fig5_actions": {
+      "action_counts": {
+         "CLICK": 752,
+         "TYPE_TEXT": 196,
+         "DRAG_AND_DROP": 37,
+         "HOVER": 122,
+         "KEY_COMBINATION": 60,
+         "RIGHT_CLICK": 37,
+         "DOUBLE_CLICK": 20,
+         "RELEASE": 1,
+         "CONTINUOUS_DRAG": 4,
+         "SELECT": 2,
+         "CLICK_TEXT": 1
+      },
+      "target_kind_counts": {
+         "desktop_gui": 535,
+         "non_gui": 394,
+         "cli": 79,
+         "unknown": 38,
+         "web": 9
+      }
+   },
+   "fig6_depth": {
+      "apps_with_data": 227,
+      "median_steps": 3.0,
+      "total_grounded": 867
+   },
+   "qlora_eval": {
+      "base_acc": 0.0,
+      "adapter_acc": 0.833,
+      "n": 6,
+      "split": "held-out TEST 30%",
+      "round": "round2",
+      "adapter": "brain/qlora_adapter_r2"
+   }
+}

@@ -1,0 +1,85 @@
+{
+   "app_metadata": {
+      "app_name": "QuickText",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Summon the QuickText panel and use it to insert a snippet into an input box",
+   "prerequisite_state": "QuickText is running and the user is in an input box",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Press Ctrl+Shift+8 to summon the QuickText panel",
+         "ui_target": {
+            "element_name": "QuickText panel",
+            "automation_id": null,
+            "hierarchical_path": "System tray > QuickText panel",
+            "element_type": "Panel",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Shift",
+               "8"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The QuickText panel appears over the active window"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Type a few letters to search for a snippet and press Enter to insert it",
+         "ui_target": {
+            "element_name": "Search box",
+            "automation_id": null,
+            "hierarchical_path": "QuickText panel > Search box",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "example"
+         },
+         "expected_state_change": "The matching snippet is pasted into the active input box"
+      }
+   ],
+   "_meta": {
+      "source_app": "QuickText",
+      "app_key": "quicktext",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "QuickText",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:51:58Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,2094 @@
+{
+ "app": "mspaint",
+ "name": "paint",
+ "tier": 1,
+ "mode": "full",
+ "scenario": "",
+ "started": "2026-10-10 12:18:49",
+ "phases": {
+  "target": {
+   "display": "Paint",
+   "id": "Microsoft.Paint_8wekyb3d8bbwe!App",
+   "exe": "",
+   "packaged": true,
+   "chromium": ""
+  },
+  "state": {
+   "packaged": true,
+   "family": "Microsoft.Paint_8wekyb3d8bbwe",
+   "backed_up": "C:\\Users\\dhruv\\AppData\\Local\\Packages\\Microsoft.Paint_8wekyb3d8bbwe\\LocalState",
+   "session_files_cleared": 0
+  },
+  "launch": {
+   "launched": true,
+   "hwnd": 263600,
+   "notes": [
+    "app took focus at startup (returned)"
+   ],
+   "resolved": "Paint",
+   "title": "Untitled - Paint",
+   "launch_s": 3.02
+  },
+  "park": "parked",
+  "tree": {
+   "nodes": 64,
+   "waited_s": 0.0,
+   "frame_only": false
+  },
+  "start_s": 3.4,
+  "deep_scan": {
+   "profile": {
+    "family": "winui",
+    "evidence": [
+     "class MSPaintApp / framework Win32",
+     "XAML controls inside"
+    ],
+    "window_class": "MSPaintApp",
+    "process": "mspaint",
+    "framework_id": "Win32",
+    "route_prior": [
+     "control",
+     "shortcut",
+     "value"
+    ],
+    "expected_a11y": "rich",
+    "adapters": [],
+    "note": "XAML: Invoke / Toggle / Select work; posted mouse input is usually ignored (measured on Paint)"
+   },
+   "nodes": 64,
+   "interactive": 43,
+   "named": 47,
+   "depth": 7,
+   "native_menu_items": 0,
+   "state": "rich",
+   "waited_s": 1.33,
+   "settled": true,
+   "notes": [
+    "a tree cannot see closed drop-downs and menus: those come from native menus, the guide, or opening them (owned windows only)"
+   ]
+  },
+  "vision_scan": {
+   "vision_model": false,
+   "seconds": 1.9,
+   "elements": 34,
+   "named": 27,
+   "by_source": {
+    "uia": 25,
+    "ocr": 11,
+    "cv": 21,
+    "icon_memory": 2
+   },
+   "regions": 6,
+   "path": "full:quick"
+  },
+  "catalog": {
+   "app": "mspaint",
+   "verbs": 21,
+   "with_shortcut": 3,
+   "tooltips": 1,
+   "menus": [
+    "System",
+    "work area"
+   ],
+   "sources": {
+    "uia": 19,
+    "ocr": 1,
+    "vision": 1,
+    "menu-expand": 73
+   },
+   "conflicts": 0,
+   "safety": {
+    "safe": 18,
+    "commit": 1,
+    "runtime": 0,
+    "sensitive": 1,
+    "unsafe": 1
+   },
+   "archetype": "document_text",
+   "seconds": 0.001
+  },
+  "revealed": [
+   "Show toolbar"
+  ],
+  "menus": {
+   "openers": 9,
+   "opened": 9,
+   "items": 73,
+   "dialog_openers": 0,
+   "submenus": 4,
+   "failed": [],
+   "skipped": [
+    {
+     "path": "File > Recent",
+     "why": "lists the person's own files / history - left closed"
+    }
+   ],
+   "seconds": 54.0,
+   "by_opener": {
+    "File": 12,
+    "File > Import to canvas": 2,
+    "File > Save as": 5,
+    "File > Print": 2,
+    "Edit": 4,
+    "View": 8,
+    "View > Zoom": 4,
+    "Select": 6,
+    "Rotate": 4,
+    "Flip": 2,
+    "Brushes": 9,
+    "Copilot": 3,
+    "Zoom": 12
+   }
+  },
+  "catalog_after_menus": {
+   "app": "mspaint",
+   "verbs": 161,
+   "with_shortcut": 21,
+   "tooltips": 1,
+   "menus": [
+    "Brushes",
+    "Colours",
+    "Copilot",
+    "Edit",
+    "File",
+    "Image",
+    "Selection",
+    "Shapes",
+    "System",
+    "Tools",
+    "View",
+    "Zoom",
+    "work area"
+   ],
+   "sources": {
+    "uia": 19,
+    "ocr": 1,
+    "vision": 1,
+    "menu-expand": 73
+   },
+   "conflicts": 1,
+   "safety": {
+    "safe": 140,
+    "commit": 6,
+    "runtime": 0,
+    "sensitive": 6,
+    "unsafe": 9
+   },
+   "archetype": "document_text",
+   "seconds": 0.001
+  },
+  "options": {
+   "candidates": 6,
+   "tried": 1,
+   "opened": 1,
+   "dialogs": 0,
+   "pages": 1,
+   "inline": 0,
+   "nothing": 0,
+   "controls": 9,
+   "left_ok": 0,
+   "skipped": [
+    {
+     "path": "File > Open",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "File > Save",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "File > Save as project",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "File > Share",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "Save",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "Share",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "What's new",
+     "why": "leaves the application (web, account, update, help) - not opened"
+    }
+   ],
+   "surfaces": [
+    {
+     "path": "Open settings",
+     "label": "Open settings",
+     "kind": "page",
+     "controls": [
+      "Back",
+      "App theme",
+      "Light",
+      "Dark",
+      "Use system setting",
+      "Licence Terms",
+      "Privacy Policy",
+      "Third-Party Software Acknowledgements",
+      "Send feedback"
+     ],
+     "how": "UIA Invoke",
+     "left_by": "'Back' button + Escape + closed its windows + re-applied the display the run had set up + Escape",
+     "restored": false,
+     "seconds": 12.6,
+     "effect": "context_change",
+     "added": 9,
+     "still_differs": "text: 'Zoom=100%[4]'->'-'; 'Zoom=100%[4]'->'-'; states: aid:EditableText: sel=None,tog=-1,exp=-1,en=True->-; edit: sel=None,tog=-1,exp=-1,en=True->-"
+    }
+   ],
+   "stopped": "could not prove the application is back after 'Open settings' (text: 'Zoom=100%[4]'->'-'; 'Zoom=100%[4]'->'-'; states: aid:EditableText: sel=None,tog=-1,exp=-1,en=True->-; edit: sel=N): exploring stopped",
+   "tainted": true,
+   "seconds": 16.0
+  },
+  "catalog_after_options": {
+   "app": "mspaint",
+   "verbs": 170,
+   "with_shortcut": 21,
+   "tooltips": 1,
+   "menus": [
+    "Brushes",
+    "Colours",
+    "Copilot",
+    "Edit",
+    "File",
+    "Image",
+    "Open settings",
+    "Selection",
+    "Shapes",
+    "System",
+    "Tools",
+    "View",
+    "Zoom",
+    "work area"
+   ],
+   "sources": {
+    "uia": 19,
+    "ocr": 1,
+    "vision": 1,
+    "menu-expand": 73,
+    "reveal": 9
+   },
+   "conflicts": 1,
+   "safety": {
+    "safe": 147,
+    "commit": 6,
+    "runtime": 0,
+    "sensitive": 8,
+    "unsafe": 9
+   },
+   "archetype": "document_text",
+   "seconds": 0.001
+  },
+  "options_first_try": {
+   "candidates": 6,
+   "tried": 1,
+   "opened": 1,
+   "dialogs": 0,
+   "pages": 1,
+   "inline": 0,
+   "nothing": 0,
+   "controls": 9,
+   "left_ok": 0,
+   "skipped": [
+    {
+     "path": "File > Open",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "File > Save",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "File > Save as project",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "File > Share",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "Save",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "Share",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "What's new",
+     "why": "leaves the application (web, account, update, help) - not opened"
+    }
+   ],
+   "surfaces": [
+    {
+     "path": "Open settings",
+     "label": "Open settings",
+     "kind": "page",
+     "controls": [
+      "Back",
+      "App theme",
+      "Light",
+      "Dark",
+      "Use system setting",
+      "Licence Terms",
+      "Privacy Policy",
+      "Third-Party Software Acknowledgements",
+      "Send feedback"
+     ],
+     "how": "UIA Invoke",
+     "left_by": "'Back' button + Escape + closed its windows + re-applied the display the run had set up + Escape",
+     "restored": false,
+     "seconds": 12.6,
+     "effect": "context_change",
+     "added": 9,
+     "still_differs": "text: 'Zoom=100%[4]'->'-'; 'Zoom=100%[4]'->'-'; states: aid:EditableText: sel=None,tog=-1,exp=-1,en=True->-; edit: sel=None,tog=-1,exp=-1,en=True->-"
+    }
+   ],
+   "stopped": "could not prove the application is back after 'Open settings' (text: 'Zoom=100%[4]'->'-'; 'Zoom=100%[4]'->'-'; states: aid:EditableText: sel=None,tog=-1,exp=-1,en=True->-; edit: sel=N): exploring stopped",
+   "tainted": true,
+   "seconds": 16.0
+  },
+  "relaunched_after": "could not prove the application is back after 'Open settings' (text: 'Zoom=100%[4]'->'-'; 'Zoom=100%[4]'->'-'; states: aid:EditableText: sel=None,tog=-1,exp=-1,",
+  "ui_map": [
+   {
+    "path": "Brushes",
+    "kind": "menu",
+    "count": 9,
+    "items": [
+     "Airbrush",
+     "Brush",
+     "Calligraphy brush",
+     "Calligraphy pen",
+     "Crayon",
+     "Marker",
+     "Natural pencil",
+     "Oil brush",
+     "Watercolour brush"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "Copilot",
+    "kind": "menu",
+    "count": 3,
+    "items": [
+     "Generative erase",
+     "Image Creator",
+     "Remove background"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "Edit",
+    "kind": "menu",
+    "count": 4,
+    "items": [
+     "Copy",
+     "Copy visible layers",
+     "Cut",
+     "Paste"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "File",
+    "kind": "menu",
+    "count": 12,
+    "items": [
+     "Exit",
+     "Image properties",
+     "Import to canvas",
+     "New",
+     "Open",
+     "Print",
+     "Recent",
+     "Save",
+     "Save as",
+     "Save as project",
+     "Set as desktop background",
+     "Share"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "File > Import to canvas",
+    "kind": "submenu",
+    "count": 2,
+    "items": [
+     "From a file",
+     "From scanner or camera"
+    ],
+    "depth": 2
+   },
+   {
+    "path": "File > Print",
+    "kind": "submenu",
+    "count": 2,
+    "items": [
+     "Page setup",
+     "Print preview"
+    ],
+    "depth": 2
+   },
+   {
+    "path": "File > Save as",
+    "kind": "submenu",
+    "count": 5,
+    "items": [
+     "BMP picture",
+     "GIF picture",
+     "JPEG picture",
+     "Other format",
+     "PNG picture"
+    ],
+    "depth": 2
+   },
+   {
+    "path": "Image > Flip",
+    "kind": "submenu",
+    "count": 2,
+    "items": [
+     "Flip horizontal",
+     "Flip vertical"
+    ],
+    "depth": 2
+   },
+   {
+    "path": "Image > Rotate",
+    "kind": "submenu",
+    "count": 4,
+    "items": [
+     "Rotate 180º",
+     "Rotate customised",
+     "Rotate left 90º",
+     "Rotate right 90º"
+    ],
+    "depth": 2
+   },
+   {
+    "path": "Selection > Select",
+    "kind": "submenu",
+    "count": 6,
+    "items": [
+     "Delete",
+     "Free-form",
+     "Invert selection",
+     "Rectangle",
+     "Select all",
+     "Transparent selection"
+    ],
+    "depth": 2
+   },
+   {
+    "path": "View",
+    "kind": "menu",
+    "count": 8,
+    "items": [
+     "Always show toolbar",
+     "Automatically hide toolbar",
+     "Full screen",
+     "Gridlines",
+     "Rulers",
+     "Status bar",
+     "Thumbnail",
+     "Zoom"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "View > Zoom",
+    "kind": "submenu",
+    "count": 4,
+    "items": [
+     "100%",
+     "Fit to window",
+     "Zoom in",
+     "Zoom out"
+    ],
+    "depth": 2
+   },
+   {
+    "path": "Zoom",
+    "kind": "menu",
+    "count": 12,
+    "items": [
+     "100%",
+     "1000%",
+     "200%",
+     "300%",
+     "400%",
+     "500%",
+     "600%",
+     "700%",
+     "75%",
+     "800%",
+     "900%",
+     "Close"
+    ],
+    "depth": 1
+   }
+  ],
+  "tree_picture": {
+   "nodes": 229,
+   "levels": 11,
+   "by_depth": {
+    "0": 1,
+    "1": 2,
+    "2": 5,
+    "3": 2,
+    "4": 24,
+    "5": 24,
+    "6": 15,
+    "7": 34,
+    "8": 74,
+    "9": 25,
+    "10": 23
+   },
+   "top_roles": {
+    "button": 62,
+    "listitem": 53,
+    "image": 46,
+    "text": 29,
+    "group": 10,
+    "pane": 5,
+    "menuitem": 4,
+    "radiobutton": 4
+   }
+  },
+  "perceive_s": 69.1,
+  "guide": {
+   "docs": 5,
+   "runnable_procedures": 17
+  },
+  "unrevealed": [
+   "Hide toolbar"
+  ],
+  "close": {
+   "how": "process ended (it refused to close and holds only the scan's empty document)",
+   "closed": true
+  },
+  "state_after": {
+   "restored": "C:\\Users\\dhruv\\AppData\\Local\\Packages\\Microsoft.Paint_8wekyb3d8bbwe\\LocalState"
+  }
+ },
+ "checkpoints": [
+  {
+   "n": 1,
+   "tag": "launched",
+   "file": "checkpoints/cp_01_launched.png",
+   "at_s": 3.6
+  },
+  {
+   "n": 2,
+   "tag": "launched",
+   "file": "checkpoints/cp_02_launched.png",
+   "at_s": 100.4
+  },
+  {
+   "n": 3,
+   "tag": "after_scan_home",
+   "file": "checkpoints/cp_03_after_scan_home.png",
+   "at_s": 169.6
+  },
+  {
+   "n": 4,
+   "tag": "task01_blocked_Discussion (2)",
+   "file": "checkpoints/cp_04_task01_blocked_Discussion_2_.png",
+   "at_s": 171.5
+  },
+  {
+   "n": 5,
+   "tag": "task02_blocked_How to use layers on Microsoft Paint",
+   "file": "checkpoints/cp_05_task02_blocked_How_to_use_layers_on_Microsoft_Pain.png",
+   "at_s": 173.1
+  },
+  {
+   "n": 6,
+   "tag": "task03_ok_Create a New Image",
+   "file": "checkpoints/cp_06_task03_ok_Create_a_New_Image.png",
+   "at_s": 182.5
+  },
+  {
+   "n": 7,
+   "tag": "task04_ok_Rotate and Flip Images",
+   "file": "checkpoints/cp_07_task04_ok_Rotate_and_Flip_Images.png",
+   "at_s": 190.8
+  },
+  {
+   "n": 8,
+   "tag": "task05_blocked_Print from Paint",
+   "file": "checkpoints/cp_08_task05_blocked_Print_from_Paint.png",
+   "at_s": 195.9
+  },
+  {
+   "n": 9,
+   "tag": "task06_blocked_Open an existing image",
+   "file": "checkpoints/cp_09_task06_blocked_Open_an_existing_image.png",
+   "at_s": 212.8
+  },
+  {
+   "n": 10,
+   "tag": "task07_blocked_Save your work",
+   "file": "checkpoints/cp_10_task07_blocked_Save_your_work.png",
+   "at_s": 217.7
+  },
+  {
+   "n": 11,
+   "tag": "task08_blocked_Crop an Image",
+   "file": "checkpoints/cp_11_task08_blocked_Crop_an_Image.png",
+   "at_s": 226.7
+  },
+  {
+   "n": 12,
+   "tag": "task09_failed_Use the pencil",
+   "file": "checkpoints/cp_12_task09_failed_Use_the_pencil.png",
+   "at_s": 250.6
+  },
+  {
+   "n": 13,
+   "tag": "task10_blocked_Use rectangular selection",
+   "file": "checkpoints/cp_13_task10_blocked_Use_rectangular_selection.png",
+   "at_s": 258.9
+  },
+  {
+   "n": 14,
+   "tag": "task11_blocked_4. Insert text in Microsoft Paint for Windows 11",
+   "file": "checkpoints/cp_14_task11_blocked_4._Insert_text_in_Microsoft_Paint_f.png",
+   "at_s": 264.5
+  },
+  {
+   "n": 15,
+   "tag": "task12_blocked_Remove an Image Background",
+   "file": "checkpoints/cp_15_task12_blocked_Remove_an_Image_Background.png",
+   "at_s": 266.7
+  },
+  {
+   "n": 16,
+   "tag": "task13_blocked_Make a transparent logo or sticker",
+   "file": "checkpoints/cp_16_task13_blocked_Make_a_transparent_logo_or_sticker.png",
+   "at_s": 268.7
+  },
+  {
+   "n": 17,
+   "tag": "task14_blocked_Use free-form selection",
+   "file": "checkpoints/cp_17_task14_blocked_Use_free-form_selection.png",
+   "at_s": 277.5
+  },
+  {
+   "n": 18,
+   "tag": "task15_blocked_Fill an area with color",
+   "file": "checkpoints/cp_18_task15_blocked_Fill_an_area_with_color.png",
+   "at_s": 282.1
+  },
+  {
+   "n": 19,
+   "tag": "task16_failed_Set the canvas size",
+   "file": "checkpoints/cp_19_task16_failed_Set_the_canvas_size.png",
+   "at_s": 316.6
+  },
+  {
+   "n": 20,
+   "tag": "task17_blocked_Use brushes",
+   "file": "checkpoints/cp_20_task17_blocked_Use_brushes.png",
+   "at_s": 322.5
+  },
+  {
+   "n": 21,
+   "tag": "end_of_run",
+   "file": "checkpoints/cp_21_end_of_run.png",
+   "at_s": 322.6
+  }
+ ],
+ "seconds": 322.6,
+ "ledger": [
+  {
+   "goal": "Cocreator",
+   "cite": "Use Copilot+ PC features in Paint > Cocreator",
+   "source": "https://support.microsoft.com/en-us/windows/ai/ai-apps/use-copilot-pc-features-in-paint",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface ('enter a text prompt and start drawing on the Paint canvas, )"
+  },
+  {
+   "goal": "Cocreator",
+   "cite": "Use Copilot+ PC features in Paint > Cocreator",
+   "source": "https://support.microsoft.com/en-us/windows/ai/ai-apps/use-copilot-pc-features-in-paint",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Creativity'; no such control is in the appl; the manual says 'a Style'; no such control is in the applica)"
+  },
+  {
+   "goal": "Generative fill",
+   "cite": "Use Copilot+ PC features in Paint > Generative fill",
+   "source": "https://support.microsoft.com/en-us/windows/ai/ai-apps/use-copilot-pc-features-in-paint",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Sticker generator",
+   "cite": "Use Copilot+ PC features in Paint > Sticker generator",
+   "source": "https://support.microsoft.com/en-us/windows/ai/ai-apps/use-copilot-pc-features-in-paint",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'the Sticker generator'; no such control is )"
+  },
+  {
+   "goal": "Object Select",
+   "cite": "Use Copilot+ PC features in Paint > Object Select",
+   "source": "https://support.microsoft.com/en-us/windows/ai/ai-apps/use-copilot-pc-features-in-paint",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'the Object select tool'; no such control is)"
+  },
+  {
+   "goal": "How to open Paint in Windows 11",
+   "cite": "How to use Paint in Windows 11 > How to open Paint in Windows 11",
+   "source": "https://www.digitalcitizen.life/paint-windows-11/",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "describes launching / updating the application, not using it"
+  },
+  {
+   "goal": "1. Open images in Paint for Windows 11",
+   "cite": "How to use Paint in Windows 11 > How to use Paint for Windows 11 > 1. Open images in Paint for Windows 11",
+   "source": "https://www.digitalcitizen.life/paint-windows-11/",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "describes launching / updating the application, not using it"
+  },
+  {
+   "goal": "2. Use Windows 11’s Paint to edit images (crop, resize, flip, rotate)",
+   "cite": "How to use Paint in Windows 11 > How to use Paint for Windows 11 > 2. Use Windows 11’s Paint to edit images (crop, resize, flip, rotate)",
+   "source": "https://www.digitalcitizen.life/paint-windows-11/",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'size and position of the'; no such control )"
+  },
+  {
+   "goal": "7. Match Paint’s colors with Windows 11 using Dark mode",
+   "cite": "How to use Paint in Windows 11 > How to use Paint for Windows 11 > 7. Match Paint’s colors with Windows 11 using Dark mode",
+   "source": "https://www.digitalcitizen.life/paint-windows-11/",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'cogwheel'; no such control is in the applic)"
+  },
+  {
+   "goal": "How to use layers on Microsoft Paint",
+   "cite": "How to use image layers on Paint for Windows 11 > How to use layers on Microsoft Paint",
+   "source": "https://pureinfotech.com/use-image-layers-paint-windows-11/",
+   "steps": 10,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Layers'; no such control is in the applicat; the manual says 'Plus (+'; no such control is in the applica)"
+  },
+  {
+   "goal": "Comments",
+   "cite": "How to use image layers on Paint for Windows 11 > Comments",
+   "source": "https://pureinfotech.com/use-image-layers-paint-windows-11/",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Comment How-ToWindows'; no such control is )"
+  },
+  {
+   "goal": "Open Paint from the Start menu",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Open Microsoft Paint in Windows 11 > Open Paint from the Start menu",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "describes launching / updating the application, not using it"
+  },
+  {
+   "goal": "Open an image directly in Paint",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Open Microsoft Paint in Windows 11 > Open an image directly in Paint",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "describes launching / updating the application, not using it"
+  },
+  {
+   "goal": "Update Paint",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Open Microsoft Paint in Windows 11 > Update Paint",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "describes launching / updating the application, not using it"
+  },
+  {
+   "goal": "Resize an Image",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Resize an Image",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 6,
+   "grounded": 0.167,
+   "disposition": "skipped",
+   "reason": "its first step ('Open the image.') matches no control and only 17% of the steps do"
+  },
+  {
+   "goal": "Add Text to an Image",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Add Text to an Image",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 5,
+   "grounded": 0.4,
+   "disposition": "skipped",
+   "reason": "its first step ('Click the **Text** tool, usual') matches no control and only 40% of the steps do"
+  },
+  {
+   "goal": "Use Shapes and Lines",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Use Shapes and Lines",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 5,
+   "grounded": 0.2,
+   "disposition": "skipped",
+   "reason": "its first step ('Shapes') matches no control and only 20% of the steps do"
+  },
+  {
+   "goal": "Use the color picker",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Pick and Manage Colors > Use the color picker",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 3,
+   "grounded": 0.333,
+   "disposition": "skipped",
+   "reason": "its first step ('Color picker') matches no control and only 33% of the steps do"
+  },
+  {
+   "goal": "Edit custom colors",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Pick and Manage Colors > Edit custom colors",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Edit colors'; no such control is in the app; the manual says 'color'; no such control is in the applicati)"
+  },
+  {
+   "goal": "Open the Layers panel",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Use Layers in Paint > Open the Layers panel",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Layers'; no such control is in the applicat)"
+  },
+  {
+   "goal": "Add a new layer",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Use Layers in Paint > Add a new layer",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Layers'; no such control is in the applicat; the manual says 'New layer'; no such control is in the appli)"
+  },
+  {
+   "goal": "Use Cocreator or Image Creator",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Use AI Features in Paint > Use Cocreator or Image Creator",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 5,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Use generative erase or related AI editing tools",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Use AI Features in Paint > Use generative erase or related AI editing tools",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the step names no control)"
+  },
+  {
+   "goal": "Paste a screenshot into Paint",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Work with Screenshots in Paint > Paste a screenshot into Paint",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "describes starting the application (Start menu), not using it"
+  },
+  {
+   "goal": "Create a simple how-to image",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Practical Paint Projects You Can Do Quickly > Create a simple how-to image",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (policy: Shift+Win+S is an operating-system shortcut, not one)"
+  },
+  {
+   "goal": "Create a quick social media graphic",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Practical Paint Projects You Can Do Quickly > Create a quick social media graphic",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control)"
+  },
+  {
+   "goal": "Discussion (2)",
+   "cite": "How to use Paint in Windows 11 > Discussion (2)",
+   "source": "https://www.digitalcitizen.life/paint-windows-11/",
+   "steps": 1,
+   "grounded": 1.0,
+   "disposition": "blocked",
+   "reason": "'Close' is unsafe; waiting for a human yes"
+  },
+  {
+   "goal": "Create a New Image",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Create a New Image",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 2,
+   "grounded": 1.0,
+   "disposition": "ok",
+   "reason": ""
+  },
+  {
+   "goal": "Rotate and Flip Images",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Rotate and Flip Images",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 2,
+   "grounded": 1.0,
+   "disposition": "ok",
+   "reason": ""
+  },
+  {
+   "goal": "Print from Paint",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Print from Paint",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 5,
+   "grounded": 0.8,
+   "disposition": "blocked",
+   "reason": "'Print' is sensitive; waiting for a human yes"
+  },
+  {
+   "goal": "Open an existing image",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Open, Save, and Export Images > Open an existing image",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 4,
+   "grounded": 0.75,
+   "disposition": "blocked",
+   "reason": "policy: the Professor never chooses the user's own files"
+  },
+  {
+   "goal": "Save your work",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Open, Save, and Export Images > Save your work",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 4,
+   "grounded": 0.75,
+   "disposition": "blocked",
+   "reason": "'Save as' is commit; waiting for a human yes"
+  },
+  {
+   "goal": "Crop an Image",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Crop an Image",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 4,
+   "grounded": 0.75,
+   "disposition": "blocked",
+   "reason": "'Click and drag around the area you want to keep.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be driven headlessly"
+  },
+  {
+   "goal": "Use the pencil",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Draw with Brushes, Pencil, Eraser, and Fill > Use the pencil",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 4,
+   "grounded": 0.75,
+   "disposition": "failed",
+   "reason": "no route produced a visible effect | tried: control:Pencil -> UIA Toggle => no_effect (nothing changed)"
+  },
+  {
+   "goal": "Use rectangular selection",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Select, Move, Copy, and Delete Parts of an Image > Use rectangular selection",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 3,
+   "grounded": 0.667,
+   "disposition": "blocked",
+   "reason": "'Drag around the area you want to select.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be driven headlessly"
+  },
+  {
+   "goal": "4. Insert text in Microsoft Paint for Windows 11",
+   "cite": "How to use Paint in Windows 11 > How to use Paint for Windows 11 > 4. Insert text in Microsoft Paint for Windows 11",
+   "source": "https://www.digitalcitizen.life/paint-windows-11/",
+   "steps": 2,
+   "grounded": 0.5,
+   "disposition": "blocked",
+   "reason": "underspecified: the step names no control"
+  },
+  {
+   "goal": "Remove an Image Background",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Remove an Image Background",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 2,
+   "grounded": 0.5,
+   "disposition": "blocked",
+   "reason": "'Remove background' is unsafe; waiting for a human yes"
+  },
+  {
+   "goal": "Make a transparent logo or sticker",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Practical Paint Projects You Can Do Quickly > Make a transparent logo or sticker",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 2,
+   "grounded": 0.5,
+   "disposition": "blocked",
+   "reason": "'Remove background' is unsafe; waiting for a human yes"
+  },
+  {
+   "goal": "Use free-form selection",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Select, Move, Copy, and Delete Parts of an Image > Use free-form selection",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 4,
+   "grounded": 0.5,
+   "disposition": "blocked",
+   "reason": "'Draw around the object or area.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be driven headlessly"
+  },
+  {
+   "goal": "Fill an area with color",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Draw with Brushes, Pencil, Eraser, and Fill > Fill an area with color",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 3,
+   "grounded": 0.333,
+   "disposition": "blocked",
+   "reason": "underspecified: the step names no control"
+  },
+  {
+   "goal": "Set the canvas size",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Create a New Image > Set the canvas size",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 6,
+   "grounded": 0.333,
+   "disposition": "failed",
+   "reason": "no route produced a visible effect | tried: value:set value of 'Height:' -> UIA SetValue => no_effect (nothing changed)"
+  },
+  {
+   "goal": "Use brushes",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Draw with Brushes, Pencil, Eraser, and Fill > Use brushes",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps": 4,
+   "grounded": 0.25,
+   "disposition": "blocked",
+   "reason": "underspecified: the step names no control"
+  }
+ ],
+ "ledger_counts": {
+  "blocked": 14,
+  "failed": 2,
+  "ok": 2,
+  "skipped": 24
+ },
+ "tasks": [
+  {
+   "goal": "Discussion (2)",
+   "cite": "How to use Paint in Windows 11 > Discussion (2)",
+   "source": "https://www.digitalcitizen.life/paint-windows-11/",
+   "steps_in_guide": 1,
+   "grounded": 1.0,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "'Close' is unsafe; waiting for a human yes",
+     "remedy": "",
+     "steps": 1,
+     "done": 0,
+     "seconds": 0.2,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Close",
+       "status": "needs_human",
+       "route": "",
+       "effect": "",
+       "summary": "'Close' is unsafe; waiting for a human yes",
+       "vision_ok": null,
+       "ms": 0
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "How to use layers on Microsoft Paint",
+   "cite": "How to use image layers on Paint for Windows 11 > How to use layers on Microsoft Paint",
+   "source": "https://pureinfotech.com/use-image-layers-paint-windows-11/",
+   "steps_in_guide": 1,
+   "grounded": 1.0,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "'Save' is commit; waiting for a human yes",
+     "remedy": "",
+     "steps": 1,
+     "done": 0,
+     "seconds": 0.2,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Save",
+       "status": "needs_human",
+       "route": "",
+       "effect": "",
+       "summary": "'Save' is commit; waiting for a human yes",
+       "vision_ok": null,
+       "ms": 0
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "Create a New Image",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Create a New Image",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps_in_guide": 2,
+   "grounded": 1.0,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ok",
+     "why": "",
+     "remedy": "",
+     "steps": 2,
+     "done": 2,
+     "seconds": 7.9,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "File",
+       "status": "done",
+       "route": "control:File",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text 'File' -> ''; text 'Edit' -> ''; text 'View' -> ''; file: sel=None,tog=-1,exp=0,en=True -> sel=None,tog=-1,exp=1,en=True; added Pop-upH",
+       "vision_ok": null,
+       "ms": 2876
+      },
+      {
+       "step": 2,
+       "verb": "New",
+       "status": "done",
+       "route": "control:New",
+       "effect": "context_change",
+       "summary": "text '' -> 'File'; text '' -> 'Edit'; text '' -> 'View'; file: sel=None,tog=-1,exp=1,en=True -> sel=None,tog=-1,exp=0,en=True; removed Pop-upHost, New, Open,",
+       "vision_ok": null,
+       "ms": 4582
+      }
+     ]
+    }
+   ],
+   "final": "ok"
+  },
+  {
+   "goal": "Rotate and Flip Images",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Rotate and Flip Images",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps_in_guide": 2,
+   "grounded": 1.0,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ok",
+     "why": "",
+     "remedy": "",
+     "steps": 2,
+     "done": 2,
+     "seconds": 7.0,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Rotate",
+       "status": "done",
+       "route": "expand:open 'Rotate' (ExpandCollapse)",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text 'File' -> ''; text 'Edit' -> ''; text 'View' -> ''; aid:RotateDropdown: sel=None,tog=-1,exp=0,en=True -> sel=None,tog=-1,exp=1,en=True;",
+       "vision_ok": null,
+       "ms": 3028
+      },
+      {
+       "step": 2,
+       "verb": "Rotate right 90º",
+       "status": "done",
+       "route": "expand:open 'Rotate right 90º' (ExpandCollapse)",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text '' -> 'Rotate'; text '' -> 'File'; text '' -> 'Edit'; undo: sel=None,tog=-1,exp=-1,en=False -> sel=None,tog=-1,exp=-1,en=True; aid:Rota",
+       "vision_ok": null,
+       "ms": 3535
+      }
+     ]
+    }
+   ],
+   "final": "ok"
+  },
+  {
+   "goal": "Print from Paint",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Print from Paint",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps_in_guide": 5,
+   "grounded": 0.8,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "'Print' is sensitive; waiting for a human yes",
+     "remedy": "",
+     "steps": 5,
+     "done": 1,
+     "seconds": 3.5,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "File",
+       "status": "done",
+       "route": "expand:open 'File' (ExpandCollapse)",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text 'File' -> ''; text 'Edit' -> ''; text 'View' -> ''; file: sel=None,tog=-1,exp=0,en=True -> sel=None,tog=-1,exp=1,en=True; added Pop-upH",
+       "vision_ok": null,
+       "ms": 3112
+      },
+      {
+       "step": 2,
+       "verb": "Print",
+       "status": "needs_human",
+       "route": "",
+       "effect": "",
+       "summary": "'Print' is sensitive; waiting for a human yes",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the step names no control"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "Open an existing image",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Open, Save, and Export Images > Open an existing image",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps_in_guide": 4,
+   "grounded": 0.75,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "policy: the Professor never chooses the user's own files",
+     "remedy": "",
+     "steps": 4,
+     "done": 2,
+     "seconds": 11.4,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "File",
+       "status": "done",
+       "route": "control:File",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text 'File' -> ''; text 'Edit' -> ''; text 'View' -> ''; file: sel=None,tog=-1,exp=0,en=True -> sel=None,tog=-1,exp=1,en=True; added Pop-upH",
+       "vision_ok": null,
+       "ms": 3393
+      },
+      {
+       "step": 2,
+       "verb": "Open",
+       "status": "done",
+       "route": "control:Open",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text '' -> 'File'; text '' -> 'Edit'; text '' -> 'View'; file: sel=None,tog=-1,exp=1,en=True -> sel=None,tog=-1,exp=0,en=True; added Open, E",
+       "vision_ok": null,
+       "ms": 6288
+      },
+      {
+       "step": 3,
+       "verb": "Choose an image from your PC.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "policy: the Professor never chooses the user's own files",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "policy: the Professor never chooses the user's own files"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "Save your work",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Open, Save, and Export Images > Save your work",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps_in_guide": 4,
+   "grounded": 0.75,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "'Save as' is commit; waiting for a human yes",
+     "remedy": "",
+     "steps": 4,
+     "done": 1,
+     "seconds": 3.6,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "File",
+       "status": "done",
+       "route": "control:File",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text 'File' -> ''; text 'Edit' -> ''; text 'View' -> ''; file: sel=None,tog=-1,exp=0,en=True -> sel=None,tog=-1,exp=1,en=True; added Pop-upH",
+       "vision_ok": null,
+       "ms": 3144
+      },
+      {
+       "step": 2,
+       "verb": "Save as",
+       "status": "needs_human",
+       "route": "",
+       "effect": "",
+       "summary": "'Save as' is commit; waiting for a human yes",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'PNG'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "Crop an Image",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Crop an Image",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps_in_guide": 4,
+   "grounded": 0.75,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "'Click and drag around the area you want to keep.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be driven headlessly",
+     "remedy": "",
+     "steps": 4,
+     "done": 2,
+     "seconds": 7.5,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Select",
+       "status": "done",
+       "route": "expand:open 'Select' (ExpandCollapse)",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text 'File' -> ''; text 'Edit' -> ''; text 'View' -> ''; select: sel=False,tog=-1,exp=0,en=True -> sel=False,tog=-1,exp=1,en=True; added Pop",
+       "vision_ok": null,
+       "ms": 3318
+      },
+      {
+       "step": 2,
+       "verb": "Rectangle",
+       "status": "done",
+       "route": "control:Rectangle",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text '' -> 'Select (S)'; text '' -> 'File'; text '' -> 'Edit'; select: sel=False,tog=-1,exp=1,en=True -> sel=True,tog=-1,exp=0,en=True; aid:",
+       "vision_ok": null,
+       "ms": 3547
+      },
+      {
+       "step": 3,
+       "verb": "Click and drag around the area you want to keep.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "'Click and drag around the area you want to keep.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be dr",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "'Click and drag around the area you want to keep.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be driven headlessly"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "Use the pencil",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Draw with Brushes, Pencil, Eraser, and Fill > Use the pencil",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps_in_guide": 4,
+   "grounded": 0.75,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "no_effect",
+     "why": "no route produced a visible effect | tried: control:Black -> UIA Invoke => no_effect (nothing changed)",
+     "remedy": "re-laid-out the parked window; re-read the tree (237 nodes)",
+     "steps": 4,
+     "done": 1,
+     "seconds": 6.9,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Pencil",
+       "status": "done",
+       "route": "control:Pencil",
+       "effect": "state_change",
+       "summary": "select: sel=True,tog=-1,exp=0,en=True -> sel=False,tog=-1,exp=0,en=True; aid:PencilTool: sel=None,tog=0,exp=-1,en=True -> sel=None,tog=1,exp=-1,en=True; added S",
+       "vision_ok": null,
+       "ms": 3288
+      },
+      {
+       "step": 2,
+       "verb": "Black",
+       "status": "no_effect",
+       "route": "",
+       "effect": "",
+       "summary": "no route produced a visible effect",
+       "vision_ok": null,
+       "ms": 3309
+      },
+      {
+       "unknown_in_guide": [
+        "'Draw on the canvas.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be driven headlessly"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\mspaint\\evidence\\09_Use_the_pencil_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "no_effect",
+     "why": "no route produced a visible effect | tried: control:Pencil -> UIA Toggle => no_effect (nothing changed)",
+     "remedy": "re-laid-out the parked window; re-read the tree (237 nodes)",
+     "steps": 4,
+     "done": 0,
+     "seconds": 3.8,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Pencil",
+       "status": "no_effect",
+       "route": "",
+       "effect": "",
+       "summary": "no route produced a visible effect",
+       "vision_ok": null,
+       "ms": 3496
+      },
+      {
+       "unknown_in_guide": [
+        "'Draw on the canvas.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be driven headlessly"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\mspaint\\evidence\\09_Use_the_pencil_a2.png"
+      }
+     ]
+    },
+    {
+     "n": 3,
+     "status": "no_effect",
+     "why": "no route produced a visible effect | tried: control:Pencil -> UIA Toggle => no_effect (nothing changed)",
+     "remedy": "re-laid-out the parked window; re-read the tree (237 nodes) | repeated identically: no further attempts",
+     "steps": 4,
+     "done": 0,
+     "seconds": 3.7,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Pencil",
+       "status": "no_effect",
+       "route": "",
+       "effect": "",
+       "summary": "no route produced a visible effect",
+       "vision_ok": null,
+       "ms": 3450
+      },
+      {
+       "unknown_in_guide": [
+        "'Draw on the canvas.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be driven headlessly"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\mspaint\\evidence\\09_Use_the_pencil_a3.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Use rectangular selection",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Select, Move, Copy, and Delete Parts of an Image > Use rectangular selection",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps_in_guide": 3,
+   "grounded": 0.667,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "'Drag around the area you want to select.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be driven headlessly",
+     "remedy": "",
+     "steps": 3,
+     "done": 2,
+     "seconds": 6.9,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Select",
+       "status": "done",
+       "route": "expand:open 'Select' (ExpandCollapse)",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text 'File' -> ''; text 'Edit' -> ''; text 'View' -> ''; select: sel=False,tog=-1,exp=0,en=True -> sel=False,tog=-1,exp=1,en=True; added Pop",
+       "vision_ok": null,
+       "ms": 3268
+      },
+      {
+       "step": 2,
+       "verb": "Rectangle",
+       "status": "done",
+       "route": "expand:open 'Rectangle' (ExpandCollapse)",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text '' -> 'Select (S)'; text '' -> 'File'; text '' -> 'Edit'; select: sel=False,tog=-1,exp=1,en=True -> sel=True,tog=-1,exp=0,en=True; aid:",
+       "vision_ok": null,
+       "ms": 3098
+      },
+      {
+       "step": 3,
+       "verb": "Drag around the area you want to select.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "'Drag around the area you want to select.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be driven hea",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "'Drag around the area you want to select.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be driven headlessly"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "4. Insert text in Microsoft Paint for Windows 11",
+   "cite": "How to use Paint in Windows 11 > How to use Paint for Windows 11 > 4. Insert text in Microsoft Paint for Windows 11",
+   "source": "https://www.digitalcitizen.life/paint-windows-11/",
+   "steps_in_guide": 2,
+   "grounded": 0.5,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "underspecified: the step names no control",
+     "remedy": "",
+     "steps": 2,
+     "done": 1,
+     "seconds": 3.6,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Text",
+       "status": "done",
+       "route": "control:Text",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text 'File' -> ''; text 'Edit' -> ''; text 'View' -> ''; select: sel=True,tog=-1,exp=0,en=True -> sel=False,tog=-1,exp=0,en=True; text: sel=",
+       "vision_ok": null,
+       "ms": 3072
+      },
+      {
+       "step": 2,
+       "verb": "click or tap on the image where you want to write the text.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the step names no control",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the step names no control"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "Remove an Image Background",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Remove an Image Background",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps_in_guide": 2,
+   "grounded": 0.5,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "'Remove background' is unsafe; waiting for a human yes",
+     "remedy": "",
+     "steps": 2,
+     "done": 0,
+     "seconds": 0.2,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Remove background",
+       "status": "needs_human",
+       "route": "",
+       "effect": "",
+       "summary": "'Remove background' is unsafe; waiting for a human yes",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'PNG'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "Make a transparent logo or sticker",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Practical Paint Projects You Can Do Quickly > Make a transparent logo or sticker",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps_in_guide": 2,
+   "grounded": 0.5,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "'Remove background' is unsafe; waiting for a human yes",
+     "remedy": "",
+     "steps": 2,
+     "done": 0,
+     "seconds": 0.3,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Remove background",
+       "status": "needs_human",
+       "route": "",
+       "effect": "",
+       "summary": "'Remove background' is unsafe; waiting for a human yes",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'PNG'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "Use free-form selection",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Select, Move, Copy, and Delete Parts of an Image > Use free-form selection",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps_in_guide": 4,
+   "grounded": 0.5,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "'Draw around the object or area.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be driven headlessly",
+     "remedy": "",
+     "steps": 4,
+     "done": 2,
+     "seconds": 7.4,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Select",
+       "status": "done",
+       "route": "expand:open 'Select' (ExpandCollapse)",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text '' -> ''; text '' -> ''; text '' -> ''; select: sel=False,tog=-1,exp=0,en=True -> sel=False,tog=-1,exp=1,en=True; added Rectangle, F",
+       "vision_ok": null,
+       "ms": 3334
+      },
+      {
+       "step": 2,
+       "verb": "Free-form",
+       "status": "done",
+       "route": "expand:open 'Free-form' (ExpandCollapse)",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text '' -> 'Select (S)'; text '' -> 'File'; text '' -> 'Edit'; select: sel=False,tog=-1,exp=1,en=True -> sel=True,tog=-1,exp=0,en=True; text",
+       "vision_ok": null,
+       "ms": 3474
+      },
+      {
+       "step": 3,
+       "verb": "Draw around the object or area.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "'Draw around the object or area.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be driven headlessly",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "'Draw around the object or area.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be driven headlessly",
+        "'Release the mouse button to complete the selection.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be driven headlessly"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "Fill an area with color",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Draw with Brushes, Pencil, Eraser, and Fill > Fill an area with color",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps_in_guide": 3,
+   "grounded": 0.333,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "underspecified: the step names no control",
+     "remedy": "",
+     "steps": 3,
+     "done": 1,
+     "seconds": 3.2,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Fill",
+       "status": "done",
+       "route": "control:Fill",
+       "effect": "state_change",
+       "summary": "select: sel=True,tog=-1,exp=0,en=True -> sel=False,tog=-1,exp=0,en=True; fill: sel=None,tog=0,exp=-1,en=True -> sel=None,tog=1,exp=-1,en=True; added Tolerance; ",
+       "vision_ok": null,
+       "ms": 2734
+      },
+      {
+       "step": 2,
+       "verb": "Choose a color.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the step names no control",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the step names no control",
+        "the step names no control"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "Set the canvas size",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Create a New Image > Set the canvas size",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps_in_guide": 6,
+   "grounded": 0.333,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "no_effect",
+     "why": "no route produced a visible effect | tried: value:set value of 'Height:' -> UIA SetValue => no_effect (nothing changed)",
+     "remedy": "re-laid-out the parked window; re-read the tree (273 nodes)",
+     "steps": 6,
+     "done": 3,
+     "seconds": 13.0,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "File",
+       "status": "done",
+       "route": "control:File",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text 'File' -> ''; text 'Edit' -> ''; text 'View' -> ''; file: sel=None,tog=-1,exp=0,en=True -> sel=None,tog=-1,exp=1,en=True; added Pop-upH",
+       "vision_ok": null,
+       "ms": 2723
+      },
+      {
+       "step": 2,
+       "verb": "Image properties",
+       "status": "done",
+       "route": "control:Image properties",
+       "effect": "context_change",
+       "summary": "text '' -> 'Image Properties'; text '' -> 'File Attributes'; text '' -> 'Last Saved:'; file: sel=None,tog=-1,exp=1,en=True -> sel=None,tog=-1,exp=0,en=True; ",
+       "vision_ok": null,
+       "ms": 2743
+      },
+      {
+       "step": 3,
+       "verb": "Width:",
+       "status": "done",
+       "route": "value:set value of 'Width:'",
+       "effect": "state_change",
+       "summary": "text 'Width: Minimum1 Maximum99999=648[3]' -> 'Width: Minimum1 Maximum99999=100[3]'; added Delete, ; context changed in Image Properties; 0.39% of pixels chang",
+       "vision_ok": null,
+       "ms": 2803
+      },
+      {
+       "step": 4,
+       "verb": "Height:",
+       "status": "no_effect",
+       "route": "",
+       "effect": "",
+       "summary": "no route produced a visible effect",
+       "vision_ok": null,
+       "ms": 4260
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Width'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Height'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Pixels'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\mspaint\\evidence\\16_Set_the_canvas_size_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "no_effect",
+     "why": "no route produced a visible effect | tried: value:set value of 'Height:' -> UIA SetValue => no_effect (nothing changed)",
+     "remedy": "re-laid-out the parked window; re-read the tree (273 nodes) | repeated identically: no further attempts",
+     "steps": 6,
+     "done": 3,
+     "seconds": 13.9,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "File",
+       "status": "done",
+       "route": "control:File",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text 'Image Properties' -> ''; text 'File Attributes' -> ''; text 'Last Saved:' -> ''; file: sel=None,tog=-1,exp=0,en=True -> sel=None,tog=-",
+       "vision_ok": null,
+       "ms": 3470
+      },
+      {
+       "step": 2,
+       "verb": "Image properties",
+       "status": "done",
+       "route": "control:Image properties",
+       "effect": "context_change",
+       "summary": "text '' -> 'Image Properties'; text '' -> 'File Attributes'; text '' -> 'Last Saved:'; file: sel=None,tog=-1,exp=1,en=True -> sel=None,tog=-1,exp=0,en=True; ",
+       "vision_ok": null,
+       "ms": 3151
+      },
+      {
+       "step": 3,
+       "verb": "Width:",
+       "status": "done",
+       "route": "value:set value of 'Width:'",
+       "effect": "state_change",
+       "summary": "text 'Width: Minimum1 Maximum99999=648[3]' -> 'Width: Minimum1 Maximum99999=100[3]'; added Delete, ; context changed in Image Properties; 0.39% of pixels chang",
+       "vision_ok": null,
+       "ms": 2756
+      },
+      {
+       "step": 4,
+       "verb": "Height:",
+       "status": "no_effect",
+       "route": "",
+       "effect": "",
+       "summary": "no route produced a visible effect",
+       "vision_ok": null,
+       "ms": 4157
+      },
+      {
+       "unknown_in_guide": [
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\mspaint\\evidence\\16_Set_the_canvas_size_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Use brushes",
+   "cite": "How to Use Microsoft Paint in Windows 11 > Draw with Brushes, Pencil, Eraser, and Fill > Use brushes",
+   "source": "https://geekchamp.com/how-to-use-microsoft-paint-in-windows-11/",
+   "steps_in_guide": 4,
+   "grounded": 0.25,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "underspecified: the step names no control",
+     "remedy": "",
+     "steps": 4,
+     "done": 1,
+     "seconds": 4.3,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Brushes",
+       "status": "done",
+       "route": "expand:open 'Brushes' (ExpandCollapse)",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); aid:BrushesSplitButton: sel=False,tog=-1,exp=0,en=True -> sel=False,tog=-1,exp=1,en=True; added Pop-upHost, Brush, Calligraphy brush, Calligrap",
+       "vision_ok": null,
+       "ms": 3541
+      },
+      {
+       "step": 2,
+       "verb": "Choose a brush style.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the step names no control",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the step names no control",
+        "the step names no control",
+        "'Drag on the canvas to draw.' needs a pointer gesture on the canvas (drag / draw): a toolkit that ignores posted pointer input cannot be driven headlessly"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  }
+ ],
+ "counts": {
+  "ok": 2,
+  "blocked": 13,
+  "failed": 2
+ },
+ "ml": {
+  "outcome": {
+   "seen": 1544,
+   "updates": 4986,
+   "prequential_n": 1543,
+   "ok_accuracy": 0.8587,
+   "ok_baseline": 0.7531,
+   "effect_accuracy": 0.7472,
+   "effect_baseline": 0.4822,
+   "ok_brier": 0.1197,
+   "beats_baseline": true,
+   "parameters": 98646
+  },
+  "candidates": {
+   "seen": 28998,
+   "positives": 18625,
+   "updates": 5885,
+   "prequential_auc": 0.9606,
+   "parameters": 24625,
+   "sources": 3,
+   "ready_to_filter": false
+  },
+  "motor": {
+   "a": 0.1,
+   "b": 0.12,
+   "prior": {
+    "a": 0.1,
+    "b": 0.12
+   },
+   "learned_from_people": false,
+   "n": 0,
+   "r2": null,
+   "rmse": null
+  },
+  "events": {
+   "transitions": 67,
+   "scans": 8,
+   "replay_rounds": 75,
+   "checkpoints": 22
+  },
+  "training_now": false
+ },
+ "history": {
+  "transitions": 1085,
+  "with_effect": 804,
+  "targets": 33,
+  "apps": 1,
+  "by_source": {
+   "guide": 774,
+   "menu-expand": 309,
+   "reveal": 2
+  }
+ },
+ "pointer": {
+  "traces": 588,
+  "avg_planned_s": 0.686,
+  "avg_actual_s": 0.686,
+  "virtual": 0
+ },
+ "focus_returns": 39
+}

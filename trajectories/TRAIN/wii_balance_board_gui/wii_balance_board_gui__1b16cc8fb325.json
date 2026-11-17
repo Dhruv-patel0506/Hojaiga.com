@@ -1,0 +1,196 @@
+{
+   "app_metadata": {
+      "app_name": "Wii Balance Board GUI",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Set up and connect the Wii Balance Board to the Wii Balance Board GUI application",
+   "prerequisite_state": "The user has downloaded and is ready to run the Wii Balance Board GUI application",
+   "total_steps": 6,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click Pair Device(s)",
+         "ui_target": {
+            "element_name": "Pair Device(s)",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Pair Device(s)",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Pair Device(s) button is clicked and the Pair window opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click Pair",
+         "ui_target": {
+            "element_name": "Pair",
+            "automation_id": null,
+            "hierarchical_path": "Pair window > Pair",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Pair button is clicked and the user is prompted to hold the Sync button on the Wii Balance Board"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Hold down the Sync button on the Wii Fit Balance Board located in the battery bay",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user holds down the Sync button on the Wii Balance Board"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click Connect Paired Board while still holding the Sync button",
+         "ui_target": {
+            "element_name": "Connect Paired Board",
+            "automation_id": null,
+            "hierarchical_path": "Pair window > Connect Paired Board",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Connect Paired Board button is clicked and the connection attempt is made"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "If unsuccessful, do not click Pair again",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user does not click Pair again if the connection attempt fails"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Right click the icon in the system tray and click Show",
+         "ui_target": {
+            "element_name": "System Tray icon",
+            "automation_id": null,
+            "hierarchical_path": "System Tray > System Tray icon",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The System Tray icon is right-clicked and the Show option is selected, revealing the application"
+      }
+   ],
+   "_meta": {
+      "source_app": "Wii Balance Board GUI",
+      "app_key": "wii_balance_board_gui",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Wii Balance Board GUI",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T13:51:12Z",
+      "schema_warnings": [
+         "step3_ungrounded_target",
+         "step5_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

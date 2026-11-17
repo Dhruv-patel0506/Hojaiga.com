@@ -1,0 +1,112 @@
+{
+   "app_metadata": {
+      "app_name": "FileHistoryClone",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure FileHistoryClone to start automatic file backups",
+   "prerequisite_state": "User is on a Windows 10/11 system with .NET 8 SDK installed",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install FileHistoryClone using winget",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install tomoyukioya.FileHistoryClone"
+         },
+         "expected_state_change": "FileHistoryClone is installed"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run FileHistoryClone from the Start menu or desktop shortcut",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "FileHistoryClone opens and starts running in the system tray"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Open the Settings window from the system tray icon",
+         "ui_target": {
+            "element_name": "Open Settings",
+            "automation_id": null,
+            "hierarchical_path": "System tray > FileHistoryClone > Open Settings",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Settings window opens"
+      }
+   ],
+   "_meta": {
+      "source_app": "FileHistoryClone",
+      "app_key": "filehistoryclone",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "FileHistoryClone",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:44:21Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

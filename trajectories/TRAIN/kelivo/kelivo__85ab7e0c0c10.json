@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "Kelivo",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Getting started with Kelivo by adding a model provider, starting a conversation, and setting up a workspace.",
+   "prerequisite_state": "Kelivo application is installed and launched on the desktop.",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the Settings menu.",
+         "ui_target": {
+            "element_name": "Settings",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Settings",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Settings dropdown opens showing various options."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select the Providers tab.",
+         "ui_target": {
+            "element_name": "Providers",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Settings > Providers",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Providers tab opens, allowing you to add a model provider."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Add a new provider by entering an API key.",
+         "ui_target": {
+            "element_name": "Add Provider",
+            "automation_id": null,
+            "hierarchical_path": "Settings > Providers > Add Provider",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A dialog appears asking for the API key to add a new provider."
+      }
+   ],
+   "_meta": {
+      "source_app": "Kelivo",
+      "app_key": "kelivo",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Kelivo",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:36:45Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

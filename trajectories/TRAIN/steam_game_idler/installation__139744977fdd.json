@@ -1,0 +1,113 @@
+{
+   "app_metadata": {
+      "app_name": "Steam Game Idler",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure Steam Game Idler",
+   "prerequisite_state": "User is on the Steam Game Idler download page",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the latest release for your OS from the releases page or the website",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User navigates to the download page or the download link is opened in a new tab"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Choose between Steam Sign-in or Legacy Sign-in mode",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User selects either Steam Sign-in or Legacy Sign-in mode"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Start idling!",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Steam Game Idler starts running with the selected sign-in mode"
+      }
+   ],
+   "_meta": {
+      "source_app": "Steam Game Idler",
+      "app_key": "steam_game_idler",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Installation",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:36:27Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

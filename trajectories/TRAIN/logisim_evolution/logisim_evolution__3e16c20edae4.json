@@ -1,0 +1,193 @@
+{
+   "app_metadata": {
+      "app_name": "Logisim-evolution",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Create a simple logic function in Logisim-evolution",
+   "prerequisite_state": "Logisim-evolution is open and ready to use",
+   "total_steps": 6,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "File → New",
+         "ui_target": {
+            "element_name": "File",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The File dropdown opens showing New, Open, Save"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Choose New",
+         "ui_target": {
+            "element_name": "New",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File > New",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A blank untitled project window appears"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Place two Input components and one AND gate",
+         "ui_target": {
+            "element_name": "Input",
+            "automation_id": null,
+            "hierarchical_path": "Toolbox > Input",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "An Input component is placed on the canvas"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Place another Input component",
+         "ui_target": {
+            "element_name": "Input",
+            "automation_id": null,
+            "hierarchical_path": "Toolbox > Input",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Another Input component is placed on the canvas"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Place an AND gate",
+         "ui_target": {
+            "element_name": "AND",
+            "automation_id": null,
+            "hierarchical_path": "Toolbox > AND",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "An AND gate is placed on the canvas"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Add a Probe as the output",
+         "ui_target": {
+            "element_name": "Probe",
+            "automation_id": null,
+            "hierarchical_path": "Toolbox > Probe",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A Probe component is placed on the canvas"
+      }
+   ],
+   "_meta": {
+      "source_app": "Logisim-evolution",
+      "app_key": "logisim_evolution",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Logisim-evolution #",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:15:21Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

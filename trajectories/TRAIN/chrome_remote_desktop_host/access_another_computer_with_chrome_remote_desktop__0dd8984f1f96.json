@@ -1,0 +1,378 @@
+{
+   "app_metadata": {
+      "app_name": "Chrome Remote Desktop Host",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "high_level_task": "Set up and manage Chrome Remote Desktop access",
+   "prerequisite_state": "The user has a computer with Chrome installed",
+   "total_steps": 12,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open Chrome",
+         "ui_target": {
+            "element_name": "Chrome",
+            "automation_id": null,
+            "hierarchical_path": "Application > Chrome",
+            "element_type": "Application",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Chrome browser opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Navigate to remotedesktop.google.com/access",
+         "ui_target": {
+            "element_name": "remotedesktop.google.com/access",
+            "automation_id": null,
+            "hierarchical_path": "Address bar > remotedesktop.google.com/access",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "remotedesktop.google.com/access"
+         },
+         "expected_state_change": "The page loads with the 'Set up Remote Access' section visible"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click Download",
+         "ui_target": {
+            "element_name": "Download",
+            "automation_id": null,
+            "hierarchical_path": "Set up Remote Access > Download",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The download starts for the Chrome Remote Desktop installer"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Follow onscreen directions to install Chrome Remote Desktop",
+         "ui_target": {
+            "element_name": "Onscreen directions",
+            "automation_id": null,
+            "hierarchical_path": "Installer > Onscreen directions",
+            "element_type": "Window",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CONTINUOUS_DRAG",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Chrome Remote Desktop is installed"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Enter your computer password to give Chrome Remote Desktop access",
+         "ui_target": {
+            "element_name": "Password prompt",
+            "automation_id": null,
+            "hierarchical_path": "Installer > Password prompt",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Your password"
+         },
+         "expected_state_change": "The installation completes and the Chrome Remote Desktop settings appear"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Follow onscreen directions to set up remote access",
+         "ui_target": {
+            "element_name": "Onscreen directions",
+            "automation_id": null,
+            "hierarchical_path": "Settings > Onscreen directions",
+            "element_type": "Window",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CONTINUOUS_DRAG",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Remote access is set up"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Click Generate Code",
+         "ui_target": {
+            "element_name": "Generate Code",
+            "automation_id": null,
+            "hierarchical_path": "Settings > Generate Code",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A code is generated and displayed"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Copy the code and send to the person you want to have access to your computer",
+         "ui_target": {
+            "element_name": "Code",
+            "automation_id": null,
+            "hierarchical_path": "Settings > Code",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The code is copied to the clipboard"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Enter the access code on the site to allow them full access to your computer",
+         "ui_target": {
+            "element_name": "Access code input",
+            "automation_id": null,
+            "hierarchical_path": "remotedesktop.google.com/support > Access code input",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "The generated code"
+         },
+         "expected_state_change": "The person is granted access"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Click Share",
+         "ui_target": {
+            "element_name": "Share",
+            "automation_id": null,
+            "hierarchical_path": "remotedesktop.google.com/support > Share",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The person is granted full access"
+      },
+      {
+         "step_id": 11,
+         "low_level_instruction": "Click Stop Sharing",
+         "ui_target": {
+            "element_name": "Stop Sharing",
+            "automation_id": null,
+            "hierarchical_path": "remotedesktop.google.com/support > Stop Sharing",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The sharing session is ended"
+      },
+      {
+         "step_id": 12,
+         "low_level_instruction": "Click Disable remote connections",
+         "ui_target": {
+            "element_name": "Disable remote connections",
+            "automation_id": null,
+            "hierarchical_path": "remotedesktop.google.com/access > Disable remote connections",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The computer is removed from the list of accessible computers"
+      }
+   ],
+   "_meta": {
+      "source_app": "Chrome Remote Desktop Host",
+      "app_key": "chrome_remote_desktop_host",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Access another computer with Chrome Remote Desktop",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T13:17:22Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

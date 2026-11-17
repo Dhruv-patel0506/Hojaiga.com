@@ -1,0 +1,379 @@
+{
+   "app_metadata": {
+      "app_name": "Microsoft Visual Studio Code",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Customize the layout of Microsoft Visual Studio Code",
+   "prerequisite_state": "Microsoft Visual Studio Code is open with the default layout",
+   "total_steps": 12,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Enable modern UI layout",
+         "ui_target": {
+            "element_name": "Workbench",
+            "automation_id": null,
+            "hierarchical_path": "Window > Workbench",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The layout density options appear in the title bar"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select 'Customize Layout' from the title bar",
+         "ui_target": {
+            "element_name": "Customize Layout",
+            "automation_id": null,
+            "hierarchical_path": "Window > Title Bar > Customize Layout",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The layout density options appear in the dropdown"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Select 'Compact' from the layout density options",
+         "ui_target": {
+            "element_name": "Compact",
+            "automation_id": null,
+            "hierarchical_path": "Window > Title Bar > Customize Layout > Layout Density > Compact",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The layout density changes to compact"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Move the Primary Side Bar to the right",
+         "ui_target": {
+            "element_name": "Primary Side Bar",
+            "automation_id": null,
+            "hierarchical_path": "Window > Side Bar > Primary Side Bar",
+            "element_type": "Panel",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Primary Side Bar moves to the right"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Select 'Move Primary Side Bar Right' from the context menu",
+         "ui_target": {
+            "element_name": "Move Primary Side Bar Right",
+            "automation_id": null,
+            "hierarchical_path": "Window > Side Bar > Primary Side Bar > Context Menu > Move Primary Side Bar Right",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Primary Side Bar moves to the right"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Toggle the Secondary Side Bar visibility",
+         "ui_target": {
+            "element_name": "Secondary Side Bar",
+            "automation_id": null,
+            "hierarchical_path": "Window > Side Bar > Secondary Side Bar",
+            "element_type": "Panel",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Secondary Side Bar visibility toggles"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Select 'Toggle Secondary Side Bar Visibility' from the context menu",
+         "ui_target": {
+            "element_name": "Toggle Secondary Side Bar Visibility",
+            "automation_id": null,
+            "hierarchical_path": "Window > Side Bar > Secondary Side Bar > Context Menu > Toggle Secondary Side Bar Visibility",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Secondary Side Bar visibility toggles"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Move the Command Palette to the top",
+         "ui_target": {
+            "element_name": "Command Palette",
+            "automation_id": null,
+            "hierarchical_path": "Window > Command Palette",
+            "element_type": "Panel",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Command Palette moves to the top"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Move the Activity Bar to the top",
+         "ui_target": {
+            "element_name": "Activity Bar",
+            "automation_id": null,
+            "hierarchical_path": "Window > Activity Bar",
+            "element_type": "Panel",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Activity Bar moves to the top"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Set the Activity Bar to compact mode",
+         "ui_target": {
+            "element_name": "Activity Bar",
+            "automation_id": null,
+            "hierarchical_path": "Window > Activity Bar",
+            "element_type": "Panel",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Activity Bar switches to compact mode"
+      },
+      {
+         "step_id": 11,
+         "low_level_instruction": "Select 'Compact' from the Activity Bar context menu",
+         "ui_target": {
+            "element_name": "Compact",
+            "automation_id": null,
+            "hierarchical_path": "Window > Activity Bar > Context Menu > Compact",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Activity Bar switches to compact mode"
+      },
+      {
+         "step_id": 12,
+         "low_level_instruction": "Maximize the Panel size",
+         "ui_target": {
+            "element_name": "Panel",
+            "automation_id": null,
+            "hierarchical_path": "Window > Panel",
+            "element_type": "Panel",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Panel size maximizes"
+      }
+   ],
+   "_meta": {
+      "source_app": "Microsoft Visual Studio Code",
+      "app_key": "microsoft_visual_studio_code",
+      "dataset_split": "TRAIN",
+      "category": "Code Editor",
+      "guide_title": "Custom Layout",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:14:46Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

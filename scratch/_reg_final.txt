@@ -1,0 +1,58 @@
+Hojaiga System Intelligence & Reliability Suite
+================================================================================
+[pointer preflight] pointer (988, 611)->(988, 611) cause=still (guard calls=0, hardware events=0, injected events=0, hardware keys=0, fastest step=0px at 0.0px/ms, hook=on)  -> quiet
+[vision gate] up=True started=True (started in 62s)
+
+================================================================================
+TEST ANY1 [ANYAPP]: ANY1: any-app discovery - scan walks are bounded by TIME with a visible depth rail, readiness follows a splash chain instead of a flat 10 s, an unnamed DataGrid is grounded by role, XAML hosts are recognised
+================================================================================
+[PASS] 45.61s — splash-chain-extends-the-deadline-then-ready=OK(ready after 3.4s with a flat deadline of 1s; extended by 1.2s because the window set kept changing); a-static-never-ready-app-still-gives-up-at-the-flat-deadline=OK(gave up after 1.0s (deadline 1s), no extension); deep-scan-reports-its-limits=OK({'nodes_walked': 67, 'max_depth_seen': 7, 'walk_max_depth': 64, 'depth_hit_cap': False, 'time_budget_ms': 6000, 'time_budget_hit': False, 'walk_ms': 188}); time-budget-cuts-the-walk-and-says-so=OK(1 ms budget: 10 of 67 nodes, time_budget_hit=True); depth-rail-is-secondary-and-visible=OK(rail=2: depth_hit_cap=True (default rail 64: hit=False)); organ_41-time-budget-and-visible-rails=OK(full 58 nodes (depth rail 32, hit=False); 1 ms budget -> 5 nodes time_budget_hit=True; rail 2 -> depth_hit_cap=True); xaml-host-recognised-and-win32-window-not=OK(calculator frame xaml=True; native Win32 window xaml=False); excel-grid-grounded-by-role-with-honest-sampling=OK(263 elements; datagrid elements=1 (named ['Grid']); cells surfaced 120 of 492 (cap 120, sampled out 372)); physical-pointer-untouched-and-no-guard-violations=OK(pointer (988, 611)->(988, 611), guard violations+=0, largest 10 ms step=0px)
+        excel_elements = 263
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 13/10
+        proc = threads=34 handles=470 rss_mb=123
+        gdi_growth = +12/+8
+
+================================================================================
+TEST LM1 [SCANKNOW]: LM1: every section + control + window-relative position is mapped generically; deepening reversible
+================================================================================
+[FAIL] 27.42s — notepad: 155 controls in 20 regions {'window': 1, 'document': 1, 'tabstrip': 1, 'list': 3, 'menubar': 2, 'dropdown': 4, 'sidebar_right': 2, 'content': 4, 'menu': 2} deepen={'tabs_visited': 0, 'tab_strips_restored': 0, 'dropdowns_candidates': 4, 'dropdowns_opened': 4, 'tree_nodes_expanded': 0, 'scrollables_paged': 0} opaque=0 File@[0.0355, 0.0948] view_similarity=1.000 6.1s | conds=all-true | paint: 82 controls in 7 regions {'window': 1, 'menubar': 2, 'canvas': 2, 'titlebar': 1, 'dropdown': 1} deepen={'tabs_visited': 0, 'tab_strips_restored': 0, 'dropdowns_candidates': 1, 'dropdowns_opened': 1, 'tree_nodes_expanded': 0, 'scrollables_paged': 0} opaque=2 File@[0.026, 0.073] view_similarity=1.000 2.9s | conds={'paint_controls>=100 (got 82)': False} | FAILED: ['paint']
+        apps = 2
+        pointer = still drift=0px hw=0 inj=0
+        gdi_user_end = 13/10
+        proc = threads=32 handles=492 rss_mb=128
+        gdi_growth = +0/+5
+
+================================================================================
+TEST SCK1 [SCANKNOW]: SCK1: organ_30 scan consults organ_48/50 knowledge: E0 + layout first, cached on re-scan
+================================================================================
+[ENV-BLOCKED] 45.82s — ABORTED-ENV (not a code failure): somebody was using this machine while the test ran (967 physical input events, 0 synthetic) -> its outcome is not measurable. Unsettled checks: the run itself. pointer (988, 611)->(1069, 587) cause=human-hand (guard calls=0, hardware events=967, injected events=0, hardware keys=0, fastest step=826px at 156.98px/ms, hook=on) | scan1: 230 controls, learned 349 commands (E0 Nones) in 19.4s; scan2: E0 ['skipped'] cached, skipped_known=14, catalog_only=0 in 21.3s; stop=completed
+        scan1_s = 19.4
+        scan2_s = 21.3
+        pointer = human-hand drift=105px hw=967 inj=0
+        gdi_user_end = 13/10
+        proc = threads=32 handles=581 rss_mb=186
+        gdi_growth = +0/+5
+
+================================================================================
+SUMMARY — 1/3 PASS, 1 ENV-BLOCKED, 1 FAIL in 185.6s
+================================================================================
+[PASS] ANY1 ANY1: any-app discovery - scan walks are bounded by TIME w  45614.0 ms
+[FAIL] LM1 LM1: every section + control + window-relative position is  27424.9 ms
+[ENV-BLOCKED] SCK1 SCK1: organ_30 scan consults organ_48/50 knowledge: E0 + l  45824.8 ms
+
+================================================================================
+GDI OBJECT BUDGET (cap 10000) — end-of-test count / growth
+================================================================================
+  curve: ANY1:13(+12) LM1:13(+0) SCK1:13(+0)
+   ANY1 consumed    12 handles (process at 13)
+
+================================================================================
+RECONCILED SUBSYSTEM RANKINGS (70% pass-rate, 30% latency; B=env-blocked, neutral)
+================================================================================
+ #  SUBSYSTEM                                      TESTS   SCORE    AVG MS
+ 1  Any-app discovery (time-budget scan, window find)           1/1   70.0   45614.0
+ 2  Knowledge-assisted scanning (organ_49/50) 0/2 (+1B ENV)    0.0   36624.8
+
+Full log written: D:\new_automation\All codes\core_organs\system_intelligence_results_partial.txt
+[vision gate] vision(Qwen2.5-VL-7B :8081) server=up calls=0 found=0 errors=0 avg=0ms by_fn={} log=data\vision_log.jsonl

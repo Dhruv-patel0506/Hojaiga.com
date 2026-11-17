@@ -1,0 +1,893 @@
+{
+ "stamp": "20261026_213340",
+ "summary": {
+  "tasks": 20,
+  "cold": {
+   "success": "10/20",
+   "success_rate": 0.5,
+   "mean_clicks_when_ok": 1.1,
+   "mean_seconds_all": 8.0
+  },
+  "pool": {
+   "success": "13/20",
+   "success_rate": 0.65,
+   "mean_clicks_when_ok": 1.2,
+   "mean_seconds_all": 8.4
+  },
+  "retrieval_top1_correct": "18/20",
+  "retrieval_in_top3": "20/20",
+  "pool_found_nothing": 0,
+  "pool_healed_after_a_stale_path": 1,
+  "pool_ok_by_stored_path_alone": 12,
+  "mean_retrieval_ms": 270,
+  "pool_failures_by_reason": {
+   "the pool had no": 0,
+   "step '": 0,
+   "could not click": 0,
+   "the page did not": 0
+  }
+ },
+ "results": [
+  {
+   "task": {
+    "host": "youtube.com",
+    "site": "Youtube",
+    "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+    "category": "",
+    "chain": [
+     "YouTube Home"
+    ],
+    "label": "YouTube Home",
+    "outcome": "opened a new page",
+    "expect_title": "Me at the zoo - YouTube",
+    "expect_items": [],
+    "stored_goal": "Go to the YouTube Home page on Youtube",
+    "id": 1,
+    "question": "How do I get to YouTube Home on Youtube?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 4.5,
+    "picture": "task_01_cold_fail.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the YouTube Home page on Youtube",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 697,
+    "pid": "2b349406eb8bdd64c9e9",
+    "seconds": 9.9,
+    "picture": "task_01_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "openstreetmap.org",
+    "site": "Openstreetmap",
+    "url": "https://openstreetmap.org",
+    "category": "",
+    "chain": [
+     "Find directions between tw"
+    ],
+    "label": "Find directions between two points",
+    "outcome": "opened a new page",
+    "expect_title": "Changesets | OpenStreetMap",
+    "expect_items": [],
+    "stored_goal": "Go to the Find directions between two points page on Openstreetmap",
+    "id": 2,
+    "question": "How do I get to Find directions between two points on Openstreetmap?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 20.9,
+    "picture": "task_02_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Find directions between two points page on Openstreetmap",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 173,
+    "pid": "9e2daed5a0e8d8d377ed",
+    "seconds": 17.9,
+    "picture": "task_02_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "tinypng.com",
+    "site": "Tinypng",
+    "url": "https://tinypng.com",
+    "category": "",
+    "chain": [
+     "Tools",
+     "More about conversion"
+    ],
+    "label": "More about conversion",
+    "outcome": "opened a new page",
+    "expect_title": "TinyPNG\u2019s online image compressor and image converter",
+    "expect_items": [],
+    "stored_goal": "Go to the More about conversion page on Tinypng via Tools",
+    "id": 3,
+    "question": "How do I get to More about conversion on Tinypng?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 8.1,
+    "picture": "task_03_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the More about conversion page on Tinypng via Tools",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 206,
+    "pid": "d6177192413c206e76d9",
+    "seconds": 7.5,
+    "picture": "task_03_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "time.is",
+    "site": "Time",
+    "url": "https://time.is",
+    "category": "",
+    "chain": [
+     "Make UTC time default"
+    ],
+    "label": "Make UTC time default",
+    "outcome": "opened a new page",
+    "expect_title": "Time.is 09:42",
+    "expect_items": [],
+    "stored_goal": "Go to the Make UTC time default page on Time",
+    "id": 4,
+    "question": "How do I get to Make UTC time default on Time?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 1.5,
+    "picture": "task_04_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "the stored path failed (skipped ['Make UTC time default']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "Make UTC time default"
+    ],
+    "fallback_clicks": 0,
+    "retrieved": "Go to the Make UTC time default page on Time",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 194,
+    "pid": "c61993a833b4bbb13e2a",
+    "seconds": 1.4,
+    "picture": "task_04_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "w3schools.com",
+    "site": "W3schools",
+    "url": "https://w3schools.com",
+    "category": "",
+    "chain": [
+     "Exercises",
+     "What is an Exercise?"
+    ],
+    "label": "What is an Exercise?",
+    "outcome": "opened a new page",
+    "expect_title": "W3Schools Exercises",
+    "expect_items": [],
+    "stored_goal": "Go to the What is an Exercise? page on W3schools via Exercises",
+    "id": 5,
+    "question": "How do I get to What is an Exercise? on W3schools?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 1,
+    "why": "nothing on the page matches",
+    "seconds": 8.2,
+    "picture": "task_05_cold_fail.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Exercises Practice with interactive exercises Browse Exercises page on W3schools via Exercises",
+    "retrieved_correct": false,
+    "in_top3": true,
+    "retrieval_ms": 179,
+    "pid": "d66364677de7ca823c8d",
+    "seconds": 8.7,
+    "picture": "task_05_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "lobste.rs",
+    "site": "Lobste",
+    "url": "https://lobste.rs",
+    "category": "",
+    "chain": [
+     "chat room"
+    ],
+    "label": "chat room",
+    "outcome": "opened a new page",
+    "expect_title": "Chat | Lobsters",
+    "expect_items": [],
+    "stored_goal": "Go to the chat room page on Lobste",
+    "id": 6,
+    "question": "How do I get to chat room on Lobste?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 2.6,
+    "picture": "task_06_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "the stored path failed (skipped ['chat room']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "chat room"
+    ],
+    "fallback_clicks": 0,
+    "retrieved": "Go to the chat room page on Lobste",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 148,
+    "pid": "4e9bdfa6d6cf1bbdf2c4",
+    "seconds": 2.9,
+    "picture": "task_06_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "calculator.net",
+    "site": "Calculator",
+    "url": "https://calculator.net",
+    "category": "",
+    "chain": [
+     "sitemap"
+    ],
+    "label": "sitemap",
+    "outcome": "opened a new page",
+    "expect_title": "Sitemap",
+    "expect_items": [],
+    "stored_goal": "Go to the sitemap page on Calculator",
+    "id": 7,
+    "question": "How do I get to sitemap on Calculator?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 3.5,
+    "picture": "task_07_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the sitemap page on Calculator",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 155,
+    "pid": "b4194a61fbbc1ffbc43e",
+    "seconds": 3.7,
+    "picture": "task_07_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "ted.com",
+    "site": "Ted",
+    "url": "https://ted.com",
+    "category": "",
+    "chain": [
+     "Sort by",
+     "Oldest"
+    ],
+    "label": "Oldest",
+    "outcome": "opened a new page",
+    "expect_title": "TED Talks",
+    "expect_items": [],
+    "stored_goal": "Go to the Oldest page on Ted via Sort by",
+    "id": 8,
+    "question": "How do I get to Oldest on Ted?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 5,
+    "why": "nothing on the page matches",
+    "seconds": 14.0,
+    "picture": "task_08_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 5,
+    "why": "the stored path failed (skipped ['Sort by', 'Oldest']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "Sort by",
+     "Oldest"
+    ],
+    "fallback_clicks": 5,
+    "retrieved": "Go to the Oldest page on Ted via Sort by",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 383,
+    "pid": "7e7920eb3f39d2bd5aa9",
+    "seconds": 13.2,
+    "picture": "task_08_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "openstreetmap.org",
+    "site": "Openstreetmap",
+    "url": "https://openstreetmap.org",
+    "category": "",
+    "chain": [
+     "Copyright"
+    ],
+    "label": "Copyright",
+    "outcome": "opened a new page",
+    "expect_title": "Copyright and License | OpenStreetMap",
+    "expect_items": [],
+    "stored_goal": "Go to the Copyright page on Openstreetmap",
+    "id": 9,
+    "question": "How do I get to Copyright on Openstreetmap?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 4.7,
+    "picture": "task_09_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Copyright page on Openstreetmap",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 287,
+    "pid": "f4e916d7fa3dabcd88b4",
+    "seconds": 5.2,
+    "picture": "task_09_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "tinypng.com",
+    "site": "Tinypng",
+    "url": "https://tinypng.com",
+    "category": "",
+    "chain": [
+     "Pricing"
+    ],
+    "label": "Pricing",
+    "outcome": "opened a new page",
+    "expect_title": "Tinify Web subscriptions Pricing - Unlock more features",
+    "expect_items": [],
+    "stored_goal": "Go to the Pricing page on Tinypng",
+    "id": 10,
+    "question": "How do I get to Pricing on Tinypng?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 6.7,
+    "picture": "task_10_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Pricing page on Tinypng",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 171,
+    "pid": "ea0334c698a9fdccdc54",
+    "seconds": 6.9,
+    "picture": "task_10_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "proton.me",
+    "site": "Proton",
+    "url": "https://proton.me",
+    "category": "",
+    "chain": [
+     "Bisnis"
+    ],
+    "label": "Bisnis",
+    "outcome": "opened a new page",
+    "expect_title": "Solusi bisnis aman | Proton for Business",
+    "expect_items": [],
+    "stored_goal": "Go to the Bisnis page on Proton",
+    "id": 11,
+    "question": "How do I get to Bisnis on Proton?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "seconds": 8.2,
+    "picture": "task_11_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "healed": true,
+    "skipped": [
+     "Bisnis"
+    ],
+    "fallback_clicks": 2,
+    "retrieved": "Go to the Bisnis page on Proton",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 152,
+    "pid": "4418124cb916d1a0da9c",
+    "seconds": 9.5,
+    "picture": "task_11_pool_ok.png",
+    "filed_correction": true
+   }
+  },
+  {
+   "task": {
+    "host": "bbc.com",
+    "site": "Bbc",
+    "url": "https://bbc.com",
+    "category": "",
+    "chain": [
+     "Open menu",
+     "Culture"
+    ],
+    "label": "Culture",
+    "outcome": "opened a new page",
+    "expect_title": "BBC Culture | Arts, Film & TV, Reviews, Books, Music, Style",
+    "expect_items": [],
+    "stored_goal": "Go to the Culture page on Bbc via Open menu",
+    "id": 12,
+    "question": "How do I get to Culture on Bbc?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 8.7,
+    "picture": "task_12_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Culture page on Bbc via Open menu",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 342,
+    "pid": "86f0fd85b6a75a12443c",
+    "seconds": 11.2,
+    "picture": "task_12_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "duckduckgo.com",
+    "site": "Duckduckgo",
+    "url": "https://duckduckgo.com",
+    "category": "",
+    "chain": [
+     "Learn about DuckDuckGo"
+    ],
+    "label": "Learn about DuckDuckGo",
+    "outcome": "opened a new page",
+    "expect_title": "About DuckDuckGo",
+    "expect_items": [],
+    "stored_goal": "Go to the Learn about DuckDuckGo page on Duckduckgo",
+    "id": 13,
+    "question": "How do I get to Learn about DuckDuckGo on Duckduckgo?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 4.1,
+    "picture": "task_13_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Learn about DuckDuckGo page on Duckduckgo",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 273,
+    "pid": "b807f8288432ec30e003",
+    "seconds": 2.7,
+    "picture": "task_13_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "speedtest.net",
+    "site": "Speedtest",
+    "url": "https://speedtest.net",
+    "category": "",
+    "chain": [
+     "Apps"
+    ],
+    "label": "Apps",
+    "outcome": "opened a new page",
+    "expect_title": "Speedtest Apps: Our internet speed test available across a v",
+    "expect_items": [],
+    "stored_goal": "Go to the Apps page on Speedtest",
+    "id": 14,
+    "question": "How do I get to Apps on Speedtest?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 8.2,
+    "picture": "task_14_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Apps page on Speedtest",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 179,
+    "pid": "592b7be6add359a6239e",
+    "seconds": 7.3,
+    "picture": "task_14_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "ted.com",
+    "site": "Ted",
+    "url": "https://ted.com",
+    "category": "",
+    "chain": [
+     "Type to search"
+    ],
+    "label": "Type to search",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Type to search",
+     "Cancel"
+    ],
+    "stored_goal": "Open the Type to search menu on Ted",
+    "id": 15,
+    "question": "I want to see the Type to search menu on Ted. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 6,
+    "why": "nothing on the page matches",
+    "seconds": 14.7,
+    "picture": "task_15_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 6,
+    "why": "the stored path failed (skipped []) and the live page did not help",
+    "healed": false,
+    "skipped": [],
+    "fallback_clicks": 5,
+    "retrieved": "Open the Type to search menu on Ted",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 433,
+    "pid": "9ec099dcaedf1e4ac7fa",
+    "seconds": 16.8,
+    "picture": "task_15_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "desmos.com",
+    "site": "Desmos",
+    "url": "https://desmos.com/scientific",
+    "category": "",
+    "chain": [
+     "Add Item",
+     "Add folder"
+    ],
+    "label": "Add folder",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Collapse: Folder 4",
+     "Folder 4",
+     "Delete: Folder 4",
+     "Hide: Folder 4"
+    ],
+    "stored_goal": "Open the Add folder menu on Desmos via Add Item",
+    "id": 16,
+    "question": "I want to see the Add folder menu on Desmos. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 7,
+    "why": "nothing on the page matches",
+    "seconds": 9.3,
+    "picture": "task_16_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 5,
+    "why": "the stored path failed (skipped ['Add Item', 'Add folder']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "Add Item",
+     "Add folder"
+    ],
+    "fallback_clicks": 5,
+    "retrieved": "Open the Add folder menu on Desmos via Add Item",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 319,
+    "pid": "b621b3594ef8a9723c51",
+    "seconds": 8.2,
+    "picture": "task_16_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "en.wikipedia.org",
+    "site": "Wikipedia",
+    "url": "https://en.wikipedia.org",
+    "category": "",
+    "chain": [
+     "Toggle Overview of page pr",
+     "Requesting protection"
+    ],
+    "label": "Requesting protection",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Main menu",
+     "Search Wikipedia",
+     "Search",
+     "Appearance"
+    ],
+    "stored_goal": "Open the Requesting protection menu on Wikipedia via Toggle Overview of page pr",
+    "id": 17,
+    "question": "I want to see the Requesting protection menu on Wikipedia. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 2.5,
+    "picture": "task_17_cold_fail.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 0,
+    "why": "",
+    "healed": false,
+    "skipped": [
+     "Toggle Overview of page pr",
+     "Requesting protection"
+    ],
+    "retrieved": "Open the Requesting protection menu on Wikipedia via Toggle Overview of page pr",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 273,
+    "pid": "691718943e092346c17f",
+    "seconds": 2.8,
+    "picture": "task_17_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "speedtest.net",
+    "site": "Speedtest",
+    "url": "https://speedtest.net",
+    "category": "",
+    "chain": [
+     "Open sharing menu",
+     "Email"
+    ],
+    "label": "Email",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Embed",
+     "Email",
+     "Download",
+     "Facebook"
+    ],
+    "stored_goal": "Open the Email menu on Speedtest via Open sharing menu",
+    "id": 18,
+    "question": "I want to see the Email menu on Speedtest. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 2,
+    "why": "nothing on the page matches",
+    "seconds": 7.2,
+    "picture": "task_18_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 6,
+    "why": "the stored path failed (skipped []) and the live page did not help",
+    "healed": false,
+    "skipped": [],
+    "fallback_clicks": 5,
+    "retrieved": "Open the Sign In with Email menu on Speedtest",
+    "retrieved_correct": false,
+    "in_top3": true,
+    "retrieval_ms": 287,
+    "pid": "67b9cbb5b8483465398f",
+    "seconds": 14.8,
+    "picture": "task_18_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "khanacademy.org",
+    "site": "Khanacademy",
+    "url": "https://khanacademy.org",
+    "category": "",
+    "chain": [
+     "Explore",
+     "All boards"
+    ],
+    "label": "All boards",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "ALL BOARDS",
+     "NCERT",
+     "Karnataka",
+     "Telangana"
+    ],
+    "stored_goal": "Open the All boards menu on Khanacademy via Explore",
+    "id": 19,
+    "question": "I want to see the All boards menu on Khanacademy. What do I click?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 7.2,
+    "picture": "task_19_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Open the All boards menu on Khanacademy via Explore",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 195,
+    "pid": "feda58d67969fc835169",
+    "seconds": 7.4,
+    "picture": "task_19_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "github.com",
+    "site": "Github",
+    "url": "https://github.com",
+    "category": "",
+    "chain": [
+     "Milestones"
+    ],
+    "label": "Milestones",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Organization and team management",
+     "Pages and wikis",
+     "Multiple issue assignees",
+     "Push protection"
+    ],
+    "stored_goal": "Open the Milestones menu on Github",
+    "id": 20,
+    "question": "I want to see the Milestones menu on Github. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 8,
+    "why": "budget spent",
+    "seconds": 16.1,
+    "picture": "task_20_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 5,
+    "why": "the stored path failed (skipped ['Milestones']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "Milestones"
+    ],
+    "fallback_clicks": 5,
+    "retrieved": "Open the Milestones menu on Github",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 353,
+    "pid": "14e63fe3883957bd89da",
+    "seconds": 9.2,
+    "picture": "task_20_pool_fail.png",
+    "filed_correction": false
+   }
+  }
+ ]
+}

@@ -1,0 +1,71 @@
+{
+   "app_metadata": {
+      "app_name": "Resurrector",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "non_gui",
+   "high_level_task": "Install and configure Resurrector",
+   "prerequisite_state": "No specific application state required",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the latest release from GitHub",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "https://github.com/user-attachments/releases"
+         },
+         "expected_state_change": "The user navigates to the GitHub releases page"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Extract the downloaded zip file to a desired location",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Extract the zip file to %LOCALAPPDATA%\\Programs\\Resurrector\\"
+         },
+         "expected_state_change": "The zip file is extracted to the specified location"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Run resurrector.exe",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Run resurrector.exe"
+         },
+         "expected_state_change": "Resurrector starts and an icon appears in the system tray"
+      }
+   ],
+   "_meta": {
+      "source_app": "Resurrector",
+      "app_key": "resurrector",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Resurrector",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:24:10Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

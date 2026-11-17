@@ -1,0 +1,165 @@
+{
+   "app_metadata": {
+      "app_name": "NoteStitch",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Stitch multiple Notepad windows into one document",
+   "prerequisite_state": "Six Notepad windows are open with various content",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Launch NoteStitch",
+         "ui_target": {
+            "element_name": "NoteStitch",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Application",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "NoteStitch application window opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Check the checkboxes next to the Notepad windows you want to include",
+         "ui_target": {
+            "element_name": "meeting-notes",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Checkbox (meeting-notes)",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'meeting-notes' checkbox is checked"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Check the checkboxes next to the Notepad windows you want to include",
+         "ui_target": {
+            "element_name": "ideas",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Checkbox (ideas)",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'ideas' checkbox is checked"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click the 'Merge ▶' button",
+         "ui_target": {
+            "element_name": "Merge ▶",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Merge ▶",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected Notepad windows' contents are merged into a single document with section headers"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Copy the merged document to the clipboard",
+         "ui_target": {
+            "element_name": "Copy to clipboard",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Copy to clipboard",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The merged document is copied to the clipboard"
+      }
+   ],
+   "_meta": {
+      "source_app": "NoteStitch",
+      "app_key": "notestitch",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "<img src=\"NoteStitch/Assets/notes.png\" width=\"32\" height=\"32\" valign=\"middle\"> NoteStitch",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:00:11Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

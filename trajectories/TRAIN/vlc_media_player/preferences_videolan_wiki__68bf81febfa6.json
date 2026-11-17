@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "VLC media player",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure VLC preferences",
+   "prerequisite_state": "VLC media player is open and active",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Navigate to the menu toolbar and select Tools",
+         "ui_target": {
+            "element_name": "Tools",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Tools",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Tools dropdown menu appears"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select Preferences from the Tools menu",
+         "ui_target": {
+            "element_name": "Preferences",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Tools > Preferences",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Preferences dialogue opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click Save to save the preferences",
+         "ui_target": {
+            "element_name": "Save",
+            "automation_id": null,
+            "hierarchical_path": "Preferences dialogue > Save",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The preferences are saved"
+      }
+   ],
+   "_meta": {
+      "source_app": "VLC media player",
+      "app_key": "vlc_media_player",
+      "dataset_split": "TRAIN",
+      "category": "Media Player",
+      "guide_title": "Preferences - VideoLAN Wiki",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:02:28Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

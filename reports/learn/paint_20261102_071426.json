@@ -1,0 +1,145 @@
+{
+ "app": "paint",
+ "started": "2026-11-02 07:14:31",
+ "phases": {
+  "read": {
+   "store": {
+    "Microsoft.Paint": {
+     "key": "paint",
+     "ui_words": 814,
+     "views": 55,
+     "chunks": 45
+    }
+   },
+   "seconds": 7.9,
+   "level": "explored"
+  },
+  "map": {
+   "ran": true,
+   "seconds": 21.1,
+   "level": "explored",
+   "commands": 365,
+   "with_shortcut": 38,
+   "dialogs": 9,
+   "layout_controls": 444,
+   "state_variables": 1,
+   "frontier": {
+    "total": 14,
+    "by_status": {
+     "explored": 7,
+     "failed": 4,
+     "no_effect": 1,
+     "unsafe": 2
+    },
+    "explorable": 12,
+    "explored_n": 8,
+    "explored_fraction": 0.667
+   }
+  },
+  "ask": {
+   "asked": 4,
+   "answered": 2,
+   "items": [
+    {
+     "q": "In paint, how do I use Zoom?",
+     "status": "ANSWERED",
+     "answer": "In Paint, to use Zoom, you can click on 'Zoom in' or 'Zoom out' [3]. These options are part of the application's UI and allow you to adjust the view of your canvas."
+    },
+    {
+     "q": "In paint, how do I use Dark?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about paint (271 documents, 9 procedures, 0 shortcuts). how to use the Dark theme in Paint. Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In paint, how do I use Open settings?",
+     "status": "ANSWERED",
+     "answer": "To use Open settings in Paint, press the [SettingsButtonName] which is \"Open settings\" [1]."
+    },
+    {
+     "q": "In paint, how do I use Third-Party Software Acknowledgements?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about paint (271 documents, 9 procedures, 0 shortcuts). how to use Third-Party Software Acknowledgements in Paint. Reverse engineering or scanning it more would fill this in."
+    }
+   ],
+   "seconds": 12.4
+  },
+  "practice": {
+   "written": 6,
+   "levels": [
+    {
+     "level": 1,
+     "proven": 0,
+     "of": 2
+    },
+    {
+     "level": 1,
+     "proven": 0,
+     "of": 2
+    },
+    {
+     "level": 1,
+     "proven": 0,
+     "of": 2
+    }
+   ],
+   "highest_level_proven": 0,
+   "tried": 6,
+   "proven_done": 0,
+   "kept_training_rows": 0,
+   "results": [
+    {
+     "task": "open paint, type 'Hello, World!' in the center of the canvas using the text tool, draw a blue-grey triangle next to it, and save as 'hello_world.png' in D:\\new_automation\\data\\practice\\paint",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 54.1,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'paint': BLOCKED (window hwnd=2950780), 6 verified-loop steps in 43.7s\n    - 'create a new blank document' -> DONE (PASS) [WEAK evidence: the UI"
+    },
+    {
+     "task": "open paint, draw a 5-point star with a gold outline and a grey fill, resize and skew it to the right, and save as 'star_design.bmp' in D:\\new_automation\\data\\practice\\paint",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 17.5,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'paint': DELEGATED\n    - 'draw a 5-point star with a gold outline and a grey fill, resize and sk' -> DELEGATED to the drawing tools (not an elem"
+    },
+    {
+     "task": "open paint, type 'Automation Practice' in the center of the canvas using the text tool, draw a triangle with a blue-grey outline and a light turquoise fill, rotate the triangle 45 degrees clockwise, save as D:\\new_automation\\data\\practice\\paint\\practice1.png",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 47.3,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'paint': BLOCKED (window hwnd=5898918), 6 verified-loop steps in 35.6s\n    - 'create a new blank document' -> DONE (PASS) [WEAK evidence: the UI"
+    },
+    {
+     "task": "open paint, type '1234567890' in the center of the canvas using the text tool, draw a diamond with a gold outline and a grey fill, calculate the area of the diamond (assuming side length 50), display the area as text next to the diamond, save as D:\\new_automation\\data\\practice\\paint\\practice2.bmp",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 111.2,
+     "proof": "[{'file': 'D:\\\\new_automation\\\\data\\\\practice\\\\paint\\\\practice2.bmp', 'ok': False, 'why': 'the file was not saved'}]"
+    },
+    {
+     "task": "open paint, type 'Automation Practice' in the center of the canvas using the text tool, change the text color to blue-grey, add a triangle shape to the right of the text with a gold outline and a grey fill, rotate the triangle 45 degrees clockwise, save as D:\\new_automation\\data\\practice\\paint\\automation_practice.png",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 74.8,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'paint': BLOCKED (window hwnd=5046450), 5 verified-loop steps in 37.9s\n    - 'type 'Automation Practice' in the center of the canvas using the t"
+    },
+    {
+     "task": "open paint, type '1234567890' in the center of the canvas using the text tool, change the text color to light turquoise, add a diamond shape to the right of the text with a gold outline and a grey fill, resize and skew the diamond to fit the text, save as D:\\new_automation\\data\\practice\\paint\\number_sequence.bmp",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 50.0,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'paint': BLOCKED (window hwnd=7407908), 6 verified-loop steps in 35.7s\n    - 'create a new blank document' -> DONE (PASS) [WEAK evidence: the UI"
+    }
+   ],
+   "seconds": 373.8
+  }
+ },
+ "app_key": "paint",
+ "exe": "C:\\Program Files\\WindowsApps\\Microsoft.Paint_11.2605.81.0_x64__8wekyb3d8bbwe\\PaintApp\\mspaint.exe",
+ "readiness": {
+  "knows_commands": true,
+  "answers_questions": "2/4",
+  "proven_tasks": "0/6",
+  "verdict": "not ready: nothing proven yet"
+ },
+ "seconds": 421.1
+}

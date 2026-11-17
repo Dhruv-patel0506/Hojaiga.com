@@ -1,0 +1,472 @@
+{
+   "app_metadata": {
+      "app_name": "Save Wizard for PS4 MAX",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "high_level_task": "Whitelist Save Wizard emails in various email clients to ensure they are not marked as spam and are delivered to the inbox",
+   "prerequisite_state": "User has purchased Save Wizard for PS4 MAX and is familiar with their email client",
+   "total_steps": 16,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Add The Save Wizard Team to your contacts list in Gmail",
+         "ui_target": {
+            "element_name": "Not spam button",
+            "automation_id": null,
+            "hierarchical_path": "Email toolbar > Not spam",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The email from The Save Wizard Team is marked as not spam"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select Move to in the Gmail toolbar",
+         "ui_target": {
+            "element_name": "Move to",
+            "automation_id": null,
+            "hierarchical_path": "Email toolbar > Move to",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Move to dialog opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Select Primary from the Move to dialog",
+         "ui_target": {
+            "element_name": "Primary",
+            "automation_id": null,
+            "hierarchical_path": "Move to dialog > Primary",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The email from The Save Wizard Team is moved to the Primary Inbox tab"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Tap the Gmail menu icon in the top right corner of the Gmail app",
+         "ui_target": {
+            "element_name": "Gmail menu icon",
+            "automation_id": null,
+            "hierarchical_path": "Gmail app > Menu icon",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The menu options appear"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Select Move to from the menu options",
+         "ui_target": {
+            "element_name": "Move to",
+            "automation_id": null,
+            "hierarchical_path": "Gmail menu > Move to",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Move to dialog opens"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Select Primary from the Move to dialog",
+         "ui_target": {
+            "element_name": "Primary",
+            "automation_id": null,
+            "hierarchical_path": "Move to dialog > Primary",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The email from The Save Wizard Team is moved to the Primary Inbox tab"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Open Yahoo! Mail and check the Spam folder",
+         "ui_target": {
+            "element_name": "Spam folder",
+            "automation_id": null,
+            "hierarchical_path": "Yahoo! Mail > Spam folder",
+            "element_type": "Folder",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Spam folder is opened"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Open the email from The Save Wizard Team in the Spam folder",
+         "ui_target": {
+            "element_name": "Email from The Save Wizard Team",
+            "automation_id": null,
+            "hierarchical_path": "Yahoo! Mail > Spam folder > Email from The Save Wizard Team",
+            "element_type": "Email",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The email from The Save Wizard Team is opened"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Click the Not Spam button on the top toolbar",
+         "ui_target": {
+            "element_name": "Not Spam button",
+            "automation_id": null,
+            "hierarchical_path": "Email toolbar > Not Spam",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The email from The Save Wizard Team is marked as not spam"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Create a filter in Yahoo! Mail to automatically send email from The Save Wizard Team to the Inbox",
+         "ui_target": {
+            "element_name": "Gear icon",
+            "automation_id": null,
+            "hierarchical_path": "Yahoo! Mail > Gear icon",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Settings page opens"
+      },
+      {
+         "step_id": 11,
+         "low_level_instruction": "Select Filters from the Settings page",
+         "ui_target": {
+            "element_name": "Filters",
+            "automation_id": null,
+            "hierarchical_path": "Yahoo! Mail > Settings > Filters",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Filters page opens"
+      },
+      {
+         "step_id": 12,
+         "low_level_instruction": "Click the Add button on the Filters page",
+         "ui_target": {
+            "element_name": "Add button",
+            "automation_id": null,
+            "hierarchical_path": "Yahoo! Mail > Filters > Add",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Add filter dialog opens"
+      },
+      {
+         "step_id": 13,
+         "low_level_instruction": "Enter the email address of The Save Wizard Team in the From field",
+         "ui_target": {
+            "element_name": "From field",
+            "automation_id": null,
+            "hierarchical_path": "Yahoo! Mail > Filters > Add filter > From field",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "[email protected]"
+         },
+         "expected_state_change": "The email address is entered in the From field"
+      },
+      {
+         "step_id": 14,
+         "low_level_instruction": "Select the Inbox as the destination folder",
+         "ui_target": {
+            "element_name": "Inbox",
+            "automation_id": null,
+            "hierarchical_path": "Yahoo! Mail > Filters > Add filter > Destination folder",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The filter is saved and the email from The Save Wizard Team is automatically sent to the Inbox"
+      },
+      {
+         "step_id": 15,
+         "low_level_instruction": "Open the Mail app and go to the Mailboxes screen",
+         "ui_target": {
+            "element_name": "Mailboxes screen",
+            "automation_id": null,
+            "hierarchical_path": "Outlook Mobile App > Mailboxes",
+            "element_type": "Screen",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Mailboxes screen is opened"
+      },
+      {
+         "step_id": 16,
+         "low_level_instruction": "Select the Junk folder",
+         "ui_target": {
+            "element_name": "Junk folder",
+            "automation_id": null,
+            "hierarchical_path": "Outlook Mobile App > Mailboxes > Junk folder",
+            "element_type": "Folder",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Junk folder is opened"
+      }
+   ],
+   "_meta": {
+      "source_app": "Save Wizard for PS4 MAX",
+      "app_key": "save_wizard_for_ps4_max",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Support For PS4 MAX",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T13:09:24Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

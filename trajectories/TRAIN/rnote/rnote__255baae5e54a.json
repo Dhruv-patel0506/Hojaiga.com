@@ -1,0 +1,137 @@
+{
+   "app_metadata": {
+      "app_name": "Rnote",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure Rnote to use a specific pen button as an eraser",
+   "prerequisite_state": "Rnote is open and the user is hovering over the canvas with a stylus",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Hover over the canvas with the stylus",
+         "ui_target": {
+            "element_name": "Canvas",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Canvas",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The canvas is highlighted to indicate the user is hovering over it"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Press and hold the eraser button on the pen",
+         "ui_target": {
+            "element_name": "Eraser button",
+            "automation_id": null,
+            "hierarchical_path": "Stylus > Eraser button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The pen button is held down"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Switch to the desired pen style while keeping the eraser button pressed",
+         "ui_target": {
+            "element_name": "Pen style",
+            "automation_id": null,
+            "hierarchical_path": "Settings > Pen style",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The pen style menu opens"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Release the pressed eraser button",
+         "ui_target": {
+            "element_name": "Eraser button",
+            "automation_id": null,
+            "hierarchical_path": "Stylus > Eraser button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The pen style is remembered in the 'Eraser' mode"
+      }
+   ],
+   "_meta": {
+      "source_app": "Rnote",
+      "app_key": "rnote",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Rnote",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:58:45Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

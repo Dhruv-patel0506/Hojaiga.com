@@ -1,0 +1,102 @@
+{
+   "app_metadata": {
+      "app_name": "Calculator",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "12x8=96",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "ui_target": {
+            "element_name": "One",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 1",
+         "low_level_instruction": "CLICK One"
+      },
+      {
+         "step_id": 2,
+         "ui_target": {
+            "element_name": "Two",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 12",
+         "low_level_instruction": "CLICK Two"
+      },
+      {
+         "step_id": 3,
+         "ui_target": {
+            "element_name": "Multiply by",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 12",
+         "low_level_instruction": "CLICK Multiply by"
+      },
+      {
+         "step_id": 4,
+         "ui_target": {
+            "element_name": "Eight",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 8",
+         "low_level_instruction": "CLICK Eight"
+      },
+      {
+         "step_id": 5,
+         "ui_target": {
+            "element_name": "Equals",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 96",
+         "low_level_instruction": "CLICK Equals"
+      }
+   ]
+}

@@ -1,0 +1,112 @@
+{
+   "app_metadata": {
+      "app_name": "MWBToggle",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure MWBToggle to manage Mouse Without Borders clipboard and file sharing.",
+   "prerequisite_state": "No application is open.",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download MWBToggle from the latest release.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The MWBToggle executable is downloaded and saved to the local machine."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Install MWBToggle using WinGet.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "MWBToggle is installed and added to the system."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Configure MWBToggle settings.",
+         "ui_target": {
+            "element_name": "Settings",
+            "automation_id": null,
+            "hierarchical_path": "Tray icon > Settings",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The MWBToggle settings window opens."
+      }
+   ],
+   "_meta": {
+      "source_app": "MWBToggle",
+      "app_key": "mwbtoggle",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "MWBToggle",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:34:38Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

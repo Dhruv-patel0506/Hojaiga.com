@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "Greenlight",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Close the Greenlight application",
+   "prerequisite_state": "Greenlight application is open and running",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click on the Xbox logo at the top-left to close the application",
+         "ui_target": {
+            "element_name": "Xbox logo",
+            "automation_id": null,
+            "hierarchical_path": "Top bar > Left corner > Xbox logo",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A confirmation dialog appears asking to confirm the closing of the application"
+      }
+   ],
+   "_meta": {
+      "source_app": "Greenlight",
+      "app_key": "greenlight",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Greenlight",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:53:57Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,120 @@
+{
+   "app_metadata": {
+      "app_name": "Calculator",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "100-1=99",
+   "total_steps": 6,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "ui_target": {
+            "element_name": "One",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 1",
+         "low_level_instruction": "CLICK One"
+      },
+      {
+         "step_id": 2,
+         "ui_target": {
+            "element_name": "Zero",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 10",
+         "low_level_instruction": "CLICK Zero"
+      },
+      {
+         "step_id": 3,
+         "ui_target": {
+            "element_name": "Zero",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 100",
+         "low_level_instruction": "CLICK Zero"
+      },
+      {
+         "step_id": 4,
+         "ui_target": {
+            "element_name": "Minus",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 100",
+         "low_level_instruction": "CLICK Minus"
+      },
+      {
+         "step_id": 5,
+         "ui_target": {
+            "element_name": "One",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 1",
+         "low_level_instruction": "CLICK One"
+      },
+      {
+         "step_id": 6,
+         "ui_target": {
+            "element_name": "Equals",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 99",
+         "low_level_instruction": "CLICK Equals"
+      }
+   ]
+}

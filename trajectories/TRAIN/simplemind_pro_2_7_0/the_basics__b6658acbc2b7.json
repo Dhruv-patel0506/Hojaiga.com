@@ -1,0 +1,451 @@
+{
+   "app_metadata": {
+      "app_name": "SimpleMind Pro 2.7.0",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Explain and demonstrate basic operations in SimpleMind Pro 2.7.0",
+   "prerequisite_state": "SimpleMind Pro 2.7.0 is open and ready for use",
+   "total_steps": 14,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the File menu",
+         "ui_target": {
+            "element_name": "File",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The File dropdown opens showing New, Open, Save"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click on New",
+         "ui_target": {
+            "element_name": "New",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File > New",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A blank untitled document appears in the workspace"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Add a child topic with a single tap on the 'add topic tool'",
+         "ui_target": {
+            "element_name": "Add Topic Tool",
+            "automation_id": null,
+            "hierarchical_path": "Topic toolbar > Add Topic Tool",
+            "element_type": "Tool",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A new topic is added as a child of the selected topic"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Add a sibling topic using 'Enter'",
+         "ui_target": {
+            "element_name": "Enter",
+            "automation_id": null,
+            "hierarchical_path": "Topic toolbar > Enter",
+            "element_type": "Tool",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Enter"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "A new topic is added as a sibling of the selected topic"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Add a new central theme by double-tapping in empty space",
+         "ui_target": {
+            "element_name": "Empty Space",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DOUBLE_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A new central theme is added in the empty space"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Add a topic in between two existing topics using the 'Insert Topic' command",
+         "ui_target": {
+            "element_name": "Insert Topic",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Insert Topic",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A new topic is inserted between the selected topics"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Double tap a topic to edit the topic text",
+         "ui_target": {
+            "element_name": "Topic Text",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DOUBLE_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The topic text editor opens, allowing text editing"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Split a topic by double tapping the topic",
+         "ui_target": {
+            "element_name": "Topic Text",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DOUBLE_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The topic splits into two, with the cursor positioned at the split point"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Use Shift+Tab to create a new sibling topic",
+         "ui_target": {
+            "element_name": "Tab",
+            "automation_id": null,
+            "hierarchical_path": "Topic toolbar > Tab",
+            "element_type": "Tool",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Shift",
+               "Tab"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "A new sibling topic is created at the split point"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Add a topic in between two existing topics by dragging the add topic tool",
+         "ui_target": {
+            "element_name": "Add Topic Tool",
+            "automation_id": null,
+            "hierarchical_path": "Topic toolbar > Add Topic Tool",
+            "element_type": "Tool",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A new topic is inserted between the selected topics"
+      },
+      {
+         "step_id": 11,
+         "low_level_instruction": "Move a topic by selecting and dragging it",
+         "ui_target": {
+            "element_name": "Topic",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Topic",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected topic is moved to the new location"
+      },
+      {
+         "step_id": 12,
+         "low_level_instruction": "Reconnect a topic to another parent topic by dragging and dropping it",
+         "ui_target": {
+            "element_name": "Topic",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Topic",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The topic is reconnected to the new parent topic"
+      },
+      {
+         "step_id": 13,
+         "low_level_instruction": "Change the layout of a topic by selecting the layout button",
+         "ui_target": {
+            "element_name": "Layout Button",
+            "automation_id": null,
+            "hierarchical_path": "Topic toolbar > Layout",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The layout of the selected topic changes"
+      },
+      {
+         "step_id": 14,
+         "low_level_instruction": "Delete a topic by selecting it and using the delete key",
+         "ui_target": {
+            "element_name": "Topic",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Topic",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Delete"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected topic and its entire branch are deleted"
+      }
+   ],
+   "_meta": {
+      "source_app": "SimpleMind Pro 2.7.0",
+      "app_key": "simplemind_pro_2_7_0",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "The Basics",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:19:19Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

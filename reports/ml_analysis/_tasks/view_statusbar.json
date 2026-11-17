@@ -1,0 +1,48 @@
+{
+   "app_metadata": {
+      "app_name": "Notepad",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "view-statusbar",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "ui_target": {
+            "element_name": "View",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "View menu opens",
+         "low_level_instruction": "CLICK View"
+      },
+      {
+         "step_id": 2,
+         "ui_target": {
+            "element_name": "Status bar",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "status bar visible",
+         "low_level_instruction": "CLICK Status bar"
+      }
+   ]
+}

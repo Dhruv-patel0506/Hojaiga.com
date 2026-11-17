@@ -1,0 +1,515 @@
+20:59:17 NI run auto_cpu_031 on CPU; hours=2.0 smoke=False
+20:59:17 explicit task list: ['enc2/text/banking77']
+20:59:17 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+20:59:17 [data] enc2/text/banking77: n=13083 C=77 D=768 shards=1
+21:00:18 [enc2/text/banking77] vote=0.938 uniform=0.936 best1=0.939 n_val=3948 vram=0.00GB 62s
+21:00:31 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 3948, "n_val": 794, "base_rate": 0.9508816003799438, "inner": {"auc": 0.894769910001698, "ece": 0.02018749398608652, "brier": 0.03393268957734108, "acc80": 0.9858267903327942}, "outer_conf": {"auc": 0.8952623535404992, "ece": 0.024460361590163234, "brier": 0.0358804389834404, "acc80": 0.9858267903327942}}
+21:00:31 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+21:01:41 [enc2/text/banking77] vote=0.938 uniform=0.937 best1=0.937 n_val=3925 vram=0.00GB 69s | grade=0.969 inner_auc=0.931 vs conf_auc=0.929
+21:01:48 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+21:02:52 [enc2/text/banking77] vote=0.933 uniform=0.931 best1=0.933 n_val=3950 vram=0.00GB 64s | grade=0.965 inner_auc=0.949 vs conf_auc=0.947
+21:02:57 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+21:03:54 [enc2/text/banking77] vote=0.936 uniform=0.934 best1=0.935 n_val=3976 vram=0.00GB 57s | grade=0.968 inner_auc=0.937 vs conf_auc=0.927
+21:04:00 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+21:04:50 [enc2/text/banking77] vote=0.947 uniform=0.945 best1=0.941 n_val=3844 vram=0.00GB 51s | grade=0.958 inner_auc=0.932 vs conf_auc=0.931
+21:04:56 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+21:05:43 [enc2/text/banking77] vote=0.941 uniform=0.937 best1=0.938 n_val=3977 vram=0.00GB 47s | grade=0.960 inner_auc=0.924 vs conf_auc=0.928
+21:05:48 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+21:06:46 [enc2/text/banking77] vote=0.939 uniform=0.935 best1=0.934 n_val=3927 vram=0.00GB 57s | grade=0.964 inner_auc=0.930 vs conf_auc=0.930
+21:06:52 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+21:07:42 [enc2/text/banking77] vote=0.939 uniform=0.936 best1=0.935 n_val=3964 vram=0.00GB 50s | grade=0.967 inner_auc=0.955 vs conf_auc=0.945
+21:07:48 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+21:08:41 [enc2/text/banking77] vote=0.942 uniform=0.938 best1=0.939 n_val=3865 vram=0.00GB 53s | grade=0.964 inner_auc=0.908 vs conf_auc=0.901
+21:08:47 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+21:09:37 [enc2/text/banking77] vote=0.947 uniform=0.942 best1=0.945 n_val=3932 vram=0.00GB 50s | grade=0.964 inner_auc=0.951 vs conf_auc=0.940
+21:09:41 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+21:10:30 [enc2/text/banking77] vote=0.946 uniform=0.945 best1=0.943 n_val=3967 vram=0.00GB 49s | grade=0.967 inner_auc=0.917 vs conf_auc=0.913
+21:10:35 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+21:11:27 [enc2/text/banking77] vote=0.945 uniform=0.941 best1=0.940 n_val=3892 vram=0.00GB 52s | grade=0.969 inner_auc=0.935 vs conf_auc=0.939
+21:11:33 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+21:12:19 [enc2/text/banking77] vote=0.939 uniform=0.936 best1=0.936 n_val=3924 vram=0.00GB 46s | grade=0.966 inner_auc=0.896 vs conf_auc=0.899
+21:12:24 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+21:13:16 [enc2/text/banking77] vote=0.941 uniform=0.937 best1=0.937 n_val=3997 vram=0.00GB 52s | grade=0.965 inner_auc=0.917 vs conf_auc=0.907
+21:13:21 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+21:14:06 [enc2/text/banking77] vote=0.948 uniform=0.941 best1=0.943 n_val=3997 vram=0.00GB 44s | grade=0.962 inner_auc=0.946 vs conf_auc=0.941
+21:14:10 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+21:15:05 [enc2/text/banking77] vote=0.944 uniform=0.944 best1=0.945 n_val=4018 vram=0.00GB 55s | grade=0.961 inner_auc=0.932 vs conf_auc=0.936
+21:15:11 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+21:16:04 [enc2/text/banking77] vote=0.943 uniform=0.939 best1=0.941 n_val=3894 vram=0.00GB 53s | grade=0.968 inner_auc=0.911 vs conf_auc=0.915
+21:16:09 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+21:17:00 [enc2/text/banking77] vote=0.946 uniform=0.939 best1=0.939 n_val=3982 vram=0.00GB 51s | grade=0.967 inner_auc=0.907 vs conf_auc=0.906
+21:17:06 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+21:18:01 [enc2/text/banking77] vote=0.943 uniform=0.940 best1=0.940 n_val=4005 vram=0.00GB 55s | grade=0.959 inner_auc=0.885 vs conf_auc=0.884
+21:18:07 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+21:18:56 [enc2/text/banking77] vote=0.948 uniform=0.947 best1=0.946 n_val=3947 vram=0.00GB 50s | grade=0.960 inner_auc=0.911 vs conf_auc=0.896
+21:19:02 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+21:19:57 [enc2/text/banking77] vote=0.942 uniform=0.939 best1=0.940 n_val=3894 vram=0.00GB 55s | grade=0.963 inner_auc=0.942 vs conf_auc=0.938
+21:20:03 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+21:20:54 [enc2/text/banking77] vote=0.937 uniform=0.933 best1=0.934 n_val=3977 vram=0.00GB 51s | grade=0.962 inner_auc=0.953 vs conf_auc=0.946
+21:20:59 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+21:21:54 [enc2/text/banking77] vote=0.941 uniform=0.937 best1=0.935 n_val=3843 vram=0.00GB 55s | grade=0.964 inner_auc=0.938 vs conf_auc=0.935
+21:22:00 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+21:22:53 [enc2/text/banking77] vote=0.942 uniform=0.939 best1=0.935 n_val=3929 vram=0.00GB 54s | grade=0.964 inner_auc=0.927 vs conf_auc=0.927
+21:22:59 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+21:23:50 [enc2/text/banking77] vote=0.943 uniform=0.937 best1=0.936 n_val=3944 vram=0.00GB 51s | grade=0.966 inner_auc=0.927 vs conf_auc=0.923
+21:23:56 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+21:24:51 [enc2/text/banking77] vote=0.943 uniform=0.941 best1=0.938 n_val=3848 vram=0.00GB 55s | grade=0.965 inner_auc=0.924 vs conf_auc=0.914
+21:24:57 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+21:25:47 [enc2/text/banking77] vote=0.946 uniform=0.943 best1=0.942 n_val=3918 vram=0.00GB 50s | grade=0.968 inner_auc=0.925 vs conf_auc=0.928
+21:25:53 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+21:26:48 [enc2/text/banking77] vote=0.942 uniform=0.938 best1=0.937 n_val=3932 vram=0.00GB 55s | grade=0.964 inner_auc=0.900 vs conf_auc=0.896
+21:26:54 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+21:27:45 [enc2/text/banking77] vote=0.944 uniform=0.943 best1=0.942 n_val=3862 vram=0.00GB 50s | grade=0.965 inner_auc=0.915 vs conf_auc=0.915
+21:27:50 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+21:28:44 [enc2/text/banking77] vote=0.942 uniform=0.939 best1=0.940 n_val=3931 vram=0.00GB 54s | grade=0.965 inner_auc=0.937 vs conf_auc=0.934
+21:28:50 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+21:29:43 [enc2/text/banking77] vote=0.941 uniform=0.938 best1=0.935 n_val=3895 vram=0.00GB 53s | grade=0.965 inner_auc=0.958 vs conf_auc=0.962
+21:29:48 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+21:30:41 [enc2/text/banking77] vote=0.942 uniform=0.941 best1=0.939 n_val=3841 vram=0.00GB 53s | grade=0.966 inner_auc=0.939 vs conf_auc=0.933
+21:30:47 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+21:31:41 [enc2/text/banking77] vote=0.941 uniform=0.936 best1=0.935 n_val=3914 vram=0.00GB 55s | grade=0.969 inner_auc=0.945 vs conf_auc=0.949
+21:31:48 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+21:32:38 [enc2/text/banking77] vote=0.945 uniform=0.944 best1=0.941 n_val=3909 vram=0.00GB 50s | grade=0.962 inner_auc=0.919 vs conf_auc=0.910
+21:32:44 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+21:33:39 [enc2/text/banking77] vote=0.941 uniform=0.939 best1=0.937 n_val=3913 vram=0.00GB 55s | grade=0.968 inner_auc=0.879 vs conf_auc=0.882
+21:33:45 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+21:34:35 [enc2/text/banking77] vote=0.938 uniform=0.934 best1=0.936 n_val=3896 vram=0.00GB 50s | grade=0.966 inner_auc=0.926 vs conf_auc=0.929
+21:34:41 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+21:35:36 [enc2/text/banking77] vote=0.944 uniform=0.939 best1=0.938 n_val=3966 vram=0.00GB 55s | grade=0.964 inner_auc=0.964 vs conf_auc=0.961
+21:35:41 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+21:36:34 [enc2/text/banking77] vote=0.945 uniform=0.944 best1=0.943 n_val=3933 vram=0.00GB 53s | grade=0.970 inner_auc=0.939 vs conf_auc=0.941
+21:36:40 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+21:37:32 [enc2/text/banking77] vote=0.941 uniform=0.938 best1=0.935 n_val=4029 vram=0.00GB 52s | grade=0.964 inner_auc=0.949 vs conf_auc=0.941
+21:37:38 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+21:38:33 [enc2/text/banking77] vote=0.947 uniform=0.941 best1=0.943 n_val=3960 vram=0.00GB 56s | grade=0.966 inner_auc=0.940 vs conf_auc=0.934
+21:38:40 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+21:39:29 [enc2/text/banking77] vote=0.944 uniform=0.941 best1=0.943 n_val=3858 vram=0.00GB 50s | grade=0.963 inner_auc=0.883 vs conf_auc=0.886
+21:39:35 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+21:40:31 [enc2/text/banking77] vote=0.939 uniform=0.935 best1=0.937 n_val=3788 vram=0.00GB 56s | grade=0.964 inner_auc=0.957 vs conf_auc=0.955
+21:40:38 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+21:41:27 [enc2/text/banking77] vote=0.941 uniform=0.941 best1=0.937 n_val=4055 vram=0.00GB 50s | grade=0.962 inner_auc=0.939 vs conf_auc=0.933
+21:41:32 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+21:42:28 [enc2/text/banking77] vote=0.942 uniform=0.939 best1=0.939 n_val=3897 vram=0.00GB 55s | grade=0.968 inner_auc=0.899 vs conf_auc=0.907
+21:42:34 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+21:43:27 [enc2/text/banking77] vote=0.944 uniform=0.940 best1=0.939 n_val=3982 vram=0.00GB 53s | grade=0.965 inner_auc=0.916 vs conf_auc=0.913
+21:43:33 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+21:44:25 [enc2/text/banking77] vote=0.943 uniform=0.938 best1=0.941 n_val=3922 vram=0.00GB 52s | grade=0.965 inner_auc=0.928 vs conf_auc=0.922
+21:44:31 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+21:45:27 [enc2/text/banking77] vote=0.937 uniform=0.932 best1=0.935 n_val=3837 vram=0.00GB 56s | grade=0.964 inner_auc=0.953 vs conf_auc=0.949
+21:45:33 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+21:46:23 [enc2/text/banking77] vote=0.942 uniform=0.937 best1=0.939 n_val=4045 vram=0.00GB 50s | grade=0.967 inner_auc=0.911 vs conf_auc=0.910
+21:46:29 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+21:47:25 [enc2/text/banking77] vote=0.942 uniform=0.941 best1=0.941 n_val=3997 vram=0.00GB 55s | grade=0.967 inner_auc=0.931 vs conf_auc=0.931
+21:47:31 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+21:48:22 [enc2/text/banking77] vote=0.941 uniform=0.934 best1=0.936 n_val=3877 vram=0.00GB 51s | grade=0.969 inner_auc=0.916 vs conf_auc=0.917
+21:48:27 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+21:49:21 [enc2/text/banking77] vote=0.939 uniform=0.934 best1=0.936 n_val=3978 vram=0.00GB 55s | grade=0.966 inner_auc=0.925 vs conf_auc=0.928
+21:49:28 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+21:50:21 [enc2/text/banking77] vote=0.948 uniform=0.942 best1=0.943 n_val=3903 vram=0.00GB 53s | grade=0.965 inner_auc=0.956 vs conf_auc=0.954
+21:50:27 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+21:51:18 [enc2/text/banking77] vote=0.941 uniform=0.937 best1=0.939 n_val=4009 vram=0.00GB 51s | grade=0.963 inner_auc=0.943 vs conf_auc=0.948
+21:51:24 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+21:52:20 [enc2/text/banking77] vote=0.937 uniform=0.934 best1=0.938 n_val=3986 vram=0.00GB 56s | grade=0.963 inner_auc=0.938 vs conf_auc=0.934
+21:52:26 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+21:53:16 [enc2/text/banking77] vote=0.942 uniform=0.936 best1=0.939 n_val=3888 vram=0.00GB 50s | grade=0.964 inner_auc=0.943 vs conf_auc=0.940
+21:53:22 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+21:54:17 [enc2/text/banking77] vote=0.945 uniform=0.941 best1=0.942 n_val=3943 vram=0.00GB 55s | grade=0.965 inner_auc=0.909 vs conf_auc=0.910
+21:54:24 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+21:55:15 [enc2/text/banking77] vote=0.945 uniform=0.942 best1=0.940 n_val=3922 vram=0.00GB 51s | grade=0.967 inner_auc=0.922 vs conf_auc=0.922
+21:55:20 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+21:56:15 [enc2/text/banking77] vote=0.936 uniform=0.930 best1=0.931 n_val=3899 vram=0.00GB 54s | grade=0.963 inner_auc=0.911 vs conf_auc=0.910
+21:56:21 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+21:57:15 [enc2/text/banking77] vote=0.944 uniform=0.940 best1=0.940 n_val=3934 vram=0.00GB 54s | grade=0.966 inner_auc=0.937 vs conf_auc=0.936
+21:57:20 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+21:58:11 [enc2/text/banking77] vote=0.940 uniform=0.938 best1=0.935 n_val=3818 vram=0.00GB 51s | grade=0.966 inner_auc=0.926 vs conf_auc=0.927
+21:58:18 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+21:59:13 [enc2/text/banking77] vote=0.943 uniform=0.941 best1=0.938 n_val=3936 vram=0.00GB 55s | grade=0.966 inner_auc=0.945 vs conf_auc=0.943
+21:59:19 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+22:00:08 [enc2/text/banking77] vote=0.945 uniform=0.939 best1=0.942 n_val=3874 vram=0.00GB 49s | grade=0.966 inner_auc=0.904 vs conf_auc=0.895
+22:00:14 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+22:01:10 [enc2/text/banking77] vote=0.950 uniform=0.947 best1=0.945 n_val=3929 vram=0.00GB 55s | grade=0.965 inner_auc=0.952 vs conf_auc=0.948
+22:01:16 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+22:02:08 [enc2/text/banking77] vote=0.939 uniform=0.936 best1=0.936 n_val=3962 vram=0.00GB 52s | grade=0.962 inner_auc=0.922 vs conf_auc=0.923
+22:02:13 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+22:03:06 [enc2/text/banking77] vote=0.943 uniform=0.939 best1=0.940 n_val=3906 vram=0.00GB 53s | grade=0.962 inner_auc=0.928 vs conf_auc=0.928
+22:03:13 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+22:04:07 [enc2/text/banking77] vote=0.944 uniform=0.941 best1=0.939 n_val=4086 vram=0.00GB 54s | grade=0.968 inner_auc=0.939 vs conf_auc=0.937
+22:04:12 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+22:05:02 [enc2/text/banking77] vote=0.943 uniform=0.935 best1=0.940 n_val=3920 vram=0.00GB 50s | grade=0.966 inner_auc=0.930 vs conf_auc=0.940
+22:05:09 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+22:06:04 [enc2/text/banking77] vote=0.943 uniform=0.939 best1=0.938 n_val=3913 vram=0.00GB 55s | grade=0.971 inner_auc=0.964 vs conf_auc=0.965
+22:06:10 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+22:06:59 [enc2/text/banking77] vote=0.942 uniform=0.936 best1=0.938 n_val=3968 vram=0.00GB 48s | grade=0.964 inner_auc=0.947 vs conf_auc=0.951
+22:07:05 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+22:08:00 [enc2/text/banking77] vote=0.942 uniform=0.942 best1=0.939 n_val=3970 vram=0.00GB 55s | grade=0.965 inner_auc=0.944 vs conf_auc=0.948
+22:08:07 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+22:09:00 [enc2/text/banking77] vote=0.942 uniform=0.937 best1=0.938 n_val=3984 vram=0.00GB 53s | grade=0.964 inner_auc=0.959 vs conf_auc=0.956
+22:09:05 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+22:09:58 [enc2/text/banking77] vote=0.938 uniform=0.936 best1=0.937 n_val=3975 vram=0.00GB 53s | grade=0.966 inner_auc=0.918 vs conf_auc=0.925
+22:10:04 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+22:11:00 [enc2/text/banking77] vote=0.944 uniform=0.941 best1=0.937 n_val=3844 vram=0.00GB 56s | grade=0.963 inner_auc=0.920 vs conf_auc=0.923
+22:11:05 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+22:11:55 [enc2/text/banking77] vote=0.947 uniform=0.943 best1=0.943 n_val=3982 vram=0.00GB 50s | grade=0.962 inner_auc=0.949 vs conf_auc=0.940
+22:12:02 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+22:12:57 [enc2/text/banking77] vote=0.941 uniform=0.940 best1=0.939 n_val=3990 vram=0.00GB 56s | grade=0.963 inner_auc=0.956 vs conf_auc=0.959
+22:13:04 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+22:13:53 [enc2/text/banking77] vote=0.948 uniform=0.946 best1=0.943 n_val=3883 vram=0.00GB 49s | grade=0.961 inner_auc=0.933 vs conf_auc=0.935
+22:13:59 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+22:14:52 [enc2/text/banking77] vote=0.939 uniform=0.935 best1=0.933 n_val=3979 vram=0.00GB 54s | grade=0.959 inner_auc=0.929 vs conf_auc=0.930
+22:14:58 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+22:15:46 [enc2/text/banking77] vote=0.942 uniform=0.938 best1=0.937 n_val=3945 vram=0.00GB 48s | grade=0.966 inner_auc=0.925 vs conf_auc=0.923
+22:15:51 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+22:16:36 [enc2/text/banking77] vote=0.942 uniform=0.939 best1=0.939 n_val=3881 vram=0.00GB 45s | grade=0.965 inner_auc=0.920 vs conf_auc=0.917
+22:16:42 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+22:17:32 [enc2/text/banking77] vote=0.942 uniform=0.940 best1=0.939 n_val=3922 vram=0.00GB 50s | grade=0.962 inner_auc=0.925 vs conf_auc=0.915
+22:17:37 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+22:18:20 [enc2/text/banking77] vote=0.942 uniform=0.938 best1=0.938 n_val=3923 vram=0.00GB 43s | grade=0.961 inner_auc=0.915 vs conf_auc=0.925
+22:18:26 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+22:19:12 [enc2/text/banking77] vote=0.942 uniform=0.940 best1=0.941 n_val=3944 vram=0.00GB 47s | grade=0.967 inner_auc=0.941 vs conf_auc=0.939
+22:19:19 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+22:20:03 [enc2/text/banking77] vote=0.938 uniform=0.935 best1=0.935 n_val=3912 vram=0.00GB 44s | grade=0.963 inner_auc=0.952 vs conf_auc=0.948
+22:20:08 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+22:20:57 [enc2/text/banking77] vote=0.943 uniform=0.939 best1=0.940 n_val=3907 vram=0.00GB 49s | grade=0.963 inner_auc=0.917 vs conf_auc=0.920
+22:21:03 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+22:21:57 [enc2/text/banking77] vote=0.949 uniform=0.946 best1=0.943 n_val=3946 vram=0.00GB 53s | grade=0.961 inner_auc=0.950 vs conf_auc=0.949
+22:22:02 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+22:22:52 [enc2/text/banking77] vote=0.943 uniform=0.935 best1=0.938 n_val=3889 vram=0.00GB 50s | grade=0.962 inner_auc=0.967 vs conf_auc=0.966
+22:22:58 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+22:23:52 [enc2/text/banking77] vote=0.943 uniform=0.935 best1=0.940 n_val=3841 vram=0.00GB 54s | grade=0.966 inner_auc=0.918 vs conf_auc=0.915
+22:23:58 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+22:24:46 [enc2/text/banking77] vote=0.943 uniform=0.938 best1=0.941 n_val=4030 vram=0.00GB 48s | grade=0.968 inner_auc=0.914 vs conf_auc=0.912
+22:24:52 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+22:25:45 [enc2/text/banking77] vote=0.942 uniform=0.937 best1=0.937 n_val=3911 vram=0.00GB 53s | grade=0.966 inner_auc=0.959 vs conf_auc=0.959
+22:25:52 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+22:26:41 [enc2/text/banking77] vote=0.943 uniform=0.942 best1=0.943 n_val=3947 vram=0.00GB 50s | grade=0.967 inner_auc=0.928 vs conf_auc=0.922
+22:26:47 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+22:27:40 [enc2/text/banking77] vote=0.944 uniform=0.938 best1=0.939 n_val=3910 vram=0.00GB 52s | grade=0.964 inner_auc=0.932 vs conf_auc=0.931
+22:27:46 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+22:28:39 [enc2/text/banking77] vote=0.944 uniform=0.942 best1=0.940 n_val=3987 vram=0.00GB 52s | grade=0.964 inner_auc=0.904 vs conf_auc=0.904
+22:28:44 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+22:29:34 [enc2/text/banking77] vote=0.937 uniform=0.936 best1=0.937 n_val=3999 vram=0.00GB 49s | grade=0.957 inner_auc=0.956 vs conf_auc=0.956
+22:29:40 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+22:30:34 [enc2/text/banking77] vote=0.941 uniform=0.936 best1=0.934 n_val=3888 vram=0.00GB 54s | grade=0.964 inner_auc=0.931 vs conf_auc=0.929
+22:30:41 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+22:31:29 [enc2/text/banking77] vote=0.944 uniform=0.942 best1=0.939 n_val=3876 vram=0.00GB 48s | grade=0.964 inner_auc=0.932 vs conf_auc=0.934
+22:31:35 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+22:32:29 [enc2/text/banking77] vote=0.942 uniform=0.939 best1=0.939 n_val=3992 vram=0.00GB 54s | grade=0.963 inner_auc=0.938 vs conf_auc=0.933
+22:32:36 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+22:33:26 [enc2/text/banking77] vote=0.947 uniform=0.941 best1=0.942 n_val=3868 vram=0.00GB 51s | grade=0.960 inner_auc=0.963 vs conf_auc=0.958
+22:33:31 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+22:34:24 [enc2/text/banking77] vote=0.936 uniform=0.933 best1=0.933 n_val=3999 vram=0.00GB 53s | grade=0.956 inner_auc=0.922 vs conf_auc=0.925
+22:34:30 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+22:35:23 [enc2/text/banking77] vote=0.944 uniform=0.941 best1=0.941 n_val=3918 vram=0.00GB 53s | grade=0.961 inner_auc=0.962 vs conf_auc=0.959
+22:35:29 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+22:36:19 [enc2/text/banking77] vote=0.945 uniform=0.939 best1=0.940 n_val=3901 vram=0.00GB 51s | grade=0.966 inner_auc=0.943 vs conf_auc=0.942
+22:36:26 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+22:37:24 [enc2/text/banking77] vote=0.944 uniform=0.940 best1=0.940 n_val=3992 vram=0.00GB 58s | grade=0.967 inner_auc=0.907 vs conf_auc=0.909
+22:37:30 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+22:38:21 [enc2/text/banking77] vote=0.946 uniform=0.942 best1=0.943 n_val=3883 vram=0.00GB 50s | grade=0.968 inner_auc=0.909 vs conf_auc=0.902
+22:38:28 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+22:39:30 [enc2/text/banking77] vote=0.938 uniform=0.936 best1=0.935 n_val=3910 vram=0.00GB 62s | grade=0.963 inner_auc=0.922 vs conf_auc=0.921
+22:39:37 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+22:41:20 [enc2/text/banking77] vote=0.943 uniform=0.940 best1=0.941 n_val=3910 vram=0.00GB 102s | grade=0.964 inner_auc=0.930 vs conf_auc=0.932
+22:41:26 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+22:42:20 [enc2/text/banking77] vote=0.938 uniform=0.932 best1=0.937 n_val=3916 vram=0.00GB 54s | grade=0.964 inner_auc=0.964 vs conf_auc=0.961
+22:42:27 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+22:43:40 [enc2/text/banking77] vote=0.942 uniform=0.939 best1=0.939 n_val=3957 vram=0.00GB 73s | grade=0.961 inner_auc=0.963 vs conf_auc=0.961
+22:43:48 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+22:44:50 [enc2/text/banking77] vote=0.943 uniform=0.939 best1=0.941 n_val=3974 vram=0.00GB 62s | grade=0.964 inner_auc=0.947 vs conf_auc=0.952
+22:44:58 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+22:46:11 [enc2/text/banking77] vote=0.946 uniform=0.943 best1=0.945 n_val=3896 vram=0.00GB 73s | grade=0.965 inner_auc=0.897 vs conf_auc=0.894
+22:46:19 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+22:47:21 [enc2/text/banking77] vote=0.933 uniform=0.931 best1=0.932 n_val=3922 vram=0.00GB 61s | grade=0.955 inner_auc=0.920 vs conf_auc=0.919
+22:47:27 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+22:48:55 [enc2/text/banking77] vote=0.942 uniform=0.936 best1=0.938 n_val=3894 vram=0.00GB 88s | grade=0.961 inner_auc=0.945 vs conf_auc=0.943
+22:49:06 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+22:50:17 [enc2/text/banking77] vote=0.940 uniform=0.936 best1=0.940 n_val=3979 vram=0.00GB 72s | grade=0.965 inner_auc=0.911 vs conf_auc=0.916
+22:50:26 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+22:51:33 [enc2/text/banking77] vote=0.939 uniform=0.932 best1=0.934 n_val=3856 vram=0.00GB 67s | grade=0.965 inner_auc=0.946 vs conf_auc=0.945
+22:51:42 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+22:52:55 [enc2/text/banking77] vote=0.942 uniform=0.936 best1=0.936 n_val=3978 vram=0.00GB 73s | grade=0.966 inner_auc=0.921 vs conf_auc=0.922
+22:53:03 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+22:54:08 [enc2/text/banking77] vote=0.938 uniform=0.934 best1=0.937 n_val=3960 vram=0.00GB 65s | grade=0.962 inner_auc=0.925 vs conf_auc=0.929
+22:54:16 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+22:57:16 [enc2/text/banking77] vote=0.942 uniform=0.937 best1=0.939 n_val=3900 vram=0.00GB 179s | grade=0.966 inner_auc=0.915 vs conf_auc=0.918
+22:57:36 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+23:00:03 [enc2/text/banking77] vote=0.939 uniform=0.935 best1=0.934 n_val=3995 vram=0.00GB 147s | grade=0.962 inner_auc=0.949 vs conf_auc=0.946
+23:00:26 RUN COMPLETE
+14:28:09 NI run auto_cpu_031 on CPU; hours=2.0 smoke=False
+14:28:09 explicit task list: ['enc2/text/banking77']
+14:28:16 [resume] from checkpoint: next cycle 116, rounds 116, 116 metric rows, inner net restored
+14:28:16 ===== CYCLE 116 (OUTER-ONLY BOOTSTRAP) =====
+14:28:16 [data] enc2/text/banking77: n=13083 C=77 D=768 shards=1
+14:31:38 [enc2/text/banking77] vote=0.943 uniform=0.937 best1=0.941 n_val=3943 vram=0.00GB 202s
+14:32:57 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 116, "n_records": 3943, "n_val": 787, "base_rate": 0.9466328024864197, "inner": {"auc": 0.9612016618728028, "ece": 0.013377334861016183, "brier": 0.03299160674214363, "acc80": 0.998410165309906}, "outer_conf": {"auc": 0.9552253116011505, "ece": 0.014380901408165201, "brier": 0.03363072872161865, "acc80": 0.998410165309906}}
+14:32:57 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+14:39:23 [enc2/text/banking77] vote=0.941 uniform=0.935 best1=0.938 n_val=3930 vram=0.00GB 386s | grade=0.964 inner_auc=0.968 vs conf_auc=0.965
+14:40:08 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+14:46:30 [enc2/text/banking77] vote=0.950 uniform=0.944 best1=0.947 n_val=3984 vram=0.00GB 382s | grade=0.966 inner_auc=0.922 vs conf_auc=0.920
+14:47:10 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+00:34:07 NI run auto_cpu_031 on CPU; hours=2.0 smoke=False
+00:34:07 explicit task list: ['enc2/text/banking77']
+00:34:18 [resume] from checkpoint: next cycle 119, rounds 119, 119 metric rows, inner net restored
+00:34:18 ===== CYCLE 119 (OUTER-ONLY BOOTSTRAP) =====
+00:34:19 [data] enc2/text/banking77: n=13083 C=77 D=768 shards=1
+00:37:14 [enc2/text/banking77] vote=0.944 uniform=0.942 best1=0.941 n_val=3944 vram=0.00GB 176s
+00:37:48 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 119, "n_records": 3944, "n_val": 750, "base_rate": 0.9386666417121887, "inner": {"auc": 0.9443243577075099, "ece": 0.017483430604139965, "brier": 0.03544851765036583, "acc80": 0.9933333396911621}, "outer_conf": {"auc": 0.9374382411067194, "ece": 0.025593213578065235, "brier": 0.03763853386044502, "acc80": 0.9933333396911621}}
+00:37:48 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+00:41:07 [enc2/text/banking77] vote=0.942 uniform=0.939 best1=0.940 n_val=3938 vram=0.00GB 200s | grade=0.963 inner_auc=0.924 vs conf_auc=0.935
+00:41:28 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+00:44:41 [enc2/text/banking77] vote=0.939 uniform=0.933 best1=0.937 n_val=3822 vram=0.00GB 193s | grade=0.963 inner_auc=0.955 vs conf_auc=0.954
+00:44:59 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+00:48:18 [enc2/text/banking77] vote=0.944 uniform=0.942 best1=0.940 n_val=3920 vram=0.00GB 199s | grade=0.963 inner_auc=0.927 vs conf_auc=0.937
+00:48:36 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+00:52:02 [enc2/text/banking77] vote=0.944 uniform=0.942 best1=0.942 n_val=3849 vram=0.00GB 206s | grade=0.968 inner_auc=0.945 vs conf_auc=0.944
+00:52:20 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+00:55:22 [enc2/text/banking77] vote=0.940 uniform=0.935 best1=0.938 n_val=3928 vram=0.00GB 183s | grade=0.965 inner_auc=0.936 vs conf_auc=0.935
+00:55:43 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+00:58:59 [enc2/text/banking77] vote=0.937 uniform=0.939 best1=0.936 n_val=3907 vram=0.00GB 197s | grade=0.964 inner_auc=0.935 vs conf_auc=0.934
+00:59:19 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+01:02:24 [enc2/text/banking77] vote=0.937 uniform=0.931 best1=0.932 n_val=3871 vram=0.00GB 185s | grade=0.965 inner_auc=0.913 vs conf_auc=0.902
+01:02:43 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+01:05:57 [enc2/text/banking77] vote=0.935 uniform=0.934 best1=0.935 n_val=3904 vram=0.00GB 194s | grade=0.965 inner_auc=0.936 vs conf_auc=0.935
+01:06:18 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+01:09:34 [enc2/text/banking77] vote=0.941 uniform=0.938 best1=0.938 n_val=4010 vram=0.00GB 196s | grade=0.963 inner_auc=0.934 vs conf_auc=0.929
+01:09:53 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+01:13:05 [enc2/text/banking77] vote=0.939 uniform=0.936 best1=0.937 n_val=3934 vram=0.00GB 192s | grade=0.962 inner_auc=0.929 vs conf_auc=0.937
+01:13:27 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+01:16:46 [enc2/text/banking77] vote=0.943 uniform=0.940 best1=0.941 n_val=3968 vram=0.00GB 200s | grade=0.963 inner_auc=0.910 vs conf_auc=0.905
+01:17:08 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+01:20:18 [enc2/text/banking77] vote=0.938 uniform=0.937 best1=0.934 n_val=3971 vram=0.00GB 190s | grade=0.965 inner_auc=0.952 vs conf_auc=0.941
+01:20:38 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+01:24:01 [enc2/text/banking77] vote=0.937 uniform=0.936 best1=0.935 n_val=3938 vram=0.00GB 203s | grade=0.964 inner_auc=0.940 vs conf_auc=0.946
+01:24:23 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+01:27:37 [enc2/text/banking77] vote=0.943 uniform=0.937 best1=0.940 n_val=3869 vram=0.00GB 194s | grade=0.964 inner_auc=0.904 vs conf_auc=0.903
+01:28:00 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+01:31:14 [enc2/text/banking77] vote=0.943 uniform=0.938 best1=0.938 n_val=3839 vram=0.00GB 194s | grade=0.965 inner_auc=0.924 vs conf_auc=0.928
+01:31:37 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+01:35:31 [enc2/text/banking77] vote=0.939 uniform=0.937 best1=0.936 n_val=3886 vram=0.00GB 234s | grade=0.961 inner_auc=0.943 vs conf_auc=0.952
+01:35:59 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+01:39:51 [enc2/text/banking77] vote=0.944 uniform=0.944 best1=0.942 n_val=3857 vram=0.00GB 232s | grade=0.963 inner_auc=0.913 vs conf_auc=0.918
+01:40:18 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+01:44:03 [enc2/text/banking77] vote=0.948 uniform=0.941 best1=0.945 n_val=4008 vram=0.00GB 225s | grade=0.965 inner_auc=0.951 vs conf_auc=0.953
+01:44:27 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+01:48:22 [enc2/text/banking77] vote=0.943 uniform=0.941 best1=0.939 n_val=3879 vram=0.00GB 235s | grade=0.964 inner_auc=0.914 vs conf_auc=0.922
+01:48:47 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+01:52:40 [enc2/text/banking77] vote=0.946 uniform=0.940 best1=0.942 n_val=3907 vram=0.00GB 233s | grade=0.970 inner_auc=0.941 vs conf_auc=0.940
+01:53:08 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+01:57:03 [enc2/text/banking77] vote=0.940 uniform=0.934 best1=0.938 n_val=3890 vram=0.00GB 234s | grade=0.963 inner_auc=0.921 vs conf_auc=0.911
+01:57:30 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+02:01:22 [enc2/text/banking77] vote=0.941 uniform=0.940 best1=0.940 n_val=3868 vram=0.00GB 232s | grade=0.966 inner_auc=0.937 vs conf_auc=0.940
+02:01:43 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+02:05:26 [enc2/text/banking77] vote=0.943 uniform=0.943 best1=0.941 n_val=3980 vram=0.00GB 223s | grade=0.966 inner_auc=0.911 vs conf_auc=0.918
+02:06:09 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+02:10:39 [enc2/text/banking77] vote=0.940 uniform=0.937 best1=0.937 n_val=3941 vram=0.00GB 270s | grade=0.964 inner_auc=0.925 vs conf_auc=0.919
+02:11:07 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+02:15:28 [enc2/text/banking77] vote=0.940 uniform=0.938 best1=0.940 n_val=3937 vram=0.00GB 261s | grade=0.967 inner_auc=0.927 vs conf_auc=0.936
+02:15:56 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+02:20:25 [enc2/text/banking77] vote=0.938 uniform=0.930 best1=0.935 n_val=3942 vram=0.00GB 269s | grade=0.965 inner_auc=0.932 vs conf_auc=0.930
+02:20:56 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+02:25:13 [enc2/text/banking77] vote=0.937 uniform=0.935 best1=0.933 n_val=3962 vram=0.00GB 257s | grade=0.961 inner_auc=0.904 vs conf_auc=0.904
+02:25:41 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+02:30:27 [enc2/text/banking77] vote=0.939 uniform=0.935 best1=0.940 n_val=3952 vram=0.00GB 286s | grade=0.961 inner_auc=0.916 vs conf_auc=0.907
+02:31:04 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+02:36:31 [enc2/text/banking77] vote=0.944 uniform=0.940 best1=0.942 n_val=4004 vram=0.00GB 327s | grade=0.966 inner_auc=0.959 vs conf_auc=0.961
+02:37:02 RUN COMPLETE
+16:24:04 NI run auto_cpu_031 on CPU; hours=2.0 smoke=False
+16:24:04 explicit task list: ['enc2/text/banking77']
+16:24:22 [resume] from checkpoint: next cycle 149, rounds 149, 149 metric rows, inner net restored
+16:24:22 ===== CYCLE 149 (OUTER-ONLY BOOTSTRAP) =====
+16:24:22 [data] enc2/text/banking77: n=13083 C=77 D=768 shards=1
+16:27:50 [enc2/text/banking77] vote=0.941 uniform=0.937 best1=0.939 n_val=3856 vram=0.00GB 208s
+16:28:35 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 149, "n_records": 3856, "n_val": 751, "base_rate": 0.9440745711326599, "inner": {"auc": 0.8783329975149439, "ece": 0.025220546677966568, "brier": 0.04539726302027702, "acc80": 0.9833333492279053}, "outer_conf": {"auc": 0.884109073812882, "ece": 0.030143860335673855, "brier": 0.04346147179603577, "acc80": 0.9833333492279053}}
+16:28:35 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+16:32:15 [enc2/text/banking77] vote=0.942 uniform=0.936 best1=0.938 n_val=3977 vram=0.00GB 220s | grade=0.968 inner_auc=0.913 vs conf_auc=0.913
+16:32:40 ===== CYCLE 151 (OUTER -> INNER -> FEEDBACK) =====
+16:36:45 [enc2/text/banking77] vote=0.944 uniform=0.938 best1=0.943 n_val=3984 vram=0.00GB 244s | grade=0.967 inner_auc=0.920 vs conf_auc=0.913
+16:37:06 ===== CYCLE 152 (OUTER -> INNER -> FEEDBACK) =====
+16:41:10 [enc2/text/banking77] vote=0.942 uniform=0.938 best1=0.939 n_val=3955 vram=0.00GB 244s | grade=0.968 inner_auc=0.952 vs conf_auc=0.947
+16:41:33 ===== CYCLE 153 (OUTER -> INNER -> FEEDBACK) =====
+16:45:31 [enc2/text/banking77] vote=0.940 uniform=0.936 best1=0.938 n_val=3890 vram=0.00GB 238s | grade=0.966 inner_auc=0.927 vs conf_auc=0.921
+16:45:49 ===== CYCLE 154 (OUTER -> INNER -> FEEDBACK) =====
+16:49:00 [enc2/text/banking77] vote=0.946 uniform=0.941 best1=0.943 n_val=3964 vram=0.00GB 192s | grade=0.969 inner_auc=0.943 vs conf_auc=0.932
+16:49:20 ===== CYCLE 155 (OUTER -> INNER -> FEEDBACK) =====
+16:52:40 [enc2/text/banking77] vote=0.944 uniform=0.937 best1=0.939 n_val=3987 vram=0.00GB 200s | grade=0.965 inner_auc=0.923 vs conf_auc=0.910
+16:52:58 ===== CYCLE 156 (OUTER -> INNER -> FEEDBACK) =====
+16:55:57 [enc2/text/banking77] vote=0.943 uniform=0.939 best1=0.941 n_val=4017 vram=0.00GB 179s | grade=0.969 inner_auc=0.894 vs conf_auc=0.898
+16:56:18 ===== CYCLE 157 (OUTER -> INNER -> FEEDBACK) =====
+16:59:37 [enc2/text/banking77] vote=0.944 uniform=0.937 best1=0.938 n_val=3890 vram=0.00GB 199s | grade=0.967 inner_auc=0.959 vs conf_auc=0.953
+16:59:59 ===== CYCLE 158 (OUTER -> INNER -> FEEDBACK) =====
+17:03:00 [enc2/text/banking77] vote=0.945 uniform=0.942 best1=0.942 n_val=3868 vram=0.00GB 181s | grade=0.968 inner_auc=0.941 vs conf_auc=0.948
+17:03:19 ===== CYCLE 159 (OUTER -> INNER -> FEEDBACK) =====
+17:06:31 [enc2/text/banking77] vote=0.943 uniform=0.941 best1=0.941 n_val=3926 vram=0.00GB 193s | grade=0.965 inner_auc=0.921 vs conf_auc=0.908
+17:06:49 ===== CYCLE 160 (OUTER -> INNER -> FEEDBACK) =====
+17:10:09 [enc2/text/banking77] vote=0.942 uniform=0.937 best1=0.937 n_val=3946 vram=0.00GB 200s | grade=0.968 inner_auc=0.930 vs conf_auc=0.922
+17:10:29 ===== CYCLE 161 (OUTER -> INNER -> FEEDBACK) =====
+17:14:40 [enc2/text/banking77] vote=0.937 uniform=0.933 best1=0.935 n_val=3922 vram=0.00GB 250s | grade=0.962 inner_auc=0.950 vs conf_auc=0.950
+17:15:04 ===== CYCLE 162 (OUTER -> INNER -> FEEDBACK) =====
+17:19:11 [enc2/text/banking77] vote=0.942 uniform=0.938 best1=0.937 n_val=3916 vram=0.00GB 247s | grade=0.964 inner_auc=0.936 vs conf_auc=0.938
+17:19:38 ===== CYCLE 163 (OUTER -> INNER -> FEEDBACK) =====
+17:23:47 [enc2/text/banking77] vote=0.942 uniform=0.940 best1=0.939 n_val=3950 vram=0.00GB 249s | grade=0.964 inner_auc=0.889 vs conf_auc=0.890
+17:24:17 ===== CYCLE 164 (OUTER -> INNER -> FEEDBACK) =====
+17:28:26 [enc2/text/banking77] vote=0.945 uniform=0.945 best1=0.945 n_val=3931 vram=0.00GB 249s | grade=0.966 inner_auc=0.957 vs conf_auc=0.953
+17:28:52 ===== CYCLE 165 (OUTER -> INNER -> FEEDBACK) =====
+17:32:55 [enc2/text/banking77] vote=0.940 uniform=0.941 best1=0.938 n_val=3922 vram=0.00GB 243s | grade=0.963 inner_auc=0.905 vs conf_auc=0.911
+17:33:23 ===== CYCLE 166 (OUTER -> INNER -> FEEDBACK) =====
+17:37:20 [enc2/text/banking77] vote=0.946 uniform=0.942 best1=0.942 n_val=3943 vram=0.00GB 237s | grade=0.965 inner_auc=0.941 vs conf_auc=0.930
+17:37:51 ===== CYCLE 167 (OUTER -> INNER -> FEEDBACK) =====
+17:41:30 [enc2/text/banking77] vote=0.941 uniform=0.939 best1=0.937 n_val=3910 vram=0.00GB 219s | grade=0.964 inner_auc=0.957 vs conf_auc=0.961
+17:41:58 ===== CYCLE 168 (OUTER -> INNER -> FEEDBACK) =====
+17:45:59 [enc2/text/banking77] vote=0.941 uniform=0.940 best1=0.935 n_val=3885 vram=0.00GB 242s | grade=0.967 inner_auc=0.923 vs conf_auc=0.926
+17:46:28 ===== CYCLE 169 (OUTER -> INNER -> FEEDBACK) =====
+17:50:21 [enc2/text/banking77] vote=0.941 uniform=0.938 best1=0.940 n_val=3931 vram=0.00GB 234s | grade=0.966 inner_auc=0.955 vs conf_auc=0.953
+17:50:45 ===== CYCLE 170 (OUTER -> INNER -> FEEDBACK) =====
+17:54:44 [enc2/text/banking77] vote=0.944 uniform=0.942 best1=0.942 n_val=3886 vram=0.00GB 239s | grade=0.965 inner_auc=0.950 vs conf_auc=0.946
+17:55:09 ===== CYCLE 171 (OUTER -> INNER -> FEEDBACK) =====
+17:59:03 [enc2/text/banking77] vote=0.945 uniform=0.940 best1=0.942 n_val=4085 vram=0.00GB 234s | grade=0.968 inner_auc=0.933 vs conf_auc=0.924
+17:59:26 ===== CYCLE 172 (OUTER -> INNER -> FEEDBACK) =====
+18:03:37 [enc2/text/banking77] vote=0.943 uniform=0.940 best1=0.941 n_val=3921 vram=0.00GB 252s | grade=0.967 inner_auc=0.940 vs conf_auc=0.932
+18:04:07 ===== CYCLE 173 (OUTER -> INNER -> FEEDBACK) =====
+18:08:15 [enc2/text/banking77] vote=0.943 uniform=0.939 best1=0.940 n_val=3948 vram=0.00GB 248s | grade=0.967 inner_auc=0.914 vs conf_auc=0.904
+18:08:41 ===== CYCLE 174 (OUTER -> INNER -> FEEDBACK) =====
+18:12:36 [enc2/text/banking77] vote=0.937 uniform=0.933 best1=0.934 n_val=3842 vram=0.00GB 235s | grade=0.961 inner_auc=0.945 vs conf_auc=0.946
+18:13:05 ===== CYCLE 175 (OUTER -> INNER -> FEEDBACK) =====
+18:17:18 [enc2/text/banking77] vote=0.938 uniform=0.935 best1=0.936 n_val=3869 vram=0.00GB 253s | grade=0.962 inner_auc=0.941 vs conf_auc=0.936
+18:17:45 ===== CYCLE 176 (OUTER -> INNER -> FEEDBACK) =====
+18:21:32 [enc2/text/banking77] vote=0.938 uniform=0.936 best1=0.935 n_val=3853 vram=0.00GB 226s | grade=0.964 inner_auc=0.926 vs conf_auc=0.928
+18:21:49 ===== CYCLE 177 (OUTER -> INNER -> FEEDBACK) =====
+18:26:01 [enc2/text/banking77] vote=0.940 uniform=0.937 best1=0.940 n_val=3899 vram=0.00GB 253s | grade=0.963 inner_auc=0.920 vs conf_auc=0.924
+18:26:33 RUN COMPLETE
+20:24:19 NI run auto_cpu_031 on CPU; hours=2.0 smoke=False
+20:24:19 explicit task list: ['enc2/text/banking77']
+20:24:37 [resume] from checkpoint: next cycle 178, rounds 178, 178 metric rows, inner net restored
+20:24:37 ===== CYCLE 178 (OUTER-ONLY BOOTSTRAP) =====
+20:24:38 [data] enc2/text/banking77: n=13083 C=77 D=768 shards=1
+20:29:41 [enc2/text/banking77] vote=0.940 uniform=0.935 best1=0.938 n_val=4041 vram=0.00GB 303s
+20:30:46 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 178, "n_records": 4041, "n_val": 755, "base_rate": 0.9430463314056396, "inner": {"auc": 0.9316697151816044, "ece": 0.017620383804997072, "brier": 0.03804827108979225, "acc80": 0.9933775067329407}, "outer_conf": {"auc": 0.9249738698719624, "ece": 0.014168932066847948, "brier": 0.038553446531295776, "acc80": 0.9900662302970886}}
+20:30:46 ===== CYCLE 179 (OUTER -> INNER -> FEEDBACK) =====
+20:35:48 [enc2/text/banking77] vote=0.938 uniform=0.942 best1=0.937 n_val=3994 vram=0.00GB 301s | grade=0.963 inner_auc=0.924 vs conf_auc=0.924
+20:36:27 ===== CYCLE 180 (OUTER -> INNER -> FEEDBACK) =====
+20:41:07 [enc2/text/banking77] vote=0.943 uniform=0.940 best1=0.939 n_val=3890 vram=0.00GB 281s | grade=0.963 inner_auc=0.942 vs conf_auc=0.942
+20:41:41 ===== CYCLE 181 (OUTER -> INNER -> FEEDBACK) =====
+20:46:50 [enc2/text/banking77] vote=0.946 uniform=0.941 best1=0.943 n_val=3973 vram=0.00GB 309s | grade=0.965 inner_auc=0.946 vs conf_auc=0.944
+20:47:27 ===== CYCLE 182 (OUTER -> INNER -> FEEDBACK) =====
+20:51:57 [enc2/text/banking77] vote=0.938 uniform=0.938 best1=0.935 n_val=3940 vram=0.00GB 270s | grade=0.961 inner_auc=0.934 vs conf_auc=0.944
+20:52:26 ===== CYCLE 183 (OUTER -> INNER -> FEEDBACK) =====
+20:57:00 [enc2/text/banking77] vote=0.940 uniform=0.939 best1=0.934 n_val=3845 vram=0.00GB 274s | grade=0.965 inner_auc=0.950 vs conf_auc=0.947
+20:57:29 ===== CYCLE 184 (OUTER -> INNER -> FEEDBACK) =====
+21:02:02 [enc2/text/banking77] vote=0.943 uniform=0.940 best1=0.941 n_val=3874 vram=0.00GB 273s | grade=0.961 inner_auc=0.958 vs conf_auc=0.951
+21:02:31 ===== CYCLE 185 (OUTER -> INNER -> FEEDBACK) =====
+21:06:50 [enc2/text/banking77] vote=0.947 uniform=0.942 best1=0.942 n_val=3788 vram=0.00GB 259s | grade=0.965 inner_auc=0.934 vs conf_auc=0.929
+21:07:14 ===== CYCLE 186 (OUTER -> INNER -> FEEDBACK) =====
+21:11:46 [enc2/text/banking77] vote=0.941 uniform=0.937 best1=0.939 n_val=3971 vram=0.00GB 272s | grade=0.961 inner_auc=0.953 vs conf_auc=0.953
+21:12:17 ===== CYCLE 187 (OUTER -> INNER -> FEEDBACK) =====
+21:16:32 [enc2/text/banking77] vote=0.950 uniform=0.949 best1=0.950 n_val=3980 vram=0.00GB 255s | grade=0.965 inner_auc=0.926 vs conf_auc=0.937
+21:17:02 ===== CYCLE 188 (OUTER -> INNER -> FEEDBACK) =====
+21:21:40 [enc2/text/banking77] vote=0.940 uniform=0.939 best1=0.938 n_val=3982 vram=0.00GB 278s | grade=0.959 inner_auc=0.959 vs conf_auc=0.965
+21:22:10 ===== CYCLE 189 (OUTER -> INNER -> FEEDBACK) =====
+21:26:41 [enc2/text/banking77] vote=0.940 uniform=0.936 best1=0.937 n_val=3866 vram=0.00GB 270s | grade=0.967 inner_auc=0.901 vs conf_auc=0.901
+21:27:08 ===== CYCLE 190 (OUTER -> INNER -> FEEDBACK) =====
+21:31:40 [enc2/text/banking77] vote=0.938 uniform=0.937 best1=0.938 n_val=3863 vram=0.00GB 273s | grade=0.962 inner_auc=0.941 vs conf_auc=0.933
+21:32:13 ===== CYCLE 191 (OUTER -> INNER -> FEEDBACK) =====
+21:36:51 [enc2/text/banking77] vote=0.941 uniform=0.938 best1=0.937 n_val=3890 vram=0.00GB 278s | grade=0.963 inner_auc=0.958 vs conf_auc=0.956
+21:37:20 ===== CYCLE 192 (OUTER -> INNER -> FEEDBACK) =====
+21:42:04 [enc2/text/banking77] vote=0.946 uniform=0.944 best1=0.942 n_val=3943 vram=0.00GB 284s | grade=0.961 inner_auc=0.949 vs conf_auc=0.941
+21:42:36 ===== CYCLE 193 (OUTER -> INNER -> FEEDBACK) =====
+21:47:07 [enc2/text/banking77] vote=0.943 uniform=0.942 best1=0.938 n_val=3963 vram=0.00GB 271s | grade=0.963 inner_auc=0.900 vs conf_auc=0.898
+21:47:36 ===== CYCLE 194 (OUTER -> INNER -> FEEDBACK) =====
+21:52:08 [enc2/text/banking77] vote=0.945 uniform=0.941 best1=0.942 n_val=3936 vram=0.00GB 272s | grade=0.967 inner_auc=0.940 vs conf_auc=0.939
+21:52:33 ===== CYCLE 195 (OUTER -> INNER -> FEEDBACK) =====
+21:57:01 [enc2/text/banking77] vote=0.943 uniform=0.938 best1=0.941 n_val=3836 vram=0.00GB 267s | grade=0.965 inner_auc=0.937 vs conf_auc=0.923
+21:57:34 ===== CYCLE 196 (OUTER -> INNER -> FEEDBACK) =====
+22:02:56 [enc2/text/banking77] vote=0.933 uniform=0.931 best1=0.930 n_val=3937 vram=0.00GB 321s | grade=0.960 inner_auc=0.961 vs conf_auc=0.965
+22:03:32 ===== CYCLE 197 (OUTER -> INNER -> FEEDBACK) =====
+22:07:58 [enc2/text/banking77] vote=0.944 uniform=0.943 best1=0.941 n_val=3950 vram=0.00GB 266s | grade=0.963 inner_auc=0.899 vs conf_auc=0.897
+22:08:29 ===== CYCLE 198 (OUTER -> INNER -> FEEDBACK) =====
+22:13:32 [enc2/text/banking77] vote=0.940 uniform=0.936 best1=0.937 n_val=4012 vram=0.00GB 303s | grade=0.961 inner_auc=0.914 vs conf_auc=0.908
+22:14:06 ===== CYCLE 199 (OUTER -> INNER -> FEEDBACK) =====
+22:19:25 [enc2/text/banking77] vote=0.946 uniform=0.939 best1=0.944 n_val=3890 vram=0.00GB 319s | grade=0.962 inner_auc=0.956 vs conf_auc=0.959
+22:20:01 ===== CYCLE 200 (OUTER -> INNER -> FEEDBACK) =====
+22:24:43 [enc2/text/banking77] vote=0.938 uniform=0.933 best1=0.933 n_val=3817 vram=0.00GB 282s | grade=0.961 inner_auc=0.945 vs conf_auc=0.951
+22:25:21 RUN COMPLETE
+17:04:07 NI run auto_cpu_031 on CPU; hours=2.0 smoke=False
+17:04:07 explicit task list: ['enc2/text/banking77']
+17:04:19 [resume] from checkpoint: next cycle 201, rounds 201, 201 metric rows, inner net restored
+17:04:19 ===== CYCLE 201 (OUTER-ONLY BOOTSTRAP) =====
+17:04:19 [data] enc2/text/banking77: n=13083 C=77 D=768 shards=1
+17:07:22 [enc2/text/banking77] vote=0.941 uniform=0.936 best1=0.939 n_val=3966 vram=0.00GB 183s
+17:08:02 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 201, "n_records": 3966, "n_val": 790, "base_rate": 0.949367105960846, "inner": {"auc": 0.9180666666666667, "ece": 0.014914979342418382, "brier": 0.03724532574415207, "acc80": 0.9905063509941101}, "outer_conf": {"auc": 0.9147666666666666, "ece": 0.018595863746691352, "brier": 0.03812512755393982, "acc80": 0.9920886158943176}}
+17:08:02 ===== CYCLE 202 (OUTER -> INNER -> FEEDBACK) =====
+17:11:38 [enc2/text/banking77] vote=0.939 uniform=0.937 best1=0.936 n_val=3917 vram=0.00GB 217s | grade=0.963 inner_auc=0.945 vs conf_auc=0.942
+17:12:03 ===== CYCLE 203 (OUTER -> INNER -> FEEDBACK) =====
+17:15:54 [enc2/text/banking77] vote=0.941 uniform=0.939 best1=0.939 n_val=3940 vram=0.00GB 231s | grade=0.964 inner_auc=0.928 vs conf_auc=0.920
+17:16:16 ===== CYCLE 204 (OUTER -> INNER -> FEEDBACK) =====
+17:19:40 [enc2/text/banking77] vote=0.940 uniform=0.931 best1=0.938 n_val=3923 vram=0.00GB 204s | grade=0.965 inner_auc=0.939 vs conf_auc=0.932
+17:20:02 ===== CYCLE 205 (OUTER -> INNER -> FEEDBACK) =====
+17:23:24 [enc2/text/banking77] vote=0.944 uniform=0.941 best1=0.940 n_val=3932 vram=0.00GB 202s | grade=0.963 inner_auc=0.944 vs conf_auc=0.943
+17:23:46 ===== CYCLE 206 (OUTER -> INNER -> FEEDBACK) =====
+17:27:14 [enc2/text/banking77] vote=0.935 uniform=0.935 best1=0.935 n_val=3902 vram=0.00GB 208s | grade=0.963 inner_auc=0.930 vs conf_auc=0.928
+17:27:36 ===== CYCLE 207 (OUTER -> INNER -> FEEDBACK) =====
+17:31:03 [enc2/text/banking77] vote=0.938 uniform=0.935 best1=0.940 n_val=3937 vram=0.00GB 207s | grade=0.964 inner_auc=0.943 vs conf_auc=0.941
+17:31:25 ===== CYCLE 208 (OUTER -> INNER -> FEEDBACK) =====
+17:35:11 [enc2/text/banking77] vote=0.944 uniform=0.944 best1=0.941 n_val=3958 vram=0.00GB 226s | grade=0.968 inner_auc=0.925 vs conf_auc=0.929
+17:35:35 ===== CYCLE 209 (OUTER -> INNER -> FEEDBACK) =====
+17:44:41 NI run auto_cpu_031 on CPU; hours=2.0 smoke=False
+17:44:41 explicit task list: ['enc2/text/banking77']
+17:44:46 [resume] from checkpoint: next cycle 209, rounds 209, 209 metric rows, inner net restored
+17:44:46 ===== CYCLE 209 (OUTER-ONLY BOOTSTRAP) =====
+17:44:46 [data] enc2/text/banking77: n=13083 C=77 D=768 shards=1
+17:46:37 [enc2/text/banking77] vote=0.940 uniform=0.940 best1=0.937 n_val=3997 vram=0.00GB 111s
+17:47:12 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 209, "n_records": 3997, "n_val": 787, "base_rate": 0.9466328024864197, "inner": {"auc": 0.9616171300735059, "ece": 0.022985945927899855, "brier": 0.03268158808350563, "acc80": 0.996820330619812}, "outer_conf": {"auc": 0.956024288910195, "ece": 0.025144614175132453, "brier": 0.03387347236275673, "acc80": 0.996820330619812}}
+17:47:12 ===== CYCLE 210 (OUTER -> INNER -> FEEDBACK) =====
+17:51:07 [enc2/text/banking77] vote=0.945 uniform=0.943 best1=0.943 n_val=4002 vram=0.00GB 236s | grade=0.968 inner_auc=0.957 vs conf_auc=0.957
+17:51:32 ===== CYCLE 211 (OUTER -> INNER -> FEEDBACK) =====
+17:55:15 [enc2/text/banking77] vote=0.943 uniform=0.939 best1=0.938 n_val=3931 vram=0.00GB 223s | grade=0.965 inner_auc=0.917 vs conf_auc=0.925
+17:55:38 ===== CYCLE 212 (OUTER -> INNER -> FEEDBACK) =====
+17:59:38 [enc2/text/banking77] vote=0.942 uniform=0.940 best1=0.939 n_val=3858 vram=0.00GB 239s | grade=0.966 inner_auc=0.907 vs conf_auc=0.911
+18:00:02 ===== CYCLE 213 (OUTER -> INNER -> FEEDBACK) =====
+18:04:17 [enc2/text/banking77] vote=0.937 uniform=0.934 best1=0.934 n_val=3899 vram=0.00GB 255s | grade=0.963 inner_auc=0.962 vs conf_auc=0.954
+18:04:45 ===== CYCLE 214 (OUTER -> INNER -> FEEDBACK) =====
+18:08:28 [enc2/text/banking77] vote=0.936 uniform=0.935 best1=0.933 n_val=3984 vram=0.00GB 224s | grade=0.966 inner_auc=0.952 vs conf_auc=0.948
+18:08:58 ===== CYCLE 215 (OUTER -> INNER -> FEEDBACK) =====
+18:12:50 [enc2/text/banking77] vote=0.944 uniform=0.939 best1=0.940 n_val=3940 vram=0.00GB 232s | grade=0.963 inner_auc=0.944 vs conf_auc=0.942
+18:13:18 ===== CYCLE 216 (OUTER -> INNER -> FEEDBACK) =====
+18:17:45 [enc2/text/banking77] vote=0.935 uniform=0.933 best1=0.936 n_val=3936 vram=0.00GB 267s | grade=0.962 inner_auc=0.938 vs conf_auc=0.935
+18:18:11 ===== CYCLE 217 (OUTER -> INNER -> FEEDBACK) =====
+18:22:00 [enc2/text/banking77] vote=0.944 uniform=0.942 best1=0.941 n_val=3955 vram=0.00GB 229s | grade=0.961 inner_auc=0.927 vs conf_auc=0.919
+18:22:20 ===== CYCLE 218 (OUTER -> INNER -> FEEDBACK) =====
+18:26:31 [enc2/text/banking77] vote=0.941 uniform=0.938 best1=0.938 n_val=3966 vram=0.00GB 251s | grade=0.966 inner_auc=0.942 vs conf_auc=0.928
+18:26:59 ===== CYCLE 219 (OUTER -> INNER -> FEEDBACK) =====
+18:31:03 [enc2/text/banking77] vote=0.947 uniform=0.941 best1=0.944 n_val=3950 vram=0.00GB 244s | grade=0.965 inner_auc=0.898 vs conf_auc=0.889
+18:31:28 ===== CYCLE 220 (OUTER -> INNER -> FEEDBACK) =====
+18:35:21 [enc2/text/banking77] vote=0.943 uniform=0.937 best1=0.942 n_val=3967 vram=0.00GB 233s | grade=0.965 inner_auc=0.933 vs conf_auc=0.931
+18:35:46 ===== CYCLE 221 (OUTER -> INNER -> FEEDBACK) =====
+18:39:59 [enc2/text/banking77] vote=0.948 uniform=0.950 best1=0.945 n_val=3942 vram=0.00GB 253s | grade=0.965 inner_auc=0.908 vs conf_auc=0.905
+18:40:28 ===== CYCLE 222 (OUTER -> INNER -> FEEDBACK) =====
+18:44:43 [enc2/text/banking77] vote=0.939 uniform=0.935 best1=0.936 n_val=3966 vram=0.00GB 255s | grade=0.964 inner_auc=0.951 vs conf_auc=0.948
+18:45:09 ===== CYCLE 223 (OUTER -> INNER -> FEEDBACK) =====
+18:48:48 [enc2/text/banking77] vote=0.942 uniform=0.938 best1=0.941 n_val=3885 vram=0.00GB 218s | grade=0.965 inner_auc=0.929 vs conf_auc=0.921
+18:49:21 ===== CYCLE 224 (OUTER -> INNER -> FEEDBACK) =====
+18:53:30 [enc2/text/banking77] vote=0.941 uniform=0.938 best1=0.937 n_val=3956 vram=0.00GB 248s | grade=0.966 inner_auc=0.930 vs conf_auc=0.923
+18:53:55 ===== CYCLE 225 (OUTER -> INNER -> FEEDBACK) =====
+18:58:04 [enc2/text/banking77] vote=0.940 uniform=0.936 best1=0.937 n_val=3948 vram=0.00GB 249s | grade=0.964 inner_auc=0.927 vs conf_auc=0.929
+18:58:33 ===== CYCLE 226 (OUTER -> INNER -> FEEDBACK) =====
+19:02:05 [enc2/text/banking77] vote=0.938 uniform=0.940 best1=0.937 n_val=3891 vram=0.00GB 212s | grade=0.964 inner_auc=0.906 vs conf_auc=0.903
+19:02:35 ===== CYCLE 227 (OUTER -> INNER -> FEEDBACK) =====
+19:06:27 [enc2/text/banking77] vote=0.940 uniform=0.939 best1=0.938 n_val=3923 vram=0.00GB 232s | grade=0.966 inner_auc=0.933 vs conf_auc=0.926
+19:06:59 ===== CYCLE 228 (OUTER -> INNER -> FEEDBACK) =====
+19:10:56 [enc2/text/banking77] vote=0.948 uniform=0.944 best1=0.944 n_val=3944 vram=0.00GB 237s | grade=0.965 inner_auc=0.890 vs conf_auc=0.891
+19:11:19 ===== CYCLE 229 (OUTER -> INNER -> FEEDBACK) =====
+19:14:57 [enc2/text/banking77] vote=0.942 uniform=0.937 best1=0.936 n_val=3965 vram=0.00GB 217s | grade=0.964 inner_auc=0.928 vs conf_auc=0.926
+19:15:24 ===== CYCLE 230 (OUTER -> INNER -> FEEDBACK) =====
+19:19:27 [enc2/text/banking77] vote=0.942 uniform=0.942 best1=0.941 n_val=3916 vram=0.00GB 243s | grade=0.969 inner_auc=0.920 vs conf_auc=0.917
+19:19:51 ===== CYCLE 231 (OUTER -> INNER -> FEEDBACK) =====
+19:23:49 [enc2/text/banking77] vote=0.942 uniform=0.940 best1=0.939 n_val=3898 vram=0.00GB 238s | grade=0.965 inner_auc=0.939 vs conf_auc=0.936
+19:24:22 ===== CYCLE 232 (OUTER -> INNER -> FEEDBACK) =====
+19:27:45 [enc2/text/banking77] vote=0.943 uniform=0.939 best1=0.940 n_val=3838 vram=0.00GB 203s | grade=0.965 inner_auc=0.954 vs conf_auc=0.951
+19:28:15 ===== CYCLE 233 (OUTER -> INNER -> FEEDBACK) =====
+19:32:17 [enc2/text/banking77] vote=0.943 uniform=0.939 best1=0.943 n_val=3921 vram=0.00GB 242s | grade=0.967 inner_auc=0.902 vs conf_auc=0.903
+19:32:42 ===== CYCLE 234 (OUTER -> INNER -> FEEDBACK) =====
+19:36:52 [enc2/text/banking77] vote=0.932 uniform=0.930 best1=0.930 n_val=3957 vram=0.00GB 250s | grade=0.959 inner_auc=0.945 vs conf_auc=0.942
+19:37:13 ===== CYCLE 235 (OUTER -> INNER -> FEEDBACK) =====
+19:40:53 [enc2/text/banking77] vote=0.937 uniform=0.935 best1=0.935 n_val=3971 vram=0.00GB 220s | grade=0.962 inner_auc=0.941 vs conf_auc=0.937
+19:41:19 ===== CYCLE 236 (OUTER -> INNER -> FEEDBACK) =====
+19:45:07 [enc2/text/banking77] vote=0.945 uniform=0.942 best1=0.942 n_val=3946 vram=0.00GB 228s | grade=0.962 inner_auc=0.947 vs conf_auc=0.941
+19:45:33 RUN COMPLETE

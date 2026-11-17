@@ -1,0 +1,165 @@
+{
+   "app_metadata": {
+      "app_name": "GoXLR Streamlabs Sync",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure and run GoXLR Streamlabs Sync to synchronize GoXLR faders with Streamlabs Desktop audio sources.",
+   "prerequisite_state": "GoXLR Utility is running, and Streamlabs Desktop is open.",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the Streamlabs Desktop application.",
+         "ui_target": {
+            "element_name": "Streamlabs Desktop",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Streamlabs Desktop application window is in focus."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Create the separated capture sources in Streamlabs Desktop.",
+         "ui_target": {
+            "element_name": "Settings",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Settings",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Settings dialog opens."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Add the required audio output capture sources in Streamlabs Desktop.",
+         "ui_target": {
+            "element_name": "Add",
+            "automation_id": null,
+            "hierarchical_path": "Settings dialog > Output (Advanced mode) > Add",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A new source is added to the list."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Configure the mappings in the Streamlabs Desktop settings.",
+         "ui_target": {
+            "element_name": "Mappings",
+            "automation_id": null,
+            "hierarchical_path": "Settings dialog > Output (Advanced mode) > Mappings",
+            "element_type": "Tab",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Mappings editor opens."
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Run GoXLR Streamlabs Sync.",
+         "ui_target": {
+            "element_name": "Start",
+            "automation_id": null,
+            "hierarchical_path": "System tray icon > Start",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "GoXLR Streamlabs Sync starts and the system tray icon appears."
+      }
+   ],
+   "_meta": {
+      "source_app": "GoXLR Streamlabs Sync",
+      "app_key": "goxlr_streamlabs_sync",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "goxlr-streamlabs-sync",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:20:43Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

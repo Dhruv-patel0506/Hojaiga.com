@@ -1,0 +1,193 @@
+{
+   "app_metadata": {
+      "app_name": "MultiPing",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure and run MultiPing in MultiPing mode",
+   "prerequisite_state": "MultiPing application is open and in PlotPing mode",
+   "total_steps": 6,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Enter a hostname or IP address in the Add target field",
+         "ui_target": {
+            "element_name": "Add target",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Add target",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "example.com"
+         },
+         "expected_state_change": "The text box contains the entered hostname or IP address"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Press Enter to add the target",
+         "ui_target": {
+            "element_name": "Enter",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Add target > Enter",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The entered target is added to the list of targets"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Select the Start button to begin monitoring",
+         "ui_target": {
+            "element_name": "Start",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Start",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Monitoring starts and the upper-right panel displays the traceroute for the selected destination"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Select a destination to view its traceroute",
+         "ui_target": {
+            "element_name": "Destination",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Destination",
+            "element_type": "ListItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected destination's traceroute is displayed in the upper-right panel"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Select the Remove button to remove the currently selected destination",
+         "ui_target": {
+            "element_name": "Remove",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Remove",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected destination is removed from the list"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Select the File menu > New MultiPing Window to open another independent monitoring window",
+         "ui_target": {
+            "element_name": "File",
+            "automation_id": null,
+            "hierarchical_path": "Main window > File",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A new MultiPing window opens"
+      }
+   ],
+   "_meta": {
+      "source_app": "MultiPing",
+      "app_key": "multiping",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Installation",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:38:42Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

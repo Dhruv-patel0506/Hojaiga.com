@@ -1,0 +1,107 @@
+{
+ "app": "word",
+ "started": "2026-11-02 06:18:36",
+ "phases": {
+  "read": {
+   "seconds": 3.4,
+   "level": "explored"
+  },
+  "map": {
+   "ran": true,
+   "seconds": 234.9,
+   "level": "explored",
+   "commands": 2786,
+   "with_shortcut": 24,
+   "dialogs": 20,
+   "layout_controls": 958,
+   "state_variables": 38,
+   "frontier": {
+    "total": 182,
+    "by_status": {
+     "explored": 65,
+     "no_effect": 6,
+     "open": 102,
+     "unsafe": 9
+    },
+    "explorable": 173,
+    "explored_n": 71,
+    "explored_fraction": 0.41
+   }
+  },
+  "ask": {
+   "asked": 4,
+   "answered": 1,
+   "items": [
+    {
+     "q": "In word, how do I use View?",
+     "status": "ANSWERED",
+     "answer": "To use View in Word, follow these steps:\n\n1. Look at the screen [3].\n2. Move your pointer to the View tab on the Ribbon [3].\n3. Click on the View tab to reveal additional options [3]."
+    },
+    {
+     "q": "In word, how do I use Help?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about word (1 documents, 4 procedures, 0 shortcuts). how to use the Help feature in Word. Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In word, how do I use References?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about word (1 documents, 4 procedures, 0 shortcuts). how to use References feature in Word Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In word, how do I use Multilevel List?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about word (1 documents, 4 procedures, 0 shortcuts). how to use Multilevel List in Word Reverse engineering or scanning it more would fill this in."
+    }
+   ],
+   "seconds": 10.3
+  },
+  "practice": {
+   "written": 5,
+   "tried": 5,
+   "proven_done": 0,
+   "kept_training_rows": 0,
+   "results": [
+    {
+     "task": "open word, type 'Hello, World!' in the document, change the font to Candara, font size to 18, and add a multilevel list with two levels: '1. First level item' and '1.1. Second level item', then save as D:\\new_automation\\data\\practice\\word\\multilevel_list.docx",
+     "status": "FAILED",
+     "seconds": 278.4,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'word': BLOCKED (window hwnd=6753214), 13 verified-loop steps in 246.1s\n    - 'type 'Hello, World!' in the document, change the font to Candara,"
+    },
+    {
+     "task": "open word, type 'Area of a Circle' in the document, use the 'Area of Circle' feature to calculate the area of a circle with a radius of 5 cm, then save as D:\\new_automation\\data\\practice\\word\\area_of_circle.docx",
+     "status": "FAILED",
+     "seconds": 62.3,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'word': BLOCKED (window hwnd=4260340), 6 verified-loop steps in 51.8s\n    - 'create a new blank document' -> DONE (PASS) [WEAK evidence: the UI "
+    },
+    {
+     "task": "open word, type 'Insert Table of Authorities' in the document, insert a 3x4 table, fill it with numbers 1 to 12, then save as D:\\new_automation\\data\\practice\\word\\table_of_authorities.docx",
+     "status": "FAILED",
+     "seconds": 97.0,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'word': BLOCKED (window hwnd=6490498), 5 verified-loop steps in 95.0s\n    - 'type \"'Insert Table of Authorities' in the document\"' -> NOT DONE ("
+    },
+    {
+     "task": "open word, type 'Isosceles Triangle' in the document, use the 'Isosceles Triangle' feature to draw an isosceles triangle with a base of 10 cm and height of 8 cm, then save as D:\\new_automation\\data\\practice\\word\\isosceles_triangle.docx",
+     "status": "FAILED",
+     "seconds": 257.8,
+     "proof": "[{'file': 'D:\\\\new_automation\\\\data\\\\practice\\\\word\\\\isosceles_triangle.docx', 'ok': False, 'why': 'the file was not saved'}]"
+    },
+    {
+     "task": "open word, type 'Century Gothic-Palatino Linotype' in the document, use the 'Century Gothic-Palatino Linotype' font, add a 6x6 table, fill it with the numbers 1 to 36, then save as D:\\new_automation\\data\\practice\\word\\six_by_six_table.docx",
+     "status": "FAILED",
+     "seconds": 267.2,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'word': BLOCKED (window hwnd=7277244), 5 verified-loop steps in 264.8s\n    - 'type \"'Century Gothic-Palatino Linotype' in the document, use the "
+    }
+   ],
+   "seconds": 978.1
+  }
+ },
+ "app_key": "word",
+ "exe": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
+ "readiness": {
+  "knows_commands": true,
+  "answers_questions": "1/4",
+  "proven_tasks": "0/5",
+  "verdict": "not ready: nothing proven yet"
+ },
+ "seconds": 1233.0
+}

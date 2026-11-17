@@ -1,0 +1,167 @@
+{
+   "app_metadata": {
+      "app_name": "VoZii",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure VoZii on a Windows machine",
+   "prerequisite_state": "User is on the desktop of a Windows 11 machine",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download VoZii.exe from the latest release",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User navigates to the latest release page on GitHub"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Double-click VoZii.exe to open the settings window",
+         "ui_target": {
+            "element_name": "VoZii",
+            "automation_id": null,
+            "hierarchical_path": "Desktop > VoZii",
+            "element_type": "Window",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DOUBLE_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "VoZii settings window opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Download the recommended Whisper model",
+         "ui_target": {
+            "element_name": "Download",
+            "automation_id": null,
+            "hierarchical_path": "Settings window > Models > Download",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The recommended Whisper model is downloaded"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Test the microphone",
+         "ui_target": {
+            "element_name": "Test",
+            "automation_id": null,
+            "hierarchical_path": "Settings window > Microphone > Test",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A live level meter confirms the microphone signal"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Click Start to begin using VoZii",
+         "ui_target": {
+            "element_name": "Start",
+            "automation_id": null,
+            "hierarchical_path": "Settings window > Start",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "VoZii lives in the system tray, ready for use"
+      }
+   ],
+   "_meta": {
+      "source_app": "VoZii",
+      "app_key": "vozii",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "✨ Highlights",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:18:21Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

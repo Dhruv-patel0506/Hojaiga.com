@@ -1,0 +1,46 @@
+| enc/graph/deezer_ego_nets | v3 | 6772 | 0.5320 | 0.5007 | 0.5141 | 0.6893 | 0.524 | 0.518 | 0.556 | 0.543 | 39.5 |
+| enc/graph/deezer_ego_nets | v4 | 6772 | 0.5395 | 0.5004 | 0.5125 | 0.6886 | 0.524 | 0.518 | 0.556 | 0.550 | 39.4 |
+| enc/graph/twitch_egos | v3 | 14081 | 0.6640 | 0.6595 | 0.6984 | 0.6351 | 0.660 | 0.628 | 0.625 | 0.658 | 53.3 |
+| enc/graph/twitch_egos | v4 | 14081 | 0.6945 | 0.6897 | 0.7115 | 0.6210 | 0.660 | 0.628 | 0.625 | 0.703 | 59.1 |
+| enc/graph/imdb_binary | v3 | 680 | 0.6659 | 0.6658 | 0.7591 | 0.5845 | 0.675 | 0.659 | 0.655 | 0.661 | 27.2 |
+| enc/graph/imdb_binary | v4 | 680 | 0.7131 | 0.7129 | 0.7863 | 0.5618 | 0.675 | 0.659 | 0.655 | 0.707 | 31.0 |
+| enc/graph/aids | v3 | 1363 | 0.9782 | 0.9467 | 0.9863 | 0.0844 | 0.979 | 0.977 | 0.972 | 0.954 | 28.2 |
+| enc/graph/aids | v4 | 1363 | 0.9862 | 0.9649 | 0.9871 | 0.0670 | 0.979 | 0.977 | 0.972 | 0.994 | 35.7 |
+| enc/graph/reddit_threads | v3 | 13939 | 0.7621 | 0.7609 | 0.8232 | 0.5164 | 0.764 | 0.744 | 0.709 | 0.753 | 53.0 |
+| enc/graph/reddit_threads | v4 | 13939 | 0.7695 | 0.7681 | 0.8291 | 0.5042 | 0.764 | 0.744 | 0.709 | 0.772 | 60.0 |
+| enc/graph/ogbg_molhiv | v3 | 14021 | 0.9517 | 0.7343 | 0.8021 | 0.1099 | 0.963 | 0.969 | 0.970 | 0.969 | 52.7 |
+| enc/graph/ogbg_molhiv | v4 | 14021 | 0.9500 | 0.7462 | 0.8027 | 0.1098 | 0.963 | 0.969 | 0.970 | 0.970 | 346.0 |
+| enc/audio/ravdess | v3 | 1008 | 0.7009 | 0.7067 | nan | 0.8868 | 0.663 | 0.728 | 0.585 | 0.599 | 38.3 |
+| enc/audio/ravdess | v4 | 1008 | 0.7032 | 0.7085 | nan | 0.8827 | 0.663 | 0.728 | 0.585 | 0.592 | 125.4 |
+| enc/text/emotion | v3 | 14076 | 0.7436 | 0.7062 | nan | 0.7014 | 0.688 | 0.747 | 0.699 | 0.645 | 48.6 |
+| enc/text/emotion | v4 | 14076 | 0.7349 | 0.7090 | nan | 0.7010 | 0.688 | 0.747 | 0.699 | 0.670 | 277.8 |
+## probe 2026-11-08 02:18  algos=v3,v4 rounds=2 cap=20000 device=cpu
+
+| task | algo | n_tr | vote acc | balanced acc | AUROC | NLL | Logic | Pattern | Verifier | Explor. | sec/round |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| enc/graph/deezer_ego_nets | v3 | 6772 | 0.5320 | 0.5007 | 0.5141 | 0.6893 | 0.524 | 0.518 | 0.556 | 0.543 | 39.5 |
+|  | v3 diag | | {"refit_on_all": true, "n_fit": 5920, "n_cal": 807, "D": 534, "imbalance": 1.34, "pattern_seeds": 2, "verifier_k": 40, "verifier_tau": 0.1, "T": [0.25, 8.0, 8.0, 2.8], "stack": [0.997, 0.968, 1.009, 1.026], "prior_shift": 0.0, "tree_mix": 0.0, "tree_nll": "off"} |
+| enc/graph/deezer_ego_nets | v4 | 6772 | 0.5395 | 0.5004 | 0.5125 | 0.6886 | 0.524 | 0.518 | 0.556 | 0.550 | 39.4 |
+| enc/graph/twitch_egos | v3 | 14081 | 0.6640 | 0.6595 | 0.6984 | 0.6351 | 0.660 | 0.628 | 0.625 | 0.658 | 53.3 |
+|  | v3 diag | | {"refit_on_all": true, "n_fit": 12293, "n_cal": 1676, "D": 534, "imbalance": 1.17, "pattern_seeds": 2, "verifier_k": 40, "verifier_tau": 0.1, "T": [0.7, 4.0, 2.0, 1.0], "stack": [1.137, 0.932, 0.851, 1.079], "prior_shift": 0.0, "tree_mix": 0.0, "tree_nll": "off"} |
+| enc/graph/twitch_egos | v4 | 14081 | 0.6945 | 0.6897 | 0.7115 | 0.6210 | 0.660 | 0.628 | 0.625 | 0.703 | 59.1 |
+| enc/graph/imdb_binary | v3 | 680 | 0.6659 | 0.6658 | 0.7591 | 0.5845 | 0.675 | 0.659 | 0.655 | 0.661 | 27.2 |
+|  | v3 diag | | {"refit_on_all": true, "n_fit": 615, "n_cal": 83, "D": 534, "imbalance": 1.02, "pattern_seeds": 3, "verifier_k": 40, "verifier_tau": 0.1, "T": [0.7, 2.0, 2.8, 1.0], "stack": [1.208, 0.845, 1.063, 0.884], "prior_shift": 0.0, "tree_mix": 0.0, "tree_nll": "off"} |
+| enc/graph/imdb_binary | v4 | 680 | 0.7131 | 0.7129 | 0.7863 | 0.5618 | 0.675 | 0.659 | 0.655 | 0.707 | 31.0 |
+| enc/graph/aids | v3 | 1363 | 0.9782 | 0.9467 | 0.9863 | 0.0844 | 0.979 | 0.977 | 0.972 | 0.954 | 28.2 |
+|  | v3 diag | | {"refit_on_all": true, "n_fit": 1231, "n_cal": 167, "D": 608, "imbalance": 3.9, "pattern_seeds": 3, "verifier_k": 40, "verifier_tau": 0.05, "T": [0.25, 0.25, 0.7, 0.35], "stack": [1.276, 1.247, 0.759, 0.717], "prior_shift": 0.0, "tree_mix": 0.0, "tree_nll": "off"} |
+| enc/graph/aids | v4 | 1363 | 0.9862 | 0.9649 | 0.9871 | 0.0670 | 0.979 | 0.977 | 0.972 | 0.994 | 35.7 |
+| enc/graph/reddit_threads | v3 | 13939 | 0.7621 | 0.7609 | 0.8232 | 0.5164 | 0.764 | 0.744 | 0.709 | 0.753 | 53.0 |
+|  | v3 diag | | {"refit_on_all": true, "n_fit": 12400, "n_cal": 1690, "D": 534, "imbalance": 1.07, "pattern_seeds": 2, "verifier_k": 40, "verifier_tau": 0.1, "T": [1.4, 2.0, 2.0, 1.0], "stack": [1.45, 0.862, 0.652, 1.036], "prior_shift": 0.0, "tree_mix": 0.0, "tree_nll": "off"} |
+| enc/graph/reddit_threads | v4 | 13939 | 0.7695 | 0.7681 | 0.8291 | 0.5042 | 0.764 | 0.744 | 0.709 | 0.772 | 60.0 |
+| enc/graph/ogbg_molhiv | v3 | 14021 | 0.9517 | 0.7343 | 0.8021 | 0.1099 | 0.963 | 0.969 | 0.970 | 0.969 | 52.7 |
+|  | v3 diag | | {"refit_on_all": true, "n_fit": 12436, "n_cal": 1695, "D": 550, "imbalance": 29.56, "pattern_seeds": 2, "verifier_k": 40, "verifier_tau": 0.1, "T": [0.7, 0.5, 1.4, 0.5], "stack": [0.903, 1.01, 0.982, 1.104], "prior_shift": 0.5, "tree_mix": 0.0, "tree_nll": "off"} |
+| enc/graph/ogbg_molhiv | v4 | 14021 | 0.9500 | 0.7462 | 0.8027 | 0.1098 | 0.963 | 0.969 | 0.970 | 0.970 | 346.0 |
+| enc/audio/ravdess | v3 | 1008 | 0.7009 | 0.7067 | nan | 0.8868 | 0.663 | 0.728 | 0.585 | 0.599 | 38.3 |
+|  | v3 diag | | {"refit_on_all": true, "n_fit": 895, "n_cal": 121, "D": 768, "imbalance": 2.03, "pattern_seeds": 3, "verifier_k": 40, "verifier_tau": 0.05, "T": [0.7, 1.4, 1.0, 0.7], "stack": [1.293, 1.55, 0.65, 0.506], "prior_shift": 0.0, "tree_mix": 0.0, "tree_nll": "off"} |
+| enc/audio/ravdess | v4 | 1008 | 0.7032 | 0.7085 | nan | 0.8827 | 0.663 | 0.728 | 0.585 | 0.592 | 125.4 |
+| enc/text/emotion | v3 | 14076 | 0.7436 | 0.7062 | nan | 0.7014 | 0.688 | 0.747 | 0.699 | 0.645 | 48.6 |
+|  | v3 diag | | {"refit_on_all": true, "n_fit": 12367, "n_cal": 1686, "D": 384, "imbalance": 9.52, "pattern_seeds": 2, "verifier_k": 40, "verifier_tau": 0.1, "T": [0.7, 1.0, 0.7, 0.5], "stack": [0.547, 1.74, 1.217, 0.496], "prior_shift": 0.75, "tree_mix": 0.0, "tree_nll": "off"} |
+| enc/text/emotion | v4 | 14076 | 0.7349 | 0.7090 | nan | 0.7010 | 0.688 | 0.747 | 0.699 | 0.670 | 277.8 |
+
+

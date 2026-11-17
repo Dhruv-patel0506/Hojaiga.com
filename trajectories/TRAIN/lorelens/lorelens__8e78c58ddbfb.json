@@ -1,0 +1,373 @@
+{
+   "app_metadata": {
+      "app_name": "LoreLens",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide the user through the setup and usage of LoreLens, a local Lore VCS desktop client.",
+   "prerequisite_state": "The user has the necessary environment to run LoreLens and the Lore CLI.",
+   "total_steps": 12,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the repository with **Open repository…**.",
+         "ui_target": {
+            "element_name": "Open repository…",
+            "automation_id": null,
+            "hierarchical_path": "Repository",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The file browser opens, allowing the user to select a repository."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Choose `Move…` from the context menu of a file or folder.",
+         "ui_target": {
+            "element_name": "Move…",
+            "automation_id": null,
+            "hierarchical_path": "Files > Context menu",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A dialog appears for moving the selected file or folder."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Select an item using `↑`/`↓` and enter a destination path including the new name.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "C:\\path\\to\\destination"
+         },
+         "expected_state_change": "The destination path is set in the dialog."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Use `→` to enter the selected folder and `←` to move to its parent.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "right"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected folder is entered."
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Use `Ctrl` (or `Cmd` on macOS) plus click to add or remove files and folders from the selection.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "ctrl"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The selection is toggled."
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Use `Shift` plus click to select a range.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "shift"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "A range of files or folders is selected."
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Stage, Unstage, and Diff apply to the selected items.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected items are staged, unstaged, or diffed."
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Use **Clone repository…** to enter a repository URL and absolute destination path.",
+         "ui_target": {
+            "element_name": "Clone repository…",
+            "automation_id": null,
+            "hierarchical_path": "Repository",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A dialog appears for cloning the repository."
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Use **Repository → Create repository…** to create a remote Lore repository and its local workspace.",
+         "ui_target": {
+            "element_name": "Create repository…",
+            "automation_id": null,
+            "hierarchical_path": "Repository",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A dialog appears for creating the repository."
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Use **Account** to display the account used by the current workspace.",
+         "ui_target": {
+            "element_name": "Account",
+            "automation_id": null,
+            "hierarchical_path": "Account",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The account information is displayed."
+      },
+      {
+         "step_id": 11,
+         "low_level_instruction": "Use **Sync** to run `lore sync` and refresh the file list, change status, lock indicators, and branch information.",
+         "ui_target": {
+            "element_name": "Sync",
+            "automation_id": null,
+            "hierarchical_path": "Sync",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The file list, change status, lock indicators, and branch information are refreshed."
+      },
+      {
+         "step_id": 12,
+         "low_level_instruction": "Use **Push** to send local commits on the current branch to the remote using the signed-in account.",
+         "ui_target": {
+            "element_name": "Push",
+            "automation_id": null,
+            "hierarchical_path": "Push",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Local commits are pushed to the remote."
+      }
+   ],
+   "_meta": {
+      "source_app": "LoreLens",
+      "app_key": "lorelens",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "LoreLens",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:34:57Z",
+      "schema_warnings": [
+         "step3_ungrounded_target",
+         "step4_ungrounded_target",
+         "step5_ungrounded_target",
+         "step6_ungrounded_target",
+         "step7_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

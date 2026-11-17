@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "Notepad++",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Describe the Preferences dialog settings in Notepad++",
+   "prerequisite_state": "Notepad++ is open and the Preferences dialog is open",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the Preferences dialog",
+         "ui_target": {
+            "element_name": "Preferences",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Preferences",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Preferences dialog opens"
+      }
+   ],
+   "_meta": {
+      "source_app": "Notepad++",
+      "app_key": "notepad",
+      "dataset_split": "TRAIN",
+      "category": "Text Editor",
+      "guide_title": "Preferences | Notepad++ User Manual",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:01:54Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,155 @@
+{
+   "app_metadata": {
+      "app_name": "SignalRGB Desktop Wallpaper",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure SignalRGB Desktop Wallpaper",
+   "prerequisite_state": "Windows 10 or 11, SignalRGB installed and running",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install SignalRGB Desktop Wallpaper using winget",
+         "ui_target": {
+            "element_name": "winget",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install Delido.SignalRGBWallpaper"
+         },
+         "expected_state_change": "SignalRGB Desktop Wallpaper installation starts"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Open the Configurator",
+         "ui_target": {
+            "element_name": "Configurator",
+            "automation_id": null,
+            "hierarchical_path": "Browser > Configurator",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Configurator opens at http://127.0.0.1:17320/configurator"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Place SignalRGB devices in SignalRGB Layouts",
+         "ui_target": {
+            "element_name": "Desktop Wallpaper – Screen N",
+            "automation_id": null,
+            "hierarchical_path": "SignalRGB > Layouts > Desktop Wallpaper – Screen N",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  100,
+                  100
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "SignalRGB devices are placed on the canvas where you want colours sampled from"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Assign SignalRGB Glow wallpapers in the wallpaper host",
+         "ui_target": {
+            "element_name": "SignalRGB Glow",
+            "automation_id": null,
+            "hierarchical_path": "Wallpaper Host > My Wallpapers > SignalRGB Glow",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  100,
+                  100
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "SignalRGB Glow wallpapers are assigned to every monitor with a different Screen index per assignment"
+      }
+   ],
+   "_meta": {
+      "source_app": "SignalRGB Desktop Wallpaper",
+      "app_key": "signalrgb_desktop_wallpaper",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "**Live RGB glow on your desktop, driven by your SignalRGB effect.**",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:29:10Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

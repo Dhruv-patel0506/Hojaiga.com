@@ -1,0 +1,972 @@
+{
+  "audit_kind": "read_only_production_rag_and_archetype_routing",
+  "execution": "NO_UI_ACTIONS_WERE_ATTEMPTED",
+  "warning": "A structural match is not proof of live app autonomy.  A real autonomy claim requires a fresh scan, grounded controls, verified state transitions, and task-specific postconditions.",
+  "store": {
+    "ok": true,
+    "root": "D:\\new_automation\\data\\ai_root",
+    "degraded": [],
+    "tables": {
+      "knowledge_chunks": 223,
+      "procedures": 1427,
+      "fast_paths": 242,
+      "error_playbooks": 51,
+      "ui_states": 302
+    },
+    "embedder": "nomic-embed-text@ollama-cpu",
+    "schema_version": 1
+  },
+  "real_scanned_control_holdout_evaluation": {
+    "matrix": {
+      "archetypes": 25,
+      "train_apps": 175,
+      "test_apps": 75,
+      "name_only_zero_shot": {
+        "n": 75,
+        "accuracy": 0.133
+      }
+    },
+    "real_apps": 22,
+    "splits": 20,
+    "held_out_predictions": 140,
+    "signals_only_top1": 0.564,
+    "signals_plus_fitted_top1": 0.564,
+    "signals_plus_fitted_top3": 0.729,
+    "caveat": "labels for the scanned apps were assigned by me; classes with one scanned app cannot be learned when it is held out, so the fitted number is a floor"
+  },
+  "manual_demo_token_only_accuracy": {
+    "correct": 6,
+    "labelled_cases": 6,
+    "note": "Small hand-labelled smoke test only; not a benchmark or a training score."
+  },
+  "cases": [
+    {
+      "app": "Microsoft Excel",
+      "rag_app_key": "excel",
+      "goal": "Explain how to enter a value in a cell and save the workbook.",
+      "observed_control_count": 4,
+      "observed_controls": [
+        "role=grid",
+        "Name Box",
+        "fx",
+        "Sheet1"
+      ],
+      "expected_archetype_for_manual_audit": "spreadsheet",
+      "token_only": {
+        "candidates": [
+          {
+            "archetype_id": "spreadsheet",
+            "archetype_name": "Spreadsheet",
+            "relative_score": 1.0
+          },
+          {
+            "archetype_id": "file_manager",
+            "archetype_name": "File manager / archiver",
+            "relative_score": 0.403
+          },
+          {
+            "archetype_id": "word_processor",
+            "archetype_name": "Document / word processor",
+            "relative_score": 0.0
+          }
+        ],
+        "supporting_signal_words": [
+          "box",
+          "name"
+        ],
+        "routing_assessment": {
+          "status": "candidate",
+          "margin": 0.597,
+          "note": "Margin and relative scores rank candidates; neither is a calibrated probability."
+        },
+        "match_is_correct_against_manual_label": true
+      },
+      "production_candidate": {
+        "archetype_id": "spreadsheet",
+        "archetype_name": "Spreadsheet",
+        "relative_score": 1.0
+      },
+      "direct_app_evidence": {
+        "counts": {
+          "chunks": 0,
+          "commands": 20,
+          "fast_paths": 2,
+          "matching_chunks": 0,
+          "matching_procedures": 3
+        },
+        "chunks": [],
+        "procedures": [
+          {
+            "kind": "procedure",
+            "trust": "web",
+            "confidence": 0.5,
+            "citation": "https://excelcombo.com/excel-toolbar-explained-for-beginners/",
+            "source_kind": "",
+            "heading": "",
+            "excerpt": "Excel Toolbar Explained for Beginners - ExcelCombo (logic chain)"
+          },
+          {
+            "kind": "procedure",
+            "trust": "web",
+            "confidence": 0.5,
+            "citation": "bing:ai-summary?q=Excel+toolbar+menu+keyboard+shortcuts+for+beginners",
+            "source_kind": "",
+            "heading": "",
+            "excerpt": "AI summary: Excel toolbar menu keyboard shortcuts for beginners (logic chain)"
+          },
+          {
+            "kind": "procedure",
+            "trust": "web",
+            "confidence": 0.5,
+            "citation": "bing:ai-summary?q=how+to+use+Excel+step+by+step",
+            "source_kind": "",
+            "heading": "",
+            "excerpt": "AI summary: how to use Excel step by step (logic chain)"
+          }
+        ],
+        "router_evidence": [
+          {
+            "kind": "com",
+            "trust": "seed",
+            "confidence": 0.6667,
+            "citation": "fast:ec878c42ce:seed",
+            "source_kind": "",
+            "heading": "",
+            "excerpt": "Create a sheet with a header row and a SUM formula under a column"
+          },
+          {
+            "kind": "hotkey",
+            "trust": "web",
+            "confidence": 0.5,
+            "citation": "fast:cb027aa494:web_table",
+            "source_kind": "",
+            "heading": "",
+            "excerpt": "Toolbar is Missing:"
+          }
+        ],
+        "router_gaps": [],
+        "router_plan_count_not_executed": 0
+      },
+      "archetype_context": {
+        "action_grammar": [
+          "select cell",
+          "type value / formula",
+          "format cells",
+          "sort / filter",
+          "chart",
+          "save"
+        ],
+        "trap_guards": [
+          "buy",
+          "clear all",
+          "delete",
+          "delete sheet",
+          "empty",
+          "format",
+          "log out",
+          "pay",
+          "post",
+          "publish",
+          "purchase",
+          "remove all",
+          "send",
+          "sign out",
+          "submit",
+          "uninstall"
+        ],
+        "visible_trap_hits": [],
+        "fallback_skeleton": null
+      },
+      "automation_verdict": "DIRECT_GOAL_EVIDENCE_PRESENT__STILL_REQUIRES_LIVE_STATE_GROUNDING_AND_POSTCONDITION_CHECKS"
+    },
+    {
+      "app": "Grist",
+      "rag_app_key": "grist",
+      "goal": "Explain how to enter a value in a cell.",
+      "observed_control_count": 3,
+      "observed_controls": [
+        "role=grid",
+        "Column Header",
+        "Cell"
+      ],
+      "expected_archetype_for_manual_audit": "spreadsheet",
+      "token_only": {
+        "candidates": [
+          {
+            "archetype_id": "spreadsheet",
+            "archetype_name": "Spreadsheet",
+            "relative_score": 1.0
+          },
+          {
+            "archetype_id": "text_editor",
+            "archetype_name": "Plain text editor",
+            "relative_score": 0.4797
+          },
+          {
+            "archetype_id": "word_processor",
+            "archetype_name": "Document / word processor",
+            "relative_score": 0.0
+          }
+        ],
+        "supporting_signal_words": [
+          "cell",
+          "column"
+        ],
+        "routing_assessment": {
+          "status": "candidate",
+          "margin": 0.5203,
+          "note": "Margin and relative scores rank candidates; neither is a calibrated probability."
+        },
+        "match_is_correct_against_manual_label": true
+      },
+      "production_candidate": {
+        "archetype_id": "spreadsheet",
+        "archetype_name": "Spreadsheet",
+        "relative_score": 1.0
+      },
+      "direct_app_evidence": {
+        "counts": {
+          "chunks": 0,
+          "commands": 0,
+          "fast_paths": 0,
+          "matching_chunks": 0,
+          "matching_procedures": 0
+        },
+        "chunks": [],
+        "procedures": [],
+        "router_evidence": [],
+        "router_gaps": [
+          "nothing_known"
+        ],
+        "router_plan_count_not_executed": 0
+      },
+      "archetype_context": {
+        "action_grammar": [
+          "select cell",
+          "type value / formula",
+          "format cells",
+          "sort / filter",
+          "chart",
+          "save"
+        ],
+        "trap_guards": [
+          "buy",
+          "clear all",
+          "delete",
+          "delete sheet",
+          "empty",
+          "format",
+          "log out",
+          "pay",
+          "post",
+          "publish",
+          "purchase",
+          "remove all",
+          "send",
+          "sign out",
+          "submit",
+          "uninstall"
+        ],
+        "visible_trap_hits": [],
+        "fallback_skeleton": {
+          "source": "archetype",
+          "confidence": 0.45,
+          "archetype": "spreadsheet",
+          "runner_up": "text_editor",
+          "phases": [
+            "select cell",
+            "type value / formula",
+            "format cells",
+            "sort / filter",
+            "chart",
+            "save"
+          ],
+          "keys": {
+            "save": "Ctrl+S",
+            "undo": "Ctrl+Z",
+            "redo": "Ctrl+Y",
+            "find": "Ctrl+F",
+            "open": "Ctrl+O",
+            "new": "Ctrl+N",
+            "copy": "Ctrl+C",
+            "paste": "Ctrl+V",
+            "select all": "Ctrl+A",
+            "edit cell": "F2",
+            "fill down": "Ctrl+D",
+            "sum": "Alt+="
+          },
+          "traps": [
+            "buy",
+            "clear all",
+            "delete",
+            "delete sheet",
+            "empty",
+            "format",
+            "log out",
+            "pay",
+            "post",
+            "publish",
+            "purchase",
+            "remove all",
+            "send",
+            "sign out",
+            "submit",
+            "uninstall"
+          ],
+          "closest_template": "put {text} in {cell}",
+          "routing_status": "candidate",
+          "routing_margin": 0.5203,
+          "note": "skeleton only: every step must resolve to a control that exists in this app's scan"
+        }
+      },
+      "automation_verdict": "SCAN_REQUIRED__ONLY_A_NON_EXECUTABLE_ARCHETYPE_SKELETON_IS_AVAILABLE"
+    },
+    {
+      "app": "Blender",
+      "rag_app_key": "blender",
+      "goal": "Explain how to move an object without deleting it.",
+      "observed_control_count": 4,
+      "observed_controls": [
+        "webgl",
+        "Outliner",
+        "Position X",
+        "Transform Gizmo"
+      ],
+      "expected_archetype_for_manual_audit": "3d_modeler",
+      "token_only": {
+        "candidates": [
+          {
+            "archetype_id": "3d_modeler",
+            "archetype_name": "3D modeling / animation",
+            "relative_score": 1.0
+          },
+          {
+            "archetype_id": "word_processor",
+            "archetype_name": "Document / word processor",
+            "relative_score": 0.0
+          },
+          {
+            "archetype_id": "spreadsheet",
+            "archetype_name": "Spreadsheet",
+            "relative_score": 0.0
+          }
+        ],
+        "supporting_signal_words": [
+          "gizmo",
+          "outliner",
+          "transform"
+        ],
+        "routing_assessment": {
+          "status": "candidate",
+          "margin": 1.0,
+          "note": "Margin and relative scores rank candidates; neither is a calibrated probability."
+        },
+        "match_is_correct_against_manual_label": true
+      },
+      "production_candidate": {
+        "archetype_id": "3d_modeler",
+        "archetype_name": "3D modeling / animation",
+        "relative_score": 1.5
+      },
+      "direct_app_evidence": {
+        "counts": {
+          "chunks": 3,
+          "commands": 0,
+          "fast_paths": 0,
+          "matching_chunks": 3,
+          "matching_procedures": 3
+        },
+        "chunks": [
+          {
+            "kind": "chunk",
+            "trust": "transcript",
+            "confidence": 0.15,
+            "citation": "clip_331fa7fe40@0-0",
+            "source_kind": "video_transcript",
+            "heading": "File:2D image to 3D travelling, in less than 5 minutes – Blender and Stable Diffusion in Automatic1111 (graphics arts tutorial).webm",
+            "excerpt": "Welcome to this quick tutorial to turn a single image into a great 3D camera travelling with parallax, light, and depth of field."
+          },
+          {
+            "kind": "chunk",
+            "trust": "transcript",
+            "confidence": 0.15,
+            "citation": "clip_d53f815a85@0-44",
+            "source_kind": "video_transcript",
+            "heading": "File:Blender 2.82 Rigging Tutorial (in 2 min).webm",
+            "excerpt": "A lot has changed since I made this one last year. Thought now would be a good time to bring it up to speed. Learned a few new tricks this time too~ Hope it helps :)   Big thanks to all the amazing helpful comments from the last Rigging Video to help find shortcuts for this one~!"
+          },
+          {
+            "kind": "chunk",
+            "trust": "transcript",
+            "confidence": 0.15,
+            "citation": "clip_d53f815a85@66-88",
+            "source_kind": "video_transcript",
+            "heading": "File:Blender 2.82 Rigging Tutorial (in 2 min).webm",
+            "excerpt": "Female Body Model Link:  https://www.youtube.com/watch?v=_XfvLpLyulI    If you enjoyed this video, please don't forget to like and subscribe! You can find my entire Blender 2.8 Speed Tutorial series here:   https://www.youtube.com/watch?v=f6vgICNCVxQ&amp;list=PLZpDYt0cyiuu-sxJKbu"
+          }
+        ],
+        "procedures": [
+          {
+            "kind": "procedure",
+            "trust": "learned",
+            "confidence": 0.5,
+            "citation": "app-registry",
+            "source_kind": "",
+            "heading": "",
+            "excerpt": "Blender 5.2: View3D > Delete > Bones"
+          },
+          {
+            "kind": "procedure",
+            "trust": "learned",
+            "confidence": 0.5,
+            "citation": "app-registry",
+            "source_kind": "",
+            "heading": "",
+            "excerpt": "Blender 5.2: Nla > Track > Move"
+          },
+          {
+            "kind": "procedure",
+            "trust": "learned",
+            "confidence": 0.5,
+            "citation": "app-registry",
+            "source_kind": "",
+            "heading": "",
+            "excerpt": "Blender 5.2: Text > Edit > Text to 3D Object > One Object"
+          }
+        ],
+        "router_evidence": [
+          {
+            "kind": "chunk",
+            "trust": "transcript",
+            "confidence": 0.15,
+            "citation": "clip_331fa7fe40@0-0",
+            "source_kind": "video_transcript",
+            "heading": "File:2D image to 3D travelling, in less than 5 minutes – Blender and Stable Diffusion in Automatic1111 (graphics arts tutorial).webm",
+            "excerpt": "Welcome to this quick tutorial to turn a single image into a great 3D camera travelling with parallax, light, and depth of field."
+          },
+          {
+            "kind": "chunk",
+            "trust": "transcript",
+            "confidence": 0.15,
+            "citation": "clip_d53f815a85@0-44",
+            "source_kind": "video_transcript",
+            "heading": "File:Blender 2.82 Rigging Tutorial (in 2 min).webm",
+            "excerpt": "A lot has changed since I made this one last year. Thought now would be a good time to bring it up to speed. Learned a few new tricks this time too~ Hope it helps :)   Big thanks to all the amazing helpful comments from the last Rigging Video to help find shortcuts for this one~!"
+          },
+          {
+            "kind": "chunk",
+            "trust": "transcript",
+            "confidence": 0.15,
+            "citation": "clip_d53f815a85@66-88",
+            "source_kind": "video_transcript",
+            "heading": "File:Blender 2.82 Rigging Tutorial (in 2 min).webm",
+            "excerpt": "Female Body Model Link:  https://www.youtube.com/watch?v=_XfvLpLyulI    If you enjoyed this video, please don't forget to like and subscribe! You can find my entire Blender 2.8 Speed Tutorial series here:   https://www.youtube.com/watch?v=f6vgICNCVxQ&amp;list=PLZpDYt0cyiuu-sxJKbu"
+          }
+        ],
+        "router_gaps": [],
+        "router_plan_count_not_executed": 0
+      },
+      "archetype_context": {
+        "action_grammar": [
+          "add object",
+          "transform",
+          "edit mesh",
+          "material",
+          "render"
+        ],
+        "trap_guards": [
+          "apply all modifiers",
+          "buy",
+          "clear scene",
+          "delete",
+          "delete all",
+          "empty",
+          "format",
+          "log out",
+          "pay",
+          "post",
+          "publish",
+          "purchase",
+          "remove all",
+          "send",
+          "sign out",
+          "submit",
+          "uninstall"
+        ],
+        "visible_trap_hits": [],
+        "fallback_skeleton": null
+      },
+      "automation_verdict": "DIRECT_GOAL_EVIDENCE_PRESENT__STILL_REQUIRES_LIVE_STATE_GROUNDING_AND_POSTCONDITION_CHECKS"
+    },
+    {
+      "app": "Shapr3D Web",
+      "rag_app_key": "shapr3d_web",
+      "goal": "Explain how to move an object without changing its dimensions.",
+      "observed_control_count": 3,
+      "observed_controls": [
+        "canvas",
+        "Perspective",
+        "Transform"
+      ],
+      "expected_archetype_for_manual_audit": "3d_modeler",
+      "token_only": {
+        "candidates": [
+          {
+            "archetype_id": "3d_modeler",
+            "archetype_name": "3D modeling / animation",
+            "relative_score": 1.0
+          },
+          {
+            "archetype_id": "diagram_whiteboard",
+            "archetype_name": "Whiteboard / diagram canvas",
+            "relative_score": 0.4431
+          },
+          {
+            "archetype_id": "raster_editor",
+            "archetype_name": "Raster image editor",
+            "relative_score": 0.427
+          }
+        ],
+        "supporting_signal_words": [
+          "perspective",
+          "transform"
+        ],
+        "routing_assessment": {
+          "status": "candidate",
+          "margin": 0.5569,
+          "note": "Margin and relative scores rank candidates; neither is a calibrated probability."
+        },
+        "match_is_correct_against_manual_label": true
+      },
+      "production_candidate": {
+        "archetype_id": "3d_modeler",
+        "archetype_name": "3D modeling / animation",
+        "relative_score": 1.0
+      },
+      "direct_app_evidence": {
+        "counts": {
+          "chunks": 0,
+          "commands": 0,
+          "fast_paths": 0,
+          "matching_chunks": 0,
+          "matching_procedures": 0
+        },
+        "chunks": [],
+        "procedures": [],
+        "router_evidence": [],
+        "router_gaps": [
+          "nothing_known"
+        ],
+        "router_plan_count_not_executed": 0
+      },
+      "archetype_context": {
+        "action_grammar": [
+          "add object",
+          "transform",
+          "edit mesh",
+          "material",
+          "render"
+        ],
+        "trap_guards": [
+          "apply all modifiers",
+          "buy",
+          "clear scene",
+          "delete",
+          "delete all",
+          "empty",
+          "format",
+          "log out",
+          "pay",
+          "post",
+          "publish",
+          "purchase",
+          "remove all",
+          "send",
+          "sign out",
+          "submit",
+          "uninstall"
+        ],
+        "visible_trap_hits": [],
+        "fallback_skeleton": {
+          "source": "archetype",
+          "confidence": 0.45,
+          "archetype": "3d_modeler",
+          "runner_up": "diagram_whiteboard",
+          "phases": [
+            "add object",
+            "transform",
+            "edit mesh",
+            "material",
+            "render"
+          ],
+          "keys": {
+            "save": "Ctrl+S",
+            "undo": "Ctrl+Z",
+            "redo": "Ctrl+Y",
+            "find": "Ctrl+F",
+            "open": "Ctrl+O",
+            "new": "Ctrl+N",
+            "copy": "Ctrl+C",
+            "paste": "Ctrl+V",
+            "select all": "Ctrl+A",
+            "move": "G",
+            "rotate": "R",
+            "scale": "S",
+            "extrude": "E"
+          },
+          "traps": [
+            "apply all modifiers",
+            "buy",
+            "clear scene",
+            "delete",
+            "delete all",
+            "empty",
+            "format",
+            "log out",
+            "pay",
+            "post",
+            "publish",
+            "purchase",
+            "remove all",
+            "send",
+            "sign out",
+            "submit",
+            "uninstall"
+          ],
+          "closest_template": "move it up {n}",
+          "routing_status": "candidate",
+          "routing_margin": 0.5569,
+          "note": "skeleton only: every step must resolve to a control that exists in this app's scan"
+        }
+      },
+      "automation_verdict": "SCAN_REQUIRED__ONLY_A_NON_EXECUTABLE_ARCHETYPE_SKELETON_IS_AVAILABLE"
+    },
+    {
+      "app": "Obsidian",
+      "rag_app_key": "obsidian",
+      "goal": "Explain how to create and organize a note.",
+      "observed_control_count": 3,
+      "observed_controls": [
+        "contenteditable=true",
+        "role=textbox",
+        "Heading"
+      ],
+      "expected_archetype_for_manual_audit": "note_taking",
+      "token_only": {
+        "candidates": [
+          {
+            "archetype_id": "note_taking",
+            "archetype_name": "Notes / knowledge base",
+            "relative_score": 1.0
+          },
+          {
+            "archetype_id": "word_processor",
+            "archetype_name": "Document / word processor",
+            "relative_score": 0.9701
+          },
+          {
+            "archetype_id": "spreadsheet",
+            "archetype_name": "Spreadsheet",
+            "relative_score": 0.0
+          }
+        ],
+        "supporting_signal_words": [
+          "contenteditable"
+        ],
+        "routing_assessment": {
+          "status": "ambiguous",
+          "margin": 0.0299,
+          "note": "Margin and relative scores rank candidates; neither is a calibrated probability."
+        },
+        "match_is_correct_against_manual_label": true
+      },
+      "production_candidate": {
+        "archetype_id": "note_taking",
+        "archetype_name": "Notes / knowledge base",
+        "relative_score": 1.5
+      },
+      "direct_app_evidence": {
+        "counts": {
+          "chunks": 0,
+          "commands": 0,
+          "fast_paths": 0,
+          "matching_chunks": 0,
+          "matching_procedures": 0
+        },
+        "chunks": [],
+        "procedures": [],
+        "router_evidence": [],
+        "router_gaps": [
+          "nothing_known"
+        ],
+        "router_plan_count_not_executed": 0
+      },
+      "archetype_context": {
+        "action_grammar": [
+          "new note",
+          "type",
+          "organize",
+          "search"
+        ],
+        "trap_guards": [
+          "buy",
+          "delete",
+          "delete notebook",
+          "empty",
+          "empty trash",
+          "format",
+          "log out",
+          "pay",
+          "post",
+          "publish",
+          "purchase",
+          "remove all",
+          "send",
+          "share publicly",
+          "sign out",
+          "submit",
+          "uninstall"
+        ],
+        "visible_trap_hits": [],
+        "fallback_skeleton": null
+      },
+      "automation_verdict": "SCAN_REQUIRED__ONLY_A_NON_EXECUTABLE_ARCHETYPE_SKELETON_IS_AVAILABLE"
+    },
+    {
+      "app": "Quip",
+      "rag_app_key": "quip",
+      "goal": "Explain how to create a document and add a heading.",
+      "observed_control_count": 3,
+      "observed_controls": [
+        "role=textbox",
+        "RichEdit",
+        "Document"
+      ],
+      "expected_archetype_for_manual_audit": "word_processor",
+      "token_only": {
+        "candidates": [
+          {
+            "archetype_id": "word_processor",
+            "archetype_name": "Document / word processor",
+            "relative_score": 1.0
+          },
+          {
+            "archetype_id": "pdf_reader",
+            "archetype_name": "Document reader / PDF",
+            "relative_score": 0.5286
+          },
+          {
+            "archetype_id": "spreadsheet",
+            "archetype_name": "Spreadsheet",
+            "relative_score": 0.0
+          }
+        ],
+        "supporting_signal_words": [
+          "document",
+          "richedit"
+        ],
+        "routing_assessment": {
+          "status": "candidate",
+          "margin": 0.4714,
+          "note": "Margin and relative scores rank candidates; neither is a calibrated probability."
+        },
+        "match_is_correct_against_manual_label": true
+      },
+      "production_candidate": {
+        "archetype_id": "word_processor",
+        "archetype_name": "Document / word processor",
+        "relative_score": 1.0
+      },
+      "direct_app_evidence": {
+        "counts": {
+          "chunks": 0,
+          "commands": 0,
+          "fast_paths": 0,
+          "matching_chunks": 0,
+          "matching_procedures": 0
+        },
+        "chunks": [],
+        "procedures": [],
+        "router_evidence": [],
+        "router_gaps": [
+          "nothing_known"
+        ],
+        "router_plan_count_not_executed": 0
+      },
+      "archetype_context": {
+        "action_grammar": [
+          "open or create",
+          "type body text",
+          "apply style / format",
+          "insert object",
+          "review",
+          "save / export"
+        ],
+        "trap_guards": [
+          "accept all changes",
+          "buy",
+          "delete",
+          "empty",
+          "format",
+          "log out",
+          "mail merge send",
+          "pay",
+          "post",
+          "publish",
+          "purchase",
+          "reject all",
+          "remove all",
+          "send",
+          "sign out",
+          "submit",
+          "uninstall"
+        ],
+        "visible_trap_hits": [],
+        "fallback_skeleton": {
+          "source": "archetype",
+          "confidence": 0.45,
+          "archetype": "word_processor",
+          "runner_up": "pdf_reader",
+          "phases": [
+            "open or create",
+            "type body text",
+            "apply style / format",
+            "insert object",
+            "review",
+            "save / export"
+          ],
+          "keys": {
+            "save": "Ctrl+S",
+            "undo": "Ctrl+Z",
+            "redo": "Ctrl+Y",
+            "find": "Ctrl+F",
+            "open": "Ctrl+O",
+            "new": "Ctrl+N",
+            "copy": "Ctrl+C",
+            "paste": "Ctrl+V",
+            "select all": "Ctrl+A",
+            "bold": "Ctrl+B",
+            "italic": "Ctrl+I",
+            "print": "Ctrl+P"
+          },
+          "traps": [
+            "accept all changes",
+            "buy",
+            "delete",
+            "empty",
+            "format",
+            "log out",
+            "mail merge send",
+            "pay",
+            "post",
+            "publish",
+            "purchase",
+            "reject all",
+            "remove all",
+            "send",
+            "sign out",
+            "submit",
+            "uninstall"
+          ],
+          "closest_template": "make the first line a heading",
+          "routing_status": "candidate",
+          "routing_margin": 0.4714,
+          "note": "skeleton only: every step must resolve to a control that exists in this app's scan"
+        }
+      },
+      "automation_verdict": "SCAN_REQUIRED__ONLY_A_NON_EXECUTABLE_ARCHETYPE_SKELETON_IS_AVAILABLE"
+    },
+    {
+      "app": "ComfyUI",
+      "rag_app_key": "comfyui",
+      "goal": "Explain the safe first step before queuing a workflow.",
+      "observed_control_count": 4,
+      "observed_controls": [
+        "react-flow",
+        "node",
+        "socket",
+        "Queue Prompt"
+      ],
+      "expected_archetype_for_manual_audit": null,
+      "token_only": {
+        "candidates": [
+          {
+            "archetype_id": "terminal",
+            "archetype_name": "Terminal / shell",
+            "relative_score": 1.0
+          },
+          {
+            "archetype_id": "vector_editor",
+            "archetype_name": "Vector / diagram drawing",
+            "relative_score": 0.9608
+          },
+          {
+            "archetype_id": "media_player",
+            "archetype_name": "Media player / streaming",
+            "relative_score": 0.9608
+          }
+        ],
+        "supporting_signal_words": [
+          "prompt"
+        ],
+        "routing_assessment": {
+          "status": "ambiguous",
+          "margin": 0.0392,
+          "note": "Margin and relative scores rank candidates; neither is a calibrated probability."
+        },
+        "match_is_correct_against_manual_label": null
+      },
+      "production_candidate": {
+        "archetype_id": "terminal",
+        "archetype_name": "Terminal / shell",
+        "relative_score": 1.0
+      },
+      "direct_app_evidence": {
+        "counts": {
+          "chunks": 0,
+          "commands": 0,
+          "fast_paths": 0,
+          "matching_chunks": 0,
+          "matching_procedures": 0
+        },
+        "chunks": [],
+        "procedures": [],
+        "router_evidence": [],
+        "router_gaps": [
+          "nothing_known"
+        ],
+        "router_plan_count_not_executed": 0
+      },
+      "archetype_context": {
+        "action_grammar": [
+          "open session",
+          "type command",
+          "read output",
+          "copy"
+        ],
+        "trap_guards": [
+          "buy",
+          "delete",
+          "empty",
+          "format",
+          "log out",
+          "pay",
+          "post",
+          "publish",
+          "purchase",
+          "remove all",
+          "rm -rf",
+          "send",
+          "shutdown",
+          "sign out",
+          "submit",
+          "sudo",
+          "uninstall"
+        ],
+        "visible_trap_hits": [],
+        "fallback_skeleton": null
+      },
+      "automation_verdict": "SCAN_REQUIRED__ONLY_A_NON_EXECUTABLE_ARCHETYPE_SKELETON_IS_AVAILABLE"
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+   "app_metadata": {
+      "app_name": "Reginald",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Launch Reginald and use its application launcher to find and launch an application",
+   "prerequisite_state": "Reginald is not open",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open Reginald",
+         "ui_target": {
+            "element_name": "Reginald",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Window",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Reginald application window opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Press Alt + Space to open the Reginald search window",
+         "ui_target": {
+            "element_name": "Alt + Space",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Hotkey",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Alt",
+               "Space"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The Reginald search window opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Type the name of an application and press Enter to launch it",
+         "ui_target": {
+            "element_name": "Search box",
+            "automation_id": null,
+            "hierarchical_path": "Search window > Search box",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "notepad"
+         },
+         "expected_state_change": "Notepad application launches"
+      }
+   ],
+   "_meta": {
+      "source_app": "Reginald",
+      "app_key": "reginald",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "**Table of Contents**",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:45:17Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

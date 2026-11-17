@@ -1,0 +1,257 @@
+06:17:51 NI run auto_gpu_050 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+06:17:51 explicit task list: ['enc/audio/speech_commands_v0.02']
+06:17:51 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+06:17:53 [data] enc/audio/speech_commands_v0.02: n=105835 C=36 D=768 shards=1
+06:18:34 [enc/audio/speech_commands_v0.02] vote=0.729 uniform=0.714 best1=0.728 n_val=31652 vram=1.25GB 41s
+06:18:43 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 31652, "n_val": 6248, "base_rate": 0.7263123989105225, "inner": {"auc": 0.8895899216235094, "ece": 0.015568555788841773, "brier": 0.11860431730747223, "acc80": 0.842737078666687}, "outer_conf": {"auc": 0.8739173296838394, "ece": 0.05725219799623027, "brier": 0.1298210173845291, "acc80": 0.8355342149734497}}
+06:18:43 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+06:19:22 [enc/audio/speech_commands_v0.02] vote=0.729 uniform=0.718 best1=0.726 n_val=31698 vram=1.54GB 39s | grade=0.833 inner_auc=0.886 vs conf_auc=0.869
+06:19:27 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+06:19:55 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.715 best1=0.727 n_val=31787 vram=1.54GB 28s | grade=0.836 inner_auc=0.883 vs conf_auc=0.866
+06:19:59 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+06:20:33 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.715 best1=0.727 n_val=31662 vram=1.54GB 34s | grade=0.843 inner_auc=0.880 vs conf_auc=0.862
+06:20:38 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+06:21:10 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.717 best1=0.726 n_val=31749 vram=1.54GB 31s | grade=0.842 inner_auc=0.882 vs conf_auc=0.864
+06:21:14 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+06:21:49 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.716 best1=0.727 n_val=31599 vram=1.54GB 35s | grade=0.843 inner_auc=0.887 vs conf_auc=0.869
+06:21:54 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+06:22:28 [enc/audio/speech_commands_v0.02] vote=0.718 uniform=0.712 best1=0.724 n_val=31705 vram=1.54GB 34s | grade=0.838 inner_auc=0.890 vs conf_auc=0.873
+06:22:33 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+06:23:07 [enc/audio/speech_commands_v0.02] vote=0.730 uniform=0.716 best1=0.729 n_val=31879 vram=1.54GB 34s | grade=0.840 inner_auc=0.884 vs conf_auc=0.863
+06:23:13 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+06:23:47 [enc/audio/speech_commands_v0.02] vote=0.721 uniform=0.712 best1=0.726 n_val=31664 vram=1.54GB 34s | grade=0.836 inner_auc=0.890 vs conf_auc=0.869
+06:23:51 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+06:24:22 [enc/audio/speech_commands_v0.02] vote=0.725 uniform=0.710 best1=0.725 n_val=31813 vram=1.54GB 31s | grade=0.840 inner_auc=0.879 vs conf_auc=0.859
+06:24:27 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+06:25:02 [enc/audio/speech_commands_v0.02] vote=0.725 uniform=0.711 best1=0.723 n_val=31898 vram=1.54GB 35s | grade=0.840 inner_auc=0.887 vs conf_auc=0.869
+06:25:08 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+06:25:39 [enc/audio/speech_commands_v0.02] vote=0.726 uniform=0.713 best1=0.724 n_val=31661 vram=1.54GB 31s | grade=0.839 inner_auc=0.887 vs conf_auc=0.870
+06:25:44 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+06:26:18 [enc/audio/speech_commands_v0.02] vote=0.731 uniform=0.718 best1=0.730 n_val=31535 vram=1.54GB 34s | grade=0.842 inner_auc=0.885 vs conf_auc=0.865
+06:26:23 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+06:26:56 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.711 best1=0.727 n_val=31818 vram=1.54GB 33s | grade=0.841 inner_auc=0.881 vs conf_auc=0.863
+06:27:02 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+06:27:37 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.712 best1=0.726 n_val=31685 vram=1.54GB 35s | grade=0.844 inner_auc=0.881 vs conf_auc=0.858
+06:27:42 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+06:28:12 [enc/audio/speech_commands_v0.02] vote=0.725 uniform=0.711 best1=0.724 n_val=32057 vram=1.54GB 30s | grade=0.838 inner_auc=0.890 vs conf_auc=0.867
+06:28:17 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+06:28:53 [enc/audio/speech_commands_v0.02] vote=0.726 uniform=0.717 best1=0.725 n_val=31611 vram=1.54GB 36s | grade=0.839 inner_auc=0.882 vs conf_auc=0.862
+06:28:59 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+06:29:32 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.717 best1=0.727 n_val=31619 vram=1.54GB 33s | grade=0.838 inner_auc=0.884 vs conf_auc=0.863
+06:29:38 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+06:30:13 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.711 best1=0.726 n_val=31998 vram=1.54GB 35s | grade=0.840 inner_auc=0.885 vs conf_auc=0.865
+06:30:19 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+06:30:53 [enc/audio/speech_commands_v0.02] vote=0.723 uniform=0.709 best1=0.722 n_val=31708 vram=1.54GB 34s | grade=0.836 inner_auc=0.880 vs conf_auc=0.858
+06:30:59 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+06:31:32 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.713 best1=0.727 n_val=31915 vram=1.54GB 34s | grade=0.838 inner_auc=0.887 vs conf_auc=0.863
+06:31:38 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+06:32:07 [enc/audio/speech_commands_v0.02] vote=0.730 uniform=0.714 best1=0.729 n_val=32000 vram=1.54GB 29s | grade=0.841 inner_auc=0.895 vs conf_auc=0.870
+06:32:13 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+06:32:47 [enc/audio/speech_commands_v0.02] vote=0.729 uniform=0.713 best1=0.728 n_val=31874 vram=1.54GB 33s | grade=0.840 inner_auc=0.883 vs conf_auc=0.865
+06:32:52 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+06:33:25 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.716 best1=0.728 n_val=31913 vram=1.54GB 33s | grade=0.840 inner_auc=0.885 vs conf_auc=0.865
+06:33:31 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+06:34:07 [enc/audio/speech_commands_v0.02] vote=0.729 uniform=0.717 best1=0.729 n_val=32130 vram=1.53GB 35s | grade=0.839 inner_auc=0.886 vs conf_auc=0.862
+06:34:13 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+06:34:47 [enc/audio/speech_commands_v0.02] vote=0.722 uniform=0.709 best1=0.722 n_val=31716 vram=1.54GB 34s | grade=0.832 inner_auc=0.890 vs conf_auc=0.864
+06:34:52 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+06:35:26 [enc/audio/speech_commands_v0.02] vote=0.724 uniform=0.715 best1=0.724 n_val=31700 vram=1.54GB 33s | grade=0.837 inner_auc=0.885 vs conf_auc=0.863
+06:35:32 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+06:36:06 [enc/audio/speech_commands_v0.02] vote=0.729 uniform=0.716 best1=0.730 n_val=31499 vram=1.54GB 34s | grade=0.837 inner_auc=0.886 vs conf_auc=0.866
+06:36:12 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+06:36:47 [enc/audio/speech_commands_v0.02] vote=0.713 uniform=0.714 best1=0.725 n_val=31776 vram=1.54GB 35s | grade=0.830 inner_auc=0.904 vs conf_auc=0.877
+06:36:54 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+06:37:30 [enc/audio/speech_commands_v0.02] vote=0.730 uniform=0.717 best1=0.730 n_val=31638 vram=1.54GB 36s | grade=0.834 inner_auc=0.889 vs conf_auc=0.866
+06:37:36 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+06:38:11 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.714 best1=0.727 n_val=31741 vram=1.54GB 35s | grade=0.840 inner_auc=0.888 vs conf_auc=0.863
+06:38:17 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+06:38:50 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.714 best1=0.727 n_val=31709 vram=1.54GB 33s | grade=0.839 inner_auc=0.888 vs conf_auc=0.869
+06:38:55 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+06:39:25 [enc/audio/speech_commands_v0.02] vote=0.731 uniform=0.717 best1=0.731 n_val=31790 vram=1.54GB 30s | grade=0.839 inner_auc=0.885 vs conf_auc=0.863
+06:39:31 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+06:40:06 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.714 best1=0.728 n_val=31676 vram=1.54GB 35s | grade=0.838 inner_auc=0.892 vs conf_auc=0.868
+06:40:12 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+06:40:46 [enc/audio/speech_commands_v0.02] vote=0.725 uniform=0.715 best1=0.725 n_val=31652 vram=1.54GB 34s | grade=0.842 inner_auc=0.878 vs conf_auc=0.852
+06:40:53 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+06:41:29 [enc/audio/speech_commands_v0.02] vote=0.710 uniform=0.713 best1=0.723 n_val=31869 vram=1.54GB 36s | grade=0.830 inner_auc=0.906 vs conf_auc=0.878
+06:41:36 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+06:42:12 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.714 best1=0.727 n_val=31544 vram=1.54GB 35s | grade=0.830 inner_auc=0.876 vs conf_auc=0.853
+06:42:20 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+06:42:53 [enc/audio/speech_commands_v0.02] vote=0.725 uniform=0.712 best1=0.725 n_val=31684 vram=1.54GB 33s | grade=0.837 inner_auc=0.887 vs conf_auc=0.867
+06:42:59 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+06:43:35 [enc/audio/speech_commands_v0.02] vote=0.725 uniform=0.712 best1=0.724 n_val=32005 vram=1.54GB 35s | grade=0.838 inner_auc=0.885 vs conf_auc=0.867
+06:43:43 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+06:44:18 [enc/audio/speech_commands_v0.02] vote=0.723 uniform=0.711 best1=0.723 n_val=31737 vram=1.54GB 35s | grade=0.837 inner_auc=0.885 vs conf_auc=0.862
+06:44:25 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+06:45:02 [enc/audio/speech_commands_v0.02] vote=0.729 uniform=0.717 best1=0.729 n_val=31451 vram=1.54GB 37s | grade=0.837 inner_auc=0.891 vs conf_auc=0.873
+06:45:08 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+06:45:42 [enc/audio/speech_commands_v0.02] vote=0.725 uniform=0.712 best1=0.725 n_val=31878 vram=1.54GB 34s | grade=0.836 inner_auc=0.885 vs conf_auc=0.864
+06:45:48 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+06:46:22 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.718 best1=0.727 n_val=31489 vram=1.54GB 34s | grade=0.838 inner_auc=0.886 vs conf_auc=0.867
+06:46:30 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+06:47:01 [enc/audio/speech_commands_v0.02] vote=0.725 uniform=0.715 best1=0.725 n_val=31613 vram=1.54GB 31s | grade=0.837 inner_auc=0.884 vs conf_auc=0.863
+06:47:10 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+06:47:47 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.714 best1=0.727 n_val=31762 vram=1.54GB 37s | grade=0.839 inner_auc=0.883 vs conf_auc=0.861
+06:47:53 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+06:48:27 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.716 best1=0.728 n_val=31960 vram=1.54GB 34s | grade=0.838 inner_auc=0.894 vs conf_auc=0.871
+06:48:34 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+06:49:11 [enc/audio/speech_commands_v0.02] vote=0.731 uniform=0.717 best1=0.731 n_val=31686 vram=1.54GB 37s | grade=0.840 inner_auc=0.885 vs conf_auc=0.863
+06:49:17 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+06:49:50 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.713 best1=0.727 n_val=31665 vram=1.54GB 33s | grade=0.838 inner_auc=0.884 vs conf_auc=0.867
+06:49:57 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+06:50:32 [enc/audio/speech_commands_v0.02] vote=0.726 uniform=0.712 best1=0.725 n_val=31535 vram=1.54GB 35s | grade=0.842 inner_auc=0.884 vs conf_auc=0.860
+06:50:39 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+06:51:13 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.713 best1=0.727 n_val=31505 vram=1.54GB 34s | grade=0.838 inner_auc=0.883 vs conf_auc=0.860
+06:51:21 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+06:51:55 [enc/audio/speech_commands_v0.02] vote=0.724 uniform=0.712 best1=0.724 n_val=31882 vram=1.54GB 35s | grade=0.835 inner_auc=0.885 vs conf_auc=0.867
+06:52:02 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+06:52:35 [enc/audio/speech_commands_v0.02] vote=0.726 uniform=0.714 best1=0.726 n_val=31766 vram=1.54GB 33s | grade=0.837 inner_auc=0.884 vs conf_auc=0.865
+06:52:43 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+06:53:18 [enc/audio/speech_commands_v0.02] vote=0.723 uniform=0.713 best1=0.723 n_val=31781 vram=1.54GB 35s | grade=0.839 inner_auc=0.892 vs conf_auc=0.872
+06:53:24 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+06:53:57 [enc/audio/speech_commands_v0.02] vote=0.729 uniform=0.718 best1=0.730 n_val=31856 vram=1.54GB 33s | grade=0.832 inner_auc=0.882 vs conf_auc=0.868
+06:54:04 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+06:54:39 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.717 best1=0.727 n_val=31556 vram=1.54GB 35s | grade=0.838 inner_auc=0.885 vs conf_auc=0.864
+06:54:46 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+06:55:23 [enc/audio/speech_commands_v0.02] vote=0.729 uniform=0.715 best1=0.728 n_val=32075 vram=1.54GB 37s | grade=0.840 inner_auc=0.887 vs conf_auc=0.867
+06:55:32 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+06:56:08 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.717 best1=0.728 n_val=31648 vram=1.54GB 37s | grade=0.840 inner_auc=0.883 vs conf_auc=0.856
+06:56:16 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+06:56:52 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.715 best1=0.728 n_val=31662 vram=1.54GB 36s | grade=0.839 inner_auc=0.890 vs conf_auc=0.870
+06:57:00 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+06:57:35 [enc/audio/speech_commands_v0.02] vote=0.729 uniform=0.723 best1=0.729 n_val=31848 vram=1.54GB 35s | grade=0.841 inner_auc=0.881 vs conf_auc=0.861
+06:57:42 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+06:58:15 [enc/audio/speech_commands_v0.02] vote=0.726 uniform=0.712 best1=0.726 n_val=31881 vram=1.54GB 34s | grade=0.836 inner_auc=0.888 vs conf_auc=0.866
+06:58:24 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+06:58:57 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.723 best1=0.728 n_val=31819 vram=1.54GB 34s | grade=0.839 inner_auc=0.878 vs conf_auc=0.860
+06:59:04 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+06:59:39 [enc/audio/speech_commands_v0.02] vote=0.725 uniform=0.714 best1=0.725 n_val=32046 vram=1.54GB 35s | grade=0.836 inner_auc=0.878 vs conf_auc=0.861
+06:59:48 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+07:00:23 [enc/audio/speech_commands_v0.02] vote=0.723 uniform=0.709 best1=0.723 n_val=31862 vram=1.54GB 36s | grade=0.837 inner_auc=0.877 vs conf_auc=0.857
+07:00:30 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+07:01:07 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.718 best1=0.728 n_val=31563 vram=1.54GB 37s | grade=0.837 inner_auc=0.887 vs conf_auc=0.866
+07:01:16 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+07:01:48 [enc/audio/speech_commands_v0.02] vote=0.726 uniform=0.712 best1=0.726 n_val=31802 vram=1.54GB 32s | grade=0.840 inner_auc=0.882 vs conf_auc=0.859
+07:01:55 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+07:02:34 [enc/audio/speech_commands_v0.02] vote=0.715 uniform=0.714 best1=0.726 n_val=32007 vram=1.54GB 39s | grade=0.835 inner_auc=0.901 vs conf_auc=0.875
+07:02:43 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+07:03:29 [enc/audio/speech_commands_v0.02] vote=0.732 uniform=0.719 best1=0.732 n_val=31685 vram=1.54GB 46s | grade=0.833 inner_auc=0.882 vs conf_auc=0.864
+07:03:39 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+07:04:25 [enc/audio/speech_commands_v0.02] vote=0.731 uniform=0.715 best1=0.731 n_val=31929 vram=1.54GB 46s | grade=0.841 inner_auc=0.886 vs conf_auc=0.866
+07:04:33 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+07:05:13 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.714 best1=0.727 n_val=31627 vram=1.54GB 39s | grade=0.837 inner_auc=0.883 vs conf_auc=0.858
+07:05:19 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+07:05:57 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.716 best1=0.728 n_val=31731 vram=1.54GB 38s | grade=0.839 inner_auc=0.884 vs conf_auc=0.862
+07:06:04 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+07:06:47 [enc/audio/speech_commands_v0.02] vote=0.732 uniform=0.717 best1=0.732 n_val=31849 vram=1.54GB 43s | grade=0.839 inner_auc=0.882 vs conf_auc=0.859
+07:06:58 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+07:07:52 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.714 best1=0.728 n_val=31757 vram=1.54GB 55s | grade=0.837 inner_auc=0.892 vs conf_auc=0.869
+07:08:05 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+07:08:59 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.711 best1=0.727 n_val=31582 vram=1.54GB 54s | grade=0.838 inner_auc=0.893 vs conf_auc=0.869
+07:09:11 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+07:10:01 [enc/audio/speech_commands_v0.02] vote=0.729 uniform=0.715 best1=0.729 n_val=31968 vram=1.54GB 50s | grade=0.842 inner_auc=0.881 vs conf_auc=0.860
+07:10:09 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+07:10:43 [enc/audio/speech_commands_v0.02] vote=0.725 uniform=0.711 best1=0.724 n_val=31964 vram=1.54GB 34s | grade=0.837 inner_auc=0.885 vs conf_auc=0.863
+07:10:52 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+07:11:33 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.714 best1=0.728 n_val=31384 vram=1.54GB 41s | grade=0.838 inner_auc=0.889 vs conf_auc=0.865
+07:11:42 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+07:12:29 [enc/audio/speech_commands_v0.02] vote=0.726 uniform=0.714 best1=0.726 n_val=31753 vram=1.54GB 46s | grade=0.837 inner_auc=0.894 vs conf_auc=0.871
+07:12:38 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+07:13:21 [enc/audio/speech_commands_v0.02] vote=0.720 uniform=0.712 best1=0.723 n_val=31875 vram=1.54GB 43s | grade=0.838 inner_auc=0.889 vs conf_auc=0.862
+07:13:30 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+07:14:09 [enc/audio/speech_commands_v0.02] vote=0.725 uniform=0.713 best1=0.725 n_val=32253 vram=1.53GB 39s | grade=0.834 inner_auc=0.887 vs conf_auc=0.863
+07:14:22 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+07:15:22 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.711 best1=0.727 n_val=31678 vram=1.54GB 60s | grade=0.843 inner_auc=0.887 vs conf_auc=0.869
+07:15:35 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+07:16:35 [enc/audio/speech_commands_v0.02] vote=0.718 uniform=0.718 best1=0.730 n_val=31904 vram=1.54GB 60s | grade=0.835 inner_auc=0.897 vs conf_auc=0.874
+07:16:46 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+07:17:44 [enc/audio/speech_commands_v0.02] vote=0.731 uniform=0.716 best1=0.730 n_val=31734 vram=1.54GB 57s | grade=0.835 inner_auc=0.887 vs conf_auc=0.863
+07:17:56 RUN COMPLETE
+23:50:50 NI run auto_gpu_050 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+23:50:50 explicit task list: ['enc/audio/speech_commands_v0.02']
+23:51:02 [resume] from checkpoint: next cycle 82, rounds 82, 82 metric rows, inner net restored
+23:51:02 ===== CYCLE 82 (OUTER-ONLY BOOTSTRAP) =====
+23:51:05 [data] enc/audio/speech_commands_v0.02: n=105835 C=36 D=768 shards=1
+23:52:19 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.715 best1=0.727 n_val=31633 vram=1.25GB 74s
+23:52:43 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 82, "n_records": 31633, "n_val": 6328, "base_rate": 0.7277180552482605, "inner": {"auc": 0.8872897371765909, "ece": 0.013015469494976301, "brier": 0.12001955509185791, "acc80": 0.8413670659065247}, "outer_conf": {"auc": 0.866595079788491, "ece": 0.02828703234831693, "brier": 0.1311137080192566, "acc80": 0.8295140266418457}}
+23:52:43 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+23:54:27 [enc/audio/speech_commands_v0.02] vote=0.726 uniform=0.719 best1=0.726 n_val=31550 vram=1.54GB 104s | grade=0.838 inner_auc=0.893 vs conf_auc=0.868
+23:54:39 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+23:55:52 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.714 best1=0.727 n_val=31880 vram=1.54GB 73s | grade=0.838 inner_auc=0.882 vs conf_auc=0.856
+23:56:04 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+23:57:18 [enc/audio/speech_commands_v0.02] vote=0.729 uniform=0.714 best1=0.729 n_val=31618 vram=1.54GB 73s | grade=0.840 inner_auc=0.890 vs conf_auc=0.866
+23:57:27 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+23:58:47 [enc/audio/speech_commands_v0.02] vote=0.726 uniform=0.715 best1=0.726 n_val=31830 vram=1.54GB 80s | grade=0.837 inner_auc=0.886 vs conf_auc=0.865
+23:59:00 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+00:00:13 [enc/audio/speech_commands_v0.02] vote=0.723 uniform=0.711 best1=0.723 n_val=31599 vram=1.54GB 73s | grade=0.836 inner_auc=0.896 vs conf_auc=0.869
+00:00:24 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+00:01:39 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.712 best1=0.727 n_val=31739 vram=1.54GB 75s | grade=0.842 inner_auc=0.885 vs conf_auc=0.862
+00:01:51 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+00:03:10 [enc/audio/speech_commands_v0.02] vote=0.726 uniform=0.711 best1=0.726 n_val=31596 vram=1.54GB 79s | grade=0.838 inner_auc=0.882 vs conf_auc=0.860
+00:03:23 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+00:04:43 [enc/audio/speech_commands_v0.02] vote=0.726 uniform=0.710 best1=0.726 n_val=31753 vram=1.54GB 79s | grade=0.837 inner_auc=0.886 vs conf_auc=0.863
+00:04:55 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+00:06:09 [enc/audio/speech_commands_v0.02] vote=0.726 uniform=0.710 best1=0.726 n_val=32041 vram=1.53GB 74s | grade=0.837 inner_auc=0.879 vs conf_auc=0.861
+00:06:21 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+00:07:39 [enc/audio/speech_commands_v0.02] vote=0.722 uniform=0.711 best1=0.722 n_val=31808 vram=1.54GB 78s | grade=0.835 inner_auc=0.885 vs conf_auc=0.862
+00:07:51 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+00:09:09 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.715 best1=0.727 n_val=31865 vram=1.54GB 78s | grade=0.837 inner_auc=0.888 vs conf_auc=0.867
+00:09:21 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+00:10:31 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.717 best1=0.728 n_val=31960 vram=1.54GB 71s | grade=0.839 inner_auc=0.891 vs conf_auc=0.868
+00:10:47 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+00:12:19 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.714 best1=0.727 n_val=31667 vram=1.54GB 92s | grade=0.839 inner_auc=0.884 vs conf_auc=0.867
+00:12:30 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+00:13:32 [enc/audio/speech_commands_v0.02] vote=0.722 uniform=0.711 best1=0.722 n_val=31799 vram=1.54GB 62s | grade=0.835 inner_auc=0.894 vs conf_auc=0.870
+00:13:44 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+00:15:06 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.717 best1=0.727 n_val=31803 vram=1.54GB 81s | grade=0.837 inner_auc=0.893 vs conf_auc=0.868
+00:15:20 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+00:16:38 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.714 best1=0.727 n_val=31672 vram=1.54GB 78s | grade=0.841 inner_auc=0.887 vs conf_auc=0.865
+00:16:51 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+00:18:09 [enc/audio/speech_commands_v0.02] vote=0.725 uniform=0.713 best1=0.725 n_val=31511 vram=1.54GB 78s | grade=0.836 inner_auc=0.888 vs conf_auc=0.866
+00:18:21 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+00:19:36 [enc/audio/speech_commands_v0.02] vote=0.724 uniform=0.713 best1=0.724 n_val=31769 vram=1.54GB 75s | grade=0.836 inner_auc=0.891 vs conf_auc=0.871
+00:19:50 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+00:21:10 [enc/audio/speech_commands_v0.02] vote=0.726 uniform=0.711 best1=0.726 n_val=31709 vram=1.54GB 79s | grade=0.840 inner_auc=0.886 vs conf_auc=0.868
+00:21:24 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+00:22:37 [enc/audio/speech_commands_v0.02] vote=0.725 uniform=0.711 best1=0.724 n_val=31799 vram=1.54GB 73s | grade=0.836 inner_auc=0.889 vs conf_auc=0.868
+00:22:50 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+00:24:09 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.714 best1=0.727 n_val=31771 vram=1.54GB 79s | grade=0.842 inner_auc=0.884 vs conf_auc=0.859
+00:24:26 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+00:26:13 [enc/audio/speech_commands_v0.02] vote=0.721 uniform=0.713 best1=0.726 n_val=31671 vram=1.54GB 107s | grade=0.839 inner_auc=0.888 vs conf_auc=0.860
+00:26:32 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+00:27:53 [enc/audio/speech_commands_v0.02] vote=0.723 uniform=0.710 best1=0.723 n_val=31670 vram=1.54GB 81s | grade=0.835 inner_auc=0.876 vs conf_auc=0.852
+00:28:08 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+00:29:40 [enc/audio/speech_commands_v0.02] vote=0.730 uniform=0.717 best1=0.730 n_val=31474 vram=1.54GB 92s | grade=0.836 inner_auc=0.881 vs conf_auc=0.858
+00:29:59 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+00:31:29 [enc/audio/speech_commands_v0.02] vote=0.731 uniform=0.717 best1=0.731 n_val=31767 vram=1.54GB 90s | grade=0.839 inner_auc=0.884 vs conf_auc=0.860
+00:31:45 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+00:33:26 [enc/audio/speech_commands_v0.02] vote=0.716 uniform=0.717 best1=0.728 n_val=31699 vram=1.54GB 101s | grade=0.833 inner_auc=0.893 vs conf_auc=0.866
+00:33:45 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+00:35:30 [enc/audio/speech_commands_v0.02] vote=0.725 uniform=0.714 best1=0.725 n_val=31693 vram=1.54GB 105s | grade=0.834 inner_auc=0.878 vs conf_auc=0.855
+00:35:47 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+00:37:15 [enc/audio/speech_commands_v0.02] vote=0.730 uniform=0.716 best1=0.730 n_val=31860 vram=1.54GB 88s | grade=0.838 inner_auc=0.890 vs conf_auc=0.869
+00:37:31 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+00:39:10 [enc/audio/speech_commands_v0.02] vote=0.731 uniform=0.714 best1=0.731 n_val=31715 vram=1.54GB 98s | grade=0.842 inner_auc=0.886 vs conf_auc=0.860
+00:39:29 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+00:41:19 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.714 best1=0.728 n_val=31770 vram=1.54GB 110s | grade=0.837 inner_auc=0.890 vs conf_auc=0.866
+00:41:41 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+00:43:28 [enc/audio/speech_commands_v0.02] vote=0.724 uniform=0.711 best1=0.724 n_val=31733 vram=1.54GB 107s | grade=0.834 inner_auc=0.887 vs conf_auc=0.864
+00:43:49 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+00:45:19 [enc/audio/speech_commands_v0.02] vote=0.727 uniform=0.717 best1=0.727 n_val=31787 vram=1.54GB 91s | grade=0.840 inner_auc=0.889 vs conf_auc=0.867
+00:45:38 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+00:47:13 [enc/audio/speech_commands_v0.02] vote=0.720 uniform=0.715 best1=0.727 n_val=31764 vram=1.54GB 96s | grade=0.838 inner_auc=0.894 vs conf_auc=0.870
+00:47:36 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+00:49:17 [enc/audio/speech_commands_v0.02] vote=0.730 uniform=0.719 best1=0.730 n_val=31798 vram=1.54GB 101s | grade=0.835 inner_auc=0.888 vs conf_auc=0.864
+00:49:37 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+00:51:20 [enc/audio/speech_commands_v0.02] vote=0.728 uniform=0.714 best1=0.728 n_val=31935 vram=1.54GB 103s | grade=0.838 inner_auc=0.889 vs conf_auc=0.862
+00:51:45 RUN COMPLETE
+02:15:42 NI run auto_gpu_050 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+02:15:42 explicit task list: ['enc/audio/speech_commands_v0.02']
+02:15:57 [resume] from checkpoint: next cycle 118, rounds 118, 118 metric rows, inner net restored
+02:15:57 ===== CYCLE 118 (OUTER-ONLY BOOTSTRAP) =====
+02:16:01 [data] enc/audio/speech_commands_v0.02: n=105835 C=36 D=768 shards=1
+02:17:53 [enc/audio/speech_commands_v0.02] vote=0.725 uniform=0.713 best1=0.725 n_val=31756 vram=1.24GB 112s
+02:18:33 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 118, "n_records": 31756, "n_val": 6491, "base_rate": 0.7233092188835144, "inner": {"auc": 0.8853431243492224, "ece": 0.009421743477227379, "brier": 0.12140089273452759, "acc80": 0.8384052515029907}, "outer_conf": {"auc": 0.8670710085837419, "ece": 0.03410375286757423, "brier": 0.13210882246494293, "acc80": 0.8287750482559204}}
+02:18:33 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+06:21:25 [enc/audio/speech_commands_v0.02] vote=0.725 uniform=0.712 best1=0.725 n_val=31794 vram=1.54GB 14572s | grade=0.839 inner_auc=0.878 vs conf_auc=0.859
+06:21:38 RUN COMPLETE

@@ -1,0 +1,116 @@
+{
+   "app_metadata": {
+      "app_name": "Temp_Cleaner GUI",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Provide instructions for changing the banner image in Temp_Cleaner GUI",
+   "prerequisite_state": "Temp_Cleaner GUI is installed on the system",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Go to the installation directory of Temp_Cleaner GUI",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user is at the installation directory of Temp_Cleaner GUI"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Replace the `banner.png` file with a new one",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The `banner.png` file is replaced with the new one"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Rename the original `banner.png` file to `banner.png.old`",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Shift"
+            ],
+            "text_payload": "banner.png.old"
+         },
+         "expected_state_change": "The original `banner.png` file is renamed to `banner.png.old`"
+      }
+   ],
+   "_meta": {
+      "source_app": "Temp_Cleaner GUI",
+      "app_key": "temp_cleaner_gui",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "<img src='https://github.com/InsertX2k/temp_cleaner_gui/assets/62176660/59af8e66-abd7-45cd-bd9e-07c5c4b3d42b' width='30' height='30' style=\"padding-bottom: 0px;\"></img> Temp_Cleaner GUI  [![Download T",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:37:27Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

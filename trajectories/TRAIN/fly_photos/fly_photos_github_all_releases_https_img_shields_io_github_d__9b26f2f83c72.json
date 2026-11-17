@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "Fly Photos",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Set Fly Photos as the default photo viewer for image files",
+   "prerequisite_state": "Fly Photos is installed and the user has an image file open",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Right-click an image file",
+         "ui_target": {
+            "element_name": "Image file",
+            "automation_id": null,
+            "hierarchical_path": "File Explorer > Context Menu",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The context menu appears with options to open with other applications"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select 'Open with' from the context menu",
+         "ui_target": {
+            "element_name": "Open with",
+            "automation_id": null,
+            "hierarchical_path": "Context Menu > Open with",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'Open with' dialog appears with a list of applications"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Select 'Fly Photos' and click 'Always'",
+         "ui_target": {
+            "element_name": "Fly Photos",
+            "automation_id": null,
+            "hierarchical_path": "Open with dialog > Fly Photos",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Fly Photos is set as the default application for the selected image file type"
+      }
+   ],
+   "_meta": {
+      "source_app": "Fly Photos",
+      "app_key": "fly_photos",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Fly Photos [![Github All Releases](https://img.shields.io/github/downloads/riyasy/FlyPhotos/total.svg)]()",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:49:04Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

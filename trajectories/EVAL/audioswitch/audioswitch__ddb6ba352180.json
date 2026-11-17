@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "AudioSwitch",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Open the AudioSwitch application from the system tray and switch playback devices.",
+   "prerequisite_state": "Windows 10 or 11, with the AudioSwitch application installed and the system tray icon visible.",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click the AudioSwitch system tray icon to open the devices.",
+         "ui_target": {
+            "element_name": "AudioSwitch system tray icon",
+            "automation_id": null,
+            "hierarchical_path": "System tray > AudioSwitch icon",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The AudioSwitch devices menu opens, showing the current playback and recording devices."
+      }
+   ],
+   "_meta": {
+      "source_app": "AudioSwitch",
+      "app_key": "audioswitch",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "AudioSwitch",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:16:18Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

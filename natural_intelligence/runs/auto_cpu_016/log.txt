@@ -1,0 +1,709 @@
+17:59:39 NI run auto_cpu_016 on CPU; hours=2.0 smoke=False
+17:59:39 explicit task list: ['enc/graph/deezer_ego_nets']
+17:59:39 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+17:59:40 [data] enc/graph/deezer_ego_nets: n=9629 C=2 D=534 shards=1
+17:59:55 [enc/graph/deezer_ego_nets] vote=0.540 uniform=0.540 best1=0.536 n_val=2876 vram=0.00GB 16s
+18:00:05 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 2876, "n_val": 566, "base_rate": 0.5265017747879028, "inner": {"auc": 0.532981067815286, "ece": 0.034949260813187374, "brier": 0.2516237795352936, "acc80": 0.528761088848114}, "outer_conf": {"auc": 0.5189196634278274, "ece": 0.07854741559011776, "brier": 0.2578483521938324, "acc80": 0.5331858396530151}}
+18:00:05 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+18:00:25 [enc/graph/deezer_ego_nets] vote=0.530 uniform=0.530 best1=0.532 n_val=2881 vram=0.00GB 20s | grade=0.837 inner_auc=0.534 vs conf_auc=0.505
+18:00:32 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+18:00:56 [enc/graph/deezer_ego_nets] vote=0.534 uniform=0.534 best1=0.523 n_val=2875 vram=0.00GB 24s | grade=0.842 inner_auc=0.557 vs conf_auc=0.531
+18:01:05 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+18:02:33 [enc/graph/deezer_ego_nets] vote=0.519 uniform=0.519 best1=0.534 n_val=2890 vram=0.00GB 89s | grade=0.827 inner_auc=0.543 vs conf_auc=0.525
+18:03:00 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+18:04:22 [enc/graph/deezer_ego_nets] vote=0.536 uniform=0.536 best1=0.534 n_val=2926 vram=0.00GB 82s | grade=0.835 inner_auc=0.560 vs conf_auc=0.519
+18:04:46 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+18:05:51 [enc/graph/deezer_ego_nets] vote=0.539 uniform=0.536 best1=0.529 n_val=2920 vram=0.00GB 65s | grade=0.846 inner_auc=0.508 vs conf_auc=0.480
+18:06:15 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+18:07:19 [enc/graph/deezer_ego_nets] vote=0.541 uniform=0.542 best1=0.539 n_val=2869 vram=0.00GB 64s | grade=0.848 inner_auc=0.488 vs conf_auc=0.519
+18:07:40 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+18:09:07 [enc/graph/deezer_ego_nets] vote=0.531 uniform=0.530 best1=0.525 n_val=2819 vram=0.00GB 87s | grade=0.839 inner_auc=0.496 vs conf_auc=0.533
+18:09:36 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+18:10:31 [enc/graph/deezer_ego_nets] vote=0.556 uniform=0.556 best1=0.548 n_val=2846 vram=0.00GB 55s | grade=0.844 inner_auc=0.513 vs conf_auc=0.515
+18:10:46 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+18:11:30 [enc/graph/deezer_ego_nets] vote=0.521 uniform=0.520 best1=0.524 n_val=2888 vram=0.00GB 45s | grade=0.818 inner_auc=0.521 vs conf_auc=0.518
+18:11:44 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+18:12:21 [enc/graph/deezer_ego_nets] vote=0.531 uniform=0.531 best1=0.534 n_val=2939 vram=0.00GB 37s | grade=0.835 inner_auc=0.535 vs conf_auc=0.538
+18:12:33 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+18:13:12 [enc/graph/deezer_ego_nets] vote=0.529 uniform=0.527 best1=0.530 n_val=2873 vram=0.00GB 39s | grade=0.841 inner_auc=0.501 vs conf_auc=0.498
+18:13:28 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+18:14:17 [enc/graph/deezer_ego_nets] vote=0.536 uniform=0.535 best1=0.535 n_val=2915 vram=0.00GB 49s | grade=0.843 inner_auc=0.505 vs conf_auc=0.526
+18:14:31 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+18:15:17 [enc/graph/deezer_ego_nets] vote=0.528 uniform=0.529 best1=0.533 n_val=2851 vram=0.00GB 46s | grade=0.837 inner_auc=0.482 vs conf_auc=0.529
+18:15:34 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+18:16:14 [enc/graph/deezer_ego_nets] vote=0.529 uniform=0.529 best1=0.528 n_val=2867 vram=0.00GB 40s | grade=0.840 inner_auc=0.482 vs conf_auc=0.501
+18:16:26 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+18:17:04 [enc/graph/deezer_ego_nets] vote=0.523 uniform=0.521 best1=0.532 n_val=2979 vram=0.00GB 37s | grade=0.833 inner_auc=0.554 vs conf_auc=0.529
+18:17:15 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+18:17:57 [enc/graph/deezer_ego_nets] vote=0.518 uniform=0.521 best1=0.537 n_val=2893 vram=0.00GB 41s | grade=0.833 inner_auc=0.575 vs conf_auc=0.577
+18:18:14 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+18:18:56 [enc/graph/deezer_ego_nets] vote=0.538 uniform=0.536 best1=0.531 n_val=2860 vram=0.00GB 43s | grade=0.834 inner_auc=0.518 vs conf_auc=0.516
+18:19:14 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+18:19:58 [enc/graph/deezer_ego_nets] vote=0.542 uniform=0.544 best1=0.543 n_val=2839 vram=0.00GB 44s | grade=0.846 inner_auc=0.533 vs conf_auc=0.521
+18:20:13 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+18:20:54 [enc/graph/deezer_ego_nets] vote=0.545 uniform=0.546 best1=0.540 n_val=2901 vram=0.00GB 41s | grade=0.848 inner_auc=0.531 vs conf_auc=0.508
+18:21:07 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+18:21:46 [enc/graph/deezer_ego_nets] vote=0.532 uniform=0.526 best1=0.525 n_val=2844 vram=0.00GB 39s | grade=0.836 inner_auc=0.549 vs conf_auc=0.504
+18:21:58 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+18:22:44 [enc/graph/deezer_ego_nets] vote=0.532 uniform=0.532 best1=0.538 n_val=2918 vram=0.00GB 47s | grade=0.843 inner_auc=0.506 vs conf_auc=0.493
+18:23:03 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+18:23:48 [enc/graph/deezer_ego_nets] vote=0.527 uniform=0.524 best1=0.526 n_val=2909 vram=0.00GB 45s | grade=0.839 inner_auc=0.487 vs conf_auc=0.474
+18:24:04 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+01:04:34 NI run auto_cpu_016 on CPU; hours=2.0 smoke=False
+01:04:34 explicit task list: ['enc/graph/deezer_ego_nets']
+01:04:51 [resume] from checkpoint: next cycle 23, rounds 23, 23 metric rows, inner net restored
+01:04:51 ===== CYCLE 23 (OUTER-ONLY BOOTSTRAP) =====
+01:04:52 [data] enc/graph/deezer_ego_nets: n=9629 C=2 D=534 shards=1
+01:07:35 [enc/graph/deezer_ego_nets] vote=0.550 uniform=0.550 best1=0.559 n_val=2901 vram=0.00GB 163s
+01:08:25 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 23, "n_records": 2901, "n_val": 555, "base_rate": 0.5387387275695801, "inner": {"auc": 0.5781119356187291, "ece": 0.02319826172278808, "brier": 0.24494554102420807, "acc80": 0.565315306186676}, "outer_conf": {"auc": 0.5701687918060201, "ece": 0.019114548880774695, "brier": 0.24735277891159058, "acc80": 0.5608108043670654}}
+01:08:25 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+01:10:15 [enc/graph/deezer_ego_nets] vote=0.526 uniform=0.527 best1=0.540 n_val=2924 vram=0.00GB 110s | grade=0.853 inner_auc=0.522 vs conf_auc=0.508
+01:10:22 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+01:11:06 [enc/graph/deezer_ego_nets] vote=0.529 uniform=0.523 best1=0.545 n_val=2900 vram=0.00GB 44s | grade=0.862 inner_auc=0.531 vs conf_auc=0.520
+01:11:13 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+01:12:02 [enc/graph/deezer_ego_nets] vote=0.545 uniform=0.545 best1=0.545 n_val=2882 vram=0.00GB 49s | grade=0.860 inner_auc=0.550 vs conf_auc=0.532
+01:12:11 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+01:13:03 [enc/graph/deezer_ego_nets] vote=0.540 uniform=0.532 best1=0.554 n_val=2893 vram=0.00GB 52s | grade=0.864 inner_auc=0.528 vs conf_auc=0.524
+01:13:13 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+01:14:18 [enc/graph/deezer_ego_nets] vote=0.527 uniform=0.523 best1=0.542 n_val=2904 vram=0.00GB 65s | grade=0.864 inner_auc=0.547 vs conf_auc=0.543
+01:14:27 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+01:15:23 [enc/graph/deezer_ego_nets] vote=0.520 uniform=0.518 best1=0.535 n_val=2873 vram=0.00GB 56s | grade=0.857 inner_auc=0.574 vs conf_auc=0.544
+01:15:31 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+01:16:04 [enc/graph/deezer_ego_nets] vote=0.536 uniform=0.529 best1=0.547 n_val=2923 vram=0.00GB 33s | grade=0.861 inner_auc=0.540 vs conf_auc=0.495
+01:16:10 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+01:16:50 [enc/graph/deezer_ego_nets] vote=0.534 uniform=0.530 best1=0.543 n_val=3002 vram=0.00GB 40s | grade=0.868 inner_auc=0.532 vs conf_auc=0.508
+01:16:56 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+01:17:31 [enc/graph/deezer_ego_nets] vote=0.512 uniform=0.510 best1=0.535 n_val=2915 vram=0.00GB 34s | grade=0.849 inner_auc=0.531 vs conf_auc=0.537
+01:17:37 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+01:18:18 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.541 best1=0.553 n_val=2848 vram=0.00GB 41s | grade=0.853 inner_auc=0.564 vs conf_auc=0.527
+01:18:25 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+01:18:59 [enc/graph/deezer_ego_nets] vote=0.550 uniform=0.544 best1=0.560 n_val=2920 vram=0.00GB 34s | grade=0.863 inner_auc=0.539 vs conf_auc=0.518
+01:19:06 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+01:19:46 [enc/graph/deezer_ego_nets] vote=0.542 uniform=0.541 best1=0.547 n_val=2838 vram=0.00GB 40s | grade=0.866 inner_auc=0.515 vs conf_auc=0.498
+01:19:52 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+01:20:28 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.536 best1=0.542 n_val=2891 vram=0.00GB 35s | grade=0.871 inner_auc=0.534 vs conf_auc=0.576
+01:20:33 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+01:21:13 [enc/graph/deezer_ego_nets] vote=0.539 uniform=0.535 best1=0.550 n_val=2908 vram=0.00GB 40s | grade=0.866 inner_auc=0.580 vs conf_auc=0.534
+01:21:20 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+01:21:56 [enc/graph/deezer_ego_nets] vote=0.531 uniform=0.527 best1=0.541 n_val=2842 vram=0.00GB 36s | grade=0.868 inner_auc=0.531 vs conf_auc=0.537
+01:22:02 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+01:22:42 [enc/graph/deezer_ego_nets] vote=0.531 uniform=0.520 best1=0.545 n_val=2861 vram=0.00GB 40s | grade=0.868 inner_auc=0.519 vs conf_auc=0.499
+01:22:48 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+01:23:26 [enc/graph/deezer_ego_nets] vote=0.538 uniform=0.540 best1=0.545 n_val=2937 vram=0.00GB 37s | grade=0.868 inner_auc=0.537 vs conf_auc=0.518
+01:23:31 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+01:24:12 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.541 best1=0.546 n_val=2867 vram=0.00GB 41s | grade=0.866 inner_auc=0.537 vs conf_auc=0.523
+01:24:19 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+01:25:07 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.534 best1=0.550 n_val=2909 vram=0.00GB 47s | grade=0.866 inner_auc=0.566 vs conf_auc=0.534
+01:25:19 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+01:26:07 [enc/graph/deezer_ego_nets] vote=0.529 uniform=0.526 best1=0.555 n_val=2929 vram=0.00GB 48s | grade=0.859 inner_auc=0.577 vs conf_auc=0.564
+01:26:14 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+01:26:55 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.536 best1=0.556 n_val=2942 vram=0.00GB 41s | grade=0.859 inner_auc=0.549 vs conf_auc=0.562
+01:27:01 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+01:27:38 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.540 best1=0.548 n_val=2920 vram=0.00GB 37s | grade=0.862 inner_auc=0.555 vs conf_auc=0.545
+01:27:46 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+01:28:33 [enc/graph/deezer_ego_nets] vote=0.539 uniform=0.528 best1=0.540 n_val=2904 vram=0.00GB 47s | grade=0.865 inner_auc=0.542 vs conf_auc=0.512
+01:28:41 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+01:29:30 [enc/graph/deezer_ego_nets] vote=0.535 uniform=0.530 best1=0.532 n_val=2914 vram=0.00GB 48s | grade=0.869 inner_auc=0.516 vs conf_auc=0.522
+01:29:40 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+01:30:35 [enc/graph/deezer_ego_nets] vote=0.545 uniform=0.547 best1=0.542 n_val=2843 vram=0.00GB 56s | grade=0.863 inner_auc=0.536 vs conf_auc=0.532
+01:30:44 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+01:31:34 [enc/graph/deezer_ego_nets] vote=0.533 uniform=0.524 best1=0.543 n_val=2952 vram=0.00GB 50s | grade=0.866 inner_auc=0.517 vs conf_auc=0.500
+01:31:42 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+01:32:35 [enc/graph/deezer_ego_nets] vote=0.527 uniform=0.512 best1=0.530 n_val=2897 vram=0.00GB 53s | grade=0.865 inner_auc=0.507 vs conf_auc=0.496
+01:32:45 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+01:33:30 [enc/graph/deezer_ego_nets] vote=0.537 uniform=0.532 best1=0.546 n_val=2910 vram=0.00GB 45s | grade=0.866 inner_auc=0.531 vs conf_auc=0.532
+01:33:38 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+01:34:26 [enc/graph/deezer_ego_nets] vote=0.537 uniform=0.534 best1=0.538 n_val=2953 vram=0.00GB 48s | grade=0.870 inner_auc=0.547 vs conf_auc=0.508
+01:34:35 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+01:35:21 [enc/graph/deezer_ego_nets] vote=0.539 uniform=0.531 best1=0.556 n_val=2841 vram=0.00GB 46s | grade=0.871 inner_auc=0.566 vs conf_auc=0.535
+01:35:28 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+01:36:18 [enc/graph/deezer_ego_nets] vote=0.539 uniform=0.540 best1=0.545 n_val=2816 vram=0.00GB 50s | grade=0.870 inner_auc=0.523 vs conf_auc=0.495
+01:36:28 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+01:37:18 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.538 best1=0.561 n_val=2922 vram=0.00GB 50s | grade=0.870 inner_auc=0.512 vs conf_auc=0.511
+01:37:27 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+01:38:24 [enc/graph/deezer_ego_nets] vote=0.553 uniform=0.550 best1=0.554 n_val=2916 vram=0.00GB 57s | grade=0.865 inner_auc=0.515 vs conf_auc=0.534
+01:38:33 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+01:39:23 [enc/graph/deezer_ego_nets] vote=0.550 uniform=0.532 best1=0.553 n_val=2903 vram=0.00GB 50s | grade=0.866 inner_auc=0.523 vs conf_auc=0.519
+01:39:32 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+01:40:17 [enc/graph/deezer_ego_nets] vote=0.538 uniform=0.530 best1=0.538 n_val=2893 vram=0.00GB 45s | grade=0.863 inner_auc=0.550 vs conf_auc=0.525
+01:40:25 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+01:41:14 [enc/graph/deezer_ego_nets] vote=0.539 uniform=0.539 best1=0.554 n_val=2900 vram=0.00GB 48s | grade=0.870 inner_auc=0.559 vs conf_auc=0.540
+01:41:21 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+01:42:04 [enc/graph/deezer_ego_nets] vote=0.550 uniform=0.547 best1=0.540 n_val=2900 vram=0.00GB 43s | grade=0.864 inner_auc=0.539 vs conf_auc=0.518
+01:42:12 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+01:43:02 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.539 best1=0.552 n_val=2898 vram=0.00GB 50s | grade=0.868 inner_auc=0.549 vs conf_auc=0.456
+01:43:09 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+01:43:54 [enc/graph/deezer_ego_nets] vote=0.541 uniform=0.537 best1=0.543 n_val=2912 vram=0.00GB 45s | grade=0.867 inner_auc=0.526 vs conf_auc=0.521
+01:44:03 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+01:44:52 [enc/graph/deezer_ego_nets] vote=0.548 uniform=0.532 best1=0.543 n_val=2867 vram=0.00GB 50s | grade=0.866 inner_auc=0.492 vs conf_auc=0.496
+01:45:01 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+01:45:45 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.533 best1=0.547 n_val=2934 vram=0.00GB 44s | grade=0.869 inner_auc=0.528 vs conf_auc=0.503
+01:45:53 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+01:46:43 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.539 best1=0.554 n_val=2902 vram=0.00GB 50s | grade=0.867 inner_auc=0.561 vs conf_auc=0.542
+01:46:52 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+01:47:37 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.533 best1=0.556 n_val=2887 vram=0.00GB 45s | grade=0.867 inner_auc=0.571 vs conf_auc=0.516
+01:47:44 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+01:48:31 [enc/graph/deezer_ego_nets] vote=0.538 uniform=0.527 best1=0.541 n_val=2903 vram=0.00GB 47s | grade=0.864 inner_auc=0.567 vs conf_auc=0.526
+01:48:39 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+01:49:20 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.538 best1=0.538 n_val=2861 vram=0.00GB 41s | grade=0.866 inner_auc=0.517 vs conf_auc=0.518
+01:49:27 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+01:50:13 [enc/graph/deezer_ego_nets] vote=0.532 uniform=0.530 best1=0.537 n_val=2915 vram=0.00GB 46s | grade=0.860 inner_auc=0.559 vs conf_auc=0.505
+01:50:21 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+01:51:42 [enc/graph/deezer_ego_nets] vote=0.542 uniform=0.524 best1=0.543 n_val=2917 vram=0.00GB 82s | grade=0.867 inner_auc=0.507 vs conf_auc=0.512
+01:52:01 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+01:53:36 [enc/graph/deezer_ego_nets] vote=0.537 uniform=0.530 best1=0.543 n_val=2910 vram=0.00GB 95s | grade=0.869 inner_auc=0.565 vs conf_auc=0.547
+01:53:58 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+01:54:44 [enc/graph/deezer_ego_nets] vote=0.540 uniform=0.523 best1=0.541 n_val=2952 vram=0.00GB 46s | grade=0.867 inner_auc=0.505 vs conf_auc=0.465
+01:54:50 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+01:55:28 [enc/graph/deezer_ego_nets] vote=0.528 uniform=0.530 best1=0.546 n_val=2904 vram=0.00GB 37s | grade=0.864 inner_auc=0.506 vs conf_auc=0.526
+01:55:35 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+01:56:17 [enc/graph/deezer_ego_nets] vote=0.555 uniform=0.554 best1=0.553 n_val=2875 vram=0.00GB 42s | grade=0.857 inner_auc=0.517 vs conf_auc=0.527
+01:56:24 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+01:57:13 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.546 best1=0.549 n_val=2817 vram=0.00GB 49s | grade=0.867 inner_auc=0.504 vs conf_auc=0.471
+01:57:38 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+02:00:16 [enc/graph/deezer_ego_nets] vote=0.534 uniform=0.526 best1=0.552 n_val=2985 vram=0.00GB 158s | grade=0.864 inner_auc=0.567 vs conf_auc=0.523
+02:00:43 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+02:01:37 [enc/graph/deezer_ego_nets] vote=0.532 uniform=0.514 best1=0.552 n_val=2923 vram=0.00GB 54s | grade=0.866 inner_auc=0.604 vs conf_auc=0.526
+02:01:46 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+02:02:40 [enc/graph/deezer_ego_nets] vote=0.561 uniform=0.552 best1=0.568 n_val=2824 vram=0.00GB 54s | grade=0.852 inner_auc=0.550 vs conf_auc=0.496
+02:02:49 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+02:05:05 [enc/graph/deezer_ego_nets] vote=0.538 uniform=0.523 best1=0.547 n_val=2835 vram=0.00GB 135s | grade=0.859 inner_auc=0.540 vs conf_auc=0.504
+02:05:26 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+02:06:58 [enc/graph/deezer_ego_nets] vote=0.536 uniform=0.519 best1=0.542 n_val=2869 vram=0.00GB 92s | grade=0.872 inner_auc=0.557 vs conf_auc=0.507
+02:07:07 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+02:07:51 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.530 best1=0.545 n_val=2969 vram=0.00GB 45s | grade=0.868 inner_auc=0.512 vs conf_auc=0.498
+02:07:58 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+02:08:43 [enc/graph/deezer_ego_nets] vote=0.565 uniform=0.543 best1=0.558 n_val=2883 vram=0.00GB 45s | grade=0.851 inner_auc=0.533 vs conf_auc=0.512
+02:09:06 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+02:10:48 [enc/graph/deezer_ego_nets] vote=0.541 uniform=0.521 best1=0.549 n_val=2888 vram=0.00GB 102s | grade=0.857 inner_auc=0.515 vs conf_auc=0.513
+02:10:55 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+02:11:36 [enc/graph/deezer_ego_nets] vote=0.541 uniform=0.531 best1=0.549 n_val=2891 vram=0.00GB 41s | grade=0.869 inner_auc=0.533 vs conf_auc=0.519
+02:11:45 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+02:12:30 [enc/graph/deezer_ego_nets] vote=0.545 uniform=0.531 best1=0.547 n_val=2916 vram=0.00GB 45s | grade=0.868 inner_auc=0.531 vs conf_auc=0.549
+02:12:38 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+02:13:14 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.539 best1=0.550 n_val=2879 vram=0.00GB 37s | grade=0.870 inner_auc=0.566 vs conf_auc=0.522
+02:13:22 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+02:14:06 [enc/graph/deezer_ego_nets] vote=0.530 uniform=0.514 best1=0.541 n_val=2876 vram=0.00GB 43s | grade=0.864 inner_auc=0.553 vs conf_auc=0.508
+02:14:14 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+02:14:57 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.543 best1=0.546 n_val=2822 vram=0.00GB 43s | grade=0.861 inner_auc=0.515 vs conf_auc=0.482
+02:15:03 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+02:15:49 [enc/graph/deezer_ego_nets] vote=0.539 uniform=0.533 best1=0.550 n_val=2852 vram=0.00GB 46s | grade=0.866 inner_auc=0.512 vs conf_auc=0.534
+02:15:58 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+02:16:43 [enc/graph/deezer_ego_nets] vote=0.538 uniform=0.533 best1=0.537 n_val=2855 vram=0.00GB 45s | grade=0.868 inner_auc=0.521 vs conf_auc=0.516
+02:16:50 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+02:17:37 [enc/graph/deezer_ego_nets] vote=0.542 uniform=0.529 best1=0.549 n_val=2937 vram=0.00GB 47s | grade=0.868 inner_auc=0.544 vs conf_auc=0.532
+02:17:45 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+02:18:29 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.538 best1=0.551 n_val=2858 vram=0.00GB 44s | grade=0.867 inner_auc=0.570 vs conf_auc=0.519
+02:18:36 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+02:19:18 [enc/graph/deezer_ego_nets] vote=0.538 uniform=0.525 best1=0.538 n_val=2903 vram=0.00GB 41s | grade=0.866 inner_auc=0.552 vs conf_auc=0.497
+02:19:25 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+02:20:10 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.535 best1=0.541 n_val=2953 vram=0.00GB 44s | grade=0.867 inner_auc=0.542 vs conf_auc=0.497
+02:20:18 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+02:20:55 [enc/graph/deezer_ego_nets] vote=0.541 uniform=0.537 best1=0.546 n_val=2808 vram=0.00GB 37s | grade=0.870 inner_auc=0.534 vs conf_auc=0.534
+02:21:02 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+02:21:45 [enc/graph/deezer_ego_nets] vote=0.534 uniform=0.531 best1=0.537 n_val=2986 vram=0.00GB 43s | grade=0.861 inner_auc=0.543 vs conf_auc=0.548
+02:21:52 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+02:22:31 [enc/graph/deezer_ego_nets] vote=0.552 uniform=0.533 best1=0.549 n_val=2815 vram=0.00GB 39s | grade=0.858 inner_auc=0.517 vs conf_auc=0.519
+02:22:37 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+02:23:20 [enc/graph/deezer_ego_nets] vote=0.539 uniform=0.526 best1=0.545 n_val=2939 vram=0.00GB 42s | grade=0.868 inner_auc=0.550 vs conf_auc=0.522
+02:23:27 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+02:24:07 [enc/graph/deezer_ego_nets] vote=0.545 uniform=0.534 best1=0.555 n_val=2936 vram=0.00GB 40s | grade=0.869 inner_auc=0.544 vs conf_auc=0.533
+02:24:14 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+02:24:55 [enc/graph/deezer_ego_nets] vote=0.539 uniform=0.531 best1=0.543 n_val=2846 vram=0.00GB 40s | grade=0.863 inner_auc=0.582 vs conf_auc=0.521
+02:25:02 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+02:25:43 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.534 best1=0.545 n_val=2934 vram=0.00GB 41s | grade=0.868 inner_auc=0.527 vs conf_auc=0.518
+02:25:50 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+02:26:28 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.540 best1=0.554 n_val=2844 vram=0.00GB 38s | grade=0.868 inner_auc=0.558 vs conf_auc=0.562
+02:26:35 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+02:27:17 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.533 best1=0.561 n_val=2923 vram=0.00GB 42s | grade=0.868 inner_auc=0.532 vs conf_auc=0.510
+02:27:24 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+02:28:02 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.546 best1=0.554 n_val=2852 vram=0.00GB 38s | grade=0.864 inner_auc=0.509 vs conf_auc=0.471
+02:28:09 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+02:28:50 [enc/graph/deezer_ego_nets] vote=0.541 uniform=0.524 best1=0.542 n_val=2852 vram=0.00GB 41s | grade=0.869 inner_auc=0.535 vs conf_auc=0.524
+02:28:58 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+02:29:37 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.529 best1=0.548 n_val=2860 vram=0.00GB 39s | grade=0.868 inner_auc=0.537 vs conf_auc=0.550
+02:29:44 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+02:30:24 [enc/graph/deezer_ego_nets] vote=0.550 uniform=0.545 best1=0.547 n_val=2918 vram=0.00GB 40s | grade=0.866 inner_auc=0.535 vs conf_auc=0.544
+02:30:32 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+02:31:13 [enc/graph/deezer_ego_nets] vote=0.548 uniform=0.537 best1=0.554 n_val=2933 vram=0.00GB 41s | grade=0.873 inner_auc=0.518 vs conf_auc=0.472
+02:31:20 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+02:31:59 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.531 best1=0.540 n_val=2938 vram=0.00GB 39s | grade=0.867 inner_auc=0.538 vs conf_auc=0.545
+02:32:07 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+02:32:49 [enc/graph/deezer_ego_nets] vote=0.537 uniform=0.537 best1=0.538 n_val=2908 vram=0.00GB 42s | grade=0.872 inner_auc=0.557 vs conf_auc=0.533
+02:32:55 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+02:33:34 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.536 best1=0.544 n_val=2924 vram=0.00GB 39s | grade=0.870 inner_auc=0.538 vs conf_auc=0.579
+02:33:42 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+02:34:23 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.527 best1=0.560 n_val=2829 vram=0.00GB 41s | grade=0.865 inner_auc=0.576 vs conf_auc=0.527
+02:34:31 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+02:35:09 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.537 best1=0.552 n_val=2877 vram=0.00GB 38s | grade=0.871 inner_auc=0.511 vs conf_auc=0.489
+02:35:16 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+02:35:57 [enc/graph/deezer_ego_nets] vote=0.542 uniform=0.531 best1=0.550 n_val=2842 vram=0.00GB 41s | grade=0.870 inner_auc=0.513 vs conf_auc=0.509
+02:36:05 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+02:36:44 [enc/graph/deezer_ego_nets] vote=0.550 uniform=0.545 best1=0.549 n_val=2939 vram=0.00GB 39s | grade=0.866 inner_auc=0.545 vs conf_auc=0.492
+02:36:50 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+02:37:30 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.534 best1=0.542 n_val=2876 vram=0.00GB 40s | grade=0.868 inner_auc=0.512 vs conf_auc=0.487
+02:37:38 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+02:38:18 [enc/graph/deezer_ego_nets] vote=0.541 uniform=0.535 best1=0.552 n_val=2941 vram=0.00GB 40s | grade=0.869 inner_auc=0.567 vs conf_auc=0.508
+02:38:25 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+02:39:00 [enc/graph/deezer_ego_nets] vote=0.535 uniform=0.529 best1=0.551 n_val=2933 vram=0.00GB 36s | grade=0.871 inner_auc=0.550 vs conf_auc=0.554
+02:39:07 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+02:39:46 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.546 best1=0.557 n_val=2851 vram=0.00GB 39s | grade=0.861 inner_auc=0.557 vs conf_auc=0.559
+02:39:52 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+02:40:27 [enc/graph/deezer_ego_nets] vote=0.542 uniform=0.521 best1=0.536 n_val=2824 vram=0.00GB 34s | grade=0.863 inner_auc=0.536 vs conf_auc=0.464
+02:40:34 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+02:41:13 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.538 best1=0.549 n_val=2942 vram=0.00GB 39s | grade=0.866 inner_auc=0.526 vs conf_auc=0.515
+02:41:20 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+02:41:55 [enc/graph/deezer_ego_nets] vote=0.538 uniform=0.536 best1=0.536 n_val=2789 vram=0.00GB 35s | grade=0.866 inner_auc=0.526 vs conf_auc=0.524
+02:42:01 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+02:42:54 [enc/graph/deezer_ego_nets] vote=0.539 uniform=0.537 best1=0.541 n_val=2972 vram=0.00GB 53s | grade=0.870 inner_auc=0.548 vs conf_auc=0.527
+02:43:04 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+02:43:57 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.533 best1=0.547 n_val=2901 vram=0.00GB 53s | grade=0.869 inner_auc=0.538 vs conf_auc=0.482
+02:44:06 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+02:44:57 [enc/graph/deezer_ego_nets] vote=0.558 uniform=0.547 best1=0.551 n_val=2815 vram=0.00GB 51s | grade=0.868 inner_auc=0.517 vs conf_auc=0.530
+02:45:07 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+02:46:01 [enc/graph/deezer_ego_nets] vote=0.554 uniform=0.539 best1=0.556 n_val=2887 vram=0.00GB 53s | grade=0.870 inner_auc=0.525 vs conf_auc=0.499
+02:46:10 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+02:47:00 [enc/graph/deezer_ego_nets] vote=0.555 uniform=0.538 best1=0.556 n_val=2901 vram=0.00GB 50s | grade=0.871 inner_auc=0.500 vs conf_auc=0.513
+02:47:10 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+02:48:03 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.530 best1=0.551 n_val=2877 vram=0.00GB 53s | grade=0.865 inner_auc=0.542 vs conf_auc=0.524
+02:48:13 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+02:49:08 [enc/graph/deezer_ego_nets] vote=0.554 uniform=0.545 best1=0.559 n_val=2886 vram=0.00GB 55s | grade=0.865 inner_auc=0.527 vs conf_auc=0.545
+02:49:17 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+02:50:12 [enc/graph/deezer_ego_nets] vote=0.542 uniform=0.542 best1=0.556 n_val=2914 vram=0.00GB 54s | grade=0.866 inner_auc=0.599 vs conf_auc=0.549
+02:50:21 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+02:51:16 [enc/graph/deezer_ego_nets] vote=0.548 uniform=0.540 best1=0.547 n_val=2946 vram=0.00GB 55s | grade=0.869 inner_auc=0.544 vs conf_auc=0.524
+02:51:23 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+02:52:01 [enc/graph/deezer_ego_nets] vote=0.524 uniform=0.522 best1=0.531 n_val=2939 vram=0.00GB 38s | grade=0.855 inner_auc=0.547 vs conf_auc=0.545
+02:52:08 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+02:52:49 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.546 best1=0.545 n_val=2888 vram=0.00GB 41s | grade=0.862 inner_auc=0.482 vs conf_auc=0.505
+02:52:56 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+02:53:30 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.532 best1=0.548 n_val=2879 vram=0.00GB 35s | grade=0.868 inner_auc=0.578 vs conf_auc=0.520
+02:53:36 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+02:54:11 [enc/graph/deezer_ego_nets] vote=0.541 uniform=0.528 best1=0.539 n_val=2811 vram=0.00GB 35s | grade=0.868 inner_auc=0.532 vs conf_auc=0.504
+02:54:18 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+02:54:50 [enc/graph/deezer_ego_nets] vote=0.530 uniform=0.511 best1=0.540 n_val=2883 vram=0.00GB 32s | grade=0.864 inner_auc=0.533 vs conf_auc=0.515
+02:54:56 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+02:55:33 [enc/graph/deezer_ego_nets] vote=0.536 uniform=0.529 best1=0.544 n_val=2823 vram=0.00GB 37s | grade=0.865 inner_auc=0.507 vs conf_auc=0.513
+02:55:41 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+02:56:17 [enc/graph/deezer_ego_nets] vote=0.535 uniform=0.534 best1=0.535 n_val=2885 vram=0.00GB 37s | grade=0.870 inner_auc=0.534 vs conf_auc=0.510
+02:56:23 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+02:56:56 [enc/graph/deezer_ego_nets] vote=0.542 uniform=0.522 best1=0.543 n_val=2901 vram=0.00GB 32s | grade=0.868 inner_auc=0.505 vs conf_auc=0.489
+02:57:02 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+02:57:43 [enc/graph/deezer_ego_nets] vote=0.552 uniform=0.550 best1=0.564 n_val=2845 vram=0.00GB 41s | grade=0.860 inner_auc=0.510 vs conf_auc=0.532
+02:57:50 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+02:58:24 [enc/graph/deezer_ego_nets] vote=0.553 uniform=0.538 best1=0.550 n_val=2821 vram=0.00GB 33s | grade=0.866 inner_auc=0.537 vs conf_auc=0.525
+02:58:30 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+02:59:09 [enc/graph/deezer_ego_nets] vote=0.535 uniform=0.531 best1=0.539 n_val=2885 vram=0.00GB 38s | grade=0.862 inner_auc=0.501 vs conf_auc=0.477
+02:59:16 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+02:59:54 [enc/graph/deezer_ego_nets] vote=0.538 uniform=0.523 best1=0.542 n_val=2873 vram=0.00GB 38s | grade=0.868 inner_auc=0.555 vs conf_auc=0.502
+03:00:01 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+03:00:42 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.533 best1=0.550 n_val=2857 vram=0.00GB 41s | grade=0.866 inner_auc=0.536 vs conf_auc=0.510
+03:00:50 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+03:01:29 [enc/graph/deezer_ego_nets] vote=0.561 uniform=0.548 best1=0.562 n_val=2906 vram=0.00GB 39s | grade=0.858 inner_auc=0.557 vs conf_auc=0.527
+03:01:36 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+03:02:11 [enc/graph/deezer_ego_nets] vote=0.552 uniform=0.540 best1=0.558 n_val=2961 vram=0.00GB 35s | grade=0.865 inner_auc=0.542 vs conf_auc=0.534
+03:02:18 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+03:02:57 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.518 best1=0.551 n_val=2999 vram=0.00GB 38s | grade=0.869 inner_auc=0.547 vs conf_auc=0.518
+03:03:03 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+03:03:37 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.532 best1=0.548 n_val=2950 vram=0.00GB 34s | grade=0.871 inner_auc=0.549 vs conf_auc=0.517
+03:03:44 ===== CYCLE 149 (OUTER -> INNER -> FEEDBACK) =====
+03:04:19 [enc/graph/deezer_ego_nets] vote=0.537 uniform=0.533 best1=0.535 n_val=2877 vram=0.00GB 36s | grade=0.865 inner_auc=0.479 vs conf_auc=0.465
+03:04:26 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+03:05:02 [enc/graph/deezer_ego_nets] vote=0.555 uniform=0.542 best1=0.558 n_val=2877 vram=0.00GB 36s | grade=0.859 inner_auc=0.541 vs conf_auc=0.535
+03:05:08 RUN COMPLETE
+15:00:01 NI run auto_cpu_016 on CPU; hours=2.0 smoke=False
+15:00:01 explicit task list: ['enc/graph/deezer_ego_nets']
+15:00:19 [resume] from checkpoint: next cycle 151, rounds 151, 151 metric rows, inner net restored
+15:00:19 ===== CYCLE 151 (OUTER-ONLY BOOTSTRAP) =====
+15:00:19 [data] enc/graph/deezer_ego_nets: n=9629 C=2 D=534 shards=1
+15:03:44 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.524 best1=0.559 n_val=2920 vram=0.00GB 205s
+06:29:19 NI run auto_cpu_016 on CPU; hours=2.0 smoke=False
+06:29:19 explicit task list: ['enc/graph/deezer_ego_nets']
+06:29:26 [resume] from checkpoint: next cycle 151, rounds 151, 152 metric rows, inner net restored
+06:29:26 ===== CYCLE 151 (OUTER-ONLY BOOTSTRAP) =====
+06:29:26 [data] enc/graph/deezer_ego_nets: n=9629 C=2 D=534 shards=1
+06:31:11 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.525 best1=0.559 n_val=2920 vram=0.00GB 105s
+06:31:45 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 151, "n_records": 2920, "n_val": 617, "base_rate": 0.5202593207359314, "inner": {"auc": 0.5277742695966995, "ece": 0.04629183593213655, "brier": 0.25342807173728943, "acc80": 0.529411792755127}, "outer_conf": {"auc": 0.521175380988465, "ece": 0.02494435637851202, "brier": 0.25054457783699036, "acc80": 0.5314401388168335}}
+06:31:45 ===== CYCLE 152 (OUTER -> INNER -> FEEDBACK) =====
+06:34:20 [enc/graph/deezer_ego_nets] vote=0.532 uniform=0.525 best1=0.545 n_val=2804 vram=0.00GB 155s | grade=0.868 inner_auc=0.532 vs conf_auc=0.506
+06:34:45 ===== CYCLE 153 (OUTER -> INNER -> FEEDBACK) =====
+06:38:05 [enc/graph/deezer_ego_nets] vote=0.560 uniform=0.537 best1=0.563 n_val=2857 vram=0.00GB 200s | grade=0.858 inner_auc=0.570 vs conf_auc=0.562
+06:38:30 ===== CYCLE 154 (OUTER -> INNER -> FEEDBACK) =====
+06:41:49 [enc/graph/deezer_ego_nets] vote=0.561 uniform=0.542 best1=0.557 n_val=2908 vram=0.00GB 199s | grade=0.871 inner_auc=0.571 vs conf_auc=0.497
+06:42:23 ===== CYCLE 155 (OUTER -> INNER -> FEEDBACK) =====
+06:46:07 [enc/graph/deezer_ego_nets] vote=0.548 uniform=0.546 best1=0.552 n_val=2933 vram=0.00GB 224s | grade=0.861 inner_auc=0.521 vs conf_auc=0.546
+06:46:39 ===== CYCLE 156 (OUTER -> INNER -> FEEDBACK) =====
+06:50:07 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.532 best1=0.550 n_val=2919 vram=0.00GB 208s | grade=0.872 inner_auc=0.512 vs conf_auc=0.506
+06:50:45 ===== CYCLE 157 (OUTER -> INNER -> FEEDBACK) =====
+06:53:47 [enc/graph/deezer_ego_nets] vote=0.560 uniform=0.537 best1=0.556 n_val=2905 vram=0.00GB 182s | grade=0.862 inner_auc=0.553 vs conf_auc=0.518
+06:54:07 ===== CYCLE 158 (OUTER -> INNER -> FEEDBACK) =====
+06:56:39 [enc/graph/deezer_ego_nets] vote=0.554 uniform=0.545 best1=0.554 n_val=2905 vram=0.00GB 152s | grade=0.866 inner_auc=0.551 vs conf_auc=0.517
+06:57:05 ===== CYCLE 159 (OUTER -> INNER -> FEEDBACK) =====
+07:00:10 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.549 best1=0.549 n_val=2811 vram=0.00GB 185s | grade=0.864 inner_auc=0.514 vs conf_auc=0.513
+07:00:36 ===== CYCLE 160 (OUTER -> INNER -> FEEDBACK) =====
+07:03:04 [enc/graph/deezer_ego_nets] vote=0.556 uniform=0.547 best1=0.551 n_val=2871 vram=0.00GB 147s | grade=0.860 inner_auc=0.570 vs conf_auc=0.543
+07:03:29 ===== CYCLE 161 (OUTER -> INNER -> FEEDBACK) =====
+07:06:42 [enc/graph/deezer_ego_nets] vote=0.553 uniform=0.540 best1=0.556 n_val=2895 vram=0.00GB 193s | grade=0.874 inner_auc=0.525 vs conf_auc=0.520
+07:07:08 ===== CYCLE 162 (OUTER -> INNER -> FEEDBACK) =====
+07:09:46 [enc/graph/deezer_ego_nets] vote=0.534 uniform=0.527 best1=0.545 n_val=2917 vram=0.00GB 158s | grade=0.861 inner_auc=0.534 vs conf_auc=0.490
+07:10:07 ===== CYCLE 163 (OUTER -> INNER -> FEEDBACK) =====
+07:13:18 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.535 best1=0.547 n_val=2734 vram=0.00GB 190s | grade=0.869 inner_auc=0.509 vs conf_auc=0.462
+07:13:43 ===== CYCLE 164 (OUTER -> INNER -> FEEDBACK) =====
+07:16:33 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.523 best1=0.548 n_val=2883 vram=0.00GB 170s | grade=0.870 inner_auc=0.531 vs conf_auc=0.482
+07:16:55 ===== CYCLE 165 (OUTER -> INNER -> FEEDBACK) =====
+07:19:42 [enc/graph/deezer_ego_nets] vote=0.540 uniform=0.539 best1=0.549 n_val=2912 vram=0.00GB 167s | grade=0.868 inner_auc=0.587 vs conf_auc=0.560
+07:20:11 ===== CYCLE 166 (OUTER -> INNER -> FEEDBACK) =====
+07:23:03 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.535 best1=0.547 n_val=2933 vram=0.00GB 172s | grade=0.869 inner_auc=0.525 vs conf_auc=0.506
+07:23:30 ===== CYCLE 167 (OUTER -> INNER -> FEEDBACK) =====
+07:26:20 [enc/graph/deezer_ego_nets] vote=0.560 uniform=0.536 best1=0.559 n_val=2942 vram=0.00GB 171s | grade=0.863 inner_auc=0.527 vs conf_auc=0.484
+07:26:48 ===== CYCLE 168 (OUTER -> INNER -> FEEDBACK) =====
+07:29:49 [enc/graph/deezer_ego_nets] vote=0.540 uniform=0.540 best1=0.544 n_val=2867 vram=0.00GB 180s | grade=0.860 inner_auc=0.535 vs conf_auc=0.510
+07:30:09 ===== CYCLE 169 (OUTER -> INNER -> FEEDBACK) =====
+07:32:53 [enc/graph/deezer_ego_nets] vote=0.565 uniform=0.555 best1=0.562 n_val=2823 vram=0.00GB 163s | grade=0.854 inner_auc=0.559 vs conf_auc=0.515
+07:33:20 ===== CYCLE 170 (OUTER -> INNER -> FEEDBACK) =====
+07:36:28 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.539 best1=0.555 n_val=2869 vram=0.00GB 189s | grade=0.860 inner_auc=0.545 vs conf_auc=0.496
+07:36:58 ===== CYCLE 171 (OUTER -> INNER -> FEEDBACK) =====
+07:39:20 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.526 best1=0.547 n_val=2957 vram=0.00GB 142s | grade=0.864 inner_auc=0.579 vs conf_auc=0.489
+07:39:46 ===== CYCLE 172 (OUTER -> INNER -> FEEDBACK) =====
+07:42:59 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.542 best1=0.547 n_val=2848 vram=0.00GB 194s | grade=0.873 inner_auc=0.556 vs conf_auc=0.552
+07:43:29 ===== CYCLE 173 (OUTER -> INNER -> FEEDBACK) =====
+07:46:16 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.522 best1=0.545 n_val=2796 vram=0.00GB 167s | grade=0.871 inner_auc=0.520 vs conf_auc=0.538
+07:46:41 ===== CYCLE 174 (OUTER -> INNER -> FEEDBACK) =====
+07:49:46 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.537 best1=0.560 n_val=2883 vram=0.00GB 184s | grade=0.868 inner_auc=0.533 vs conf_auc=0.508
+07:50:16 ===== CYCLE 175 (OUTER -> INNER -> FEEDBACK) =====
+07:54:02 [enc/graph/deezer_ego_nets] vote=0.548 uniform=0.536 best1=0.558 n_val=2822 vram=0.00GB 226s | grade=0.876 inner_auc=0.552 vs conf_auc=0.516
+07:54:31 ===== CYCLE 176 (OUTER -> INNER -> FEEDBACK) =====
+07:59:19 [enc/graph/deezer_ego_nets] vote=0.558 uniform=0.537 best1=0.556 n_val=2835 vram=0.00GB 288s | grade=0.869 inner_auc=0.512 vs conf_auc=0.482
+07:59:55 ===== CYCLE 177 (OUTER -> INNER -> FEEDBACK) =====
+08:03:44 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.540 best1=0.549 n_val=2982 vram=0.00GB 229s | grade=0.862 inner_auc=0.523 vs conf_auc=0.519
+08:04:15 ===== CYCLE 178 (OUTER -> INNER -> FEEDBACK) =====
+08:08:13 [enc/graph/deezer_ego_nets] vote=0.536 uniform=0.524 best1=0.541 n_val=2945 vram=0.00GB 238s | grade=0.868 inner_auc=0.542 vs conf_auc=0.517
+08:08:59 ===== CYCLE 179 (OUTER -> INNER -> FEEDBACK) =====
+08:12:52 [enc/graph/deezer_ego_nets] vote=0.552 uniform=0.543 best1=0.554 n_val=2938 vram=0.00GB 233s | grade=0.862 inner_auc=0.539 vs conf_auc=0.534
+08:13:25 ===== CYCLE 180 (OUTER -> INNER -> FEEDBACK) =====
+08:17:14 [enc/graph/deezer_ego_nets] vote=0.545 uniform=0.543 best1=0.552 n_val=2913 vram=0.00GB 229s | grade=0.865 inner_auc=0.554 vs conf_auc=0.551
+08:17:52 ===== CYCLE 181 (OUTER -> INNER -> FEEDBACK) =====
+08:21:30 [enc/graph/deezer_ego_nets] vote=0.541 uniform=0.544 best1=0.542 n_val=2880 vram=0.00GB 218s | grade=0.873 inner_auc=0.521 vs conf_auc=0.529
+08:21:56 ===== CYCLE 182 (OUTER -> INNER -> FEEDBACK) =====
+08:24:48 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.531 best1=0.551 n_val=2893 vram=0.00GB 172s | grade=0.864 inner_auc=0.563 vs conf_auc=0.510
+08:25:21 ===== CYCLE 183 (OUTER -> INNER -> FEEDBACK) =====
+08:28:51 [enc/graph/deezer_ego_nets] vote=0.542 uniform=0.540 best1=0.545 n_val=2846 vram=0.00GB 210s | grade=0.870 inner_auc=0.520 vs conf_auc=0.555
+08:29:26 RUN COMPLETE
+20:50:59 NI run auto_cpu_016 on CPU; hours=2.0 smoke=False
+20:50:59 explicit task list: ['enc/graph/deezer_ego_nets']
+20:51:06 [resume] from checkpoint: next cycle 184, rounds 184, 185 metric rows, inner net restored
+20:51:06 ===== CYCLE 184 (OUTER-ONLY BOOTSTRAP) =====
+20:51:06 [data] enc/graph/deezer_ego_nets: n=9629 C=2 D=534 shards=1
+20:52:55 [enc/graph/deezer_ego_nets] vote=0.539 uniform=0.537 best1=0.541 n_val=2900 vram=0.00GB 108s
+20:53:37 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 184, "n_records": 2900, "n_val": 575, "base_rate": 0.5356521606445312, "inner": {"auc": 0.537763266695851, "ece": 0.01990167369013247, "brier": 0.24830996990203857, "acc80": 0.541304349899292}, "outer_conf": {"auc": 0.5266975533829467, "ece": 0.016068641517473305, "brier": 0.2489854395389557, "acc80": 0.5478261113166809}}
+20:53:37 ===== CYCLE 185 (OUTER -> INNER -> FEEDBACK) =====
+20:56:45 [enc/graph/deezer_ego_nets] vote=0.545 uniform=0.541 best1=0.553 n_val=2834 vram=0.00GB 188s | grade=0.870 inner_auc=0.569 vs conf_auc=0.528
+20:57:06 ===== CYCLE 186 (OUTER -> INNER -> FEEDBACK) =====
+20:59:32 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.539 best1=0.553 n_val=2890 vram=0.00GB 147s | grade=0.870 inner_auc=0.508 vs conf_auc=0.479
+20:59:58 ===== CYCLE 187 (OUTER -> INNER -> FEEDBACK) =====
+21:03:01 [enc/graph/deezer_ego_nets] vote=0.551 uniform=0.542 best1=0.553 n_val=2861 vram=0.00GB 183s | grade=0.869 inner_auc=0.525 vs conf_auc=0.482
+21:03:25 ===== CYCLE 188 (OUTER -> INNER -> FEEDBACK) =====
+21:06:28 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.531 best1=0.546 n_val=2841 vram=0.00GB 183s | grade=0.873 inner_auc=0.551 vs conf_auc=0.524
+21:07:03 ===== CYCLE 189 (OUTER -> INNER -> FEEDBACK) =====
+21:11:19 [enc/graph/deezer_ego_nets] vote=0.556 uniform=0.547 best1=0.555 n_val=2937 vram=0.00GB 256s | grade=0.866 inner_auc=0.536 vs conf_auc=0.522
+21:11:53 ===== CYCLE 190 (OUTER -> INNER -> FEEDBACK) =====
+21:15:07 [enc/graph/deezer_ego_nets] vote=0.548 uniform=0.539 best1=0.560 n_val=2909 vram=0.00GB 194s | grade=0.865 inner_auc=0.582 vs conf_auc=0.542
+21:15:46 ===== CYCLE 191 (OUTER -> INNER -> FEEDBACK) =====
+21:19:44 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.529 best1=0.545 n_val=2954 vram=0.00GB 237s | grade=0.874 inner_auc=0.565 vs conf_auc=0.531
+21:20:19 ===== CYCLE 192 (OUTER -> INNER -> FEEDBACK) =====
+21:23:58 [enc/graph/deezer_ego_nets] vote=0.557 uniform=0.538 best1=0.563 n_val=2808 vram=0.00GB 219s | grade=0.865 inner_auc=0.563 vs conf_auc=0.551
+21:24:26 ===== CYCLE 193 (OUTER -> INNER -> FEEDBACK) =====
+21:28:43 [enc/graph/deezer_ego_nets] vote=0.551 uniform=0.544 best1=0.553 n_val=2853 vram=0.00GB 257s | grade=0.867 inner_auc=0.565 vs conf_auc=0.497
+21:29:20 ===== CYCLE 194 (OUTER -> INNER -> FEEDBACK) =====
+21:32:50 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.536 best1=0.541 n_val=2859 vram=0.00GB 210s | grade=0.866 inner_auc=0.498 vs conf_auc=0.508
+21:33:20 ===== CYCLE 195 (OUTER -> INNER -> FEEDBACK) =====
+21:37:08 [enc/graph/deezer_ego_nets] vote=0.551 uniform=0.545 best1=0.547 n_val=2841 vram=0.00GB 228s | grade=0.864 inner_auc=0.486 vs conf_auc=0.469
+21:37:43 ===== CYCLE 196 (OUTER -> INNER -> FEEDBACK) =====
+21:41:21 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.534 best1=0.536 n_val=2946 vram=0.00GB 218s | grade=0.862 inner_auc=0.555 vs conf_auc=0.524
+21:41:48 ===== CYCLE 197 (OUTER -> INNER -> FEEDBACK) =====
+21:45:24 [enc/graph/deezer_ego_nets] vote=0.553 uniform=0.529 best1=0.554 n_val=2906 vram=0.00GB 217s | grade=0.865 inner_auc=0.531 vs conf_auc=0.532
+21:45:57 ===== CYCLE 198 (OUTER -> INNER -> FEEDBACK) =====
+21:49:44 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.538 best1=0.547 n_val=2937 vram=0.00GB 228s | grade=0.870 inner_auc=0.556 vs conf_auc=0.545
+21:50:13 ===== CYCLE 199 (OUTER -> INNER -> FEEDBACK) =====
+21:54:05 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.539 best1=0.548 n_val=2927 vram=0.00GB 232s | grade=0.865 inner_auc=0.548 vs conf_auc=0.531
+21:54:40 ===== CYCLE 200 (OUTER -> INNER -> FEEDBACK) =====
+21:58:11 [enc/graph/deezer_ego_nets] vote=0.537 uniform=0.529 best1=0.544 n_val=2858 vram=0.00GB 211s | grade=0.868 inner_auc=0.532 vs conf_auc=0.541
+21:58:35 ===== CYCLE 201 (OUTER -> INNER -> FEEDBACK) =====
+22:01:28 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.541 best1=0.563 n_val=2875 vram=0.00GB 173s | grade=0.867 inner_auc=0.557 vs conf_auc=0.540
+22:01:57 ===== CYCLE 202 (OUTER -> INNER -> FEEDBACK) =====
+22:05:34 [enc/graph/deezer_ego_nets] vote=0.545 uniform=0.536 best1=0.554 n_val=2862 vram=0.00GB 217s | grade=0.864 inner_auc=0.565 vs conf_auc=0.508
+22:06:04 ===== CYCLE 203 (OUTER -> INNER -> FEEDBACK) =====
+22:09:15 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.535 best1=0.545 n_val=2880 vram=0.00GB 191s | grade=0.872 inner_auc=0.525 vs conf_auc=0.518
+22:09:50 ===== CYCLE 204 (OUTER -> INNER -> FEEDBACK) =====
+22:13:13 [enc/graph/deezer_ego_nets] vote=0.534 uniform=0.529 best1=0.537 n_val=2947 vram=0.00GB 203s | grade=0.870 inner_auc=0.527 vs conf_auc=0.524
+22:13:40 ===== CYCLE 205 (OUTER -> INNER -> FEEDBACK) =====
+22:16:26 [enc/graph/deezer_ego_nets] vote=0.551 uniform=0.545 best1=0.562 n_val=2929 vram=0.00GB 166s | grade=0.864 inner_auc=0.565 vs conf_auc=0.507
+22:16:52 ===== CYCLE 206 (OUTER -> INNER -> FEEDBACK) =====
+22:19:52 [enc/graph/deezer_ego_nets] vote=0.539 uniform=0.524 best1=0.540 n_val=2950 vram=0.00GB 180s | grade=0.866 inner_auc=0.508 vs conf_auc=0.525
+22:20:23 ===== CYCLE 207 (OUTER -> INNER -> FEEDBACK) =====
+22:23:06 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.534 best1=0.548 n_val=2940 vram=0.00GB 163s | grade=0.865 inner_auc=0.539 vs conf_auc=0.519
+22:23:30 ===== CYCLE 208 (OUTER -> INNER -> FEEDBACK) =====
+22:26:37 [enc/graph/deezer_ego_nets] vote=0.551 uniform=0.539 best1=0.545 n_val=2859 vram=0.00GB 187s | grade=0.866 inner_auc=0.530 vs conf_auc=0.558
+22:27:10 ===== CYCLE 209 (OUTER -> INNER -> FEEDBACK) =====
+22:30:30 [enc/graph/deezer_ego_nets] vote=0.550 uniform=0.544 best1=0.555 n_val=2909 vram=0.00GB 200s | grade=0.868 inner_auc=0.484 vs conf_auc=0.483
+22:30:54 ===== CYCLE 210 (OUTER -> INNER -> FEEDBACK) =====
+22:34:03 [enc/graph/deezer_ego_nets] vote=0.548 uniform=0.525 best1=0.547 n_val=2964 vram=0.00GB 189s | grade=0.865 inner_auc=0.528 vs conf_auc=0.482
+22:34:35 ===== CYCLE 211 (OUTER -> INNER -> FEEDBACK) =====
+22:38:06 [enc/graph/deezer_ego_nets] vote=0.545 uniform=0.532 best1=0.546 n_val=2924 vram=0.00GB 211s | grade=0.869 inner_auc=0.546 vs conf_auc=0.504
+22:38:31 ===== CYCLE 212 (OUTER -> INNER -> FEEDBACK) =====
+22:41:30 [enc/graph/deezer_ego_nets] vote=0.541 uniform=0.523 best1=0.553 n_val=2978 vram=0.00GB 179s | grade=0.870 inner_auc=0.553 vs conf_auc=0.521
+22:42:02 ===== CYCLE 213 (OUTER -> INNER -> FEEDBACK) =====
+22:45:48 [enc/graph/deezer_ego_nets] vote=0.550 uniform=0.540 best1=0.560 n_val=2918 vram=0.00GB 226s | grade=0.869 inner_auc=0.535 vs conf_auc=0.496
+22:46:19 ===== CYCLE 214 (OUTER -> INNER -> FEEDBACK) =====
+22:49:16 [enc/graph/deezer_ego_nets] vote=0.558 uniform=0.562 best1=0.555 n_val=2893 vram=0.00GB 177s | grade=0.862 inner_auc=0.528 vs conf_auc=0.484
+22:49:45 ===== CYCLE 215 (OUTER -> INNER -> FEEDBACK) =====
+22:53:25 [enc/graph/deezer_ego_nets] vote=0.542 uniform=0.528 best1=0.546 n_val=2896 vram=0.00GB 220s | grade=0.860 inner_auc=0.545 vs conf_auc=0.502
+22:53:57 RUN COMPLETE
+00:26:57 NI run auto_cpu_016 on CPU; hours=2.0 smoke=False
+00:26:57 explicit task list: ['enc/graph/deezer_ego_nets']
+00:27:11 [resume] from checkpoint: next cycle 216, rounds 216, 217 metric rows, inner net restored
+00:27:11 ===== CYCLE 216 (OUTER-ONLY BOOTSTRAP) =====
+00:27:11 [data] enc/graph/deezer_ego_nets: n=9629 C=2 D=534 shards=1
+00:30:06 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.534 best1=0.550 n_val=2940 vram=0.00GB 175s
+00:30:48 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 216, "n_records": 2940, "n_val": 553, "base_rate": 0.5515370965003967, "inner": {"auc": 0.5524524061343205, "ece": 0.023409136919604504, "brier": 0.24558110535144806, "acc80": 0.570135772228241}, "outer_conf": {"auc": 0.5228648863035431, "ece": 0.02591600168031551, "brier": 0.24820956587791443, "acc80": 0.5588235259056091}}
+00:30:48 ===== CYCLE 217 (OUTER -> INNER -> FEEDBACK) =====
+00:33:59 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.537 best1=0.548 n_val=2920 vram=0.00GB 190s | grade=0.870 inner_auc=0.531 vs conf_auc=0.510
+00:34:30 ===== CYCLE 218 (OUTER -> INNER -> FEEDBACK) =====
+00:37:26 [enc/graph/deezer_ego_nets] vote=0.550 uniform=0.540 best1=0.548 n_val=2847 vram=0.00GB 176s | grade=0.867 inner_auc=0.533 vs conf_auc=0.502
+00:37:48 ===== CYCLE 219 (OUTER -> INNER -> FEEDBACK) =====
+00:40:46 [enc/graph/deezer_ego_nets] vote=0.537 uniform=0.527 best1=0.541 n_val=2858 vram=0.00GB 178s | grade=0.868 inner_auc=0.545 vs conf_auc=0.523
+00:41:17 ===== CYCLE 220 (OUTER -> INNER -> FEEDBACK) =====
+00:45:07 [enc/graph/deezer_ego_nets] vote=0.534 uniform=0.524 best1=0.535 n_val=2851 vram=0.00GB 230s | grade=0.869 inner_auc=0.538 vs conf_auc=0.521
+00:45:34 ===== CYCLE 221 (OUTER -> INNER -> FEEDBACK) =====
+00:49:00 [enc/graph/deezer_ego_nets] vote=0.548 uniform=0.533 best1=0.546 n_val=2900 vram=0.00GB 205s | grade=0.862 inner_auc=0.530 vs conf_auc=0.500
+00:49:30 ===== CYCLE 222 (OUTER -> INNER -> FEEDBACK) =====
+00:53:06 [enc/graph/deezer_ego_nets] vote=0.557 uniform=0.547 best1=0.561 n_val=2908 vram=0.00GB 216s | grade=0.866 inner_auc=0.524 vs conf_auc=0.508
+00:53:42 ===== CYCLE 223 (OUTER -> INNER -> FEEDBACK) =====
+00:56:41 [enc/graph/deezer_ego_nets] vote=0.541 uniform=0.531 best1=0.555 n_val=2884 vram=0.00GB 179s | grade=0.861 inner_auc=0.524 vs conf_auc=0.504
+00:57:12 ===== CYCLE 224 (OUTER -> INNER -> FEEDBACK) =====
+01:01:14 [enc/graph/deezer_ego_nets] vote=0.548 uniform=0.540 best1=0.548 n_val=2907 vram=0.00GB 242s | grade=0.869 inner_auc=0.536 vs conf_auc=0.518
+01:01:47 ===== CYCLE 225 (OUTER -> INNER -> FEEDBACK) =====
+01:04:41 [enc/graph/deezer_ego_nets] vote=0.548 uniform=0.542 best1=0.546 n_val=2907 vram=0.00GB 175s | grade=0.867 inner_auc=0.525 vs conf_auc=0.501
+01:05:12 ===== CYCLE 226 (OUTER -> INNER -> FEEDBACK) =====
+01:08:49 [enc/graph/deezer_ego_nets] vote=0.558 uniform=0.522 best1=0.555 n_val=2812 vram=0.00GB 218s | grade=0.857 inner_auc=0.570 vs conf_auc=0.499
+01:09:17 ===== CYCLE 227 (OUTER -> INNER -> FEEDBACK) =====
+01:12:31 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.532 best1=0.548 n_val=2919 vram=0.00GB 194s | grade=0.870 inner_auc=0.560 vs conf_auc=0.477
+01:12:58 ===== CYCLE 228 (OUTER -> INNER -> FEEDBACK) =====
+01:16:46 [enc/graph/deezer_ego_nets] vote=0.560 uniform=0.550 best1=0.568 n_val=2875 vram=0.00GB 228s | grade=0.868 inner_auc=0.509 vs conf_auc=0.501
+01:17:17 ===== CYCLE 229 (OUTER -> INNER -> FEEDBACK) =====
+01:20:39 [enc/graph/deezer_ego_nets] vote=0.535 uniform=0.528 best1=0.545 n_val=2841 vram=0.00GB 202s | grade=0.858 inner_auc=0.550 vs conf_auc=0.548
+01:21:07 ===== CYCLE 230 (OUTER -> INNER -> FEEDBACK) =====
+01:24:38 [enc/graph/deezer_ego_nets] vote=0.554 uniform=0.530 best1=0.556 n_val=2864 vram=0.00GB 212s | grade=0.861 inner_auc=0.528 vs conf_auc=0.510
+01:25:11 ===== CYCLE 231 (OUTER -> INNER -> FEEDBACK) =====
+01:28:49 [enc/graph/deezer_ego_nets] vote=0.551 uniform=0.538 best1=0.552 n_val=2917 vram=0.00GB 219s | grade=0.874 inner_auc=0.580 vs conf_auc=0.537
+01:29:17 ===== CYCLE 232 (OUTER -> INNER -> FEEDBACK) =====
+01:32:31 [enc/graph/deezer_ego_nets] vote=0.532 uniform=0.531 best1=0.540 n_val=2872 vram=0.00GB 194s | grade=0.860 inner_auc=0.507 vs conf_auc=0.555
+01:33:03 ===== CYCLE 233 (OUTER -> INNER -> FEEDBACK) =====
+01:36:58 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.529 best1=0.548 n_val=2901 vram=0.00GB 235s | grade=0.863 inner_auc=0.554 vs conf_auc=0.557
+01:37:25 ===== CYCLE 234 (OUTER -> INNER -> FEEDBACK) =====
+01:40:46 [enc/graph/deezer_ego_nets] vote=0.540 uniform=0.528 best1=0.541 n_val=2853 vram=0.00GB 201s | grade=0.868 inner_auc=0.523 vs conf_auc=0.548
+01:41:19 ===== CYCLE 235 (OUTER -> INNER -> FEEDBACK) =====
+01:45:04 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.545 best1=0.559 n_val=2896 vram=0.00GB 225s | grade=0.864 inner_auc=0.545 vs conf_auc=0.505
+01:45:38 ===== CYCLE 236 (OUTER -> INNER -> FEEDBACK) =====
+01:48:49 [enc/graph/deezer_ego_nets] vote=0.537 uniform=0.525 best1=0.546 n_val=2806 vram=0.00GB 191s | grade=0.862 inner_auc=0.548 vs conf_auc=0.548
+01:49:26 ===== CYCLE 237 (OUTER -> INNER -> FEEDBACK) =====
+01:53:16 [enc/graph/deezer_ego_nets] vote=0.538 uniform=0.531 best1=0.541 n_val=2823 vram=0.00GB 230s | grade=0.870 inner_auc=0.558 vs conf_auc=0.527
+01:53:50 ===== CYCLE 238 (OUTER -> INNER -> FEEDBACK) =====
+01:57:11 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.535 best1=0.547 n_val=2824 vram=0.00GB 201s | grade=0.865 inner_auc=0.510 vs conf_auc=0.499
+01:57:41 ===== CYCLE 239 (OUTER -> INNER -> FEEDBACK) =====
+02:01:35 [enc/graph/deezer_ego_nets] vote=0.550 uniform=0.541 best1=0.551 n_val=2977 vram=0.00GB 234s | grade=0.871 inner_auc=0.521 vs conf_auc=0.528
+02:02:05 ===== CYCLE 240 (OUTER -> INNER -> FEEDBACK) =====
+02:05:23 [enc/graph/deezer_ego_nets] vote=0.562 uniform=0.534 best1=0.566 n_val=2917 vram=0.00GB 198s | grade=0.869 inner_auc=0.537 vs conf_auc=0.549
+02:05:49 ===== CYCLE 241 (OUTER -> INNER -> FEEDBACK) =====
+02:08:54 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.537 best1=0.551 n_val=2879 vram=0.00GB 185s | grade=0.866 inner_auc=0.529 vs conf_auc=0.531
+02:09:22 ===== CYCLE 242 (OUTER -> INNER -> FEEDBACK) =====
+02:12:23 [enc/graph/deezer_ego_nets] vote=0.528 uniform=0.523 best1=0.539 n_val=2900 vram=0.00GB 181s | grade=0.856 inner_auc=0.568 vs conf_auc=0.549
+02:12:44 ===== CYCLE 243 (OUTER -> INNER -> FEEDBACK) =====
+02:15:13 [enc/graph/deezer_ego_nets] vote=0.553 uniform=0.538 best1=0.557 n_val=2870 vram=0.00GB 149s | grade=0.856 inner_auc=0.557 vs conf_auc=0.484
+02:15:39 ===== CYCLE 244 (OUTER -> INNER -> FEEDBACK) =====
+02:18:34 [enc/graph/deezer_ego_nets] vote=0.556 uniform=0.545 best1=0.556 n_val=2927 vram=0.00GB 175s | grade=0.868 inner_auc=0.517 vs conf_auc=0.499
+02:19:06 ===== CYCLE 245 (OUTER -> INNER -> FEEDBACK) =====
+21:04:12 NI run auto_cpu_016 on CPU; hours=2.0 smoke=False
+21:04:12 explicit task list: ['enc/graph/deezer_ego_nets']
+21:04:21 [resume] from checkpoint: next cycle 245, rounds 245, 246 metric rows, inner net restored
+21:04:21 ===== CYCLE 245 (OUTER-ONLY BOOTSTRAP) =====
+21:04:21 [data] enc/graph/deezer_ego_nets: n=9629 C=2 D=534 shards=1
+21:06:45 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.540 best1=0.550 n_val=2882 vram=0.00GB 144s
+21:07:23 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 245, "n_records": 2882, "n_val": 596, "base_rate": 0.536912739276886, "inner": {"auc": 0.5289515398550725, "ece": 0.011788226964089694, "brier": 0.24880631268024445, "acc80": 0.5525209903717041}, "outer_conf": {"auc": 0.5626811594202898, "ece": 0.016013929607884194, "brier": 0.24765264987945557, "acc80": 0.5567227005958557}}
+21:07:23 ===== CYCLE 246 (OUTER -> INNER -> FEEDBACK) =====
+21:09:42 [enc/graph/deezer_ego_nets] vote=0.542 uniform=0.532 best1=0.549 n_val=2912 vram=0.00GB 140s | grade=0.865 inner_auc=0.554 vs conf_auc=0.540
+21:10:10 ===== CYCLE 247 (OUTER -> INNER -> FEEDBACK) =====
+21:12:41 [enc/graph/deezer_ego_nets] vote=0.539 uniform=0.530 best1=0.534 n_val=2901 vram=0.00GB 151s | grade=0.867 inner_auc=0.527 vs conf_auc=0.495
+21:13:04 ===== CYCLE 248 (OUTER -> INNER -> FEEDBACK) =====
+21:15:19 [enc/graph/deezer_ego_nets] vote=0.542 uniform=0.535 best1=0.553 n_val=2938 vram=0.00GB 135s | grade=0.870 inner_auc=0.549 vs conf_auc=0.522
+21:15:42 ===== CYCLE 249 (OUTER -> INNER -> FEEDBACK) =====
+21:18:16 [enc/graph/deezer_ego_nets] vote=0.550 uniform=0.547 best1=0.551 n_val=2928 vram=0.00GB 154s | grade=0.869 inner_auc=0.538 vs conf_auc=0.498
+21:18:41 ===== CYCLE 250 (OUTER -> INNER -> FEEDBACK) =====
+21:21:11 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.538 best1=0.554 n_val=2853 vram=0.00GB 150s | grade=0.869 inner_auc=0.534 vs conf_auc=0.519
+21:21:33 ===== CYCLE 251 (OUTER -> INNER -> FEEDBACK) =====
+21:24:10 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.534 best1=0.544 n_val=2866 vram=0.00GB 158s | grade=0.868 inner_auc=0.548 vs conf_auc=0.480
+21:24:35 ===== CYCLE 252 (OUTER -> INNER -> FEEDBACK) =====
+21:27:14 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.530 best1=0.553 n_val=2866 vram=0.00GB 158s | grade=0.867 inner_auc=0.539 vs conf_auc=0.508
+21:27:38 ===== CYCLE 253 (OUTER -> INNER -> FEEDBACK) =====
+21:30:03 [enc/graph/deezer_ego_nets] vote=0.550 uniform=0.535 best1=0.546 n_val=2888 vram=0.00GB 146s | grade=0.867 inner_auc=0.524 vs conf_auc=0.548
+21:30:24 ===== CYCLE 254 (OUTER -> INNER -> FEEDBACK) =====
+21:33:07 [enc/graph/deezer_ego_nets] vote=0.551 uniform=0.535 best1=0.545 n_val=2850 vram=0.00GB 163s | grade=0.871 inner_auc=0.539 vs conf_auc=0.513
+21:33:32 ===== CYCLE 255 (OUTER -> INNER -> FEEDBACK) =====
+21:35:41 [enc/graph/deezer_ego_nets] vote=0.550 uniform=0.539 best1=0.550 n_val=2857 vram=0.00GB 129s | grade=0.869 inner_auc=0.529 vs conf_auc=0.531
+21:36:04 ===== CYCLE 256 (OUTER -> INNER -> FEEDBACK) =====
+21:38:44 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.542 best1=0.548 n_val=2860 vram=0.00GB 159s | grade=0.865 inner_auc=0.527 vs conf_auc=0.502
+21:39:09 ===== CYCLE 257 (OUTER -> INNER -> FEEDBACK) =====
+21:41:42 [enc/graph/deezer_ego_nets] vote=0.536 uniform=0.532 best1=0.541 n_val=2909 vram=0.00GB 154s | grade=0.862 inner_auc=0.547 vs conf_auc=0.552
+21:41:59 ===== CYCLE 258 (OUTER -> INNER -> FEEDBACK) =====
+21:44:50 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.537 best1=0.545 n_val=2934 vram=0.00GB 170s | grade=0.872 inner_auc=0.533 vs conf_auc=0.548
+21:45:17 ===== CYCLE 259 (OUTER -> INNER -> FEEDBACK) =====
+21:47:44 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.533 best1=0.544 n_val=2854 vram=0.00GB 147s | grade=0.868 inner_auc=0.515 vs conf_auc=0.518
+21:48:04 ===== CYCLE 260 (OUTER -> INNER -> FEEDBACK) =====
+21:50:38 [enc/graph/deezer_ego_nets] vote=0.552 uniform=0.531 best1=0.559 n_val=2881 vram=0.00GB 153s | grade=0.872 inner_auc=0.558 vs conf_auc=0.502
+21:51:03 ===== CYCLE 261 (OUTER -> INNER -> FEEDBACK) =====
+21:53:56 [enc/graph/deezer_ego_nets] vote=0.537 uniform=0.534 best1=0.552 n_val=2917 vram=0.00GB 173s | grade=0.856 inner_auc=0.499 vs conf_auc=0.505
+21:54:19 ===== CYCLE 262 (OUTER -> INNER -> FEEDBACK) =====
+21:56:50 [enc/graph/deezer_ego_nets] vote=0.528 uniform=0.525 best1=0.531 n_val=2973 vram=0.00GB 151s | grade=0.863 inner_auc=0.564 vs conf_auc=0.546
+21:57:16 ===== CYCLE 263 (OUTER -> INNER -> FEEDBACK) =====
+22:00:05 [enc/graph/deezer_ego_nets] vote=0.554 uniform=0.542 best1=0.559 n_val=2876 vram=0.00GB 169s | grade=0.858 inner_auc=0.526 vs conf_auc=0.509
+22:00:31 ===== CYCLE 264 (OUTER -> INNER -> FEEDBACK) =====
+22:02:39 [enc/graph/deezer_ego_nets] vote=0.555 uniform=0.539 best1=0.558 n_val=2852 vram=0.00GB 128s | grade=0.867 inner_auc=0.526 vs conf_auc=0.499
+22:03:03 ===== CYCLE 265 (OUTER -> INNER -> FEEDBACK) =====
+22:05:58 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.542 best1=0.542 n_val=2858 vram=0.00GB 175s | grade=0.863 inner_auc=0.572 vs conf_auc=0.549
+22:06:21 ===== CYCLE 266 (OUTER -> INNER -> FEEDBACK) =====
+22:08:38 [enc/graph/deezer_ego_nets] vote=0.531 uniform=0.527 best1=0.543 n_val=2937 vram=0.00GB 136s | grade=0.865 inner_auc=0.567 vs conf_auc=0.503
+22:08:57 ===== CYCLE 267 (OUTER -> INNER -> FEEDBACK) =====
+22:11:49 [enc/graph/deezer_ego_nets] vote=0.553 uniform=0.542 best1=0.555 n_val=2957 vram=0.00GB 172s | grade=0.860 inner_auc=0.517 vs conf_auc=0.496
+22:12:12 ===== CYCLE 268 (OUTER -> INNER -> FEEDBACK) =====
+22:14:38 [enc/graph/deezer_ego_nets] vote=0.558 uniform=0.547 best1=0.560 n_val=2899 vram=0.00GB 146s | grade=0.866 inner_auc=0.547 vs conf_auc=0.507
+22:15:05 ===== CYCLE 269 (OUTER -> INNER -> FEEDBACK) =====
+22:17:28 [enc/graph/deezer_ego_nets] vote=0.557 uniform=0.551 best1=0.563 n_val=2936 vram=0.00GB 143s | grade=0.869 inner_auc=0.557 vs conf_auc=0.557
+22:17:54 ===== CYCLE 270 (OUTER -> INNER -> FEEDBACK) =====
+22:20:29 [enc/graph/deezer_ego_nets] vote=0.541 uniform=0.532 best1=0.544 n_val=2872 vram=0.00GB 155s | grade=0.865 inner_auc=0.499 vs conf_auc=0.529
+22:20:52 ===== CYCLE 271 (OUTER -> INNER -> FEEDBACK) =====
+22:23:04 [enc/graph/deezer_ego_nets] vote=0.551 uniform=0.539 best1=0.557 n_val=2925 vram=0.00GB 132s | grade=0.863 inner_auc=0.573 vs conf_auc=0.541
+22:23:29 ===== CYCLE 272 (OUTER -> INNER -> FEEDBACK) =====
+22:26:22 [enc/graph/deezer_ego_nets] vote=0.523 uniform=0.517 best1=0.533 n_val=2866 vram=0.00GB 173s | grade=0.847 inner_auc=0.547 vs conf_auc=0.546
+22:26:47 ===== CYCLE 273 (OUTER -> INNER -> FEEDBACK) =====
+22:28:57 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.538 best1=0.555 n_val=2955 vram=0.00GB 130s | grade=0.854 inner_auc=0.596 vs conf_auc=0.536
+22:29:21 ===== CYCLE 274 (OUTER -> INNER -> FEEDBACK) =====
+22:32:11 [enc/graph/deezer_ego_nets] vote=0.556 uniform=0.545 best1=0.561 n_val=2891 vram=0.00GB 170s | grade=0.868 inner_auc=0.570 vs conf_auc=0.524
+22:32:37 ===== CYCLE 275 (OUTER -> INNER -> FEEDBACK) =====
+22:35:14 [enc/graph/deezer_ego_nets] vote=0.553 uniform=0.532 best1=0.559 n_val=2930 vram=0.00GB 157s | grade=0.870 inner_auc=0.565 vs conf_auc=0.494
+22:35:36 ===== CYCLE 276 (OUTER -> INNER -> FEEDBACK) =====
+22:38:05 [enc/graph/deezer_ego_nets] vote=0.553 uniform=0.546 best1=0.558 n_val=2881 vram=0.00GB 150s | grade=0.868 inner_auc=0.552 vs conf_auc=0.492
+22:38:29 ===== CYCLE 277 (OUTER -> INNER -> FEEDBACK) =====
+22:40:59 [enc/graph/deezer_ego_nets] vote=0.556 uniform=0.535 best1=0.559 n_val=2901 vram=0.00GB 150s | grade=0.864 inner_auc=0.533 vs conf_auc=0.469
+22:41:18 ===== CYCLE 278 (OUTER -> INNER -> FEEDBACK) =====
+22:43:39 [enc/graph/deezer_ego_nets] vote=0.532 uniform=0.517 best1=0.546 n_val=2895 vram=0.00GB 141s | grade=0.859 inner_auc=0.563 vs conf_auc=0.544
+22:44:04 ===== CYCLE 279 (OUTER -> INNER -> FEEDBACK) =====
+22:46:42 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.528 best1=0.547 n_val=2852 vram=0.00GB 158s | grade=0.863 inner_auc=0.509 vs conf_auc=0.485
+22:47:08 ===== CYCLE 280 (OUTER -> INNER -> FEEDBACK) =====
+22:49:27 [enc/graph/deezer_ego_nets] vote=0.537 uniform=0.522 best1=0.546 n_val=2851 vram=0.00GB 139s | grade=0.866 inner_auc=0.541 vs conf_auc=0.507
+22:49:47 ===== CYCLE 281 (OUTER -> INNER -> FEEDBACK) =====
+22:52:23 [enc/graph/deezer_ego_nets] vote=0.545 uniform=0.534 best1=0.544 n_val=2896 vram=0.00GB 156s | grade=0.865 inner_auc=0.558 vs conf_auc=0.528
+22:52:45 ===== CYCLE 282 (OUTER -> INNER -> FEEDBACK) =====
+22:55:18 [enc/graph/deezer_ego_nets] vote=0.540 uniform=0.520 best1=0.539 n_val=2876 vram=0.00GB 153s | grade=0.863 inner_auc=0.534 vs conf_auc=0.495
+22:55:41 ===== CYCLE 283 (OUTER -> INNER -> FEEDBACK) =====
+22:58:02 [enc/graph/deezer_ego_nets] vote=0.538 uniform=0.536 best1=0.542 n_val=2922 vram=0.00GB 140s | grade=0.870 inner_auc=0.547 vs conf_auc=0.509
+22:58:26 ===== CYCLE 284 (OUTER -> INNER -> FEEDBACK) =====
+23:01:21 [enc/graph/deezer_ego_nets] vote=0.559 uniform=0.554 best1=0.557 n_val=2933 vram=0.00GB 175s | grade=0.864 inner_auc=0.556 vs conf_auc=0.554
+23:01:40 ===== CYCLE 285 (OUTER -> INNER -> FEEDBACK) =====
+23:03:46 [enc/graph/deezer_ego_nets] vote=0.554 uniform=0.543 best1=0.557 n_val=2909 vram=0.00GB 126s | grade=0.865 inner_auc=0.520 vs conf_auc=0.531
+23:04:05 ===== CYCLE 286 (OUTER -> INNER -> FEEDBACK) =====
+23:06:15 [enc/graph/deezer_ego_nets] vote=0.538 uniform=0.521 best1=0.552 n_val=2876 vram=0.00GB 130s | grade=0.864 inner_auc=0.555 vs conf_auc=0.536
+23:06:39 RUN COMPLETE
+21:50:26 NI run auto_cpu_016 on CPU; hours=2.0 smoke=False
+21:50:26 explicit task list: ['enc/graph/deezer_ego_nets']
+21:50:36 [resume] from checkpoint: next cycle 287, rounds 287, 288 metric rows, inner net restored
+21:50:36 ===== CYCLE 287 (OUTER-ONLY BOOTSTRAP) =====
+21:50:37 [data] enc/graph/deezer_ego_nets: n=9629 C=2 D=534 shards=1
+21:52:52 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.518 best1=0.559 n_val=2906 vram=0.00GB 135s
+21:53:35 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 287, "n_records": 2906, "n_val": 548, "base_rate": 0.5419707894325256, "inner": {"auc": 0.5449380927468577, "ece": 0.030527972555073505, "brier": 0.2475762963294983, "acc80": 0.5525113940238953}, "outer_conf": {"auc": 0.4978134599648544, "ece": 0.02175593147747708, "brier": 0.2492881864309311, "acc80": 0.5365296602249146}}
+21:53:35 ===== CYCLE 288 (OUTER -> INNER -> FEEDBACK) =====
+21:56:07 [enc/graph/deezer_ego_nets] vote=0.556 uniform=0.540 best1=0.543 n_val=2811 vram=0.00GB 153s | grade=0.863 inner_auc=0.509 vs conf_auc=0.467
+21:56:36 ===== CYCLE 289 (OUTER -> INNER -> FEEDBACK) =====
+21:59:01 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.531 best1=0.553 n_val=2919 vram=0.00GB 145s | grade=0.866 inner_auc=0.518 vs conf_auc=0.499
+21:59:24 ===== CYCLE 290 (OUTER -> INNER -> FEEDBACK) =====
+22:01:52 [enc/graph/deezer_ego_nets] vote=0.540 uniform=0.520 best1=0.547 n_val=2953 vram=0.00GB 148s | grade=0.869 inner_auc=0.528 vs conf_auc=0.522
+22:02:15 ===== CYCLE 291 (OUTER -> INNER -> FEEDBACK) =====
+22:04:45 [enc/graph/deezer_ego_nets] vote=0.545 uniform=0.522 best1=0.541 n_val=2927 vram=0.00GB 150s | grade=0.864 inner_auc=0.546 vs conf_auc=0.492
+22:05:07 ===== CYCLE 292 (OUTER -> INNER -> FEEDBACK) =====
+22:07:34 [enc/graph/deezer_ego_nets] vote=0.550 uniform=0.530 best1=0.550 n_val=2934 vram=0.00GB 147s | grade=0.869 inner_auc=0.542 vs conf_auc=0.538
+22:07:59 ===== CYCLE 293 (OUTER -> INNER -> FEEDBACK) =====
+22:10:28 [enc/graph/deezer_ego_nets] vote=0.556 uniform=0.544 best1=0.568 n_val=2906 vram=0.00GB 150s | grade=0.867 inner_auc=0.558 vs conf_auc=0.510
+22:10:51 ===== CYCLE 294 (OUTER -> INNER -> FEEDBACK) =====
+22:13:21 [enc/graph/deezer_ego_nets] vote=0.541 uniform=0.532 best1=0.544 n_val=2970 vram=0.00GB 150s | grade=0.863 inner_auc=0.548 vs conf_auc=0.518
+22:13:43 ===== CYCLE 295 (OUTER -> INNER -> FEEDBACK) =====
+22:16:13 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.531 best1=0.551 n_val=2900 vram=0.00GB 150s | grade=0.868 inner_auc=0.566 vs conf_auc=0.538
+22:16:36 ===== CYCLE 296 (OUTER -> INNER -> FEEDBACK) =====
+22:19:03 [enc/graph/deezer_ego_nets] vote=0.557 uniform=0.547 best1=0.560 n_val=2944 vram=0.00GB 147s | grade=0.862 inner_auc=0.521 vs conf_auc=0.528
+22:19:28 ===== CYCLE 297 (OUTER -> INNER -> FEEDBACK) =====
+22:21:55 [enc/graph/deezer_ego_nets] vote=0.555 uniform=0.537 best1=0.564 n_val=2809 vram=0.00GB 146s | grade=0.870 inner_auc=0.552 vs conf_auc=0.531
+22:22:15 ===== CYCLE 298 (OUTER -> INNER -> FEEDBACK) =====
+22:24:48 [enc/graph/deezer_ego_nets] vote=0.557 uniform=0.551 best1=0.557 n_val=2831 vram=0.00GB 153s | grade=0.870 inner_auc=0.549 vs conf_auc=0.532
+22:25:13 ===== CYCLE 299 (OUTER -> INNER -> FEEDBACK) =====
+22:27:43 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.528 best1=0.542 n_val=2887 vram=0.00GB 150s | grade=0.863 inner_auc=0.519 vs conf_auc=0.480
+22:28:07 ===== CYCLE 300 (OUTER -> INNER -> FEEDBACK) =====
+22:30:33 [enc/graph/deezer_ego_nets] vote=0.540 uniform=0.524 best1=0.548 n_val=2891 vram=0.00GB 146s | grade=0.867 inner_auc=0.567 vs conf_auc=0.585
+22:30:57 ===== CYCLE 301 (OUTER -> INNER -> FEEDBACK) =====
+22:33:34 [enc/graph/deezer_ego_nets] vote=0.539 uniform=0.526 best1=0.551 n_val=2933 vram=0.00GB 157s | grade=0.874 inner_auc=0.543 vs conf_auc=0.507
+22:33:59 ===== CYCLE 302 (OUTER -> INNER -> FEEDBACK) =====
+22:36:33 [enc/graph/deezer_ego_nets] vote=0.536 uniform=0.527 best1=0.542 n_val=2852 vram=0.00GB 154s | grade=0.872 inner_auc=0.608 vs conf_auc=0.566
+22:36:55 ===== CYCLE 303 (OUTER -> INNER -> FEEDBACK) =====
+22:39:28 [enc/graph/deezer_ego_nets] vote=0.542 uniform=0.533 best1=0.539 n_val=2869 vram=0.00GB 154s | grade=0.871 inner_auc=0.508 vs conf_auc=0.508
+22:39:48 ===== CYCLE 304 (OUTER -> INNER -> FEEDBACK) =====
+22:42:10 [enc/graph/deezer_ego_nets] vote=0.542 uniform=0.533 best1=0.547 n_val=2865 vram=0.00GB 141s | grade=0.869 inner_auc=0.565 vs conf_auc=0.516
+22:42:30 ===== CYCLE 305 (OUTER -> INNER -> FEEDBACK) =====
+22:44:50 [enc/graph/deezer_ego_nets] vote=0.556 uniform=0.539 best1=0.560 n_val=2841 vram=0.00GB 141s | grade=0.857 inner_auc=0.563 vs conf_auc=0.538
+22:45:16 ===== CYCLE 306 (OUTER -> INNER -> FEEDBACK) =====
+22:47:34 [enc/graph/deezer_ego_nets] vote=0.545 uniform=0.534 best1=0.554 n_val=2890 vram=0.00GB 138s | grade=0.865 inner_auc=0.555 vs conf_auc=0.567
+22:47:56 ===== CYCLE 307 (OUTER -> INNER -> FEEDBACK) =====
+22:50:22 [enc/graph/deezer_ego_nets] vote=0.538 uniform=0.540 best1=0.543 n_val=2923 vram=0.00GB 145s | grade=0.865 inner_auc=0.493 vs conf_auc=0.537
+22:50:43 ===== CYCLE 308 (OUTER -> INNER -> FEEDBACK) =====
+22:53:00 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.543 best1=0.544 n_val=2868 vram=0.00GB 137s | grade=0.865 inner_auc=0.550 vs conf_auc=0.542
+22:53:22 ===== CYCLE 309 (OUTER -> INNER -> FEEDBACK) =====
+22:55:45 [enc/graph/deezer_ego_nets] vote=0.540 uniform=0.537 best1=0.543 n_val=2915 vram=0.00GB 144s | grade=0.872 inner_auc=0.518 vs conf_auc=0.518
+22:56:10 ===== CYCLE 310 (OUTER -> INNER -> FEEDBACK) =====
+22:58:44 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.535 best1=0.552 n_val=2944 vram=0.00GB 153s | grade=0.869 inner_auc=0.553 vs conf_auc=0.542
+22:59:05 ===== CYCLE 311 (OUTER -> INNER -> FEEDBACK) =====
+23:01:20 [enc/graph/deezer_ego_nets] vote=0.541 uniform=0.536 best1=0.557 n_val=2884 vram=0.00GB 135s | grade=0.864 inner_auc=0.546 vs conf_auc=0.516
+23:01:42 ===== CYCLE 312 (OUTER -> INNER -> FEEDBACK) =====
+23:04:13 [enc/graph/deezer_ego_nets] vote=0.557 uniform=0.542 best1=0.556 n_val=2935 vram=0.00GB 151s | grade=0.863 inner_auc=0.497 vs conf_auc=0.516
+23:04:33 ===== CYCLE 313 (OUTER -> INNER -> FEEDBACK) =====
+23:06:46 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.525 best1=0.551 n_val=2892 vram=0.00GB 134s | grade=0.867 inner_auc=0.579 vs conf_auc=0.515
+23:07:09 ===== CYCLE 314 (OUTER -> INNER -> FEEDBACK) =====
+23:09:18 [enc/graph/deezer_ego_nets] vote=0.543 uniform=0.534 best1=0.546 n_val=2875 vram=0.00GB 129s | grade=0.869 inner_auc=0.536 vs conf_auc=0.551
+23:09:38 ===== CYCLE 315 (OUTER -> INNER -> FEEDBACK) =====
+23:12:00 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.544 best1=0.552 n_val=2855 vram=0.00GB 142s | grade=0.868 inner_auc=0.537 vs conf_auc=0.580
+23:12:21 ===== CYCLE 316 (OUTER -> INNER -> FEEDBACK) =====
+23:14:30 [enc/graph/deezer_ego_nets] vote=0.556 uniform=0.539 best1=0.557 n_val=2932 vram=0.00GB 128s | grade=0.864 inner_auc=0.565 vs conf_auc=0.492
+23:14:53 ===== CYCLE 317 (OUTER -> INNER -> FEEDBACK) =====
+23:17:11 [enc/graph/deezer_ego_nets] vote=0.553 uniform=0.537 best1=0.548 n_val=2881 vram=0.00GB 138s | grade=0.874 inner_auc=0.518 vs conf_auc=0.504
+23:17:31 ===== CYCLE 318 (OUTER -> INNER -> FEEDBACK) =====
+23:19:56 [enc/graph/deezer_ego_nets] vote=0.547 uniform=0.530 best1=0.553 n_val=2887 vram=0.00GB 145s | grade=0.860 inner_auc=0.579 vs conf_auc=0.516
+23:20:15 ===== CYCLE 319 (OUTER -> INNER -> FEEDBACK) =====
+23:22:20 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.527 best1=0.554 n_val=2899 vram=0.00GB 125s | grade=0.870 inner_auc=0.556 vs conf_auc=0.481
+23:22:41 ===== CYCLE 320 (OUTER -> INNER -> FEEDBACK) =====
+23:24:52 [enc/graph/deezer_ego_nets] vote=0.536 uniform=0.522 best1=0.542 n_val=2823 vram=0.00GB 131s | grade=0.865 inner_auc=0.509 vs conf_auc=0.527
+23:25:16 ===== CYCLE 321 (OUTER -> INNER -> FEEDBACK) =====
+23:27:32 [enc/graph/deezer_ego_nets] vote=0.538 uniform=0.531 best1=0.545 n_val=2898 vram=0.00GB 136s | grade=0.871 inner_auc=0.558 vs conf_auc=0.558
+23:27:52 ===== CYCLE 322 (OUTER -> INNER -> FEEDBACK) =====
+23:30:13 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.536 best1=0.555 n_val=2984 vram=0.00GB 141s | grade=0.869 inner_auc=0.530 vs conf_auc=0.517
+23:30:35 ===== CYCLE 323 (OUTER -> INNER -> FEEDBACK) =====
+23:32:54 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.535 best1=0.553 n_val=2899 vram=0.00GB 139s | grade=0.872 inner_auc=0.544 vs conf_auc=0.536
+23:33:15 ===== CYCLE 324 (OUTER -> INNER -> FEEDBACK) =====
+23:35:47 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.538 best1=0.548 n_val=2885 vram=0.00GB 153s | grade=0.874 inner_auc=0.565 vs conf_auc=0.535
+23:36:10 ===== CYCLE 325 (OUTER -> INNER -> FEEDBACK) =====
+23:38:28 [enc/graph/deezer_ego_nets] vote=0.538 uniform=0.525 best1=0.544 n_val=2898 vram=0.00GB 138s | grade=0.866 inner_auc=0.547 vs conf_auc=0.513
+23:38:50 ===== CYCLE 326 (OUTER -> INNER -> FEEDBACK) =====
+23:41:16 [enc/graph/deezer_ego_nets] vote=0.549 uniform=0.542 best1=0.548 n_val=2909 vram=0.00GB 146s | grade=0.868 inner_auc=0.531 vs conf_auc=0.489
+23:41:37 ===== CYCLE 327 (OUTER -> INNER -> FEEDBACK) =====
+23:43:56 [enc/graph/deezer_ego_nets] vote=0.546 uniform=0.540 best1=0.547 n_val=2875 vram=0.00GB 139s | grade=0.858 inner_auc=0.534 vs conf_auc=0.514
+23:44:19 ===== CYCLE 328 (OUTER -> INNER -> FEEDBACK) =====
+23:46:38 [enc/graph/deezer_ego_nets] vote=0.552 uniform=0.537 best1=0.555 n_val=2905 vram=0.00GB 139s | grade=0.864 inner_auc=0.590 vs conf_auc=0.493
+23:47:03 ===== CYCLE 329 (OUTER -> INNER -> FEEDBACK) =====
+23:49:17 [enc/graph/deezer_ego_nets] vote=0.552 uniform=0.535 best1=0.545 n_val=2838 vram=0.00GB 134s | grade=0.871 inner_auc=0.519 vs conf_auc=0.471
+23:49:39 ===== CYCLE 330 (OUTER -> INNER -> FEEDBACK) =====
+23:51:59 [enc/graph/deezer_ego_nets] vote=0.544 uniform=0.537 best1=0.545 n_val=2847 vram=0.00GB 140s | grade=0.867 inner_auc=0.571 vs conf_auc=0.506
+23:52:22 RUN COMPLETE

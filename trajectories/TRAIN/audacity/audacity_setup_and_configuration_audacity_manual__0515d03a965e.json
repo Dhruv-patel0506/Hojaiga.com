@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "Audacity",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Access and explore Audacity Preferences",
+   "prerequisite_state": "Audacity is open and running",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the Edit Menu and select Preferences",
+         "ui_target": {
+            "element_name": "Edit",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Edit",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Preferences dialog opens"
+      }
+   ],
+   "_meta": {
+      "source_app": "Audacity",
+      "app_key": "audacity",
+      "dataset_split": "TRAIN",
+      "category": "Audio Editor",
+      "guide_title": "Audacity Setup and Configuration - Audacity Manual",
+      "source_status": "extracted_weak",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:06:42Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

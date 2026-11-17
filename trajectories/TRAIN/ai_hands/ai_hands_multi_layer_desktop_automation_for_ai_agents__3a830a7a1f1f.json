@@ -1,0 +1,80 @@
+{
+   "app_metadata": {
+      "app_name": "AI-Hands",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "non_gui",
+   "high_level_task": "Install AI-Hands using the manual download method",
+   "prerequisite_state": "No application is open",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the Windows x64 version of AI-Hands",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The mouse pointer hovers over the download link"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click the download link for the Windows x64 version of AI-Hands",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The download starts"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Save the downloaded file as 'hands.exe' and place it in %LOCALAPPDATA%\\CPC\\servers\\",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The file is saved and moved to the specified directory"
+      }
+   ],
+   "_meta": {
+      "source_app": "AI-Hands",
+      "app_key": "ai_hands",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "AI-Hands — Multi-Layer Desktop Automation for AI Agents",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:34:57Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

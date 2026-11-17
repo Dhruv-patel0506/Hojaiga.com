@@ -1,0 +1,571 @@
+18:29:17 NI run auto_cpu_025 on CPU; hours=2.0 smoke=False
+18:29:17 explicit task list: ['enc/audio/cremad_parquet']
+18:29:17 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+18:29:17 [data] enc/audio/cremad_parquet: n=7442 C=6 D=768 shards=1
+18:29:43 [enc/audio/cremad_parquet] vote=0.603 uniform=0.603 best1=0.594 n_val=2219 vram=0.00GB 26s
+18:30:11 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 2219, "n_val": 415, "base_rate": 0.6096385717391968, "inner": {"auc": 0.7260527985165667, "ece": 0.0643101095435131, "brier": 0.20255331695079803, "acc80": 0.6777108311653137}, "outer_conf": {"auc": 0.6845020250817352, "ece": 0.09118248540234854, "brier": 0.2215728461742401, "acc80": 0.6536144614219666}}
+18:30:11 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+18:30:51 [enc/audio/cremad_parquet] vote=0.594 uniform=0.594 best1=0.592 n_val=2264 vram=0.00GB 40s | grade=0.843 inner_auc=0.692 vs conf_auc=0.656
+18:31:04 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+18:31:48 [enc/audio/cremad_parquet] vote=0.611 uniform=0.611 best1=0.615 n_val=2211 vram=0.00GB 43s | grade=0.842 inner_auc=0.737 vs conf_auc=0.671
+18:32:03 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+18:32:47 [enc/audio/cremad_parquet] vote=0.607 uniform=0.605 best1=0.602 n_val=2275 vram=0.00GB 44s | grade=0.847 inner_auc=0.710 vs conf_auc=0.695
+18:33:01 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+18:33:43 [enc/audio/cremad_parquet] vote=0.608 uniform=0.606 best1=0.599 n_val=2204 vram=0.00GB 42s | grade=0.856 inner_auc=0.698 vs conf_auc=0.705
+18:33:58 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+18:34:40 [enc/audio/cremad_parquet] vote=0.601 uniform=0.594 best1=0.601 n_val=2215 vram=0.00GB 43s | grade=0.852 inner_auc=0.679 vs conf_auc=0.668
+18:34:55 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+18:35:39 [enc/audio/cremad_parquet] vote=0.619 uniform=0.615 best1=0.608 n_val=2238 vram=0.00GB 44s | grade=0.847 inner_auc=0.665 vs conf_auc=0.674
+18:35:52 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+18:36:35 [enc/audio/cremad_parquet] vote=0.616 uniform=0.595 best1=0.601 n_val=2213 vram=0.00GB 43s | grade=0.853 inner_auc=0.678 vs conf_auc=0.697
+18:36:50 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+18:37:34 [enc/audio/cremad_parquet] vote=0.615 uniform=0.600 best1=0.609 n_val=2294 vram=0.00GB 44s | grade=0.862 inner_auc=0.708 vs conf_auc=0.699
+18:37:49 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+18:38:32 [enc/audio/cremad_parquet] vote=0.608 uniform=0.589 best1=0.600 n_val=2241 vram=0.00GB 44s | grade=0.858 inner_auc=0.725 vs conf_auc=0.717
+18:38:47 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+18:39:29 [enc/audio/cremad_parquet] vote=0.598 uniform=0.591 best1=0.587 n_val=2234 vram=0.00GB 42s | grade=0.861 inner_auc=0.683 vs conf_auc=0.683
+18:39:43 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+18:40:26 [enc/audio/cremad_parquet] vote=0.608 uniform=0.593 best1=0.599 n_val=2235 vram=0.00GB 43s | grade=0.856 inner_auc=0.685 vs conf_auc=0.683
+18:40:42 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+18:41:26 [enc/audio/cremad_parquet] vote=0.613 uniform=0.600 best1=0.610 n_val=2173 vram=0.00GB 44s | grade=0.864 inner_auc=0.686 vs conf_auc=0.683
+18:41:41 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+18:42:23 [enc/audio/cremad_parquet] vote=0.611 uniform=0.605 best1=0.603 n_val=2256 vram=0.00GB 42s | grade=0.867 inner_auc=0.676 vs conf_auc=0.686
+18:42:38 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+18:43:21 [enc/audio/cremad_parquet] vote=0.594 uniform=0.592 best1=0.593 n_val=2346 vram=0.00GB 43s | grade=0.855 inner_auc=0.740 vs conf_auc=0.733
+18:43:36 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+18:44:19 [enc/audio/cremad_parquet] vote=0.622 uniform=0.614 best1=0.614 n_val=2205 vram=0.00GB 44s | grade=0.854 inner_auc=0.709 vs conf_auc=0.701
+18:44:33 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+18:45:15 [enc/audio/cremad_parquet] vote=0.613 uniform=0.598 best1=0.602 n_val=2243 vram=0.00GB 42s | grade=0.858 inner_auc=0.703 vs conf_auc=0.699
+18:45:31 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+18:46:13 [enc/audio/cremad_parquet] vote=0.606 uniform=0.592 best1=0.599 n_val=2282 vram=0.00GB 42s | grade=0.858 inner_auc=0.700 vs conf_auc=0.698
+18:46:29 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+18:47:11 [enc/audio/cremad_parquet] vote=0.598 uniform=0.592 best1=0.595 n_val=2217 vram=0.00GB 43s | grade=0.858 inner_auc=0.677 vs conf_auc=0.680
+18:47:27 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+18:48:07 [enc/audio/cremad_parquet] vote=0.597 uniform=0.590 best1=0.589 n_val=2262 vram=0.00GB 40s | grade=0.865 inner_auc=0.696 vs conf_auc=0.692
+18:48:23 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+18:49:05 [enc/audio/cremad_parquet] vote=0.618 uniform=0.610 best1=0.598 n_val=2241 vram=0.00GB 41s | grade=0.858 inner_auc=0.708 vs conf_auc=0.705
+18:49:21 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+18:50:04 [enc/audio/cremad_parquet] vote=0.608 uniform=0.594 best1=0.599 n_val=2238 vram=0.00GB 43s | grade=0.860 inner_auc=0.676 vs conf_auc=0.668
+18:50:19 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+18:51:00 [enc/audio/cremad_parquet] vote=0.624 uniform=0.611 best1=0.615 n_val=2152 vram=0.00GB 41s | grade=0.860 inner_auc=0.708 vs conf_auc=0.709
+18:51:16 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+18:51:58 [enc/audio/cremad_parquet] vote=0.611 uniform=0.600 best1=0.595 n_val=2247 vram=0.00GB 43s | grade=0.861 inner_auc=0.669 vs conf_auc=0.666
+18:52:13 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+18:52:57 [enc/audio/cremad_parquet] vote=0.584 uniform=0.581 best1=0.573 n_val=2247 vram=0.00GB 45s | grade=0.840 inner_auc=0.726 vs conf_auc=0.723
+18:53:12 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+18:53:56 [enc/audio/cremad_parquet] vote=0.597 uniform=0.588 best1=0.590 n_val=2245 vram=0.00GB 44s | grade=0.856 inner_auc=0.732 vs conf_auc=0.727
+18:54:12 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+23:24:12 NI run auto_cpu_025 on CPU; hours=2.0 smoke=False
+23:24:12 explicit task list: ['enc/audio/cremad_parquet']
+23:24:15 [resume] from checkpoint: next cycle 26, rounds 26, 26 metric rows, inner net restored
+23:24:15 ===== CYCLE 26 (OUTER-ONLY BOOTSTRAP) =====
+23:24:15 [data] enc/audio/cremad_parquet: n=7442 C=6 D=768 shards=1
+23:26:27 [enc/audio/cremad_parquet] vote=0.603 uniform=0.600 best1=0.600 n_val=2321 vram=0.00GB 132s
+23:27:14 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 26, "n_records": 2321, "n_val": 473, "base_rate": 0.5919661521911621, "inner": {"auc": 0.688619541080681, "ece": 0.05587109413005836, "brier": 0.21760188043117523, "acc80": 0.6507936716079712}, "outer_conf": {"auc": 0.6773316062176166, "ece": 0.045380755282355675, "brier": 0.2194482535123825, "acc80": 0.6402116417884827}}
+23:27:14 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+23:32:56 [enc/audio/cremad_parquet] vote=0.600 uniform=0.595 best1=0.601 n_val=2178 vram=0.00GB 343s | grade=0.862 inner_auc=0.734 vs conf_auc=0.736
+23:33:17 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+23:37:07 [enc/audio/cremad_parquet] vote=0.605 uniform=0.596 best1=0.601 n_val=2212 vram=0.00GB 230s | grade=0.864 inner_auc=0.716 vs conf_auc=0.705
+23:37:13 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+23:38:27 [enc/audio/cremad_parquet] vote=0.607 uniform=0.586 best1=0.608 n_val=2201 vram=0.00GB 75s | grade=0.864 inner_auc=0.723 vs conf_auc=0.714
+23:38:34 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+23:40:33 [enc/audio/cremad_parquet] vote=0.615 uniform=0.589 best1=0.606 n_val=2282 vram=0.00GB 119s | grade=0.858 inner_auc=0.666 vs conf_auc=0.666
+23:40:44 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+23:43:59 [enc/audio/cremad_parquet] vote=0.614 uniform=0.597 best1=0.609 n_val=2243 vram=0.00GB 195s | grade=0.862 inner_auc=0.711 vs conf_auc=0.711
+23:44:11 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+23:47:03 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:47:09 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+23:48:21 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:48:26 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+23:49:32 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:49:38 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+23:50:45 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:50:50 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+23:52:00 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:52:05 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+23:53:15 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:53:21 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+23:54:29 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:54:34 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+23:55:36 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:55:41 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+23:56:48 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:56:54 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+23:57:54 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:57:59 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+23:59:03 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:59:10 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+00:00:21 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:00:27 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+00:01:26 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:01:32 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+00:02:49 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:02:55 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+00:04:01 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:04:08 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+00:05:20 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:05:26 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+00:06:33 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:06:38 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+00:07:43 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:07:49 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+00:08:52 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:09:00 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+00:10:24 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:10:30 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+00:11:40 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:11:45 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+00:12:53 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:13:00 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+00:15:14 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:15:21 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+00:16:31 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:16:37 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+00:17:49 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:17:57 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+00:19:47 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:20:00 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+00:23:12 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:23:37 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+00:25:33 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:25:40 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+00:27:08 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:27:17 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+00:28:34 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:28:42 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+00:30:33 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:30:42 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+00:33:37 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:33:53 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+00:35:35 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:35:44 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+00:39:55 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:40:15 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+00:44:16 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:44:26 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+00:46:25 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:46:32 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+00:47:32 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:47:38 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+00:48:39 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:48:45 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+00:49:41 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:49:47 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+00:50:49 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:50:54 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+00:52:01 ERROR enc/audio/cremad_parquet Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:52:01 too many consecutive failures; stopping
+00:52:06 RUN COMPLETE
+20:24:21 NI run auto_cpu_025 on CPU; hours=2.0 smoke=False
+20:24:21 explicit task list: ['enc/audio/cremad_parquet']
+20:24:46 [resume] from checkpoint: next cycle 73, rounds 73, 32 metric rows, inner net restored
+20:24:46 ===== CYCLE 73 (OUTER-ONLY BOOTSTRAP) =====
+20:24:46 [data] enc/audio/cremad_parquet: n=7442 C=6 D=768 shards=1
+20:31:03 [enc/audio/cremad_parquet] vote=0.615 uniform=0.605 best1=0.607 n_val=2231 vram=0.00GB 377s
+20:31:53 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 73, "n_records": 2231, "n_val": 427, "base_rate": 0.6159250736236572, "inner": {"auc": 0.7084299360103867, "ece": 0.04716433867358491, "brier": 0.20729252696037292, "acc80": 0.6715542674064636}, "outer_conf": {"auc": 0.7077112120931095, "ece": 0.04978072196594166, "brier": 0.2087349146604538, "acc80": 0.6774193644523621}}
+20:31:53 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+20:38:05 [enc/audio/cremad_parquet] vote=0.594 uniform=0.586 best1=0.584 n_val=2229 vram=0.00GB 372s | grade=0.854 inner_auc=0.754 vs conf_auc=0.745
+20:38:28 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+20:44:21 [enc/audio/cremad_parquet] vote=0.605 uniform=0.596 best1=0.596 n_val=2213 vram=0.00GB 354s | grade=0.857 inner_auc=0.687 vs conf_auc=0.688
+20:44:41 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+20:51:01 [enc/audio/cremad_parquet] vote=0.591 uniform=0.576 best1=0.587 n_val=2186 vram=0.00GB 380s | grade=0.854 inner_auc=0.700 vs conf_auc=0.708
+20:51:21 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+20:56:47 [enc/audio/cremad_parquet] vote=0.619 uniform=0.611 best1=0.613 n_val=2213 vram=0.00GB 326s | grade=0.852 inner_auc=0.703 vs conf_auc=0.686
+20:57:09 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+21:02:50 [enc/audio/cremad_parquet] vote=0.599 uniform=0.590 best1=0.591 n_val=2229 vram=0.00GB 341s | grade=0.855 inner_auc=0.723 vs conf_auc=0.711
+21:03:14 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+21:09:22 [enc/audio/cremad_parquet] vote=0.612 uniform=0.598 best1=0.611 n_val=2236 vram=0.00GB 368s | grade=0.861 inner_auc=0.708 vs conf_auc=0.694
+21:09:44 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+21:15:16 [enc/audio/cremad_parquet] vote=0.589 uniform=0.591 best1=0.592 n_val=2229 vram=0.00GB 332s | grade=0.849 inner_auc=0.726 vs conf_auc=0.723
+21:15:37 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+21:20:50 [enc/audio/cremad_parquet] vote=0.609 uniform=0.588 best1=0.606 n_val=2187 vram=0.00GB 312s | grade=0.854 inner_auc=0.693 vs conf_auc=0.706
+21:21:10 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+21:26:04 [enc/audio/cremad_parquet] vote=0.595 uniform=0.588 best1=0.594 n_val=2164 vram=0.00GB 294s | grade=0.852 inner_auc=0.698 vs conf_auc=0.689
+21:26:23 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+21:32:14 [enc/audio/cremad_parquet] vote=0.597 uniform=0.597 best1=0.595 n_val=2271 vram=0.00GB 351s | grade=0.863 inner_auc=0.722 vs conf_auc=0.711
+21:32:37 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+21:36:51 [enc/audio/cremad_parquet] vote=0.620 uniform=0.611 best1=0.618 n_val=2218 vram=0.00GB 254s | grade=0.854 inner_auc=0.699 vs conf_auc=0.700
+21:37:11 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+21:42:09 [enc/audio/cremad_parquet] vote=0.597 uniform=0.589 best1=0.594 n_val=2268 vram=0.00GB 297s | grade=0.850 inner_auc=0.706 vs conf_auc=0.703
+21:42:31 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+21:48:29 [enc/audio/cremad_parquet] vote=0.600 uniform=0.588 best1=0.598 n_val=2236 vram=0.00GB 358s | grade=0.861 inner_auc=0.698 vs conf_auc=0.682
+21:48:51 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+21:54:48 [enc/audio/cremad_parquet] vote=0.600 uniform=0.596 best1=0.596 n_val=2240 vram=0.00GB 357s | grade=0.863 inner_auc=0.726 vs conf_auc=0.722
+21:55:12 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+22:00:44 [enc/audio/cremad_parquet] vote=0.598 uniform=0.597 best1=0.597 n_val=2293 vram=0.00GB 332s | grade=0.858 inner_auc=0.713 vs conf_auc=0.721
+22:01:02 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+22:06:26 [enc/audio/cremad_parquet] vote=0.611 uniform=0.592 best1=0.605 n_val=2151 vram=0.00GB 323s | grade=0.856 inner_auc=0.679 vs conf_auc=0.664
+22:06:45 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+22:14:31 [enc/audio/cremad_parquet] vote=0.604 uniform=0.597 best1=0.607 n_val=2271 vram=0.00GB 465s | grade=0.861 inner_auc=0.734 vs conf_auc=0.728
+22:14:53 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+22:20:53 [enc/audio/cremad_parquet] vote=0.612 uniform=0.610 best1=0.610 n_val=2252 vram=0.00GB 361s | grade=0.863 inner_auc=0.702 vs conf_auc=0.700
+22:21:13 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+22:27:45 [enc/audio/cremad_parquet] vote=0.602 uniform=0.591 best1=0.597 n_val=2255 vram=0.00GB 391s | grade=0.854 inner_auc=0.755 vs conf_auc=0.747
+22:28:05 RUN COMPLETE
+13:01:05 NI run auto_cpu_025 on CPU; hours=2.0 smoke=False
+13:01:05 explicit task list: ['enc/audio/cremad_parquet']
+13:01:18 [resume] from checkpoint: next cycle 93, rounds 93, 52 metric rows, inner net restored
+13:01:18 ===== CYCLE 93 (OUTER-ONLY BOOTSTRAP) =====
+13:01:18 [data] enc/audio/cremad_parquet: n=7442 C=6 D=768 shards=1
+13:06:51 [enc/audio/cremad_parquet] vote=0.598 uniform=0.608 best1=0.600 n_val=2246 vram=0.00GB 333s
+13:07:44 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 93, "n_records": 2246, "n_val": 484, "base_rate": 0.6322314143180847, "inner": {"auc": 0.7387824043475067, "ece": 0.05709724596216659, "brier": 0.1987389773130417, "acc80": 0.6950904130935669}, "outer_conf": {"auc": 0.7273628552544613, "ece": 0.0592758196814001, "brier": 0.19966444373130798, "acc80": 0.6899224519729614}}
+13:07:44 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+13:15:12 [enc/audio/cremad_parquet] vote=0.613 uniform=0.610 best1=0.608 n_val=2254 vram=0.00GB 447s | grade=0.855 inner_auc=0.734 vs conf_auc=0.716
+13:15:37 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+13:21:04 [enc/audio/cremad_parquet] vote=0.612 uniform=0.602 best1=0.610 n_val=2250 vram=0.00GB 327s | grade=0.862 inner_auc=0.739 vs conf_auc=0.718
+13:21:28 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+13:26:34 [enc/audio/cremad_parquet] vote=0.596 uniform=0.588 best1=0.593 n_val=2272 vram=0.00GB 307s | grade=0.855 inner_auc=0.699 vs conf_auc=0.691
+13:26:57 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+13:32:22 [enc/audio/cremad_parquet] vote=0.609 uniform=0.596 best1=0.607 n_val=2178 vram=0.00GB 325s | grade=0.858 inner_auc=0.751 vs conf_auc=0.745
+13:32:46 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+13:38:57 [enc/audio/cremad_parquet] vote=0.600 uniform=0.594 best1=0.600 n_val=2240 vram=0.00GB 371s | grade=0.861 inner_auc=0.724 vs conf_auc=0.694
+13:39:23 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+13:45:57 [enc/audio/cremad_parquet] vote=0.619 uniform=0.601 best1=0.616 n_val=2263 vram=0.00GB 394s | grade=0.855 inner_auc=0.666 vs conf_auc=0.665
+13:46:23 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+13:53:41 [enc/audio/cremad_parquet] vote=0.598 uniform=0.587 best1=0.599 n_val=2213 vram=0.00GB 438s | grade=0.853 inner_auc=0.664 vs conf_auc=0.650
+13:54:09 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+14:00:23 [enc/audio/cremad_parquet] vote=0.598 uniform=0.594 best1=0.598 n_val=2219 vram=0.00GB 374s | grade=0.859 inner_auc=0.721 vs conf_auc=0.705
+14:00:52 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+14:07:24 [enc/audio/cremad_parquet] vote=0.611 uniform=0.592 best1=0.606 n_val=2198 vram=0.00GB 392s | grade=0.858 inner_auc=0.709 vs conf_auc=0.693
+14:07:40 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+16:03:56 NI run auto_cpu_025 on CPU; hours=2.0 smoke=False
+16:03:56 explicit task list: ['enc/audio/cremad_parquet']
+16:04:09 [resume] from checkpoint: next cycle 103, rounds 103, 62 metric rows, inner net restored
+16:04:09 ===== CYCLE 103 (OUTER-ONLY BOOTSTRAP) =====
+16:04:09 [data] enc/audio/cremad_parquet: n=7442 C=6 D=768 shards=1
+16:10:51 [enc/audio/cremad_parquet] vote=0.606 uniform=0.593 best1=0.604 n_val=2241 vram=0.00GB 402s
+16:11:39 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 103, "n_records": 2241, "n_val": 447, "base_rate": 0.5794183611869812, "inner": {"auc": 0.7275733179988499, "ece": 0.04530337091193637, "brier": 0.20684155821800232, "acc80": 0.6470588445663452}, "outer_conf": {"auc": 0.7073851967468989, "ece": 0.09350857155301694, "brier": 0.21379157900810242, "acc80": 0.6470588445663452}}
+16:11:39 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+16:17:11 [enc/audio/cremad_parquet] vote=0.608 uniform=0.604 best1=0.605 n_val=2260 vram=0.00GB 333s | grade=0.866 inner_auc=0.696 vs conf_auc=0.690
+16:17:34 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+16:23:38 [enc/audio/cremad_parquet] vote=0.596 uniform=0.591 best1=0.597 n_val=2209 vram=0.00GB 363s | grade=0.859 inner_auc=0.743 vs conf_auc=0.744
+16:24:03 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+16:31:20 [enc/audio/cremad_parquet] vote=0.587 uniform=0.594 best1=0.593 n_val=2184 vram=0.00GB 437s | grade=0.854 inner_auc=0.711 vs conf_auc=0.693
+16:31:44 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+16:38:53 [enc/audio/cremad_parquet] vote=0.611 uniform=0.593 best1=0.607 n_val=2261 vram=0.00GB 429s | grade=0.855 inner_auc=0.699 vs conf_auc=0.696
+16:39:18 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+16:47:29 [enc/audio/cremad_parquet] vote=0.582 uniform=0.589 best1=0.583 n_val=2259 vram=0.00GB 491s | grade=0.845 inner_auc=0.737 vs conf_auc=0.716
+16:47:58 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+16:54:30 [enc/audio/cremad_parquet] vote=0.595 uniform=0.599 best1=0.601 n_val=2292 vram=0.00GB 391s | grade=0.854 inner_auc=0.746 vs conf_auc=0.743
+16:55:02 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+17:02:32 [enc/audio/cremad_parquet] vote=0.604 uniform=0.594 best1=0.601 n_val=2196 vram=0.00GB 450s | grade=0.858 inner_auc=0.695 vs conf_auc=0.713
+17:03:08 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+17:10:47 [enc/audio/cremad_parquet] vote=0.606 uniform=0.586 best1=0.602 n_val=2281 vram=0.00GB 459s | grade=0.862 inner_auc=0.706 vs conf_auc=0.719
+17:11:13 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+17:18:59 [enc/audio/cremad_parquet] vote=0.592 uniform=0.578 best1=0.587 n_val=2227 vram=0.00GB 466s | grade=0.853 inner_auc=0.694 vs conf_auc=0.697
+17:19:31 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+17:26:50 [enc/audio/cremad_parquet] vote=0.607 uniform=0.602 best1=0.601 n_val=2286 vram=0.00GB 439s | grade=0.859 inner_auc=0.702 vs conf_auc=0.703
+17:27:18 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+17:34:27 [enc/audio/cremad_parquet] vote=0.605 uniform=0.600 best1=0.597 n_val=2243 vram=0.00GB 430s | grade=0.861 inner_auc=0.712 vs conf_auc=0.680
+17:34:52 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+17:41:32 [enc/audio/cremad_parquet] vote=0.588 uniform=0.579 best1=0.582 n_val=2236 vram=0.00GB 401s | grade=0.849 inner_auc=0.726 vs conf_auc=0.715
+17:42:01 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+17:49:12 [enc/audio/cremad_parquet] vote=0.611 uniform=0.609 best1=0.607 n_val=2266 vram=0.00GB 432s | grade=0.851 inner_auc=0.720 vs conf_auc=0.699
+17:49:37 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+17:57:13 [enc/audio/cremad_parquet] vote=0.608 uniform=0.605 best1=0.603 n_val=2261 vram=0.00GB 455s | grade=0.858 inner_auc=0.725 vs conf_auc=0.705
+17:57:36 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+18:04:35 [enc/audio/cremad_parquet] vote=0.606 uniform=0.606 best1=0.605 n_val=2129 vram=0.00GB 419s | grade=0.864 inner_auc=0.716 vs conf_auc=0.718
+18:05:01 RUN COMPLETE
+12:43:50 NI run auto_cpu_025 on CPU; hours=2.0 smoke=False
+12:43:50 explicit task list: ['enc/audio/cremad_parquet']
+12:44:05 [resume] from checkpoint: next cycle 119, rounds 119, 78 metric rows, inner net restored
+12:44:05 ===== CYCLE 119 (OUTER-ONLY BOOTSTRAP) =====
+12:44:06 [data] enc/audio/cremad_parquet: n=7442 C=6 D=768 shards=1
+12:49:26 [enc/audio/cremad_parquet] vote=0.597 uniform=0.600 best1=0.595 n_val=2155 vram=0.00GB 320s
+12:50:14 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 119, "n_records": 2155, "n_val": 439, "base_rate": 0.5990888476371765, "inner": {"auc": 0.6862253715865884, "ece": 0.06748800373430404, "brier": 0.21917296946048737, "acc80": 0.6581196784973145}, "outer_conf": {"auc": 0.6903733148980298, "ece": 0.05299502461809233, "brier": 0.2163008153438568, "acc80": 0.6638176441192627}}
+12:50:14 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+12:56:16 [enc/audio/cremad_parquet] vote=0.595 uniform=0.598 best1=0.594 n_val=2206 vram=0.00GB 361s | grade=0.861 inner_auc=0.730 vs conf_auc=0.726
+12:56:38 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+13:02:09 [enc/audio/cremad_parquet] vote=0.606 uniform=0.601 best1=0.600 n_val=2267 vram=0.00GB 330s | grade=0.860 inner_auc=0.702 vs conf_auc=0.708
+13:02:32 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+13:07:11 [enc/audio/cremad_parquet] vote=0.607 uniform=0.604 best1=0.606 n_val=2222 vram=0.00GB 279s | grade=0.862 inner_auc=0.713 vs conf_auc=0.701
+13:07:35 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+13:12:57 [enc/audio/cremad_parquet] vote=0.603 uniform=0.592 best1=0.600 n_val=2295 vram=0.00GB 321s | grade=0.862 inner_auc=0.740 vs conf_auc=0.728
+13:13:19 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+13:19:10 [enc/audio/cremad_parquet] vote=0.588 uniform=0.583 best1=0.585 n_val=2235 vram=0.00GB 351s | grade=0.854 inner_auc=0.697 vs conf_auc=0.686
+13:19:38 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+13:24:43 [enc/audio/cremad_parquet] vote=0.611 uniform=0.613 best1=0.608 n_val=2276 vram=0.00GB 305s | grade=0.853 inner_auc=0.730 vs conf_auc=0.713
+13:25:07 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+13:30:58 [enc/audio/cremad_parquet] vote=0.612 uniform=0.605 best1=0.611 n_val=2225 vram=0.00GB 352s | grade=0.865 inner_auc=0.727 vs conf_auc=0.727
+13:31:25 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+13:36:48 [enc/audio/cremad_parquet] vote=0.611 uniform=0.589 best1=0.608 n_val=2196 vram=0.00GB 323s | grade=0.866 inner_auc=0.680 vs conf_auc=0.691
+13:37:16 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+13:41:23 [enc/audio/cremad_parquet] vote=0.630 uniform=0.598 best1=0.621 n_val=2330 vram=0.00GB 246s | grade=0.856 inner_auc=0.703 vs conf_auc=0.695
+13:41:44 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+13:46:45 [enc/audio/cremad_parquet] vote=0.601 uniform=0.599 best1=0.595 n_val=2197 vram=0.00GB 302s | grade=0.848 inner_auc=0.748 vs conf_auc=0.744
+13:47:11 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+13:52:30 [enc/audio/cremad_parquet] vote=0.595 uniform=0.591 best1=0.593 n_val=2198 vram=0.00GB 319s | grade=0.855 inner_auc=0.691 vs conf_auc=0.696
+13:52:55 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+13:58:30 [enc/audio/cremad_parquet] vote=0.593 uniform=0.588 best1=0.591 n_val=2254 vram=0.00GB 335s | grade=0.862 inner_auc=0.680 vs conf_auc=0.661
+13:58:55 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+14:03:40 [enc/audio/cremad_parquet] vote=0.611 uniform=0.594 best1=0.606 n_val=2220 vram=0.00GB 285s | grade=0.855 inner_auc=0.700 vs conf_auc=0.689
+14:04:06 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+14:09:26 [enc/audio/cremad_parquet] vote=0.612 uniform=0.611 best1=0.609 n_val=2227 vram=0.00GB 320s | grade=0.863 inner_auc=0.724 vs conf_auc=0.704
+14:09:50 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+14:15:28 [enc/audio/cremad_parquet] vote=0.591 uniform=0.575 best1=0.587 n_val=2183 vram=0.00GB 338s | grade=0.852 inner_auc=0.718 vs conf_auc=0.710
+14:15:52 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+12:34:17 NI run auto_cpu_025 on CPU; hours=2.0 smoke=False
+12:34:17 explicit task list: ['enc/audio/cremad_parquet']
+12:34:26 [resume] from checkpoint: next cycle 135, rounds 135, 94 metric rows, inner net restored
+12:34:26 ===== CYCLE 135 (OUTER-ONLY BOOTSTRAP) =====
+12:34:26 [data] enc/audio/cremad_parquet: n=7442 C=6 D=768 shards=1
+12:39:12 [enc/audio/cremad_parquet] vote=0.605 uniform=0.595 best1=0.601 n_val=2258 vram=0.00GB 285s
+12:39:46 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 135, "n_records": 2258, "n_val": 441, "base_rate": 0.5895691514015198, "inner": {"auc": 0.7558861028474289, "ece": 0.05118742936592794, "brier": 0.1973493993282318, "acc80": 0.6676136255264282}, "outer_conf": {"auc": 0.7392052698682533, "ece": 0.04936722647440948, "brier": 0.20226150751113892, "acc80": 0.6647727489471436}}
+12:39:46 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+12:45:12 [enc/audio/cremad_parquet] vote=0.599 uniform=0.595 best1=0.599 n_val=2232 vram=0.00GB 326s | grade=0.859 inner_auc=0.716 vs conf_auc=0.714
+12:45:31 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+12:49:44 [enc/audio/cremad_parquet] vote=0.591 uniform=0.589 best1=0.590 n_val=2234 vram=0.00GB 253s | grade=0.855 inner_auc=0.733 vs conf_auc=0.731
+12:50:06 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+12:54:50 [enc/audio/cremad_parquet] vote=0.604 uniform=0.597 best1=0.600 n_val=2306 vram=0.00GB 284s | grade=0.860 inner_auc=0.732 vs conf_auc=0.714
+12:55:08 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+12:59:09 [enc/audio/cremad_parquet] vote=0.605 uniform=0.602 best1=0.598 n_val=2226 vram=0.00GB 241s | grade=0.865 inner_auc=0.712 vs conf_auc=0.694
+12:59:28 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+13:03:53 [enc/audio/cremad_parquet] vote=0.601 uniform=0.589 best1=0.601 n_val=2248 vram=0.00GB 265s | grade=0.863 inner_auc=0.718 vs conf_auc=0.686
+13:04:10 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+13:07:54 [enc/audio/cremad_parquet] vote=0.594 uniform=0.594 best1=0.593 n_val=2206 vram=0.00GB 224s | grade=0.856 inner_auc=0.724 vs conf_auc=0.712
+13:08:14 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+13:12:54 [enc/audio/cremad_parquet] vote=0.607 uniform=0.590 best1=0.605 n_val=2288 vram=0.00GB 280s | grade=0.856 inner_auc=0.713 vs conf_auc=0.698
+13:13:13 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+13:17:15 [enc/audio/cremad_parquet] vote=0.611 uniform=0.605 best1=0.609 n_val=2244 vram=0.00GB 242s | grade=0.865 inner_auc=0.734 vs conf_auc=0.719
+13:17:34 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+13:21:46 [enc/audio/cremad_parquet] vote=0.592 uniform=0.579 best1=0.591 n_val=2235 vram=0.00GB 251s | grade=0.856 inner_auc=0.718 vs conf_auc=0.729
+13:22:04 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+13:25:58 [enc/audio/cremad_parquet] vote=0.588 uniform=0.590 best1=0.588 n_val=2225 vram=0.00GB 234s | grade=0.858 inner_auc=0.713 vs conf_auc=0.692
+13:26:17 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+13:30:19 [enc/audio/cremad_parquet] vote=0.604 uniform=0.596 best1=0.601 n_val=2239 vram=0.00GB 242s | grade=0.853 inner_auc=0.764 vs conf_auc=0.760
+13:30:37 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+13:34:45 [enc/audio/cremad_parquet] vote=0.603 uniform=0.583 best1=0.601 n_val=2260 vram=0.00GB 248s | grade=0.864 inner_auc=0.705 vs conf_auc=0.698
+13:35:02 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+13:39:11 [enc/audio/cremad_parquet] vote=0.590 uniform=0.578 best1=0.587 n_val=2161 vram=0.00GB 249s | grade=0.852 inner_auc=0.691 vs conf_auc=0.697
+13:39:28 ===== CYCLE 149 (OUTER -> INNER -> FEEDBACK) =====
+13:44:03 [enc/audio/cremad_parquet] vote=0.603 uniform=0.590 best1=0.600 n_val=2216 vram=0.00GB 275s | grade=0.857 inner_auc=0.667 vs conf_auc=0.667
+13:44:22 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+13:48:52 [enc/audio/cremad_parquet] vote=0.601 uniform=0.594 best1=0.602 n_val=2218 vram=0.00GB 269s | grade=0.861 inner_auc=0.687 vs conf_auc=0.686
+13:49:09 ===== CYCLE 151 (OUTER -> INNER -> FEEDBACK) =====
+13:53:49 [enc/audio/cremad_parquet] vote=0.609 uniform=0.601 best1=0.604 n_val=2184 vram=0.00GB 279s | grade=0.856 inner_auc=0.746 vs conf_auc=0.724
+13:54:09 ===== CYCLE 152 (OUTER -> INNER -> FEEDBACK) =====
+13:57:58 [enc/audio/cremad_parquet] vote=0.594 uniform=0.594 best1=0.591 n_val=2293 vram=0.00GB 229s | grade=0.850 inner_auc=0.705 vs conf_auc=0.694
+13:58:17 ===== CYCLE 153 (OUTER -> INNER -> FEEDBACK) =====
+14:03:41 [enc/audio/cremad_parquet] vote=0.605 uniform=0.605 best1=0.600 n_val=2266 vram=0.00GB 325s | grade=0.861 inner_auc=0.710 vs conf_auc=0.692
+14:04:00 ===== CYCLE 154 (OUTER -> INNER -> FEEDBACK) =====
+14:07:53 [enc/audio/cremad_parquet] vote=0.613 uniform=0.592 best1=0.610 n_val=2238 vram=0.00GB 233s | grade=0.856 inner_auc=0.665 vs conf_auc=0.669
+14:08:11 ===== CYCLE 155 (OUTER -> INNER -> FEEDBACK) =====
+14:11:53 [enc/audio/cremad_parquet] vote=0.611 uniform=0.601 best1=0.609 n_val=2240 vram=0.00GB 221s | grade=0.860 inner_auc=0.714 vs conf_auc=0.705
+14:12:10 ===== CYCLE 156 (OUTER -> INNER -> FEEDBACK) =====
+14:16:10 [enc/audio/cremad_parquet] vote=0.611 uniform=0.597 best1=0.609 n_val=2198 vram=0.00GB 240s | grade=0.861 inner_auc=0.712 vs conf_auc=0.701
+14:16:29 ===== CYCLE 157 (OUTER -> INNER -> FEEDBACK) =====
+14:19:58 [enc/audio/cremad_parquet] vote=0.598 uniform=0.596 best1=0.597 n_val=2200 vram=0.00GB 209s | grade=0.857 inner_auc=0.703 vs conf_auc=0.710
+14:20:15 ===== CYCLE 158 (OUTER -> INNER -> FEEDBACK) =====
+14:23:44 [enc/audio/cremad_parquet] vote=0.593 uniform=0.586 best1=0.587 n_val=2229 vram=0.00GB 209s | grade=0.856 inner_auc=0.732 vs conf_auc=0.713
+14:24:00 ===== CYCLE 159 (OUTER -> INNER -> FEEDBACK) =====
+14:27:11 [enc/audio/cremad_parquet] vote=0.588 uniform=0.597 best1=0.595 n_val=2276 vram=0.00GB 191s | grade=0.859 inner_auc=0.700 vs conf_auc=0.684
+14:27:27 ===== CYCLE 160 (OUTER -> INNER -> FEEDBACK) =====
+14:30:46 [enc/audio/cremad_parquet] vote=0.598 uniform=0.600 best1=0.594 n_val=2211 vram=0.00GB 199s | grade=0.859 inner_auc=0.731 vs conf_auc=0.709
+14:31:05 ===== CYCLE 161 (OUTER -> INNER -> FEEDBACK) =====
+14:35:27 [enc/audio/cremad_parquet] vote=0.602 uniform=0.604 best1=0.599 n_val=2207 vram=0.00GB 263s | grade=0.861 inner_auc=0.726 vs conf_auc=0.705
+14:35:46 RUN COMPLETE

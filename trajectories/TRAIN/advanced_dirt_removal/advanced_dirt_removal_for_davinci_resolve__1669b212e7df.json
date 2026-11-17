@@ -1,0 +1,314 @@
+{
+   "app_metadata": {
+      "app_name": "Advanced Dirt Removal",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure Advanced Dirt Removal for DaVinci Resolve",
+   "prerequisite_state": "DaVinci Resolve is open and ready for installation of new macros",
+   "total_steps": 10,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open Fusion Page",
+         "ui_target": {
+            "element_name": "Fusion",
+            "automation_id": null,
+            "hierarchical_path": "DaVinci Resolve > Fusion",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Fusion page is active in DaVinci Resolve"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Add the Advanced Dirt Removal macro",
+         "ui_target": {
+            "element_name": "Advanced Dirt Removal",
+            "automation_id": null,
+            "hierarchical_path": "Fusion > Tools > Add Tool > Templates > Macros > Advanced Dirt Removal",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Advanced Dirt Removal macro is added to the Fusion page"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Connect MediaIn to Advanced Dirt Removal",
+         "ui_target": {
+            "element_name": "MediaIn",
+            "automation_id": null,
+            "hierarchical_path": "Fusion > Nodes > MediaIn",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "MediaIn node is selected"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Connect Advanced Dirt Removal to MediaOut",
+         "ui_target": {
+            "element_name": "MediaOut",
+            "automation_id": null,
+            "hierarchical_path": "Fusion > Nodes > MediaOut",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "MediaOut node is selected"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Configure Recovery type to Recovery Brush",
+         "ui_target": {
+            "element_name": "Recovery type",
+            "automation_id": null,
+            "hierarchical_path": "Advanced Dirt Removal > Recovery type",
+            "element_type": "ComboBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Recovery type is set to Recovery Brush"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Add Mask Paint tool",
+         "ui_target": {
+            "element_name": "Mask Paint",
+            "automation_id": null,
+            "hierarchical_path": "Fusion > Tools > Add Tool > Mask Paint",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Mask Paint tool is added to the Fusion page"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Connect Mask Paint to Advanced Dirt Removal",
+         "ui_target": {
+            "element_name": "Mask Paint/Magic Mask",
+            "automation_id": null,
+            "hierarchical_path": "Advanced Dirt Removal > Mask Paint/Magic Mask",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Mask Paint tool is connected to the Advanced Dirt Removal macro"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Set Recovery type to Recovery Brush",
+         "ui_target": {
+            "element_name": "Recovery type",
+            "automation_id": null,
+            "hierarchical_path": "Advanced Dirt Removal > Recovery type",
+            "element_type": "ComboBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Recovery type is set to Recovery Brush"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Paint to recover specific details",
+         "ui_target": {
+            "element_name": "Mask Paint",
+            "automation_id": null,
+            "hierarchical_path": "Fusion > Tools > Mask Paint",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  100,
+                  100
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Mask Paint tool is used to paint recovery areas"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Toggle Spanish Dirt Removal mode",
+         "ui_target": {
+            "element_name": "Spanish Dirt Removal",
+            "automation_id": null,
+            "hierarchical_path": "Advanced Dirt Removal > Spanish Dirt Removal",
+            "element_type": "CheckBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Spanish Dirt Removal mode is toggled on"
+      }
+   ],
+   "_meta": {
+      "source_app": "Advanced Dirt Removal",
+      "app_key": "advanced_dirt_removal",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Advanced Dirt Removal for DaVinci Resolve",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:50:48Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

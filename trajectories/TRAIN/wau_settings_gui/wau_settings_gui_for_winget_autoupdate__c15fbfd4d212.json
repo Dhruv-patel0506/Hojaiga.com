@@ -1,0 +1,306 @@
+{
+   "app_metadata": {
+      "app_name": "WAU Settings GUI",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure and manage settings for Winget-AutoUpdate (WAU) through the WAU Settings GUI",
+   "prerequisite_state": "WAU Settings GUI application window is open",
+   "total_steps": 10,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click on the File menu",
+         "ui_target": {
+            "element_name": "File",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The File dropdown opens showing New, Open, Save"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click on New",
+         "ui_target": {
+            "element_name": "New",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File > New",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A blank untitled document appears in the workspace"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Press F11 to take a screenshot with masking functionality",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "F11"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "A screenshot of the current settings window is taken and saved with masking functionality"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click on the F5 key to refresh status information",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "F5"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The status information display is refreshed showing version details, last run times, and current configuration state"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Click on the F12 key to open Dev Tools",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "F12"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "Dev Tools window opens with various options for advanced troubleshooting"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Click on the manifest, issues, errors, gpo, tsk, reg, uid, sys, mod, lst, usr, msi, wsb, cfg, wau, ver, src options in Dev Tools",
+         "ui_target": {
+            "element_name": "Dev Tools",
+            "automation_id": null,
+            "hierarchical_path": "Dev Tools",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The corresponding functionality is accessed as described in the guide"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Click on the Start Menu shortcuts, WAU Desktop shortcut, App Installer shortcut options in the GUI",
+         "ui_target": {
+            "element_name": "Start Menu shortcuts",
+            "automation_id": null,
+            "hierarchical_path": "GUI > Start Menu shortcuts",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The corresponding shortcut options are toggled as described in the guide"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Click on the Save Settings button to save the current settings",
+         "ui_target": {
+            "element_name": "Save Settings",
+            "automation_id": null,
+            "hierarchical_path": "GUI > Save Settings",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The current settings are saved"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Click on the WAU Settings (Administrator) shortcut in the Start Menu",
+         "ui_target": {
+            "element_name": "WAU Settings (Administrator)",
+            "automation_id": null,
+            "hierarchical_path": "Start Menu > Programs > Winget-AutoUpdate > WAU Settings (Administrator)",
+            "element_type": "Shortcut",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "WAU Settings (Administrator) window opens"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Click on the Uninstall button to uninstall the WAU Settings GUI",
+         "ui_target": {
+            "element_name": "Uninstall",
+            "automation_id": null,
+            "hierarchical_path": "GUI > Uninstall",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The WAU Settings GUI is uninstalled"
+      }
+   ],
+   "_meta": {
+      "source_app": "WAU Settings GUI",
+      "app_key": "wau_settings_gui",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "WAU Settings GUI (for Winget-AutoUpdate)",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:59:15Z",
+      "schema_warnings": [
+         "step3_ungrounded_target",
+         "step4_ungrounded_target",
+         "step5_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

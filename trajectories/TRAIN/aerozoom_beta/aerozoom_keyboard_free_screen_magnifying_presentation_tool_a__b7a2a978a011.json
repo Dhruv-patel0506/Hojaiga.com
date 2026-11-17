@@ -1,0 +1,212 @@
+{
+   "app_metadata": {
+      "app_name": "AeroZoom Beta",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Getting started with AeroZoom Beta and exploring its features",
+   "prerequisite_state": "AeroZoom Beta is downloaded and extracted, or installed via Chocolatey or winget",
+   "total_steps": 6,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Run AeroZoom.exe",
+         "ui_target": {
+            "element_name": "AeroZoom",
+            "automation_id": null,
+            "hierarchical_path": "Application > AeroZoom",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "AeroZoom panel appears on the screen"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Zoom with [Left]+[Wheel-up/down] mouse buttons",
+         "ui_target": {
+            "element_name": "Zoom in/out",
+            "automation_id": null,
+            "hierarchical_path": "AeroZoom Panel > Zoom in/out",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [
+               "left"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The screen zooms in or out"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Reset zoom with [Left]+[Middle] buttons",
+         "ui_target": {
+            "element_name": "Reset zoom",
+            "automation_id": null,
+            "hierarchical_path": "AeroZoom Panel > Reset zoom",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [
+               "left",
+               "middle"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The screen zoom resets to default"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Bring up the AeroZoom panel by pressing [Left]+[Right]",
+         "ui_target": {
+            "element_name": "AeroZoom panel",
+            "automation_id": null,
+            "hierarchical_path": "Application > AeroZoom > AeroZoom panel",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [
+               "left",
+               "right"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The AeroZoom panel appears on the screen"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Switch the default [Left] mouse button modifier to a key e.g. [Ctrl]",
+         "ui_target": {
+            "element_name": "Change modifier",
+            "automation_id": null,
+            "hierarchical_path": "AeroZoom Panel > Change modifier",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [
+               "left"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The modifier for the AeroZoom panel is changed to [Ctrl]"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Adjust the zoom rate by dragging the Zoom Rate Slider",
+         "ui_target": {
+            "element_name": "Zoom Rate Slider",
+            "automation_id": null,
+            "hierarchical_path": "AeroZoom Panel > Zoom Rate Slider",
+            "element_type": "Slider",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  100,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The zoom rate is adjusted"
+      }
+   ],
+   "_meta": {
+      "source_app": "AeroZoom Beta",
+      "app_key": "aerozoom_beta",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "AeroZoom – Keyboard-Free Screen-Magnifying Presentation Tool and Mouse-Enhancing Panel for Windows",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:05:16Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

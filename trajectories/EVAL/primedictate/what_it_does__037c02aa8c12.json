@@ -1,0 +1,188 @@
+{
+   "app_metadata": {
+      "app_name": "PrimeDictate",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure PrimeDictate for local dictation",
+   "prerequisite_state": "No application is open. User is at the Windows Start Menu or desktop.",
+   "total_steps": 6,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install PrimeDictate from GitHub Releases",
+         "ui_target": {
+            "element_name": "GitHub Releases",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "PrimeDictate MSI installer opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run the PrimeDictate MSI installer",
+         "ui_target": {
+            "element_name": "PrimeDictate-Setup-vX.Y.Z-x64.msi",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "PrimeDictate installation begins"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Complete first-run setup",
+         "ui_target": {
+            "element_name": "PrimeDictate first-run setup",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Backend and model selection, command phrases and transcript replacements, overlay style and silence auto-commit timing, coding mode, impact stats are configured"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Launch PrimeDictate from Start Menu",
+         "ui_target": {
+            "element_name": "PrimeDictate",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "PrimeDictate application opens"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Focus the target application",
+         "ui_target": {
+            "element_name": "Target application",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Target application is in focus"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Press the dictation hotkey",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Shift",
+               "Space"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "PrimeDictate starts recording and showing live overlay preview"
+      }
+   ],
+   "_meta": {
+      "source_app": "PrimeDictate",
+      "app_key": "primedictate",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "What It Does",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:57:22Z",
+      "schema_warnings": [
+         "step6_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

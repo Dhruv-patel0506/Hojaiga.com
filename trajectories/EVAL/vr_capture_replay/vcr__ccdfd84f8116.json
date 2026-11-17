@@ -1,0 +1,176 @@
+{
+   "app_metadata": {
+      "app_name": "VR Capture & Replay",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide on how to use VR Capture & Replay for automation",
+   "prerequisite_state": "VR Capture & Replay tools are installed and the user is familiar with the command-line interface",
+   "total_steps": 12,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Start application and SteamVR on a normal OpenVR system that has an HMD and controllers",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The application and SteamVR are running"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Use `1_capture.cmd` to start recording the session",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "1_capture.cmd"
+         },
+         "expected_state_change": "The capture tool starts recording the session"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Verify devices and input components are recognized correctly - capture will list all devices it finds",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "Devices and input components are listed and recognized correctly"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Interact with the application through the HMD, perform actions that should be automated",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "The application is interacted with and actions are performed"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Press <SPACE> to separate recording into segments - each segment is stored in a ``tracking_<i>.bin`` file and will be replayable separately",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "space"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "Recording is separated into segments"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Stop recording by pressing <ESC>",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "esc"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "Recording stops"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Use a filter to modify the tracking data - please refer to the readme in the filter sample for more information",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "Tracking data is modified"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Copy the resulting `tape` directory to a different system if replay happens somewhere else",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "The `tape` directory is copied to another system"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Update hardware and tracking files to newest VCR version if needed",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "Hardware and tracking files are updated"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Use `2_install_replay.cmd` to install the replay driver on the target system",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "2_install_replay.cmd"
+         },
+         "expected_state_change": "The replay driver is installed on the target system"
+      },
+      {
+         "step_id": 11,
+         "low_level_instruction": "Start SteamVR, the replay driver will use the recorded data to emulate the HMD and the controllers",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "SteamVR is started and the replay driver is running"
+      },
+      {
+         "step_id": 12,
+         "low_level_instruction": "Replay the session or the session segments",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "The recorded session or segments are replayed"
+      }
+   ],
+   "_meta": {
+      "source_app": "VR Capture & Replay",
+      "app_key": "vr_capture_replay",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "VCR",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T19:07:24Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target",
+         "step4_ungrounded_target",
+         "step5_ungrounded_target",
+         "step6_ungrounded_target",
+         "step7_ungrounded_target",
+         "step8_ungrounded_target",
+         "step9_ungrounded_target",
+         "step10_ungrounded_target",
+         "step11_ungrounded_target",
+         "step12_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

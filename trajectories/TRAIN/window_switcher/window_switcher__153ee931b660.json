@@ -1,0 +1,126 @@
+{
+   "app_metadata": {
+      "app_name": "Window Switcher",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure and run Window-Switcher",
+   "prerequisite_state": "No specific application window is required; the user is on the desktop or in a file explorer.",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the `windows-switcher.zip` file from the Github Release.",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user hovers over the link to the `windows-switcher.zip` file."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Unzip the downloaded `windows-switcher.zip` file.",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user hovers over the `windows-switcher.zip` file."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Extract the `window-switcher.exe` file from the unzipped folder.",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user hovers over the `window-switcher.exe` file."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Double-click the `window-switcher.exe` file to run the application.",
+         "ui_target": {
+            "element_name": "window-switcher.exe",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DOUBLE_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Window-Switcher application opens."
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Run the one-liner script to install Window-Switcher.",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "iwr -useb https://raw.githubusercontent.com/sigoden/window-switcher/main/install.ps1 | iex"
+         },
+         "expected_state_change": "The PowerShell script is executed, and Window-Switcher is installed."
+      }
+   ],
+   "_meta": {
+      "source_app": "Window Switcher",
+      "app_key": "window_switcher",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Window Switcher",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:14:20Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target",
+         "step5_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

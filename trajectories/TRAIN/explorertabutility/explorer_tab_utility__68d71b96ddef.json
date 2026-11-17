@@ -1,0 +1,112 @@
+{
+   "app_metadata": {
+      "app_name": "ExplorerTabUtility",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure ExplorerTabUtility to manage File Explorer windows as tabs.",
+   "prerequisite_state": "No specific application state required before Step 1.",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the latest version of ExplorerTabUtility from the Releases page or install it via winget or choco.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install w4po.ExplorerTabUtility --interactive"
+         },
+         "expected_state_change": "ExplorerTabUtility is installed."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run the application.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "explorerTabUtility"
+         },
+         "expected_state_change": "ExplorerTabUtility application window opens."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Double-click or right-click the tray icon to open the configuration menu.",
+         "ui_target": {
+            "element_name": "Tray Icon",
+            "automation_id": null,
+            "hierarchical_path": "System Tray > ExplorerTabUtility Icon",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Configuration menu opens."
+      }
+   ],
+   "_meta": {
+      "source_app": "ExplorerTabUtility",
+      "app_key": "explorertabutility",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Explorer Tab Utility",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:03:24Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

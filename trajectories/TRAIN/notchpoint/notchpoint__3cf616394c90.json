@@ -1,0 +1,169 @@
+{
+   "app_metadata": {
+      "app_name": "Notchpoint",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure Notchpoint to monitor AI usage",
+   "prerequisite_state": "User is on the Windows 11 desktop",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the latest NotchpointSetup-x.y.z.exe from the Releases page",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User navigates to the Notchpoint Releases page and downloads the installer"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run the downloaded NotchpointSetup-x.y.z.exe",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Notchpoint installer window opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Install Notchpoint",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Notchpoint is installed and added to the Apps & Features list"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Right-click the Notchpoint tray icon",
+         "ui_target": {
+            "element_name": "Tray icon",
+            "automation_id": null,
+            "hierarchical_path": "System tray > Notchpoint",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Settings menu opens"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Choose Settings from the context menu",
+         "ui_target": {
+            "element_name": "Settings",
+            "automation_id": null,
+            "hierarchical_path": "System tray > Notchpoint > Settings",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Notchpoint settings window opens"
+      }
+   ],
+   "_meta": {
+      "source_app": "Notchpoint",
+      "app_key": "notchpoint",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Notchpoint",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:44:18Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

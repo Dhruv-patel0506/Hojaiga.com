@@ -1,0 +1,55 @@
+{
+   "app_metadata": {
+      "app_name": "Win-Optimizer-Pro",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install Win-Optimizer-Pro from GitHub",
+   "prerequisite_state": "Browser is open and user is on the internet",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Run the PowerShell script from GitHub",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "irm https://raw.githubusercontent.com/karan5028ji/Win-Optimizer-Pro/main/run.ps1 | iex"
+         },
+         "expected_state_change": "The PowerShell script is executed and Win-Optimizer-Pro is installed"
+      }
+   ],
+   "_meta": {
+      "source_app": "Win-Optimizer-Pro",
+      "app_key": "win_optimizer_pro",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "Win-Optimizer-Pro",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:53:44Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

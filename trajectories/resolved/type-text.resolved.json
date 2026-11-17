@@ -1,0 +1,31 @@
+{
+   "app_metadata": {
+      "app_name": "Notepad",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "type-text",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "ui_target": {
+            "element_name": "text editor area",
+            "element_type": "Edit",
+            "bounding_box": [
+               -3992,
+               -3907,
+               -3593,
+               -3795
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "text_payload": "Hello Hojaiga"
+         },
+         "expected_state_change": "Hello Hojaiga",
+         "low_level_instruction": "TYPE_TEXT text editor area"
+      }
+   ]
+}

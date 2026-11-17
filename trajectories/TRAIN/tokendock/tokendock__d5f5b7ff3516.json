@@ -1,0 +1,101 @@
+{
+   "app_metadata": {
+      "app_name": "TokenDock",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "cli",
+   "high_level_task": "Run TokenDock from source code",
+   "prerequisite_state": "Windows machine with .NET 9 SDK installed",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Clone the TokenDock project from GitHub",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "git clone https://github.com/lukewire129/TokenDock.git"
+         },
+         "expected_state_change": "The project is cloned to the current directory"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Change directory to the TokenDock folder",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "cd TokenDock"
+         },
+         "expected_state_change": "The command prompt changes to the TokenDock directory"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Restore project dependencies",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "dotnet restore TokenDock.sln"
+         },
+         "expected_state_change": "Dependencies are restored for the project"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Run the TokenDock application",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "dotnet run --project src/TokenDock/TokenDock.csproj"
+         },
+         "expected_state_change": "TokenDock application runs locally"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Run tests for the TokenDock application",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "dotnet test TokenDock.sln"
+         },
+         "expected_state_change": "Tests for the TokenDock application are run"
+      }
+   ],
+   "_meta": {
+      "source_app": "TokenDock",
+      "app_key": "tokendock",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "TokenDock",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:24:36Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target",
+         "step4_ungrounded_target",
+         "step5_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

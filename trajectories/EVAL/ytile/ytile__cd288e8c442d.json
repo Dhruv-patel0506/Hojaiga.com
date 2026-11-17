@@ -1,0 +1,44 @@
+{
+   "app_metadata": {
+      "app_name": "YTile",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "non_gui",
+   "high_level_task": "Install YTile using PowerShell script",
+   "prerequisite_state": "Open PowerShell terminal",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Run the PowerShell script to install YTile",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "irm https://raw.githubusercontent.com/AegiosOT/YTile/main/scripts/install.ps1 | iex"
+         },
+         "expected_state_change": "The latest release of YTile is downloaded and installed into %LOCALAPPDATA%\\Programs\\ytile, and a starter config is written if one does not exist"
+      }
+   ],
+   "_meta": {
+      "source_app": "YTile",
+      "app_key": "ytile",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "YTile",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:31:33Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

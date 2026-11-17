@@ -1,0 +1,137 @@
+{
+   "app_metadata": {
+      "app_name": "Easy-Link-File-Viewer",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Download and install Easy Link File Viewer",
+   "prerequisite_state": "User is on the releases page of the Easy Link File Viewer GitHub repository",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Navigate to the Releases page",
+         "ui_target": {
+            "element_name": "Releases",
+            "automation_id": null,
+            "hierarchical_path": "Navigation > Releases",
+            "element_type": "Link",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user is redirected to the Releases page"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Download the latest .zip archive",
+         "ui_target": {
+            "element_name": "Download",
+            "automation_id": null,
+            "hierarchical_path": "Releases page > Latest release > Download",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The download process starts for the latest .zip archive"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Extract the contents of the .zip archive to a preferred directory",
+         "ui_target": {
+            "element_name": "Extract",
+            "automation_id": null,
+            "hierarchical_path": "File Explorer > Right-click on the .zip file > Extract",
+            "element_type": "Context Menu Item",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The .zip archive is extracted to the chosen directory"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Run the executable file to launch the application",
+         "ui_target": {
+            "element_name": "Easy Link File Viewer",
+            "automation_id": null,
+            "hierarchical_path": "Extracted files > Easy Link File Viewer.exe",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Easy Link File Viewer application opens"
+      }
+   ],
+   "_meta": {
+      "source_app": "Easy-Link-File-Viewer",
+      "app_key": "easy_link_file_viewer",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "A desktop application for Windows to read, modify and write shortcut files (.lnk) with ease.",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:41:05Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

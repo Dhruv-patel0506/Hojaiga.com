@@ -1,0 +1,52 @@
+{
+   "app_metadata": {
+      "app_name": "PeaZip",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Access PeaZip's online help and tutorial",
+   "prerequisite_state": "PeaZip application is open",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Press F1 key to access the minimal offline localized tutorial",
+         "ui_target": {
+            "element_name": "F1 key",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "F1"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The minimal offline localized tutorial appears in the application"
+      }
+   ],
+   "_meta": {
+      "source_app": "PeaZip",
+      "app_key": "peazip",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "PeaZip online help,",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:11:27Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

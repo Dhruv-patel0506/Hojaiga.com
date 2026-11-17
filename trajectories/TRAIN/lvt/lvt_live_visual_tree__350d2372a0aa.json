@@ -1,0 +1,41 @@
+{
+   "app_metadata": {
+      "app_name": "lvt",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "cli",
+   "high_level_task": "Install the lvt skill for GitHub Copilot CLI",
+   "prerequisite_state": "GitHub Copilot CLI is installed",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install the lvt skill for GitHub Copilot CLI",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "/plugin install asklar/lvt"
+         },
+         "expected_state_change": "The lvt skill is installed and can be verified with /skills list"
+      }
+   ],
+   "_meta": {
+      "source_app": "lvt",
+      "app_key": "lvt",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "lvt — Live Visual Tree",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:52:55Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

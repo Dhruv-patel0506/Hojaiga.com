@@ -1,0 +1,71 @@
+16:01:24 NI run auto_gpu_075 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+16:01:24 explicit task list: ['enc2/image/food101']
+16:01:24 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+16:01:28 [data] enc2/image/food101: n=60121 C=101 D=1536 shards=1
+16:03:07 [enc2/image/food101] vote=0.833 uniform=0.816 best1=0.832 n_val=17831 vram=1.38GB 99s
+16:03:38 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 17831, "n_val": 3503, "base_rate": 0.8321439027786255, "inner": {"auc": 0.895162250148773, "ece": 0.014662038312617146, "brier": 0.09001901745796204, "acc80": 0.9346895217895508}, "outer_conf": {"auc": 0.8880199764296799, "ece": 0.07863458852801294, "brier": 0.10173694789409637, "acc80": 0.9275517463684082}}
+16:03:39 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+16:05:12 [enc2/image/food101] vote=0.833 uniform=0.821 best1=0.830 n_val=17874 vram=1.75GB 94s | grade=0.870 inner_auc=0.904 vs conf_auc=0.895
+16:05:25 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+16:06:55 [enc2/image/food101] vote=0.836 uniform=0.818 best1=0.832 n_val=18205 vram=1.74GB 90s | grade=0.875 inner_auc=0.901 vs conf_auc=0.891
+16:07:09 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+16:08:40 [enc2/image/food101] vote=0.832 uniform=0.821 best1=0.830 n_val=18212 vram=1.74GB 90s | grade=0.871 inner_auc=0.914 vs conf_auc=0.909
+16:08:54 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+16:10:42 [enc2/image/food101] vote=0.832 uniform=0.814 best1=0.829 n_val=17916 vram=1.75GB 108s | grade=0.878 inner_auc=0.911 vs conf_auc=0.902
+16:10:59 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+16:12:26 [enc2/image/food101] vote=0.833 uniform=0.816 best1=0.830 n_val=18013 vram=1.74GB 87s | grade=0.879 inner_auc=0.908 vs conf_auc=0.903
+16:12:40 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+16:14:06 [enc2/image/food101] vote=0.835 uniform=0.818 best1=0.833 n_val=18132 vram=1.74GB 87s | grade=0.878 inner_auc=0.899 vs conf_auc=0.894
+16:14:23 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+16:15:56 [enc2/image/food101] vote=0.832 uniform=0.817 best1=0.830 n_val=18156 vram=1.74GB 93s | grade=0.879 inner_auc=0.910 vs conf_auc=0.903
+16:16:13 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+16:17:45 [enc2/image/food101] vote=0.835 uniform=0.820 best1=0.834 n_val=17990 vram=1.74GB 92s | grade=0.880 inner_auc=0.905 vs conf_auc=0.897
+16:18:01 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+16:19:25 [enc2/image/food101] vote=0.832 uniform=0.817 best1=0.830 n_val=17976 vram=1.74GB 84s | grade=0.883 inner_auc=0.905 vs conf_auc=0.899
+16:19:40 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+16:21:13 [enc2/image/food101] vote=0.833 uniform=0.816 best1=0.831 n_val=18187 vram=1.74GB 93s | grade=0.881 inner_auc=0.905 vs conf_auc=0.899
+16:21:32 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+16:23:10 [enc2/image/food101] vote=0.837 uniform=0.818 best1=0.834 n_val=18141 vram=1.74GB 99s | grade=0.879 inner_auc=0.899 vs conf_auc=0.890
+16:23:28 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+16:25:07 [enc2/image/food101] vote=0.832 uniform=0.820 best1=0.831 n_val=18183 vram=1.74GB 99s | grade=0.879 inner_auc=0.907 vs conf_auc=0.896
+16:25:23 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+16:26:54 [enc2/image/food101] vote=0.836 uniform=0.815 best1=0.835 n_val=18114 vram=1.74GB 91s | grade=0.879 inner_auc=0.913 vs conf_auc=0.903
+16:27:11 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+16:28:54 [enc2/image/food101] vote=0.834 uniform=0.820 best1=0.832 n_val=18121 vram=1.74GB 103s | grade=0.886 inner_auc=0.897 vs conf_auc=0.891
+16:29:14 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+16:30:54 [enc2/image/food101] vote=0.836 uniform=0.820 best1=0.835 n_val=17951 vram=1.75GB 101s | grade=0.882 inner_auc=0.905 vs conf_auc=0.896
+16:31:10 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+16:32:46 [enc2/image/food101] vote=0.838 uniform=0.818 best1=0.836 n_val=18093 vram=1.74GB 96s | grade=0.883 inner_auc=0.907 vs conf_auc=0.897
+16:33:01 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+16:34:31 [enc2/image/food101] vote=0.831 uniform=0.815 best1=0.830 n_val=18078 vram=1.74GB 89s | grade=0.880 inner_auc=0.905 vs conf_auc=0.893
+16:34:48 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+16:36:21 [enc2/image/food101] vote=0.835 uniform=0.820 best1=0.834 n_val=18021 vram=1.74GB 93s | grade=0.882 inner_auc=0.911 vs conf_auc=0.900
+16:36:38 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+16:38:06 [enc2/image/food101] vote=0.830 uniform=0.817 best1=0.829 n_val=18093 vram=1.74GB 88s | grade=0.883 inner_auc=0.909 vs conf_auc=0.896
+16:38:24 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+16:39:58 [enc2/image/food101] vote=0.833 uniform=0.819 best1=0.833 n_val=17998 vram=1.74GB 94s | grade=0.885 inner_auc=0.908 vs conf_auc=0.895
+16:40:17 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+16:41:56 [enc2/image/food101] vote=0.833 uniform=0.818 best1=0.832 n_val=18088 vram=1.74GB 99s | grade=0.887 inner_auc=0.905 vs conf_auc=0.894
+16:42:16 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+16:44:03 [enc2/image/food101] vote=0.831 uniform=0.816 best1=0.830 n_val=17993 vram=1.74GB 107s | grade=0.884 inner_auc=0.912 vs conf_auc=0.905
+16:44:19 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+16:45:55 [enc2/image/food101] vote=0.834 uniform=0.819 best1=0.833 n_val=18079 vram=1.74GB 96s | grade=0.883 inner_auc=0.908 vs conf_auc=0.898
+16:46:12 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+16:47:45 [enc2/image/food101] vote=0.834 uniform=0.818 best1=0.833 n_val=18214 vram=1.74GB 93s | grade=0.885 inner_auc=0.911 vs conf_auc=0.892
+16:48:02 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+16:49:40 [enc2/image/food101] vote=0.838 uniform=0.819 best1=0.837 n_val=18189 vram=1.74GB 98s | grade=0.885 inner_auc=0.918 vs conf_auc=0.904
+16:49:58 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+16:51:33 [enc2/image/food101] vote=0.834 uniform=0.818 best1=0.834 n_val=18067 vram=1.74GB 95s | grade=0.883 inner_auc=0.909 vs conf_auc=0.895
+16:51:52 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+16:53:21 [enc2/image/food101] vote=0.833 uniform=0.817 best1=0.832 n_val=17975 vram=1.74GB 89s | grade=0.884 inner_auc=0.917 vs conf_auc=0.906
+16:53:38 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+16:55:09 [enc2/image/food101] vote=0.830 uniform=0.815 best1=0.829 n_val=18020 vram=1.74GB 91s | grade=0.886 inner_auc=0.909 vs conf_auc=0.896
+16:55:26 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+16:56:56 [enc2/image/food101] vote=0.836 uniform=0.819 best1=0.836 n_val=18174 vram=1.74GB 90s | grade=0.885 inner_auc=0.911 vs conf_auc=0.898
+16:57:11 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+16:58:28 [enc2/image/food101] vote=0.837 uniform=0.821 best1=0.836 n_val=18160 vram=1.74GB 77s | grade=0.887 inner_auc=0.910 vs conf_auc=0.898
+16:58:44 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+17:00:11 [enc2/image/food101] vote=0.832 uniform=0.816 best1=0.832 n_val=18198 vram=1.74GB 87s | grade=0.884 inner_auc=0.898 vs conf_auc=0.885
+17:00:32 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+17:02:12 [enc2/image/food101] vote=0.836 uniform=0.820 best1=0.835 n_val=18149 vram=1.74GB 99s | grade=0.884 inner_auc=0.904 vs conf_auc=0.892
+17:02:32 RUN COMPLETE

@@ -1,0 +1,759 @@
+17:36:38 NI run auto_cpu_004 on CPU; hours=2.0 smoke=False
+17:36:38 explicit task list: ['hand/graph/imdb_binary', 'hand/graph/aids', 'hand/graph/ogbg_molhiv']
+17:36:38 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+17:36:38 [data] hand/graph/imdb_binary: n=1000 C=2 D=22 shards=1
+17:36:48 [hand/graph/imdb_binary] vote=0.716 uniform=0.716 best1=0.731 n_val=282 vram=0.00GB 10s
+17:36:48 [data] hand/graph/aids: n=2000 C=2 D=96 shards=1
+17:36:55 [hand/graph/aids] vote=0.993 uniform=0.993 best1=0.992 n_val=595 vram=0.00GB 8s
+17:36:55 [data] hand/graph/ogbg_molhiv: n=41127 C=2 D=38 shards=1
+17:37:19 [hand/graph/ogbg_molhiv] vote=0.966 uniform=0.966 best1=0.966 n_val=12191 vram=0.00GB 24s
+17:37:29 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 13068, "n_val": 2530, "base_rate": 0.9628458619117737, "inner": {"auc": 0.8089473500331901, "ece": 0.008547200504027807, "brier": 0.032289326190948486, "acc80": 0.9866600632667542}, "outer_conf": {"auc": 0.79792474583377, "ece": 0.06889100739136043, "brier": 0.037354737520217896, "acc80": 0.9851778745651245}}
+17:37:29 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+17:37:38 [hand/graph/imdb_binary] vote=0.740 uniform=0.740 best1=0.744 n_val=258 vram=0.00GB 9s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+17:37:47 [hand/graph/aids] vote=0.996 uniform=0.996 best1=0.996 n_val=562 vram=0.00GB 9s | grade=0.957 inner_auc=n/a vs conf_auc=n/a
+17:38:14 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.968 best1=0.968 n_val=12382 vram=0.00GB 27s | grade=0.955 inner_auc=0.714 vs conf_auc=0.731
+17:38:19 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+17:38:28 [hand/graph/imdb_binary] vote=0.677 uniform=0.677 best1=0.699 n_val=282 vram=0.00GB 9s | grade=0.841 inner_auc=n/a vs conf_auc=n/a
+17:38:37 [hand/graph/aids] vote=0.987 uniform=0.987 best1=0.986 n_val=636 vram=0.00GB 9s | grade=0.959 inner_auc=0.959 vs conf_auc=0.982
+17:39:03 [hand/graph/ogbg_molhiv] vote=0.969 uniform=0.969 best1=0.969 n_val=12483 vram=0.00GB 27s | grade=0.953 inner_auc=0.780 vs conf_auc=0.776
+17:39:09 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+17:39:18 [hand/graph/imdb_binary] vote=0.731 uniform=0.731 best1=0.734 n_val=305 vram=0.00GB 9s | grade=0.874 inner_auc=n/a vs conf_auc=n/a
+17:39:28 [hand/graph/aids] vote=0.992 uniform=0.992 best1=0.993 n_val=601 vram=0.00GB 11s | grade=0.963 inner_auc=nan vs conf_auc=nan
+17:39:55 [hand/graph/ogbg_molhiv] vote=0.966 uniform=0.966 best1=0.968 n_val=12362 vram=0.00GB 27s | grade=0.952 inner_auc=0.776 vs conf_auc=0.788
+17:40:01 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+17:40:11 [hand/graph/imdb_binary] vote=0.726 uniform=0.726 best1=0.739 n_val=307 vram=0.00GB 9s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+17:40:20 [hand/graph/aids] vote=0.995 uniform=0.995 best1=0.997 n_val=579 vram=0.00GB 10s | grade=0.976 inner_auc=1.000 vs conf_auc=1.000
+17:40:55 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.968 best1=0.969 n_val=12312 vram=0.00GB 34s | grade=0.953 inner_auc=0.751 vs conf_auc=0.751
+17:41:04 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+17:41:17 [hand/graph/imdb_binary] vote=0.712 uniform=0.712 best1=0.731 n_val=316 vram=0.00GB 12s | grade=0.884 inner_auc=n/a vs conf_auc=n/a
+17:41:31 [hand/graph/aids] vote=0.991 uniform=0.990 best1=0.990 n_val=584 vram=0.00GB 14s | grade=0.948 inner_auc=1.000 vs conf_auc=1.000
+17:42:11 [hand/graph/ogbg_molhiv] vote=0.967 uniform=0.966 best1=0.967 n_val=12307 vram=0.00GB 40s | grade=0.950 inner_auc=0.765 vs conf_auc=0.747
+17:42:19 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+17:42:31 [hand/graph/imdb_binary] vote=0.720 uniform=0.720 best1=0.726 n_val=296 vram=0.00GB 12s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+17:42:45 [hand/graph/aids] vote=0.989 uniform=0.989 best1=0.990 n_val=623 vram=0.00GB 14s | grade=0.962 inner_auc=1.000 vs conf_auc=1.000
+17:43:26 [hand/graph/ogbg_molhiv] vote=0.969 uniform=0.969 best1=0.971 n_val=12395 vram=0.00GB 41s | grade=0.950 inner_auc=0.767 vs conf_auc=0.761
+17:43:35 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+17:43:48 [hand/graph/imdb_binary] vote=0.709 uniform=0.705 best1=0.722 n_val=302 vram=0.00GB 13s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+17:44:03 [hand/graph/aids] vote=0.987 uniform=0.987 best1=0.989 n_val=622 vram=0.00GB 15s | grade=0.962 inner_auc=0.991 vs conf_auc=0.996
+17:44:47 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.968 best1=0.969 n_val=12298 vram=0.00GB 44s | grade=0.950 inner_auc=0.784 vs conf_auc=0.780
+17:44:57 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+17:45:10 [hand/graph/imdb_binary] vote=0.692 uniform=0.692 best1=0.731 n_val=286 vram=0.00GB 13s | grade=0.878 inner_auc=n/a vs conf_auc=n/a
+17:45:26 [hand/graph/aids] vote=0.992 uniform=0.995 best1=0.992 n_val=590 vram=0.00GB 15s | grade=0.937 inner_auc=1.000 vs conf_auc=1.000
+17:46:07 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.968 best1=0.969 n_val=12383 vram=0.00GB 42s | grade=0.955 inner_auc=0.760 vs conf_auc=0.757
+17:46:16 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+17:46:29 [hand/graph/imdb_binary] vote=0.685 uniform=0.681 best1=0.691 n_val=298 vram=0.00GB 13s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+17:46:44 [hand/graph/aids] vote=0.993 uniform=0.992 best1=0.993 n_val=596 vram=0.00GB 15s | grade=0.991 inner_auc=0.965 vs conf_auc=1.000
+17:47:25 [hand/graph/ogbg_molhiv] vote=0.966 uniform=0.966 best1=0.966 n_val=12397 vram=0.00GB 42s | grade=0.957 inner_auc=0.784 vs conf_auc=0.793
+17:47:35 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+17:47:50 [hand/graph/imdb_binary] vote=0.712 uniform=0.715 best1=0.722 n_val=309 vram=0.00GB 14s | grade=0.870 inner_auc=n/a vs conf_auc=n/a
+17:48:04 [hand/graph/aids] vote=0.990 uniform=0.989 best1=0.989 n_val=626 vram=0.00GB 14s | grade=0.964 inner_auc=0.992 vs conf_auc=1.000
+17:48:46 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.968 best1=0.969 n_val=12364 vram=0.00GB 42s | grade=0.953 inner_auc=0.767 vs conf_auc=0.760
+17:48:57 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+17:49:14 [hand/graph/imdb_binary] vote=0.753 uniform=0.757 best1=0.747 n_val=296 vram=0.00GB 17s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+17:49:35 [hand/graph/aids] vote=0.992 uniform=0.992 best1=0.994 n_val=616 vram=0.00GB 21s | grade=0.964 inner_auc=0.992 vs conf_auc=0.992
+17:50:34 [hand/graph/ogbg_molhiv] vote=0.967 uniform=0.967 best1=0.968 n_val=12329 vram=0.00GB 58s | grade=0.954 inner_auc=0.786 vs conf_auc=0.767
+17:50:48 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+17:51:06 [hand/graph/imdb_binary] vote=0.747 uniform=0.750 best1=0.744 n_val=324 vram=0.00GB 18s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+17:51:27 [hand/graph/aids] vote=0.997 uniform=0.998 best1=0.995 n_val=591 vram=0.00GB 22s | grade=0.971 inner_auc=nan vs conf_auc=nan
+17:52:27 [hand/graph/ogbg_molhiv] vote=0.967 uniform=0.968 best1=0.968 n_val=12232 vram=0.00GB 59s | grade=0.955 inner_auc=0.796 vs conf_auc=0.775
+17:52:38 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+17:52:51 [hand/graph/imdb_binary] vote=0.731 uniform=0.731 best1=0.727 n_val=286 vram=0.00GB 13s | grade=0.878 inner_auc=n/a vs conf_auc=n/a
+17:53:06 [hand/graph/aids] vote=0.991 uniform=0.993 best1=0.990 n_val=574 vram=0.00GB 15s | grade=0.988 inner_auc=nan vs conf_auc=nan
+17:53:49 [hand/graph/ogbg_molhiv] vote=0.969 uniform=0.969 best1=0.970 n_val=12599 vram=0.00GB 42s | grade=0.955 inner_auc=0.814 vs conf_auc=0.793
+17:53:59 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+17:54:13 [hand/graph/imdb_binary] vote=0.699 uniform=0.699 best1=0.716 n_val=296 vram=0.00GB 14s | grade=0.871 inner_auc=n/a vs conf_auc=n/a
+17:54:28 [hand/graph/aids] vote=0.985 uniform=0.987 best1=0.988 n_val=606 vram=0.00GB 15s | grade=0.962 inner_auc=0.955 vs conf_auc=0.983
+17:55:09 [hand/graph/ogbg_molhiv] vote=0.967 uniform=0.967 best1=0.968 n_val=12277 vram=0.00GB 41s | grade=0.952 inner_auc=0.783 vs conf_auc=0.767
+17:55:19 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+17:55:33 [hand/graph/imdb_binary] vote=0.705 uniform=0.708 best1=0.708 n_val=312 vram=0.00GB 14s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+17:55:51 [hand/graph/aids] vote=0.994 uniform=0.992 best1=0.995 n_val=618 vram=0.00GB 18s | grade=0.961 inner_auc=1.000 vs conf_auc=1.000
+17:58:06 [hand/graph/ogbg_molhiv] vote=0.969 uniform=0.969 best1=0.970 n_val=12337 vram=0.00GB 134s | grade=0.954 inner_auc=0.785 vs conf_auc=0.766
+17:58:34 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+17:59:14 [hand/graph/imdb_binary] vote=0.736 uniform=0.736 best1=0.755 n_val=314 vram=0.00GB 40s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+17:59:52 [hand/graph/aids] vote=0.995 uniform=0.997 best1=0.997 n_val=604 vram=0.00GB 38s | grade=0.965 inner_auc=nan vs conf_auc=nan
+18:02:02 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.968 best1=0.969 n_val=12368 vram=0.00GB 130s | grade=0.955 inner_auc=0.774 vs conf_auc=0.769
+18:02:34 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+18:03:14 [hand/graph/imdb_binary] vote=0.736 uniform=0.736 best1=0.748 n_val=258 vram=0.00GB 40s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+18:04:06 [hand/graph/aids] vote=0.991 uniform=0.991 best1=0.990 n_val=576 vram=0.00GB 52s | grade=0.977 inner_auc=0.991 vs conf_auc=0.994
+18:05:53 [hand/graph/ogbg_molhiv] vote=0.970 uniform=0.970 best1=0.971 n_val=12360 vram=0.00GB 107s | grade=0.954 inner_auc=0.781 vs conf_auc=0.771
+18:06:18 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+18:06:51 [hand/graph/imdb_binary] vote=0.691 uniform=0.691 best1=0.697 n_val=320 vram=0.00GB 32s | grade=0.862 inner_auc=n/a vs conf_auc=n/a
+18:07:28 [hand/graph/aids] vote=0.995 uniform=0.995 best1=0.990 n_val=590 vram=0.00GB 38s | grade=0.987 inner_auc=nan vs conf_auc=nan
+18:09:41 [hand/graph/ogbg_molhiv] vote=0.969 uniform=0.968 best1=0.970 n_val=12263 vram=0.00GB 132s | grade=0.954 inner_auc=0.804 vs conf_auc=0.795
+18:10:00 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+18:10:28 [hand/graph/imdb_binary] vote=0.705 uniform=0.705 best1=0.719 n_val=281 vram=0.00GB 28s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+18:10:53 [hand/graph/aids] vote=0.990 uniform=0.992 best1=0.993 n_val=590 vram=0.00GB 25s | grade=0.962 inner_auc=1.000 vs conf_auc=1.000
+18:11:59 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.968 best1=0.968 n_val=12443 vram=0.00GB 66s | grade=0.957 inner_auc=0.733 vs conf_auc=0.714
+18:12:14 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+18:12:31 [hand/graph/imdb_binary] vote=0.664 uniform=0.667 best1=0.704 n_val=321 vram=0.00GB 17s | grade=0.855 inner_auc=n/a vs conf_auc=n/a
+18:12:53 [hand/graph/aids] vote=0.994 uniform=0.994 best1=0.994 n_val=628 vram=0.00GB 22s | grade=0.988 inner_auc=nan vs conf_auc=nan
+18:14:03 [hand/graph/ogbg_molhiv] vote=0.969 uniform=0.969 best1=0.970 n_val=12467 vram=0.00GB 70s | grade=0.956 inner_auc=0.783 vs conf_auc=0.766
+18:14:21 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+18:14:43 [hand/graph/imdb_binary] vote=0.674 uniform=0.667 best1=0.701 n_val=288 vram=0.00GB 22s | grade=0.858 inner_auc=n/a vs conf_auc=n/a
+18:15:10 [hand/graph/aids] vote=0.993 uniform=0.993 best1=0.995 n_val=588 vram=0.00GB 28s | grade=0.965 inner_auc=1.000 vs conf_auc=1.000
+18:16:18 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.968 best1=0.969 n_val=12281 vram=0.00GB 68s | grade=0.956 inner_auc=0.789 vs conf_auc=0.786
+18:16:32 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+18:16:51 [hand/graph/imdb_binary] vote=0.719 uniform=0.716 best1=0.743 n_val=303 vram=0.00GB 19s | grade=0.868 inner_auc=n/a vs conf_auc=n/a
+18:17:12 [hand/graph/aids] vote=0.994 uniform=0.994 best1=0.997 n_val=648 vram=0.00GB 20s | grade=0.957 inner_auc=nan vs conf_auc=nan
+18:18:19 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.968 best1=0.969 n_val=12406 vram=0.00GB 67s | grade=0.953 inner_auc=0.786 vs conf_auc=0.797
+18:18:33 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+18:18:58 [hand/graph/imdb_binary] vote=0.685 uniform=0.681 best1=0.688 n_val=317 vram=0.00GB 25s | grade=0.857 inner_auc=n/a vs conf_auc=n/a
+18:19:26 [hand/graph/aids] vote=0.988 uniform=0.986 best1=0.986 n_val=583 vram=0.00GB 27s | grade=0.967 inner_auc=0.968 vs conf_auc=0.964
+18:20:34 [hand/graph/ogbg_molhiv] vote=0.967 uniform=0.967 best1=0.967 n_val=12127 vram=0.00GB 69s | grade=0.957 inner_auc=0.774 vs conf_auc=0.760
+18:20:50 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+18:21:08 [hand/graph/imdb_binary] vote=0.727 uniform=0.742 best1=0.745 n_val=267 vram=0.00GB 18s | grade=0.864 inner_auc=n/a vs conf_auc=n/a
+18:21:30 [hand/graph/aids] vote=0.987 uniform=0.987 best1=0.989 n_val=613 vram=0.00GB 22s | grade=0.938 inner_auc=1.000 vs conf_auc=1.000
+18:22:37 [hand/graph/ogbg_molhiv] vote=0.967 uniform=0.967 best1=0.968 n_val=12238 vram=0.00GB 66s | grade=0.957 inner_auc=0.774 vs conf_auc=0.765
+18:22:57 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+18:23:21 [hand/graph/imdb_binary] vote=0.731 uniform=0.738 best1=0.745 n_val=294 vram=0.00GB 24s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+18:23:48 [hand/graph/aids] vote=0.992 uniform=0.992 best1=0.994 n_val=646 vram=0.00GB 27s | grade=0.971 inner_auc=1.000 vs conf_auc=1.000
+01:03:54 NI run auto_cpu_004 on CPU; hours=2.0 smoke=False
+01:03:54 explicit task list: ['hand/graph/imdb_binary', 'hand/graph/aids', 'hand/graph/ogbg_molhiv']
+01:04:10 [resume] from checkpoint: next cycle 25, rounds 75, 77 metric rows, inner net restored
+01:04:11 ===== CYCLE 25 (OUTER-ONLY BOOTSTRAP) =====
+01:04:11 [data] hand/graph/imdb_binary: n=1000 C=2 D=22 shards=1
+01:05:58 [hand/graph/imdb_binary] vote=0.752 uniform=0.752 best1=0.745 n_val=294 vram=0.00GB 108s
+01:05:58 [data] hand/graph/aids: n=2000 C=2 D=96 shards=1
+01:07:44 [hand/graph/aids] vote=0.994 uniform=0.994 best1=0.994 n_val=646 vram=0.00GB 106s
+01:07:44 [data] hand/graph/ogbg_molhiv: n=41127 C=2 D=38 shards=1
+01:09:10 [hand/graph/ogbg_molhiv] vote=0.843 uniform=0.968 best1=0.969 n_val=12344 vram=0.00GB 85s
+01:09:52 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 25, "n_records": 13284, "n_val": 2708, "base_rate": 0.8519202470779419, "inner": {"auc": 0.9537194075928515, "ece": 0.009018492122817691, "brier": 0.029924817383289337, "acc80": 0.9833794832229614}, "outer_conf": {"auc": 0.7632398198262471, "ece": 0.09573691667358845, "brier": 0.12332630902528763, "acc80": 0.9016620516777039}}
+01:09:52 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+01:10:25 [hand/graph/imdb_binary] vote=0.728 uniform=0.735 best1=0.745 n_val=302 vram=0.00GB 33s | grade=0.870 inner_auc=n/a vs conf_auc=n/a
+01:10:57 [hand/graph/aids] vote=0.998 uniform=0.998 best1=0.998 n_val=584 vram=0.00GB 32s | grade=0.991 inner_auc=nan vs conf_auc=nan
+01:11:25 [hand/graph/ogbg_molhiv] vote=0.949 uniform=0.968 best1=0.969 n_val=12305 vram=0.00GB 28s | grade=0.867 inner_auc=0.870 vs conf_auc=0.806
+01:11:34 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+01:12:07 [hand/graph/imdb_binary] vote=0.723 uniform=0.717 best1=0.730 n_val=311 vram=0.00GB 34s | grade=0.871 inner_auc=n/a vs conf_auc=n/a
+01:12:46 [hand/graph/aids] vote=0.992 uniform=0.993 best1=0.992 n_val=604 vram=0.00GB 39s | grade=0.990 inner_auc=0.967 vs conf_auc=0.959
+01:13:18 [hand/graph/ogbg_molhiv] vote=0.938 uniform=0.966 best1=0.968 n_val=12212 vram=0.00GB 32s | grade=0.909 inner_auc=0.871 vs conf_auc=0.791
+01:13:27 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+01:14:13 [hand/graph/imdb_binary] vote=0.693 uniform=0.700 best1=0.697 n_val=287 vram=0.00GB 46s | grade=0.848 inner_auc=n/a vs conf_auc=n/a
+01:14:55 [hand/graph/aids] vote=0.989 uniform=0.987 best1=0.987 n_val=619 vram=0.00GB 42s | grade=0.973 inner_auc=1.000 vs conf_auc=1.000
+01:15:30 [hand/graph/ogbg_molhiv] vote=0.952 uniform=0.967 best1=0.969 n_val=12374 vram=0.00GB 35s | grade=0.921 inner_auc=0.817 vs conf_auc=0.786
+01:15:36 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+01:15:57 [hand/graph/imdb_binary] vote=0.701 uniform=0.688 best1=0.713 n_val=324 vram=0.00GB 22s | grade=0.868 inner_auc=n/a vs conf_auc=n/a
+01:16:25 [hand/graph/aids] vote=0.993 uniform=0.993 best1=0.992 n_val=615 vram=0.00GB 27s | grade=0.968 inner_auc=nan vs conf_auc=nan
+01:16:50 [hand/graph/ogbg_molhiv] vote=0.844 uniform=0.966 best1=0.969 n_val=12194 vram=0.00GB 26s | grade=0.841 inner_auc=0.969 vs conf_auc=0.748
+01:16:57 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+01:17:19 [hand/graph/imdb_binary] vote=0.727 uniform=0.731 best1=0.721 n_val=297 vram=0.00GB 22s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+01:17:46 [hand/graph/aids] vote=0.994 uniform=0.991 best1=0.991 n_val=651 vram=0.00GB 27s | grade=0.969 inner_auc=nan vs conf_auc=nan
+01:18:12 [hand/graph/ogbg_molhiv] vote=0.941 uniform=0.966 best1=0.968 n_val=12259 vram=0.00GB 26s | grade=0.870 inner_auc=0.892 vs conf_auc=0.797
+01:18:19 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+01:18:43 [hand/graph/imdb_binary] vote=0.716 uniform=0.716 best1=0.719 n_val=306 vram=0.00GB 24s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+01:19:08 [hand/graph/aids] vote=0.987 uniform=0.990 best1=0.990 n_val=605 vram=0.00GB 25s | grade=0.986 inner_auc=1.000 vs conf_auc=1.000
+01:19:33 [hand/graph/ogbg_molhiv] vote=0.964 uniform=0.967 best1=0.969 n_val=12217 vram=0.00GB 25s | grade=0.932 inner_auc=0.830 vs conf_auc=0.808
+01:19:40 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+01:20:05 [hand/graph/imdb_binary] vote=0.761 uniform=0.765 best1=0.765 n_val=272 vram=0.00GB 25s | grade=0.857 inner_auc=n/a vs conf_auc=n/a
+01:20:31 [hand/graph/aids] vote=0.987 uniform=0.987 best1=0.990 n_val=621 vram=0.00GB 25s | grade=0.959 inner_auc=0.991 vs conf_auc=1.000
+01:20:55 [hand/graph/ogbg_molhiv] vote=0.947 uniform=0.970 best1=0.970 n_val=12200 vram=0.00GB 24s | grade=0.907 inner_auc=0.857 vs conf_auc=0.775
+01:21:02 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+01:21:29 [hand/graph/imdb_binary] vote=0.752 uniform=0.745 best1=0.742 n_val=306 vram=0.00GB 27s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+01:21:55 [hand/graph/aids] vote=0.988 uniform=0.993 best1=0.993 n_val=597 vram=0.00GB 26s | grade=0.987 inner_auc=1.000 vs conf_auc=1.000
+01:22:18 [hand/graph/ogbg_molhiv] vote=0.963 uniform=0.966 best1=0.967 n_val=12318 vram=0.00GB 23s | grade=0.934 inner_auc=0.758 vs conf_auc=0.751
+01:22:25 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+01:22:52 [hand/graph/imdb_binary] vote=0.655 uniform=0.655 best1=0.679 n_val=287 vram=0.00GB 27s | grade=0.812 inner_auc=n/a vs conf_auc=n/a
+01:23:19 [hand/graph/aids] vote=0.993 uniform=0.995 best1=0.993 n_val=576 vram=0.00GB 28s | grade=0.944 inner_auc=0.991 vs conf_auc=1.000
+01:23:40 [hand/graph/ogbg_molhiv] vote=0.946 uniform=0.968 best1=0.967 n_val=12345 vram=0.00GB 21s | grade=0.899 inner_auc=0.854 vs conf_auc=0.786
+01:23:48 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+01:24:17 [hand/graph/imdb_binary] vote=0.730 uniform=0.737 best1=0.743 n_val=300 vram=0.00GB 29s | grade=0.840 inner_auc=n/a vs conf_auc=n/a
+01:24:49 [hand/graph/aids] vote=0.995 uniform=0.997 best1=0.997 n_val=598 vram=0.00GB 31s | grade=0.987 inner_auc=1.000 vs conf_auc=1.000
+01:25:25 [hand/graph/ogbg_molhiv] vote=0.931 uniform=0.964 best1=0.966 n_val=12137 vram=0.00GB 37s | grade=0.911 inner_auc=0.896 vs conf_auc=0.831
+01:25:36 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+01:26:06 [hand/graph/imdb_binary] vote=0.723 uniform=0.733 best1=0.723 n_val=329 vram=0.00GB 30s | grade=0.871 inner_auc=n/a vs conf_auc=n/a
+01:26:38 [hand/graph/aids] vote=0.992 uniform=0.995 best1=1.000 n_val=618 vram=0.00GB 32s | grade=0.977 inner_auc=1.000 vs conf_auc=0.996
+01:27:01 [hand/graph/ogbg_molhiv] vote=0.941 uniform=0.966 best1=0.969 n_val=12113 vram=0.00GB 24s | grade=0.911 inner_auc=0.868 vs conf_auc=0.788
+01:27:08 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+01:27:33 [hand/graph/imdb_binary] vote=0.713 uniform=0.720 best1=0.726 n_val=296 vram=0.00GB 25s | grade=0.866 inner_auc=n/a vs conf_auc=n/a
+01:28:04 [hand/graph/aids] vote=0.988 uniform=0.992 best1=0.992 n_val=600 vram=0.00GB 31s | grade=0.977 inner_auc=0.996 vs conf_auc=1.000
+01:28:35 [hand/graph/ogbg_molhiv] vote=0.937 uniform=0.964 best1=0.965 n_val=12114 vram=0.00GB 32s | grade=0.913 inner_auc=0.885 vs conf_auc=0.827
+01:28:45 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+01:29:17 [hand/graph/imdb_binary] vote=0.678 uniform=0.678 best1=0.702 n_val=289 vram=0.00GB 32s | grade=0.845 inner_auc=n/a vs conf_auc=n/a
+01:29:56 [hand/graph/aids] vote=0.985 uniform=0.986 best1=0.990 n_val=585 vram=0.00GB 39s | grade=0.970 inner_auc=1.000 vs conf_auc=1.000
+01:30:32 [hand/graph/ogbg_molhiv] vote=0.967 uniform=0.967 best1=0.969 n_val=12247 vram=0.00GB 36s | grade=0.930 inner_auc=0.754 vs conf_auc=0.771
+01:30:41 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+01:31:15 [hand/graph/imdb_binary] vote=0.733 uniform=0.730 best1=0.740 n_val=296 vram=0.00GB 33s | grade=0.865 inner_auc=n/a vs conf_auc=n/a
+01:31:52 [hand/graph/aids] vote=0.992 uniform=0.994 best1=0.992 n_val=629 vram=0.00GB 38s | grade=0.993 inner_auc=0.993 vs conf_auc=0.993
+01:32:27 [hand/graph/ogbg_molhiv] vote=0.939 uniform=0.968 best1=0.969 n_val=12270 vram=0.00GB 35s | grade=0.899 inner_auc=0.889 vs conf_auc=0.816
+01:32:37 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+01:33:09 [hand/graph/imdb_binary] vote=0.715 uniform=0.704 best1=0.708 n_val=291 vram=0.00GB 32s | grade=0.865 inner_auc=n/a vs conf_auc=n/a
+01:33:42 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.997 n_val=572 vram=0.00GB 33s | grade=0.966 inner_auc=1.000 vs conf_auc=1.000
+01:34:13 [hand/graph/ogbg_molhiv] vote=0.939 uniform=0.965 best1=0.966 n_val=12246 vram=0.00GB 31s | grade=0.914 inner_auc=0.817 vs conf_auc=0.756
+01:34:23 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+01:34:56 [hand/graph/imdb_binary] vote=0.693 uniform=0.673 best1=0.690 n_val=300 vram=0.00GB 33s | grade=0.852 inner_auc=n/a vs conf_auc=n/a
+01:35:28 [hand/graph/aids] vote=0.989 uniform=0.989 best1=0.987 n_val=634 vram=0.00GB 32s | grade=0.964 inner_auc=nan vs conf_auc=nan
+01:35:58 [hand/graph/ogbg_molhiv] vote=0.934 uniform=0.967 best1=0.966 n_val=12423 vram=0.00GB 31s | grade=0.912 inner_auc=0.885 vs conf_auc=0.808
+01:36:09 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+01:36:43 [hand/graph/imdb_binary] vote=0.712 uniform=0.703 best1=0.716 n_val=306 vram=0.00GB 35s | grade=0.868 inner_auc=n/a vs conf_auc=n/a
+01:37:21 [hand/graph/aids] vote=0.992 uniform=0.992 best1=0.995 n_val=618 vram=0.00GB 37s | grade=0.987 inner_auc=1.000 vs conf_auc=1.000
+01:37:55 [hand/graph/ogbg_molhiv] vote=0.938 uniform=0.967 best1=0.968 n_val=12204 vram=0.00GB 34s | grade=0.912 inner_auc=0.895 vs conf_auc=0.809
+01:38:06 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+01:38:44 [hand/graph/imdb_binary] vote=0.728 uniform=0.725 best1=0.734 n_val=305 vram=0.00GB 39s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+01:39:22 [hand/graph/aids] vote=0.992 uniform=0.990 best1=0.993 n_val=605 vram=0.00GB 38s | grade=0.896 inner_auc=0.983 vs conf_auc=1.000
+01:39:50 [hand/graph/ogbg_molhiv] vote=0.955 uniform=0.967 best1=0.967 n_val=12397 vram=0.00GB 28s | grade=0.921 inner_auc=0.830 vs conf_auc=0.767
+01:39:58 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+01:40:32 [hand/graph/imdb_binary] vote=0.675 uniform=0.675 best1=0.685 n_val=286 vram=0.00GB 34s | grade=0.833 inner_auc=n/a vs conf_auc=n/a
+01:41:08 [hand/graph/aids] vote=0.989 uniform=0.994 best1=0.991 n_val=638 vram=0.00GB 36s | grade=0.985 inner_auc=1.000 vs conf_auc=1.000
+01:41:35 [hand/graph/ogbg_molhiv] vote=0.943 uniform=0.966 best1=0.969 n_val=12368 vram=0.00GB 27s | grade=0.910 inner_auc=0.841 vs conf_auc=0.787
+01:41:43 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+01:42:13 [hand/graph/imdb_binary] vote=0.683 uniform=0.679 best1=0.700 n_val=287 vram=0.00GB 30s | grade=0.858 inner_auc=n/a vs conf_auc=n/a
+01:42:50 [hand/graph/aids] vote=0.988 uniform=0.990 best1=0.990 n_val=604 vram=0.00GB 37s | grade=0.985 inner_auc=0.962 vs conf_auc=0.962
+01:43:21 [hand/graph/ogbg_molhiv] vote=0.805 uniform=0.965 best1=0.966 n_val=12257 vram=0.00GB 30s | grade=0.827 inner_auc=0.957 vs conf_auc=0.770
+01:43:30 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+01:44:01 [hand/graph/imdb_binary] vote=0.687 uniform=0.683 best1=0.700 n_val=300 vram=0.00GB 31s | grade=0.882 inner_auc=n/a vs conf_auc=n/a
+01:44:38 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.997 n_val=587 vram=0.00GB 37s | grade=0.991 inner_auc=1.000 vs conf_auc=1.000
+01:45:09 [hand/graph/ogbg_molhiv] vote=0.939 uniform=0.968 best1=0.970 n_val=12447 vram=0.00GB 31s | grade=0.842 inner_auc=0.876 vs conf_auc=0.789
+01:45:17 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+01:45:47 [hand/graph/imdb_binary] vote=0.690 uniform=0.687 best1=0.703 n_val=313 vram=0.00GB 30s | grade=0.884 inner_auc=n/a vs conf_auc=n/a
+01:46:23 [hand/graph/aids] vote=0.991 uniform=0.993 best1=0.995 n_val=568 vram=0.00GB 37s | grade=0.983 inner_auc=1.000 vs conf_auc=1.000
+01:46:55 [hand/graph/ogbg_molhiv] vote=0.940 uniform=0.966 best1=0.968 n_val=12478 vram=0.00GB 32s | grade=0.915 inner_auc=0.866 vs conf_auc=0.786
+01:47:05 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+01:47:35 [hand/graph/imdb_binary] vote=0.704 uniform=0.695 best1=0.724 n_val=311 vram=0.00GB 30s | grade=0.874 inner_auc=n/a vs conf_auc=n/a
+01:48:08 [hand/graph/aids] vote=0.993 uniform=0.995 best1=0.995 n_val=600 vram=0.00GB 33s | grade=0.958 inner_auc=nan vs conf_auc=nan
+01:48:37 [hand/graph/ogbg_molhiv] vote=0.965 uniform=0.966 best1=0.968 n_val=12417 vram=0.00GB 30s | grade=0.922 inner_auc=0.751 vs conf_auc=0.761
+01:48:46 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+01:49:14 [hand/graph/imdb_binary] vote=0.688 uniform=0.681 best1=0.688 n_val=298 vram=0.00GB 28s | grade=0.877 inner_auc=n/a vs conf_auc=n/a
+01:49:43 [hand/graph/aids] vote=0.998 uniform=0.993 best1=0.995 n_val=587 vram=0.00GB 29s | grade=0.948 inner_auc=nan vs conf_auc=nan
+01:50:15 [hand/graph/ogbg_molhiv] vote=0.941 uniform=0.968 best1=0.970 n_val=12417 vram=0.00GB 32s | grade=0.903 inner_auc=0.855 vs conf_auc=0.792
+01:50:23 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+01:51:05 [hand/graph/imdb_binary] vote=0.721 uniform=0.718 best1=0.725 n_val=305 vram=0.00GB 42s | grade=0.880 inner_auc=n/a vs conf_auc=n/a
+01:52:33 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.997 n_val=631 vram=0.00GB 88s | grade=0.989 inner_auc=nan vs conf_auc=nan
+01:53:32 [hand/graph/ogbg_molhiv] vote=0.939 uniform=0.966 best1=0.967 n_val=12392 vram=0.00GB 59s | grade=0.911 inner_auc=0.874 vs conf_auc=0.787
+01:53:46 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+01:54:27 [hand/graph/imdb_binary] vote=0.744 uniform=0.737 best1=0.737 n_val=293 vram=0.00GB 40s | grade=0.880 inner_auc=n/a vs conf_auc=n/a
+01:54:57 [hand/graph/aids] vote=0.993 uniform=0.995 best1=0.993 n_val=590 vram=0.00GB 30s | grade=0.995 inner_auc=nan vs conf_auc=nan
+01:55:21 [hand/graph/ogbg_molhiv] vote=0.937 uniform=0.966 best1=0.968 n_val=12414 vram=0.00GB 24s | grade=0.912 inner_auc=0.844 vs conf_auc=0.768
+01:55:28 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+01:55:56 [hand/graph/imdb_binary] vote=0.647 uniform=0.647 best1=0.677 n_val=303 vram=0.00GB 28s | grade=0.798 inner_auc=n/a vs conf_auc=n/a
+01:56:26 [hand/graph/aids] vote=0.991 uniform=0.993 best1=0.997 n_val=585 vram=0.00GB 30s | grade=0.979 inner_auc=nan vs conf_auc=nan
+01:56:51 [hand/graph/ogbg_molhiv] vote=0.940 uniform=0.967 best1=0.967 n_val=12452 vram=0.00GB 25s | grade=0.911 inner_auc=0.870 vs conf_auc=0.798
+01:57:00 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+01:58:38 [hand/graph/imdb_binary] vote=0.712 uniform=0.705 best1=0.726 n_val=285 vram=0.00GB 98s | grade=0.860 inner_auc=n/a vs conf_auc=n/a
+02:00:37 [hand/graph/aids] vote=0.986 uniform=0.986 best1=0.988 n_val=588 vram=0.00GB 119s | grade=0.953 inner_auc=0.963 vs conf_auc=0.935
+02:01:13 [hand/graph/ogbg_molhiv] vote=0.966 uniform=0.966 best1=0.968 n_val=12289 vram=0.00GB 36s | grade=0.929 inner_auc=0.815 vs conf_auc=0.793
+02:01:24 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+02:02:01 [hand/graph/imdb_binary] vote=0.713 uniform=0.706 best1=0.729 n_val=303 vram=0.00GB 37s | grade=0.877 inner_auc=n/a vs conf_auc=n/a
+02:02:40 [hand/graph/aids] vote=0.987 uniform=0.985 best1=0.987 n_val=602 vram=0.00GB 39s | grade=0.972 inner_auc=1.000 vs conf_auc=0.988
+02:03:48 [hand/graph/ogbg_molhiv] vote=0.941 uniform=0.968 best1=0.968 n_val=12223 vram=0.00GB 67s | grade=0.901 inner_auc=0.878 vs conf_auc=0.802
+02:04:15 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+02:05:42 [hand/graph/imdb_binary] vote=0.697 uniform=0.704 best1=0.710 n_val=314 vram=0.00GB 88s | grade=0.880 inner_auc=n/a vs conf_auc=n/a
+02:06:53 [hand/graph/aids] vote=0.993 uniform=0.995 best1=0.995 n_val=550 vram=0.00GB 70s | grade=0.970 inner_auc=n/a vs conf_auc=n/a
+02:07:23 [hand/graph/ogbg_molhiv] vote=0.964 uniform=0.966 best1=0.969 n_val=12444 vram=0.00GB 30s | grade=0.927 inner_auc=0.815 vs conf_auc=0.798
+02:07:33 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+02:08:00 [hand/graph/imdb_binary] vote=0.709 uniform=0.699 best1=0.706 n_val=306 vram=0.00GB 27s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+02:08:34 [hand/graph/aids] vote=0.992 uniform=0.991 best1=0.992 n_val=632 vram=0.00GB 34s | grade=0.963 inner_auc=1.000 vs conf_auc=1.000
+02:09:47 [hand/graph/ogbg_molhiv] vote=0.932 uniform=0.967 best1=0.967 n_val=12374 vram=0.00GB 73s | grade=0.893 inner_auc=0.879 vs conf_auc=0.811
+02:10:17 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+02:10:53 [hand/graph/imdb_binary] vote=0.701 uniform=0.711 best1=0.731 n_val=301 vram=0.00GB 36s | grade=0.871 inner_auc=n/a vs conf_auc=n/a
+02:11:23 [hand/graph/aids] vote=0.989 uniform=0.990 best1=0.987 n_val=623 vram=0.00GB 30s | grade=0.957 inner_auc=0.991 vs conf_auc=0.991
+02:11:53 [hand/graph/ogbg_molhiv] vote=0.939 uniform=0.969 best1=0.970 n_val=12348 vram=0.00GB 30s | grade=0.908 inner_auc=0.903 vs conf_auc=0.803
+02:12:02 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+02:12:32 [hand/graph/imdb_binary] vote=0.727 uniform=0.720 best1=0.720 n_val=289 vram=0.00GB 30s | grade=0.864 inner_auc=n/a vs conf_auc=n/a
+02:13:00 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.997 n_val=583 vram=0.00GB 28s | grade=0.993 inner_auc=1.000 vs conf_auc=1.000
+02:13:24 [hand/graph/ogbg_molhiv] vote=0.938 uniform=0.964 best1=0.967 n_val=12280 vram=0.00GB 25s | grade=0.911 inner_auc=0.876 vs conf_auc=0.802
+02:13:33 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+02:14:03 [hand/graph/imdb_binary] vote=0.714 uniform=0.707 best1=0.721 n_val=287 vram=0.00GB 29s | grade=0.877 inner_auc=n/a vs conf_auc=n/a
+02:14:35 [hand/graph/aids] vote=0.985 uniform=0.986 best1=0.988 n_val=648 vram=0.00GB 32s | grade=0.973 inner_auc=1.000 vs conf_auc=1.000
+02:15:01 [hand/graph/ogbg_molhiv] vote=0.935 uniform=0.968 best1=0.969 n_val=12240 vram=0.00GB 26s | grade=0.910 inner_auc=0.896 vs conf_auc=0.814
+02:15:09 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+02:15:40 [hand/graph/imdb_binary] vote=0.739 uniform=0.739 best1=0.764 n_val=310 vram=0.00GB 31s | grade=0.868 inner_auc=n/a vs conf_auc=n/a
+02:16:16 [hand/graph/aids] vote=0.991 uniform=0.991 best1=0.993 n_val=578 vram=0.00GB 35s | grade=0.983 inner_auc=nan vs conf_auc=nan
+02:16:45 [hand/graph/ogbg_molhiv] vote=0.778 uniform=0.969 best1=0.969 n_val=12368 vram=0.00GB 29s | grade=0.817 inner_auc=0.973 vs conf_auc=0.787
+02:16:53 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+02:17:25 [hand/graph/imdb_binary] vote=0.681 uniform=0.691 best1=0.705 n_val=298 vram=0.00GB 32s | grade=0.849 inner_auc=n/a vs conf_auc=n/a
+02:17:58 [hand/graph/aids] vote=0.992 uniform=0.994 best1=0.990 n_val=625 vram=0.00GB 34s | grade=0.987 inner_auc=1.000 vs conf_auc=1.000
+02:18:27 [hand/graph/ogbg_molhiv] vote=0.937 uniform=0.967 best1=0.968 n_val=12444 vram=0.00GB 29s | grade=0.829 inner_auc=0.897 vs conf_auc=0.802
+02:18:35 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+02:19:02 [hand/graph/imdb_binary] vote=0.739 uniform=0.730 best1=0.736 n_val=322 vram=0.00GB 27s | grade=0.857 inner_auc=n/a vs conf_auc=n/a
+02:19:35 [hand/graph/aids] vote=0.990 uniform=0.995 best1=0.992 n_val=608 vram=0.00GB 33s | grade=0.988 inner_auc=nan vs conf_auc=nan
+02:20:04 [hand/graph/ogbg_molhiv] vote=0.942 uniform=0.969 best1=0.969 n_val=12510 vram=0.00GB 29s | grade=0.905 inner_auc=0.879 vs conf_auc=0.797
+02:20:14 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+02:20:39 [hand/graph/imdb_binary] vote=0.694 uniform=0.694 best1=0.707 n_val=310 vram=0.00GB 25s | grade=0.855 inner_auc=n/a vs conf_auc=n/a
+02:21:08 [hand/graph/aids] vote=0.993 uniform=0.995 best1=0.993 n_val=578 vram=0.00GB 29s | grade=0.977 inner_auc=nan vs conf_auc=nan
+02:21:35 [hand/graph/ogbg_molhiv] vote=0.938 uniform=0.966 best1=0.968 n_val=12320 vram=0.00GB 28s | grade=0.908 inner_auc=0.884 vs conf_auc=0.804
+02:21:44 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+02:22:12 [hand/graph/imdb_binary] vote=0.696 uniform=0.670 best1=0.703 n_val=276 vram=0.00GB 28s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+02:22:39 [hand/graph/aids] vote=0.990 uniform=0.990 best1=0.990 n_val=620 vram=0.00GB 27s | grade=0.985 inner_auc=0.980 vs conf_auc=0.984
+02:23:06 [hand/graph/ogbg_molhiv] vote=0.955 uniform=0.968 best1=0.970 n_val=12307 vram=0.00GB 27s | grade=0.919 inner_auc=0.855 vs conf_auc=0.837
+02:23:15 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+02:23:43 [hand/graph/imdb_binary] vote=0.666 uniform=0.656 best1=0.669 n_val=308 vram=0.00GB 28s | grade=0.850 inner_auc=n/a vs conf_auc=n/a
+02:24:12 [hand/graph/aids] vote=0.992 uniform=0.997 best1=0.992 n_val=597 vram=0.00GB 29s | grade=0.976 inner_auc=1.000 vs conf_auc=1.000
+02:24:36 [hand/graph/ogbg_molhiv] vote=0.963 uniform=0.966 best1=0.967 n_val=12201 vram=0.00GB 24s | grade=0.935 inner_auc=0.768 vs conf_auc=0.761
+02:24:45 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+02:25:14 [hand/graph/imdb_binary] vote=0.693 uniform=0.661 best1=0.693 n_val=322 vram=0.00GB 28s | grade=0.861 inner_auc=n/a vs conf_auc=n/a
+02:25:44 [hand/graph/aids] vote=0.992 uniform=0.992 best1=0.990 n_val=597 vram=0.00GB 30s | grade=0.973 inner_auc=0.964 vs conf_auc=0.986
+02:26:08 [hand/graph/ogbg_molhiv] vote=0.954 uniform=0.967 best1=0.968 n_val=12373 vram=0.00GB 24s | grade=0.924 inner_auc=0.832 vs conf_auc=0.793
+02:26:15 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+02:26:42 [hand/graph/imdb_binary] vote=0.711 uniform=0.721 best1=0.718 n_val=287 vram=0.00GB 27s | grade=0.878 inner_auc=n/a vs conf_auc=n/a
+02:27:13 [hand/graph/aids] vote=0.991 uniform=0.989 best1=0.991 n_val=659 vram=0.00GB 31s | grade=0.964 inner_auc=0.986 vs conf_auc=0.993
+02:27:37 [hand/graph/ogbg_molhiv] vote=0.939 uniform=0.967 best1=0.969 n_val=12369 vram=0.00GB 24s | grade=0.902 inner_auc=0.889 vs conf_auc=0.822
+02:27:46 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+02:28:11 [hand/graph/imdb_binary] vote=0.698 uniform=0.707 best1=0.714 n_val=311 vram=0.00GB 25s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+02:28:42 [hand/graph/aids] vote=0.993 uniform=0.998 best1=0.991 n_val=579 vram=0.00GB 31s | grade=0.974 inner_auc=nan vs conf_auc=nan
+02:29:10 [hand/graph/ogbg_molhiv] vote=0.933 uniform=0.968 best1=0.969 n_val=12414 vram=0.00GB 28s | grade=0.908 inner_auc=0.866 vs conf_auc=0.798
+02:29:17 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+02:29:42 [hand/graph/imdb_binary] vote=0.689 uniform=0.676 best1=0.699 n_val=296 vram=0.00GB 25s | grade=0.847 inner_auc=n/a vs conf_auc=n/a
+02:30:11 [hand/graph/aids] vote=0.998 uniform=0.998 best1=0.997 n_val=585 vram=0.00GB 29s | grade=0.952 inner_auc=nan vs conf_auc=nan
+02:30:39 [hand/graph/ogbg_molhiv] vote=0.932 uniform=0.963 best1=0.965 n_val=12361 vram=0.00GB 28s | grade=0.908 inner_auc=0.867 vs conf_auc=0.795
+02:30:48 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+02:31:15 [hand/graph/imdb_binary] vote=0.719 uniform=0.715 best1=0.741 n_val=270 vram=0.00GB 27s | grade=0.875 inner_auc=n/a vs conf_auc=n/a
+02:31:42 [hand/graph/aids] vote=0.992 uniform=0.994 best1=0.994 n_val=620 vram=0.00GB 27s | grade=0.984 inner_auc=0.992 vs conf_auc=0.992
+02:32:10 [hand/graph/ogbg_molhiv] vote=0.956 uniform=0.965 best1=0.966 n_val=12314 vram=0.00GB 28s | grade=0.916 inner_auc=0.808 vs conf_auc=0.754
+02:32:18 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+02:32:48 [hand/graph/imdb_binary] vote=0.747 uniform=0.730 best1=0.737 n_val=304 vram=0.00GB 30s | grade=0.878 inner_auc=n/a vs conf_auc=n/a
+02:33:16 [hand/graph/aids] vote=0.993 uniform=0.992 best1=0.992 n_val=607 vram=0.00GB 28s | grade=0.968 inner_auc=0.993 vs conf_auc=1.000
+02:33:41 [hand/graph/ogbg_molhiv] vote=0.934 uniform=0.966 best1=0.968 n_val=12212 vram=0.00GB 25s | grade=0.896 inner_auc=0.890 vs conf_auc=0.806
+02:33:49 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+02:34:18 [hand/graph/imdb_binary] vote=0.737 uniform=0.716 best1=0.747 n_val=289 vram=0.00GB 29s | grade=0.877 inner_auc=n/a vs conf_auc=n/a
+02:34:48 [hand/graph/aids] vote=0.992 uniform=0.988 best1=0.992 n_val=590 vram=0.00GB 30s | grade=0.895 inner_auc=1.000 vs conf_auc=1.000
+02:35:12 [hand/graph/ogbg_molhiv] vote=0.932 uniform=0.966 best1=0.968 n_val=12353 vram=0.00GB 24s | grade=0.908 inner_auc=0.903 vs conf_auc=0.810
+02:35:20 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+02:35:48 [hand/graph/imdb_binary] vote=0.717 uniform=0.701 best1=0.707 n_val=304 vram=0.00GB 28s | grade=0.882 inner_auc=n/a vs conf_auc=n/a
+02:36:19 [hand/graph/aids] vote=0.992 uniform=0.993 best1=0.994 n_val=613 vram=0.00GB 31s | grade=0.983 inner_auc=0.996 vs conf_auc=1.000
+02:36:43 [hand/graph/ogbg_molhiv] vote=0.936 uniform=0.968 best1=0.970 n_val=12406 vram=0.00GB 24s | grade=0.908 inner_auc=0.885 vs conf_auc=0.809
+02:36:51 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+02:37:17 [hand/graph/imdb_binary] vote=0.708 uniform=0.701 best1=0.711 n_val=308 vram=0.00GB 26s | grade=0.872 inner_auc=n/a vs conf_auc=n/a
+02:37:48 [hand/graph/aids] vote=0.993 uniform=0.993 best1=0.995 n_val=575 vram=0.00GB 31s | grade=0.946 inner_auc=nan vs conf_auc=nan
+02:38:15 [hand/graph/ogbg_molhiv] vote=0.756 uniform=0.965 best1=0.966 n_val=12166 vram=0.00GB 27s | grade=0.806 inner_auc=0.977 vs conf_auc=0.784
+02:38:23 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+02:38:46 [hand/graph/imdb_binary] vote=0.703 uniform=0.693 best1=0.709 n_val=306 vram=0.00GB 23s | grade=0.868 inner_auc=n/a vs conf_auc=n/a
+02:39:14 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.997 n_val=657 vram=0.00GB 28s | grade=0.993 inner_auc=0.984 vs conf_auc=0.992
+02:39:39 [hand/graph/ogbg_molhiv] vote=0.937 uniform=0.966 best1=0.967 n_val=12544 vram=0.00GB 25s | grade=0.816 inner_auc=0.893 vs conf_auc=0.818
+02:39:48 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+02:40:10 [hand/graph/imdb_binary] vote=0.685 uniform=0.685 best1=0.695 n_val=295 vram=0.00GB 23s | grade=0.858 inner_auc=n/a vs conf_auc=n/a
+02:40:37 [hand/graph/aids] vote=0.993 uniform=0.993 best1=0.993 n_val=592 vram=0.00GB 27s | grade=0.966 inner_auc=nan vs conf_auc=nan
+02:41:01 [hand/graph/ogbg_molhiv] vote=0.955 uniform=0.968 best1=0.969 n_val=12268 vram=0.00GB 24s | grade=0.915 inner_auc=0.799 vs conf_auc=0.768
+02:41:10 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+02:41:35 [hand/graph/imdb_binary] vote=0.672 uniform=0.666 best1=0.682 n_val=296 vram=0.00GB 25s | grade=0.843 inner_auc=n/a vs conf_auc=n/a
+02:42:01 [hand/graph/aids] vote=0.992 uniform=0.993 best1=0.993 n_val=595 vram=0.00GB 26s | grade=0.995 inner_auc=nan vs conf_auc=nan
+02:42:35 [hand/graph/ogbg_molhiv] vote=0.934 uniform=0.968 best1=0.969 n_val=12273 vram=0.00GB 34s | grade=0.899 inner_auc=0.866 vs conf_auc=0.771
+02:42:47 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+02:43:23 [hand/graph/imdb_binary] vote=0.697 uniform=0.690 best1=0.704 n_val=287 vram=0.00GB 36s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+02:44:01 [hand/graph/aids] vote=0.995 uniform=0.995 best1=0.997 n_val=575 vram=0.00GB 39s | grade=0.944 inner_auc=0.991 vs conf_auc=1.000
+02:44:34 [hand/graph/ogbg_molhiv] vote=0.952 uniform=0.967 best1=0.968 n_val=12079 vram=0.00GB 32s | grade=0.918 inner_auc=0.813 vs conf_auc=0.788
+02:44:45 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+02:45:22 [hand/graph/imdb_binary] vote=0.709 uniform=0.719 best1=0.726 n_val=285 vram=0.00GB 37s | grade=0.866 inner_auc=n/a vs conf_auc=n/a
+02:46:02 [hand/graph/aids] vote=0.995 uniform=0.995 best1=0.995 n_val=608 vram=0.00GB 40s | grade=0.972 inner_auc=nan vs conf_auc=nan
+02:46:36 [hand/graph/ogbg_molhiv] vote=0.938 uniform=0.969 best1=0.969 n_val=12406 vram=0.00GB 34s | grade=0.900 inner_auc=0.900 vs conf_auc=0.823
+02:46:46 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+02:47:22 [hand/graph/imdb_binary] vote=0.690 uniform=0.690 best1=0.710 n_val=300 vram=0.00GB 35s | grade=0.865 inner_auc=n/a vs conf_auc=n/a
+02:48:02 [hand/graph/aids] vote=0.991 uniform=0.995 best1=0.991 n_val=571 vram=0.00GB 40s | grade=0.994 inner_auc=0.976 vs conf_auc=0.948
+02:48:38 [hand/graph/ogbg_molhiv] vote=0.954 uniform=0.968 best1=0.968 n_val=12325 vram=0.00GB 36s | grade=0.916 inner_auc=0.820 vs conf_auc=0.793
+02:48:49 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+02:49:25 [hand/graph/imdb_binary] vote=0.696 uniform=0.689 best1=0.722 n_val=309 vram=0.00GB 35s | grade=0.865 inner_auc=n/a vs conf_auc=n/a
+02:50:05 [hand/graph/aids] vote=0.992 uniform=0.997 best1=0.997 n_val=623 vram=0.00GB 40s | grade=0.977 inner_auc=1.000 vs conf_auc=0.992
+02:50:39 [hand/graph/ogbg_molhiv] vote=0.934 uniform=0.965 best1=0.967 n_val=12468 vram=0.00GB 35s | grade=0.899 inner_auc=0.882 vs conf_auc=0.820
+02:50:52 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+02:51:24 [hand/graph/imdb_binary] vote=0.704 uniform=0.698 best1=0.711 n_val=318 vram=0.00GB 32s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+02:51:53 [hand/graph/aids] vote=0.986 uniform=0.988 best1=0.988 n_val=579 vram=0.00GB 29s | grade=0.991 inner_auc=1.000 vs conf_auc=1.000
+02:52:17 [hand/graph/ogbg_molhiv] vote=0.931 uniform=0.966 best1=0.967 n_val=12452 vram=0.00GB 25s | grade=0.908 inner_auc=0.883 vs conf_auc=0.787
+02:52:26 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+02:52:53 [hand/graph/imdb_binary] vote=0.707 uniform=0.704 best1=0.707 n_val=304 vram=0.00GB 28s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+02:53:20 [hand/graph/aids] vote=0.992 uniform=0.993 best1=0.992 n_val=606 vram=0.00GB 27s | grade=0.956 inner_auc=0.991 vs conf_auc=0.982
+02:53:39 [hand/graph/ogbg_molhiv] vote=0.931 uniform=0.966 best1=0.968 n_val=12498 vram=0.00GB 19s | grade=0.906 inner_auc=0.885 vs conf_auc=0.796
+02:53:47 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+02:54:11 [hand/graph/imdb_binary] vote=0.714 uniform=0.711 best1=0.726 n_val=318 vram=0.00GB 24s | grade=0.862 inner_auc=n/a vs conf_auc=n/a
+02:54:37 [hand/graph/aids] vote=0.998 uniform=0.995 best1=0.998 n_val=614 vram=0.00GB 26s | grade=0.944 inner_auc=nan vs conf_auc=nan
+02:54:57 [hand/graph/ogbg_molhiv] vote=0.931 uniform=0.966 best1=0.968 n_val=12259 vram=0.00GB 20s | grade=0.909 inner_auc=0.903 vs conf_auc=0.824
+02:55:03 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+02:55:30 [hand/graph/imdb_binary] vote=0.683 uniform=0.692 best1=0.689 n_val=312 vram=0.00GB 27s | grade=0.871 inner_auc=n/a vs conf_auc=n/a
+02:55:58 [hand/graph/aids] vote=0.995 uniform=0.997 best1=0.998 n_val=597 vram=0.00GB 28s | grade=0.950 inner_auc=1.000 vs conf_auc=1.000
+02:56:21 [hand/graph/ogbg_molhiv] vote=0.935 uniform=0.967 best1=0.968 n_val=12232 vram=0.00GB 23s | grade=0.906 inner_auc=0.873 vs conf_auc=0.790
+02:56:28 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+02:56:50 [hand/graph/imdb_binary] vote=0.689 uniform=0.676 best1=0.689 n_val=296 vram=0.00GB 22s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+02:57:18 [hand/graph/aids] vote=0.996 uniform=0.998 best1=0.996 n_val=563 vram=0.00GB 28s | grade=0.996 inner_auc=n/a vs conf_auc=n/a
+02:57:44 [hand/graph/ogbg_molhiv] vote=0.926 uniform=0.964 best1=0.967 n_val=12379 vram=0.00GB 27s | grade=0.902 inner_auc=0.881 vs conf_auc=0.786
+02:57:53 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+02:58:16 [hand/graph/imdb_binary] vote=0.714 uniform=0.708 best1=0.742 n_val=318 vram=0.00GB 23s | grade=0.860 inner_auc=n/a vs conf_auc=n/a
+02:58:42 [hand/graph/aids] vote=0.992 uniform=0.992 best1=0.992 n_val=606 vram=0.00GB 26s | grade=0.976 inner_auc=0.991 vs conf_auc=0.983
+02:59:09 [hand/graph/ogbg_molhiv] vote=0.741 uniform=0.966 best1=0.968 n_val=12319 vram=0.00GB 26s | grade=0.796 inner_auc=0.970 vs conf_auc=0.773
+02:59:17 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+02:59:42 [hand/graph/imdb_binary] vote=0.701 uniform=0.711 best1=0.711 n_val=311 vram=0.00GB 26s | grade=0.869 inner_auc=n/a vs conf_auc=n/a
+03:00:12 [hand/graph/aids] vote=0.993 uniform=0.993 best1=0.990 n_val=595 vram=0.00GB 30s | grade=0.940 inner_auc=0.983 vs conf_auc=1.000
+03:00:39 [hand/graph/ogbg_molhiv] vote=0.931 uniform=0.965 best1=0.966 n_val=12339 vram=0.00GB 27s | grade=0.809 inner_auc=0.881 vs conf_auc=0.801
+03:00:48 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+03:01:16 [hand/graph/imdb_binary] vote=0.715 uniform=0.689 best1=0.722 n_val=309 vram=0.00GB 28s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+03:01:43 [hand/graph/aids] vote=0.997 uniform=0.995 best1=0.997 n_val=611 vram=0.00GB 27s | grade=0.955 inner_auc=nan vs conf_auc=nan
+03:02:06 [hand/graph/ogbg_molhiv] vote=0.929 uniform=0.965 best1=0.967 n_val=12310 vram=0.00GB 23s | grade=0.905 inner_auc=0.905 vs conf_auc=0.819
+03:02:14 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+03:02:41 [hand/graph/imdb_binary] vote=0.733 uniform=0.719 best1=0.736 n_val=303 vram=0.00GB 27s | grade=0.863 inner_auc=n/a vs conf_auc=n/a
+03:03:09 [hand/graph/aids] vote=1.000 uniform=1.000 best1=0.998 n_val=578 vram=0.00GB 27s | grade=0.994 inner_auc=n/a vs conf_auc=n/a
+03:03:30 [hand/graph/ogbg_molhiv] vote=0.934 uniform=0.967 best1=0.968 n_val=12388 vram=0.00GB 21s | grade=0.905 inner_auc=0.883 vs conf_auc=0.812
+03:03:38 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+03:04:02 [hand/graph/imdb_binary] vote=0.674 uniform=0.681 best1=0.695 n_val=282 vram=0.00GB 24s | grade=0.836 inner_auc=n/a vs conf_auc=n/a
+03:04:10 RUN COMPLETE
+14:59:12 NI run auto_cpu_004 on CPU; hours=2.0 smoke=False
+14:59:12 explicit task list: ['hand/graph/imdb_binary', 'hand/graph/aids', 'hand/graph/ogbg_molhiv']
+14:59:30 [resume] from checkpoint: next cycle 92, rounds 274, 276 metric rows, inner net restored
+14:59:30 ===== CYCLE 92 (OUTER-ONLY BOOTSTRAP) =====
+14:59:30 [data] hand/graph/imdb_binary: n=1000 C=2 D=22 shards=1
+15:01:50 [hand/graph/imdb_binary] vote=0.741 uniform=0.741 best1=0.747 n_val=332 vram=0.00GB 140s
+15:01:50 [data] hand/graph/aids: n=2000 C=2 D=96 shards=1
+06:28:29 NI run auto_cpu_004 on CPU; hours=2.0 smoke=False
+06:28:29 explicit task list: ['hand/graph/imdb_binary', 'hand/graph/aids', 'hand/graph/ogbg_molhiv']
+06:28:33 [resume] from checkpoint: next cycle 92, rounds 274, 277 metric rows, inner net restored
+06:28:33 ===== CYCLE 92 (OUTER-ONLY BOOTSTRAP) =====
+06:28:33 [data] hand/graph/imdb_binary: n=1000 C=2 D=22 shards=1
+06:29:25 [hand/graph/imdb_binary] vote=0.741 uniform=0.741 best1=0.747 n_val=332 vram=0.00GB 52s
+06:29:25 [data] hand/graph/aids: n=2000 C=2 D=96 shards=1
+06:30:37 [hand/graph/aids] vote=0.998 uniform=0.998 best1=1.000 n_val=594 vram=0.00GB 72s
+06:30:37 [data] hand/graph/ogbg_molhiv: n=41127 C=2 D=38 shards=1
+06:31:55 [hand/graph/ogbg_molhiv] vote=0.965 uniform=0.967 best1=0.968 n_val=12107 vram=0.00GB 79s
+06:32:38 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 92, "n_records": 13033, "n_val": 2610, "base_rate": 0.9574712514877319, "inner": {"auc": 0.7665138127323001, "ece": 0.016495489685928226, "brier": 0.036898452788591385, "acc80": 0.9789271950721741}, "outer_conf": {"auc": 0.7641507053271759, "ece": 0.02499137013808064, "brier": 0.03840872272849083, "acc80": 0.9784482717514038}}
+06:32:38 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+06:34:21 [hand/graph/imdb_binary] vote=0.665 uniform=0.656 best1=0.677 n_val=337 vram=0.00GB 102s | grade=0.838 inner_auc=n/a vs conf_auc=n/a
+06:36:25 [hand/graph/aids] vote=0.995 uniform=0.997 best1=0.993 n_val=599 vram=0.00GB 124s | grade=0.994 inner_auc=nan vs conf_auc=nan
+06:38:55 [hand/graph/ogbg_molhiv] vote=0.929 uniform=0.967 best1=0.968 n_val=12268 vram=0.00GB 150s | grade=0.887 inner_auc=0.895 vs conf_auc=0.826
+06:39:24 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+06:42:04 [hand/graph/imdb_binary] vote=0.738 uniform=0.724 best1=0.731 n_val=286 vram=0.00GB 160s | grade=0.859 inner_auc=n/a vs conf_auc=n/a
+06:45:43 [hand/graph/aids] vote=0.995 uniform=0.995 best1=0.998 n_val=602 vram=0.00GB 219s | grade=0.954 inner_auc=nan vs conf_auc=nan
+06:48:08 [hand/graph/ogbg_molhiv] vote=0.964 uniform=0.965 best1=0.969 n_val=12202 vram=0.00GB 146s | grade=0.928 inner_auc=0.714 vs conf_auc=0.722
+06:48:40 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+06:51:06 [hand/graph/imdb_binary] vote=0.676 uniform=0.659 best1=0.690 n_val=287 vram=0.00GB 146s | grade=0.823 inner_auc=n/a vs conf_auc=n/a
+06:53:17 [hand/graph/aids] vote=0.992 uniform=0.993 best1=0.995 n_val=599 vram=0.00GB 131s | grade=0.960 inner_auc=nan vs conf_auc=nan
+06:55:20 [hand/graph/ogbg_molhiv] vote=0.951 uniform=0.965 best1=0.967 n_val=12226 vram=0.00GB 124s | grade=0.922 inner_auc=0.835 vs conf_auc=0.796
+06:55:41 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+06:58:01 [hand/graph/imdb_binary] vote=0.742 uniform=0.738 best1=0.758 n_val=298 vram=0.00GB 140s | grade=0.856 inner_auc=n/a vs conf_auc=n/a
+07:00:51 [hand/graph/aids] vote=0.995 uniform=0.995 best1=0.998 n_val=600 vram=0.00GB 170s | grade=0.952 inner_auc=n/a vs conf_auc=n/a
+07:02:54 [hand/graph/ogbg_molhiv] vote=0.929 uniform=0.964 best1=0.965 n_val=12300 vram=0.00GB 123s | grade=0.900 inner_auc=0.901 vs conf_auc=0.827
+07:03:17 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+07:05:09 [hand/graph/imdb_binary] vote=0.685 uniform=0.688 best1=0.699 n_val=292 vram=0.00GB 111s | grade=0.852 inner_auc=n/a vs conf_auc=n/a
+07:07:41 [hand/graph/aids] vote=0.995 uniform=0.997 best1=0.997 n_val=608 vram=0.00GB 152s | grade=0.933 inner_auc=nan vs conf_auc=nan
+07:09:50 [hand/graph/ogbg_molhiv] vote=0.895 uniform=0.966 best1=0.968 n_val=12238 vram=0.00GB 129s | grade=0.889 inner_auc=0.941 vs conf_auc=0.822
+07:10:11 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+07:12:12 [hand/graph/imdb_binary] vote=0.693 uniform=0.703 best1=0.713 n_val=313 vram=0.00GB 121s | grade=0.880 inner_auc=n/a vs conf_auc=n/a
+07:15:05 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.998 n_val=580 vram=0.00GB 172s | grade=0.995 inner_auc=n/a vs conf_auc=n/a
+07:17:04 [hand/graph/ogbg_molhiv] vote=0.963 uniform=0.966 best1=0.967 n_val=12349 vram=0.00GB 120s | grade=0.902 inner_auc=0.775 vs conf_auc=0.759
+07:17:26 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+07:19:43 [hand/graph/imdb_binary] vote=0.703 uniform=0.699 best1=0.712 n_val=306 vram=0.00GB 137s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+07:22:23 [hand/graph/aids] vote=0.992 uniform=0.994 best1=0.992 n_val=620 vram=0.00GB 159s | grade=0.978 inner_auc=nan vs conf_auc=nan
+07:24:25 [hand/graph/ogbg_molhiv] vote=0.952 uniform=0.967 best1=0.968 n_val=12347 vram=0.00GB 123s | grade=0.920 inner_auc=0.823 vs conf_auc=0.774
+07:24:49 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+07:26:49 [hand/graph/imdb_binary] vote=0.728 uniform=0.722 best1=0.732 n_val=313 vram=0.00GB 120s | grade=0.873 inner_auc=n/a vs conf_auc=n/a
+07:29:28 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.998 n_val=600 vram=0.00GB 159s | grade=0.968 inner_auc=nan vs conf_auc=nan
+07:31:43 [hand/graph/ogbg_molhiv] vote=0.931 uniform=0.969 best1=0.971 n_val=12326 vram=0.00GB 135s | grade=0.895 inner_auc=0.916 vs conf_auc=0.842
+07:32:08 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+07:34:20 [hand/graph/imdb_binary] vote=0.714 uniform=0.708 best1=0.718 n_val=308 vram=0.00GB 132s | grade=0.875 inner_auc=n/a vs conf_auc=n/a
+07:36:27 [hand/graph/aids] vote=0.989 uniform=0.994 best1=0.990 n_val=627 vram=0.00GB 126s | grade=0.971 inner_auc=1.000 vs conf_auc=1.000
+07:38:38 [hand/graph/ogbg_molhiv] vote=0.928 uniform=0.966 best1=0.968 n_val=12349 vram=0.00GB 132s | grade=0.907 inner_auc=0.879 vs conf_auc=0.810
+07:39:00 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+07:40:49 [hand/graph/imdb_binary] vote=0.728 uniform=0.718 best1=0.735 n_val=309 vram=0.00GB 108s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+07:43:33 [hand/graph/aids] vote=0.997 uniform=0.995 best1=0.998 n_val=582 vram=0.00GB 164s | grade=0.946 inner_auc=nan vs conf_auc=nan
+07:45:44 [hand/graph/ogbg_molhiv] vote=0.932 uniform=0.966 best1=0.967 n_val=12405 vram=0.00GB 131s | grade=0.903 inner_auc=0.911 vs conf_auc=0.843
+07:46:08 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+07:48:02 [hand/graph/imdb_binary] vote=0.719 uniform=0.708 best1=0.729 n_val=288 vram=0.00GB 114s | grade=0.877 inner_auc=n/a vs conf_auc=n/a
+07:50:48 [hand/graph/aids] vote=0.992 uniform=0.992 best1=0.992 n_val=607 vram=0.00GB 166s | grade=0.979 inner_auc=nan vs conf_auc=nan
+07:53:52 [hand/graph/ogbg_molhiv] vote=0.930 uniform=0.969 best1=0.970 n_val=12380 vram=0.00GB 184s | grade=0.905 inner_auc=0.902 vs conf_auc=0.800
+07:54:21 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+07:57:13 [hand/graph/imdb_binary] vote=0.705 uniform=0.705 best1=0.714 n_val=308 vram=0.00GB 172s | grade=0.865 inner_auc=n/a vs conf_auc=n/a
+08:01:31 [hand/graph/aids] vote=0.995 uniform=0.997 best1=1.000 n_val=603 vram=0.00GB 259s | grade=0.979 inner_auc=nan vs conf_auc=nan
+08:04:38 [hand/graph/ogbg_molhiv] vote=0.931 uniform=0.966 best1=0.968 n_val=12305 vram=0.00GB 187s | grade=0.904 inner_auc=0.888 vs conf_auc=0.817
+08:05:17 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+08:08:07 [hand/graph/imdb_binary] vote=0.749 uniform=0.728 best1=0.749 n_val=283 vram=0.00GB 170s | grade=0.853 inner_auc=n/a vs conf_auc=n/a
+08:12:03 [hand/graph/aids] vote=0.995 uniform=0.993 best1=0.998 n_val=575 vram=0.00GB 237s | grade=0.971 inner_auc=nan vs conf_auc=nan
+08:14:46 [hand/graph/ogbg_molhiv] vote=0.951 uniform=0.966 best1=0.968 n_val=12265 vram=0.00GB 163s | grade=0.916 inner_auc=0.833 vs conf_auc=0.785
+08:15:24 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+08:18:29 [hand/graph/imdb_binary] vote=0.694 uniform=0.684 best1=0.690 n_val=310 vram=0.00GB 185s | grade=0.852 inner_auc=n/a vs conf_auc=n/a
+08:21:18 [hand/graph/aids] vote=0.992 uniform=0.992 best1=0.992 n_val=616 vram=0.00GB 169s | grade=0.967 inner_auc=nan vs conf_auc=nan
+08:23:42 [hand/graph/ogbg_molhiv] vote=0.957 uniform=0.968 best1=0.969 n_val=12281 vram=0.00GB 144s | grade=0.923 inner_auc=0.805 vs conf_auc=0.778
+08:24:13 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+08:26:33 [hand/graph/imdb_binary] vote=0.697 uniform=0.690 best1=0.700 n_val=300 vram=0.00GB 140s | grade=0.879 inner_auc=n/a vs conf_auc=n/a
+08:29:16 [hand/graph/aids] vote=0.997 uniform=0.995 best1=0.995 n_val=601 vram=0.00GB 163s | grade=0.960 inner_auc=0.992 vs conf_auc=1.000
+08:29:46 RUN COMPLETE
+20:50:08 NI run auto_cpu_004 on CPU; hours=2.0 smoke=False
+20:50:08 explicit task list: ['hand/graph/imdb_binary', 'hand/graph/aids', 'hand/graph/ogbg_molhiv']
+20:50:10 [resume] from checkpoint: next cycle 108, rounds 321, 324 metric rows, inner net restored
+20:50:10 ===== CYCLE 108 (OUTER-ONLY BOOTSTRAP) =====
+20:50:10 [data] hand/graph/imdb_binary: n=1000 C=2 D=22 shards=1
+20:50:33 [hand/graph/imdb_binary] vote=0.753 uniform=0.731 best1=0.760 n_val=308 vram=0.00GB 23s
+20:50:33 [data] hand/graph/aids: n=2000 C=2 D=96 shards=1
+20:51:25 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.998 n_val=587 vram=0.00GB 52s
+20:51:25 [data] hand/graph/ogbg_molhiv: n=41127 C=2 D=38 shards=1
+20:52:56 [hand/graph/ogbg_molhiv] vote=0.894 uniform=0.966 best1=0.967 n_val=12293 vram=0.00GB 91s
+20:53:39 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 108, "n_records": 13188, "n_val": 2664, "base_rate": 0.8960210084915161, "inner": {"auc": 0.9324129346838093, "ece": 0.007379408134287364, "brier": 0.030407696962356567, "acc80": 0.9821680188179016}, "outer_conf": {"auc": 0.8058337958768843, "ece": 0.0771451401817906, "brier": 0.08993037790060043, "acc80": 0.9465039968490601}}
+20:53:39 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+20:55:36 [hand/graph/imdb_binary] vote=0.743 uniform=0.720 best1=0.743 n_val=307 vram=0.00GB 117s | grade=0.861 inner_auc=n/a vs conf_auc=n/a
+20:57:22 [hand/graph/aids] vote=0.998 uniform=0.998 best1=0.998 n_val=596 vram=0.00GB 106s | grade=0.997 inner_auc=nan vs conf_auc=nan
+20:59:39 [hand/graph/ogbg_molhiv] vote=0.929 uniform=0.965 best1=0.968 n_val=12448 vram=0.00GB 136s | grade=0.891 inner_auc=0.903 vs conf_auc=0.817
+21:00:04 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+21:02:01 [hand/graph/imdb_binary] vote=0.734 uniform=0.724 best1=0.737 n_val=323 vram=0.00GB 117s | grade=0.880 inner_auc=n/a vs conf_auc=n/a
+21:04:28 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.997 n_val=611 vram=0.00GB 147s | grade=0.995 inner_auc=nan vs conf_auc=nan
+21:07:22 [hand/graph/ogbg_molhiv] vote=0.925 uniform=0.966 best1=0.968 n_val=12351 vram=0.00GB 173s | grade=0.907 inner_auc=0.900 vs conf_auc=0.819
+21:07:55 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+21:10:37 [hand/graph/imdb_binary] vote=0.701 uniform=0.685 best1=0.707 n_val=314 vram=0.00GB 162s | grade=0.861 inner_auc=n/a vs conf_auc=n/a
+21:14:05 [hand/graph/aids] vote=0.995 uniform=0.998 best1=1.000 n_val=593 vram=0.00GB 208s | grade=0.993 inner_auc=n/a vs conf_auc=n/a
+21:17:29 [hand/graph/ogbg_molhiv] vote=0.919 uniform=0.966 best1=0.968 n_val=12410 vram=0.00GB 205s | grade=0.905 inner_auc=0.917 vs conf_auc=0.833
+21:18:04 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+21:20:44 [hand/graph/imdb_binary] vote=0.719 uniform=0.710 best1=0.719 n_val=317 vram=0.00GB 160s | grade=0.878 inner_auc=n/a vs conf_auc=n/a
+21:23:56 [hand/graph/aids] vote=0.995 uniform=0.992 best1=1.000 n_val=598 vram=0.00GB 192s | grade=0.963 inner_auc=1.000 vs conf_auc=1.000
+21:27:30 [hand/graph/ogbg_molhiv] vote=0.919 uniform=0.966 best1=0.967 n_val=12316 vram=0.00GB 214s | grade=0.912 inner_auc=0.906 vs conf_auc=0.827
+21:28:07 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+21:30:56 [hand/graph/imdb_binary] vote=0.714 uniform=0.703 best1=0.710 n_val=290 vram=0.00GB 168s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+21:33:51 [hand/graph/aids] vote=0.998 uniform=0.998 best1=1.000 n_val=610 vram=0.00GB 175s | grade=0.996 inner_auc=nan vs conf_auc=nan
+21:37:09 [hand/graph/ogbg_molhiv] vote=0.920 uniform=0.967 best1=0.968 n_val=12386 vram=0.00GB 198s | grade=0.905 inner_auc=0.883 vs conf_auc=0.797
+21:37:45 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+21:40:23 [hand/graph/imdb_binary] vote=0.708 uniform=0.708 best1=0.705 n_val=295 vram=0.00GB 157s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+21:43:03 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.995 n_val=595 vram=0.00GB 160s | grade=0.995 inner_auc=nan vs conf_auc=nan
+21:46:55 [hand/graph/ogbg_molhiv] vote=0.957 uniform=0.969 best1=0.970 n_val=12396 vram=0.00GB 232s | grade=0.905 inner_auc=0.834 vs conf_auc=0.815
+21:47:33 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+21:49:53 [hand/graph/imdb_binary] vote=0.711 uniform=0.708 best1=0.725 n_val=305 vram=0.00GB 140s | grade=0.867 inner_auc=n/a vs conf_auc=n/a
+21:53:29 [hand/graph/aids] vote=0.995 uniform=0.992 best1=1.000 n_val=604 vram=0.00GB 216s | grade=0.973 inner_auc=1.000 vs conf_auc=0.991
+21:56:50 [hand/graph/ogbg_molhiv] vote=0.925 uniform=0.967 best1=0.969 n_val=12225 vram=0.00GB 201s | grade=0.892 inner_auc=0.901 vs conf_auc=0.802
+21:57:25 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+21:59:14 [hand/graph/imdb_binary] vote=0.714 uniform=0.695 best1=0.711 n_val=308 vram=0.00GB 109s | grade=0.874 inner_auc=n/a vs conf_auc=n/a
+22:02:18 [hand/graph/aids] vote=0.998 uniform=0.998 best1=1.000 n_val=655 vram=0.00GB 184s | grade=0.944 inner_auc=nan vs conf_auc=nan
+22:05:08 [hand/graph/ogbg_molhiv] vote=0.924 uniform=0.968 best1=0.970 n_val=12501 vram=0.00GB 170s | grade=0.904 inner_auc=0.924 vs conf_auc=0.840
+22:05:46 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+22:07:50 [hand/graph/imdb_binary] vote=0.721 uniform=0.721 best1=0.725 n_val=287 vram=0.00GB 124s | grade=0.852 inner_auc=n/a vs conf_auc=n/a
+22:11:19 [hand/graph/aids] vote=0.995 uniform=0.997 best1=1.000 n_val=594 vram=0.00GB 210s | grade=0.961 inner_auc=nan vs conf_auc=nan
+22:14:14 [hand/graph/ogbg_molhiv] vote=0.923 uniform=0.968 best1=0.968 n_val=12262 vram=0.00GB 175s | grade=0.911 inner_auc=0.917 vs conf_auc=0.817
+22:14:37 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+22:16:20 [hand/graph/imdb_binary] vote=0.728 uniform=0.720 best1=0.735 n_val=279 vram=0.00GB 103s | grade=0.875 inner_auc=n/a vs conf_auc=n/a
+22:19:08 [hand/graph/aids] vote=1.000 uniform=1.000 best1=1.000 n_val=606 vram=0.00GB 167s | grade=0.996 inner_auc=nan vs conf_auc=nan
+22:21:49 [hand/graph/ogbg_molhiv] vote=0.930 uniform=0.966 best1=0.966 n_val=12504 vram=0.00GB 161s | grade=0.901 inner_auc=0.884 vs conf_auc=0.809
+22:22:11 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+22:23:48 [hand/graph/imdb_binary] vote=0.760 uniform=0.745 best1=0.767 n_val=275 vram=0.00GB 98s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+22:26:28 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.997 n_val=608 vram=0.00GB 160s | grade=0.995 inner_auc=nan vs conf_auc=nan
+22:29:41 [hand/graph/ogbg_molhiv] vote=0.918 uniform=0.966 best1=0.967 n_val=12507 vram=0.00GB 193s | grade=0.903 inner_auc=0.911 vs conf_auc=0.819
+22:30:10 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+22:32:02 [hand/graph/imdb_binary] vote=0.712 uniform=0.732 best1=0.766 n_val=299 vram=0.00GB 112s | grade=0.851 inner_auc=n/a vs conf_auc=n/a
+22:35:07 [hand/graph/aids] vote=0.992 uniform=0.994 best1=0.995 n_val=624 vram=0.00GB 185s | grade=0.968 inner_auc=1.000 vs conf_auc=1.000
+22:38:12 [hand/graph/ogbg_molhiv] vote=0.929 uniform=0.965 best1=0.967 n_val=12317 vram=0.00GB 184s | grade=0.898 inner_auc=0.883 vs conf_auc=0.794
+22:38:39 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+22:40:29 [hand/graph/imdb_binary] vote=0.703 uniform=0.700 best1=0.706 n_val=313 vram=0.00GB 110s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+22:43:04 [hand/graph/aids] vote=0.995 uniform=0.995 best1=0.995 n_val=651 vram=0.00GB 155s | grade=0.993 inner_auc=nan vs conf_auc=nan
+22:46:13 [hand/graph/ogbg_molhiv] vote=0.927 uniform=0.967 best1=0.968 n_val=12228 vram=0.00GB 189s | grade=0.903 inner_auc=0.903 vs conf_auc=0.802
+22:46:43 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+22:48:28 [hand/graph/imdb_binary] vote=0.726 uniform=0.713 best1=0.720 n_val=303 vram=0.00GB 105s | grade=0.869 inner_auc=n/a vs conf_auc=n/a
+22:51:20 [hand/graph/aids] vote=0.992 uniform=0.997 best1=0.992 n_val=626 vram=0.00GB 173s | grade=0.981 inner_auc=nan vs conf_auc=nan
+22:51:54 RUN COMPLETE
+00:24:28 NI run auto_cpu_004 on CPU; hours=2.0 smoke=False
+00:24:28 explicit task list: ['hand/graph/imdb_binary', 'hand/graph/aids', 'hand/graph/ogbg_molhiv']
+00:24:48 [resume] from checkpoint: next cycle 123, rounds 365, 368 metric rows, inner net restored
+00:24:48 ===== CYCLE 123 (OUTER-ONLY BOOTSTRAP) =====
+00:24:48 [data] hand/graph/imdb_binary: n=1000 C=2 D=22 shards=1
+00:26:58 [hand/graph/imdb_binary] vote=0.689 uniform=0.686 best1=0.693 n_val=293 vram=0.00GB 130s
+00:26:58 [data] hand/graph/aids: n=2000 C=2 D=96 shards=1
+00:29:37 [hand/graph/aids] vote=0.995 uniform=0.995 best1=1.000 n_val=585 vram=0.00GB 159s
+00:29:37 [data] hand/graph/ogbg_molhiv: n=41127 C=2 D=38 shards=1
+00:31:39 [hand/graph/ogbg_molhiv] vote=0.926 uniform=0.967 best1=0.968 n_val=12311 vram=0.00GB 122s
+00:32:35 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 123, "n_records": 13189, "n_val": 2630, "base_rate": 0.9273764491081238, "inner": {"auc": 0.9057291096471174, "ece": 0.012161430681103085, "brier": 0.029805170372128487, "acc80": 0.9847908616065979}, "outer_conf": {"auc": 0.8000103037679591, "ece": 0.10653610859533678, "brier": 0.08008065819740295, "acc80": 0.9624524712562561}}
+00:32:35 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+00:34:45 [hand/graph/imdb_binary] vote=0.709 uniform=0.689 best1=0.713 n_val=289 vram=0.00GB 130s | grade=0.874 inner_auc=n/a vs conf_auc=n/a
+00:37:31 [hand/graph/aids] vote=0.996 uniform=0.996 best1=0.998 n_val=555 vram=0.00GB 166s | grade=0.944 inner_auc=n/a vs conf_auc=n/a
+00:39:59 [hand/graph/ogbg_molhiv] vote=0.926 uniform=0.967 best1=0.968 n_val=12267 vram=0.00GB 149s | grade=0.905 inner_auc=0.924 vs conf_auc=0.822
+00:40:33 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+00:42:48 [hand/graph/imdb_binary] vote=0.724 uniform=0.727 best1=0.724 n_val=315 vram=0.00GB 135s | grade=0.880 inner_auc=n/a vs conf_auc=n/a
+00:45:31 [hand/graph/aids] vote=1.000 uniform=1.000 best1=1.000 n_val=582 vram=0.00GB 163s | grade=0.995 inner_auc=nan vs conf_auc=nan
+00:48:19 [hand/graph/ogbg_molhiv] vote=0.952 uniform=0.966 best1=0.968 n_val=12340 vram=0.00GB 167s | grade=0.910 inner_auc=0.810 vs conf_auc=0.793
+00:49:00 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+00:51:16 [hand/graph/imdb_binary] vote=0.695 uniform=0.698 best1=0.711 n_val=311 vram=0.00GB 136s | grade=0.852 inner_auc=n/a vs conf_auc=n/a
+00:54:27 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.997 n_val=573 vram=0.00GB 190s | grade=0.996 inner_auc=nan vs conf_auc=nan
+00:56:47 [hand/graph/ogbg_molhiv] vote=0.952 uniform=0.967 best1=0.968 n_val=12263 vram=0.00GB 140s | grade=0.925 inner_auc=0.791 vs conf_auc=0.745
+00:57:19 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+01:00:01 [hand/graph/imdb_binary] vote=0.690 uniform=0.690 best1=0.697 n_val=290 vram=0.00GB 162s | grade=0.877 inner_auc=n/a vs conf_auc=n/a
+01:03:01 [hand/graph/aids] vote=0.998 uniform=0.997 best1=1.000 n_val=632 vram=0.00GB 180s | grade=0.969 inner_auc=nan vs conf_auc=nan
+01:05:34 [hand/graph/ogbg_molhiv] vote=0.739 uniform=0.967 best1=0.969 n_val=12249 vram=0.00GB 153s | grade=0.787 inner_auc=0.979 vs conf_auc=0.770
+01:06:08 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+01:08:32 [hand/graph/imdb_binary] vote=0.699 uniform=0.686 best1=0.699 n_val=312 vram=0.00GB 144s | grade=0.834 inner_auc=n/a vs conf_auc=n/a
+01:11:13 [hand/graph/aids] vote=0.994 uniform=0.994 best1=0.998 n_val=625 vram=0.00GB 161s | grade=0.969 inner_auc=nan vs conf_auc=nan
+01:13:38 [hand/graph/ogbg_molhiv] vote=0.965 uniform=0.967 best1=0.968 n_val=12371 vram=0.00GB 145s | grade=0.829 inner_auc=0.781 vs conf_auc=0.775
+01:14:10 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+01:16:29 [hand/graph/imdb_binary] vote=0.720 uniform=0.716 best1=0.720 n_val=296 vram=0.00GB 139s | grade=0.868 inner_auc=n/a vs conf_auc=n/a
+01:19:27 [hand/graph/aids] vote=0.998 uniform=0.998 best1=0.998 n_val=561 vram=0.00GB 178s | grade=0.993 inner_auc=nan vs conf_auc=nan
+01:21:55 [hand/graph/ogbg_molhiv] vote=0.923 uniform=0.966 best1=0.968 n_val=12406 vram=0.00GB 148s | grade=0.884 inner_auc=0.909 vs conf_auc=0.817
+01:22:27 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+01:25:14 [hand/graph/imdb_binary] vote=0.706 uniform=0.691 best1=0.709 n_val=282 vram=0.00GB 167s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+01:28:35 [hand/graph/aids] vote=0.998 uniform=0.998 best1=1.000 n_val=580 vram=0.00GB 201s | grade=0.971 inner_auc=1.000 vs conf_auc=1.000
+01:30:55 [hand/graph/ogbg_molhiv] vote=0.967 uniform=0.968 best1=0.970 n_val=12284 vram=0.00GB 140s | grade=0.913 inner_auc=0.727 vs conf_auc=0.728
+01:31:31 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+01:34:00 [hand/graph/imdb_binary] vote=0.725 uniform=0.711 best1=0.728 n_val=305 vram=0.00GB 149s | grade=0.879 inner_auc=n/a vs conf_auc=n/a
+01:36:42 [hand/graph/aids] vote=0.986 uniform=0.986 best1=0.990 n_val=577 vram=0.00GB 163s | grade=0.962 inner_auc=1.000 vs conf_auc=1.000
+01:39:11 [hand/graph/ogbg_molhiv] vote=0.926 uniform=0.969 best1=0.969 n_val=12358 vram=0.00GB 149s | grade=0.884 inner_auc=0.895 vs conf_auc=0.813
+01:39:39 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+01:42:00 [hand/graph/imdb_binary] vote=0.728 uniform=0.722 best1=0.731 n_val=309 vram=0.00GB 141s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+01:45:26 [hand/graph/aids] vote=0.998 uniform=0.998 best1=0.998 n_val=586 vram=0.00GB 206s | grade=0.992 inner_auc=n/a vs conf_auc=n/a
+01:47:54 [hand/graph/ogbg_molhiv] vote=0.888 uniform=0.967 best1=0.968 n_val=12396 vram=0.00GB 149s | grade=0.888 inner_auc=0.933 vs conf_auc=0.820
+01:48:28 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+01:50:53 [hand/graph/imdb_binary] vote=0.686 uniform=0.689 best1=0.710 n_val=296 vram=0.00GB 144s | grade=0.859 inner_auc=n/a vs conf_auc=n/a
+01:53:55 [hand/graph/aids] vote=1.000 uniform=0.998 best1=1.000 n_val=601 vram=0.00GB 182s | grade=0.994 inner_auc=nan vs conf_auc=nan
+01:56:57 [hand/graph/ogbg_molhiv] vote=0.927 uniform=0.968 best1=0.968 n_val=12240 vram=0.00GB 182s | grade=0.883 inner_auc=0.883 vs conf_auc=0.793
+01:57:28 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+01:59:55 [hand/graph/imdb_binary] vote=0.707 uniform=0.704 best1=0.701 n_val=294 vram=0.00GB 147s | grade=0.870 inner_auc=n/a vs conf_auc=n/a
+02:03:01 [hand/graph/aids] vote=0.998 uniform=0.997 best1=1.000 n_val=629 vram=0.00GB 185s | grade=0.982 inner_auc=nan vs conf_auc=nan
+02:05:21 [hand/graph/ogbg_molhiv] vote=0.965 uniform=0.968 best1=0.969 n_val=12532 vram=0.00GB 140s | grade=0.913 inner_auc=0.763 vs conf_auc=0.777
+02:05:46 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+02:07:31 [hand/graph/imdb_binary] vote=0.730 uniform=0.727 best1=0.737 n_val=300 vram=0.00GB 105s | grade=0.863 inner_auc=n/a vs conf_auc=n/a
+02:10:13 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.998 n_val=588 vram=0.00GB 162s | grade=0.998 inner_auc=nan vs conf_auc=nan
+02:12:26 [hand/graph/ogbg_molhiv] vote=0.926 uniform=0.969 best1=0.970 n_val=12292 vram=0.00GB 134s | grade=0.882 inner_auc=0.915 vs conf_auc=0.827
+02:12:48 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+02:14:29 [hand/graph/imdb_binary] vote=0.742 uniform=0.739 best1=0.752 n_val=299 vram=0.00GB 101s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+02:17:06 [hand/graph/aids] vote=0.995 uniform=0.995 best1=1.000 n_val=604 vram=0.00GB 157s | grade=0.971 inner_auc=nan vs conf_auc=nan
+02:19:39 [hand/graph/ogbg_molhiv] vote=0.895 uniform=0.968 best1=0.968 n_val=12237 vram=0.00GB 153s | grade=0.892 inner_auc=0.947 vs conf_auc=0.816
+02:20:10 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+21:03:19 NI run auto_cpu_004 on CPU; hours=2.0 smoke=False
+21:03:19 explicit task list: ['hand/graph/imdb_binary', 'hand/graph/aids', 'hand/graph/ogbg_molhiv']
+21:03:26 [resume] from checkpoint: next cycle 137, rounds 407, 410 metric rows, inner net restored
+21:03:26 ===== CYCLE 137 (OUTER-ONLY BOOTSTRAP) =====
+21:03:26 [data] hand/graph/imdb_binary: n=1000 C=2 D=22 shards=1
+21:05:19 [hand/graph/imdb_binary] vote=0.712 uniform=0.702 best1=0.709 n_val=299 vram=0.00GB 113s
+21:05:20 [data] hand/graph/aids: n=2000 C=2 D=96 shards=1
+21:07:14 [hand/graph/aids] vote=0.993 uniform=0.997 best1=0.994 n_val=614 vram=0.00GB 115s
+21:07:15 [data] hand/graph/ogbg_molhiv: n=41127 C=2 D=38 shards=1
+21:08:40 [hand/graph/ogbg_molhiv] vote=0.925 uniform=0.967 best1=0.968 n_val=12211 vram=0.00GB 86s
+21:09:24 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 137, "n_records": 13124, "n_val": 2600, "base_rate": 0.9242307543754578, "inner": {"auc": 0.9136126373336206, "ece": 0.009583995582965705, "brier": 0.028702275827527046, "acc80": 0.9865384697914124}, "outer_conf": {"auc": 0.8113261553345965, "ece": 0.0977812708570407, "brier": 0.07802572101354599, "acc80": 0.9653846025466919}}
+21:09:25 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+21:11:23 [hand/graph/imdb_binary] vote=0.694 uniform=0.704 best1=0.718 n_val=284 vram=0.00GB 119s | grade=0.868 inner_auc=n/a vs conf_auc=n/a
+21:13:22 [hand/graph/aids] vote=0.995 uniform=0.994 best1=0.997 n_val=633 vram=0.00GB 119s | grade=0.933 inner_auc=nan vs conf_auc=nan
+21:15:10 [hand/graph/ogbg_molhiv] vote=0.920 uniform=0.966 best1=0.967 n_val=12369 vram=0.00GB 109s | grade=0.904 inner_auc=0.898 vs conf_auc=0.812
+21:15:31 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+21:17:09 [hand/graph/imdb_binary] vote=0.689 uniform=0.682 best1=0.717 n_val=283 vram=0.00GB 97s | grade=0.854 inner_auc=n/a vs conf_auc=n/a
+21:19:23 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.998 n_val=622 vram=0.00GB 134s | grade=0.956 inner_auc=1.000 vs conf_auc=1.000
+21:21:17 [hand/graph/ogbg_molhiv] vote=0.955 uniform=0.966 best1=0.967 n_val=12344 vram=0.00GB 114s | grade=0.905 inner_auc=0.825 vs conf_auc=0.756
+21:21:38 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+21:23:18 [hand/graph/imdb_binary] vote=0.704 uniform=0.679 best1=0.711 n_val=287 vram=0.00GB 100s | grade=0.844 inner_auc=n/a vs conf_auc=n/a
+21:25:42 [hand/graph/aids] vote=0.997 uniform=0.993 best1=0.998 n_val=580 vram=0.00GB 144s | grade=0.972 inner_auc=nan vs conf_auc=nan
+21:27:44 [hand/graph/ogbg_molhiv] vote=0.920 uniform=0.967 best1=0.969 n_val=12277 vram=0.00GB 122s | grade=0.888 inner_auc=0.906 vs conf_auc=0.811
+21:28:05 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+21:29:54 [hand/graph/imdb_binary] vote=0.722 uniform=0.729 best1=0.712 n_val=295 vram=0.00GB 109s | grade=0.870 inner_auc=n/a vs conf_auc=n/a
+21:32:08 [hand/graph/aids] vote=0.997 uniform=0.993 best1=0.997 n_val=600 vram=0.00GB 134s | grade=0.983 inner_auc=n/a vs conf_auc=n/a
+21:34:13 [hand/graph/ogbg_molhiv] vote=0.920 uniform=0.969 best1=0.970 n_val=12218 vram=0.00GB 126s | grade=0.905 inner_auc=0.911 vs conf_auc=0.817
+21:34:33 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+21:36:06 [hand/graph/imdb_binary] vote=0.726 uniform=0.726 best1=0.745 n_val=318 vram=0.00GB 93s | grade=0.844 inner_auc=n/a vs conf_auc=n/a
+21:38:22 [hand/graph/aids] vote=0.993 uniform=0.995 best1=0.997 n_val=569 vram=0.00GB 136s | grade=0.989 inner_auc=1.000 vs conf_auc=1.000
+21:40:22 [hand/graph/ogbg_molhiv] vote=0.964 uniform=0.965 best1=0.968 n_val=12306 vram=0.00GB 120s | grade=0.912 inner_auc=0.792 vs conf_auc=0.762
+21:40:47 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+21:42:08 [hand/graph/imdb_binary] vote=0.673 uniform=0.684 best1=0.704 n_val=294 vram=0.00GB 81s | grade=0.800 inner_auc=n/a vs conf_auc=n/a
+21:44:31 [hand/graph/aids] vote=0.993 uniform=0.993 best1=1.000 n_val=582 vram=0.00GB 143s | grade=0.987 inner_auc=1.000 vs conf_auc=1.000
+21:46:46 [hand/graph/ogbg_molhiv] vote=0.923 uniform=0.966 best1=0.968 n_val=12326 vram=0.00GB 135s | grade=0.882 inner_auc=0.902 vs conf_auc=0.802
+21:47:07 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+21:48:34 [hand/graph/imdb_binary] vote=0.698 uniform=0.714 best1=0.708 n_val=308 vram=0.00GB 86s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+21:50:52 [hand/graph/aids] vote=0.995 uniform=0.995 best1=0.998 n_val=584 vram=0.00GB 139s | grade=0.996 inner_auc=nan vs conf_auc=nan
+21:53:14 [hand/graph/ogbg_molhiv] vote=0.923 uniform=0.966 best1=0.967 n_val=12366 vram=0.00GB 142s | grade=0.905 inner_auc=0.908 vs conf_auc=0.819
+21:53:39 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+21:55:03 [hand/graph/imdb_binary] vote=0.703 uniform=0.696 best1=0.724 n_val=293 vram=0.00GB 84s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+21:57:18 [hand/graph/aids] vote=1.000 uniform=1.000 best1=1.000 n_val=583 vram=0.00GB 134s | grade=0.995 inner_auc=nan vs conf_auc=nan
+21:59:28 [hand/graph/ogbg_molhiv] vote=0.953 uniform=0.968 best1=0.970 n_val=12254 vram=0.00GB 130s | grade=0.905 inner_auc=0.876 vs conf_auc=0.840
+22:00:03 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+22:01:28 [hand/graph/imdb_binary] vote=0.712 uniform=0.705 best1=0.722 n_val=295 vram=0.00GB 85s | grade=0.871 inner_auc=n/a vs conf_auc=n/a
+22:03:30 [hand/graph/aids] vote=0.991 uniform=0.991 best1=0.996 n_val=563 vram=0.00GB 122s | grade=0.974 inner_auc=n/a vs conf_auc=n/a
+22:05:36 [hand/graph/ogbg_molhiv] vote=0.927 uniform=0.967 best1=0.968 n_val=12239 vram=0.00GB 126s | grade=0.891 inner_auc=0.916 vs conf_auc=0.846
+22:06:06 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+22:07:50 [hand/graph/imdb_binary] vote=0.707 uniform=0.704 best1=0.704 n_val=270 vram=0.00GB 104s | grade=0.877 inner_auc=n/a vs conf_auc=n/a
+22:09:39 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.998 n_val=616 vram=0.00GB 109s | grade=0.995 inner_auc=nan vs conf_auc=nan
+22:11:57 [hand/graph/ogbg_molhiv] vote=0.953 uniform=0.966 best1=0.968 n_val=12456 vram=0.00GB 138s | grade=0.909 inner_auc=0.840 vs conf_auc=0.785
+22:12:23 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+22:14:03 [hand/graph/imdb_binary] vote=0.734 uniform=0.711 best1=0.731 n_val=308 vram=0.00GB 100s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+22:15:57 [hand/graph/aids] vote=0.998 uniform=0.998 best1=0.998 n_val=582 vram=0.00GB 114s | grade=0.997 inner_auc=nan vs conf_auc=nan
+22:18:05 [hand/graph/ogbg_molhiv] vote=0.924 uniform=0.968 best1=0.968 n_val=12313 vram=0.00GB 128s | grade=0.889 inner_auc=0.902 vs conf_auc=0.829
+22:18:34 ===== CYCLE 149 (OUTER -> INNER -> FEEDBACK) =====
+22:20:25 [hand/graph/imdb_binary] vote=0.709 uniform=0.690 best1=0.709 n_val=306 vram=0.00GB 111s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+22:22:06 [hand/graph/aids] vote=1.000 uniform=0.998 best1=1.000 n_val=619 vram=0.00GB 101s | grade=0.921 inner_auc=nan vs conf_auc=nan
+22:24:01 [hand/graph/ogbg_molhiv] vote=0.926 uniform=0.965 best1=0.966 n_val=12338 vram=0.00GB 115s | grade=0.904 inner_auc=0.918 vs conf_auc=0.842
+22:24:33 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+22:26:15 [hand/graph/imdb_binary] vote=0.711 uniform=0.725 best1=0.725 n_val=287 vram=0.00GB 102s | grade=0.871 inner_auc=n/a vs conf_auc=n/a
+22:28:10 [hand/graph/aids] vote=0.995 uniform=0.989 best1=0.996 n_val=557 vram=0.00GB 115s | grade=0.968 inner_auc=nan vs conf_auc=nan
+22:30:05 [hand/graph/ogbg_molhiv] vote=0.965 uniform=0.966 best1=0.968 n_val=12244 vram=0.00GB 115s | grade=0.910 inner_auc=0.817 vs conf_auc=0.794
+22:30:34 ===== CYCLE 151 (OUTER -> INNER -> FEEDBACK) =====
+22:32:15 [hand/graph/imdb_binary] vote=0.723 uniform=0.713 best1=0.734 n_val=289 vram=0.00GB 101s | grade=0.872 inner_auc=n/a vs conf_auc=n/a
+22:34:22 [hand/graph/aids] vote=0.998 uniform=0.997 best1=0.998 n_val=577 vram=0.00GB 127s | grade=0.976 inner_auc=nan vs conf_auc=nan
+22:36:05 [hand/graph/ogbg_molhiv] vote=0.925 uniform=0.966 best1=0.967 n_val=12346 vram=0.00GB 103s | grade=0.885 inner_auc=0.901 vs conf_auc=0.812
+22:36:30 ===== CYCLE 152 (OUTER -> INNER -> FEEDBACK) =====
+22:38:25 [hand/graph/imdb_binary] vote=0.693 uniform=0.689 best1=0.733 n_val=296 vram=0.00GB 115s | grade=0.863 inner_auc=n/a vs conf_auc=n/a
+22:40:36 [hand/graph/aids] vote=0.998 uniform=0.998 best1=0.998 n_val=571 vram=0.00GB 130s | grade=0.998 inner_auc=nan vs conf_auc=nan
+22:42:20 [hand/graph/ogbg_molhiv] vote=0.953 uniform=0.966 best1=0.969 n_val=12231 vram=0.00GB 105s | grade=0.910 inner_auc=0.798 vs conf_auc=0.769
+22:42:41 ===== CYCLE 153 (OUTER -> INNER -> FEEDBACK) =====
+22:44:23 [hand/graph/imdb_binary] vote=0.697 uniform=0.697 best1=0.707 n_val=307 vram=0.00GB 102s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+22:46:27 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.998 n_val=605 vram=0.00GB 124s | grade=0.995 inner_auc=nan vs conf_auc=nan
+22:48:25 [hand/graph/ogbg_molhiv] vote=0.920 uniform=0.966 best1=0.966 n_val=12233 vram=0.00GB 118s | grade=0.891 inner_auc=0.888 vs conf_auc=0.801
+22:48:47 ===== CYCLE 154 (OUTER -> INNER -> FEEDBACK) =====
+22:50:22 [hand/graph/imdb_binary] vote=0.735 uniform=0.719 best1=0.735 n_val=313 vram=0.00GB 95s | grade=0.855 inner_auc=n/a vs conf_auc=n/a
+22:52:39 [hand/graph/aids] vote=0.998 uniform=0.996 best1=1.000 n_val=559 vram=0.00GB 137s | grade=0.959 inner_auc=nan vs conf_auc=nan
+22:54:49 [hand/graph/ogbg_molhiv] vote=0.924 uniform=0.968 best1=0.970 n_val=12344 vram=0.00GB 130s | grade=0.902 inner_auc=0.923 vs conf_auc=0.831
+22:55:14 ===== CYCLE 155 (OUTER -> INNER -> FEEDBACK) =====
+22:56:36 [hand/graph/imdb_binary] vote=0.729 uniform=0.723 best1=0.735 n_val=321 vram=0.00GB 81s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+22:58:54 [hand/graph/aids] vote=1.000 uniform=0.998 best1=1.000 n_val=564 vram=0.00GB 139s | grade=0.998 inner_auc=nan vs conf_auc=nan
+23:01:21 [hand/graph/ogbg_molhiv] vote=0.955 uniform=0.966 best1=0.967 n_val=12467 vram=0.00GB 147s | grade=0.911 inner_auc=0.829 vs conf_auc=0.770
+23:01:41 ===== CYCLE 156 (OUTER -> INNER -> FEEDBACK) =====
+23:02:59 [hand/graph/imdb_binary] vote=0.724 uniform=0.731 best1=0.748 n_val=286 vram=0.00GB 78s | grade=0.874 inner_auc=n/a vs conf_auc=n/a
+23:04:48 [hand/graph/aids] vote=0.998 uniform=0.995 best1=0.998 n_val=554 vram=0.00GB 109s | grade=0.997 inner_auc=nan vs conf_auc=nan
+23:05:12 RUN COMPLETE
+19:51:55 NI run auto_cpu_004 on CPU; hours=2.0 smoke=False
+19:51:55 explicit task list: ['hand/graph/imdb_binary', 'hand/graph/aids', 'hand/graph/ogbg_molhiv']
+19:52:05 [resume] from checkpoint: next cycle 157, rounds 466, 469 metric rows, inner net restored
+19:52:05 ===== CYCLE 157 (OUTER-ONLY BOOTSTRAP) =====
+19:52:05 [data] hand/graph/imdb_binary: n=1000 C=2 D=22 shards=1
+19:53:45 [hand/graph/imdb_binary] vote=0.702 uniform=0.688 best1=0.702 n_val=285 vram=0.00GB 100s
+19:53:45 [data] hand/graph/aids: n=2000 C=2 D=96 shards=1
+19:56:02 [hand/graph/aids] vote=1.000 uniform=0.995 best1=1.000 n_val=554 vram=0.00GB 137s
+19:56:02 [data] hand/graph/ogbg_molhiv: n=41127 C=2 D=38 shards=1
+19:57:39 [hand/graph/ogbg_molhiv] vote=0.923 uniform=0.968 best1=0.968 n_val=12203 vram=0.00GB 97s
+19:58:23 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 157, "n_records": 13042, "n_val": 2680, "base_rate": 0.9238805770874023, "inner": {"auc": 0.9312943473027337, "ece": 0.009707479923963546, "brier": 0.029332026839256287, "acc80": 0.9883395433425903}, "outer_conf": {"auc": 0.8227325461687098, "ece": 0.10211157342836039, "brier": 0.07931683212518692, "acc80": 0.965018630027771}}
+19:58:23 ===== CYCLE 158 (OUTER -> INNER -> FEEDBACK) =====
+20:00:10 [hand/graph/imdb_binary] vote=0.681 uniform=0.681 best1=0.681 n_val=298 vram=0.00GB 106s | grade=0.868 inner_auc=n/a vs conf_auc=n/a
+20:02:02 [hand/graph/aids] vote=0.990 uniform=0.992 best1=0.992 n_val=599 vram=0.00GB 112s | grade=0.981 inner_auc=1.000 vs conf_auc=0.991
+20:03:57 [hand/graph/ogbg_molhiv] vote=0.922 uniform=0.966 best1=0.969 n_val=12404 vram=0.00GB 115s | grade=0.903 inner_auc=0.918 vs conf_auc=0.828
+20:04:20 ===== CYCLE 159 (OUTER -> INNER -> FEEDBACK) =====
+20:05:55 [hand/graph/imdb_binary] vote=0.733 uniform=0.730 best1=0.726 n_val=281 vram=0.00GB 95s | grade=0.858 inner_auc=n/a vs conf_auc=n/a
+20:08:25 [hand/graph/aids] vote=0.998 uniform=0.998 best1=0.998 n_val=602 vram=0.00GB 150s | grade=0.995 inner_auc=nan vs conf_auc=nan
+20:10:29 [hand/graph/ogbg_molhiv] vote=0.919 uniform=0.969 best1=0.968 n_val=12250 vram=0.00GB 124s | grade=0.901 inner_auc=0.900 vs conf_auc=0.808
+20:10:52 ===== CYCLE 160 (OUTER -> INNER -> FEEDBACK) =====
+20:12:38 [hand/graph/imdb_binary] vote=0.723 uniform=0.716 best1=0.761 n_val=285 vram=0.00GB 106s | grade=0.867 inner_auc=n/a vs conf_auc=n/a
+20:14:54 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.997 n_val=603 vram=0.00GB 136s | grade=0.959 inner_auc=nan vs conf_auc=nan
+20:16:50 [hand/graph/ogbg_molhiv] vote=0.951 uniform=0.969 best1=0.969 n_val=12326 vram=0.00GB 116s | grade=0.904 inner_auc=0.858 vs conf_auc=0.815
+20:17:14 ===== CYCLE 161 (OUTER -> INNER -> FEEDBACK) =====
+20:18:44 [hand/graph/imdb_binary] vote=0.695 uniform=0.708 best1=0.718 n_val=305 vram=0.00GB 90s | grade=0.865 inner_auc=n/a vs conf_auc=n/a
+20:20:52 [hand/graph/aids] vote=0.995 uniform=0.993 best1=0.995 n_val=562 vram=0.00GB 128s | grade=0.996 inner_auc=nan vs conf_auc=nan
+20:23:15 [hand/graph/ogbg_molhiv] vote=0.920 uniform=0.967 best1=0.970 n_val=12472 vram=0.00GB 143s | grade=0.890 inner_auc=0.908 vs conf_auc=0.810
+20:23:36 ===== CYCLE 162 (OUTER -> INNER -> FEEDBACK) =====
+20:25:09 [hand/graph/imdb_binary] vote=0.740 uniform=0.747 best1=0.756 n_val=312 vram=0.00GB 92s | grade=0.867 inner_auc=n/a vs conf_auc=n/a
+20:27:53 [hand/graph/aids] vote=0.998 uniform=0.997 best1=0.998 n_val=591 vram=0.00GB 164s | grade=0.971 inner_auc=nan vs conf_auc=nan
+20:30:16 [hand/graph/ogbg_molhiv] vote=0.928 uniform=0.968 best1=0.970 n_val=12375 vram=0.00GB 143s | grade=0.899 inner_auc=0.899 vs conf_auc=0.824
+20:30:39 ===== CYCLE 163 (OUTER -> INNER -> FEEDBACK) =====
+20:32:12 [hand/graph/imdb_binary] vote=0.744 uniform=0.733 best1=0.744 n_val=285 vram=0.00GB 93s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+20:34:38 [hand/graph/aids] vote=0.997 uniform=0.995 best1=0.997 n_val=575 vram=0.00GB 147s | grade=0.996 inner_auc=nan vs conf_auc=nan
+20:36:52 [hand/graph/ogbg_molhiv] vote=0.889 uniform=0.966 best1=0.968 n_val=12239 vram=0.00GB 134s | grade=0.888 inner_auc=0.924 vs conf_auc=0.802
+20:37:18 ===== CYCLE 164 (OUTER -> INNER -> FEEDBACK) =====
+20:38:53 [hand/graph/imdb_binary] vote=0.722 uniform=0.715 best1=0.739 n_val=295 vram=0.00GB 96s | grade=0.866 inner_auc=n/a vs conf_auc=n/a
+20:41:18 [hand/graph/aids] vote=0.997 uniform=0.997 best1=0.997 n_val=600 vram=0.00GB 144s | grade=0.998 inner_auc=nan vs conf_auc=nan
+20:43:52 [hand/graph/ogbg_molhiv] vote=0.925 uniform=0.966 best1=0.968 n_val=12342 vram=0.00GB 154s | grade=0.885 inner_auc=0.904 vs conf_auc=0.798
+20:44:16 ===== CYCLE 165 (OUTER -> INNER -> FEEDBACK) =====
+20:45:54 [hand/graph/imdb_binary] vote=0.734 uniform=0.720 best1=0.734 n_val=304 vram=0.00GB 97s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+20:48:01 [hand/graph/aids] vote=0.995 uniform=0.993 best1=0.995 n_val=606 vram=0.00GB 127s | grade=0.994 inner_auc=nan vs conf_auc=nan
+20:50:08 [hand/graph/ogbg_molhiv] vote=0.966 uniform=0.967 best1=0.969 n_val=12389 vram=0.00GB 127s | grade=0.910 inner_auc=0.795 vs conf_auc=0.779
+20:50:37 ===== CYCLE 166 (OUTER -> INNER -> FEEDBACK) =====
+20:52:13 [hand/graph/imdb_binary] vote=0.723 uniform=0.723 best1=0.756 n_val=307 vram=0.00GB 96s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+20:54:02 [hand/graph/aids] vote=0.998 uniform=0.997 best1=0.998 n_val=621 vram=0.00GB 110s | grade=0.997 inner_auc=nan vs conf_auc=nan
+20:56:57 [hand/graph/ogbg_molhiv] vote=0.920 uniform=0.968 best1=0.967 n_val=12313 vram=0.00GB 175s | grade=0.881 inner_auc=0.908 vs conf_auc=0.818
+20:57:27 ===== CYCLE 167 (OUTER -> INNER -> FEEDBACK) =====
+20:59:07 [hand/graph/imdb_binary] vote=0.705 uniform=0.715 best1=0.718 n_val=312 vram=0.00GB 101s | grade=0.870 inner_auc=n/a vs conf_auc=n/a
+21:00:53 [hand/graph/aids] vote=0.985 uniform=0.992 best1=0.987 n_val=607 vram=0.00GB 106s | grade=0.982 inner_auc=0.977 vs conf_auc=0.958
+21:03:44 [hand/graph/ogbg_molhiv] vote=0.954 uniform=0.967 best1=0.968 n_val=12182 vram=0.00GB 171s | grade=0.909 inner_auc=0.812 vs conf_auc=0.792
+21:04:12 ===== CYCLE 168 (OUTER -> INNER -> FEEDBACK) =====
+21:05:53 [hand/graph/imdb_binary] vote=0.714 uniform=0.720 best1=0.717 n_val=318 vram=0.00GB 100s | grade=0.873 inner_auc=n/a vs conf_auc=n/a
+21:07:56 [hand/graph/aids] vote=0.998 uniform=0.993 best1=0.998 n_val=614 vram=0.00GB 123s | grade=0.992 inner_auc=nan vs conf_auc=nan
+21:10:16 [hand/graph/ogbg_molhiv] vote=0.920 uniform=0.966 best1=0.967 n_val=12534 vram=0.00GB 140s | grade=0.884 inner_auc=0.925 vs conf_auc=0.845
+21:10:43 ===== CYCLE 169 (OUTER -> INNER -> FEEDBACK) =====
+21:12:41 [hand/graph/imdb_binary] vote=0.739 uniform=0.714 best1=0.736 n_val=280 vram=0.00GB 118s | grade=0.877 inner_auc=n/a vs conf_auc=n/a
+21:14:42 [hand/graph/aids] vote=0.998 uniform=0.996 best1=0.998 n_val=570 vram=0.00GB 121s | grade=0.998 inner_auc=n/a vs conf_auc=n/a
+21:17:07 [hand/graph/ogbg_molhiv] vote=0.955 uniform=0.968 best1=0.969 n_val=12365 vram=0.00GB 145s | grade=0.904 inner_auc=0.842 vs conf_auc=0.795
+21:17:40 ===== CYCLE 170 (OUTER -> INNER -> FEEDBACK) =====
+21:20:08 [hand/graph/imdb_binary] vote=0.731 uniform=0.747 best1=0.758 n_val=297 vram=0.00GB 148s | grade=0.860 inner_auc=n/a vs conf_auc=n/a
+21:21:50 [hand/graph/aids] vote=0.990 uniform=0.995 best1=0.993 n_val=604 vram=0.00GB 102s | grade=0.961 inner_auc=0.991 vs conf_auc=0.991
+21:24:33 [hand/graph/ogbg_molhiv] vote=0.920 uniform=0.966 best1=0.967 n_val=12380 vram=0.00GB 164s | grade=0.885 inner_auc=0.916 vs conf_auc=0.823
+21:25:03 ===== CYCLE 171 (OUTER -> INNER -> FEEDBACK) =====
+21:27:15 [hand/graph/imdb_binary] vote=0.732 uniform=0.721 best1=0.742 n_val=287 vram=0.00GB 132s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+21:29:26 [hand/graph/aids] vote=0.998 uniform=0.997 best1=0.998 n_val=611 vram=0.00GB 132s | grade=0.993 inner_auc=nan vs conf_auc=nan
+21:31:50 [hand/graph/ogbg_molhiv] vote=0.964 uniform=0.967 best1=0.968 n_val=12363 vram=0.00GB 144s | grade=0.904 inner_auc=0.798 vs conf_auc=0.782
+21:32:28 ===== CYCLE 172 (OUTER -> INNER -> FEEDBACK) =====
+21:34:22 [hand/graph/imdb_binary] vote=0.735 uniform=0.725 best1=0.735 n_val=313 vram=0.00GB 114s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+21:36:39 [hand/graph/aids] vote=0.998 uniform=0.995 best1=0.998 n_val=590 vram=0.00GB 137s | grade=0.973 inner_auc=nan vs conf_auc=nan
+21:38:58 [hand/graph/ogbg_molhiv] vote=0.926 uniform=0.964 best1=0.966 n_val=12281 vram=0.00GB 139s | grade=0.887 inner_auc=0.897 vs conf_auc=0.818
+21:39:34 ===== CYCLE 173 (OUTER -> INNER -> FEEDBACK) =====
+21:41:53 [hand/graph/imdb_binary] vote=0.703 uniform=0.703 best1=0.739 n_val=303 vram=0.00GB 139s | grade=0.870 inner_auc=n/a vs conf_auc=n/a
+21:44:30 [hand/graph/aids] vote=1.000 uniform=1.000 best1=1.000 n_val=574 vram=0.00GB 157s | grade=0.997 inner_auc=nan vs conf_auc=nan
+21:46:54 [hand/graph/ogbg_molhiv] vote=0.917 uniform=0.967 best1=0.966 n_val=12328 vram=0.00GB 143s | grade=0.898 inner_auc=0.916 vs conf_auc=0.817
+21:47:23 ===== CYCLE 174 (OUTER -> INNER -> FEEDBACK) =====
+21:49:20 [hand/graph/imdb_binary] vote=0.685 uniform=0.699 best1=0.699 n_val=336 vram=0.00GB 116s | grade=0.864 inner_auc=n/a vs conf_auc=n/a
+21:51:19 [hand/graph/aids] vote=0.998 uniform=0.996 best1=0.998 n_val=564 vram=0.00GB 119s | grade=0.998 inner_auc=nan vs conf_auc=nan
+21:53:16 [hand/graph/ogbg_molhiv] vote=0.949 uniform=0.964 best1=0.966 n_val=12310 vram=0.00GB 117s | grade=0.908 inner_auc=0.848 vs conf_auc=0.798
+21:53:40 RUN COMPLETE

@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "HeiziFlashTools",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "安装和使用HeiziFlashTools中的Fastboot Flash Tool (FFT)、Image Flash Tool (IFT)和Apk & Sideload Tool (AST)",
+   "prerequisite_state": "计算机已安装HeiziFlashTools并已下载相关工具",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "双击HeiziFlashTools安装包运行安装程序",
+         "ui_target": {
+            "element_name": "HeiziFlashTools安装包",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "exe或msi文件",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DOUBLE_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "安装程序启动，开始安装HeiziFlashTools"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "启动Fastboot Flash Tool",
+         "ui_target": {
+            "element_name": "开始菜单中的Fastboot Flash Tool",
+            "automation_id": null,
+            "hierarchical_path": "开始菜单 > Fastboot Flash Tool",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Fastboot Flash Tool启动，显示设备轮询界面"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "启动Image Flash Tool",
+         "ui_target": {
+            "element_name": "开始菜单中的Image Flash Tool",
+            "automation_id": null,
+            "hierarchical_path": "开始菜单 > Image Flash Tool",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Image Flash Tool启动，显示刷机界面"
+      }
+   ],
+   "_meta": {
+      "source_app": "HeiziFlashTools",
+      "app_key": "heiziflashtools",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Heizi Flash Tools",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:19:06Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

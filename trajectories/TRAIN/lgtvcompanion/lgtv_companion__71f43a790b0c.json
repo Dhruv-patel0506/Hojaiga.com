@@ -1,0 +1,234 @@
+{
+   "app_metadata": {
+      "app_name": "LGTVCompanion",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure LGTVCompanion to manage LG WebOS TVs",
+   "prerequisite_state": "Windows environment, network connection, LG WebOS TVs powered on and connected to the same local area network",
+   "total_steps": 11,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Ensure all TVs are powered on and connected to the local area network via Wi-Fi or cable",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "All TVs are powered on and connected to the network"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Enable 'Turn On via Wi-Fi' in the TV settings",
+         "ui_target": {
+            "element_name": "Turn On via Wi-Fi",
+            "automation_id": null,
+            "hierarchical_path": "Settings > All Settings > Connection > Mobile Connection Management > TV On with Mobile",
+            "element_type": "CheckBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'Turn On via Wi-Fi' checkbox is checked"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Set a static DHCP lease for the WebOS devices in the router settings",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "Static DHCP leases are set for the WebOS devices"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Download the latest version of LGTVCompanion from the releases page",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "Downloaded the latest version of LGTVCompanion"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Install LGTVCompanion",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "LGTVCompanion is installed and the service LGTVsvc.exe is running"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Open the LGTV Companion application from the Windows start menu",
+         "ui_target": {
+            "element_name": "LGTV Companion",
+            "automation_id": null,
+            "hierarchical_path": "Start Menu > LGTV Companion",
+            "element_type": "Application",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "LGTV Companion application window is opened"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Click the 'Scan' button to automatically find network attached WebOS devices",
+         "ui_target": {
+            "element_name": "Scan",
+            "automation_id": null,
+            "hierarchical_path": "Main Window > Scan",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The application attempts to find and list network attached WebOS devices"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Check the 'Automatically manage this device' checkbox for each device",
+         "ui_target": {
+            "element_name": "Automatically manage this device",
+            "automation_id": null,
+            "hierarchical_path": "Device List > Device > Automatically manage this device",
+            "element_type": "CheckBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'Automatically manage this device' checkbox is checked for the selected device"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Click the hamburger icon to access global settings",
+         "ui_target": {
+            "element_name": "Hamburger Icon",
+            "automation_id": null,
+            "hierarchical_path": "Main Window > Hamburger Icon",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The global settings menu is opened"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Click 'Apply' to save the configuration and restart the service",
+         "ui_target": {
+            "element_name": "Apply",
+            "automation_id": null,
+            "hierarchical_path": "Global Settings > Apply",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The configuration is saved and the service is restarted"
+      },
+      {
+         "step_id": 11,
+         "low_level_instruction": "Accept the pairing dialog on the TV",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "The TV pairing is successful"
+      }
+   ],
+   "_meta": {
+      "source_app": "LGTVCompanion",
+      "app_key": "lgtvcompanion",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "LGTV Companion",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:50:23Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step3_ungrounded_target",
+         "step4_ungrounded_target",
+         "step5_ungrounded_target",
+         "step11_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

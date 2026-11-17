@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "HashHash",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide the user through the usage of HashHash to hash files and text.",
+   "prerequisite_state": "HashHash application is installed and launched.",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the file hashing screen",
+         "ui_target": {
+            "element_name": "File hashing screen",
+            "automation_id": null,
+            "hierarchical_path": "Main window > File hashing screen",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The file hashing screen is displayed with input fields and a calculate button."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select a file to hash",
+         "ui_target": {
+            "element_name": "Browse button",
+            "automation_id": null,
+            "hierarchical_path": "File hashing screen > Browse button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A file dialog opens allowing the user to select a file."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click the calculate button",
+         "ui_target": {
+            "element_name": "Calculate button",
+            "automation_id": null,
+            "hierarchical_path": "File hashing screen > Calculate button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The hash of the selected file is calculated and displayed."
+      }
+   ],
+   "_meta": {
+      "source_app": "HashHash",
+      "app_key": "hashhash",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "About The Project",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:54:14Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

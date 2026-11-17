@@ -1,0 +1,108 @@
+{
+   "app_metadata": {
+      "app_name": "SkyNotepad",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "high_level_task": "Provide instructions on how to download and install SkyNotepad",
+   "prerequisite_state": "The user is on the internet and has access to the SkyNotepad GitHub repository",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download SkyNotepad from Microsoft Store",
+         "ui_target": {
+            "element_name": "Microsoft Store",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Microsoft Store application opens and SkyNotepad is listed as an available app"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click on the SkyNotepad app in the Microsoft Store",
+         "ui_target": {
+            "element_name": "SkyNotepad",
+            "automation_id": null,
+            "hierarchical_path": "Microsoft Store > SkyNotepad",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The SkyNotepad app details page opens in the Microsoft Store"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click the 'Get' button to install SkyNotepad",
+         "ui_target": {
+            "element_name": "Get",
+            "automation_id": null,
+            "hierarchical_path": "Microsoft Store > SkyNotepad > Get",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "SkyNotepad starts downloading and installing on the user's device"
+      }
+   ],
+   "_meta": {
+      "source_app": "SkyNotepad",
+      "app_key": "skynotepad",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "SkyNotepad",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T08:48:20Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

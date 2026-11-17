@@ -1,0 +1,142 @@
+{
+   "app_metadata": {
+      "app_name": "MicMute",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Provide instructions for installing and using MicMute on Windows.",
+   "prerequisite_state": "User is on a Windows 10/11 system.",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download MicMute from the latest release.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User is directed to the latest release page."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click on the MicMute.exe file to download it.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "MicMute.exe is downloaded to the user's system."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Install MicMute using WinGet.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User is directed to the WinGet installation command."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Run the WinGet command to install MicMute.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install itsnateai.MicMute"
+         },
+         "expected_state_change": "MicMute is installed via WinGet."
+      }
+   ],
+   "_meta": {
+      "source_app": "MicMute",
+      "app_key": "micmute",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "MicMute",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:34:01Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target",
+         "step4_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

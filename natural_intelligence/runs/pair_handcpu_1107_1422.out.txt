@@ -1,0 +1,231 @@
+14:22:32 NI run pair_handcpu_1107_1422 on CPU; hours=3.0 smoke=False
+14:22:32 explicit task list: ['hand/text/ag_news', 'hand/text/banking77', 'hand/text/20_newsgroups', 'hand/graph/ogbg_molhiv', 'hand/graph/imdb_binary', 'hand/image/cifar10', 'hand/audio/esc50']
+14:22:32 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+14:22:37 [data] hand/text/ag_news: n=120000 C=4 D=2048 shards=1
+14:24:33 [hand/text/ag_news] vote=0.887 uniform=0.887 best1=0.888 n_val=35910 vram=0.00GB 116s
+14:24:33 [data] hand/text/banking77: n=13083 C=77 D=2048 shards=1
+14:24:53 [hand/text/banking77] vote=0.661 uniform=0.661 best1=0.819 n_val=3952 vram=0.00GB 20s
+14:24:54 [data] hand/text/20_newsgroups: n=18846 C=20 D=2048 shards=1
+14:25:25 [hand/text/20_newsgroups] vote=0.589 uniform=0.589 best1=0.548 n_val=5690 vram=0.00GB 31s
+14:25:25 [data] hand/graph/ogbg_molhiv: n=41127 C=2 D=38 shards=1
+14:25:41 [hand/graph/ogbg_molhiv] vote=0.965 uniform=0.965 best1=0.966 n_val=12191 vram=0.00GB 16s
+14:25:41 [data] hand/graph/imdb_binary: n=1000 C=2 D=22 shards=1
+14:25:46 [hand/graph/imdb_binary] vote=0.720 uniform=0.720 best1=0.727 n_val=282 vram=0.00GB 5s
+14:25:46 [data] hand/image/cifar10: n=50000 C=10 D=384 shards=1
+14:26:13 [hand/image/cifar10] vote=0.657 uniform=0.657 best1=0.679 n_val=14926 vram=0.00GB 27s
+14:26:14 [data] hand/audio/esc50: n=2000 C=50 D=134 shards=1
+14:26:25 [hand/audio/esc50] vote=0.530 uniform=0.530 best1=0.572 n_val=572 vram=0.00GB 12s
+14:26:43 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 73523, "n_val": 14649, "base_rate": 0.8155505657196045, "inner": {"auc": 0.9045220201213142, "ece": 0.006679122220437204, "brier": 0.08666836470365524, "acc80": 0.9296014904975891}, "outer_conf": {"auc": 0.8620898079520597, "ece": 0.20140254913415834, "brier": 0.15090718865394592, "acc80": 0.9099752306938171}}
+14:26:43 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+14:29:22 [hand/text/ag_news] vote=0.890 uniform=0.890 best1=0.889 n_val=36174 vram=0.00GB 159s | grade=0.865 inner_auc=0.867 vs conf_auc=0.828
+14:29:52 [hand/text/banking77] vote=0.670 uniform=0.670 best1=0.832 n_val=4010 vram=0.00GB 30s | grade=0.812 inner_auc=0.975 vs conf_auc=0.913
+14:30:31 [hand/text/20_newsgroups] vote=0.584 uniform=0.584 best1=0.539 n_val=5770 vram=0.00GB 39s | grade=0.760 inner_auc=0.862 vs conf_auc=0.823
+14:30:59 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.968 best1=0.968 n_val=12382 vram=0.00GB 28s | grade=0.926 inner_auc=0.756 vs conf_auc=0.730
+14:31:06 [hand/graph/imdb_binary] vote=0.717 uniform=0.717 best1=0.733 n_val=258 vram=0.00GB 7s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+14:31:48 [hand/image/cifar10] vote=0.656 uniform=0.656 best1=0.684 n_val=15216 vram=0.00GB 42s | grade=0.826 inner_auc=0.848 vs conf_auc=0.779
+14:32:00 [hand/audio/esc50] vote=0.540 uniform=0.540 best1=0.567 n_val=600 vram=0.00GB 12s | grade=0.804 inner_auc=0.800 vs conf_auc=0.773
+14:32:06 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+14:34:53 [hand/text/ag_news] vote=0.889 uniform=0.886 best1=0.886 n_val=36178 vram=0.00GB 167s | grade=0.877 inner_auc=0.858 vs conf_auc=0.825
+14:35:21 [hand/text/banking77] vote=0.768 uniform=0.681 best1=0.835 n_val=3918 vram=0.00GB 28s | grade=0.775 inner_auc=0.950 vs conf_auc=0.910
+14:35:54 [hand/text/20_newsgroups] vote=0.590 uniform=0.589 best1=0.535 n_val=5565 vram=0.00GB 34s | grade=0.762 inner_auc=0.864 vs conf_auc=0.823
+14:36:14 [hand/graph/ogbg_molhiv] vote=0.967 uniform=0.968 best1=0.969 n_val=12483 vram=0.00GB 20s | grade=0.951 inner_auc=0.784 vs conf_auc=0.794
+14:36:25 [hand/graph/imdb_binary] vote=0.684 uniform=0.684 best1=0.709 n_val=282 vram=0.00GB 10s | grade=0.861 inner_auc=n/a vs conf_auc=n/a
+14:37:07 [hand/image/cifar10] vote=0.673 uniform=0.658 best1=0.682 n_val=15110 vram=0.00GB 42s | grade=0.818 inner_auc=0.832 vs conf_auc=0.782
+14:37:20 [hand/audio/esc50] vote=0.552 uniform=0.542 best1=0.574 n_val=598 vram=0.00GB 13s | grade=0.804 inner_auc=0.792 vs conf_auc=0.776
+14:37:26 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+14:40:17 [hand/text/ag_news] vote=0.891 uniform=0.885 best1=0.886 n_val=36166 vram=0.00GB 171s | grade=0.888 inner_auc=0.872 vs conf_auc=0.841
+14:40:55 [hand/text/banking77] vote=0.787 uniform=0.655 best1=0.822 n_val=3907 vram=0.00GB 38s | grade=0.822 inner_auc=0.948 vs conf_auc=0.931
+14:41:31 [hand/text/20_newsgroups] vote=0.577 uniform=0.575 best1=0.526 n_val=5747 vram=0.00GB 36s | grade=0.766 inner_auc=0.855 vs conf_auc=0.815
+14:42:03 [hand/graph/ogbg_molhiv] vote=0.964 uniform=0.964 best1=0.968 n_val=12362 vram=0.00GB 32s | grade=0.969 inner_auc=0.813 vs conf_auc=0.804
+14:42:15 [hand/graph/imdb_binary] vote=0.731 uniform=0.731 best1=0.728 n_val=305 vram=0.00GB 12s | grade=0.873 inner_auc=n/a vs conf_auc=n/a
+14:42:55 [hand/image/cifar10] vote=0.677 uniform=0.656 best1=0.678 n_val=14940 vram=0.00GB 40s | grade=0.827 inner_auc=0.834 vs conf_auc=0.791
+14:43:08 [hand/audio/esc50] vote=0.518 uniform=0.505 best1=0.544 n_val=608 vram=0.00GB 13s | grade=0.800 inner_auc=0.767 vs conf_auc=0.720
+14:43:18 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+14:45:59 [hand/text/ag_news] vote=0.892 uniform=0.885 best1=0.886 n_val=36093 vram=0.00GB 161s | grade=0.896 inner_auc=0.871 vs conf_auc=0.845
+14:46:41 [hand/text/banking77] vote=0.818 uniform=0.673 best1=0.830 n_val=3924 vram=0.00GB 42s | grade=0.825 inner_auc=0.930 vs conf_auc=0.911
+14:47:11 [hand/text/20_newsgroups] vote=0.589 uniform=0.587 best1=0.529 n_val=5553 vram=0.00GB 30s | grade=0.766 inner_auc=0.866 vs conf_auc=0.831
+14:47:35 [hand/graph/ogbg_molhiv] vote=0.966 uniform=0.966 best1=0.969 n_val=12312 vram=0.00GB 24s | grade=0.968 inner_auc=0.786 vs conf_auc=0.789
+14:47:43 [hand/graph/imdb_binary] vote=0.720 uniform=0.717 best1=0.723 n_val=307 vram=0.00GB 7s | grade=0.875 inner_auc=n/a vs conf_auc=n/a
+14:48:27 [hand/image/cifar10] vote=0.684 uniform=0.656 best1=0.677 n_val=14901 vram=0.00GB 45s | grade=0.829 inner_auc=0.821 vs conf_auc=0.795
+14:48:39 [hand/audio/esc50] vote=0.552 uniform=0.542 best1=0.561 n_val=574 vram=0.00GB 11s | grade=0.800 inner_auc=0.773 vs conf_auc=0.768
+14:48:45 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+14:51:26 [hand/text/ag_news] vote=0.896 uniform=0.888 best1=0.887 n_val=36008 vram=0.00GB 161s | grade=0.901 inner_auc=0.860 vs conf_auc=0.831
+14:51:56 [hand/text/banking77] vote=0.830 uniform=0.662 best1=0.831 n_val=3810 vram=0.00GB 30s | grade=0.839 inner_auc=0.906 vs conf_auc=0.903
+14:52:36 [hand/text/20_newsgroups] vote=0.590 uniform=0.581 best1=0.534 n_val=5695 vram=0.00GB 40s | grade=0.775 inner_auc=0.867 vs conf_auc=0.848
+14:52:58 [hand/graph/ogbg_molhiv] vote=0.966 uniform=0.966 best1=0.967 n_val=12307 vram=0.00GB 22s | grade=0.965 inner_auc=0.773 vs conf_auc=0.752
+14:53:06 [hand/graph/imdb_binary] vote=0.706 uniform=0.706 best1=0.734 n_val=316 vram=0.00GB 8s | grade=0.877 inner_auc=n/a vs conf_auc=n/a
+14:53:59 [hand/image/cifar10] vote=0.692 uniform=0.662 best1=0.682 n_val=14880 vram=0.00GB 53s | grade=0.831 inner_auc=0.825 vs conf_auc=0.801
+14:54:11 [hand/audio/esc50] vote=0.544 uniform=0.514 best1=0.560 n_val=629 vram=0.00GB 12s | grade=0.807 inner_auc=0.796 vs conf_auc=0.815
+14:54:17 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+14:56:47 [hand/text/ag_news] vote=0.893 uniform=0.886 best1=0.884 n_val=35916 vram=0.00GB 151s | grade=0.906 inner_auc=0.844 vs conf_auc=0.814
+14:57:21 [hand/text/banking77] vote=0.832 uniform=0.661 best1=0.832 n_val=3943 vram=0.00GB 33s | grade=0.854 inner_auc=0.912 vs conf_auc=0.900
+14:58:10 [hand/text/20_newsgroups] vote=0.594 uniform=0.587 best1=0.538 n_val=5599 vram=0.00GB 49s | grade=0.780 inner_auc=0.861 vs conf_auc=0.831
+14:58:30 [hand/graph/ogbg_molhiv] vote=0.967 uniform=0.968 best1=0.971 n_val=12395 vram=0.00GB 21s | grade=0.970 inner_auc=0.784 vs conf_auc=0.785
+14:58:40 [hand/graph/imdb_binary] vote=0.716 uniform=0.716 best1=0.753 n_val=296 vram=0.00GB 9s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+14:59:18 [hand/image/cifar10] vote=0.687 uniform=0.656 best1=0.675 n_val=15027 vram=0.00GB 38s | grade=0.838 inner_auc=0.810 vs conf_auc=0.792
+14:59:33 [hand/audio/esc50] vote=0.538 uniform=0.502 best1=0.535 n_val=632 vram=0.00GB 15s | grade=0.814 inner_auc=0.766 vs conf_auc=0.709
+14:59:43 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+15:02:34 [hand/text/ag_news] vote=0.895 uniform=0.887 best1=0.886 n_val=36188 vram=0.00GB 170s | grade=0.910 inner_auc=0.867 vs conf_auc=0.833
+15:03:08 [hand/text/banking77] vote=0.827 uniform=0.666 best1=0.823 n_val=3837 vram=0.00GB 34s | grade=0.855 inner_auc=0.880 vs conf_auc=0.868
+15:03:42 [hand/text/20_newsgroups] vote=0.588 uniform=0.578 best1=0.545 n_val=5643 vram=0.00GB 34s | grade=0.781 inner_auc=0.852 vs conf_auc=0.824
+15:04:08 [hand/graph/ogbg_molhiv] vote=0.966 uniform=0.966 best1=0.969 n_val=12298 vram=0.00GB 26s | grade=0.969 inner_auc=0.805 vs conf_auc=0.803
+15:04:16 [hand/graph/imdb_binary] vote=0.705 uniform=0.705 best1=0.738 n_val=302 vram=0.00GB 8s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+15:04:54 [hand/image/cifar10] vote=0.694 uniform=0.663 best1=0.683 n_val=15122 vram=0.00GB 38s | grade=0.842 inner_auc=0.837 vs conf_auc=0.817
+15:05:14 [hand/audio/esc50] vote=0.530 uniform=0.486 best1=0.522 n_val=636 vram=0.00GB 20s | grade=0.815 inner_auc=0.720 vs conf_auc=0.731
+15:05:25 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+15:08:09 [hand/text/ag_news] vote=0.896 uniform=0.886 best1=0.888 n_val=36148 vram=0.00GB 164s | grade=0.912 inner_auc=0.859 vs conf_auc=0.826
+15:08:42 [hand/text/banking77] vote=0.829 uniform=0.657 best1=0.828 n_val=3875 vram=0.00GB 33s | grade=0.859 inner_auc=0.911 vs conf_auc=0.898
+15:09:21 [hand/text/20_newsgroups] vote=0.591 uniform=0.584 best1=0.539 n_val=5590 vram=0.00GB 39s | grade=0.782 inner_auc=0.866 vs conf_auc=0.839
+15:09:56 [hand/graph/ogbg_molhiv] vote=0.967 uniform=0.968 best1=0.969 n_val=12383 vram=0.00GB 36s | grade=0.967 inner_auc=0.755 vs conf_auc=0.764
+15:10:06 [hand/graph/imdb_binary] vote=0.703 uniform=0.699 best1=0.706 n_val=286 vram=0.00GB 9s | grade=0.879 inner_auc=n/a vs conf_auc=n/a
+15:10:46 [hand/image/cifar10] vote=0.693 uniform=0.664 best1=0.683 n_val=14992 vram=0.00GB 40s | grade=0.849 inner_auc=0.823 vs conf_auc=0.807
+15:11:00 [hand/audio/esc50] vote=0.530 uniform=0.501 best1=0.527 n_val=583 vram=0.00GB 14s | grade=0.818 inner_auc=0.730 vs conf_auc=0.730
+15:11:07 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+15:14:19 [hand/text/ag_news] vote=0.895 uniform=0.886 best1=0.888 n_val=35859 vram=0.00GB 192s | grade=0.913 inner_auc=0.870 vs conf_auc=0.835
+15:14:52 [hand/text/banking77] vote=0.825 uniform=0.657 best1=0.822 n_val=3974 vram=0.00GB 33s | grade=0.857 inner_auc=0.894 vs conf_auc=0.888
+15:15:32 [hand/text/20_newsgroups] vote=0.588 uniform=0.584 best1=0.532 n_val=5533 vram=0.00GB 40s | grade=0.781 inner_auc=0.851 vs conf_auc=0.830
+15:15:56 [hand/graph/ogbg_molhiv] vote=0.965 uniform=0.965 best1=0.966 n_val=12397 vram=0.00GB 24s | grade=0.961 inner_auc=0.798 vs conf_auc=0.808
+15:16:06 [hand/graph/imdb_binary] vote=0.668 uniform=0.671 best1=0.708 n_val=298 vram=0.00GB 11s | grade=0.855 inner_auc=n/a vs conf_auc=n/a
+15:16:57 [hand/image/cifar10] vote=0.687 uniform=0.652 best1=0.673 n_val=15056 vram=0.00GB 51s | grade=0.851 inner_auc=0.811 vs conf_auc=0.797
+15:17:12 [hand/audio/esc50] vote=0.598 uniform=0.567 best1=0.598 n_val=550 vram=0.00GB 14s | grade=0.786 inner_auc=0.755 vs conf_auc=0.746
+15:17:19 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+15:20:33 [hand/text/ag_news] vote=0.895 uniform=0.886 best1=0.885 n_val=35887 vram=0.00GB 193s | grade=0.915 inner_auc=0.856 vs conf_auc=0.821
+15:21:14 [hand/text/banking77] vote=0.838 uniform=0.669 best1=0.839 n_val=3932 vram=0.00GB 41s | grade=0.855 inner_auc=0.907 vs conf_auc=0.897
+15:21:59 [hand/text/20_newsgroups] vote=0.598 uniform=0.588 best1=0.537 n_val=5747 vram=0.00GB 45s | grade=0.783 inner_auc=0.873 vs conf_auc=0.840
+15:22:25 [hand/graph/ogbg_molhiv] vote=0.967 uniform=0.968 best1=0.969 n_val=12364 vram=0.00GB 26s | grade=0.969 inner_auc=0.783 vs conf_auc=0.773
+15:22:35 [hand/graph/imdb_binary] vote=0.709 uniform=0.712 best1=0.731 n_val=309 vram=0.00GB 10s | grade=0.853 inner_auc=n/a vs conf_auc=n/a
+15:23:43 [hand/image/cifar10] vote=0.691 uniform=0.660 best1=0.683 n_val=15081 vram=0.00GB 68s | grade=0.855 inner_auc=0.824 vs conf_auc=0.807
+15:23:57 [hand/audio/esc50] vote=0.583 uniform=0.527 best1=0.573 n_val=592 vram=0.00GB 14s | grade=0.806 inner_auc=0.814 vs conf_auc=0.803
+15:24:06 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+15:27:05 [hand/text/ag_news] vote=0.896 uniform=0.887 best1=0.888 n_val=35833 vram=0.00GB 179s | grade=0.913 inner_auc=0.868 vs conf_auc=0.828
+15:27:41 [hand/text/banking77] vote=0.837 uniform=0.658 best1=0.831 n_val=3971 vram=0.00GB 36s | grade=0.858 inner_auc=0.898 vs conf_auc=0.885
+15:28:42 [hand/text/20_newsgroups] vote=0.603 uniform=0.594 best1=0.544 n_val=5621 vram=0.00GB 61s | grade=0.784 inner_auc=0.843 vs conf_auc=0.835
+15:29:08 [hand/graph/ogbg_molhiv] vote=0.966 uniform=0.966 best1=0.968 n_val=12329 vram=0.00GB 27s | grade=0.967 inner_auc=0.807 vs conf_auc=0.789
+15:29:18 [hand/graph/imdb_binary] vote=0.730 uniform=0.733 best1=0.743 n_val=296 vram=0.00GB 9s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+15:30:06 [hand/image/cifar10] vote=0.689 uniform=0.657 best1=0.679 n_val=14969 vram=0.00GB 48s | grade=0.857 inner_auc=0.827 vs conf_auc=0.807
+15:30:20 [hand/audio/esc50] vote=0.604 uniform=0.564 best1=0.589 n_val=596 vram=0.00GB 15s | grade=0.805 inner_auc=0.731 vs conf_auc=0.736
+15:30:31 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+15:33:50 [hand/text/ag_news] vote=0.896 uniform=0.888 best1=0.887 n_val=36057 vram=0.00GB 200s | grade=0.915 inner_auc=0.862 vs conf_auc=0.820
+15:34:26 [hand/text/banking77] vote=0.828 uniform=0.668 best1=0.825 n_val=3900 vram=0.00GB 36s | grade=0.854 inner_auc=0.910 vs conf_auc=0.905
+15:35:08 [hand/text/20_newsgroups] vote=0.589 uniform=0.587 best1=0.532 n_val=5585 vram=0.00GB 43s | grade=0.778 inner_auc=0.884 vs conf_auc=0.858
+15:35:37 [hand/graph/ogbg_molhiv] vote=0.967 uniform=0.967 best1=0.968 n_val=12232 vram=0.00GB 29s | grade=0.965 inner_auc=0.793 vs conf_auc=0.786
+15:35:53 [hand/graph/imdb_binary] vote=0.738 uniform=0.741 best1=0.747 n_val=324 vram=0.00GB 16s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+15:36:41 [hand/image/cifar10] vote=0.685 uniform=0.658 best1=0.677 n_val=14972 vram=0.00GB 48s | grade=0.859 inner_auc=0.827 vs conf_auc=0.808
+15:36:57 [hand/audio/esc50] vote=0.601 uniform=0.570 best1=0.587 n_val=586 vram=0.00GB 15s | grade=0.816 inner_auc=0.794 vs conf_auc=0.769
+15:37:07 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+15:40:18 [hand/text/ag_news] vote=0.896 uniform=0.886 best1=0.886 n_val=36039 vram=0.00GB 191s | grade=0.915 inner_auc=0.865 vs conf_auc=0.831
+15:41:09 [hand/text/banking77] vote=0.827 uniform=0.668 best1=0.823 n_val=3828 vram=0.00GB 51s | grade=0.857 inner_auc=0.890 vs conf_auc=0.871
+15:41:48 [hand/text/20_newsgroups] vote=0.597 uniform=0.579 best1=0.542 n_val=5611 vram=0.00GB 39s | grade=0.784 inner_auc=0.843 vs conf_auc=0.818
+15:42:18 [hand/graph/ogbg_molhiv] vote=0.969 uniform=0.969 best1=0.970 n_val=12599 vram=0.00GB 30s | grade=0.970 inner_auc=0.808 vs conf_auc=0.799
+15:42:37 [hand/graph/imdb_binary] vote=0.713 uniform=0.713 best1=0.731 n_val=286 vram=0.00GB 19s | grade=0.852 inner_auc=n/a vs conf_auc=n/a
+15:43:33 [hand/image/cifar10] vote=0.691 uniform=0.659 best1=0.683 n_val=15012 vram=0.00GB 57s | grade=0.863 inner_auc=0.835 vs conf_auc=0.814
+15:43:46 [hand/audio/esc50] vote=0.570 uniform=0.551 best1=0.566 n_val=581 vram=0.00GB 13s | grade=0.804 inner_auc=0.754 vs conf_auc=0.752
+15:43:55 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+15:46:54 [hand/text/ag_news] vote=0.898 uniform=0.888 best1=0.888 n_val=35650 vram=0.00GB 179s | grade=0.918 inner_auc=0.857 vs conf_auc=0.820
+15:47:49 [hand/text/banking77] vote=0.840 uniform=0.665 best1=0.836 n_val=3930 vram=0.00GB 55s | grade=0.853 inner_auc=0.893 vs conf_auc=0.874
+15:48:21 [hand/text/20_newsgroups] vote=0.595 uniform=0.584 best1=0.535 n_val=5512 vram=0.00GB 32s | grade=0.784 inner_auc=0.858 vs conf_auc=0.829
+15:48:48 [hand/graph/ogbg_molhiv] vote=0.966 uniform=0.966 best1=0.968 n_val=12277 vram=0.00GB 27s | grade=0.966 inner_auc=0.795 vs conf_auc=0.789
+15:48:57 [hand/graph/imdb_binary] vote=0.689 uniform=0.689 best1=0.703 n_val=296 vram=0.00GB 8s | grade=0.869 inner_auc=n/a vs conf_auc=n/a
+15:49:47 [hand/image/cifar10] vote=0.687 uniform=0.657 best1=0.680 n_val=15062 vram=0.00GB 50s | grade=0.865 inner_auc=0.832 vs conf_auc=0.816
+15:49:59 [hand/audio/esc50] vote=0.572 uniform=0.531 best1=0.575 n_val=640 vram=0.00GB 13s | grade=0.811 inner_auc=0.724 vs conf_auc=0.740
+15:50:08 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+15:53:15 [hand/text/ag_news] vote=0.897 uniform=0.889 best1=0.888 n_val=35686 vram=0.00GB 187s | grade=0.920 inner_auc=0.858 vs conf_auc=0.813
+15:53:55 [hand/text/banking77] vote=0.834 uniform=0.666 best1=0.833 n_val=3893 vram=0.00GB 40s | grade=0.855 inner_auc=0.922 vs conf_auc=0.910
+15:54:38 [hand/text/20_newsgroups] vote=0.592 uniform=0.581 best1=0.531 n_val=5541 vram=0.00GB 42s | grade=0.783 inner_auc=0.875 vs conf_auc=0.854
+15:55:02 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.968 best1=0.970 n_val=12337 vram=0.00GB 24s | grade=0.968 inner_auc=0.796 vs conf_auc=0.782
+15:55:12 [hand/graph/imdb_binary] vote=0.718 uniform=0.712 best1=0.728 n_val=312 vram=0.00GB 9s | grade=0.878 inner_auc=n/a vs conf_auc=n/a
+15:56:05 [hand/image/cifar10] vote=0.686 uniform=0.659 best1=0.679 n_val=14747 vram=0.00GB 53s | grade=0.867 inner_auc=0.824 vs conf_auc=0.801
+15:56:18 [hand/audio/esc50] vote=0.585 uniform=0.530 best1=0.578 n_val=557 vram=0.00GB 13s | grade=0.803 inner_auc=0.784 vs conf_auc=0.778
+15:56:26 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+15:59:24 [hand/text/ag_news] vote=0.895 uniform=0.885 best1=0.887 n_val=35937 vram=0.00GB 178s | grade=0.920 inner_auc=0.855 vs conf_auc=0.810
+16:00:17 [hand/text/banking77] vote=0.829 uniform=0.661 best1=0.828 n_val=3854 vram=0.00GB 53s | grade=0.857 inner_auc=0.916 vs conf_auc=0.906
+16:01:13 [hand/text/20_newsgroups] vote=0.600 uniform=0.590 best1=0.535 n_val=5684 vram=0.00GB 55s | grade=0.780 inner_auc=0.844 vs conf_auc=0.830
+16:01:40 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.968 best1=0.969 n_val=12368 vram=0.00GB 27s | grade=0.967 inner_auc=0.803 vs conf_auc=0.800
+16:01:57 [hand/graph/imdb_binary] vote=0.736 uniform=0.732 best1=0.745 n_val=314 vram=0.00GB 17s | grade=0.880 inner_auc=n/a vs conf_auc=n/a
+16:02:51 [hand/image/cifar10] vote=0.687 uniform=0.656 best1=0.683 n_val=15123 vram=0.00GB 54s | grade=0.868 inner_auc=0.830 vs conf_auc=0.814
+16:03:17 [hand/audio/esc50] vote=0.593 uniform=0.558 best1=0.580 n_val=572 vram=0.00GB 26s | grade=0.817 inner_auc=0.764 vs conf_auc=0.754
+16:03:33 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+16:07:12 [hand/text/ag_news] vote=0.895 uniform=0.888 best1=0.887 n_val=35857 vram=0.00GB 219s | grade=0.921 inner_auc=0.863 vs conf_auc=0.823
+16:08:01 [hand/text/banking77] vote=0.826 uniform=0.657 best1=0.828 n_val=3960 vram=0.00GB 50s | grade=0.857 inner_auc=0.905 vs conf_auc=0.894
+16:08:52 [hand/text/20_newsgroups] vote=0.593 uniform=0.584 best1=0.535 n_val=5736 vram=0.00GB 50s | grade=0.784 inner_auc=0.855 vs conf_auc=0.838
+16:09:21 [hand/graph/ogbg_molhiv] vote=0.969 uniform=0.970 best1=0.971 n_val=12360 vram=0.00GB 30s | grade=0.965 inner_auc=0.782 vs conf_auc=0.777
+16:09:33 [hand/graph/imdb_binary] vote=0.740 uniform=0.733 best1=0.721 n_val=258 vram=0.00GB 12s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+16:10:35 [hand/image/cifar10] vote=0.680 uniform=0.648 best1=0.677 n_val=14874 vram=0.00GB 62s | grade=0.865 inner_auc=0.828 vs conf_auc=0.808
+16:11:00 [hand/audio/esc50] vote=0.566 uniform=0.532 best1=0.555 n_val=611 vram=0.00GB 25s | grade=0.805 inner_auc=0.738 vs conf_auc=0.738
+16:11:16 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+16:14:42 [hand/text/ag_news] vote=0.896 uniform=0.887 best1=0.889 n_val=36062 vram=0.00GB 206s | grade=0.920 inner_auc=0.878 vs conf_auc=0.827
+16:15:30 [hand/text/banking77] vote=0.833 uniform=0.660 best1=0.830 n_val=3924 vram=0.00GB 48s | grade=0.855 inner_auc=0.895 vs conf_auc=0.875
+16:16:32 [hand/text/20_newsgroups] vote=0.588 uniform=0.578 best1=0.529 n_val=5611 vram=0.00GB 62s | grade=0.787 inner_auc=0.867 vs conf_auc=0.854
+16:17:08 [hand/graph/ogbg_molhiv] vote=0.969 uniform=0.969 best1=0.970 n_val=12263 vram=0.00GB 37s | grade=0.970 inner_auc=0.800 vs conf_auc=0.774
+16:17:20 [hand/graph/imdb_binary] vote=0.678 uniform=0.681 best1=0.694 n_val=320 vram=0.00GB 12s | grade=0.841 inner_auc=n/a vs conf_auc=n/a
+16:18:15 [hand/image/cifar10] vote=0.689 uniform=0.661 best1=0.685 n_val=14797 vram=0.00GB 55s | grade=0.866 inner_auc=0.815 vs conf_auc=0.798
+16:18:33 [hand/audio/esc50] vote=0.564 uniform=0.511 best1=0.560 n_val=603 vram=0.00GB 17s | grade=0.816 inner_auc=0.752 vs conf_auc=0.751
+16:18:44 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+16:22:35 [hand/text/ag_news] vote=0.894 uniform=0.888 best1=0.886 n_val=35973 vram=0.00GB 231s | grade=0.921 inner_auc=0.868 vs conf_auc=0.821
+16:23:17 [hand/text/banking77] vote=0.827 uniform=0.662 best1=0.825 n_val=3935 vram=0.00GB 42s | grade=0.855 inner_auc=0.914 vs conf_auc=0.904
+16:24:11 [hand/text/20_newsgroups] vote=0.600 uniform=0.592 best1=0.537 n_val=5604 vram=0.00GB 53s | grade=0.781 inner_auc=0.864 vs conf_auc=0.842
+16:24:45 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.968 best1=0.968 n_val=12443 vram=0.00GB 35s | grade=0.969 inner_auc=0.739 vs conf_auc=0.722
+16:25:03 [hand/graph/imdb_binary] vote=0.694 uniform=0.690 best1=0.687 n_val=281 vram=0.00GB 17s | grade=0.863 inner_auc=n/a vs conf_auc=n/a
+16:25:52 [hand/image/cifar10] vote=0.684 uniform=0.661 best1=0.680 n_val=15131 vram=0.00GB 50s | grade=0.869 inner_auc=0.813 vs conf_auc=0.792
+16:26:11 [hand/audio/esc50] vote=0.605 uniform=0.551 best1=0.598 n_val=574 vram=0.00GB 18s | grade=0.795 inner_auc=0.729 vs conf_auc=0.739
+16:26:24 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+16:30:12 [hand/text/ag_news] vote=0.893 uniform=0.885 best1=0.887 n_val=36091 vram=0.00GB 228s | grade=0.922 inner_auc=0.862 vs conf_auc=0.812
+16:31:01 [hand/text/banking77] vote=0.831 uniform=0.674 best1=0.825 n_val=3947 vram=0.00GB 50s | grade=0.859 inner_auc=0.895 vs conf_auc=0.872
+16:31:48 [hand/text/20_newsgroups] vote=0.601 uniform=0.588 best1=0.535 n_val=5592 vram=0.00GB 46s | grade=0.788 inner_auc=0.867 vs conf_auc=0.843
+16:32:32 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.968 best1=0.970 n_val=12467 vram=0.00GB 44s | grade=0.966 inner_auc=0.774 vs conf_auc=0.774
+16:32:48 [hand/graph/imdb_binary] vote=0.679 uniform=0.688 best1=0.692 n_val=321 vram=0.00GB 16s | grade=0.867 inner_auc=n/a vs conf_auc=n/a
+16:33:39 [hand/image/cifar10] vote=0.688 uniform=0.659 best1=0.685 n_val=14861 vram=0.00GB 50s | grade=0.869 inner_auc=0.841 vs conf_auc=0.821
+16:33:57 [hand/audio/esc50] vote=0.538 uniform=0.495 best1=0.524 n_val=660 vram=0.00GB 18s | grade=0.784 inner_auc=0.702 vs conf_auc=0.702
+16:34:12 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+16:37:47 [hand/text/ag_news] vote=0.891 uniform=0.885 best1=0.884 n_val=36107 vram=0.00GB 215s | grade=0.921 inner_auc=0.859 vs conf_auc=0.818
+16:38:49 [hand/text/banking77] vote=0.830 uniform=0.665 best1=0.826 n_val=3915 vram=0.00GB 62s | grade=0.860 inner_auc=0.929 vs conf_auc=0.919
+16:39:36 [hand/text/20_newsgroups] vote=0.594 uniform=0.579 best1=0.537 n_val=5679 vram=0.00GB 48s | grade=0.784 inner_auc=0.846 vs conf_auc=0.825
+16:40:14 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.968 best1=0.969 n_val=12281 vram=0.00GB 37s | grade=0.968 inner_auc=0.792 vs conf_auc=0.796
+16:40:27 [hand/graph/imdb_binary] vote=0.656 uniform=0.656 best1=0.684 n_val=288 vram=0.00GB 13s | grade=0.855 inner_auc=n/a vs conf_auc=n/a
+16:41:29 [hand/image/cifar10] vote=0.682 uniform=0.657 best1=0.681 n_val=14986 vram=0.00GB 62s | grade=0.869 inner_auc=0.823 vs conf_auc=0.800
+16:41:47 [hand/audio/esc50] vote=0.533 uniform=0.507 best1=0.527 n_val=550 vram=0.00GB 18s | grade=0.818 inner_auc=0.753 vs conf_auc=0.746
+16:42:02 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+16:45:55 [hand/text/ag_news] vote=0.894 uniform=0.886 best1=0.888 n_val=35955 vram=0.00GB 233s | grade=0.920 inner_auc=0.861 vs conf_auc=0.816
+16:46:40 [hand/text/banking77] vote=0.831 uniform=0.665 best1=0.831 n_val=3977 vram=0.00GB 45s | grade=0.857 inner_auc=0.909 vs conf_auc=0.900
+16:47:46 [hand/text/20_newsgroups] vote=0.599 uniform=0.586 best1=0.538 n_val=5730 vram=0.00GB 66s | grade=0.786 inner_auc=0.869 vs conf_auc=0.850
+16:48:24 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.969 best1=0.969 n_val=12406 vram=0.00GB 38s | grade=0.966 inner_auc=0.786 vs conf_auc=0.798
+16:48:39 [hand/graph/imdb_binary] vote=0.726 uniform=0.726 best1=0.743 n_val=303 vram=0.00GB 14s | grade=0.861 inner_auc=n/a vs conf_auc=n/a
+16:49:52 [hand/image/cifar10] vote=0.679 uniform=0.654 best1=0.677 n_val=15031 vram=0.00GB 73s | grade=0.871 inner_auc=0.828 vs conf_auc=0.806
+16:50:12 [hand/audio/esc50] vote=0.582 uniform=0.550 best1=0.574 n_val=622 vram=0.00GB 20s | grade=0.791 inner_auc=0.793 vs conf_auc=0.788
+16:50:25 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+16:53:58 [hand/text/ag_news] vote=0.893 uniform=0.886 best1=0.887 n_val=35932 vram=0.00GB 212s | grade=0.921 inner_auc=0.867 vs conf_auc=0.820
+16:54:41 [hand/text/banking77] vote=0.831 uniform=0.666 best1=0.825 n_val=3895 vram=0.00GB 44s | grade=0.856 inner_auc=0.890 vs conf_auc=0.865
+16:55:55 [hand/text/20_newsgroups] vote=0.606 uniform=0.599 best1=0.546 n_val=5560 vram=0.00GB 73s | grade=0.785 inner_auc=0.857 vs conf_auc=0.829
+16:56:27 [hand/graph/ogbg_molhiv] vote=0.967 uniform=0.967 best1=0.967 n_val=12127 vram=0.00GB 32s | grade=0.964 inner_auc=0.777 vs conf_auc=0.774
+16:56:40 [hand/graph/imdb_binary] vote=0.685 uniform=0.685 best1=0.681 n_val=317 vram=0.00GB 13s | grade=0.864 inner_auc=n/a vs conf_auc=n/a
+16:57:35 [hand/image/cifar10] vote=0.679 uniform=0.652 best1=0.677 n_val=15076 vram=0.00GB 55s | grade=0.873 inner_auc=0.811 vs conf_auc=0.792
+16:57:53 [hand/audio/esc50] vote=0.566 uniform=0.533 best1=0.549 n_val=576 vram=0.00GB 18s | grade=0.816 inner_auc=0.672 vs conf_auc=0.667
+16:58:10 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+17:02:11 [hand/text/ag_news] vote=0.893 uniform=0.886 best1=0.887 n_val=36053 vram=0.00GB 241s | grade=0.925 inner_auc=0.868 vs conf_auc=0.820
+17:02:53 [hand/text/banking77] vote=0.834 uniform=0.680 best1=0.832 n_val=3871 vram=0.00GB 42s | grade=0.862 inner_auc=0.898 vs conf_auc=0.885
+17:03:40 [hand/text/20_newsgroups] vote=0.588 uniform=0.587 best1=0.528 n_val=5640 vram=0.00GB 47s | grade=0.777 inner_auc=0.863 vs conf_auc=0.851
+17:04:10 [hand/graph/ogbg_molhiv] vote=0.966 uniform=0.967 best1=0.968 n_val=12238 vram=0.00GB 30s | grade=0.968 inner_auc=0.768 vs conf_auc=0.774
+17:04:23 [hand/graph/imdb_binary] vote=0.723 uniform=0.738 best1=0.745 n_val=267 vram=0.00GB 13s | grade=0.863 inner_auc=n/a vs conf_auc=n/a
+17:05:10 [hand/image/cifar10] vote=0.680 uniform=0.653 best1=0.677 n_val=15042 vram=0.00GB 47s | grade=0.871 inner_auc=0.825 vs conf_auc=0.802
+17:05:26 [hand/audio/esc50] vote=0.583 uniform=0.537 best1=0.573 n_val=559 vram=0.00GB 17s | grade=0.816 inner_auc=0.634 vs conf_auc=0.667
+17:05:38 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+17:08:48 [hand/text/ag_news] vote=0.894 uniform=0.886 best1=0.887 n_val=36037 vram=0.00GB 190s | grade=0.924 inner_auc=0.869 vs conf_auc=0.814
+17:09:25 [hand/text/banking77] vote=0.825 uniform=0.664 best1=0.822 n_val=3853 vram=0.00GB 37s | grade=0.855 inner_auc=0.918 vs conf_auc=0.906
+17:10:07 [hand/text/20_newsgroups] vote=0.589 uniform=0.581 best1=0.536 n_val=5700 vram=0.00GB 42s | grade=0.787 inner_auc=0.861 vs conf_auc=0.845
+17:10:39 [hand/graph/ogbg_molhiv] vote=0.968 uniform=0.969 best1=0.970 n_val=12344 vram=0.00GB 32s | grade=0.964 inner_auc=0.752 vs conf_auc=0.745
+17:10:52 [hand/graph/imdb_binary] vote=0.724 uniform=0.724 best1=0.755 n_val=294 vram=0.00GB 13s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+17:11:44 [hand/image/cifar10] vote=0.682 uniform=0.661 best1=0.678 n_val=14957 vram=0.00GB 52s | grade=0.870 inner_auc=0.822 vs conf_auc=0.794
+17:12:01 [hand/audio/esc50] vote=0.573 uniform=0.551 best1=0.569 n_val=628 vram=0.00GB 17s | grade=0.822 inner_auc=0.797 vs conf_auc=0.795
+17:12:12 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+17:15:29 [hand/text/ag_news] vote=0.892 uniform=0.884 best1=0.886 n_val=36139 vram=0.00GB 197s | grade=0.923 inner_auc=0.871 vs conf_auc=0.811
+17:16:32 [hand/text/banking77] vote=0.839 uniform=0.670 best1=0.836 n_val=3926 vram=0.00GB 63s | grade=0.853 inner_auc=0.907 vs conf_auc=0.892
+17:17:43 [hand/text/20_newsgroups] vote=0.596 uniform=0.587 best1=0.538 n_val=5681 vram=0.00GB 71s | grade=0.785 inner_auc=0.851 vs conf_auc=0.833
+17:18:27 [hand/graph/ogbg_molhiv] vote=0.969 uniform=0.969 best1=0.970 n_val=12305 vram=0.00GB 44s | grade=0.963 inner_auc=0.763 vs conf_auc=0.754
+17:18:46 [hand/graph/imdb_binary] vote=0.725 uniform=0.722 best1=0.735 n_val=302 vram=0.00GB 19s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+17:19:45 [hand/image/cifar10] vote=0.683 uniform=0.661 best1=0.679 n_val=15037 vram=0.00GB 59s | grade=0.870 inner_auc=0.822 vs conf_auc=0.800
+17:19:54 [hand/audio/esc50] vote=0.551 uniform=0.541 best1=0.554 n_val=628 vram=0.00GB 9s | grade=0.811 inner_auc=0.736 vs conf_auc=0.732
+17:20:01 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+17:21:50 [hand/text/ag_news] vote=0.891 uniform=0.883 best1=0.887 n_val=36147 vram=0.00GB 110s | grade=0.924 inner_auc=0.860 vs conf_auc=0.807
+17:22:29 [hand/text/banking77] vote=0.828 uniform=0.666 best1=0.828 n_val=3954 vram=0.00GB 39s | grade=0.852 inner_auc=0.916 vs conf_auc=0.911
+17:23:05 [hand/text/20_newsgroups] vote=0.581 uniform=0.576 best1=0.536 n_val=5648 vram=0.00GB 36s | grade=0.782 inner_auc=0.851 vs conf_auc=0.833
+17:23:17 RUN COMPLETE

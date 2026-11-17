@@ -1,0 +1,693 @@
+{
+ "app": "notepad",
+ "name": "notepad",
+ "tier": 1,
+ "mode": "full",
+ "scenario": "",
+ "started": "2026-10-10 11:55:46",
+ "phases": {
+  "target": {
+   "display": "Notepad",
+   "id": "Microsoft.WindowsNotepad_8wekyb3d8bbwe!App",
+   "exe": "C:\\windows\\system32\\notepad.exe",
+   "packaged": true,
+   "chromium": ""
+  },
+  "state": {
+   "packaged": true,
+   "family": "Microsoft.WindowsNotepad_8wekyb3d8bbwe",
+   "backed_up": "C:\\Users\\dhruv\\AppData\\Local\\Packages\\Microsoft.WindowsNotepad_8wekyb3d8bbwe\\LocalState",
+   "session_files_cleared": 0
+  },
+  "launch": {
+   "launched": true,
+   "hwnd": 394894,
+   "notes": [
+    "app took focus at startup (returned)"
+   ],
+   "resolved": "Notepad",
+   "title": "Untitled - Notepad",
+   "launch_s": 3.12
+  },
+  "park": "parked",
+  "tree": {
+   "nodes": 68,
+   "waited_s": 0.0,
+   "frame_only": false
+  },
+  "start_s": 3.6,
+  "deep_scan": {
+   "profile": {
+    "family": "winui",
+    "evidence": [
+     "class Notepad / framework Win32",
+     "XAML controls inside"
+    ],
+    "window_class": "Notepad",
+    "process": "notepad",
+    "framework_id": "Win32",
+    "route_prior": [
+     "control",
+     "shortcut",
+     "value"
+    ],
+    "expected_a11y": "rich",
+    "adapters": [],
+    "note": "XAML: Invoke / Toggle / Select work; posted mouse input is usually ignored (measured on Paint)"
+   },
+   "nodes": 68,
+   "interactive": 48,
+   "named": 52,
+   "depth": 7,
+   "native_menu_items": 0,
+   "state": "rich",
+   "waited_s": 1.59,
+   "settled": true,
+   "notes": [
+    "a tree cannot see closed drop-downs and menus: those come from native menus, the guide, or opening them (owned windows only)"
+   ]
+  },
+  "vision_scan": {
+   "vision_model": false,
+   "seconds": 1.8,
+   "elements": 29,
+   "named": 28,
+   "by_source": {
+    "uia": 22,
+    "cv": 14,
+    "ocr": 13,
+    "knowledge": 6
+   },
+   "regions": 7,
+   "path": "full:quick"
+  },
+  "catalog": {
+   "app": "notepad",
+   "verbs": 22,
+   "with_shortcut": 5,
+   "tooltips": 0,
+   "menus": [
+    "System"
+   ],
+   "sources": {
+    "uia": 22,
+    "menu-expand": 58,
+    "reveal": 31
+   },
+   "conflicts": 0,
+   "safety": {
+    "safe": 19,
+    "commit": 1,
+    "runtime": 0,
+    "sensitive": 0,
+    "unsafe": 2
+   },
+   "archetype": "document_text",
+   "seconds": 0.002
+  },
+  "menus": {
+   "openers": 7,
+   "opened": 7,
+   "items": 58,
+   "dialog_openers": 0,
+   "submenus": 2,
+   "failed": [],
+   "skipped": [
+    {
+     "path": "File > Recent",
+     "why": "lists the person's own files / history - left closed"
+    }
+   ],
+   "seconds": 31.9,
+   "by_opener": {
+    "File": 13,
+    "Edit": 16,
+    "View": 4,
+    "View > Zoom": 3,
+    "View > Markdown": 2,
+    "Headings": 7,
+    "Lists": 4,
+    "Table": 2,
+    "Writing tools": 7
+   }
+  },
+  "catalog_after_menus": {
+   "app": "notepad",
+   "verbs": 80,
+   "with_shortcut": 34,
+   "tooltips": 0,
+   "menus": [
+    "Edit",
+    "File",
+    "Headings",
+    "Lists",
+    "System",
+    "Table",
+    "View",
+    "Writing tools"
+   ],
+   "sources": {
+    "uia": 22,
+    "menu-expand": 58,
+    "reveal": 31
+   },
+   "conflicts": 1,
+   "safety": {
+    "safe": 64,
+    "commit": 6,
+    "runtime": 0,
+    "sensitive": 3,
+    "unsafe": 7
+   },
+   "archetype": "document_text",
+   "seconds": 0.002
+  },
+  "options": {
+   "candidates": 6,
+   "tried": 6,
+   "opened": 4,
+   "dialogs": 1,
+   "pages": 3,
+   "inline": 0,
+   "nothing": 2,
+   "controls": 31,
+   "left_ok": 6,
+   "skipped": [
+    {
+     "path": "File > Open",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "File > Save",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "File > Save as",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "File > Save all",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "File > Print",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "Edit > Search with Bing",
+     "why": "leaves the application (web, account, update, help) - not opened"
+    },
+    {
+     "path": "Edit > Define with Bing",
+     "why": "leaves the application (web, account, update, help) - not opened"
+    },
+    {
+     "path": "What's new",
+     "why": "leaves the application (web, account, update, help) - not opened"
+    },
+    {
+     "path": "User avatar",
+     "why": "leaves the application (web, account, update, help) - not opened"
+    }
+   ],
+   "surfaces": [
+    {
+     "path": "Settings",
+     "label": "Settings",
+     "kind": "page",
+     "controls": [
+      "App theme",
+      "Font",
+      "Word wrap",
+      "Formatting",
+      "Opening files",
+      "Back"
+     ],
+     "how": "UIA Invoke",
+     "left_by": "'Back' button",
+     "restored": true,
+     "seconds": 6.2,
+     "effect": "context_change",
+     "added": 6
+    },
+    {
+     "path": "File > Page setup",
+     "label": "Page setup",
+     "kind": "dialog",
+     "controls": [
+      "Size:",
+      "Open",
+      "Source:",
+      "Open",
+      "Portrait",
+      "Landscape",
+      "Left:",
+      "Right:",
+      "Top:",
+      "Bottom:",
+      "Header:",
+      "Footer:",
+      "Input Values",
+      "OK",
+      "Cancel",
+      "Size:",
+      "Open",
+      "Source:",
+      "Open",
+      "Portrait",
+      "Landscape",
+      "Left:",
+      "Right:",
+      "Top:",
+      "Bottom:",
+      "Header:",
+      "Footer:",
+      "Input Values",
+      "OK",
+      "Cancel"
+     ],
+     "how": "UIA Invoke",
+     "left_by": "'Cancel' button",
+     "restored": true,
+     "seconds": 8.0,
+     "effect": "opens_dialog",
+     "added": 14
+    },
+    {
+     "path": "Edit > Find",
+     "label": "Find",
+     "kind": "none",
+     "controls": [],
+     "how": "UIA Invoke",
+     "left_by": "Escape",
+     "restored": true,
+     "seconds": 5.8,
+     "effect": "no_effect"
+    },
+    {
+     "path": "Edit > Replace",
+     "label": "Replace",
+     "kind": "none",
+     "controls": [],
+     "how": "UIA Invoke",
+     "left_by": "Escape",
+     "restored": true,
+     "seconds": 5.8,
+     "effect": "no_effect"
+    },
+    {
+     "path": "Edit > Go to",
+     "label": "Go to",
+     "kind": "page",
+     "controls": [
+      "Line number",
+      "Line number",
+      "Delete",
+      "Go to",
+      "Cancel"
+     ],
+     "how": "UIA Invoke",
+     "left_by": "'Cancel' button",
+     "restored": true,
+     "seconds": 8.5,
+     "effect": "context_change",
+     "added": 4
+    },
+    {
+     "path": "Edit > Font",
+     "label": "Font",
+     "kind": "page",
+     "controls": [
+      "App theme",
+      "Font",
+      "Family",
+      "Style",
+      "Size",
+      "Opening files",
+      "Back"
+     ],
+     "how": "UIA Invoke",
+     "left_by": "'Back' button",
+     "restored": true,
+     "seconds": 9.2,
+     "effect": "context_change",
+     "added": 7
+    }
+   ],
+   "stopped": "",
+   "tainted": false,
+   "seconds": 46.4
+  },
+  "catalog_after_options": {
+   "app": "notepad",
+   "verbs": 111,
+   "with_shortcut": 34,
+   "tooltips": 0,
+   "menus": [
+    "Edit",
+    "File",
+    "Headings",
+    "Lists",
+    "Settings",
+    "System",
+    "Table",
+    "View",
+    "Writing tools"
+   ],
+   "sources": {
+    "uia": 22,
+    "menu-expand": 58,
+    "reveal": 31
+   },
+   "conflicts": 1,
+   "safety": {
+    "safe": 93,
+    "commit": 7,
+    "runtime": 0,
+    "sensitive": 3,
+    "unsafe": 8
+   },
+   "archetype": "document_text",
+   "seconds": 0.002
+  },
+  "ui_map": [
+   {
+    "path": "Edit",
+    "kind": "menu",
+    "count": 16,
+    "items": [
+     "Clear formatting",
+     "Copy",
+     "Cut",
+     "Define with Bing",
+     "Delete",
+     "Find",
+     "Find next",
+     "Find previous",
+     "Font",
+     "Go to",
+     "Paste",
+     "Replace",
+     "Search with Bing",
+     "Select all",
+     "Time/Date",
+     "Undo"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "Edit > Font",
+    "kind": "page",
+    "count": 7,
+    "items": [
+     "App theme",
+     "Back",
+     "Family",
+     "Font",
+     "Opening files",
+     "Size",
+     "Style"
+    ],
+    "depth": 2
+   },
+   {
+    "path": "Edit > Go to",
+    "kind": "page",
+    "count": 4,
+    "items": [
+     "Cancel",
+     "Delete",
+     "Go to",
+     "Line number"
+    ],
+    "depth": 2
+   },
+   {
+    "path": "File",
+    "kind": "menu",
+    "count": 13,
+    "items": [
+     "Close tab",
+     "Close window",
+     "Exit",
+     "New Markdown tab",
+     "New tab",
+     "New window",
+     "Open",
+     "Page setup",
+     "Print",
+     "Recent",
+     "Save",
+     "Save all",
+     "Save as"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "File > Page setup",
+    "kind": "dialog",
+    "count": 14,
+    "items": [
+     "Bottom:",
+     "Cancel",
+     "Footer:",
+     "Header:",
+     "Input Values",
+     "Landscape",
+     "Left:",
+     "OK",
+     "Open",
+     "Portrait",
+     "Right:",
+     "Size:",
+     "Source:",
+     "Top:"
+    ],
+    "depth": 2
+   },
+   {
+    "path": "Headings",
+    "kind": "menu",
+    "count": 7,
+    "items": [
+     "Body",
+     "Heading",
+     "Section",
+     "Subheading",
+     "Subsection",
+     "Subtitle",
+     "Title"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "Lists",
+    "kind": "menu",
+    "count": 4,
+    "items": [
+     "Bulleted list",
+     "Decrease indent",
+     "Increase indent",
+     "Numbered list"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "Settings",
+    "kind": "page",
+    "count": 6,
+    "items": [
+     "App theme",
+     "Back",
+     "Font",
+     "Formatting",
+     "Opening files",
+     "Word wrap"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "Table",
+    "kind": "menu",
+    "count": 2,
+    "items": [
+     "Edit table",
+     "Insert table"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "View",
+    "kind": "menu",
+    "count": 4,
+    "items": [
+     "Markdown",
+     "Status bar",
+     "Word wrap",
+     "Zoom"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "View > Markdown",
+    "kind": "submenu",
+    "count": 2,
+    "items": [
+     "Formatted",
+     "Syntax"
+    ],
+    "depth": 2
+   },
+   {
+    "path": "View > Zoom",
+    "kind": "submenu",
+    "count": 3,
+    "items": [
+     "Restore default zoom",
+     "Zoom in",
+     "Zoom out"
+    ],
+    "depth": 2
+   },
+   {
+    "path": "Writing tools",
+    "kind": "menu",
+    "count": 7,
+    "items": [
+     "Change format",
+     "Change tone",
+     "Make longer",
+     "Make shorter",
+     "Rewrite",
+     "Summarise",
+     "Write"
+    ],
+    "depth": 1
+   }
+  ],
+  "tree_picture": {
+   "nodes": 68,
+   "levels": 8,
+   "by_depth": {
+    "0": 1,
+    "1": 5,
+    "2": 8,
+    "3": 25,
+    "4": 17,
+    "5": 6,
+    "6": 5,
+    "7": 1
+   },
+   "top_roles": {
+    "text": 24,
+    "button": 20,
+    "pane": 9,
+    "menuitem": 4,
+    "window": 2,
+    "menubar": 2,
+    "document": 1,
+    "tab": 1
+   }
+  },
+  "perceive_s": 84.3,
+  "close": {
+   "how": "close"
+  },
+  "state_after": {
+   "restored": false,
+   "why": "FileExistsError: [WinError 183] Cannot create a file when that file already exists: 'C:\\\\Users\\\\d"
+  }
+ },
+ "checkpoints": [
+  {
+   "n": 1,
+   "tag": "launched",
+   "file": "checkpoints/cp_01_launched.png",
+   "at_s": 3.6
+  },
+  {
+   "n": 2,
+   "tag": "after_scan_home",
+   "file": "checkpoints/cp_02_after_scan_home.png",
+   "at_s": 89.0
+  },
+  {
+   "n": 3,
+   "tag": "end_of_run",
+   "file": "checkpoints/cp_03_end_of_run.png",
+   "at_s": 89.0
+  }
+ ],
+ "seconds": 89.0,
+ "ledger": [],
+ "ledger_counts": {},
+ "tasks": [],
+ "counts": {
+  "ok": 0,
+  "blocked": 0,
+  "failed": 0
+ },
+ "ml": {
+  "outcome": {
+   "seen": 1490,
+   "updates": 4857,
+   "prequential_n": 1489,
+   "ok_accuracy": 0.8596,
+   "ok_baseline": 0.7502,
+   "effect_accuracy": 0.7461,
+   "effect_baseline": 0.4762,
+   "ok_brier": 0.1191,
+   "beats_baseline": true,
+   "parameters": 98646
+  },
+  "candidates": {
+   "seen": 28589,
+   "positives": 18298,
+   "updates": 5778,
+   "prequential_auc": 0.9766,
+   "parameters": 24625,
+   "sources": 3,
+   "ready_to_filter": false
+  },
+  "motor": {
+   "a": 0.1,
+   "b": 0.12,
+   "prior": {
+    "a": 0.1,
+    "b": 0.12
+   },
+   "learned_from_people": false,
+   "n": 0,
+   "r2": null,
+   "rmse": null
+  },
+  "events": {
+   "transitions": 13,
+   "scans": 3,
+   "replay_rounds": 0,
+   "checkpoints": 0
+  },
+  "training_now": false
+ },
+ "history": {
+  "transitions": 358,
+  "with_effect": 313,
+  "targets": 19,
+  "apps": 1,
+  "by_source": {
+   "guide": 99,
+   "menu-expand": 238,
+   "probe": 1,
+   "recovery": 1,
+   "reveal": 18,
+   "sleep": 1
+  }
+ },
+ "pointer": {
+  "traces": 27,
+  "avg_planned_s": 0.729,
+  "avg_actual_s": 0.729,
+  "virtual": 0
+ },
+ "focus_returns": 22
+}

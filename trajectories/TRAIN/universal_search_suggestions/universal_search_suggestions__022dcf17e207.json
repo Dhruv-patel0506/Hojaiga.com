@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "Universal Search Suggestions",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "non_gui",
+   "high_level_task": "Install Universal Search Suggestions from the Microsoft Store",
+   "prerequisite_state": "Windows 11 with PowerToys 0.95+ and the Command Palette module enabled",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click the 'Get it from Microsoft' button",
+         "ui_target": {
+            "element_name": "Get it from Microsoft",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Link",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Universal Search Suggestions .msix package starts downloading and installing"
+      }
+   ],
+   "_meta": {
+      "source_app": "Universal Search Suggestions",
+      "app_key": "universal_search_suggestions",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Universal Search Suggestions",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:52:47Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

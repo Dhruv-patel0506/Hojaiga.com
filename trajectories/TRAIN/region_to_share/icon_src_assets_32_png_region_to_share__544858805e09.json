@@ -1,0 +1,177 @@
+{
+   "app_metadata": {
+      "app_name": "Region To Share",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide the user through the basic usage of Region To Share, including starting the app, selecting a region, and sharing it in a video conference.",
+   "prerequisite_state": "Windows 10 or 11 is installed.",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Start the 'RegionToShare' app.",
+         "ui_target": {
+            "element_name": "RegionToShare",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The RegionToShare window appears on the screen."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Move the 'RegionToShare' window to the region you want to share.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The RegionToShare window is positioned over the desired screen region."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "In your meeting app, start sharing the window 'RegionToShare'.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The meeting app starts sharing the content of the RegionToShare window."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click the 'RegionToShare' window to start sharing the selected region.",
+         "ui_target": {
+            "element_name": "RegionToShare",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The RegionToShare window changes to the region selection frame, and others are seeing what's inside this frame."
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Close the region frame to stop showing the region without stopping to share.",
+         "ui_target": {
+            "element_name": "Close button",
+            "automation_id": null,
+            "hierarchical_path": "RegionToShare window > Close button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The region frame is closed, but the sharing continues."
+      }
+   ],
+   "_meta": {
+      "source_app": "Region To Share",
+      "app_key": "region_to_share",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "![Icon](./src/Assets/32.png) Region to Share",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:43:38Z",
+      "schema_warnings": [
+         "step2_ungrounded_target",
+         "step3_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

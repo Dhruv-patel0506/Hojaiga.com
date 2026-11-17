@@ -1,0 +1,473 @@
+20:57:44 NI run auto_cpu_029 on CPU; hours=2.0 smoke=False
+20:57:44 explicit task list: ['enc2/text/sms_spam']
+20:57:44 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+20:57:44 [data] enc2/text/sms_spam: n=5574 C=2 D=768 shards=1
+20:58:27 [enc2/text/sms_spam] vote=0.992 uniform=0.992 best1=0.993 n_val=1653 vram=0.00GB 43s
+20:58:38 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 1653, "n_val": 341, "base_rate": 0.9912023544311523, "inner": {"auc": 0.9930966469428008, "ece": 0.006793984919349469, "brier": 0.007572232745587826, "acc80": 1.0}, "outer_conf": {"auc": 0.9842209072978304, "ece": 0.008332486725972196, "brier": 0.007752298377454281, "acc80": 1.0}}
+20:58:38 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+20:59:19 [enc2/text/sms_spam] vote=0.992 uniform=0.992 best1=0.993 n_val=1644 vram=0.00GB 41s | grade=0.976 inner_auc=1.000 vs conf_auc=0.998
+20:59:25 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+21:00:08 [enc2/text/sms_spam] vote=0.987 uniform=0.994 best1=0.993 n_val=1674 vram=0.00GB 43s | grade=0.974 inner_auc=0.980 vs conf_auc=0.966
+21:00:16 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+21:01:03 [enc2/text/sms_spam] vote=0.990 uniform=0.990 best1=0.991 n_val=1677 vram=0.00GB 48s | grade=0.970 inner_auc=0.980 vs conf_auc=0.977
+21:01:11 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+21:01:58 [enc2/text/sms_spam] vote=0.991 uniform=0.993 best1=0.994 n_val=1689 vram=0.00GB 48s | grade=0.974 inner_auc=0.959 vs conf_auc=0.940
+21:02:05 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+21:02:50 [enc2/text/sms_spam] vote=0.989 uniform=0.990 best1=0.990 n_val=1702 vram=0.00GB 45s | grade=0.968 inner_auc=0.991 vs conf_auc=0.985
+21:02:56 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+21:03:39 [enc2/text/sms_spam] vote=0.989 uniform=0.995 best1=0.995 n_val=1644 vram=0.00GB 43s | grade=0.974 inner_auc=0.999 vs conf_auc=0.998
+21:03:44 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+21:04:19 [enc2/text/sms_spam] vote=0.992 uniform=0.992 best1=0.993 n_val=1643 vram=0.00GB 35s | grade=0.989 inner_auc=0.972 vs conf_auc=0.959
+21:04:25 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+21:04:58 [enc2/text/sms_spam] vote=0.991 uniform=0.991 best1=0.991 n_val=1693 vram=0.00GB 33s | grade=0.986 inner_auc=0.979 vs conf_auc=0.971
+21:05:03 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+21:05:35 [enc2/text/sms_spam] vote=0.989 uniform=0.987 best1=0.987 n_val=1621 vram=0.00GB 33s | grade=0.980 inner_auc=0.996 vs conf_auc=0.988
+21:05:42 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+21:06:20 [enc2/text/sms_spam] vote=0.981 uniform=0.989 best1=0.990 n_val=1653 vram=0.00GB 39s | grade=0.966 inner_auc=0.961 vs conf_auc=0.955
+21:06:27 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+21:07:06 [enc2/text/sms_spam] vote=0.995 uniform=0.993 best1=0.994 n_val=1603 vram=0.00GB 39s | grade=0.968 inner_auc=nan vs conf_auc=nan
+21:07:12 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+21:07:45 [enc2/text/sms_spam] vote=0.984 uniform=0.989 best1=0.989 n_val=1707 vram=0.00GB 33s | grade=0.975 inner_auc=0.994 vs conf_auc=0.963
+21:07:51 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+21:08:28 [enc2/text/sms_spam] vote=0.995 uniform=0.995 best1=0.995 n_val=1655 vram=0.00GB 37s | grade=0.974 inner_auc=0.975 vs conf_auc=0.963
+21:08:34 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+21:09:10 [enc2/text/sms_spam] vote=0.994 uniform=0.995 best1=0.996 n_val=1732 vram=0.00GB 37s | grade=0.962 inner_auc=0.996 vs conf_auc=0.986
+21:09:16 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+21:09:47 [enc2/text/sms_spam] vote=0.993 uniform=0.995 best1=0.995 n_val=1668 vram=0.00GB 31s | grade=0.966 inner_auc=0.998 vs conf_auc=0.976
+21:09:51 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+21:10:28 [enc2/text/sms_spam] vote=0.988 uniform=0.993 best1=0.994 n_val=1642 vram=0.00GB 36s | grade=0.961 inner_auc=0.937 vs conf_auc=0.893
+21:10:33 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+21:11:09 [enc2/text/sms_spam] vote=0.991 uniform=0.991 best1=0.991 n_val=1691 vram=0.00GB 36s | grade=0.989 inner_auc=0.958 vs conf_auc=0.927
+21:11:14 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+21:11:47 [enc2/text/sms_spam] vote=0.992 uniform=0.989 best1=0.990 n_val=1670 vram=0.00GB 33s | grade=0.972 inner_auc=0.941 vs conf_auc=0.925
+21:11:53 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+21:12:25 [enc2/text/sms_spam] vote=0.983 uniform=0.990 best1=0.991 n_val=1675 vram=0.00GB 31s | grade=0.938 inner_auc=0.993 vs conf_auc=0.880
+21:12:31 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+21:13:07 [enc2/text/sms_spam] vote=0.990 uniform=0.994 best1=0.993 n_val=1661 vram=0.00GB 36s | grade=0.968 inner_auc=0.978 vs conf_auc=0.964
+21:13:13 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+21:13:47 [enc2/text/sms_spam] vote=0.990 uniform=0.992 best1=0.995 n_val=1694 vram=0.00GB 34s | grade=0.974 inner_auc=0.993 vs conf_auc=0.986
+21:13:52 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+21:14:22 [enc2/text/sms_spam] vote=0.992 uniform=0.990 best1=0.992 n_val=1684 vram=0.00GB 30s | grade=0.967 inner_auc=0.984 vs conf_auc=0.974
+21:14:28 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+21:15:08 [enc2/text/sms_spam] vote=0.992 uniform=0.992 best1=0.994 n_val=1717 vram=0.00GB 40s | grade=0.971 inner_auc=0.971 vs conf_auc=0.960
+21:15:14 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+21:15:51 [enc2/text/sms_spam] vote=0.992 uniform=0.989 best1=0.991 n_val=1699 vram=0.00GB 37s | grade=0.971 inner_auc=0.987 vs conf_auc=0.984
+21:15:57 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+21:16:30 [enc2/text/sms_spam] vote=0.995 uniform=0.993 best1=0.995 n_val=1646 vram=0.00GB 34s | grade=0.973 inner_auc=0.793 vs conf_auc=0.753
+21:16:36 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+21:17:13 [enc2/text/sms_spam] vote=0.990 uniform=0.989 best1=0.990 n_val=1641 vram=0.00GB 37s | grade=0.961 inner_auc=0.931 vs conf_auc=0.904
+21:17:19 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+21:17:57 [enc2/text/sms_spam] vote=0.991 uniform=0.990 best1=0.990 n_val=1643 vram=0.00GB 39s | grade=0.960 inner_auc=0.889 vs conf_auc=0.794
+21:18:03 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+21:18:37 [enc2/text/sms_spam] vote=0.994 uniform=0.993 best1=0.995 n_val=1630 vram=0.00GB 33s | grade=0.980 inner_auc=0.981 vs conf_auc=0.985
+21:18:42 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+21:19:18 [enc2/text/sms_spam] vote=0.992 uniform=0.991 best1=0.991 n_val=1712 vram=0.00GB 37s | grade=0.962 inner_auc=0.968 vs conf_auc=0.977
+21:19:25 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+21:20:02 [enc2/text/sms_spam] vote=0.990 uniform=0.993 best1=0.991 n_val=1624 vram=0.00GB 37s | grade=0.974 inner_auc=1.000 vs conf_auc=0.998
+21:20:09 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+21:20:45 [enc2/text/sms_spam] vote=0.995 uniform=0.994 best1=0.993 n_val=1598 vram=0.00GB 36s | grade=0.981 inner_auc=0.945 vs conf_auc=0.947
+21:20:50 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+21:21:26 [enc2/text/sms_spam] vote=0.993 uniform=0.993 best1=0.992 n_val=1685 vram=0.00GB 36s | grade=0.976 inner_auc=0.970 vs conf_auc=0.985
+21:21:33 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+21:22:11 [enc2/text/sms_spam] vote=0.989 uniform=0.993 best1=0.993 n_val=1611 vram=0.00GB 38s | grade=0.960 inner_auc=0.999 vs conf_auc=0.787
+21:22:17 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+21:22:55 [enc2/text/sms_spam] vote=0.990 uniform=0.993 best1=0.994 n_val=1589 vram=0.00GB 38s | grade=0.954 inner_auc=0.940 vs conf_auc=0.986
+21:23:00 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+21:23:35 [enc2/text/sms_spam] vote=0.992 uniform=0.992 best1=0.992 n_val=1691 vram=0.00GB 35s | grade=0.974 inner_auc=0.902 vs conf_auc=0.905
+21:23:41 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+21:24:19 [enc2/text/sms_spam] vote=0.993 uniform=0.993 best1=0.994 n_val=1684 vram=0.00GB 38s | grade=0.971 inner_auc=0.922 vs conf_auc=0.873
+21:24:25 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+21:25:03 [enc2/text/sms_spam] vote=0.993 uniform=0.996 best1=0.995 n_val=1684 vram=0.00GB 38s | grade=0.961 inner_auc=0.969 vs conf_auc=0.955
+21:25:08 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+21:25:42 [enc2/text/sms_spam] vote=0.993 uniform=0.992 best1=0.994 n_val=1652 vram=0.00GB 35s | grade=0.974 inner_auc=0.997 vs conf_auc=0.997
+21:25:49 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+21:26:26 [enc2/text/sms_spam] vote=0.993 uniform=0.993 best1=0.992 n_val=1684 vram=0.00GB 38s | grade=0.920 inner_auc=0.852 vs conf_auc=0.870
+21:26:33 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+21:27:10 [enc2/text/sms_spam] vote=0.994 uniform=0.994 best1=0.993 n_val=1621 vram=0.00GB 38s | grade=0.963 inner_auc=0.994 vs conf_auc=0.994
+21:27:17 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+21:27:49 [enc2/text/sms_spam] vote=0.988 uniform=0.991 best1=0.990 n_val=1696 vram=0.00GB 32s | grade=0.975 inner_auc=0.984 vs conf_auc=0.992
+21:27:55 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+21:28:32 [enc2/text/sms_spam] vote=0.994 uniform=0.994 best1=0.994 n_val=1658 vram=0.00GB 37s | grade=0.962 inner_auc=0.981 vs conf_auc=0.990
+21:28:39 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+21:29:16 [enc2/text/sms_spam] vote=0.992 uniform=0.993 best1=0.994 n_val=1684 vram=0.00GB 37s | grade=0.961 inner_auc=0.929 vs conf_auc=0.909
+21:29:23 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+21:29:57 [enc2/text/sms_spam] vote=0.987 uniform=0.994 best1=0.994 n_val=1617 vram=0.00GB 34s | grade=0.967 inner_auc=1.000 vs conf_auc=0.991
+21:30:02 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+21:30:40 [enc2/text/sms_spam] vote=0.993 uniform=0.992 best1=0.991 n_val=1670 vram=0.00GB 38s | grade=0.964 inner_auc=0.949 vs conf_auc=0.990
+21:30:46 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+21:31:24 [enc2/text/sms_spam] vote=0.984 uniform=0.991 best1=0.993 n_val=1715 vram=0.00GB 38s | grade=0.969 inner_auc=0.985 vs conf_auc=0.993
+21:31:30 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+21:32:05 [enc2/text/sms_spam] vote=0.991 uniform=0.992 best1=0.993 n_val=1694 vram=0.00GB 35s | grade=0.942 inner_auc=0.885 vs conf_auc=0.872
+21:32:11 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+21:32:47 [enc2/text/sms_spam] vote=0.993 uniform=0.993 best1=0.993 n_val=1674 vram=0.00GB 36s | grade=0.961 inner_auc=0.998 vs conf_auc=0.971
+21:32:53 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+21:33:31 [enc2/text/sms_spam] vote=0.988 uniform=0.991 best1=0.989 n_val=1703 vram=0.00GB 38s | grade=0.932 inner_auc=0.949 vs conf_auc=0.915
+21:33:37 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+21:34:14 [enc2/text/sms_spam] vote=0.988 uniform=0.994 best1=0.994 n_val=1709 vram=0.00GB 36s | grade=0.968 inner_auc=0.921 vs conf_auc=0.820
+21:34:19 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+21:34:54 [enc2/text/sms_spam] vote=0.993 uniform=0.992 best1=0.993 n_val=1633 vram=0.00GB 35s | grade=0.975 inner_auc=0.954 vs conf_auc=0.991
+21:35:00 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+21:35:38 [enc2/text/sms_spam] vote=0.990 uniform=0.991 best1=0.991 n_val=1696 vram=0.00GB 37s | grade=0.976 inner_auc=0.991 vs conf_auc=0.968
+21:35:43 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+21:36:21 [enc2/text/sms_spam] vote=0.992 uniform=0.991 best1=0.993 n_val=1661 vram=0.00GB 38s | grade=0.986 inner_auc=0.808 vs conf_auc=0.583
+21:36:27 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+21:37:01 [enc2/text/sms_spam] vote=0.988 uniform=0.991 best1=0.990 n_val=1691 vram=0.00GB 33s | grade=0.973 inner_auc=0.927 vs conf_auc=0.981
+21:37:07 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+21:37:44 [enc2/text/sms_spam] vote=0.993 uniform=0.993 best1=0.992 n_val=1612 vram=0.00GB 37s | grade=0.966 inner_auc=0.947 vs conf_auc=0.981
+21:37:51 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+21:38:29 [enc2/text/sms_spam] vote=0.990 uniform=0.990 best1=0.991 n_val=1664 vram=0.00GB 38s | grade=0.956 inner_auc=0.951 vs conf_auc=0.962
+21:38:35 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+21:39:08 [enc2/text/sms_spam] vote=0.992 uniform=0.990 best1=0.992 n_val=1675 vram=0.00GB 33s | grade=0.979 inner_auc=0.919 vs conf_auc=0.836
+21:39:13 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+21:39:51 [enc2/text/sms_spam] vote=0.993 uniform=0.993 best1=0.994 n_val=1685 vram=0.00GB 37s | grade=0.974 inner_auc=0.906 vs conf_auc=0.774
+21:39:57 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+21:40:36 [enc2/text/sms_spam] vote=0.992 uniform=0.989 best1=0.990 n_val=1592 vram=0.00GB 39s | grade=0.967 inner_auc=1.000 vs conf_auc=1.000
+21:40:42 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+21:41:17 [enc2/text/sms_spam] vote=0.987 uniform=0.987 best1=0.988 n_val=1669 vram=0.00GB 35s | grade=0.951 inner_auc=0.990 vs conf_auc=0.989
+21:41:23 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+21:41:59 [enc2/text/sms_spam] vote=0.987 uniform=0.991 best1=0.992 n_val=1659 vram=0.00GB 37s | grade=0.964 inner_auc=0.893 vs conf_auc=0.829
+21:42:05 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+21:42:43 [enc2/text/sms_spam] vote=0.990 uniform=0.987 best1=0.988 n_val=1632 vram=0.00GB 38s | grade=0.951 inner_auc=0.877 vs conf_auc=0.879
+21:42:50 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+21:43:27 [enc2/text/sms_spam] vote=0.990 uniform=0.991 best1=0.992 n_val=1682 vram=0.00GB 37s | grade=0.955 inner_auc=0.976 vs conf_auc=0.979
+21:43:32 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+21:44:06 [enc2/text/sms_spam] vote=0.992 uniform=0.990 best1=0.992 n_val=1778 vram=0.00GB 34s | grade=0.982 inner_auc=0.974 vs conf_auc=0.974
+21:44:12 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+21:44:50 [enc2/text/sms_spam] vote=0.996 uniform=0.996 best1=0.997 n_val=1645 vram=0.00GB 38s | grade=0.969 inner_auc=0.973 vs conf_auc=0.973
+21:44:57 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+21:45:34 [enc2/text/sms_spam] vote=0.993 uniform=0.992 best1=0.992 n_val=1671 vram=0.00GB 38s | grade=0.959 inner_auc=0.994 vs conf_auc=0.952
+21:45:40 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+21:46:13 [enc2/text/sms_spam] vote=0.995 uniform=0.993 best1=0.995 n_val=1675 vram=0.00GB 34s | grade=0.958 inner_auc=0.965 vs conf_auc=0.945
+21:46:20 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+21:46:58 [enc2/text/sms_spam] vote=0.992 uniform=0.990 best1=0.991 n_val=1659 vram=0.00GB 38s | grade=0.982 inner_auc=0.918 vs conf_auc=0.777
+21:47:04 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+21:47:43 [enc2/text/sms_spam] vote=0.988 uniform=0.992 best1=0.992 n_val=1684 vram=0.00GB 38s | grade=0.955 inner_auc=nan vs conf_auc=nan
+21:47:49 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+21:48:23 [enc2/text/sms_spam] vote=0.992 uniform=0.990 best1=0.991 n_val=1683 vram=0.00GB 34s | grade=0.966 inner_auc=0.959 vs conf_auc=0.969
+21:48:27 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+21:49:05 [enc2/text/sms_spam] vote=0.994 uniform=0.995 best1=0.995 n_val=1677 vram=0.00GB 38s | grade=0.979 inner_auc=1.000 vs conf_auc=0.890
+21:49:11 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+21:49:50 [enc2/text/sms_spam] vote=0.992 uniform=0.992 best1=0.992 n_val=1674 vram=0.00GB 38s | grade=0.954 inner_auc=0.967 vs conf_auc=0.977
+21:49:56 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+21:50:31 [enc2/text/sms_spam] vote=0.993 uniform=0.993 best1=0.993 n_val=1653 vram=0.00GB 36s | grade=0.962 inner_auc=0.901 vs conf_auc=0.893
+21:50:36 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+21:51:13 [enc2/text/sms_spam] vote=0.992 uniform=0.994 best1=0.995 n_val=1680 vram=0.00GB 37s | grade=0.956 inner_auc=0.770 vs conf_auc=0.548
+21:51:19 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+21:51:57 [enc2/text/sms_spam] vote=0.992 uniform=0.990 best1=0.994 n_val=1656 vram=0.00GB 38s | grade=0.970 inner_auc=0.914 vs conf_auc=0.712
+21:52:04 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+21:52:41 [enc2/text/sms_spam] vote=0.992 uniform=0.991 best1=0.992 n_val=1672 vram=0.00GB 37s | grade=0.972 inner_auc=0.992 vs conf_auc=0.968
+21:52:47 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+21:53:21 [enc2/text/sms_spam] vote=0.991 uniform=0.990 best1=0.992 n_val=1666 vram=0.00GB 34s | grade=0.962 inner_auc=0.841 vs conf_auc=0.600
+21:53:27 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+21:54:05 [enc2/text/sms_spam] vote=0.993 uniform=0.992 best1=0.992 n_val=1673 vram=0.00GB 38s | grade=0.965 inner_auc=0.980 vs conf_auc=0.976
+21:54:11 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+21:54:50 [enc2/text/sms_spam] vote=0.990 uniform=0.994 best1=0.994 n_val=1673 vram=0.00GB 39s | grade=0.965 inner_auc=0.972 vs conf_auc=0.966
+21:54:55 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+21:55:29 [enc2/text/sms_spam] vote=0.987 uniform=0.990 best1=0.990 n_val=1729 vram=0.00GB 34s | grade=0.977 inner_auc=0.948 vs conf_auc=0.861
+21:55:35 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+21:56:13 [enc2/text/sms_spam] vote=0.989 uniform=0.987 best1=0.988 n_val=1758 vram=0.00GB 38s | grade=0.966 inner_auc=0.984 vs conf_auc=0.956
+21:56:19 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+21:56:57 [enc2/text/sms_spam] vote=0.989 uniform=0.992 best1=0.992 n_val=1663 vram=0.00GB 38s | grade=0.969 inner_auc=0.999 vs conf_auc=0.996
+21:57:03 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+21:57:37 [enc2/text/sms_spam] vote=0.995 uniform=0.995 best1=0.995 n_val=1684 vram=0.00GB 34s | grade=0.971 inner_auc=0.898 vs conf_auc=0.850
+21:57:42 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+21:58:20 [enc2/text/sms_spam] vote=0.995 uniform=0.994 best1=0.995 n_val=1666 vram=0.00GB 37s | grade=0.989 inner_auc=0.982 vs conf_auc=0.965
+21:58:25 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+21:59:03 [enc2/text/sms_spam] vote=0.992 uniform=0.991 best1=0.991 n_val=1710 vram=0.00GB 38s | grade=0.978 inner_auc=0.927 vs conf_auc=0.832
+21:59:10 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+21:59:46 [enc2/text/sms_spam] vote=0.993 uniform=0.989 best1=0.990 n_val=1630 vram=0.00GB 36s | grade=0.967 inner_auc=0.997 vs conf_auc=1.000
+21:59:51 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+22:00:26 [enc2/text/sms_spam] vote=0.986 uniform=0.994 best1=0.994 n_val=1708 vram=0.00GB 36s | grade=0.975 inner_auc=0.981 vs conf_auc=0.984
+22:00:33 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+22:01:11 [enc2/text/sms_spam] vote=0.991 uniform=0.991 best1=0.991 n_val=1686 vram=0.00GB 38s | grade=0.975 inner_auc=0.908 vs conf_auc=0.878
+22:01:17 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+22:01:53 [enc2/text/sms_spam] vote=0.991 uniform=0.988 best1=0.992 n_val=1648 vram=0.00GB 36s | grade=0.966 inner_auc=0.972 vs conf_auc=0.955
+22:01:59 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+22:02:33 [enc2/text/sms_spam] vote=0.993 uniform=0.993 best1=0.992 n_val=1628 vram=0.00GB 34s | grade=0.953 inner_auc=0.984 vs conf_auc=0.946
+22:02:40 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+22:03:17 [enc2/text/sms_spam] vote=0.992 uniform=0.992 best1=0.990 n_val=1663 vram=0.00GB 37s | grade=0.954 inner_auc=0.966 vs conf_auc=0.961
+22:03:23 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+22:04:01 [enc2/text/sms_spam] vote=0.992 uniform=0.992 best1=0.991 n_val=1699 vram=0.00GB 37s | grade=0.955 inner_auc=1.000 vs conf_auc=0.999
+22:04:07 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+22:04:36 [enc2/text/sms_spam] vote=0.992 uniform=0.992 best1=0.992 n_val=1570 vram=0.00GB 29s | grade=0.986 inner_auc=0.998 vs conf_auc=0.990
+22:04:41 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+22:05:19 [enc2/text/sms_spam] vote=0.990 uniform=0.992 best1=0.993 n_val=1643 vram=0.00GB 38s | grade=0.961 inner_auc=0.896 vs conf_auc=0.699
+22:05:26 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+22:06:04 [enc2/text/sms_spam] vote=0.994 uniform=0.994 best1=0.994 n_val=1735 vram=0.00GB 38s | grade=0.968 inner_auc=1.000 vs conf_auc=1.000
+22:06:10 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+22:06:45 [enc2/text/sms_spam] vote=0.996 uniform=0.996 best1=0.996 n_val=1675 vram=0.00GB 34s | grade=0.963 inner_auc=0.995 vs conf_auc=0.992
+22:06:50 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+22:07:27 [enc2/text/sms_spam] vote=0.993 uniform=0.992 best1=0.993 n_val=1663 vram=0.00GB 37s | grade=0.989 inner_auc=nan vs conf_auc=nan
+22:07:33 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+22:08:11 [enc2/text/sms_spam] vote=0.993 uniform=0.990 best1=0.993 n_val=1674 vram=0.00GB 38s | grade=0.947 inner_auc=0.936 vs conf_auc=0.837
+22:08:17 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+22:08:55 [enc2/text/sms_spam] vote=0.989 uniform=0.989 best1=0.990 n_val=1673 vram=0.00GB 37s | grade=0.970 inner_auc=0.976 vs conf_auc=0.979
+22:09:00 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+22:09:34 [enc2/text/sms_spam] vote=0.992 uniform=0.991 best1=0.991 n_val=1736 vram=0.00GB 34s | grade=0.963 inner_auc=0.999 vs conf_auc=0.988
+22:09:40 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+22:10:18 [enc2/text/sms_spam] vote=0.992 uniform=0.992 best1=0.990 n_val=1652 vram=0.00GB 38s | grade=0.958 inner_auc=0.997 vs conf_auc=0.988
+22:10:24 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+22:11:02 [enc2/text/sms_spam] vote=0.991 uniform=0.989 best1=0.992 n_val=1674 vram=0.00GB 38s | grade=0.958 inner_auc=0.995 vs conf_auc=0.952
+22:11:07 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+22:11:40 [enc2/text/sms_spam] vote=0.994 uniform=0.992 best1=0.994 n_val=1697 vram=0.00GB 33s | grade=0.973 inner_auc=0.992 vs conf_auc=0.976
+22:11:47 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+22:12:25 [enc2/text/sms_spam] vote=0.992 uniform=0.993 best1=0.992 n_val=1658 vram=0.00GB 38s | grade=0.953 inner_auc=0.897 vs conf_auc=0.950
+22:12:31 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+22:13:09 [enc2/text/sms_spam] vote=0.990 uniform=0.987 best1=0.989 n_val=1651 vram=0.00GB 38s | grade=0.962 inner_auc=0.971 vs conf_auc=0.985
+22:13:15 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+22:13:50 [enc2/text/sms_spam] vote=0.993 uniform=0.993 best1=0.993 n_val=1631 vram=0.00GB 35s | grade=0.970 inner_auc=0.998 vs conf_auc=0.965
+22:13:55 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+22:14:32 [enc2/text/sms_spam] vote=0.989 uniform=0.989 best1=0.990 n_val=1779 vram=0.00GB 37s | grade=0.961 inner_auc=1.000 vs conf_auc=0.903
+22:14:37 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+22:15:12 [enc2/text/sms_spam] vote=0.993 uniform=0.992 best1=0.991 n_val=1700 vram=0.00GB 35s | grade=0.970 inner_auc=0.974 vs conf_auc=0.994
+22:15:18 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+22:15:51 [enc2/text/sms_spam] vote=0.995 uniform=0.992 best1=0.993 n_val=1689 vram=0.00GB 33s | grade=0.948 inner_auc=0.992 vs conf_auc=0.984
+22:15:55 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+22:16:26 [enc2/text/sms_spam] vote=0.990 uniform=0.988 best1=0.990 n_val=1600 vram=0.00GB 31s | grade=0.976 inner_auc=0.993 vs conf_auc=0.975
+22:16:32 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+22:17:06 [enc2/text/sms_spam] vote=0.990 uniform=0.991 best1=0.990 n_val=1658 vram=0.00GB 34s | grade=0.964 inner_auc=0.903 vs conf_auc=0.838
+22:17:12 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+22:17:45 [enc2/text/sms_spam] vote=0.989 uniform=0.994 best1=0.993 n_val=1722 vram=0.00GB 34s | grade=0.967 inner_auc=0.934 vs conf_auc=0.942
+22:17:50 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+22:18:21 [enc2/text/sms_spam] vote=0.994 uniform=0.992 best1=0.992 n_val=1695 vram=0.00GB 30s | grade=0.944 inner_auc=0.996 vs conf_auc=0.983
+22:18:26 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+22:18:59 [enc2/text/sms_spam] vote=0.991 uniform=0.990 best1=0.993 n_val=1639 vram=0.00GB 33s | grade=0.942 inner_auc=0.897 vs conf_auc=0.785
+22:19:04 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+22:19:38 [enc2/text/sms_spam] vote=0.989 uniform=0.988 best1=0.990 n_val=1596 vram=0.00GB 34s | grade=0.941 inner_auc=0.881 vs conf_auc=0.716
+22:19:43 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+22:20:13 [enc2/text/sms_spam] vote=0.995 uniform=0.990 best1=0.992 n_val=1654 vram=0.00GB 29s | grade=0.933 inner_auc=0.982 vs conf_auc=0.977
+22:20:17 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+22:20:52 [enc2/text/sms_spam] vote=0.992 uniform=0.990 best1=0.993 n_val=1676 vram=0.00GB 35s | grade=0.957 inner_auc=0.939 vs conf_auc=0.974
+22:20:58 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+22:21:36 [enc2/text/sms_spam] vote=0.991 uniform=0.993 best1=0.992 n_val=1688 vram=0.00GB 38s | grade=0.948 inner_auc=0.970 vs conf_auc=0.931
+22:21:42 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+22:22:16 [enc2/text/sms_spam] vote=0.992 uniform=0.992 best1=0.992 n_val=1666 vram=0.00GB 34s | grade=0.957 inner_auc=0.965 vs conf_auc=0.979
+22:22:21 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+22:22:57 [enc2/text/sms_spam] vote=0.992 uniform=0.994 best1=0.994 n_val=1703 vram=0.00GB 36s | grade=0.950 inner_auc=0.980 vs conf_auc=0.961
+22:23:03 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+22:23:40 [enc2/text/sms_spam] vote=0.993 uniform=0.995 best1=0.994 n_val=1668 vram=0.00GB 37s | grade=0.969 inner_auc=nan vs conf_auc=nan
+22:23:46 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+22:24:21 [enc2/text/sms_spam] vote=0.993 uniform=0.992 best1=0.993 n_val=1677 vram=0.00GB 35s | grade=0.966 inner_auc=0.891 vs conf_auc=0.816
+22:24:26 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+22:25:01 [enc2/text/sms_spam] vote=0.992 uniform=0.993 best1=0.992 n_val=1628 vram=0.00GB 34s | grade=0.969 inner_auc=0.827 vs conf_auc=0.664
+22:25:07 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+22:25:44 [enc2/text/sms_spam] vote=0.988 uniform=0.989 best1=0.988 n_val=1603 vram=0.00GB 37s | grade=0.973 inner_auc=0.994 vs conf_auc=0.974
+22:25:50 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+22:26:26 [enc2/text/sms_spam] vote=0.995 uniform=0.994 best1=0.994 n_val=1638 vram=0.00GB 36s | grade=0.992 inner_auc=0.897 vs conf_auc=0.590
+22:26:32 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+22:27:05 [enc2/text/sms_spam] vote=0.994 uniform=0.994 best1=0.994 n_val=1741 vram=0.00GB 34s | grade=0.955 inner_auc=nan vs conf_auc=nan
+22:27:12 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+22:27:48 [enc2/text/sms_spam] vote=0.990 uniform=0.990 best1=0.989 n_val=1675 vram=0.00GB 37s | grade=0.944 inner_auc=0.964 vs conf_auc=0.925
+22:27:54 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+22:28:31 [enc2/text/sms_spam] vote=0.994 uniform=0.993 best1=0.994 n_val=1735 vram=0.00GB 37s | grade=0.987 inner_auc=1.000 vs conf_auc=0.974
+22:28:37 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+22:29:10 [enc2/text/sms_spam] vote=0.994 uniform=0.993 best1=0.994 n_val=1642 vram=0.00GB 33s | grade=0.956 inner_auc=0.980 vs conf_auc=0.920
+22:29:16 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+22:29:52 [enc2/text/sms_spam] vote=0.993 uniform=0.992 best1=0.993 n_val=1675 vram=0.00GB 37s | grade=0.987 inner_auc=0.994 vs conf_auc=0.982
+22:29:59 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+22:30:36 [enc2/text/sms_spam] vote=0.993 uniform=0.991 best1=0.991 n_val=1684 vram=0.00GB 38s | grade=0.938 inner_auc=0.984 vs conf_auc=0.963
+22:30:43 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+22:31:15 [enc2/text/sms_spam] vote=0.991 uniform=0.991 best1=0.991 n_val=1732 vram=0.00GB 33s | grade=0.951 inner_auc=0.901 vs conf_auc=0.943
+22:31:21 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+22:31:57 [enc2/text/sms_spam] vote=0.992 uniform=0.991 best1=0.992 n_val=1693 vram=0.00GB 36s | grade=0.977 inner_auc=0.933 vs conf_auc=0.867
+22:32:04 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+22:32:40 [enc2/text/sms_spam] vote=0.993 uniform=0.993 best1=0.993 n_val=1670 vram=0.00GB 36s | grade=0.958 inner_auc=0.973 vs conf_auc=0.983
+22:32:46 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+22:33:21 [enc2/text/sms_spam] vote=0.993 uniform=0.994 best1=0.995 n_val=1660 vram=0.00GB 35s | grade=0.948 inner_auc=0.695 vs conf_auc=0.603
+22:33:27 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+22:34:01 [enc2/text/sms_spam] vote=0.996 uniform=0.994 best1=0.994 n_val=1669 vram=0.00GB 34s | grade=0.951 inner_auc=0.989 vs conf_auc=0.998
+22:34:07 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+22:34:44 [enc2/text/sms_spam] vote=0.990 uniform=0.990 best1=0.992 n_val=1704 vram=0.00GB 36s | grade=0.965 inner_auc=0.891 vs conf_auc=0.805
+22:34:51 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+22:35:26 [enc2/text/sms_spam] vote=0.992 uniform=0.989 best1=0.990 n_val=1721 vram=0.00GB 36s | grade=0.962 inner_auc=0.991 vs conf_auc=0.922
+22:35:32 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+22:36:06 [enc2/text/sms_spam] vote=0.992 uniform=0.992 best1=0.991 n_val=1672 vram=0.00GB 34s | grade=0.945 inner_auc=0.726 vs conf_auc=0.529
+22:36:12 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+22:36:52 [enc2/text/sms_spam] vote=0.993 uniform=0.994 best1=0.993 n_val=1629 vram=0.00GB 40s | grade=0.972 inner_auc=0.938 vs conf_auc=0.955
+22:36:59 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+22:37:37 [enc2/text/sms_spam] vote=0.987 uniform=0.989 best1=0.989 n_val=1663 vram=0.00GB 38s | grade=0.948 inner_auc=0.989 vs conf_auc=0.987
+22:37:43 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+22:38:19 [enc2/text/sms_spam] vote=0.989 uniform=0.992 best1=0.990 n_val=1653 vram=0.00GB 36s | grade=0.956 inner_auc=0.939 vs conf_auc=0.898
+22:38:25 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+22:39:09 [enc2/text/sms_spam] vote=0.993 uniform=0.993 best1=0.993 n_val=1635 vram=0.00GB 44s | grade=0.985 inner_auc=0.960 vs conf_auc=0.960
+22:39:16 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+22:40:26 [enc2/text/sms_spam] vote=0.990 uniform=0.989 best1=0.991 n_val=1701 vram=0.00GB 70s | grade=0.970 inner_auc=0.874 vs conf_auc=0.967
+22:40:48 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+22:41:29 [enc2/text/sms_spam] vote=0.993 uniform=0.993 best1=0.992 n_val=1660 vram=0.00GB 41s | grade=0.965 inner_auc=0.905 vs conf_auc=0.808
+22:41:35 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+22:42:13 [enc2/text/sms_spam] vote=0.993 uniform=0.993 best1=0.993 n_val=1675 vram=0.00GB 39s | grade=0.997 inner_auc=0.973 vs conf_auc=0.843
+22:42:20 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+22:43:06 [enc2/text/sms_spam] vote=0.990 uniform=0.989 best1=0.989 n_val=1667 vram=0.00GB 47s | grade=0.950 inner_auc=0.992 vs conf_auc=0.962
+22:43:15 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+22:44:02 [enc2/text/sms_spam] vote=0.994 uniform=0.993 best1=0.995 n_val=1750 vram=0.00GB 47s | grade=0.959 inner_auc=0.999 vs conf_auc=0.999
+22:44:09 ===== CYCLE 149 (OUTER -> INNER -> FEEDBACK) =====
+22:44:53 [enc2/text/sms_spam] vote=0.992 uniform=0.993 best1=0.992 n_val=1660 vram=0.00GB 44s | grade=0.972 inner_auc=0.917 vs conf_auc=0.854
+22:45:01 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+22:45:51 [enc2/text/sms_spam] vote=0.992 uniform=0.991 best1=0.992 n_val=1690 vram=0.00GB 49s | grade=0.991 inner_auc=0.859 vs conf_auc=0.765
+22:45:59 ===== CYCLE 151 (OUTER -> INNER -> FEEDBACK) =====
+22:46:46 [enc2/text/sms_spam] vote=0.995 uniform=0.993 best1=0.993 n_val=1677 vram=0.00GB 47s | grade=0.979 inner_auc=0.997 vs conf_auc=0.997
+22:46:53 ===== CYCLE 152 (OUTER -> INNER -> FEEDBACK) =====
+22:47:39 [enc2/text/sms_spam] vote=0.990 uniform=0.989 best1=0.989 n_val=1682 vram=0.00GB 47s | grade=0.970 inner_auc=0.943 vs conf_auc=0.884
+22:47:55 ===== CYCLE 153 (OUTER -> INNER -> FEEDBACK) =====
+22:48:49 [enc2/text/sms_spam] vote=0.994 uniform=0.993 best1=0.996 n_val=1638 vram=0.00GB 53s | grade=0.976 inner_auc=0.964 vs conf_auc=0.963
+22:48:58 ===== CYCLE 154 (OUTER -> INNER -> FEEDBACK) =====
+22:49:52 [enc2/text/sms_spam] vote=0.988 uniform=0.988 best1=0.988 n_val=1631 vram=0.00GB 53s | grade=0.969 inner_auc=0.946 vs conf_auc=0.878
+22:50:00 ===== CYCLE 155 (OUTER -> INNER -> FEEDBACK) =====
+22:50:43 [enc2/text/sms_spam] vote=0.991 uniform=0.993 best1=0.993 n_val=1636 vram=0.00GB 44s | grade=0.962 inner_auc=0.936 vs conf_auc=0.901
+22:50:51 ===== CYCLE 156 (OUTER -> INNER -> FEEDBACK) =====
+22:51:40 [enc2/text/sms_spam] vote=0.994 uniform=0.994 best1=0.995 n_val=1685 vram=0.00GB 49s | grade=0.968 inner_auc=0.977 vs conf_auc=0.977
+22:51:49 ===== CYCLE 157 (OUTER -> INNER -> FEEDBACK) =====
+22:52:39 [enc2/text/sms_spam] vote=0.993 uniform=0.994 best1=0.993 n_val=1635 vram=0.00GB 50s | grade=0.966 inner_auc=0.930 vs conf_auc=0.844
+22:52:48 ===== CYCLE 158 (OUTER -> INNER -> FEEDBACK) =====
+22:53:32 [enc2/text/sms_spam] vote=0.991 uniform=0.989 best1=0.992 n_val=1682 vram=0.00GB 44s | grade=0.946 inner_auc=0.932 vs conf_auc=0.809
+22:53:39 ===== CYCLE 159 (OUTER -> INNER -> FEEDBACK) =====
+22:54:28 [enc2/text/sms_spam] vote=0.992 uniform=0.992 best1=0.990 n_val=1663 vram=0.00GB 48s | grade=0.970 inner_auc=0.996 vs conf_auc=0.994
+22:54:36 ===== CYCLE 160 (OUTER -> INNER -> FEEDBACK) =====
+22:57:12 [enc2/text/sms_spam] vote=0.993 uniform=0.992 best1=0.992 n_val=1658 vram=0.00GB 155s | grade=0.973 inner_auc=0.913 vs conf_auc=0.795
+22:57:27 ===== CYCLE 161 (OUTER -> INNER -> FEEDBACK) =====
+22:59:07 [enc2/text/sms_spam] vote=0.990 uniform=0.988 best1=0.990 n_val=1650 vram=0.00GB 100s | grade=0.962 inner_auc=0.990 vs conf_auc=0.974
+22:59:25 RUN COMPLETE
+00:34:40 NI run auto_cpu_029 on CPU; hours=2.0 smoke=False
+00:34:40 explicit task list: ['enc2/text/sms_spam']
+00:34:46 [resume] from checkpoint: next cycle 162, rounds 162, 162 metric rows, inner net restored
+00:34:46 ===== CYCLE 162 (OUTER-ONLY BOOTSTRAP) =====
+00:34:46 [data] enc2/text/sms_spam: n=5574 C=2 D=768 shards=1
+00:43:21 [enc2/text/sms_spam] vote=0.993 uniform=0.992 best1=0.992 n_val=1689 vram=0.00GB 515s
+00:43:53 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 162, "n_records": 1689, "n_val": 353, "base_rate": 0.9886685609817505, "inner": {"auc": 0.8624641833810889, "ece": 0.00843856202981965, "brier": 0.009803472086787224, "acc80": 0.9929078221321106}, "outer_conf": {"auc": 0.836676217765043, "ece": 0.009828472779087574, "brier": 0.010830930434167385, "acc80": 0.9964538812637329}}
+00:43:53 ===== CYCLE 163 (OUTER -> INNER -> FEEDBACK) =====
+00:47:56 [enc2/text/sms_spam] vote=0.995 uniform=0.995 best1=0.995 n_val=1659 vram=0.00GB 243s | grade=0.959 inner_auc=0.852 vs conf_auc=0.616
+00:48:02 ===== CYCLE 164 (OUTER -> INNER -> FEEDBACK) =====
+00:50:59 [enc2/text/sms_spam] vote=0.993 uniform=0.990 best1=0.991 n_val=1649 vram=0.00GB 177s | grade=0.983 inner_auc=0.989 vs conf_auc=0.985
+00:51:05 ===== CYCLE 165 (OUTER -> INNER -> FEEDBACK) =====
+00:55:20 [enc2/text/sms_spam] vote=0.992 uniform=0.993 best1=0.992 n_val=1701 vram=0.00GB 255s | grade=0.978 inner_auc=0.970 vs conf_auc=0.975
+00:55:35 ===== CYCLE 166 (OUTER -> INNER -> FEEDBACK) =====
+00:59:22 [enc2/text/sms_spam] vote=0.994 uniform=0.991 best1=0.992 n_val=1694 vram=0.00GB 226s | grade=0.965 inner_auc=0.997 vs conf_auc=1.000
+00:59:29 ===== CYCLE 167 (OUTER -> INNER -> FEEDBACK) =====
+00:29:15 NI run auto_cpu_029 on CPU; hours=2.0 smoke=False
+00:29:15 explicit task list: ['enc2/text/sms_spam']
+00:29:27 [resume] from checkpoint: next cycle 167, rounds 167, 167 metric rows, inner net restored
+00:29:27 ===== CYCLE 167 (OUTER-ONLY BOOTSTRAP) =====
+00:29:27 [data] enc2/text/sms_spam: n=5574 C=2 D=768 shards=1
+00:37:08 [enc2/text/sms_spam] vote=0.993 uniform=0.993 best1=0.993 n_val=1653 vram=0.00GB 460s
+00:37:41 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 167, "n_records": 1653, "n_val": 360, "base_rate": 0.9861111044883728, "inner": {"auc": 0.9385915492957746, "ece": 0.014880376723077564, "brier": 0.014060801826417446, "acc80": 1.0}, "outer_conf": {"auc": 0.908169014084507, "ece": 0.01005931231710646, "brier": 0.012347857467830181, "acc80": 0.9965277910232544}}
+00:37:41 ===== CYCLE 168 (OUTER -> INNER -> FEEDBACK) =====
+00:45:34 [enc2/text/sms_spam] vote=0.994 uniform=0.993 best1=0.994 n_val=1605 vram=0.00GB 473s | grade=0.977 inner_auc=0.868 vs conf_auc=0.595
+00:45:54 ===== CYCLE 169 (OUTER -> INNER -> FEEDBACK) =====
+00:54:17 [enc2/text/sms_spam] vote=0.996 uniform=0.995 best1=0.996 n_val=1632 vram=0.00GB 502s | grade=0.970 inner_auc=0.989 vs conf_auc=0.970
+00:54:35 ===== CYCLE 170 (OUTER -> INNER -> FEEDBACK) =====
+01:02:37 [enc2/text/sms_spam] vote=0.989 uniform=0.991 best1=0.990 n_val=1664 vram=0.00GB 482s | grade=0.964 inner_auc=0.967 vs conf_auc=0.969
+01:02:56 ===== CYCLE 171 (OUTER -> INNER -> FEEDBACK) =====
+01:10:54 [enc2/text/sms_spam] vote=0.993 uniform=0.991 best1=0.990 n_val=1663 vram=0.00GB 479s | grade=0.965 inner_auc=0.831 vs conf_auc=0.831
+01:11:15 ===== CYCLE 172 (OUTER -> INNER -> FEEDBACK) =====
+01:19:28 [enc2/text/sms_spam] vote=0.989 uniform=0.990 best1=0.989 n_val=1659 vram=0.00GB 493s | grade=0.980 inner_auc=0.988 vs conf_auc=0.764
+01:19:51 ===== CYCLE 173 (OUTER -> INNER -> FEEDBACK) =====
+01:28:13 [enc2/text/sms_spam] vote=0.992 uniform=0.989 best1=0.992 n_val=1640 vram=0.00GB 502s | grade=0.964 inner_auc=0.918 vs conf_auc=0.987
+01:28:32 ===== CYCLE 174 (OUTER -> INNER -> FEEDBACK) =====
+01:38:41 [enc2/text/sms_spam] vote=0.991 uniform=0.992 best1=0.992 n_val=1696 vram=0.00GB 610s | grade=0.955 inner_auc=1.000 vs conf_auc=0.768
+01:39:08 ===== CYCLE 175 (OUTER -> INNER -> FEEDBACK) =====
+01:49:44 [enc2/text/sms_spam] vote=0.994 uniform=0.993 best1=0.993 n_val=1702 vram=0.00GB 636s | grade=0.979 inner_auc=0.912 vs conf_auc=0.835
+01:50:16 ===== CYCLE 176 (OUTER -> INNER -> FEEDBACK) =====
+02:01:15 [enc2/text/sms_spam] vote=0.990 uniform=0.992 best1=0.992 n_val=1668 vram=0.00GB 660s | grade=0.972 inner_auc=0.861 vs conf_auc=0.994
+02:01:36 ===== CYCLE 177 (OUTER -> INNER -> FEEDBACK) =====
+02:13:26 [enc2/text/sms_spam] vote=0.991 uniform=0.992 best1=0.991 n_val=1627 vram=0.00GB 709s | grade=0.965 inner_auc=0.896 vs conf_auc=0.858
+02:13:54 ===== CYCLE 178 (OUTER -> INNER -> FEEDBACK) =====
+02:26:29 [enc2/text/sms_spam] vote=0.991 uniform=0.988 best1=0.990 n_val=1638 vram=0.00GB 755s | grade=0.967 inner_auc=0.941 vs conf_auc=0.970
+02:26:57 ===== CYCLE 179 (OUTER -> INNER -> FEEDBACK) =====
+02:40:40 [enc2/text/sms_spam] vote=0.994 uniform=0.993 best1=0.994 n_val=1685 vram=0.00GB 823s | grade=0.978 inner_auc=0.948 vs conf_auc=0.915
+02:41:12 RUN COMPLETE
+16:20:00 NI run auto_cpu_029 on CPU; hours=2.0 smoke=False
+16:20:00 explicit task list: ['enc2/text/sms_spam']
+16:20:20 [resume] from checkpoint: next cycle 180, rounds 180, 180 metric rows, inner net restored
+16:20:20 ===== CYCLE 180 (OUTER-ONLY BOOTSTRAP) =====
+16:20:21 [data] enc2/text/sms_spam: n=5574 C=2 D=768 shards=1
+16:29:00 [enc2/text/sms_spam] vote=0.992 uniform=0.992 best1=0.993 n_val=1649 vram=0.00GB 519s
+16:29:41 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 180, "n_records": 1649, "n_val": 302, "base_rate": 0.9801324605941772, "inner": {"auc": 0.9515765765765766, "ece": 0.011750011155936891, "brier": 0.011084533296525478, "acc80": 0.9958506226539612}, "outer_conf": {"auc": 0.9296171171171171, "ece": 0.008464337579461913, "brier": 0.014327649027109146, "acc80": 0.9958506226539612}}
+16:29:41 ===== CYCLE 181 (OUTER -> INNER -> FEEDBACK) =====
+16:38:21 [enc2/text/sms_spam] vote=0.994 uniform=0.993 best1=0.993 n_val=1660 vram=0.00GB 520s | grade=0.955 inner_auc=0.973 vs conf_auc=0.994
+16:38:53 ===== CYCLE 182 (OUTER -> INNER -> FEEDBACK) =====
+16:47:26 [enc2/text/sms_spam] vote=0.993 uniform=0.994 best1=0.995 n_val=1630 vram=0.00GB 513s | grade=0.962 inner_auc=0.876 vs conf_auc=0.779
+16:47:49 ===== CYCLE 183 (OUTER -> INNER -> FEEDBACK) =====
+16:54:41 [enc2/text/sms_spam] vote=0.991 uniform=0.992 best1=0.992 n_val=1622 vram=0.00GB 412s | grade=0.974 inner_auc=0.943 vs conf_auc=0.933
+16:54:58 ===== CYCLE 184 (OUTER -> INNER -> FEEDBACK) =====
+17:02:07 [enc2/text/sms_spam] vote=0.994 uniform=0.992 best1=0.994 n_val=1671 vram=0.00GB 429s | grade=0.977 inner_auc=0.982 vs conf_auc=0.725
+17:02:26 ===== CYCLE 185 (OUTER -> INNER -> FEEDBACK) =====
+17:10:14 [enc2/text/sms_spam] vote=0.992 uniform=0.990 best1=0.992 n_val=1631 vram=0.00GB 468s | grade=0.980 inner_auc=0.912 vs conf_auc=0.984
+17:10:36 ===== CYCLE 186 (OUTER -> INNER -> FEEDBACK) =====
+17:20:04 [enc2/text/sms_spam] vote=0.994 uniform=0.992 best1=0.993 n_val=1700 vram=0.00GB 568s | grade=0.974 inner_auc=0.898 vs conf_auc=0.826
+17:20:28 ===== CYCLE 187 (OUTER -> INNER -> FEEDBACK) =====
+17:30:48 [enc2/text/sms_spam] vote=0.994 uniform=0.992 best1=0.993 n_val=1718 vram=0.00GB 619s | grade=0.968 inner_auc=0.954 vs conf_auc=0.970
+17:31:10 ===== CYCLE 188 (OUTER -> INNER -> FEEDBACK) =====
+17:40:33 [enc2/text/sms_spam] vote=0.996 uniform=0.994 best1=0.994 n_val=1680 vram=0.00GB 562s | grade=0.953 inner_auc=0.924 vs conf_auc=0.955
+17:40:59 ===== CYCLE 189 (OUTER -> INNER -> FEEDBACK) =====
+17:50:21 [enc2/text/sms_spam] vote=0.995 uniform=0.994 best1=0.995 n_val=1693 vram=0.00GB 563s | grade=0.973 inner_auc=0.978 vs conf_auc=0.923
+17:50:44 ===== CYCLE 190 (OUTER -> INNER -> FEEDBACK) =====
+17:59:48 [enc2/text/sms_spam] vote=0.995 uniform=0.996 best1=0.996 n_val=1717 vram=0.00GB 544s | grade=0.956 inner_auc=0.935 vs conf_auc=0.949
+18:00:13 ===== CYCLE 191 (OUTER -> INNER -> FEEDBACK) =====
+18:10:45 [enc2/text/sms_spam] vote=0.992 uniform=0.991 best1=0.992 n_val=1657 vram=0.00GB 633s | grade=0.959 inner_auc=0.975 vs conf_auc=0.963
+18:11:13 ===== CYCLE 192 (OUTER -> INNER -> FEEDBACK) =====
+18:21:07 [enc2/text/sms_spam] vote=0.996 uniform=0.992 best1=0.995 n_val=1693 vram=0.00GB 593s | grade=0.946 inner_auc=0.966 vs conf_auc=0.976
+18:21:28 RUN COMPLETE
+19:56:37 NI run auto_cpu_029 on CPU; hours=2.0 smoke=False
+19:56:37 explicit task list: ['enc2/text/sms_spam']
+19:56:58 [resume] from checkpoint: next cycle 193, rounds 193, 193 metric rows, inner net restored
+19:56:58 ===== CYCLE 193 (OUTER-ONLY BOOTSTRAP) =====
+19:56:59 [data] enc2/text/sms_spam: n=5574 C=2 D=768 shards=1
+20:09:52 [enc2/text/sms_spam] vote=0.991 uniform=0.990 best1=0.991 n_val=1680 vram=0.00GB 774s
+20:10:53 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 193, "n_records": 1680, "n_val": 340, "base_rate": 0.9882352948188782, "inner": {"auc": 0.9799107142857143, "ece": 0.008944654004538762, "brier": 0.009195508435368538, "acc80": 1.0}, "outer_conf": {"auc": 0.9605654761904762, "ece": 0.012608742889236002, "brier": 0.009936626069247723, "acc80": 1.0}}
+20:10:53 ===== CYCLE 194 (OUTER -> INNER -> FEEDBACK) =====
+20:23:54 [enc2/text/sms_spam] vote=0.989 uniform=0.993 best1=0.993 n_val=1652 vram=0.00GB 781s | grade=0.957 inner_auc=0.987 vs conf_auc=0.982
+20:24:24 ===== CYCLE 195 (OUTER -> INNER -> FEEDBACK) =====
+20:37:54 [enc2/text/sms_spam] vote=0.990 uniform=0.990 best1=0.989 n_val=1627 vram=0.00GB 810s | grade=0.969 inner_auc=0.986 vs conf_auc=0.979
+20:38:33 ===== CYCLE 196 (OUTER -> INNER -> FEEDBACK) =====
+20:50:54 [enc2/text/sms_spam] vote=0.989 uniform=0.992 best1=0.993 n_val=1617 vram=0.00GB 741s | grade=0.960 inner_auc=0.927 vs conf_auc=0.940
+20:51:27 ===== CYCLE 197 (OUTER -> INNER -> FEEDBACK) =====
+21:02:43 [enc2/text/sms_spam] vote=0.994 uniform=0.995 best1=0.995 n_val=1666 vram=0.00GB 675s | grade=0.929 inner_auc=0.993 vs conf_auc=0.967
+21:03:12 ===== CYCLE 198 (OUTER -> INNER -> FEEDBACK) =====
+21:14:49 [enc2/text/sms_spam] vote=0.992 uniform=0.993 best1=0.992 n_val=1667 vram=0.00GB 697s | grade=0.955 inner_auc=0.985 vs conf_auc=0.992
+21:15:19 ===== CYCLE 199 (OUTER -> INNER -> FEEDBACK) =====
+21:26:31 [enc2/text/sms_spam] vote=0.996 uniform=0.992 best1=0.994 n_val=1697 vram=0.00GB 672s | grade=0.975 inner_auc=nan vs conf_auc=nan
+21:26:58 ===== CYCLE 200 (OUTER -> INNER -> FEEDBACK) =====
+21:38:33 [enc2/text/sms_spam] vote=0.991 uniform=0.987 best1=0.989 n_val=1713 vram=0.00GB 696s | grade=0.956 inner_auc=0.850 vs conf_auc=0.858
+21:39:07 ===== CYCLE 201 (OUTER -> INNER -> FEEDBACK) =====
+21:51:13 [enc2/text/sms_spam] vote=0.991 uniform=0.992 best1=0.992 n_val=1663 vram=0.00GB 726s | grade=0.965 inner_auc=0.996 vs conf_auc=0.967
+21:51:48 ===== CYCLE 202 (OUTER -> INNER -> FEEDBACK) =====
+22:03:41 [enc2/text/sms_spam] vote=0.994 uniform=0.992 best1=0.992 n_val=1696 vram=0.00GB 712s | grade=0.953 inner_auc=0.989 vs conf_auc=0.955
+22:04:13 RUN COMPLETE
+16:59:16 NI run auto_cpu_029 on CPU; hours=2.0 smoke=False
+16:59:16 explicit task list: ['enc2/text/sms_spam']
+16:59:27 [resume] from checkpoint: next cycle 203, rounds 203, 203 metric rows, inner net restored
+16:59:27 ===== CYCLE 203 (OUTER-ONLY BOOTSTRAP) =====
+16:59:27 [data] enc2/text/sms_spam: n=5574 C=2 D=768 shards=1
+17:09:30 [enc2/text/sms_spam] vote=0.992 uniform=0.991 best1=0.992 n_val=1653 vram=0.00GB 602s
+17:10:13 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 203, "n_records": 1653, "n_val": 333, "base_rate": 0.9879879951477051, "inner": {"auc": 0.9179331306990881, "ece": 0.010662585228413074, "brier": 0.011216542683541775, "acc80": 0.9962406158447266}, "outer_conf": {"auc": 0.85790273556231, "ece": 0.007750594401144767, "brier": 0.0111825717613101, "acc80": 0.9962406158447266}}
+17:10:13 ===== CYCLE 204 (OUTER -> INNER -> FEEDBACK) =====
+17:20:50 [enc2/text/sms_spam] vote=0.992 uniform=0.987 best1=0.990 n_val=1672 vram=0.00GB 637s | grade=0.964 inner_auc=0.925 vs conf_auc=0.823
+17:21:13 ===== CYCLE 205 (OUTER -> INNER -> FEEDBACK) =====
+17:30:53 [enc2/text/sms_spam] vote=0.994 uniform=0.993 best1=0.995 n_val=1695 vram=0.00GB 580s | grade=0.982 inner_auc=0.964 vs conf_auc=0.964
+17:31:13 ===== CYCLE 206 (OUTER -> INNER -> FEEDBACK) =====
+14:57:38 NI run auto_cpu_029 on CPU; hours=2.0 smoke=False
+14:57:38 explicit task list: ['enc2/text/sms_spam']
+14:57:48 [resume] from checkpoint: next cycle 206, rounds 206, 206 metric rows, inner net restored
+14:57:48 ===== CYCLE 206 (OUTER-ONLY BOOTSTRAP) =====
+14:57:48 [data] enc2/text/sms_spam: n=5574 C=2 D=768 shards=1
+15:07:50 [enc2/text/sms_spam] vote=0.991 uniform=0.991 best1=0.992 n_val=1677 vram=0.00GB 602s
+15:08:32 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 206, "n_records": 1677, "n_val": 341, "base_rate": 0.9882698059082031, "inner": {"auc": 0.9821958456973294, "ece": 0.004785466895512472, "brier": 0.005841327831149101, "acc80": 1.0}, "outer_conf": {"auc": 0.9695845697329377, "ece": 0.02491728913399481, "brier": 0.010410777293145657, "acc80": 1.0}}
+15:08:32 ===== CYCLE 207 (OUTER -> INNER -> FEEDBACK) =====
+15:18:39 [enc2/text/sms_spam] vote=0.992 uniform=0.993 best1=0.992 n_val=1647 vram=0.00GB 608s | grade=0.977 inner_auc=0.861 vs conf_auc=0.957
+15:19:03 ===== CYCLE 208 (OUTER -> INNER -> FEEDBACK) =====
+15:29:26 [enc2/text/sms_spam] vote=0.991 uniform=0.992 best1=0.990 n_val=1700 vram=0.00GB 622s | grade=0.931 inner_auc=0.939 vs conf_auc=0.816
+15:29:49 ===== CYCLE 209 (OUTER -> INNER -> FEEDBACK) =====
+15:40:53 [enc2/text/sms_spam] vote=0.987 uniform=0.990 best1=0.990 n_val=1664 vram=0.00GB 663s | grade=0.943 inner_auc=0.944 vs conf_auc=0.614
+15:41:21 ===== CYCLE 210 (OUTER -> INNER -> FEEDBACK) =====
+15:52:14 [enc2/text/sms_spam] vote=0.996 uniform=0.995 best1=0.996 n_val=1625 vram=0.00GB 653s | grade=0.975 inner_auc=0.569 vs conf_auc=0.997
+15:52:37 ===== CYCLE 211 (OUTER -> INNER -> FEEDBACK) =====
+16:04:03 [enc2/text/sms_spam] vote=0.991 uniform=0.990 best1=0.991 n_val=1724 vram=0.00GB 686s | grade=0.943 inner_auc=0.817 vs conf_auc=0.816
+16:04:30 ===== CYCLE 212 (OUTER -> INNER -> FEEDBACK) =====
+16:15:33 [enc2/text/sms_spam] vote=0.991 uniform=0.992 best1=0.993 n_val=1628 vram=0.00GB 664s | grade=0.981 inner_auc=0.979 vs conf_auc=0.979
+16:16:01 ===== CYCLE 213 (OUTER -> INNER -> FEEDBACK) =====
+16:27:27 [enc2/text/sms_spam] vote=0.993 uniform=0.993 best1=0.993 n_val=1684 vram=0.00GB 687s | grade=0.938 inner_auc=0.804 vs conf_auc=0.948
+16:27:52 ===== CYCLE 214 (OUTER -> INNER -> FEEDBACK) =====
+16:39:26 [enc2/text/sms_spam] vote=0.991 uniform=0.993 best1=0.992 n_val=1634 vram=0.00GB 694s | grade=0.976 inner_auc=0.984 vs conf_auc=0.953
+16:39:53 ===== CYCLE 215 (OUTER -> INNER -> FEEDBACK) =====
+16:50:17 [enc2/text/sms_spam] vote=0.989 uniform=0.993 best1=0.992 n_val=1706 vram=0.00GB 625s | grade=0.957 inner_auc=0.904 vs conf_auc=0.832
+16:50:40 ===== CYCLE 216 (OUTER -> INNER -> FEEDBACK) =====

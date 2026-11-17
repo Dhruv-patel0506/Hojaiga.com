@@ -1,0 +1,137 @@
+{
+   "app_metadata": {
+      "app_name": "Flow Launcher",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install Flow Launcher on Windows",
+   "prerequisite_state": "User is on a Windows 10+ system",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the Windows 10+ Installer",
+         "ui_target": {
+            "element_name": "Download link",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Hyperlink",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User navigates to the download page and starts downloading the installer"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run the downloaded installer",
+         "ui_target": {
+            "element_name": "Downloaded installer file",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "File",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Installer window opens and prompts for installation"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click 'Install' in the installer window",
+         "ui_target": {
+            "element_name": "Install button",
+            "automation_id": null,
+            "hierarchical_path": "Installer window > Install button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Installation process begins and Flow Launcher is installed"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Launch Flow Launcher",
+         "ui_target": {
+            "element_name": "Flow Launcher shortcut",
+            "automation_id": null,
+            "hierarchical_path": "Start menu > Flow Launcher",
+            "element_type": "Shortcut",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Flow Launcher application opens"
+      }
+   ],
+   "_meta": {
+      "source_app": "Flow Launcher",
+      "app_key": "flow_launcher",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "📣 Official Channels",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:56:18Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

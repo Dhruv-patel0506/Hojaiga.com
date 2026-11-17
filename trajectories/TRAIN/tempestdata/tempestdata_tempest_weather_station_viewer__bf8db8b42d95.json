@@ -1,0 +1,167 @@
+{
+   "app_metadata": {
+      "app_name": "TempestData",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Run the TempestData application and configure it with a WeatherFlow Tempest API token.",
+   "prerequisite_state": "No application is open. The user has a WeatherFlow Tempest API token.",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Go to the Tempestwx.com website",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user navigates to the Tempestwx.com website."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click on the Settings link",
+         "ui_target": {
+            "element_name": "Settings",
+            "automation_id": null,
+            "hierarchical_path": "Header > Settings",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Settings page is displayed."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Scroll down to the Data Authorizations section",
+         "ui_target": {
+            "element_name": "Data Authorizations",
+            "automation_id": null,
+            "hierarchical_path": "Settings > Data Authorizations",
+            "element_type": "ListItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Data Authorizations section is highlighted."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click on the Create Token button",
+         "ui_target": {
+            "element_name": "Create Token",
+            "automation_id": null,
+            "hierarchical_path": "Settings > Data Authorizations > Create Token",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A new token is generated and displayed."
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Copy the token and paste it into the Tempest API Token field in the TempestData app",
+         "ui_target": {
+            "element_name": "Tempest API Token",
+            "automation_id": null,
+            "hierarchical_path": "TempestData > Tempest API Token",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "Generated token"
+         },
+         "expected_state_change": "The Tempest API Token field in the TempestData app is populated with the copied token."
+      }
+   ],
+   "_meta": {
+      "source_app": "TempestData",
+      "app_key": "tempestdata",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "TempestData – Tempest Weather Station Viewer",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:32:36Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

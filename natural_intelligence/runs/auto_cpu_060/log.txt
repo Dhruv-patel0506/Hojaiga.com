@@ -1,0 +1,223 @@
+00:18:47 NI run auto_cpu_060 on CPU; hours=2.0 smoke=False
+00:18:47 explicit task list: ['enc2/audio/music_genres_small']
+00:18:47 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+00:18:47 [data] enc2/audio/music_genres_small: n=1000 C=10 D=2304 shards=1
+00:23:46 [enc2/audio/music_genres_small] vote=0.592 uniform=0.596 best1=0.618 n_val=319 vram=0.00GB 299s
+00:24:05 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 319, "n_val": 63, "base_rate": 0.5396825671195984, "inner": {"auc": 0.8265720081135902, "ece": 0.16622762878735856, "brier": 0.18837447464466095, "acc80": 0.6399999856948853}, "outer_conf": {"auc": 0.8002028397565923, "ece": 0.14655249861497724, "brier": 0.18274782598018646, "acc80": 0.6000000238418579}}
+00:24:05 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+00:29:09 [enc2/audio/music_genres_small] vote=0.571 uniform=0.571 best1=0.604 n_val=336 vram=0.00GB 304s | grade=0.861 inner_auc=n/a vs conf_auc=n/a
+00:29:22 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+00:34:16 [enc2/audio/music_genres_small] vote=0.561 uniform=0.568 best1=0.542 n_val=310 vram=0.00GB 294s | grade=0.853 inner_auc=n/a vs conf_auc=n/a
+00:34:32 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+00:40:13 [enc2/audio/music_genres_small] vote=0.542 uniform=0.546 best1=0.582 n_val=306 vram=0.00GB 341s | grade=0.841 inner_auc=n/a vs conf_auc=n/a
+00:40:34 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+00:46:45 [enc2/audio/music_genres_small] vote=0.532 uniform=0.525 best1=0.535 n_val=299 vram=0.00GB 372s | grade=0.828 inner_auc=n/a vs conf_auc=n/a
+00:47:05 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+00:52:41 [enc2/audio/music_genres_small] vote=0.561 uniform=0.542 best1=0.574 n_val=319 vram=0.00GB 336s | grade=0.836 inner_auc=n/a vs conf_auc=n/a
+00:53:00 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+00:57:43 [enc2/audio/music_genres_small] vote=0.544 uniform=0.560 best1=0.553 n_val=318 vram=0.00GB 284s | grade=0.819 inner_auc=n/a vs conf_auc=n/a
+00:58:03 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+01:03:35 [enc2/audio/music_genres_small] vote=0.595 uniform=0.588 best1=0.627 n_val=311 vram=0.00GB 332s | grade=0.822 inner_auc=n/a vs conf_auc=n/a
+01:03:56 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+01:09:33 [enc2/audio/music_genres_small] vote=0.566 uniform=0.573 best1=0.595 n_val=279 vram=0.00GB 336s | grade=0.840 inner_auc=n/a vs conf_auc=n/a
+01:09:51 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+01:15:54 [enc2/audio/music_genres_small] vote=0.570 uniform=0.573 best1=0.567 n_val=323 vram=0.00GB 363s | grade=0.841 inner_auc=n/a vs conf_auc=n/a
+01:16:17 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+01:21:27 [enc2/audio/music_genres_small] vote=0.531 uniform=0.528 best1=0.541 n_val=318 vram=0.00GB 310s | grade=0.826 inner_auc=n/a vs conf_auc=n/a
+01:21:49 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+01:27:04 [enc2/audio/music_genres_small] vote=0.607 uniform=0.601 best1=0.604 n_val=318 vram=0.00GB 315s | grade=0.822 inner_auc=n/a vs conf_auc=n/a
+01:27:25 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+01:33:16 [enc2/audio/music_genres_small] vote=0.548 uniform=0.551 best1=0.575 n_val=292 vram=0.00GB 351s | grade=0.815 inner_auc=n/a vs conf_auc=n/a
+01:33:42 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+01:40:16 [enc2/audio/music_genres_small] vote=0.554 uniform=0.554 best1=0.561 n_val=312 vram=0.00GB 394s | grade=0.853 inner_auc=n/a vs conf_auc=n/a
+01:40:39 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+01:47:43 [enc2/audio/music_genres_small] vote=0.564 uniform=0.571 best1=0.564 n_val=289 vram=0.00GB 424s | grade=0.854 inner_auc=n/a vs conf_auc=n/a
+01:48:11 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+01:54:29 [enc2/audio/music_genres_small] vote=0.557 uniform=0.561 best1=0.564 n_val=296 vram=0.00GB 378s | grade=0.852 inner_auc=n/a vs conf_auc=n/a
+01:54:58 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+02:01:32 [enc2/audio/music_genres_small] vote=0.607 uniform=0.587 best1=0.588 n_val=303 vram=0.00GB 395s | grade=0.845 inner_auc=n/a vs conf_auc=n/a
+02:01:53 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+02:08:11 [enc2/audio/music_genres_small] vote=0.561 uniform=0.554 best1=0.576 n_val=314 vram=0.00GB 378s | grade=0.818 inner_auc=n/a vs conf_auc=n/a
+02:08:41 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+02:15:30 [enc2/audio/music_genres_small] vote=0.518 uniform=0.531 best1=0.521 n_val=311 vram=0.00GB 408s | grade=0.829 inner_auc=n/a vs conf_auc=n/a
+02:15:56 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+02:23:26 [enc2/audio/music_genres_small] vote=0.563 uniform=0.567 best1=0.563 n_val=284 vram=0.00GB 450s | grade=0.829 inner_auc=n/a vs conf_auc=n/a
+02:23:56 RUN COMPLETE
+14:19:35 NI run auto_cpu_060 on CPU; hours=2.0 smoke=False
+14:19:35 explicit task list: ['enc2/audio/music_genres_small']
+14:19:53 [resume] from checkpoint: next cycle 20, rounds 20, 20 metric rows, inner net restored
+14:19:53 ===== CYCLE 20 (OUTER-ONLY BOOTSTRAP) =====
+14:19:53 [data] enc2/audio/music_genres_small: n=1000 C=10 D=2304 shards=1
+14:30:30 [enc2/audio/music_genres_small] vote=0.578 uniform=0.572 best1=0.578 n_val=306 vram=0.00GB 637s
+14:31:01 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 20, "n_records": 306, "n_val": 58, "base_rate": 0.5, "inner": {"auc": 0.7300832342449465, "ece": 0.18379951833650987, "brier": 0.21296225488185883, "acc80": 0.54347825050354}, "outer_conf": {"auc": 0.7217598097502973, "ece": 0.15593816442736264, "brier": 0.20799092948436737, "acc80": 0.52173912525177}}
+14:31:01 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+14:39:51 [enc2/audio/music_genres_small] vote=0.555 uniform=0.535 best1=0.552 n_val=299 vram=0.00GB 529s | grade=0.833 inner_auc=n/a vs conf_auc=n/a
+14:40:14 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+14:48:51 [enc2/audio/music_genres_small] vote=0.564 uniform=0.560 best1=0.564 n_val=282 vram=0.00GB 517s | grade=0.862 inner_auc=n/a vs conf_auc=n/a
+14:49:08 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+14:54:41 [enc2/audio/music_genres_small] vote=0.609 uniform=0.603 best1=0.593 n_val=302 vram=0.00GB 333s | grade=0.841 inner_auc=n/a vs conf_auc=n/a
+14:54:59 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+15:02:40 [enc2/audio/music_genres_small] vote=0.516 uniform=0.536 best1=0.526 n_val=304 vram=0.00GB 461s | grade=0.801 inner_auc=n/a vs conf_auc=n/a
+15:02:56 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+15:10:04 [enc2/audio/music_genres_small] vote=0.541 uniform=0.564 best1=0.554 n_val=303 vram=0.00GB 428s | grade=0.829 inner_auc=n/a vs conf_auc=n/a
+15:10:23 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+15:16:42 [enc2/audio/music_genres_small] vote=0.586 uniform=0.599 best1=0.592 n_val=304 vram=0.00GB 379s | grade=0.835 inner_auc=n/a vs conf_auc=n/a
+15:17:00 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+15:21:16 [enc2/audio/music_genres_small] vote=0.552 uniform=0.533 best1=0.539 n_val=319 vram=0.00GB 256s | grade=0.834 inner_auc=n/a vs conf_auc=n/a
+15:21:34 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+15:27:02 [enc2/audio/music_genres_small] vote=0.567 uniform=0.554 best1=0.554 n_val=298 vram=0.00GB 328s | grade=0.832 inner_auc=n/a vs conf_auc=n/a
+15:27:24 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+15:33:27 [enc2/audio/music_genres_small] vote=0.605 uniform=0.598 best1=0.587 n_val=286 vram=0.00GB 363s | grade=0.857 inner_auc=n/a vs conf_auc=n/a
+15:33:48 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+15:39:48 [enc2/audio/music_genres_small] vote=0.579 uniform=0.555 best1=0.576 n_val=321 vram=0.00GB 360s | grade=0.853 inner_auc=n/a vs conf_auc=n/a
+15:40:05 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+15:47:15 [enc2/audio/music_genres_small] vote=0.565 uniform=0.565 best1=0.571 n_val=315 vram=0.00GB 429s | grade=0.847 inner_auc=n/a vs conf_auc=n/a
+15:47:35 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+15:54:32 [enc2/audio/music_genres_small] vote=0.576 uniform=0.600 best1=0.567 n_val=330 vram=0.00GB 417s | grade=0.864 inner_auc=n/a vs conf_auc=n/a
+15:54:56 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+16:02:31 [enc2/audio/music_genres_small] vote=0.495 uniform=0.520 best1=0.509 n_val=281 vram=0.00GB 455s | grade=0.797 inner_auc=n/a vs conf_auc=n/a
+16:02:50 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+16:09:16 [enc2/audio/music_genres_small] vote=0.526 uniform=0.539 best1=0.539 n_val=306 vram=0.00GB 386s | grade=0.833 inner_auc=n/a vs conf_auc=n/a
+16:09:36 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+16:15:53 [enc2/audio/music_genres_small] vote=0.577 uniform=0.567 best1=0.577 n_val=312 vram=0.00GB 376s | grade=0.826 inner_auc=n/a vs conf_auc=n/a
+16:16:14 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+16:22:32 [enc2/audio/music_genres_small] vote=0.589 uniform=0.599 best1=0.599 n_val=292 vram=0.00GB 378s | grade=0.853 inner_auc=n/a vs conf_auc=n/a
+16:22:56 RUN COMPLETE
+18:21:32 NI run auto_cpu_060 on CPU; hours=2.0 smoke=False
+18:21:32 explicit task list: ['enc2/audio/music_genres_small']
+18:21:48 [resume] from checkpoint: next cycle 37, rounds 37, 37 metric rows, inner net restored
+18:21:48 ===== CYCLE 37 (OUTER-ONLY BOOTSTRAP) =====
+18:21:48 [data] enc2/audio/music_genres_small: n=1000 C=10 D=2304 shards=1
+18:29:23 [enc2/audio/music_genres_small] vote=0.557 uniform=0.547 best1=0.557 n_val=287 vram=0.00GB 455s
+18:29:49 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 37, "n_records": 287, "n_val": 54, "base_rate": 0.6666666865348816, "inner": {"auc": 0.7700617283950617, "ece": 0.1827455830794793, "brier": 0.1986328512430191, "acc80": 0.7441860437393188}, "outer_conf": {"auc": 0.7638888888888888, "ece": 0.2090734262709264, "brier": 0.20418913662433624, "acc80": 0.7209302186965942}}
+18:29:49 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+18:36:49 [enc2/audio/music_genres_small] vote=0.516 uniform=0.545 best1=0.532 n_val=308 vram=0.00GB 420s | grade=0.828 inner_auc=n/a vs conf_auc=n/a
+18:37:05 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+18:44:09 [enc2/audio/music_genres_small] vote=0.554 uniform=0.573 best1=0.557 n_val=323 vram=0.00GB 423s | grade=0.832 inner_auc=n/a vs conf_auc=n/a
+18:44:31 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+18:50:58 [enc2/audio/music_genres_small] vote=0.572 uniform=0.562 best1=0.579 n_val=292 vram=0.00GB 386s | grade=0.856 inner_auc=n/a vs conf_auc=n/a
+18:51:19 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+18:58:19 [enc2/audio/music_genres_small] vote=0.581 uniform=0.581 best1=0.566 n_val=327 vram=0.00GB 420s | grade=0.834 inner_auc=n/a vs conf_auc=n/a
+18:58:44 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+19:05:12 [enc2/audio/music_genres_small] vote=0.525 uniform=0.531 best1=0.528 n_val=305 vram=0.00GB 388s | grade=0.821 inner_auc=n/a vs conf_auc=n/a
+19:05:37 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+19:12:51 [enc2/audio/music_genres_small] vote=0.575 uniform=0.559 best1=0.599 n_val=299 vram=0.00GB 434s | grade=0.841 inner_auc=n/a vs conf_auc=n/a
+19:13:15 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+19:20:27 [enc2/audio/music_genres_small] vote=0.556 uniform=0.566 best1=0.576 n_val=297 vram=0.00GB 431s | grade=0.848 inner_auc=n/a vs conf_auc=n/a
+19:20:53 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+19:27:18 [enc2/audio/music_genres_small] vote=0.528 uniform=0.541 best1=0.541 n_val=318 vram=0.00GB 385s | grade=0.836 inner_auc=n/a vs conf_auc=n/a
+19:27:45 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+19:34:03 [enc2/audio/music_genres_small] vote=0.586 uniform=0.579 best1=0.572 n_val=304 vram=0.00GB 378s | grade=0.832 inner_auc=n/a vs conf_auc=n/a
+19:34:33 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+19:40:46 [enc2/audio/music_genres_small] vote=0.564 uniform=0.554 best1=0.554 n_val=305 vram=0.00GB 373s | grade=0.854 inner_auc=n/a vs conf_auc=n/a
+19:41:14 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+19:48:17 [enc2/audio/music_genres_small] vote=0.552 uniform=0.566 best1=0.559 n_val=286 vram=0.00GB 423s | grade=0.853 inner_auc=n/a vs conf_auc=n/a
+19:48:46 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+19:55:27 [enc2/audio/music_genres_small] vote=0.509 uniform=0.529 best1=0.522 n_val=289 vram=0.00GB 402s | grade=0.810 inner_auc=n/a vs conf_auc=n/a
+19:55:51 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+20:04:33 [enc2/audio/music_genres_small] vote=0.574 uniform=0.578 best1=0.588 n_val=303 vram=0.00GB 522s | grade=0.834 inner_auc=n/a vs conf_auc=n/a
+20:05:06 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+20:13:45 [enc2/audio/music_genres_small] vote=0.575 uniform=0.578 best1=0.575 n_val=306 vram=0.00GB 519s | grade=0.850 inner_auc=n/a vs conf_auc=n/a
+20:14:21 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+20:22:59 [enc2/audio/music_genres_small] vote=0.578 uniform=0.575 best1=0.568 n_val=287 vram=0.00GB 518s | grade=0.840 inner_auc=n/a vs conf_auc=n/a
+20:23:32 RUN COMPLETE
+14:58:58 NI run auto_cpu_060 on CPU; hours=2.0 smoke=False
+14:58:58 explicit task list: ['enc2/audio/music_genres_small']
+14:59:07 [resume] from checkpoint: next cycle 53, rounds 53, 53 metric rows, inner net restored
+14:59:07 ===== CYCLE 53 (OUTER-ONLY BOOTSTRAP) =====
+14:59:07 [data] enc2/audio/music_genres_small: n=1000 C=10 D=2304 shards=1
+15:03:38 [enc2/audio/music_genres_small] vote=0.592 uniform=0.578 best1=0.582 n_val=282 vram=0.00GB 271s
+15:03:59 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 53, "n_records": 282, "n_val": 60, "base_rate": 0.6833333373069763, "inner": {"auc": 0.7676508344030809, "ece": 0.23225916971762978, "brier": 0.20306138694286346, "acc80": 0.7291666865348816}, "outer_conf": {"auc": 0.7766367137355584, "ece": 0.21394691119591394, "brier": 0.2131199985742569, "acc80": 0.7708333134651184}}
+15:03:59 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+15:08:18 [enc2/audio/music_genres_small] vote=0.575 uniform=0.559 best1=0.578 n_val=306 vram=0.00GB 260s | grade=0.850 inner_auc=n/a vs conf_auc=n/a
+15:08:33 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+15:13:26 [enc2/audio/music_genres_small] vote=0.574 uniform=0.581 best1=0.577 n_val=291 vram=0.00GB 294s | grade=0.857 inner_auc=n/a vs conf_auc=n/a
+15:13:41 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+15:17:43 [enc2/audio/music_genres_small] vote=0.532 uniform=0.559 best1=0.549 n_val=297 vram=0.00GB 242s | grade=0.823 inner_auc=n/a vs conf_auc=n/a
+15:18:02 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+15:23:00 [enc2/audio/music_genres_small] vote=0.547 uniform=0.531 best1=0.553 n_val=309 vram=0.00GB 298s | grade=0.850 inner_auc=n/a vs conf_auc=n/a
+15:23:19 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+15:27:39 [enc2/audio/music_genres_small] vote=0.555 uniform=0.551 best1=0.551 n_val=292 vram=0.00GB 260s | grade=0.849 inner_auc=n/a vs conf_auc=n/a
+15:27:59 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+15:32:54 [enc2/audio/music_genres_small] vote=0.550 uniform=0.557 best1=0.560 n_val=309 vram=0.00GB 296s | grade=0.851 inner_auc=n/a vs conf_auc=n/a
+15:33:15 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+15:37:36 [enc2/audio/music_genres_small] vote=0.539 uniform=0.536 best1=0.530 n_val=304 vram=0.00GB 260s | grade=0.841 inner_auc=n/a vs conf_auc=n/a
+15:37:57 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+15:42:47 [enc2/audio/music_genres_small] vote=0.578 uniform=0.557 best1=0.578 n_val=282 vram=0.00GB 290s | grade=0.844 inner_auc=n/a vs conf_auc=n/a
+15:43:06 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+15:47:33 [enc2/audio/music_genres_small] vote=0.552 uniform=0.537 best1=0.559 n_val=315 vram=0.00GB 268s | grade=0.834 inner_auc=n/a vs conf_auc=n/a
+15:47:53 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+15:53:47 [enc2/audio/music_genres_small] vote=0.622 uniform=0.629 best1=0.619 n_val=307 vram=0.00GB 354s | grade=0.826 inner_auc=n/a vs conf_auc=n/a
+15:54:08 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+15:58:36 [enc2/audio/music_genres_small] vote=0.551 uniform=0.544 best1=0.561 n_val=287 vram=0.00GB 269s | grade=0.808 inner_auc=n/a vs conf_auc=n/a
+15:58:55 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+16:03:00 [enc2/audio/music_genres_small] vote=0.535 uniform=0.542 best1=0.538 n_val=286 vram=0.00GB 245s | grade=0.830 inner_auc=n/a vs conf_auc=n/a
+16:03:21 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+16:07:43 [enc2/audio/music_genres_small] vote=0.614 uniform=0.593 best1=0.617 n_val=290 vram=0.00GB 262s | grade=0.819 inner_auc=n/a vs conf_auc=n/a
+16:08:04 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+16:12:37 [enc2/audio/music_genres_small] vote=0.560 uniform=0.597 best1=0.584 n_val=298 vram=0.00GB 273s | grade=0.826 inner_auc=n/a vs conf_auc=n/a
+16:12:58 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+16:17:26 [enc2/audio/music_genres_small] vote=0.568 uniform=0.564 best1=0.578 n_val=303 vram=0.00GB 269s | grade=0.861 inner_auc=n/a vs conf_auc=n/a
+16:17:51 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+16:22:53 [enc2/audio/music_genres_small] vote=0.562 uniform=0.552 best1=0.562 n_val=306 vram=0.00GB 302s | grade=0.852 inner_auc=n/a vs conf_auc=n/a
+16:23:14 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+16:28:10 [enc2/audio/music_genres_small] vote=0.514 uniform=0.523 best1=0.545 n_val=321 vram=0.00GB 296s | grade=0.813 inner_auc=n/a vs conf_auc=n/a
+16:28:30 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+16:33:11 [enc2/audio/music_genres_small] vote=0.567 uniform=0.560 best1=0.585 n_val=277 vram=0.00GB 281s | grade=0.837 inner_auc=n/a vs conf_auc=n/a
+16:33:31 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+16:37:57 [enc2/audio/music_genres_small] vote=0.609 uniform=0.623 best1=0.637 n_val=289 vram=0.00GB 266s | grade=0.826 inner_auc=n/a vs conf_auc=n/a
+16:38:22 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+16:43:08 [enc2/audio/music_genres_small] vote=0.588 uniform=0.572 best1=0.595 n_val=306 vram=0.00GB 286s | grade=0.860 inner_auc=n/a vs conf_auc=n/a
+16:43:29 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+16:48:02 [enc2/audio/music_genres_small] vote=0.602 uniform=0.589 best1=0.595 n_val=299 vram=0.00GB 273s | grade=0.847 inner_auc=n/a vs conf_auc=n/a
+16:48:22 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+16:52:51 [enc2/audio/music_genres_small] vote=0.571 uniform=0.574 best1=0.571 n_val=282 vram=0.00GB 269s | grade=0.836 inner_auc=n/a vs conf_auc=n/a
+16:53:11 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+16:57:16 [enc2/audio/music_genres_small] vote=0.561 uniform=0.554 best1=0.557 n_val=296 vram=0.00GB 245s | grade=0.853 inner_auc=n/a vs conf_auc=n/a
+16:57:32 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+17:02:36 [enc2/audio/music_genres_small] vote=0.518 uniform=0.508 best1=0.524 n_val=311 vram=0.00GB 304s | grade=0.824 inner_auc=n/a vs conf_auc=n/a
+17:03:00 RUN COMPLETE
+14:55:01 NI run auto_cpu_060 on CPU; hours=2.0 smoke=False
+14:55:01 explicit task list: ['enc2/audio/music_genres_small']
+14:55:10 [resume] from checkpoint: next cycle 78, rounds 78, 78 metric rows, inner net restored
+14:55:10 ===== CYCLE 78 (OUTER-ONLY BOOTSTRAP) =====
+14:55:10 [data] enc2/audio/music_genres_small: n=1000 C=10 D=2304 shards=1
+15:00:34 [enc2/audio/music_genres_small] vote=0.553 uniform=0.549 best1=0.572 n_val=304 vram=0.00GB 324s
+15:01:00 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 78, "n_records": 304, "n_val": 60, "base_rate": 0.5, "inner": {"auc": 0.7055555555555556, "ece": 0.18126884003480276, "brier": 0.2320316731929779, "acc80": 0.5208333134651184}, "outer_conf": {"auc": 0.7077777777777777, "ece": 0.19305507739384967, "brier": 0.23224036395549774, "acc80": 0.5416666865348816}}
+15:01:00 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+15:06:13 [enc2/audio/music_genres_small] vote=0.579 uniform=0.554 best1=0.589 n_val=280 vram=0.00GB 313s | grade=0.849 inner_auc=n/a vs conf_auc=n/a
+15:06:28 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+15:11:57 [enc2/audio/music_genres_small] vote=0.583 uniform=0.583 best1=0.590 n_val=300 vram=0.00GB 329s | grade=0.864 inner_auc=n/a vs conf_auc=n/a
+15:12:12 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+15:18:08 [enc2/audio/music_genres_small] vote=0.533 uniform=0.549 best1=0.556 n_val=304 vram=0.00GB 356s | grade=0.816 inner_auc=n/a vs conf_auc=n/a
+15:18:29 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+15:24:34 [enc2/audio/music_genres_small] vote=0.524 uniform=0.521 best1=0.535 n_val=288 vram=0.00GB 365s | grade=0.837 inner_auc=n/a vs conf_auc=n/a
+15:24:53 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+15:30:35 [enc2/audio/music_genres_small] vote=0.578 uniform=0.565 best1=0.565 n_val=329 vram=0.00GB 342s | grade=0.818 inner_auc=n/a vs conf_auc=n/a
+15:30:59 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+15:37:22 [enc2/audio/music_genres_small] vote=0.586 uniform=0.577 best1=0.571 n_val=326 vram=0.00GB 383s | grade=0.858 inner_auc=n/a vs conf_auc=n/a
+15:37:49 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+15:43:45 [enc2/audio/music_genres_small] vote=0.543 uniform=0.540 best1=0.560 n_val=339 vram=0.00GB 356s | grade=0.825 inner_auc=n/a vs conf_auc=n/a
+15:44:10 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+15:50:35 [enc2/audio/music_genres_small] vote=0.582 uniform=0.585 best1=0.575 n_val=275 vram=0.00GB 385s | grade=0.852 inner_auc=n/a vs conf_auc=n/a
+15:51:01 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+15:58:03 [enc2/audio/music_genres_small] vote=0.603 uniform=0.592 best1=0.610 n_val=277 vram=0.00GB 422s | grade=0.844 inner_auc=n/a vs conf_auc=n/a
+15:58:28 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+16:04:26 [enc2/audio/music_genres_small] vote=0.576 uniform=0.593 best1=0.586 n_val=302 vram=0.00GB 357s | grade=0.833 inner_auc=n/a vs conf_auc=n/a
+16:04:51 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+16:11:30 [enc2/audio/music_genres_small] vote=0.585 uniform=0.545 best1=0.588 n_val=301 vram=0.00GB 400s | grade=0.844 inner_auc=n/a vs conf_auc=n/a
+16:11:51 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+16:17:46 [enc2/audio/music_genres_small] vote=0.546 uniform=0.571 best1=0.571 n_val=273 vram=0.00GB 355s | grade=0.832 inner_auc=n/a vs conf_auc=n/a
+16:18:10 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+16:24:18 [enc2/audio/music_genres_small] vote=0.587 uniform=0.587 best1=0.593 n_val=305 vram=0.00GB 367s | grade=0.845 inner_auc=n/a vs conf_auc=n/a
+16:24:44 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+16:30:08 [enc2/audio/music_genres_small] vote=0.567 uniform=0.583 best1=0.567 n_val=312 vram=0.00GB 323s | grade=0.852 inner_auc=n/a vs conf_auc=n/a
+16:30:34 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+16:36:28 [enc2/audio/music_genres_small] vote=0.546 uniform=0.542 best1=0.556 n_val=295 vram=0.00GB 355s | grade=0.839 inner_auc=n/a vs conf_auc=n/a
+16:36:52 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+16:42:02 [enc2/audio/music_genres_small] vote=0.565 uniform=0.565 best1=0.571 n_val=317 vram=0.00GB 311s | grade=0.846 inner_auc=n/a vs conf_auc=n/a
+16:42:29 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+16:47:16 [enc2/audio/music_genres_small] vote=0.553 uniform=0.567 best1=0.563 n_val=293 vram=0.00GB 287s | grade=0.840 inner_auc=n/a vs conf_auc=n/a
+16:47:38 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+16:52:28 [enc2/audio/music_genres_small] vote=0.573 uniform=0.585 best1=0.589 n_val=316 vram=0.00GB 290s | grade=0.855 inner_auc=n/a vs conf_auc=n/a
+16:52:54 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====

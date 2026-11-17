@@ -1,0 +1,72 @@
+{
+   "app_metadata": {
+      "app_name": "MyAgents",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure MyAgents on Windows and macOS",
+   "prerequisite_state": "User has access to a Windows 10 or 11 machine or macOS 26 (Tahoe) or later, with Claude Code and/or Codex installed and authenticated",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install MyAgents on Windows using winget",
+         "ui_target": {
+            "element_name": "winget",
+            "automation_id": null,
+            "hierarchical_path": "Start menu > winget",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The winget command-line tool opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run the command to install MyAgents",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "install MiguelAngelRamirez.MyAgents"
+         },
+         "expected_state_change": "MyAgents is installed and added to the Start menu and system tray"
+      }
+   ],
+   "_meta": {
+      "source_app": "MyAgents",
+      "app_key": "myagents",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "MyAgents",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:44:57Z",
+      "schema_warnings": [
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

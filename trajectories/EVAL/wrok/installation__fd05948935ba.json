@@ -1,0 +1,84 @@
+{
+   "app_metadata": {
+      "app_name": "Wrok",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure Wrok",
+   "prerequisite_state": "No application is open",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install Wrok using WinGet",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install --id NASS.Wrok"
+         },
+         "expected_state_change": "The installation process of Wrok starts"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Wait for the installation to complete",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Wrok is installed and ready to use"
+      }
+   ],
+   "_meta": {
+      "source_app": "Wrok",
+      "app_key": "wrok",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "Installation",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:59:33Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

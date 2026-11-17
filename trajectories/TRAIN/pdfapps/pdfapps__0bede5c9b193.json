@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "PDFApps",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Download and run PDFApps on Windows",
+   "prerequisite_state": "No application is open",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Get PDFApps from the Microsoft Store",
+         "ui_target": {
+            "element_name": "Microsoft Store",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Microsoft Store opens and the search bar is in focus"
+      }
+   ],
+   "_meta": {
+      "source_app": "PDFApps",
+      "app_key": "pdfapps",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "PDFApps",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T19:02:25Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

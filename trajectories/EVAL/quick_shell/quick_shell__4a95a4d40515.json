@@ -1,0 +1,137 @@
+{
+   "app_metadata": {
+      "app_name": "Quick Shell",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Open Quick Shell from Command Palette and navigate through its features",
+   "prerequisite_state": "Command Palette is open and Quick Shell is available as a search result",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open Command Palette",
+         "ui_target": {
+            "element_name": "Command Palette",
+            "automation_id": null,
+            "hierarchical_path": "Application > Command Palette",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Command Palette opens with a search bar and a list of available commands"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Search for Quick Shell",
+         "ui_target": {
+            "element_name": "Search bar",
+            "automation_id": null,
+            "hierarchical_path": "Command Palette > Search bar",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Quick Shell"
+         },
+         "expected_state_change": "Quick Shell appears in the search results"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Select Quick Shell from the search results",
+         "ui_target": {
+            "element_name": "Quick Shell",
+            "automation_id": null,
+            "hierarchical_path": "Command Palette > Search results > Quick Shell",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Quick Shell opens in the application window"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Browse workspaces",
+         "ui_target": {
+            "element_name": "Workspaces list",
+            "automation_id": null,
+            "hierarchical_path": "Quick Shell > Workspaces list",
+            "element_type": "ListBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The workspaces list is visible and can be interacted with"
+      }
+   ],
+   "_meta": {
+      "source_app": "Quick Shell",
+      "app_key": "quick_shell",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "Quick Shell",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:45:42Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

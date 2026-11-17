@@ -1,0 +1,167 @@
+{
+   "app_metadata": {
+      "app_name": "DSPiConsole",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure DSPi Console and Firmware for a Raspberry Pi Pico device.",
+   "prerequisite_state": "No application or document is open. The user is on the releases page of the DSPi-Console-Windows repository.",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the latest DSPi.Console version from the releases page.",
+         "ui_target": {
+            "element_name": "Download link",
+            "automation_id": null,
+            "hierarchical_path": "Releases page > Download link",
+            "element_type": "Hyperlink",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user is prompted to download the latest version of DSPi.Console."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Extract the downloaded archive to a location of your choosing.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The archive is extracted to the chosen location."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Run DSPiConsole.exe.",
+         "ui_target": {
+            "element_name": "DSPiConsole.exe",
+            "automation_id": null,
+            "hierarchical_path": "Start menu > DSPiConsole.exe",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "DSPi Console opens and detects the connected device."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Open the File menu and select Update Firmware.",
+         "ui_target": {
+            "element_name": "File",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The File dropdown opens showing Update Firmware."
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Click Update Firmware to update the device's Firmware.",
+         "ui_target": {
+            "element_name": "Update Firmware",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File > Update Firmware",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The device restarts into its bootloader and the Firmware is updated."
+      }
+   ],
+   "_meta": {
+      "source_app": "DSPiConsole",
+      "app_key": "dspiconsole",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "DSPi Console for Windows",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:09:00Z",
+      "schema_warnings": [
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

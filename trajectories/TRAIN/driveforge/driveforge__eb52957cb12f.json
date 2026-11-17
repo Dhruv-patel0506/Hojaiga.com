@@ -1,0 +1,165 @@
+{
+   "app_metadata": {
+      "app_name": "DriveForge",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Choose a task from the list and complete it using DriveForge",
+   "prerequisite_state": "DriveForge application is open and the user is at the main screen",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Choose a task from the list down the left-hand side",
+         "ui_target": {
+            "element_name": "Task list",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Task list",
+            "element_type": "ListBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected task is highlighted or otherwise visually indicated"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Pick the source (an ISO for installs; 'this PC' for clones/backups)",
+         "ui_target": {
+            "element_name": "Source selection",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Task settings > Source selection",
+            "element_type": "ComboBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The source selection dropdown opens showing options"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Pick the target drive — the colored verdict tells you if it's suitable",
+         "ui_target": {
+            "element_name": "Target drive selection",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Task settings > Target drive selection",
+            "element_type": "ListBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected target drive is highlighted or otherwise visually indicated"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Tick options in step 4 — hover any option for an explanation",
+         "ui_target": {
+            "element_name": "Options",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Task settings > Options",
+            "element_type": "CheckBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected option is checked or unchecked"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Press the green button",
+         "ui_target": {
+            "element_name": "Start button",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Start button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The task starts and the green button changes to a stop button"
+      }
+   ],
+   "_meta": {
+      "source_app": "DriveForge",
+      "app_key": "driveforge",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "DriveForge",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:59:43Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,28 @@
+{
+  "_comment": "PART-2 Phase-2 Anchor Suite: a small, permanent local set spanning distinct UI frameworks, so live execution is validated on 30-50 known apps instead of ephemeral installs of thousands. winget_id values are validated read-only by autonomous_installer_engine.py --plan before any --execute.",
+  "generated": "2026-10-13",
+  "usage": "python autonomous_installer_engine.py --plan <winget_id>  then  --execute <winget_id> --yes",
+  "anchors": [
+    {"name": "Notepad++", "winget_id": "Notepad++.Notepad++", "app_name": "Notepad++", "split": "EVAL", "launch_command": "notepad++.exe", "process_name": "notepad++", "window_title_regex": ".*Notepad\\+\\+.*", "install_args": "/S", "framework": "Win32/legacy", "category": "Native Win32 / Legacy"},
+    {"name": "7-Zip", "winget_id": "7zip.7zip", "app_name": "7-Zip File Manager", "split": "EVAL", "launch_command": "C:\\Program Files\\7-Zip\\7zFM.exe", "process_name": "7zFM", "window_title_regex": "7-Zip.*", "install_args": "/S", "framework": "Win32/legacy", "category": "Native Win32 / Legacy"},
+    {"name": "Audacity", "winget_id": "Audacity.Audacity", "app_name": "Audacity", "split": "EVAL", "launch_command": "audacity.exe", "process_name": "Audacity", "window_title_regex": "Audacity.*", "install_args": "/VERYSILENT", "framework": "wxWidgets", "category": "Audio / Media"},
+    {"name": "LibreOffice Writer","winget_id": "TheDocumentFoundation.LibreOffice","framework": "complex ribbon",   "category": "Complex Ribbon/Office"},
+    {"name": "GIMP",              "winget_id": "GIMP.GIMP",                        "framework": "canvas/tools",     "category": "Creative / Canvas"},
+    {"name": "Inkscape",          "winget_id": "Inkscape.Inkscape",                "framework": "canvas/svg",       "category": "Creative / Canvas"},
+    {"name": "Blender",           "winget_id": "BlenderFoundation.Blender",           "framework": "3D viewport",      "category": "3D / Viewport / CAD"},
+    {"name": "FreeCAD",           "winget_id": "FreeCAD.FreeCAD",                   "framework": "3D CAD",           "category": "3D / Viewport / CAD"},
+    {"name": "Visual Studio Code","winget_id": "Microsoft.VisualStudioCode",       "framework": "Electron",         "category": "Electron / Web-Hybrid"},
+    {"name": "VLC media player",  "winget_id": "VideoLAN.VLC",                     "framework": "media/Qt",         "category": "Audio / Media"},
+    {"name": "Audacity",          "winget_id": "Audacity.Audacity",                "framework": "wxWidgets",       "category": "Audio / Media"},
+    {"name": "OBS Studio",        "winget_id": "OBSProject.OBSStudio",             "framework": "Qt/multi-window",  "category": "Audio / Media"},
+    {"name": "Mozilla Firefox",   "winget_id": "Mozilla.Firefox",                  "framework": "native/browser",   "category": "Electron / Web-Hybrid"},
+    {"name": "Google Chrome",     "winget_id": "Google.Chrome",                    "framework": "native/browser",   "category": "Electron / Web-Hybrid"},
+    {"name": "Windows Terminal",  "winget_id": "Microsoft.WindowsTerminal",        "framework": "UWP/WinUI",        "category": "Native Win32 / Legacy"},
+    {"name": "Git",               "winget_id": "Git.Git",                          "framework": "win32/gui",        "category": "Native Win32 / Legacy"},
+    {"name": "WinSCP",            "winget_id": "WinSCP.WinSCP",                      "framework": "native/Win32",     "category": "Utility tools"},
+    {"name": "Vivaldi",           "winget_id": "Vivaldi.Vivaldi",                  "framework": "chromium",         "category": "Electron / Web-Hybrid"},
+    {"name": "Notion",            "winget_id": "Notion.Notion",                    "framework": "Electron",         "category": "Electron / Web-Hybrid"},
+    {"name": "Slack",             "winget_id": "SlackTechnologies.Slack",          "framework": "Electron",         "category": "Electron / Web-Hybrid"},
+    {"name": "Krita",             "winget_id": "KDE.Krita",                        "framework": "canvas/Qt",        "category": "Creative / Canvas"}
+  ]
+}

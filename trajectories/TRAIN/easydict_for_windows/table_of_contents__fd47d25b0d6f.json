@@ -1,0 +1,55 @@
+{
+   "app_metadata": {
+      "app_name": "Easydict for Windows",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install Easydict for Windows via winget",
+   "prerequisite_state": "No application is open, and the user is on a Windows 10 system with version 2004 or later and an x64 or ARM64 processor.",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Run the command `winget install xiaocang.EasydictforWindows` in PowerShell",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install xiaocang.EasydictforWindows"
+         },
+         "expected_state_change": "The installation process of Easydict for Windows starts, and the application is installed on the system."
+      }
+   ],
+   "_meta": {
+      "source_app": "Easydict for Windows",
+      "app_key": "easydict_for_windows",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Table of Contents",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:18:07Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

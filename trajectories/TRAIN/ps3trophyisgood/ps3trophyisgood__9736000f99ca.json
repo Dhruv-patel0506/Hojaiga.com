@@ -1,0 +1,174 @@
+{
+   "app_metadata": {
+      "app_name": "PS3TrophyIsGood",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide on how to use PS3TrophyIsGood to manage and sync PS3 trophies",
+   "prerequisite_state": "PS3TrophyIsGood application is open and ready for use",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the trophy folder from the PS3 console",
+         "ui_target": {
+            "element_name": "Trophy folder",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Directory",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The trophy folder is opened and the user can see the trophies inside"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Drag and drop the trophy folder into the PS3TrophyIsGood application window",
+         "ui_target": {
+            "element_name": "PS3TrophyIsGood application window",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Window",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The trophy folder is recognized and the application starts processing the trophies"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Copy the modified trophy folder back to the PS3 console",
+         "ui_target": {
+            "element_name": "Trophy folder",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Directory",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The modified trophy folder is copied back to the PS3 console"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Sync the trophies to PSN",
+         "ui_target": {
+            "element_name": "Sync button",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Sync button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The trophies are being synced to PSN and the application shows the progress"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Confirm the sync process",
+         "ui_target": {
+            "element_name": "Confirmation dialog",
+            "automation_id": null,
+            "hierarchical_path": "Sync dialog > Confirmation button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The trophies are successfully synced to PSN and the application shows the updated trophy status"
+      }
+   ],
+   "_meta": {
+      "source_app": "PS3TrophyIsGood",
+      "app_key": "ps3trophyisgood",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "PS3TrophyIsGood",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T13:45:49Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

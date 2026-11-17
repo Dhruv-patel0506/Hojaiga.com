@@ -1,0 +1,167 @@
+{
+   "app_metadata": {
+      "app_name": "NVIDIA Profile Inspector",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Start NVIDIA Profile Inspector and apply changes to a profile",
+   "prerequisite_state": "NVIDIA Profile Inspector is not running",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Start `nvidiaProfileInspector.exe`",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "NVIDIA Profile Inspector main window appears"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select a profile from the profile box",
+         "ui_target": {
+            "element_name": "Profile Box",
+            "automation_id": null,
+            "hierarchical_path": "Main Window > Profile Box",
+            "element_type": "ComboBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The profile box opens a dropdown with available profiles"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Type a game or application profile name and press Enter to find the matching profile",
+         "ui_target": {
+            "element_name": "Search Field",
+            "automation_id": null,
+            "hierarchical_path": "Main Window > Search Field",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "GameProfile"
+         },
+         "expected_state_change": "The search field contains the typed text and the profile box updates to show matching profiles"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Use the search field or setting mode selector to find the setting you want to edit",
+         "ui_target": {
+            "element_name": "Setting Mode Selector",
+            "automation_id": null,
+            "hierarchical_path": "Main Window > Setting Mode Selector",
+            "element_type": "ComboBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The setting mode selector opens a dropdown with available modes"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Change values in the settings list and click **Apply Changes** to write the profile changes to the NVIDIA driver database",
+         "ui_target": {
+            "element_name": "Apply Changes",
+            "automation_id": null,
+            "hierarchical_path": "Main Window > Apply Changes",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The changes are applied and the profile is saved to the NVIDIA driver database"
+      }
+   ],
+   "_meta": {
+      "source_app": "NVIDIA Profile Inspector",
+      "app_key": "nvidia_profile_inspector",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "NVIDIA Profile Inspector",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:25:32Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

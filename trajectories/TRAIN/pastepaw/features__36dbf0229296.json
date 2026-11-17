@@ -1,0 +1,86 @@
+{
+   "app_metadata": {
+      "app_name": "PastePaw",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure PastePaw on a Windows system",
+   "prerequisite_state": "The user is at the command line or terminal",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install PastePaw via Winget",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install XueshiQiao.PastePaw"
+         },
+         "expected_state_change": "The installation command is typed into the terminal"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Press Enter to execute the installation command",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Enter"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "PastePaw is installed on the system"
+      }
+   ],
+   "_meta": {
+      "source_app": "PastePaw",
+      "app_key": "pastepaw",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Features",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:19:21Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,19 @@
+<!doctype html><html><head><meta charset='utf-8'><title>Hojaiga Test App</title>
+<style>.tab[aria-selected=true]{font-weight:bold}.hidden{display:none}</style></head><body>
+<h1 id='title'>Hojaiga Test App</h1>
+<input id='name' type='text' aria-label='Name'><button id='greet' aria-label='Submit greeting'>Greet</button><div id='greeting'></div>
+<label><input id='agree' type='checkbox' aria-label='I agree'> I agree</label><span id='agree_state'>off</span>
+<select id='color' aria-label='Color'><option value='red'>Red</option><option value='green'>Green</option><option value='blue'>Blue</option></select>
+<div role='tablist'><button class='tab' role='tab' id='tab_home' aria-selected='true' aria-label='Home tab'>Home</button><button class='tab' role='tab' id='tab_settings' aria-selected='false' aria-label='Settings tab'>Settings</button></div>
+<button id='openmodal' aria-label='Open modal'>Open Modal</button><div id='dialog' role='dialog' class='hidden'><input id='modaltext' aria-label='Modal note'><button id='confirm' aria-label='Confirm modal'>Confirm</button></div><div id='status'></div>
+<input id='search' aria-label='Search filter'><ul id='list'><li class='row'>item1 apple</li><li class='row'>item2 banana</li><li class='row'>item3 cherry</li></ul>
+<input id='newitem' aria-label='New item'><button id='add' aria-label='Add item'>Add</button>
+<script>
+greet.onclick=()=>{greeting.textContent='Hello '+ (name.value||'stranger');};
+agree.onchange=()=>{agree_state.textContent=agree.checked?'on':'off';};
+openmodal.onclick=()=>{dialog.classList.remove('hidden');};
+confirm.onclick=()=>{status.textContent='modal:'+modaltext.value; dialog.classList.add('hidden');};
+search.oninput=()=>{[...list.children].forEach(li=>li.style.display=li.textContent.toLowerCase().includes(search.value.toLowerCase())?'':'none');};
+add.onclick=()=>{if(newitem.value){const li=document.createElement('li');li.className='row';li.textContent=newitem.value;list.appendChild(li);newitem.value='';}};
+[...document.querySelectorAll('.tab')].forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected','false'));t.setAttribute('aria-selected','true');});
+</script></body></html>

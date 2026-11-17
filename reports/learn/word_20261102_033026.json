@@ -1,0 +1,107 @@
+{
+ "app": "word",
+ "started": "2026-11-02 03:30:31",
+ "phases": {
+  "read": {
+   "seconds": 2.0,
+   "level": "live-scanned"
+  },
+  "map": {
+   "ran": true,
+   "seconds": 403.7,
+   "level": "explored",
+   "commands": 2651,
+   "with_shortcut": 24,
+   "dialogs": 3,
+   "layout_controls": 958,
+   "state_variables": 38,
+   "frontier": {
+    "total": 168,
+    "by_status": {
+     "explored": 30,
+     "no_effect": 1,
+     "open": 128,
+     "unsafe": 9
+    },
+    "explorable": 159,
+    "explored_n": 31,
+    "explored_fraction": 0.195
+   }
+  },
+  "ask": {
+   "asked": 4,
+   "answered": 0,
+   "items": [
+    {
+     "q": "In word, how do I use 1 Document1?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about word (1 documents, 4 procedures, 0 shortcuts). How to open or use Document1 in Word. Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In word, how do I use 10?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about word (1 documents, 4 procedures, 0 shortcuts). how to use the number 10 in the application Word. Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In word, how do I use 100%?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about word (1 documents, 4 procedures, 0 shortcuts). how to use 100% in Word. Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In word, how do I use 11?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about word (1 documents, 4 procedures, 0 shortcuts). How to use the number 11 in the application Word. Reverse engineering or scanning it more would fill this in."
+    }
+   ],
+   "seconds": 22.8
+  },
+  "practice": {
+   "written": 5,
+   "tried": 5,
+   "proven_done": 0,
+   "kept_training_rows": 0,
+   "results": [
+    {
+     "task": "open word,Switch Windows > 1 Document1,Font Size > 10,View > 100%,Table > 1x1 Table,Save As > D:\\new_automation\\data\\practice\\word\\practice1.docx",
+     "status": "FAILED",
+     "seconds": 224.7,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'word': BLOCKED (window hwnd=134092), 15 verified-loop steps in 221.5s\n    - 'press One' -> DONE (PASS) [WEAK evidence: the UI changed, nothing "
+    },
+    {
+     "task": "open word,Switch Windows > 1 Document1,Font Size > 24,Table > 2x3 Table,Save As > D:\\new_automation\\data\\practice\\word\\practice2.docx",
+     "status": "FAILED",
+     "seconds": 70.3,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'word': BLOCKED, 10 verified-loop steps in 69.2s\n    - 'press Two' -> DONE (PASS) [WEAK evidence: the UI changed, nothing more was proven]\n    -"
+    },
+    {
+     "task": "open word,Switch Windows > 1 Document1,Font Size > 36,Table > 3x6 Table,Save As > D:\\new_automation\\data\\practice\\word\\practice3.docx",
+     "status": "FAILED",
+     "seconds": 99.6,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'word': BLOCKED (window hwnd=330780), 8 verified-loop steps in 98.7s\n    - 'press Three' -> DONE (PASS) [WEAK evidence: the UI changed, nothing "
+    },
+    {
+     "task": "open word,Switch Windows > 1 Document1,Font Size > 12,Table > 4x5 Table,Save As > D:\\new_automation\\data\\practice\\word\\practice4.docx",
+     "status": "FAILED",
+     "seconds": 127.6,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'word': BLOCKED (window hwnd=330780), 8 verified-loop steps in 126.5s\n    - 'press Four' -> DONE (PASS) [WEAK evidence: the UI changed, nothing "
+    },
+    {
+     "task": "open word,Switch Windows > 1 Document1,Font Size > 48,Table > 4x6 Table,Save As > D:\\new_automation\\data\\practice\\word\\practice5.docx",
+     "status": "FAILED",
+     "seconds": 62.1,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'word': BLOCKED, 10 verified-loop steps in 61.0s\n    - 'press Four' -> DONE (PASS) [WEAK evidence: the UI changed, nothing more was proven]\n    "
+    }
+   ],
+   "seconds": 595.5
+  }
+ },
+ "app_key": "word",
+ "exe": "",
+ "readiness": {
+  "knows_commands": true,
+  "answers_questions": "0/4",
+  "proven_tasks": "0/5",
+  "verdict": "not ready: nothing proven yet"
+ },
+ "seconds": 1029.2
+}

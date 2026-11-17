@@ -1,0 +1,33 @@
+=== CLAUDE CODE TERMINAL LAUNCH & ARCHITECTURE PROMPT (v2) ===
+
+Copy and paste the exact instructions below directly into Claude Code / Terminal:
+
+--------------------------------------------------------------------------------
+You are developing the Natural Intelligence (NI) Dual-Brain Meta-Controller.
+
+PROJECT SYSTEM OVERVIEW & DATA FLOW PIPELINE:
+We are solving the monolithic single-predictor issue in AI by building a human-like dual-brain controller:
+
+1. OUTER BRAIN TRAINING & EXECUTION:
+   - Reads multimodal streams across 5 curriculum phases (Text -> Graph -> Image -> Audio -> Video).
+   - Runs a Multi-Predictor Voting Ensemble (Predictor_Logic, Predictor_Pattern, Predictor_Verifier, Predictor_Exploratory) to prevent single-predictor points of failure.
+   - Generates output choices, consensus scores, and execution payloads.
+
+2. INNER BRAIN CONTINUOUS TRAINING DATASET:
+   - CRITICAL RULE: Outer Brain's outcomes and prediction streams serve directly as the continuous TRAINING DATASET for the Inner Brain.
+   - The Inner Brain continuously ingests these outcomes to perform human-like self-reasoning, questioning its own assumptions ("Why did this predictor win?", "Under what edge cases will this decision fail?").
+   - It distinguishes multiple dynamic factors (Reliability, Scalability, Adaptability, Truthfulness) and triggers JEV / developer execution tools to stress-test outcomes.
+   - It calculates meta-learning feedback to dynamically adjust Outer Brain weights.
+
+3. HARDWARE & VRAM CONSTRAINTS (RTX 3060 - 6GB VRAM):
+   - Enforce 4-bit NF4 quantization (`bitsandbytes`) and QLoRA adapters (r=8, alpha=16).
+   - Micro-batching with 16 gradient accumulation steps.
+   - 5-Phase curriculum training to stay under 5.5 GB VRAM.
+   - Dynamic 70/30 dataset rotation with seed-shifting logic.
+
+RUN IN TERMINAL:
+Execute the dual-brain pipeline runner directly in your terminal:
+$ python3 train_natural_intelligence_v2.py
+
+All core Python files (`dataset_controller_v2.py`, `outer_brain_ensemble_v2.py`, `inner_brain_kernel_v2.py`, `train_natural_intelligence_v2.py`) and rules (`CLAUDE_NATURAL_INTELLIGENCE_RULES_v3.md`) have been updated and validated.
+--------------------------------------------------------------------------------

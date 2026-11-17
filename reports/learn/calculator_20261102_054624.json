@@ -1,0 +1,116 @@
+{
+ "app": "calculator",
+ "started": "2026-11-02 05:46:28",
+ "phases": {
+  "read": {
+   "store": {
+    "Microsoft.WindowsCalculator": {
+     "key": "calculator",
+     "ui_words": 1166,
+     "views": 32,
+     "chunks": 44
+    }
+   },
+   "seconds": 10.1,
+   "level": "explored"
+  },
+  "map": {
+   "ran": true,
+   "seconds": 46.0,
+   "level": "explored",
+   "commands": 62,
+   "with_shortcut": 0,
+   "dialogs": 0,
+   "layout_controls": 36,
+   "state_variables": 1,
+   "frontier": {
+    "total": 37,
+    "by_status": {
+     "explored": 25,
+     "no_effect": 5,
+     "open": 2,
+     "skipped": 1,
+     "unsafe": 4
+    },
+    "explorable": 32,
+    "explored_n": 30,
+    "explored_fraction": 0.938
+   }
+  },
+  "ask": {
+   "asked": 4,
+   "answered": 4,
+   "items": [
+    {
+     "q": "In calculator, how do I use Equals?",
+     "status": "ANSWERED",
+     "answer": "(the model's answer was not used because it cited nothing) Here is what I know (this is the evidence itself):\n- [1] commands found in the app: Turn calculation history on or off; Scientific Calculator; Standard Calculator; Programmer Calcul"
+    },
+    {
+     "q": "In calculator, how do I use Seven?",
+     "status": "ANSWERED",
+     "answer": "To use Seven in the calculator, you can simply type '7' on your keyboard [4]. If you are referring to a specific mode or function related to 'Seven', more context would be needed as the evidence does not provide detailed instructions for us"
+    },
+    {
+     "q": "In calculator, how do I use Multiply by?",
+     "status": "ANSWERED",
+     "answer": "To use Multiply by in the Calculator, you should first ensure the calculator is in **Standard** mode [5]. Once in Standard mode, you can enter the numbers and use the multiply button (usually labeled with an 'x' or '*') to multiply the numb"
+    },
+    {
+     "q": "In calculator, how do I use Six?",
+     "status": "ANSWERED",
+     "answer": "In the calculator, to use Six, you need to first switch to the appropriate mode. The evidence indicates that Six is one of the modes available in the calculator [1]. To switch to the mode that includes Six, you can press Alt + 1 to switch t"
+    }
+   ],
+   "seconds": 17.7
+  },
+  "practice": {
+   "written": 5,
+   "tried": 5,
+   "proven_done": 1,
+   "kept_training_rows": 0,
+   "results": [
+    {
+     "task": "open calculator, press Seven, Plus, Two, Equals, the app should show 9.",
+     "status": "FAILED",
+     "seconds": 230.3,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'calculator': NEEDS_HUMAN (window hwnd=6424768), 3 verified-loop steps in 214.0s\n    - 'click Seven' -> NOT DONE (HITL)\n    - 'click Plus' -> NO"
+    },
+    {
+     "task": "open calculator, press Five, Multiply by, Six, Minus, Eight, Equals, the app should show 22.",
+     "status": "FAILED",
+     "seconds": 47.6,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'calculator': NEEDS_HUMAN (window hwnd=7867370), 6 verified-loop steps in 26.1s\n    - 'create a new blank document' -> DONE (PASS) [WEAK evidenc"
+    },
+    {
+     "task": "open calculator, press Four, Factorial, Plus, Euler's number, Natural log, Equals, the app should show 25.",
+     "status": "FAILED",
+     "seconds": 62.9,
+     "proof": "[{'window': 3475760, 'ok': False, 'why': 'missing or wrong: 25 (display) [number]', 'items': [{'content': '25', 'where': 'display', 'format': 'number', 'found': False}], 'sees': '- The screenshot shows the Microsoft Calculator app.\\n- The page title is \"Calculator.\"\\n- The headings visible are \"Stan"
+    },
+    {
+     "task": "open calculator, press Nine, X to the exponent, Three, Divide by, Three, Equals, the app should show 243.",
+     "status": "DONE",
+     "seconds": 76.0,
+     "proof": "[{'window': 2098230, 'ok': True, 'why': 'all 1 asked item(s) found', 'items': [{'content': '243', 'where': 'display', 'format': 'numeric', 'found': True}], 'sees': '- The screenshot shows the Microsoft Calculator app.\\n- The page title is \"Calculator\".\\n- The headings visible are \"Standard\" and \"His"
+    },
+    {
+     "task": "open calculator, press One, Five, Memory store, Plus, Seven, Memory add, Memory recall, Multiply by, Two, Equals, the app should show 44.",
+     "status": "FAILED",
+     "seconds": 67.4,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'calculator': BLOCKED (window hwnd=4720198), 5 verified-loop steps in 36.7s\n    - 'press One, Five, Memory store, Plus, Seven, Memory add, Memor"
+    }
+   ],
+   "seconds": 495.0
+  }
+ },
+ "app_key": "calculator",
+ "exe": "C:\\Program Files\\WindowsApps\\Microsoft.WindowsCalculator_11.2607.0.0_x64__8wekyb3d8bbwe\\CalculatorApp.exe",
+ "readiness": {
+  "knows_commands": true,
+  "answers_questions": "4/4",
+  "proven_tasks": "1/5",
+  "verdict": "partly ready: it does some tasks, check the failures"
+ },
+ "seconds": 573.5
+}

@@ -1,0 +1,161 @@
+08:30:54 NI run auto_cpu_062 on CPU; hours=2.0 smoke=False
+08:30:54 explicit task list: ['enc2/audio/esc50']
+08:30:54 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+08:30:54 [data] enc2/audio/esc50: n=2000 C=50 D=2304 shards=1
+08:33:36 [enc2/audio/esc50] vote=0.973 uniform=0.970 best1=0.981 n_val=592 vram=0.00GB 162s
+08:34:07 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 592, "n_val": 121, "base_rate": 0.9586777091026306, "inner": {"auc": 0.9267241379310345, "ece": 0.025145743380893364, "brier": 0.019935354590415955, "acc80": 0.9895833134651184}, "outer_conf": {"auc": 0.9120689655172414, "ece": 0.0431639059516024, "brier": 0.023956134915351868, "acc80": 0.9895833134651184}}
+08:34:07 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+08:37:14 [enc2/audio/esc50] vote=0.981 uniform=0.979 best1=0.979 n_val=581 vram=0.00GB 187s | grade=0.976 inner_auc=0.500 vs conf_auc=0.988
+08:37:34 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+08:40:39 [enc2/audio/esc50] vote=0.973 uniform=0.975 best1=0.975 n_val=592 vram=0.00GB 186s | grade=0.976 inner_auc=0.981 vs conf_auc=0.967
+08:41:03 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+08:44:09 [enc2/audio/esc50] vote=0.987 uniform=0.987 best1=0.989 n_val=610 vram=0.00GB 186s | grade=0.979 inner_auc=0.887 vs conf_auc=0.867
+08:44:30 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+08:47:14 [enc2/audio/esc50] vote=0.973 uniform=0.971 best1=0.975 n_val=594 vram=0.00GB 164s | grade=0.964 inner_auc=0.974 vs conf_auc=0.998
+08:47:29 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+22:54:39 NI run auto_cpu_062 on CPU; hours=2.0 smoke=False
+22:54:39 explicit task list: ['enc2/audio/esc50']
+22:54:55 [resume] from checkpoint: next cycle 5, rounds 5, 5 metric rows, inner net restored
+22:54:55 ===== CYCLE 5 (OUTER-ONLY BOOTSTRAP) =====
+22:54:56 [data] enc2/audio/esc50: n=2000 C=50 D=2304 shards=1
+22:58:21 [enc2/audio/esc50] vote=0.977 uniform=0.977 best1=0.979 n_val=577 vram=0.00GB 205s
+22:58:54 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 5, "n_records": 577, "n_val": 129, "base_rate": 0.9844961166381836, "inner": {"auc": 0.5078740157480315, "ece": 0.01265924660734428, "brier": 0.010249949060380459, "acc80": 0.9902912378311157}, "outer_conf": {"auc": 0.9881889763779528, "ece": 0.02574130892753601, "brier": 0.01105211116373539, "acc80": 1.0}}
+22:58:54 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+23:02:34 [enc2/audio/esc50] vote=0.965 uniform=0.962 best1=0.969 n_val=634 vram=0.00GB 220s | grade=0.969 inner_auc=0.827 vs conf_auc=0.953
+23:03:00 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+23:06:51 [enc2/audio/esc50] vote=0.971 uniform=0.971 best1=0.969 n_val=620 vram=0.00GB 230s | grade=0.962 inner_auc=0.901 vs conf_auc=0.911
+23:07:18 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+23:10:57 [enc2/audio/esc50] vote=0.973 uniform=0.970 best1=0.975 n_val=591 vram=0.00GB 219s | grade=0.959 inner_auc=0.972 vs conf_auc=0.971
+23:11:24 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+23:15:26 [enc2/audio/esc50] vote=0.972 uniform=0.967 best1=0.972 n_val=610 vram=0.00GB 242s | grade=0.987 inner_auc=0.946 vs conf_auc=0.940
+23:15:57 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+23:20:22 [enc2/audio/esc50] vote=0.967 uniform=0.967 best1=0.971 n_val=581 vram=0.00GB 265s | grade=0.977 inner_auc=0.952 vs conf_auc=0.946
+23:20:53 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+23:25:30 [enc2/audio/esc50] vote=0.969 uniform=0.969 best1=0.969 n_val=549 vram=0.00GB 277s | grade=0.975 inner_auc=0.957 vs conf_auc=0.960
+23:26:03 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+23:30:39 [enc2/audio/esc50] vote=0.977 uniform=0.976 best1=0.979 n_val=615 vram=0.00GB 276s | grade=0.969 inner_auc=0.962 vs conf_auc=0.966
+23:31:11 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+23:35:37 [enc2/audio/esc50] vote=0.981 uniform=0.979 best1=0.986 n_val=582 vram=0.00GB 266s | grade=0.959 inner_auc=0.939 vs conf_auc=0.939
+23:36:09 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+23:40:52 [enc2/audio/esc50] vote=0.988 uniform=0.988 best1=0.985 n_val=592 vram=0.00GB 283s | grade=0.981 inner_auc=0.967 vs conf_auc=0.956
+23:41:22 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+23:45:51 [enc2/audio/esc50] vote=0.983 uniform=0.981 best1=0.988 n_val=587 vram=0.00GB 268s | grade=0.976 inner_auc=0.971 vs conf_auc=0.967
+23:46:24 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+23:50:55 [enc2/audio/esc50] vote=0.966 uniform=0.965 best1=0.971 n_val=594 vram=0.00GB 271s | grade=0.960 inner_auc=0.951 vs conf_auc=0.959
+11:38:27 RUN COMPLETE
+06:22:34 NI run auto_cpu_062 on CPU; hours=2.0 smoke=False
+06:22:34 explicit task list: ['enc2/audio/esc50']
+06:22:38 [resume] from checkpoint: next cycle 17, rounds 17, 17 metric rows, inner net restored
+06:22:38 ===== CYCLE 17 (OUTER-ONLY BOOTSTRAP) =====
+06:22:38 [data] enc2/audio/esc50: n=2000 C=50 D=2304 shards=1
+06:24:26 [enc2/audio/esc50] vote=0.969 uniform=0.964 best1=0.974 n_val=614 vram=0.00GB 108s
+06:24:49 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 17, "n_records": 614, "n_val": 136, "base_rate": 0.9852941036224365, "inner": {"auc": 1.0, "ece": 0.013154383310500313, "brier": 0.004382971674203873, "acc80": 1.0}, "outer_conf": {"auc": 0.9925373134328358, "ece": 0.02752410839585697, "brier": 0.010464060120284557, "acc80": 1.0}}
+06:24:49 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+06:27:19 [enc2/audio/esc50] vote=0.970 uniform=0.966 best1=0.971 n_val=610 vram=0.00GB 150s | grade=0.976 inner_auc=0.837 vs conf_auc=0.893
+06:27:38 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+06:30:20 [enc2/audio/esc50] vote=0.971 uniform=0.966 best1=0.973 n_val=595 vram=0.00GB 162s | grade=0.982 inner_auc=0.968 vs conf_auc=0.963
+06:30:37 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+06:33:29 [enc2/audio/esc50] vote=0.974 uniform=0.976 best1=0.976 n_val=584 vram=0.00GB 172s | grade=0.977 inner_auc=0.977 vs conf_auc=0.977
+06:33:45 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+06:36:31 [enc2/audio/esc50] vote=0.967 uniform=0.967 best1=0.972 n_val=598 vram=0.00GB 166s | grade=0.972 inner_auc=0.973 vs conf_auc=0.959
+06:36:51 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+06:39:57 [enc2/audio/esc50] vote=0.964 uniform=0.964 best1=0.965 n_val=576 vram=0.00GB 186s | grade=0.977 inner_auc=0.950 vs conf_auc=0.929
+06:40:24 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+06:43:22 [enc2/audio/esc50] vote=0.981 uniform=0.979 best1=0.983 n_val=580 vram=0.00GB 178s | grade=0.971 inner_auc=0.960 vs conf_auc=0.963
+06:43:47 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+06:46:56 [enc2/audio/esc50] vote=0.966 uniform=0.966 best1=0.973 n_val=583 vram=0.00GB 189s | grade=0.968 inner_auc=0.861 vs conf_auc=0.908
+06:47:17 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+06:50:25 [enc2/audio/esc50] vote=0.976 uniform=0.969 best1=0.985 n_val=588 vram=0.00GB 189s | grade=0.966 inner_auc=0.978 vs conf_auc=0.966
+06:50:46 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+06:53:49 [enc2/audio/esc50] vote=0.974 uniform=0.971 best1=0.977 n_val=618 vram=0.00GB 183s | grade=0.974 inner_auc=0.952 vs conf_auc=0.915
+06:54:13 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+06:57:30 [enc2/audio/esc50] vote=0.984 uniform=0.981 best1=0.984 n_val=573 vram=0.00GB 197s | grade=0.976 inner_auc=0.892 vs conf_auc=0.942
+06:57:54 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+07:00:54 [enc2/audio/esc50] vote=0.976 uniform=0.972 best1=0.979 n_val=576 vram=0.00GB 180s | grade=0.977 inner_auc=0.942 vs conf_auc=0.953
+07:01:16 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+07:04:28 [enc2/audio/esc50] vote=0.967 uniform=0.965 best1=0.968 n_val=630 vram=0.00GB 192s | grade=0.974 inner_auc=0.977 vs conf_auc=0.952
+07:04:53 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+07:08:03 [enc2/audio/esc50] vote=0.981 uniform=0.978 best1=0.981 n_val=581 vram=0.00GB 190s | grade=0.971 inner_auc=0.978 vs conf_auc=0.997
+07:08:25 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+07:11:30 [enc2/audio/esc50] vote=0.975 uniform=0.966 best1=0.973 n_val=593 vram=0.00GB 185s | grade=0.971 inner_auc=0.889 vs conf_auc=0.893
+07:11:56 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+07:15:21 [enc2/audio/esc50] vote=0.976 uniform=0.971 best1=0.972 n_val=616 vram=0.00GB 205s | grade=0.970 inner_auc=0.565 vs conf_auc=0.900
+07:15:46 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+07:19:06 [enc2/audio/esc50] vote=0.979 uniform=0.974 best1=0.977 n_val=568 vram=0.00GB 200s | grade=0.981 inner_auc=0.635 vs conf_auc=0.893
+07:19:30 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+07:22:54 [enc2/audio/esc50] vote=0.987 uniform=0.987 best1=0.987 n_val=604 vram=0.00GB 203s | grade=0.970 inner_auc=0.872 vs conf_auc=0.912
+07:23:18 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+07:26:14 [enc2/audio/esc50] vote=0.975 uniform=0.973 best1=0.975 n_val=589 vram=0.00GB 175s | grade=0.969 inner_auc=0.694 vs conf_auc=0.799
+07:26:37 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+07:29:55 [enc2/audio/esc50] vote=0.977 uniform=0.974 best1=0.975 n_val=644 vram=0.00GB 197s | grade=0.979 inner_auc=0.839 vs conf_auc=0.879
+07:30:17 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+07:33:38 [enc2/audio/esc50] vote=0.975 uniform=0.973 best1=0.972 n_val=636 vram=0.00GB 201s | grade=0.963 inner_auc=0.821 vs conf_auc=0.877
+07:33:58 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+07:36:53 [enc2/audio/esc50] vote=0.979 uniform=0.981 best1=0.982 n_val=626 vram=0.00GB 175s | grade=0.976 inner_auc=0.951 vs conf_auc=0.958
+07:37:12 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+07:40:05 [enc2/audio/esc50] vote=0.974 uniform=0.974 best1=0.976 n_val=611 vram=0.00GB 173s | grade=0.976 inner_auc=0.839 vs conf_auc=0.939
+07:40:28 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+07:43:20 [enc2/audio/esc50] vote=0.978 uniform=0.973 best1=0.978 n_val=583 vram=0.00GB 172s | grade=0.982 inner_auc=0.877 vs conf_auc=0.987
+07:43:43 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+07:46:45 [enc2/audio/esc50] vote=0.974 uniform=0.975 best1=0.974 n_val=570 vram=0.00GB 182s | grade=0.967 inner_auc=0.866 vs conf_auc=0.924
+07:47:07 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+07:50:07 [enc2/audio/esc50] vote=0.979 uniform=0.972 best1=0.983 n_val=580 vram=0.00GB 180s | grade=0.961 inner_auc=0.903 vs conf_auc=0.908
+07:50:28 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+07:53:56 [enc2/audio/esc50] vote=0.960 uniform=0.958 best1=0.961 n_val=594 vram=0.00GB 207s | grade=0.960 inner_auc=0.858 vs conf_auc=0.885
+07:54:18 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+07:57:14 [enc2/audio/esc50] vote=0.978 uniform=0.974 best1=0.979 n_val=579 vram=0.00GB 176s | grade=0.968 inner_auc=0.982 vs conf_auc=0.952
+07:57:34 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+08:00:45 [enc2/audio/esc50] vote=0.971 uniform=0.965 best1=0.971 n_val=664 vram=0.00GB 191s | grade=0.973 inner_auc=0.918 vs conf_auc=0.971
+08:01:11 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+08:04:51 [enc2/audio/esc50] vote=0.981 uniform=0.979 best1=0.981 n_val=581 vram=0.00GB 221s | grade=0.978 inner_auc=nan vs conf_auc=nan
+08:05:26 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+08:08:31 [enc2/audio/esc50] vote=0.963 uniform=0.964 best1=0.968 n_val=618 vram=0.00GB 185s | grade=0.968 inner_auc=0.894 vs conf_auc=0.958
+08:08:54 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+08:11:59 [enc2/audio/esc50] vote=0.975 uniform=0.972 best1=0.974 n_val=641 vram=0.00GB 186s | grade=0.977 inner_auc=0.960 vs conf_auc=0.968
+08:12:23 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+08:15:39 [enc2/audio/esc50] vote=0.976 uniform=0.973 best1=0.971 n_val=619 vram=0.00GB 197s | grade=0.981 inner_auc=0.745 vs conf_auc=0.849
+08:15:59 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+08:19:02 [enc2/audio/esc50] vote=0.969 uniform=0.967 best1=0.965 n_val=545 vram=0.00GB 183s | grade=0.966 inner_auc=0.992 vs conf_auc=0.988
+08:19:26 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+08:22:24 [enc2/audio/esc50] vote=0.958 uniform=0.955 best1=0.960 n_val=574 vram=0.00GB 178s | grade=0.970 inner_auc=0.812 vs conf_auc=0.796
+08:22:53 RUN COMPLETE
+23:08:41 NI run auto_cpu_062 on CPU; hours=2.0 smoke=False
+23:08:41 explicit task list: ['enc2/audio/esc50']
+23:08:53 [resume] from checkpoint: next cycle 52, rounds 52, 52 metric rows, inner net restored
+23:08:53 ===== CYCLE 52 (OUTER-ONLY BOOTSTRAP) =====
+23:08:54 [data] enc2/audio/esc50: n=2000 C=50 D=2304 shards=1
+23:11:33 [enc2/audio/esc50] vote=0.967 uniform=0.969 best1=0.967 n_val=576 vram=0.00GB 160s
+23:12:03 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 52, "n_records": 576, "n_val": 114, "base_rate": 0.9736841917037964, "inner": {"auc": 0.8288288288288288, "ece": 0.026045575999377065, "brier": 0.0229532178491354, "acc80": 0.9890109896659851}, "outer_conf": {"auc": 0.9009009009009009, "ece": 0.018925334800753674, "brier": 0.020622344687581062, "acc80": 0.9890109896659851}}
+23:12:03 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+23:14:47 [enc2/audio/esc50] vote=0.979 uniform=0.972 best1=0.970 n_val=575 vram=0.00GB 164s | grade=0.971 inner_auc=0.892 vs conf_auc=0.899
+23:15:08 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+23:18:01 [enc2/audio/esc50] vote=0.975 uniform=0.971 best1=0.979 n_val=650 vram=0.00GB 173s | grade=0.973 inner_auc=0.925 vs conf_auc=0.923
+23:18:24 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+23:21:09 [enc2/audio/esc50] vote=0.968 uniform=0.971 best1=0.969 n_val=620 vram=0.00GB 165s | grade=0.978 inner_auc=0.923 vs conf_auc=0.933
+23:21:33 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+23:24:29 [enc2/audio/esc50] vote=0.983 uniform=0.983 best1=0.985 n_val=587 vram=0.00GB 176s | grade=0.982 inner_auc=0.966 vs conf_auc=0.966
+23:24:50 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+23:27:36 [enc2/audio/esc50] vote=0.977 uniform=0.973 best1=0.977 n_val=563 vram=0.00GB 166s | grade=0.977 inner_auc=0.947 vs conf_auc=0.955
+23:27:59 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+23:30:51 [enc2/audio/esc50] vote=0.987 uniform=0.984 best1=0.987 n_val=637 vram=0.00GB 173s | grade=0.986 inner_auc=0.868 vs conf_auc=0.831
+23:31:11 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+23:33:59 [enc2/audio/esc50] vote=0.980 uniform=0.973 best1=0.978 n_val=640 vram=0.00GB 167s | grade=0.979 inner_auc=0.371 vs conf_auc=0.613
+23:34:20 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+23:37:14 [enc2/audio/esc50] vote=0.977 uniform=0.973 best1=0.978 n_val=621 vram=0.00GB 174s | grade=0.978 inner_auc=0.972 vs conf_auc=0.965
+23:37:33 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+23:53:22 NI run auto_cpu_062 on CPU; hours=2.0 smoke=False
+23:53:22 explicit task list: ['enc2/audio/esc50']
+23:53:34 [resume] from checkpoint: next cycle 61, rounds 61, 61 metric rows, inner net restored
+23:53:34 ===== CYCLE 61 (OUTER-ONLY BOOTSTRAP) =====
+23:53:35 [data] enc2/audio/esc50: n=2000 C=50 D=2304 shards=1
+23:55:57 [enc2/audio/esc50] vote=0.986 uniform=0.979 best1=0.986 n_val=622 vram=0.00GB 142s
+23:56:20 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 61, "n_records": 622, "n_val": 145, "base_rate": 0.9862068891525269, "inner": {"auc": 0.9965034965034965, "ece": 0.03615963144292091, "brier": 0.010389787144958973, "acc80": 1.0}, "outer_conf": {"auc": 1.0, "ece": 0.03625517004522784, "brier": 0.009748593904078007, "acc80": 1.0}}
+23:56:20 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+23:59:02 [enc2/audio/esc50] vote=0.976 uniform=0.977 best1=0.979 n_val=577 vram=0.00GB 162s | grade=0.983 inner_auc=0.985 vs conf_auc=0.965
+23:59:19 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+00:02:06 [enc2/audio/esc50] vote=0.974 uniform=0.975 best1=0.975 n_val=608 vram=0.00GB 167s | grade=0.973 inner_auc=0.956 vs conf_auc=0.978
+00:02:24 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+00:05:01 [enc2/audio/esc50] vote=0.967 uniform=0.965 best1=0.969 n_val=543 vram=0.00GB 156s | grade=0.969 inner_auc=0.949 vs conf_auc=0.966
+00:05:21 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+00:08:11 [enc2/audio/esc50] vote=0.975 uniform=0.972 best1=0.973 n_val=602 vram=0.00GB 170s | grade=0.972 inner_auc=0.961 vs conf_auc=0.969
+00:08:32 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====

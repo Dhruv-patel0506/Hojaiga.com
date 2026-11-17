@@ -1,0 +1,137 @@
+{
+   "app_metadata": {
+      "app_name": "Nepali Date Widget",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure and interact with the Nepali Date Widget",
+   "prerequisite_state": "Nepali Date Widget is installed and running on the Windows taskbar",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Right-click the Nepali Date Widget to unlock its position",
+         "ui_target": {
+            "element_name": "Right-click context menu",
+            "automation_id": null,
+            "hierarchical_path": "Right-click > Unlock Position",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The widget becomes draggable and can be moved to a preferred location on the screen or taskbar"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Right-click the Nepali Date Widget again to lock its position",
+         "ui_target": {
+            "element_name": "Right-click context menu",
+            "automation_id": null,
+            "hierarchical_path": "Right-click > Lock Position",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The widget becomes click-through and fixed in its current position"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Left-click the Nepali Date Widget to open the interactive Bikram Sambat Calendar",
+         "ui_target": {
+            "element_name": "Nepali Date Widget",
+            "automation_id": null,
+            "hierarchical_path": "Taskbar > Nepali Date Widget",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A full Bikram Sambat Calendar popup appears with month navigation, day highlighting, and dual date display"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Right-click the Nepali Date Widget to access settings",
+         "ui_target": {
+            "element_name": "Right-click context menu",
+            "automation_id": null,
+            "hierarchical_path": "Right-click > Settings",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A context menu appears with options to run at startup, show day of week, switch themes, and check for updates"
+      }
+   ],
+   "_meta": {
+      "source_app": "Nepali Date Widget",
+      "app_key": "nepali_date_widget",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Tithify — Nepali Date Windows Taskbar Widget",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:25:35Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

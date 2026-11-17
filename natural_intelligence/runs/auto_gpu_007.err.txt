@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 261, in <module>
+    main()
+    ~~~~^^
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 247, in main
+    r = inner.train(cycle, steps=800)
+  File "D:\new_automation\natural_intelligence\ni_inner.py", line 132, in train
+    l = vloss()
+  File "D:\new_automation\natural_intelligence\ni_inner.py", line 123, in vloss
+    return Fn.binary_cross_entropy_with_logits(self.net(Xv), yv).item()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+RuntimeError: CUDA error: an illegal memory access was encountered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+

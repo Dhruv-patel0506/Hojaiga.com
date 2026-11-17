@@ -1,0 +1,277 @@
+{
+   "app_metadata": {
+      "app_name": "vLabeler",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Start a new project and configure it using the GUI",
+   "prerequisite_state": "vLabeler application is open and the user is on the start page",
+   "total_steps": 9,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click 'New project...'",
+         "ui_target": {
+            "element_name": "New project",
+            "automation_id": null,
+            "hierarchical_path": "Start page > New project",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'New project' dialog opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select a folder containing your sample files as 'Sample Directory'",
+         "ui_target": {
+            "element_name": "Sample Directory",
+            "automation_id": null,
+            "hierarchical_path": "New project dialog > Sample Directory",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "C:\\path\\to\\sample\\files"
+         },
+         "expected_state_change": "The path is entered into the 'Sample Directory' field"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Change 'Project name' if desired",
+         "ui_target": {
+            "element_name": "Project name",
+            "automation_id": null,
+            "hierarchical_path": "New project dialog > Project name",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "MyNewProject"
+         },
+         "expected_state_change": "The project name is changed to 'MyNewProject'"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Select a labeler",
+         "ui_target": {
+            "element_name": "Labeler",
+            "automation_id": null,
+            "hierarchical_path": "New project dialog > Labeler",
+            "element_type": "ComboBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'Labeler' dropdown opens"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Select 'UTAU oto labeler'",
+         "ui_target": {
+            "element_name": "UTAU oto labeler",
+            "automation_id": null,
+            "hierarchical_path": "New project dialog > Labeler > UTAU oto labeler",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'UTAU oto labeler' is selected"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Select 'File' as the way to create the project",
+         "ui_target": {
+            "element_name": "File",
+            "automation_id": null,
+            "hierarchical_path": "New project dialog > Way to create project > File",
+            "element_type": "RadioButton",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'File' option is selected"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Set the file path",
+         "ui_target": {
+            "element_name": "File path",
+            "automation_id": null,
+            "hierarchical_path": "New project dialog > File path",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "C:\\path\\to\\sample\\file.oto"
+         },
+         "expected_state_change": "The file path is set to 'C:\\path\\to\\sample\\file.oto'"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Click 'Finish'",
+         "ui_target": {
+            "element_name": "Finish",
+            "automation_id": null,
+            "hierarchical_path": "New project dialog > Finish",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The project is created and the editor opens"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Click 'Export' in the menu to get the edited label file",
+         "ui_target": {
+            "element_name": "Export",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Export",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The label file is exported"
+      }
+   ],
+   "_meta": {
+      "source_app": "vlabeler",
+      "app_key": "vlabeler",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "vLabeler",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:01:31Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,115 @@
+{
+   "app_metadata": {
+      "app_name": "ProtonSearch",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and launch ProtonSearch",
+   "prerequisite_state": "No specific application state required",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Run the installation script in Windows PowerShell",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "curl.exe -fsSL https://raw.githubusercontent.com/PranshulSoni/protonsearch/main/scripts/install.ps1 | powershell -NoProfile -ExecutionPolicy Bypass -"
+         },
+         "expected_state_change": "The installation script is downloaded and executed in PowerShell"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Press Enter to execute the script",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Enter"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The latest ProtonSearch release is downloaded and the Windows installer is opened"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Launch ProtonSearch",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "ProtonSearch"
+         },
+         "expected_state_change": "ProtonSearch application window opens"
+      }
+   ],
+   "_meta": {
+      "source_app": "OmniSearch",
+      "app_key": "omnisearch",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "Why ProtonSearch?",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:34:45Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

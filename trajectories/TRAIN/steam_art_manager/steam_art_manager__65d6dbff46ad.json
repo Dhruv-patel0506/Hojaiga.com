@@ -1,0 +1,221 @@
+{
+   "app_metadata": {
+      "app_name": "Steam Art Manager",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Set up and use Steam Art Manager to manage game artwork",
+   "prerequisite_state": "Steam Art Manager is installed and open on its main window",
+   "total_steps": 7,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open Steam Art Manager",
+         "ui_target": {
+            "element_name": "Steam Art Manager",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Window",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Steam Art Manager main window is visible"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click the 'Set API Key' button",
+         "ui_target": {
+            "element_name": "Set API Key",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Set API Key",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The API key input field and save button appear"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Type the SteamGridDB API key into the input field",
+         "ui_target": {
+            "element_name": "API Key Input Field",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Set API Key > API Key Input Field",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "your_api_key_here"
+         },
+         "expected_state_change": "The API key is entered into the input field"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click the 'Save' button",
+         "ui_target": {
+            "element_name": "Save",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Set API Key > Save",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The API key is saved and the Set API Key button is disabled"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Browse through the images for a game",
+         "ui_target": {
+            "element_name": "Browse Images",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Browse Images",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The SteamGridDB images for the selected game are displayed"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Click the 'Upload Your Own!' button",
+         "ui_target": {
+            "element_name": "Upload Your Own!",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Upload Your Own!",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A file dialog opens to select an image file"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Click the 'Export Zip' button",
+         "ui_target": {
+            "element_name": "Export Zip",
+            "automation_id": null,
+            "hierarchical_path": "Tools window > Export Zip",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A file dialog opens to select a save location for the zip file"
+      }
+   ],
+   "_meta": {
+      "source_app": "Steam Art Manager",
+      "app_key": "steam_art_manager",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Steam Art Manager",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:50:05Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

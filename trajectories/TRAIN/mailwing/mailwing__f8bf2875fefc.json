@@ -1,0 +1,196 @@
+{
+   "app_metadata": {
+      "app_name": "Mailwing",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Add a new account to Mailwing",
+   "prerequisite_state": "Mailwing is open and the sidebar is empty",
+   "total_steps": 6,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click the **+** button at the bottom of the sidebar",
+         "ui_target": {
+            "element_name": "+",
+            "automation_id": null,
+            "hierarchical_path": "Sidebar > Bottom > Add Account",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The **+** button is clicked and a native popup menu appears"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Choose a provider from the native popup menu",
+         "ui_target": {
+            "element_name": "Provider",
+            "automation_id": null,
+            "hierarchical_path": "Popup Menu > Provider",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The provider menu is selected and the sign-in page for the chosen provider opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Sign in through the page that opens; sessions are isolated per account",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "username@example.com"
+         },
+         "expected_state_change": "The username field is filled with the provided username"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Sign in through the page that opens; sessions are isolated per account",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "password"
+         },
+         "expected_state_change": "The password field is filled with the provided password"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Sign in through the page that opens; sessions are isolated per account",
+         "ui_target": {
+            "element_name": "Sign In",
+            "automation_id": null,
+            "hierarchical_path": "Sign-in Form > Sign In",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The account is signed in and the avatar and live unread count appear automatically after login"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Right-click any avatar to change its accent colour or remove the account",
+         "ui_target": {
+            "element_name": "Avatar",
+            "automation_id": null,
+            "hierarchical_path": "Sidebar > Account Avatar",
+            "element_type": "ListItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A context menu appears with options to change the accent colour or remove the account"
+      }
+   ],
+   "_meta": {
+      "source_app": "Mailwing",
+      "app_key": "mailwing",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Mailwing",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:34:15Z",
+      "schema_warnings": [
+         "step3_ungrounded_target",
+         "step4_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

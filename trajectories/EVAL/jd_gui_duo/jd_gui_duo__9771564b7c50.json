@@ -1,0 +1,314 @@
+{
+   "app_metadata": {
+      "app_name": "JD-GUI Duo",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Open JD-GUI Duo and explore its features",
+   "prerequisite_state": "JD-GUI Duo is installed and launched",
+   "total_steps": 10,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open JD-GUI Duo",
+         "ui_target": {
+            "element_name": "JD-GUI Duo",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Window",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "JD-GUI Duo window is visible"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Open the File menu",
+         "ui_target": {
+            "element_name": "File",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The File dropdown opens showing New, Open, Save"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Choose Open Type",
+         "ui_target": {
+            "element_name": "Open Type",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File > Open Type",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A dialog appears to select a class or method to decompile"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Select a class or method to decompile",
+         "ui_target": {
+            "element_name": "Class or Method",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "java.util.ArrayList"
+         },
+         "expected_state_change": "The selected class or method is decompiled and displayed"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Open the Outline tree",
+         "ui_target": {
+            "element_name": "Outline tree",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TreeView",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Outline tree is visible and shows the decompiled methods"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Select a method from the Outline tree",
+         "ui_target": {
+            "element_name": "Method in Outline tree",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TreeNode",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected method is decompiled and displayed"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Open the Search dialog",
+         "ui_target": {
+            "element_name": "Search",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Search",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Search dialog is visible"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Enter a search term in the Search dialog",
+         "ui_target": {
+            "element_name": "Search term",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "ArrayList"
+         },
+         "expected_state_change": "Search results are displayed"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Open the Compare dialog",
+         "ui_target": {
+            "element_name": "Compare",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Compare",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Compare dialog is visible"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Select two files to compare",
+         "ui_target": {
+            "element_name": "File 1 and File 2",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "FileSelector",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected files are compared and differences are displayed"
+      }
+   ],
+   "_meta": {
+      "source_app": "JD-GUI Duo",
+      "app_key": "jd_gui_duo",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "jd-gui-duo",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T19:01:41Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

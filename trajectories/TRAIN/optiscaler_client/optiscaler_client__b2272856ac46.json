@@ -1,0 +1,195 @@
+{
+   "app_metadata": {
+      "app_name": "Optiscaler Client",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide the user through the initial setup and usage of Optiscaler Client.",
+   "prerequisite_state": "Optiscaler Client application is not running.",
+   "total_steps": 6,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click 'Scan Games' to automatically detect installed titles from all supported platforms.",
+         "ui_target": {
+            "element_name": "Scan Games",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Scan Games button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The main window updates to show detected games."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click 'Manage' next to any game to open the game management window.",
+         "ui_target": {
+            "element_name": "Manage",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Game row > Manage button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The game management window opens with details and options for the selected game."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click 'Auto Install' to install OptiScaler for the selected game.",
+         "ui_target": {
+            "element_name": "Auto Install",
+            "automation_id": null,
+            "hierarchical_path": "Game management window > Auto Install button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "OptiScaler is installed for the selected game, and the game management window updates to show the installation status."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click 'Bulk Install' to install OptiScaler on multiple games simultaneously.",
+         "ui_target": {
+            "element_name": "Bulk Install",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Bulk Install button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A dialog appears allowing the user to select games for bulk installation."
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Click 'Quick Install' from the main view to install OptiScaler with default settings.",
+         "ui_target": {
+            "element_name": "Quick Install",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Quick Install button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "OptiScaler is installed for the selected game with default settings, and the main view updates to show the installation status."
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Press 'Insert' to open the OptiScaler in-game menu and adjust upscaling settings in real-time.",
+         "ui_target": {
+            "element_name": "Insert",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Insert key",
+            "element_type": "Key",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Insert"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The OptiScaler in-game menu opens, allowing the user to adjust upscaling settings."
+      }
+   ],
+   "_meta": {
+      "source_app": "Optiscaler Client",
+      "app_key": "optiscaler_client",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "✦ OptiScaler Client",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:33:37Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

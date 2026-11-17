@@ -1,0 +1,1773 @@
+{
+ "target": "twitch.tv",
+ "recall": {
+  "known": false,
+  "ms": 3537
+ },
+ "digest": {
+  "controls": 579,
+  "labelled": 516,
+  "roles": {
+   "button": 302,
+   "link": 266,
+   "range input": 3,
+   "search input": 2,
+   "switch": 2,
+   "div": 1,
+   "textbox": 1,
+   "text input": 1,
+   "password input": 1
+  },
+  "page_shortcuts": [
+   [
+    "alt+t",
+    "Teatertilstand (alt+t)"
+   ]
+  ],
+  "walls": [],
+  "canvas_app": false
+ },
+ "recognise": {
+  "status": "ambiguous",
+  "ranked": [
+   [
+    "media_player",
+    1.0
+   ],
+   [
+    "chat_messenger",
+    0.933
+   ],
+   [
+    "pdf_reader",
+    0.76
+   ]
+  ],
+  "margin": 0.067,
+  "ms": 5
+ },
+ "scorecard": [
+  [
+   true,
+   "page loaded (8027 ms to first paint, 8027 ms settled)"
+  ],
+  [
+   true,
+   "579 controls found (516 with a readable label)"
+  ],
+  [
+   true,
+   "label coverage 516/579"
+  ],
+  [
+   true,
+   "no login / bot wall in the way"
+  ],
+  [
+   true,
+   "controls read in 0 ms"
+  ],
+  [
+   true,
+   "deep exploration: 20 clicks, 3 levels down, 6 extra pages, 1 kinds of dialog/menu outcomes, stopped by time"
+  ],
+  [
+   null,
+   "new to the pool: this is a first contact, so there is nothing to recall (not a failure)"
+  ],
+  [
+   false,
+   "recognised as 'media_player' (ambiguous, score 1.0, margin 0.067)"
+  ]
+ ],
+ "understanding": {
+  "seconds_watching": 294.3,
+  "shortcut_sheet": {
+   "opened": false
+  },
+  "network": {
+   "requests": 10214,
+   "by_kind": {
+    "first-party": 4094,
+    "cdn": 922,
+    "ads": 1097,
+    "analytics": 183,
+    "third-party": 3917,
+    "fonts": 1
+   },
+   "status": {
+    "300": 2088,
+    "200": 7887,
+    "400": 46,
+    "500": 2
+   },
+   "hosts": [
+    {
+     "host": "assets.twitch.tv",
+     "kind": "first-party",
+     "n": 3615,
+     "types": {
+      "script": 3124,
+      "stylesheet": 307,
+      "font": 74
+     }
+    },
+    {
+     "host": "static-cdn.jtvnw.net",
+     "kind": "cdn",
+     "n": 501,
+     "types": {
+      "image": 469,
+      "other": 32
+     }
+    },
+    {
+     "host": "gql.twitch.tv",
+     "kind": "first-party",
+     "n": 352,
+     "types": {
+      "fetch": 352
+     }
+    },
+    {
+     "host": "9d4a6d.rufio.hls.live-video.net",
+     "kind": "third-party",
+     "n": 280,
+     "types": {
+      "fetch": 280
+     }
+    },
+    {
+     "host": "onetag-sys.com",
+     "kind": "third-party",
+     "n": 156,
+     "types": {
+      "image": 113,
+      "document": 43
+     }
+    },
+    {
+     "host": "9362985eae81.j.cloudfront.hls.ttvnw.net",
+     "kind": "cdn",
+     "n": 151,
+     "types": {
+      "fetch": 151
+     }
+    },
+    {
+     "host": "ms-cookie-sync.presage.io",
+     "kind": "third-party",
+     "n": 149,
+     "types": {
+      "image": 113,
+      "document": 36
+     }
+    },
+    {
+     "host": "sync-tm.everesttech.net",
+     "kind": "third-party",
+     "n": 138,
+     "types": {
+      "image": 114,
+      "document": 24
+     }
+    },
+    {
+     "host": "sync.cootlogix.com",
+     "kind": "third-party",
+     "n": 134,
+     "types": {
+      "image": 80,
+      "document": 54
+     }
+    },
+    {
+     "host": "aps32.playlist.ttvnw.net",
+     "kind": "third-party",
+     "n": 116,
+     "types": {
+      "fetch": 116
+     }
+    },
+    {
+     "host": "sb.scorecardresearch.com",
+     "kind": "analytics",
+     "n": 111,
+     "types": {
+      "image": 102,
+      "script": 9
+     }
+    },
+    {
+     "host": "cookies.nextmillmedia.com",
+     "kind": "third-party",
+     "n": 110,
+     "types": {
+      "document": 82,
+      "image": 28
+     }
+    },
+    {
+     "host": "x.bidswitch.net",
+     "kind": "third-party",
+     "n": 105,
+     "types": {
+      "image": 84,
+      "document": 21
+     }
+    },
+    {
+     "host": "s.amazon-adsystem.com",
+     "kind": "ads",
+     "n": 98,
+     "types": {
+      "document": 45,
+      "image": 44,
+      "fetch": 9
+     }
+    }
+   ],
+   "api_endpoints": [
+    {
+     "method": "POST",
+     "host": "gql.twitch.tv",
+     "path": "/gql",
+     "n": 335
+    },
+    {
+     "method": "POST",
+     "host": "9d4a6d.rufio.hls.live-video.net",
+     "path": "/v1/segment/{token}",
+     "n": 280
+    },
+    {
+     "method": "POST",
+     "host": "player.stats.live-video.net",
+     "path": "/",
+     "n": 32
+    },
+    {
+     "method": "POST",
+     "host": "gql.twitch.tv",
+     "path": "/integrity",
+     "n": 17
+    },
+    {
+     "method": "POST",
+     "host": "reporting.cdndex.io",
+     "path": "/error",
+     "n": 11
+    },
+    {
+     "method": "POST",
+     "host": "spade.twitch.tv",
+     "path": "/track",
+     "n": 9
+    },
+    {
+     "method": "GET",
+     "host": "assets.twitch.tv",
+     "path": "/assets/{token}",
+     "n": 9
+    },
+    {
+     "method": "GET",
+     "host": "edge.ads.twitch.tv",
+     "path": "/ads/format",
+     "n": 9
+    },
+    {
+     "method": "GET",
+     "host": "assets.twitch.tv",
+     "path": "/config/manifest.json",
+     "n": 9
+    },
+    {
+     "method": "GET",
+     "host": "edge.ads.twitch.tv",
+     "path": "/ads",
+     "n": 9
+    },
+    {
+     "method": "POST",
+     "host": "usync.ingage.tech",
+     "path": "/cdn-cgi/rum",
+     "n": 4
+    },
+    {
+     "method": "POST",
+     "host": "usync.ingage.tech",
+     "path": "/cdn-cgi/challenge-platform/h/b/jsd/oneshot/d2d3316b729e/{token}/{hash}",
+     "n": 4
+    },
+    {
+     "method": "POST",
+     "host": "ortb.vdo.ai",
+     "path": "/cdn-cgi/rum",
+     "n": 1
+    }
+   ],
+   "graphql_operations": {
+    "CostreamingDiscoveryContextQuery": 23,
+    "SideNav": 19,
+    "WatchStreakExperiment": 16,
+    "PlaybackAccessToken": 15,
+    "GuestListQuery": 11,
+    "getGifPickerConfig": 10,
+    "DropChannelCampaignsProgress": 10,
+    "Consent": 9,
+    "GuestStarBatchCollaborationQuery": 9,
+    "SharedChatSession": 9,
+    "StreamRefetchManager": 8,
+    "GetDisplayName": 7,
+    "ChannelPanels": 7,
+    "CommunityOnboardingAllowlist": 7,
+    "ChannelLeaderboards": 6
+   },
+   "websockets": [
+    "hermes.twitch.tv",
+    "irc-ws.chat.twitch.tv"
+   ]
+  },
+  "stack": {
+   "frameworks": [
+    "React",
+    "webpack"
+   ],
+   "meta": {
+    "og:type": "website",
+    "og:title": "Twitch",
+    "og:description": "Twitch er en interaktiv livestreaming-tjeneste med indhold fra gaming, underholdning, sport, musik og meget mere.",
+    "og:site_name": "Twitch",
+    "twitter:card": "summary",
+    "description": "Twitch er en interaktiv livestreaming-tjeneste med indhold fra gaming, underholdning, sport, musik og meget mere.",
+    "theme-color": "var(--color-white)"
+   },
+   "manifest": false,
+   "sw": true,
+   "lang": "da-DK",
+   "title": "Twitch",
+   "headings": [
+    "Live p\u00e5 Twitch",
+    "kategorier vi tror, du vil kunne lide",
+    "Bare chat",
+    "Minecraft",
+    "League of Legends",
+    "Grand Theft Auto V",
+    "IRL",
+    "World of Warcraft",
+    "Just Chatting & IRL",
+    "Tastaturgenveje"
+   ],
+   "nav": [
+    "G\u00e5 til ... Alt P",
+    "Twitch \u2013 Hjem",
+    "Gennemse",
+    "Flere indstillinger",
+    "S\u00f8geknap",
+    "S\u00f8g",
+    "Log ind",
+    "Tilmeld",
+    "Brugermenu",
+    "mooda VALORANT Live 4,9 t 4,9 t seere",
+    "Kyedae VALORANT Live 5 t 5 t seere",
+    "ESLCS Counter-Strike Live 264 264 seere",
+    "iiTzTimmy Fortnite Live 4 t 4 t seere",
+    "Faith Bare chat Live 138 138 seere",
+    "summit1g DayZ Live 13 t 13 t seere"
+   ],
+   "forms": [
+    {
+     "fields": [
+      "search",
+      "submit",
+      "search"
+     ],
+     "method": "get",
+     "action": "/"
+    }
+   ],
+   "sso_buttons": [],
+   "password": false,
+   "local_keys": [
+    "amazon_ivs_device_config_v1_player-web-v1_state",
+    "video_ads.stream_loudness",
+    "local_storage_device_id",
+    "_amazon_ivs_dc_player-web-v1_b8e4f7c1",
+    "shared-chat.community-highlight-shown",
+    "local_storage_app_session_id",
+    "amazon_ivs_device_config_v1_player-web-v1_data",
+    "livestreamResumeTimes",
+    "ads_bitrate_bps",
+    "ftue-creator-wallet-callout-banner-promotion",
+    "__last-unload",
+    "CV7o9fRC/gx24wn2-rc",
+    "local_copy_unique_id",
+    "tag-size-cache-uv.2",
+    "chatSettings",
+    "twilight.emote_picker_history",
+    "sentry_device_id"
+   ],
+   "session_keys": [
+    "watch-streak-last-seen-streak-31239503",
+    "watch-streak-last-seen-streak-43539324",
+    "session_storage_last_visited_twitch_url",
+    "watch-streak-last-seen-streak-45302947",
+    "watch-streak-last-seen-streak-1494360677",
+    "twilight.update_manager.known_builds",
+    "session_storage_unique_id",
+    "page_scroll_position",
+    "watch-streak-last-seen-streak-160538649",
+    "watch-streak-last-seen-streak-453880006",
+    "watch-streak-last-seen-streak-567928581",
+    "watch-streak-last-seen-streak-26490481",
+    "watch-streak-last-seen-streak-406648901",
+    "directory_cache_first",
+    "session_storage_vx_disco_mm",
+    "watch-streak-last-seen-streak-39724467",
+    "watch-streak-last-seen-streak-51065352"
+   ],
+   "iframes": [
+    "www.twitch.tv",
+    "s.amazon-adsystem.com",
+    "aax-eu.amazon-adsystem.com",
+    "k.twitchcdn.net",
+    "s.amazon-adsystem.com"
+   ],
+   "canvases": 0,
+   "videos": 1,
+   "search": true,
+   "cookie_names": [
+    "33x_ps",
+    "3pi",
+    "A3",
+    "ADKUID",
+    "ANON_ID",
+    "BID",
+    "C",
+    "CDIPARTNERS",
+    "CDIUSER",
+    "CID",
+    "CMID",
+    "CMPRO",
+    "CMPS",
+    "Cas_User_ID",
+    "DPSync4",
+    "DSP2F_106",
+    "DSP2F_129",
+    "DSP2F_135",
+    "DSP2F_139",
+    "DSP2F_40",
+    "DSP2F_54",
+    "DSP2F_71",
+    "DSP2F_78",
+    "DSP2F_91",
+    "DW",
+    "DW_Time",
+    "DotomiUser",
+    "HAPLB3G",
+    "IDE",
+    "IDSYNC",
+    "INGRESSCOOKIE",
+    "IgniteCookieSync",
+    "KADUSERCOOKIE",
+    "KP_UIDz-ssn",
+    "KRTBCOOKIE_1251",
+    "KRTBCOOKIE_1253",
+    "KRTBCOOKIE_1323",
+    "KRTBCOOKIE_1473",
+    "KRTBCOOKIE_1515",
+    "KRTBCOOKIE_153"
+   ],
+   "cookie_flags": {
+    "n": 408,
+    "analytics_like": []
+   },
+   "headers": {
+    "server": "Varnish",
+    "via": "1.1 varnish",
+    "platform_hints": [
+     "Fastly"
+    ],
+    "security_headers": [
+     "strict-transport-security"
+    ],
+    "status": 301
+   }
+  },
+  "site_files": {
+   "robots": {
+    "disallow_rules": 67,
+    "sample_disallowed": [
+     "/login$",
+     "/login?",
+     "/login/",
+     "/signup$",
+     "/signup?",
+     "/signup/",
+     "/auth/",
+     "/user/account-recovery"
+    ],
+    "sitemaps": [
+     "https://www.twitch.tv/sitemapv2_index.xml.gz"
+    ],
+    "user_agent_groups": 5
+   },
+   "sitemap": {
+    "urls_sampled": 3015,
+    "child_sitemaps": 15,
+    "page_types": [
+     {
+      "prefix": "/videos",
+      "n": 2136
+     },
+     {
+      "prefix": "/directory",
+      "n": 824
+     },
+     {
+      "prefix": "/team",
+      "n": 14
+     },
+     {
+      "prefix": "/subs",
+      "n": 7
+     },
+     {
+      "prefix": "/annual-recap",
+      "n": 3
+     },
+     {
+      "prefix": "/privacy",
+      "n": 2
+     },
+     {
+      "prefix": "/",
+      "n": 1
+     },
+     {
+      "prefix": "/prime",
+      "n": 1
+     },
+     {
+      "prefix": "/bits",
+      "n": 1
+     },
+     {
+      "prefix": "/downloads",
+      "n": 1
+     },
+     {
+      "prefix": "/turbo",
+      "n": 1
+     },
+     {
+      "prefix": "/kaicenat",
+      "n": 1
+     }
+    ]
+   }
+  },
+  "auth": {
+   "password_form": false,
+   "sso_providers": [],
+   "sso_buttons": [],
+   "captcha": [],
+   "login_wall": false,
+   "forms": [
+    {
+     "fields": [
+      "search",
+      "submit",
+      "search"
+     ],
+     "method": "get",
+     "action": "/"
+    }
+   ],
+   "reads_as": "public pages are open to a logged-out visitor"
+  },
+  "meaning": {
+   "name": "Twitch",
+   "description": "Twitch er en interaktiv livestreaming-tjeneste med indhold fra gaming, underholdning, sport, musik og meget mere.",
+   "headings": [
+    "Live p\u00e5 Twitch",
+    "kategorier vi tror, du vil kunne lide",
+    "Bare chat",
+    "Minecraft",
+    "League of Legends",
+    "Grand Theft Auto V",
+    "IRL",
+    "World of Warcraft",
+    "Just Chatting & IRL",
+    "Tastaturgenveje"
+   ],
+   "navigation": [
+    "G\u00e5 til ... Alt P",
+    "Twitch \u2013 Hjem",
+    "Gennemse",
+    "Flere indstillinger",
+    "S\u00f8geknap",
+    "S\u00f8g",
+    "Log ind",
+    "Tilmeld",
+    "Brugermenu"
+   ],
+   "opens_something": [
+    "User Menu",
+    "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea "
+   ],
+   "lesson": [
+    "Twitch: Twitch er en interaktiv livestreaming-tjeneste med indhold fra gaming, underholdning, sport, musik og meget mere.",
+    "Main navigation: G\u00e5 til ... Alt P, Twitch \u2013 Hjem, Gennemse, Flere indstillinger, S\u00f8geknap, S\u00f8g, Log ind, Tilmeld, Brugermenu.",
+    "There is a search box on the page: that is the fastest way in.",
+    "Menus / buttons that open something: User Menu, \ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea .",
+    "Kinds of pages (from its sitemap): /videos (2136), /directory (824), /team (14), /subs (7), /annual-recap (3), /privacy (2)."
+   ]
+  }
+ },
+ "scan": {
+  "kind": "web",
+  "url": "https://twitch.tv",
+  "show": true,
+  "settled_ms": 8027,
+  "explore": {
+   "clicks": 20,
+   "max_depth": 3,
+   "outcomes": {
+    "revealed a menu / panel": 8,
+    "unreachable": 61,
+    "could not click": 1,
+    "opened a new page": 11,
+    "opened a dialog": 1
+   },
+   "nodes": [
+    {
+     "path": "User Menu",
+     "depth": 1,
+     "outcome": "revealed a menu / panel",
+     "n_new": 5,
+     "revealed": [
+      "link: LIVE 3.9K viewers",
+      "button: Language",
+      "switch: on",
+      "button: Labeled Content",
+      "button: Log In"
+     ]
+    },
+    {
+     "path": "User Menu > Language",
+     "depth": 2,
+     "outcome": "revealed a menu / panel",
+     "n_new": 33,
+     "revealed": [
+      "button: Language",
+      "button: Back button",
+      "button: English",
+      "button: Dansk",
+      "button: Deutsch",
+      "button: English - UK",
+      "button: Espa\u00f1ol - Espa\u00f1a",
+      "button: Espa\u00f1ol - Latinoam\u00e9rica",
+      "button: Fran\u00e7ais",
+      "button: Italiano",
+      "button: Magyar",
+      "button: Nederlands",
+      "button: Norsk",
+      "button: Polski",
+      "button: Portugu\u00eas",
+      "button: Portugu\u00eas - Brasil",
+      "button: Rom\u00e2n\u0103",
+      "button: Sloven\u010dina",
+      "button: Suomi",
+      "button: Svenska",
+      "button: Ti\u1ebfng Vi\u1ec7t",
+      "button: T\u00fcrk\u00e7e",
+      "button: \u010ce\u0161tina",
+      "button: \u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac",
+      "button: \u0411\u044a\u043b\u0433\u0430\u0440\u0441\u043a\u0438",
+      "button: \u0420\u0443\u0441\u0441\u043a\u0438\u0439",
+      "button: \u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430",
+      "button: \u0e20\u0e32\u0e29\u0e32\u0e44\u0e17\u0e22",
+      "button: \u0627\u0644\u0639\u0631\u0628\u064a\u0629",
+      "button: \u4e2d\u6587 \u7b80\u4f53"
+     ]
+    },
+    {
+     "path": "User Menu > Language > Back button",
+     "depth": 3,
+     "outcome": "revealed a menu / panel",
+     "n_new": 4,
+     "revealed": [
+      "button: Language",
+      "switch: on",
+      "button: Labeled Content",
+      "button: Log In"
+     ]
+    },
+    {
+     "path": "User Menu > Language > English",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Dansk",
+     "outcome": "could not click",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Deutsch",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > English - UK",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Espa\u00f1ol - Espa\u00f1a",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Espa\u00f1ol - Latinoam\u00e9rica",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Fran\u00e7ais",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Italiano",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Magyar",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Nederlands",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Norsk",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Polski",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Portugu\u00eas",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Portugu\u00eas - Brasil",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Rom\u00e2n\u0103",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Sloven\u010dina",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Suomi",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Svenska",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > Ti\u1ebfng Vi\u1ec7t",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > T\u00fcrk\u00e7e",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > \u010ce\u0161tina",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > \u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > \u0411\u044a\u043b\u0433\u0430\u0440\u0441\u043a\u0438",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > \u0420\u0443\u0441\u0441\u043a\u0438\u0439",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > \u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > \u0e20\u0e32\u0e29\u0e32\u0e44\u0e17\u0e22",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > \u0627\u0644\u0639\u0631\u0628\u064a\u0629",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Language > \u4e2d\u6587 \u7b80\u4f53",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Labeled Content",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > Log In",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "User Menu > LIVE 3.9K viewers",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "mooda VALORANT Live 3.9K 3",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Kyedae VALORANT Live 4.9K ",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Zy0xxx Papers, Please Live",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Crystalst Grand Theft Auto",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "iiTzTimmy Fortnite Live 3.",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "eggsterr PUBG: BATTLEGROUN",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Pause (space/k)",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Unmute (m)",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Settings",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Fullscreen (f)",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Faide +2 Faide and 2 guest",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Yugi Just Chatting Live 3.",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Virtyy VALORANT Live 162 1",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Twitch Home",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Browse",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "More Options",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Collapse Side Nav",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Search Button",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "View lolyoung's profile",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Category: League of Legend",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Tag, mid",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Tag, chill",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Previous video",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Next video",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "Live on Twitch",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "LIVE 4.9K viewers",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "LIVE 2.5K viewers",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "mooda (Verified) streaming",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea ",
+     "depth": 1,
+     "outcome": "opened a new page",
+     "n_new": 41,
+     "page": {
+      "title": "mooda - Twitch",
+      "url": "https://www.twitch.tv/mooda",
+      "controls": 41
+     }
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu",
+     "depth": 2,
+     "outcome": "revealed a menu / panel",
+     "n_new": 35,
+     "revealed": [
+      "link: Caedrel247 League of Legends Live 3,3 t 3,3 t seere",
+      "link: summit1g DayZ Live 13 t 13 t seere",
+      "link: iiTzTimmy Fortnite Live 3,7 t 3,7 t seere",
+      "link: ESLCS Counter-Strike Live 256 256 seere",
+      "link: Faith Bare chat Live 138 138 seere",
+      "link: Broxah League of Legends Live 688 688 seere",
+      "link: Swagg +1 Swagg og 1 g\u00e6st Call of Duty: Modern Warfare 4 Live 2,1 t 2,1 t seere",
+      "link: Faide +2 Faide og 2 g\u00e6ster Apex Legends Live 2,5 t 2,5 t seere",
+      "link: eggsterr PUBG: BATTLEGROUNDS Live 583 583 seere",
+      "link: SubrozaVOD VALORANT Live 6 6 seere",
+      "link: wtfslump VALORANT Live 50 50 seere",
+      "link: VALORANT",
+      "link: Tag, English",
+      "button: Del",
+      "button: Flere indstillinger",
+      "link: Tiktok",
+      "link: Youtube",
+      "link: Twitter",
+      "link: Plus",
+      "button: Udvid kravene til at kvalificere sig til Plus-programmet",
+      "link: ",
+      "link: ",
+      "button: quangdatbl1",
+      "button: Klik for at svare @quangdatbl1",
+      "button: ",
+      "button: ",
+      "button: bigbootycase7",
+      "button: Klik for at svare @bigbootycase7",
+      "button: ",
+      "button: fakincrvnt"
+     ]
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > Caedrel247 League of Legen",
+     "depth": 3,
+     "outcome": "opened a new page",
+     "n_new": 69,
+     "page": {
+      "title": "Caedrel247 - Twitch",
+      "url": "https://www.twitch.tv/caedrel247",
+      "controls": 69
+     }
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > summit1g DayZ Live 13 t 13",
+     "depth": 3,
+     "outcome": "opened a new page",
+     "n_new": 60,
+     "page": {
+      "title": "Caedrel247 - Twitch",
+      "url": "https://www.twitch.tv/summit1g",
+      "controls": 60
+     }
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > iiTzTimmy Fortnite Live 3,",
+     "depth": 3,
+     "outcome": "opened a new page",
+     "n_new": 63,
+     "page": {
+      "title": "iiTzTimmy - Twitch",
+      "url": "https://www.twitch.tv/iitztimmy",
+      "controls": 63
+     }
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > ESLCS Counter-Strike Live ",
+     "depth": 3,
+     "outcome": "opened a new page",
+     "n_new": 60,
+     "page": {
+      "title": "iiTzTimmy - Twitch",
+      "url": "https://www.twitch.tv/eslcs",
+      "controls": 60
+     }
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > Faith Bare chat Live 138 1",
+     "depth": 3,
+     "outcome": "opened a new page",
+     "n_new": 65,
+     "page": {
+      "title": "Faith - Twitch",
+      "url": "https://www.twitch.tv/faith",
+      "controls": 65
+     }
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > Broxah League of Legends L",
+     "depth": 3,
+     "outcome": "opened a new page",
+     "n_new": 67,
+     "page": {
+      "title": "Faith - Twitch",
+      "url": "https://www.twitch.tv/broxah",
+      "controls": 67
+     }
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > Swagg +1 Swagg og 1 g\u00e6st C",
+     "depth": 3,
+     "outcome": "opened a new page",
+     "n_new": 62,
+     "page": {
+      "title": "Broxah - Twitch",
+      "url": "https://www.twitch.tv/swagg",
+      "controls": 62
+     }
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > Faide +2 Faide og 2 g\u00e6ster",
+     "depth": 3,
+     "outcome": "opened a new page",
+     "n_new": 58,
+     "page": {
+      "title": "Swagg - Twitch",
+      "url": "https://www.twitch.tv/faide",
+      "controls": 58
+     }
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > eggsterr PUBG: BATTLEGROUN",
+     "depth": 3,
+     "outcome": "opened a new page",
+     "n_new": 58,
+     "page": {
+      "title": "eggsterr - Twitch",
+      "url": "https://www.twitch.tv/eggsterr",
+      "controls": 58
+     }
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > SubrozaVOD VALORANT Live 6",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > Del",
+     "depth": 3,
+     "outcome": "revealed a menu / panel",
+     "n_new": 41,
+     "revealed": [
+      "button: ",
+      "button: xeqlu",
+      "button: Klik for at svare @xeqlu",
+      "button: quangdatbl1",
+      "button: Klik for at svare @quangdatbl1",
+      "button: macdemarcolover03",
+      "button: Klik for at svare @macdemarcolover03",
+      "button: euauc012",
+      "button: Klik for at svare @euauc012",
+      "button: tentra1220",
+      "button: Klik for at svare @tentra1220",
+      "button: chapsoloks8",
+      "button: Klik for at svare @chapsoloks8",
+      "button: ",
+      "button: mawzu",
+      "button: Klik for at svare @mawzu",
+      "button: samuch1",
+      "button: Klik for at svare @samuch1",
+      "button: xivvxivxv",
+      "button: Klik for at svare @xivvxivxv",
+      "button: ",
+      "button: ",
+      "button: xnawod",
+      "button: Klik for at svare @xnawod",
+      "button: ",
+      "button: shirohawk23",
+      "button: Klik for at svare @shirohawk23",
+      "button: ",
+      "button: herobrine018",
+      "button: Klik for at svare @herobrine018"
+     ]
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > Flere indstillinger",
+     "depth": 3,
+     "outcome": "revealed a menu / panel",
+     "n_new": 63,
+     "revealed": [
+      "button: ",
+      "button: xeqlu",
+      "button: Klik for at svare @xeqlu",
+      "button: quangdatbl1",
+      "button: Klik for at svare @quangdatbl1",
+      "button: macdemarcolover03",
+      "button: Klik for at svare @macdemarcolover03",
+      "button: euauc012",
+      "button: Klik for at svare @euauc012",
+      "button: tentra1220",
+      "button: Klik for at svare @tentra1220",
+      "button: chapsoloks8",
+      "button: Klik for at svare @chapsoloks8",
+      "button: ",
+      "button: mawzu",
+      "button: Klik for at svare @mawzu",
+      "button: samuch1",
+      "button: Klik for at svare @samuch1",
+      "button: xivvxivxv",
+      "button: Klik for at svare @xivvxivxv",
+      "button: ",
+      "button: ",
+      "button: xnawod",
+      "button: Klik for at svare @xnawod",
+      "button: ",
+      "button: shirohawk23",
+      "button: Klik for at svare @shirohawk23",
+      "button: ",
+      "button: herobrine018",
+      "button: Klik for at svare @herobrine018"
+     ]
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > wtfslump VALORANT Live 50 ",
+     "depth": 3,
+     "outcome": "opened a new page",
+     "n_new": 63,
+     "page": {
+      "title": "wtfslump - Twitch",
+      "url": "https://www.twitch.tv/wtfslump",
+      "controls": 63
+     }
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > Sprog",
+     "depth": 3,
+     "outcome": "revealed a menu / panel",
+     "n_new": 38,
+     "revealed": [
+      "button: Log ind",
+      "button: Afvis denne besked",
+      "button: ",
+      "button: EccroW",
+      "button: Klik for at svare @EccroW",
+      "button: Sprog",
+      "button: Tilbage-knap",
+      "button: English",
+      "button: Dansk",
+      "button: Deutsch",
+      "button: English - UK",
+      "button: Espa\u00f1ol - Espa\u00f1a",
+      "button: Espa\u00f1ol - Latinoam\u00e9rica",
+      "button: Fran\u00e7ais",
+      "button: Italiano",
+      "button: Magyar",
+      "button: Nederlands",
+      "button: Norsk",
+      "button: Polski",
+      "button: Portugu\u00eas",
+      "button: Portugu\u00eas - Brasil",
+      "button: Rom\u00e2n\u0103",
+      "button: Sloven\u010dina",
+      "button: Suomi",
+      "button: Svenska",
+      "button: Ti\u1ebfng Vi\u1ec7t",
+      "button: T\u00fcrk\u00e7e",
+      "button: \u010ce\u0161tina",
+      "button: \u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac",
+      "button: \u0411\u044a\u043b\u0433\u0430\u0440\u0441\u043a\u0438"
+     ]
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > Indhold med m\u00e6rkat",
+     "depth": 3,
+     "outcome": "revealed a menu / panel",
+     "n_new": 26,
+     "revealed": [
+      "button: Udvid rangliste for st\u00f8rste gavegivere",
+      "button: Log ind",
+      "button: Afvis denne besked",
+      "button: ",
+      "button: bazarrc",
+      "button: Klik for at svare @bazarrc",
+      "button: ",
+      "button: ",
+      "button: ",
+      "button: Fossabot",
+      "button: Klik for at svare @Fossabot",
+      "button: ",
+      "button: wenzwater",
+      "button: Klik for at svare @wenzwater",
+      "button: ",
+      "button: ",
+      "button: HypeTrainl",
+      "button: ",
+      "button: ",
+      "button: ",
+      "button: Fossabot",
+      "button: Klik for at svare @Fossabot",
+      "button: Indhold med m\u00e6rkat",
+      "button: Tilbage-knap",
+      "switch: on",
+      "link: her"
+     ]
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > Log ind",
+     "depth": 3,
+     "outcome": "opened a dialog",
+     "n_new": 39,
+     "revealed": [
+      "link: LIVE",
+      "link: mooda",
+      "link: VALORANT",
+      "link: Tiktok",
+      "link: ",
+      "button: S\u00e6t p\u00e5 pause (mellemrum/k)",
+      "button: Sl\u00e5 lyd fra (m)",
+      "range input: 0.5",
+      "button: ",
+      "button: bazarrc",
+      "button: Klik for at svare @bazarrc",
+      "button: ",
+      "button: ",
+      "button: ",
+      "button: Fossabot",
+      "button: Klik for at svare @Fossabot",
+      "button: ",
+      "button: wenzwater",
+      "button: Klik for at svare @wenzwater",
+      "button: ",
+      "button: ",
+      "button: HypeTrainl",
+      "button: ",
+      "button: ",
+      "button: ",
+      "button: Fossabot",
+      "button: Klik for at svare @Fossabot",
+      "button: macdemarcolover03",
+      "button: Klik for at svare @macdemarcolover03",
+      "text input: Indtast dit brugernavn"
+     ]
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > quangdatbl1",
+     "outcome": "unreachable",
+     "n_new": 0
+    },
+    {
+     "path": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > Klik for at svare @quangda",
+     "outcome": "unreachable",
+     "n_new": 0
+    }
+   ],
+   "tree": [
+    "User Menu  ->  revealed a menu / panel (5)",
+    "  Language  ->  revealed a menu / panel (33)",
+    "    Back button  ->  revealed a menu / panel (4)",
+    "English  ->  unreachable",
+    "Dansk  ->  could not click",
+    "Deutsch  ->  unreachable",
+    "English - UK  ->  unreachable",
+    "Espa\u00f1ol - Espa\u00f1a  ->  unreachable",
+    "Espa\u00f1ol - Latinoam\u00e9rica  ->  unreachable",
+    "Fran\u00e7ais  ->  unreachable",
+    "Italiano  ->  unreachable",
+    "Magyar  ->  unreachable",
+    "Nederlands  ->  unreachable",
+    "Norsk  ->  unreachable",
+    "Polski  ->  unreachable",
+    "Portugu\u00eas  ->  unreachable",
+    "Portugu\u00eas - Brasil  ->  unreachable",
+    "Rom\u00e2n\u0103  ->  unreachable",
+    "Sloven\u010dina  ->  unreachable",
+    "Suomi  ->  unreachable",
+    "Svenska  ->  unreachable",
+    "Ti\u1ebfng Vi\u1ec7t  ->  unreachable",
+    "T\u00fcrk\u00e7e  ->  unreachable",
+    "\u010ce\u0161tina  ->  unreachable",
+    "\u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac  ->  unreachable",
+    "\u0411\u044a\u043b\u0433\u0430\u0440\u0441\u043a\u0438  ->  unreachable",
+    "\u0420\u0443\u0441\u0441\u043a\u0438\u0439  ->  unreachable",
+    "\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430  ->  unreachable",
+    "\u0e20\u0e32\u0e29\u0e32\u0e44\u0e17\u0e22  ->  unreachable",
+    "\u0627\u0644\u0639\u0631\u0628\u064a\u0629  ->  unreachable",
+    "\u4e2d\u6587 \u7b80\u4f53  ->  unreachable",
+    "Labeled Content  ->  unreachable",
+    "Log In  ->  unreachable",
+    "LIVE 3.9K viewers  ->  unreachable",
+    "mooda VALORANT Live 3.9K 3  ->  unreachable",
+    "Kyedae VALORANT Live 4.9K   ->  unreachable",
+    "Zy0xxx Papers, Please Live  ->  unreachable",
+    "Crystalst Grand Theft Auto  ->  unreachable",
+    "iiTzTimmy Fortnite Live 3.  ->  unreachable",
+    "eggsterr PUBG: BATTLEGROUN  ->  unreachable",
+    "Pause (space/k)  ->  unreachable",
+    "Unmute (m)  ->  unreachable",
+    "Settings  ->  unreachable",
+    "Fullscreen (f)  ->  unreachable",
+    "Faide +2 Faide and 2 guest  ->  unreachable",
+    "Yugi Just Chatting Live 3.  ->  unreachable",
+    "Virtyy VALORANT Live 162 1  ->  unreachable",
+    "Twitch Home  ->  unreachable",
+    "Browse  ->  unreachable",
+    "More Options  ->  unreachable",
+    "Collapse Side Nav  ->  unreachable",
+    "Search Button  ->  unreachable",
+    "View lolyoung's profile  ->  unreachable",
+    "Category: League of Legend  ->  unreachable",
+    "Tag, mid  ->  unreachable",
+    "Tag, chill  ->  unreachable",
+    "Previous video  ->  unreachable",
+    "Next video  ->  unreachable",
+    "Live on Twitch  ->  unreachable",
+    "LIVE 4.9K viewers  ->  unreachable",
+    "LIVE 2.5K viewers  ->  unreachable",
+    "mooda (Verified) streaming  ->  unreachable",
+    "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea   ->  opened a new page (41)",
+    "  Brugermenu  ->  revealed a menu / panel (35)",
+    "    Caedrel247 League of Legen  ->  opened a new page (69)",
+    "    summit1g DayZ Live 13 t 13  ->  opened a new page (60)",
+    "    iiTzTimmy Fortnite Live 3,  ->  opened a new page (63)",
+    "    ESLCS Counter-Strike Live   ->  opened a new page (60)",
+    "    Faith Bare chat Live 138 1  ->  opened a new page (65)",
+    "    Broxah League of Legends L  ->  opened a new page (67)",
+    "    Swagg +1 Swagg og 1 g\u00e6st C  ->  opened a new page (62)",
+    "    Faide +2 Faide og 2 g\u00e6ster  ->  opened a new page (58)",
+    "    eggsterr PUBG: BATTLEGROUN  ->  opened a new page (58)",
+    "SubrozaVOD VALORANT Live 6  ->  unreachable",
+    "    Del  ->  revealed a menu / panel (41)",
+    "    Flere indstillinger  ->  revealed a menu / panel (63)",
+    "    wtfslump VALORANT Live 50   ->  opened a new page (63)",
+    "    Sprog  ->  revealed a menu / panel (38)",
+    "    Indhold med m\u00e6rkat  ->  revealed a menu / panel (26)",
+    "    Log ind  ->  opened a dialog (39)",
+    "quangdatbl1  ->  unreachable",
+    "Klik for at svare @quangda  ->  unreachable"
+   ],
+   "pages": {
+    "/mooda": "mooda - Twitch",
+    "/caedrel247": "Caedrel247 - Twitch",
+    "/summit1g": "Caedrel247 - Twitch",
+    "/iitztimmy": "iiTzTimmy - Twitch",
+    "/eslcs": "iiTzTimmy - Twitch",
+    "/faith": "Faith - Twitch"
+   },
+   "external": [
+    "Tiktok -> www.tiktok.com",
+    "Youtube -> www.youtube.com",
+    "Twitter -> twitter.com",
+    "Plus -> help.twitch.tv",
+    "Twitter -> x.com",
+    "YouTube -> www.youtube.com",
+    "Discord -> www.discord.gg",
+    "Instagram -> www.instagram.com",
+    "TikTok -> www.tiktok.com",
+    "Mary -> twitter.com",
+    "\ud83d\udc97 ALL MY SOCIALS \ud83d\udc97 -> www.faithttv.com",
+    "Discord -> discord.gg",
+    "Instagram -> instagram.com",
+    "Emotes done by Soyu! -> soyukiart.wixsite.com",
+    "YouTube -> youtube.com",
+    "X -> twitter.com",
+    "Facebook -> facebook.com",
+    "Stream sammen -> dashboard.twitch.tv",
+    "Youtube -> youtube.com",
+    "tiktok -> www.tiktok.com"
+   ],
+   "skipped_risky": [
+    "\ud83c\udf1fPOST NMS BOXING\ud83c\udf1fLIVE ALL DAY N NIGHT\ud83c\udf1fFNAF MARATHON TMRW\ud83c\udf1f!socials !comm !osc",
+    "yugi (Verified) streaming \ud83c\udf1fPOST NMS BOXING\ud83c\udf1fLIVE ALL DAY N NIGHT\ud83c\udf1fFNAF MARATHON",
+    "Sign Up"
+   ],
+   "stopped_by": "time"
+  },
+  "openers_tried": 20,
+  "canvases": 0,
+  "iframes": 5,
+  "password": false,
+  "title": "Twitch",
+  "height": 820,
+  "revealed": [
+   {
+    "opener": "User Menu",
+    "found": [
+     "link: LIVE 3.9K viewers",
+     "button: Language",
+     "switch: on",
+     "button: Labeled Content",
+     "button: Log In"
+    ],
+    "n": 5
+   },
+   {
+    "opener": "User Menu > Language",
+    "found": [
+     "button: Language",
+     "button: Back button",
+     "button: English",
+     "button: Dansk",
+     "button: Deutsch",
+     "button: English - UK",
+     "button: Espa\u00f1ol - Espa\u00f1a",
+     "button: Espa\u00f1ol - Latinoam\u00e9rica",
+     "button: Fran\u00e7ais",
+     "button: Italiano",
+     "button: Magyar",
+     "button: Nederlands",
+     "button: Norsk",
+     "button: Polski",
+     "button: Portugu\u00eas",
+     "button: Portugu\u00eas - Brasil",
+     "button: Rom\u00e2n\u0103",
+     "button: Sloven\u010dina",
+     "button: Suomi",
+     "button: Svenska",
+     "button: Ti\u1ebfng Vi\u1ec7t",
+     "button: T\u00fcrk\u00e7e",
+     "button: \u010ce\u0161tina",
+     "button: \u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac",
+     "button: \u0411\u044a\u043b\u0433\u0430\u0440\u0441\u043a\u0438",
+     "button: \u0420\u0443\u0441\u0441\u043a\u0438\u0439",
+     "button: \u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430",
+     "button: \u0e20\u0e32\u0e29\u0e32\u0e44\u0e17\u0e22",
+     "button: \u0627\u0644\u0639\u0631\u0628\u064a\u0629",
+     "button: \u4e2d\u6587 \u7b80\u4f53"
+    ],
+    "n": 33
+   },
+   {
+    "opener": "User Menu > Language > Back button",
+    "found": [
+     "button: Language",
+     "switch: on",
+     "button: Labeled Content",
+     "button: Log In"
+    ],
+    "n": 4
+   },
+   {
+    "opener": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu",
+    "found": [
+     "link: Caedrel247 League of Legends Live 3,3 t 3,3 t seere",
+     "link: summit1g DayZ Live 13 t 13 t seere",
+     "link: iiTzTimmy Fortnite Live 3,7 t 3,7 t seere",
+     "link: ESLCS Counter-Strike Live 256 256 seere",
+     "link: Faith Bare chat Live 138 138 seere",
+     "link: Broxah League of Legends Live 688 688 seere",
+     "link: Swagg +1 Swagg og 1 g\u00e6st Call of Duty: Modern Warfare 4 Live 2,1 t 2,1 t seere",
+     "link: Faide +2 Faide og 2 g\u00e6ster Apex Legends Live 2,5 t 2,5 t seere",
+     "link: eggsterr PUBG: BATTLEGROUNDS Live 583 583 seere",
+     "link: SubrozaVOD VALORANT Live 6 6 seere",
+     "link: wtfslump VALORANT Live 50 50 seere",
+     "link: VALORANT",
+     "link: Tag, English",
+     "button: Del",
+     "button: Flere indstillinger",
+     "link: Tiktok",
+     "link: Youtube",
+     "link: Twitter",
+     "link: Plus",
+     "button: Udvid kravene til at kvalificere sig til Plus-programmet",
+     "link: ",
+     "link: ",
+     "button: quangdatbl1",
+     "button: Klik for at svare @quangdatbl1",
+     "button: ",
+     "button: ",
+     "button: bigbootycase7",
+     "button: Klik for at svare @bigbootycase7",
+     "button: ",
+     "button: fakincrvnt"
+    ],
+    "n": 35
+   },
+   {
+    "opener": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > Del",
+    "found": [
+     "button: ",
+     "button: xeqlu",
+     "button: Klik for at svare @xeqlu",
+     "button: quangdatbl1",
+     "button: Klik for at svare @quangdatbl1",
+     "button: macdemarcolover03",
+     "button: Klik for at svare @macdemarcolover03",
+     "button: euauc012",
+     "button: Klik for at svare @euauc012",
+     "button: tentra1220",
+     "button: Klik for at svare @tentra1220",
+     "button: chapsoloks8",
+     "button: Klik for at svare @chapsoloks8",
+     "button: ",
+     "button: mawzu",
+     "button: Klik for at svare @mawzu",
+     "button: samuch1",
+     "button: Klik for at svare @samuch1",
+     "button: xivvxivxv",
+     "button: Klik for at svare @xivvxivxv",
+     "button: ",
+     "button: ",
+     "button: xnawod",
+     "button: Klik for at svare @xnawod",
+     "button: ",
+     "button: shirohawk23",
+     "button: Klik for at svare @shirohawk23",
+     "button: ",
+     "button: herobrine018",
+     "button: Klik for at svare @herobrine018"
+    ],
+    "n": 41
+   },
+   {
+    "opener": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > Flere indstillinger",
+    "found": [
+     "button: ",
+     "button: xeqlu",
+     "button: Klik for at svare @xeqlu",
+     "button: quangdatbl1",
+     "button: Klik for at svare @quangdatbl1",
+     "button: macdemarcolover03",
+     "button: Klik for at svare @macdemarcolover03",
+     "button: euauc012",
+     "button: Klik for at svare @euauc012",
+     "button: tentra1220",
+     "button: Klik for at svare @tentra1220",
+     "button: chapsoloks8",
+     "button: Klik for at svare @chapsoloks8",
+     "button: ",
+     "button: mawzu",
+     "button: Klik for at svare @mawzu",
+     "button: samuch1",
+     "button: Klik for at svare @samuch1",
+     "button: xivvxivxv",
+     "button: Klik for at svare @xivvxivxv",
+     "button: ",
+     "button: ",
+     "button: xnawod",
+     "button: Klik for at svare @xnawod",
+     "button: ",
+     "button: shirohawk23",
+     "button: Klik for at svare @shirohawk23",
+     "button: ",
+     "button: herobrine018",
+     "button: Klik for at svare @herobrine018"
+    ],
+    "n": 63
+   },
+   {
+    "opener": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > Sprog",
+    "found": [
+     "button: Log ind",
+     "button: Afvis denne besked",
+     "button: ",
+     "button: EccroW",
+     "button: Klik for at svare @EccroW",
+     "button: Sprog",
+     "button: Tilbage-knap",
+     "button: English",
+     "button: Dansk",
+     "button: Deutsch",
+     "button: English - UK",
+     "button: Espa\u00f1ol - Espa\u00f1a",
+     "button: Espa\u00f1ol - Latinoam\u00e9rica",
+     "button: Fran\u00e7ais",
+     "button: Italiano",
+     "button: Magyar",
+     "button: Nederlands",
+     "button: Norsk",
+     "button: Polski",
+     "button: Portugu\u00eas",
+     "button: Portugu\u00eas - Brasil",
+     "button: Rom\u00e2n\u0103",
+     "button: Sloven\u010dina",
+     "button: Suomi",
+     "button: Svenska",
+     "button: Ti\u1ebfng Vi\u1ec7t",
+     "button: T\u00fcrk\u00e7e",
+     "button: \u010ce\u0161tina",
+     "button: \u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac",
+     "button: \u0411\u044a\u043b\u0433\u0430\u0440\u0441\u043a\u0438"
+    ],
+    "n": 38
+   },
+   {
+    "opener": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > Indhold med m\u00e6rkat",
+    "found": [
+     "button: Udvid rangliste for st\u00f8rste gavegivere",
+     "button: Log ind",
+     "button: Afvis denne besked",
+     "button: ",
+     "button: bazarrc",
+     "button: Klik for at svare @bazarrc",
+     "button: ",
+     "button: ",
+     "button: ",
+     "button: Fossabot",
+     "button: Klik for at svare @Fossabot",
+     "button: ",
+     "button: wenzwater",
+     "button: Klik for at svare @wenzwater",
+     "button: ",
+     "button: ",
+     "button: HypeTrainl",
+     "button: ",
+     "button: ",
+     "button: ",
+     "button: Fossabot",
+     "button: Klik for at svare @Fossabot",
+     "button: Indhold med m\u00e6rkat",
+     "button: Tilbage-knap",
+     "switch: on",
+     "link: her"
+    ],
+    "n": 26
+   },
+   {
+    "opener": "\ud83d\udfea APAC RANK 1 MOODATHON \ud83d\udfea  > Brugermenu > Log ind",
+    "found": [
+     "link: LIVE",
+     "link: mooda",
+     "link: VALORANT",
+     "link: Tiktok",
+     "link: ",
+     "button: S\u00e6t p\u00e5 pause (mellemrum/k)",
+     "button: Sl\u00e5 lyd fra (m)",
+     "range input: 0.5",
+     "button: ",
+     "button: bazarrc",
+     "button: Klik for at svare @bazarrc",
+     "button: ",
+     "button: ",
+     "button: ",
+     "button: Fossabot",
+     "button: Klik for at svare @Fossabot",
+     "button: ",
+     "button: wenzwater",
+     "button: Klik for at svare @wenzwater",
+     "button: ",
+     "button: ",
+     "button: HypeTrainl",
+     "button: ",
+     "button: ",
+     "button: ",
+     "button: Fossabot",
+     "button: Klik for at svare @Fossabot",
+     "button: macdemarcolover03",
+     "button: Klik for at svare @macdemarcolover03",
+     "text input: Indtast dit brugernavn"
+    ],
+    "n": 39
+   }
+  ],
+  "skipped_risky": [
+   "\ud83c\udf1fPOST NMS BOXING\ud83c\udf1fLIVE ALL DAY N NIGHT\ud83c\udf1fFNAF MARATHON TMRW\ud83c\udf1f!socials !comm !osc",
+   "yugi (Verified) streaming \ud83c\udf1fPOST NMS BOXING\ud83c\udf1fLIVE ALL DAY N NIGHT\ud83c\udf1fFNAF MARATHON",
+   "Sign Up"
+  ],
+  "openers_opened": 20,
+  "screenshot_show": "D:\\new_automation\\reports\\try_app\\20261026_120904\\page_show.png",
+  "total_ms": 304375,
+  "load_ms": 8027,
+  "read_ms": 0
+ }
+}

@@ -1,0 +1,10 @@
+import sqlite3
+c = sqlite3.connect("brain/episodic_memory.db")
+cur = c.cursor()
+cur.execute("DELETE FROM verified_trajectories WHERE app_name='Paint'")
+c.commit()
+cur.execute("SELECT app_name, COUNT(*) FROM verified_trajectories GROUP BY app_name")
+print("after purge Paint:", cur.fetchall())
+cur.execute("SELECT COUNT(*) FROM verified_trajectories")
+print("GENUINE clean rows now:", cur.fetchone()[0])
+c.close()

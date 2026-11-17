@@ -1,0 +1,102 @@
+{
+ "app": "excel",
+ "started": "2026-11-02 03:24:07",
+ "phases": {
+  "read": {
+   "seconds": 9.1,
+   "level": "static"
+  },
+  "map": {
+   "ran": true,
+   "seconds": 294.1,
+   "level": "explored",
+   "commands": 2696,
+   "with_shortcut": 16,
+   "dialogs": 2,
+   "layout_controls": 1861,
+   "state_variables": 35,
+   "frontier": {
+    "total": 128,
+    "by_status": {
+     "explored": 13,
+     "no_effect": 2,
+     "open": 97,
+     "unsafe": 16
+    },
+    "explorable": 112,
+    "explored_n": 15,
+    "explored_fraction": 0.134
+   }
+  },
+  "ask": {
+   "asked": 4,
+   "answered": 3,
+   "items": [
+    {
+     "q": "In excel, how do I use 100% Stacked Column?",
+     "status": "ANSWERED",
+     "answer": "To create a 100% Stacked Column chart, you can use the chart type `xl3DColumnStacked100` as specified in the evidence [1]."
+    },
+    {
+     "q": "In excel, how do I use 100% Stacked Line?",
+     "status": "ANSWERED",
+     "answer": "To use a 100% Stacked Line chart in Excel, you need to use a different chart type since \"100% Stacked Line\" is not a direct option. You can use a \"Stacked Column\" or \"Stacked Bar\" chart and then add series lines to mimic a 100% Stacked Line"
+    },
+    {
+     "q": "In excel, how do I use 100% Stacked Line with Markers?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about excel (5000 documents, 13 procedures, 2 shortcuts). instructions on how to create a 100% Stacked Line with Markers directly in Excel Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In excel, how do I use A1?",
+     "status": "ANSWERED",
+     "answer": "In Excel, you can use A1 to refer to a single cell in A1-style notation [1]. To check if the current reference style is A1, you can use the following VBA code [2]:\n\n```vb\nIf Application.ReferenceStyle = xlA1 Then\n    MsgBox \"Microsoft Excel"
+    }
+   ],
+   "seconds": 43.2
+  },
+  "practice": {
+   "written": 69,
+   "tried": 0,
+   "proven_done": 0,
+   "kept_training_rows": 0,
+   "results": [
+    {
+     "task": "open excel",
+     "status": "SKIPPED",
+     "why": "risky words or not saved in the practice folder"
+    },
+    {
+     "task": "Insert Column or Bar Chart > 100% Stacked Column",
+     "status": "SKIPPED",
+     "why": "risky words or not saved in the practice folder"
+    },
+    {
+     "task": "Grid > A1",
+     "status": "SKIPPED",
+     "why": "risky words or not saved in the practice folder"
+    },
+    {
+     "task": "Draw > A1",
+     "status": "SKIPPED",
+     "why": "risky words or not saved in the practice folder"
+    },
+    {
+     "task": "Page Layout > A1",
+     "status": "SKIPPED",
+     "why": "risky words or not saved in the practice folder"
+    }
+   ],
+   "seconds": 30.7
+  }
+ },
+ "app_key": "excel",
+ "exe": "C:\\Program Files\\Microsoft Office\\Root\\Office16\\EXCEL.EXE",
+ "readiness": {
+  "knows_commands": true,
+  "answers_questions": "3/4",
+  "proven_tasks": "0/0",
+  "verdict": "not tested live (app busy or live off)"
+ },
+ "seconds": 382.9
+}

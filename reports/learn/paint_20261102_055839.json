@@ -1,0 +1,115 @@
+{
+ "app": "paint",
+ "started": "2026-11-02 05:58:43",
+ "phases": {
+  "read": {
+   "store": {
+    "Microsoft.Paint": {
+     "key": "paint",
+     "ui_words": 814,
+     "views": 55,
+     "chunks": 45
+    }
+   },
+   "seconds": 7.9,
+   "level": "explored"
+  },
+  "map": {
+   "ran": true,
+   "seconds": 20.9,
+   "level": "explored",
+   "commands": 365,
+   "with_shortcut": 38,
+   "dialogs": 9,
+   "layout_controls": 444,
+   "state_variables": 1,
+   "frontier": {
+    "total": 14,
+    "by_status": {
+     "explored": 7,
+     "failed": 4,
+     "no_effect": 1,
+     "unsafe": 2
+    },
+    "explorable": 12,
+    "explored_n": 8,
+    "explored_fraction": 0.667
+   }
+  },
+  "ask": {
+   "asked": 4,
+   "answered": 2,
+   "items": [
+    {
+     "q": "In paint, how do I use Zoom?",
+     "status": "ANSWERED",
+     "answer": "In Paint, to use Zoom, click on 'Zoom in' or 'Zoom out' [3]. These options are part of the application's UI and allow you to adjust the view of your work."
+    },
+    {
+     "q": "In paint, how do I use Dark?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about paint (226 documents, 9 procedures, 0 shortcuts). how to use the Dark theme in Paint Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In paint, how do I use Open settings?",
+     "status": "ANSWERED",
+     "answer": "To use Open settings in Paint, press the [SettingsButtonName] which is labeled \"Open settings\" [1]."
+    },
+    {
+     "q": "In paint, how do I use Third-Party Software Acknowledgements?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about paint (226 documents, 9 procedures, 0 shortcuts). how to access or use Third-Party Software Acknowledgements in Paint. Reverse engineering or scanning it more would fill this in."
+    }
+   ],
+   "seconds": 12.7
+  },
+  "practice": {
+   "written": 5,
+   "tried": 5,
+   "proven_done": 0,
+   "kept_training_rows": 0,
+   "results": [
+    {
+     "task": "open paint, type 'Hello World' in the center using the font 'Arial' with size 36, use the color 'Dark red', draw a rounded rectangle around the text, fill it with 'Light turquoise', and save as 'greeting.bmp' in D:\\new_automation\\data\\practice\\paint",
+     "status": "FAILED",
+     "seconds": 59.1,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'paint': BLOCKED (window hwnd=9242820), 6 verified-loop steps in 41.4s\n    - 'create a new blank document' -> DONE (PASS) [WEAK evidence: the UI"
+    },
+    {
+     "task": "open paint, draw a 200x200 oval in the center of the canvas, fill it with 'Brown', draw a line from the top left to the bottom right, use the 'Zoom' feature to view the line details, then 'Zoom out' to see the whole oval, and save as 'oval_with_line.bmp' in D:\\new_automation\\data\\practice\\paint",
+     "status": "FAILED",
+     "seconds": 82.9,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'paint': BLOCKED (window hwnd=1903350), 3 verified-loop steps in 26.1s\n    - 'click Zoom > Zoom' -> DONE (PASS) [WEAK evidence: the UI changed, "
+    },
+    {
+     "task": "open paint, draw a heart shape using the 'Heart' tool, fill it with 'Turquoise', draw a cloud callout next to the heart, fill it with 'Lime', and save as 'heart_with_cloud.bmp' in D:\\new_automation\\data\\practice\\paint",
+     "status": "FAILED",
+     "seconds": 32.4,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'paint': NEEDS_HUMAN (window hwnd=7866440), 1 verified-loop steps in 11.2s\n    - 'click Heart' -> NOT DONE (HITL)\n    - 'draw heart shape' -> NO"
+    },
+    {
+     "task": "open paint, draw a four-point star in the center, fill it with 'Grey', draw a curve from the top left to the bottom right, use the 'Zoom in' feature to view the curve details, then 'Zoom out' to see the whole star, and save as 'star_with_curve.bmp' in D:\\new_automation\\data\\practice\\paint",
+     "status": "FAILED",
+     "seconds": 41.9,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'paint': BLOCKED (window hwnd=4588938), 4 verified-loop steps in 24.7s\n    - 'click Four-point star' -> DONE (PASS) [WEAK evidence: the UI chang"
+    },
+    {
+     "task": "open paint, draw a diamond shape using the 'Diamond' tool, fill it with 'Dark red', draw a line from the top left to the bottom right, use the 'Zoom' feature to view the line details, then 'Zoom out' to see the whole diamond, and save as 'diamond_with_line.bmp' in D:\\new_automation\\data\\practice\\paint",
+     "status": "FAILED",
+     "seconds": 36.3,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'paint': BLOCKED (window hwnd=2293938), 3 verified-loop steps in 24.1s\n    - 'click paint' -> DONE (PASS) [WEAK evidence: the UI changed, nothin"
+    }
+   ],
+   "seconds": 269.2
+  }
+ },
+ "app_key": "paint",
+ "exe": "C:\\Program Files\\WindowsApps\\Microsoft.Paint_11.2605.81.0_x64__8wekyb3d8bbwe\\PaintApp\\mspaint.exe",
+ "readiness": {
+  "knows_commands": true,
+  "answers_questions": "2/4",
+  "proven_tasks": "0/5",
+  "verdict": "not ready: nothing proven yet"
+ },
+ "seconds": 315.6
+}

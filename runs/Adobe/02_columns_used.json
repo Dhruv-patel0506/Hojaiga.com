@@ -1,0 +1,638 @@
+{
+  "primary": {
+    "column": "revenue_usd_m",
+    "role": "revenue",
+    "guessed": false,
+    "aggregation": "sum"
+  },
+  "used": [
+    {
+      "column": "cost_of_revenue_usd_m",
+      "safe_name": "cost_of_revenue_usd_m",
+      "role": "revenue",
+      "aggregation": "sum",
+      "missing_share": 0.0,
+      "pearson": 0.9999999999996383,
+      "spearman": 1.0,
+      "n": 201
+    },
+    {
+      "column": "operating_income_usd_m",
+      "safe_name": "operating_income_usd_m",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": 0.0674195422013494,
+      "spearman": 0.1668774937195212,
+      "n": 201
+    },
+    {
+      "column": "shares_outstanding_m",
+      "safe_name": "shares_outstanding_m",
+      "role": "volume",
+      "aggregation": "sum",
+      "missing_share": 0.0,
+      "pearson": 0.998357044722934,
+      "spearman": 0.9772074418581167,
+      "n": 201
+    },
+    {
+      "column": "open",
+      "safe_name": "open",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": -0.03900239175004498,
+      "spearman": -0.08133737254322447,
+      "n": 201
+    },
+    {
+      "column": "volume",
+      "safe_name": "volume",
+      "role": "volume",
+      "aggregation": "sum",
+      "missing_share": 0.0,
+      "pearson": 0.864824883078685,
+      "spearman": 0.8589862568346388,
+      "n": 201
+    },
+    {
+      "column": "policy_rate_pct",
+      "safe_name": "policy_rate_pct",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": -0.0869995807119757,
+      "spearman": -0.022876022612899696,
+      "n": 132
+    },
+    {
+      "column": "unemployment_rate_pct",
+      "safe_name": "unemployment_rate_pct",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": 0.02460116083271981,
+      "spearman": -0.0002273866000213779,
+      "n": 201
+    },
+    {
+      "column": "gdp_growth_pct",
+      "safe_name": "gdp_growth_pct",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": 0.0016067769585145315,
+      "spearman": -0.004849277466532336,
+      "n": 201
+    },
+    {
+      "column": "fx_rate_per_usd",
+      "safe_name": "fx_rate_per_usd",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": -0.06938465139783341,
+      "spearman": -0.04794443623466825,
+      "n": 201
+    },
+    {
+      "column": "bond_yield_10y_pct",
+      "safe_name": "bond_yield_10y_pct",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": -0.060393603422123195,
+      "spearman": -0.10754309926545402,
+      "n": 201
+    },
+    {
+      "column": "primitive_demand",
+      "safe_name": "primitive_demand",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": -0.12042215682708593,
+      "spearman": 0.01932170829023201,
+      "n": 201
+    },
+    {
+      "column": "primitive_supply",
+      "safe_name": "primitive_supply",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": -0.06933003348098661,
+      "spearman": -0.0689256686862716,
+      "n": 201
+    },
+    {
+      "column": "primitive_monetary",
+      "safe_name": "primitive_monetary",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": -0.004211416007020886,
+      "spearman": 0.006429732525491355,
+      "n": 201
+    },
+    {
+      "column": "primitive_fiscal",
+      "safe_name": "primitive_fiscal",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": 0.04809820926909962,
+      "spearman": -0.044224915028816314,
+      "n": 201
+    },
+    {
+      "column": "primitive_geopolitical",
+      "safe_name": "primitive_geopolitical",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": -0.012675385249573892,
+      "spearman": 0.004954928328653761,
+      "n": 201
+    },
+    {
+      "column": "primitive_tech",
+      "safe_name": "primitive_tech",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": -0.016168225975728586,
+      "spearman": 0.007184867740505395,
+      "n": 201
+    },
+    {
+      "column": "primitive_regulatory",
+      "safe_name": "primitive_regulatory",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": 0.003346747107841903,
+      "spearman": 0.06067090291118664,
+      "n": 201
+    },
+    {
+      "column": "primitive_pandemic",
+      "safe_name": "primitive_pandemic",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": -0.04998640451244345,
+      "spearman": 0.003950051721590069,
+      "n": 201
+    },
+    {
+      "column": "magnitude",
+      "safe_name": "magnitude",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": 0.03841148761148392,
+      "spearman": 0.02715087926703118,
+      "n": 201
+    },
+    {
+      "column": "daily_return",
+      "safe_name": "daily_return",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": -0.09900497136616496,
+      "spearman": -0.15866853849564064,
+      "n": 201
+    },
+    {
+      "column": "daily_volatility",
+      "safe_name": "daily_volatility",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": -0.006187540980231857,
+      "spearman": -0.01765775084971184,
+      "n": 201
+    },
+    {
+      "column": "rsi_14",
+      "safe_name": "rsi_14",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": -0.00825662695290415,
+      "spearman": -0.006085414511600414,
+      "n": 201
+    },
+    {
+      "column": "pe_ratio",
+      "safe_name": "pe_ratio",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": -0.04560087312782475,
+      "spearman": -0.10074774641643268,
+      "n": 201
+    },
+    {
+      "column": "pb_ratio",
+      "safe_name": "pb_ratio",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "pearson": -0.04728162793929715,
+      "spearman": -0.10038126200679769,
+      "n": 201
+    }
+  ],
+  "dropped": [
+    {
+      "column": "operating_expense_usd_m",
+      "safe_name": "operating_expense_usd_m",
+      "role": "cost",
+      "aggregation": "sum",
+      "missing_share": 0.0,
+      "reason": "duplicates cost_of_revenue_usd_m (correlation 1.000)",
+      "pearson": 0.9999999999988827,
+      "spearman": 1.0,
+      "n": 201
+    },
+    {
+      "column": "net_income_usd_m",
+      "safe_name": "net_income_usd_m",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "duplicates operating_income_usd_m (correlation 1.000)",
+      "pearson": 0.06741955687489909,
+      "spearman": 0.1668774937195212,
+      "n": 201
+    },
+    {
+      "column": "cash_usd_m",
+      "safe_name": "cash_usd_m",
+      "role": "cash",
+      "aggregation": "last",
+      "missing_share": 0.0,
+      "reason": "duplicates operating_income_usd_m (correlation 0.994)",
+      "pearson": 0.12894958184451139,
+      "spearman": 0.21009605438155757,
+      "n": 201
+    },
+    {
+      "column": "total_debt_usd_m",
+      "safe_name": "total_debt_usd_m",
+      "role": "debt",
+      "aggregation": "last",
+      "missing_share": 0.0,
+      "reason": "duplicates operating_income_usd_m (correlation 0.994)",
+      "pearson": 0.12895466071351802,
+      "spearman": 0.21009605438155757,
+      "n": 201
+    },
+    {
+      "column": "total_assets_usd_m",
+      "safe_name": "total_assets_usd_m",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "duplicates operating_income_usd_m (correlation 0.994)",
+      "pearson": 0.07009009641546281,
+      "spearman": 0.1320969410373873,
+      "n": 201
+    },
+    {
+      "column": "equity_usd_m",
+      "safe_name": "equity_usd_m",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "duplicates operating_income_usd_m (correlation 0.994)",
+      "pearson": 0.07009022178995082,
+      "spearman": 0.1320969410373873,
+      "n": 201
+    },
+    {
+      "column": "operating_cash_flow_usd_m",
+      "safe_name": "operating_cash_flow_usd_m",
+      "role": "cash",
+      "aggregation": "last",
+      "missing_share": 0.0,
+      "reason": "duplicates operating_income_usd_m (correlation 1.000)",
+      "pearson": 0.10125846909027335,
+      "spearman": 0.197264666765184,
+      "n": 201
+    },
+    {
+      "column": "capex_usd_m",
+      "safe_name": "capex_usd_m",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "duplicates operating_income_usd_m (correlation 1.000)",
+      "pearson": 0.06740907926847892,
+      "spearman": 0.1668774937195212,
+      "n": 201
+    },
+    {
+      "column": "restated_flag",
+      "safe_name": "restated_flag",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "constant or empty",
+      "pearson": null,
+      "spearman": null,
+      "n": 0
+    },
+    {
+      "column": "high",
+      "safe_name": "high",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "duplicates open (correlation 1.000)",
+      "pearson": -0.039448289298332204,
+      "spearman": -0.08203044185015518,
+      "n": 201
+    },
+    {
+      "column": "low",
+      "safe_name": "low",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "duplicates open (correlation 1.000)",
+      "pearson": -0.03989642531724846,
+      "spearman": -0.08226983892419093,
+      "n": 201
+    },
+    {
+      "column": "close",
+      "safe_name": "close",
+      "role": "price",
+      "aggregation": "last",
+      "missing_share": 0.0,
+      "reason": "duplicates open (correlation 0.999)",
+      "pearson": -0.04284128149700315,
+      "spearman": -0.04013004285503177,
+      "n": 201
+    },
+    {
+      "column": "adjusted_close",
+      "safe_name": "adjusted_close",
+      "role": "price",
+      "aggregation": "last",
+      "missing_share": 0.0,
+      "reason": "duplicates open (correlation 0.999)",
+      "pearson": -0.04284128149700315,
+      "spearman": -0.04013004285503177,
+      "n": 201
+    },
+    {
+      "column": "market_cap_usd_bn",
+      "safe_name": "market_cap_usd_bn",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "duplicates open (correlation 1.000)",
+      "pearson": -0.03921209598566068,
+      "spearman": -0.08148367075513521,
+      "n": 201
+    },
+    {
+      "column": "home_index_close",
+      "safe_name": "home_index_close",
+      "role": "index",
+      "aggregation": "last",
+      "missing_share": 0.0,
+      "reason": "identifier-like name",
+      "pearson": 0.08597530308418558,
+      "spearman": 0.06460341546447256,
+      "n": 201
+    },
+    {
+      "column": "sector_index_close",
+      "safe_name": "sector_index_close",
+      "role": "price",
+      "aggregation": "last",
+      "missing_share": 0.0,
+      "reason": "identifier-like name",
+      "pearson": 0.08823201408692498,
+      "spearman": 0.03595814046212701,
+      "n": 201
+    },
+    {
+      "column": "cpi_index",
+      "safe_name": "cpi_index",
+      "role": "index",
+      "aggregation": "last",
+      "missing_share": 0.0,
+      "reason": "identifier-like name",
+      "pearson": 0.27075818772799354,
+      "spearman": 0.34760011822077735,
+      "n": 201
+    },
+    {
+      "column": "consumer_confidence_index",
+      "safe_name": "consumer_confidence_index",
+      "role": "index",
+      "aggregation": "last",
+      "missing_share": 0.0,
+      "reason": "identifier-like name",
+      "pearson": 0.057526025590954225,
+      "spearman": 0.05666617408009458,
+      "n": 201
+    },
+    {
+      "column": "sma_20",
+      "safe_name": "sma_20",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "duplicates open (correlation 1.000)",
+      "pearson": -0.034427947330198536,
+      "spearman": -0.07803457957736074,
+      "n": 201
+    },
+    {
+      "column": "sma_50",
+      "safe_name": "sma_50",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "duplicates open (correlation 1.000)",
+      "pearson": -0.026342335270400245,
+      "spearman": -0.07327176001182208,
+      "n": 201
+    },
+    {
+      "column": "sma_200",
+      "safe_name": "sma_200",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "duplicates open (correlation 1.000)",
+      "pearson": 0.0291836141514317,
+      "spearman": -0.022258016846460765,
+      "n": 201
+    },
+    {
+      "column": "natr_14",
+      "safe_name": "natr_14",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "duplicates daily_volatility (correlation 1.000)",
+      "pearson": -0.00618754098023159,
+      "spearman": -0.01765775084971184,
+      "n": 201
+    },
+    {
+      "column": "ebitda_usd_m",
+      "safe_name": "ebitda_usd_m",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "duplicates operating_income_usd_m (correlation 1.000)",
+      "pearson": 0.06741819989656052,
+      "spearman": 0.1668774937195212,
+      "n": 201
+    },
+    {
+      "column": "ebitda_margin_pct",
+      "safe_name": "ebitda_margin_pct",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "constant or empty",
+      "pearson": null,
+      "spearman": null,
+      "n": 201
+    },
+    {
+      "column": "operating_margin_pct",
+      "safe_name": "operating_margin_pct",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "constant or empty",
+      "pearson": null,
+      "spearman": null,
+      "n": 201
+    },
+    {
+      "column": "net_margin_pct",
+      "safe_name": "net_margin_pct",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "constant or empty",
+      "pearson": null,
+      "spearman": null,
+      "n": 201
+    },
+    {
+      "column": "eps_diluted_usd",
+      "safe_name": "eps_diluted_usd",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "duplicates operating_income_usd_m (correlation 1.000)",
+      "pearson": 0.06138352166390045,
+      "spearman": 0.15711312415308984,
+      "n": 201
+    },
+    {
+      "column": "ps_ratio",
+      "safe_name": "ps_ratio",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "duplicates pe_ratio (correlation 1.000)",
+      "pearson": -0.04609889930483042,
+      "spearman": -0.1023806709029112,
+      "n": 201
+    },
+    {
+      "column": "free_cash_flow_usd_m",
+      "safe_name": "free_cash_flow_usd_m",
+      "role": "cash",
+      "aggregation": "last",
+      "missing_share": 0.0,
+      "reason": "duplicates operating_income_usd_m (correlation 1.000)",
+      "pearson": 0.10116583487836295,
+      "spearman": 0.1972144229348308,
+      "n": 201
+    },
+    {
+      "column": "adobe_digital_media_arr_usd_m",
+      "safe_name": "adobe_digital_media_arr_usd_m",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "duplicates operating_income_usd_m (correlation 0.987)",
+      "pearson": 0.04442406577634516,
+      "spearman": 0.04318752770799468,
+      "n": 201
+    },
+    {
+      "column": "adobe_document_cloud_revenue_usd_m",
+      "safe_name": "adobe_document_cloud_revenue_usd_m",
+      "role": "revenue",
+      "aggregation": "sum",
+      "missing_share": 0.0,
+      "reason": "duplicates cost_of_revenue_usd_m (correlation 0.983)",
+      "pearson": 0.9971152890647466,
+      "spearman": 0.9724087483375203,
+      "n": 201
+    },
+    {
+      "column": "adobe_creative_cloud_subscribers_m",
+      "safe_name": "adobe_creative_cloud_subscribers_m",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "duplicates operating_income_usd_m (correlation 0.987)",
+      "pearson": 0.044711382128068904,
+      "spearman": 0.042167873503768286,
+      "n": 201
+    },
+    {
+      "column": "target_next_period_return",
+      "safe_name": "target_next_period_return",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "outcome column: describes the future, would leak the answer",
+      "pearson": -0.0009069039547966964,
+      "spearman": -0.11642825476577509,
+      "n": 201
+    },
+    {
+      "column": "target_next_period_direction",
+      "safe_name": "target_next_period_direction",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "outcome column: describes the future, would leak the answer",
+      "pearson": 0.039883326205496734,
+      "spearman": 0.057228673078095135,
+      "n": 201
+    },
+    {
+      "column": "target_multi_period_fwd_return",
+      "safe_name": "target_multi_period_fwd_return",
+      "role": null,
+      "aggregation": "mean",
+      "missing_share": 0.0,
+      "reason": "outcome column: describes the future, would leak the answer",
+      "pearson": -0.06769597619890855,
+      "spearman": -0.09135806117925226,
+      "n": 201
+    }
+  ],
+  "note": "used columns feed training only if they relate to the target on training months (see 05_selected_columns.json after training)"
+}

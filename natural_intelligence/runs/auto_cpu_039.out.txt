@@ -1,0 +1,713 @@
+03:01:56 NI run auto_cpu_039 on CPU; hours=2.0 smoke=False
+03:01:56 explicit task list: ['enc/text/enron_spam']
+03:01:56 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+03:01:56 [data] enc/text/enron_spam: n=33716 C=2 D=384 shards=1
+03:02:22 [enc/text/enron_spam] vote=0.989 uniform=0.988 best1=0.988 n_val=10168 vram=0.00GB 25s
+03:02:34 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 10168, "n_val": 2074, "base_rate": 0.9874638319015503, "inner": {"auc": 0.9901216947115384, "ece": 0.005643195626231606, "brier": 0.006407459266483784, "acc80": 1.0}, "outer_conf": {"auc": 0.9739896334134616, "ece": 0.01962446716677832, "brier": 0.010047217831015587, "acc80": 1.0}}
+03:02:34 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+03:02:58 [enc/text/enron_spam] vote=0.989 uniform=0.987 best1=0.988 n_val=10124 vram=0.00GB 24s | grade=0.971 inner_auc=0.985 vs conf_auc=0.968
+03:03:04 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+03:03:26 [enc/text/enron_spam] vote=0.988 uniform=0.987 best1=0.988 n_val=10203 vram=0.00GB 22s | grade=0.969 inner_auc=0.978 vs conf_auc=0.955
+03:03:32 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+03:03:54 [enc/text/enron_spam] vote=0.987 uniform=0.984 best1=0.987 n_val=10233 vram=0.00GB 22s | grade=0.971 inner_auc=0.983 vs conf_auc=0.968
+03:04:00 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+03:04:23 [enc/text/enron_spam] vote=0.987 uniform=0.984 best1=0.987 n_val=10006 vram=0.00GB 23s | grade=0.968 inner_auc=0.980 vs conf_auc=0.952
+03:04:29 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+03:04:52 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10308 vram=0.00GB 22s | grade=0.972 inner_auc=0.988 vs conf_auc=0.969
+03:04:59 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+03:05:22 [enc/text/enron_spam] vote=0.989 uniform=0.987 best1=0.988 n_val=10129 vram=0.00GB 23s | grade=0.968 inner_auc=0.987 vs conf_auc=0.979
+03:05:28 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+03:05:49 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.988 n_val=10133 vram=0.00GB 21s | grade=0.964 inner_auc=0.979 vs conf_auc=0.956
+03:05:55 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+03:06:18 [enc/text/enron_spam] vote=0.988 uniform=0.987 best1=0.988 n_val=10161 vram=0.00GB 22s | grade=0.966 inner_auc=0.988 vs conf_auc=0.983
+03:06:23 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+03:06:48 [enc/text/enron_spam] vote=0.987 uniform=0.986 best1=0.987 n_val=10088 vram=0.00GB 25s | grade=0.965 inner_auc=0.985 vs conf_auc=0.979
+03:06:54 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+03:07:18 [enc/text/enron_spam] vote=0.988 uniform=0.986 best1=0.987 n_val=10121 vram=0.00GB 25s | grade=0.969 inner_auc=0.985 vs conf_auc=0.975
+03:07:25 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+03:07:51 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.989 n_val=10028 vram=0.00GB 26s | grade=0.968 inner_auc=0.989 vs conf_auc=0.981
+03:07:57 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+03:08:21 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.986 n_val=10179 vram=0.00GB 24s | grade=0.971 inner_auc=0.986 vs conf_auc=0.979
+03:08:27 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+03:08:52 [enc/text/enron_spam] vote=0.988 uniform=0.986 best1=0.988 n_val=10058 vram=0.00GB 24s | grade=0.969 inner_auc=0.995 vs conf_auc=0.983
+03:08:58 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+03:09:22 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.988 n_val=10115 vram=0.00GB 24s | grade=0.971 inner_auc=0.989 vs conf_auc=0.973
+03:09:29 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+03:09:53 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.987 n_val=10103 vram=0.00GB 25s | grade=0.966 inner_auc=0.991 vs conf_auc=0.981
+03:10:00 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+03:10:25 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.986 n_val=10174 vram=0.00GB 25s | grade=0.970 inner_auc=0.981 vs conf_auc=0.973
+03:10:31 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+03:10:56 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.986 n_val=10142 vram=0.00GB 25s | grade=0.971 inner_auc=0.987 vs conf_auc=0.977
+03:11:02 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+03:11:27 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.988 n_val=10163 vram=0.00GB 25s | grade=0.971 inner_auc=0.988 vs conf_auc=0.977
+03:11:34 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+03:11:58 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.988 n_val=10031 vram=0.00GB 24s | grade=0.969 inner_auc=0.990 vs conf_auc=0.976
+03:12:05 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+03:12:29 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.986 n_val=10168 vram=0.00GB 24s | grade=0.968 inner_auc=0.994 vs conf_auc=0.989
+03:12:35 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+03:13:00 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.988 n_val=10078 vram=0.00GB 25s | grade=0.973 inner_auc=0.988 vs conf_auc=0.980
+03:13:07 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+03:13:32 [enc/text/enron_spam] vote=0.991 uniform=0.989 best1=0.990 n_val=10136 vram=0.00GB 25s | grade=0.967 inner_auc=0.988 vs conf_auc=0.978
+03:13:38 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+03:14:03 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.987 n_val=10149 vram=0.00GB 25s | grade=0.971 inner_auc=0.985 vs conf_auc=0.968
+03:14:10 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+03:14:35 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.985 n_val=10162 vram=0.00GB 25s | grade=0.965 inner_auc=0.989 vs conf_auc=0.980
+03:14:42 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+03:15:07 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10114 vram=0.00GB 25s | grade=0.968 inner_auc=0.987 vs conf_auc=0.977
+03:15:14 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+03:15:39 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.987 n_val=10015 vram=0.00GB 25s | grade=0.965 inner_auc=0.994 vs conf_auc=0.985
+03:15:46 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+03:16:12 [enc/text/enron_spam] vote=0.991 uniform=0.985 best1=0.988 n_val=10152 vram=0.00GB 26s | grade=0.966 inner_auc=0.978 vs conf_auc=0.942
+03:16:19 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+03:16:45 [enc/text/enron_spam] vote=0.989 uniform=0.988 best1=0.987 n_val=10063 vram=0.00GB 26s | grade=0.972 inner_auc=0.985 vs conf_auc=0.981
+03:16:52 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+03:17:21 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10261 vram=0.00GB 28s | grade=0.972 inner_auc=0.984 vs conf_auc=0.972
+03:17:28 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+03:17:55 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.986 n_val=10025 vram=0.00GB 27s | grade=0.973 inner_auc=0.984 vs conf_auc=0.979
+03:18:02 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+03:18:27 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10100 vram=0.00GB 24s | grade=0.970 inner_auc=0.988 vs conf_auc=0.978
+03:18:33 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+03:18:57 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.987 n_val=10190 vram=0.00GB 23s | grade=0.967 inner_auc=0.987 vs conf_auc=0.974
+03:19:03 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+03:19:27 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.989 n_val=10056 vram=0.00GB 23s | grade=0.963 inner_auc=0.982 vs conf_auc=0.965
+03:19:33 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+03:19:56 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.987 n_val=9983 vram=0.00GB 23s | grade=0.967 inner_auc=0.987 vs conf_auc=0.953
+03:20:03 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+03:20:27 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.986 n_val=10104 vram=0.00GB 24s | grade=0.971 inner_auc=0.979 vs conf_auc=0.966
+03:20:33 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+03:20:57 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.985 n_val=10088 vram=0.00GB 24s | grade=0.968 inner_auc=0.987 vs conf_auc=0.977
+03:21:04 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+03:21:29 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10182 vram=0.00GB 25s | grade=0.972 inner_auc=0.978 vs conf_auc=0.952
+03:21:37 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+03:22:01 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.987 n_val=10000 vram=0.00GB 24s | grade=0.972 inner_auc=0.986 vs conf_auc=0.981
+03:22:10 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+03:22:47 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10292 vram=0.00GB 36s | grade=0.971 inner_auc=0.983 vs conf_auc=0.973
+03:22:55 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+03:23:18 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.987 n_val=10125 vram=0.00GB 23s | grade=0.961 inner_auc=0.980 vs conf_auc=0.964
+03:23:25 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+03:23:48 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.987 n_val=10125 vram=0.00GB 23s | grade=0.971 inner_auc=0.982 vs conf_auc=0.967
+03:23:54 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+03:24:18 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.989 n_val=10027 vram=0.00GB 24s | grade=0.972 inner_auc=0.989 vs conf_auc=0.982
+03:24:24 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+03:24:48 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10195 vram=0.00GB 24s | grade=0.969 inner_auc=0.989 vs conf_auc=0.988
+03:24:55 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+03:25:18 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10074 vram=0.00GB 23s | grade=0.967 inner_auc=0.979 vs conf_auc=0.966
+03:25:25 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+03:25:49 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.988 n_val=10039 vram=0.00GB 23s | grade=0.967 inner_auc=0.986 vs conf_auc=0.982
+03:25:55 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+03:26:19 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.986 n_val=10107 vram=0.00GB 24s | grade=0.967 inner_auc=0.988 vs conf_auc=0.972
+03:26:26 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+03:26:49 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10093 vram=0.00GB 24s | grade=0.968 inner_auc=0.982 vs conf_auc=0.983
+03:26:56 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+03:27:19 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=10193 vram=0.00GB 23s | grade=0.968 inner_auc=0.983 vs conf_auc=0.980
+03:27:26 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+03:27:50 [enc/text/enron_spam] vote=0.991 uniform=0.984 best1=0.989 n_val=10113 vram=0.00GB 23s | grade=0.970 inner_auc=0.992 vs conf_auc=0.990
+03:27:56 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+03:28:19 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10270 vram=0.00GB 23s | grade=0.968 inner_auc=0.975 vs conf_auc=0.976
+03:28:26 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+03:28:50 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.987 n_val=10106 vram=0.00GB 23s | grade=0.971 inner_auc=0.986 vs conf_auc=0.976
+03:28:56 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+03:29:20 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.988 n_val=10129 vram=0.00GB 23s | grade=0.971 inner_auc=0.987 vs conf_auc=0.978
+03:29:27 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+03:29:50 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.987 n_val=10041 vram=0.00GB 24s | grade=0.972 inner_auc=0.975 vs conf_auc=0.960
+03:29:57 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+03:30:20 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.987 n_val=10046 vram=0.00GB 24s | grade=0.965 inner_auc=0.983 vs conf_auc=0.979
+03:30:27 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+03:30:51 [enc/text/enron_spam] vote=0.991 uniform=0.987 best1=0.988 n_val=10126 vram=0.00GB 23s | grade=0.965 inner_auc=0.990 vs conf_auc=0.988
+03:30:58 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+03:31:21 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.988 n_val=10162 vram=0.00GB 23s | grade=0.972 inner_auc=0.988 vs conf_auc=0.977
+03:31:28 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+03:31:51 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.989 n_val=10234 vram=0.00GB 23s | grade=0.972 inner_auc=0.990 vs conf_auc=0.982
+03:31:59 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+03:32:22 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.987 n_val=10122 vram=0.00GB 23s | grade=0.964 inner_auc=0.987 vs conf_auc=0.984
+03:32:29 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+03:32:53 [enc/text/enron_spam] vote=0.989 uniform=0.983 best1=0.986 n_val=10148 vram=0.00GB 24s | grade=0.971 inner_auc=0.987 vs conf_auc=0.972
+03:32:59 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+03:33:23 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.986 n_val=10117 vram=0.00GB 24s | grade=0.972 inner_auc=0.987 vs conf_auc=0.984
+03:33:30 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+03:33:54 [enc/text/enron_spam] vote=0.988 uniform=0.983 best1=0.985 n_val=10207 vram=0.00GB 24s | grade=0.968 inner_auc=0.985 vs conf_auc=0.978
+03:34:01 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+03:34:24 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.988 n_val=10021 vram=0.00GB 23s | grade=0.965 inner_auc=0.988 vs conf_auc=0.981
+03:34:31 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+03:34:55 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.988 n_val=10005 vram=0.00GB 23s | grade=0.968 inner_auc=0.989 vs conf_auc=0.989
+03:35:02 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+03:35:26 [enc/text/enron_spam] vote=0.990 uniform=0.984 best1=0.987 n_val=9966 vram=0.00GB 24s | grade=0.973 inner_auc=0.985 vs conf_auc=0.985
+03:35:33 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+03:35:56 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10141 vram=0.00GB 24s | grade=0.971 inner_auc=0.977 vs conf_auc=0.969
+03:36:03 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+03:36:28 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.985 n_val=10067 vram=0.00GB 24s | grade=0.969 inner_auc=0.977 vs conf_auc=0.980
+03:36:35 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+03:36:58 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.988 n_val=10169 vram=0.00GB 24s | grade=0.971 inner_auc=0.990 vs conf_auc=0.984
+03:37:05 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+03:37:29 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.988 n_val=9963 vram=0.00GB 24s | grade=0.970 inner_auc=0.984 vs conf_auc=0.984
+03:37:36 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+03:38:00 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.986 n_val=10135 vram=0.00GB 24s | grade=0.967 inner_auc=0.980 vs conf_auc=0.982
+03:38:08 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+03:38:31 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.986 n_val=10154 vram=0.00GB 23s | grade=0.967 inner_auc=0.987 vs conf_auc=0.984
+03:38:39 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+03:39:02 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10081 vram=0.00GB 23s | grade=0.967 inner_auc=0.987 vs conf_auc=0.977
+03:39:09 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+03:39:33 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.986 n_val=10208 vram=0.00GB 24s | grade=0.963 inner_auc=0.984 vs conf_auc=0.977
+03:39:40 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+03:40:04 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.987 n_val=10166 vram=0.00GB 24s | grade=0.968 inner_auc=0.993 vs conf_auc=0.988
+03:40:11 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+03:40:35 [enc/text/enron_spam] vote=0.987 uniform=0.982 best1=0.985 n_val=10068 vram=0.00GB 24s | grade=0.972 inner_auc=0.983 vs conf_auc=0.964
+03:40:42 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+03:41:06 [enc/text/enron_spam] vote=0.990 uniform=0.984 best1=0.987 n_val=10046 vram=0.00GB 24s | grade=0.967 inner_auc=0.986 vs conf_auc=0.976
+03:41:13 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+03:41:37 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10181 vram=0.00GB 24s | grade=0.970 inner_auc=0.989 vs conf_auc=0.982
+03:41:45 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+03:42:09 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.988 n_val=10027 vram=0.00GB 24s | grade=0.970 inner_auc=0.987 vs conf_auc=0.983
+03:42:16 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+03:42:40 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.988 n_val=10156 vram=0.00GB 24s | grade=0.969 inner_auc=0.985 vs conf_auc=0.981
+03:42:48 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+03:43:11 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.989 n_val=10040 vram=0.00GB 23s | grade=0.971 inner_auc=0.980 vs conf_auc=0.970
+03:43:18 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+03:43:43 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.987 n_val=9979 vram=0.00GB 24s | grade=0.965 inner_auc=0.984 vs conf_auc=0.978
+03:43:50 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+03:44:14 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.986 n_val=10098 vram=0.00GB 25s | grade=0.968 inner_auc=0.987 vs conf_auc=0.986
+03:44:21 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+03:44:45 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.987 n_val=10179 vram=0.00GB 24s | grade=0.970 inner_auc=0.990 vs conf_auc=0.988
+03:44:53 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+03:45:17 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=10136 vram=0.00GB 24s | grade=0.969 inner_auc=0.985 vs conf_auc=0.984
+03:45:24 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+03:45:48 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.988 n_val=10174 vram=0.00GB 24s | grade=0.974 inner_auc=0.979 vs conf_auc=0.965
+03:45:56 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+03:46:19 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.988 n_val=10111 vram=0.00GB 24s | grade=0.974 inner_auc=0.971 vs conf_auc=0.938
+03:46:27 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+03:46:51 [enc/text/enron_spam] vote=0.991 uniform=0.987 best1=0.988 n_val=10083 vram=0.00GB 24s | grade=0.967 inner_auc=0.990 vs conf_auc=0.990
+03:46:59 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+03:47:23 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.989 n_val=10016 vram=0.00GB 24s | grade=0.974 inner_auc=0.986 vs conf_auc=0.978
+03:47:30 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+03:47:54 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.987 n_val=10291 vram=0.00GB 24s | grade=0.971 inner_auc=0.988 vs conf_auc=0.973
+03:48:02 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+03:48:26 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=9988 vram=0.00GB 24s | grade=0.972 inner_auc=0.987 vs conf_auc=0.981
+03:48:33 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+03:48:57 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10133 vram=0.00GB 24s | grade=0.973 inner_auc=0.989 vs conf_auc=0.987
+03:49:05 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+03:49:29 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.986 n_val=10014 vram=0.00GB 25s | grade=0.971 inner_auc=0.982 vs conf_auc=0.985
+03:49:36 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+03:50:01 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.988 n_val=10086 vram=0.00GB 25s | grade=0.972 inner_auc=0.991 vs conf_auc=0.986
+03:50:09 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+03:50:33 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.987 n_val=10038 vram=0.00GB 24s | grade=0.974 inner_auc=0.991 vs conf_auc=0.989
+03:50:41 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+03:51:05 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.988 n_val=10084 vram=0.00GB 24s | grade=0.970 inner_auc=0.988 vs conf_auc=0.982
+03:51:13 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+03:51:36 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.989 n_val=10097 vram=0.00GB 24s | grade=0.970 inner_auc=0.989 vs conf_auc=0.983
+03:51:44 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+03:52:08 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.986 n_val=10036 vram=0.00GB 25s | grade=0.972 inner_auc=0.982 vs conf_auc=0.975
+03:52:16 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+03:52:41 [enc/text/enron_spam] vote=0.991 uniform=0.987 best1=0.988 n_val=10008 vram=0.00GB 25s | grade=0.970 inner_auc=0.980 vs conf_auc=0.974
+03:52:48 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+03:53:12 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.986 n_val=10144 vram=0.00GB 24s | grade=0.966 inner_auc=0.979 vs conf_auc=0.976
+03:53:20 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+03:53:44 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.987 n_val=10154 vram=0.00GB 24s | grade=0.973 inner_auc=0.992 vs conf_auc=0.986
+03:53:52 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+03:54:16 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10066 vram=0.00GB 24s | grade=0.972 inner_auc=0.984 vs conf_auc=0.975
+03:54:24 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+03:54:48 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.987 n_val=10178 vram=0.00GB 25s | grade=0.970 inner_auc=0.987 vs conf_auc=0.980
+03:54:56 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+03:55:21 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.987 n_val=10213 vram=0.00GB 25s | grade=0.974 inner_auc=0.983 vs conf_auc=0.977
+03:55:29 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+03:55:53 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.989 n_val=9983 vram=0.00GB 24s | grade=0.973 inner_auc=0.982 vs conf_auc=0.982
+03:56:01 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+03:56:25 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10087 vram=0.00GB 24s | grade=0.966 inner_auc=0.993 vs conf_auc=0.988
+03:56:33 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+03:56:57 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.985 n_val=9974 vram=0.00GB 24s | grade=0.968 inner_auc=0.987 vs conf_auc=0.978
+03:57:05 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+03:57:29 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.988 n_val=10106 vram=0.00GB 24s | grade=0.968 inner_auc=0.991 vs conf_auc=0.985
+03:57:37 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+03:58:01 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.987 n_val=9974 vram=0.00GB 25s | grade=0.969 inner_auc=0.972 vs conf_auc=0.962
+03:58:09 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+03:58:34 [enc/text/enron_spam] vote=0.988 uniform=0.983 best1=0.987 n_val=10136 vram=0.00GB 24s | grade=0.970 inner_auc=0.991 vs conf_auc=0.989
+03:58:42 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+03:59:06 [enc/text/enron_spam] vote=0.988 uniform=0.986 best1=0.987 n_val=10096 vram=0.00GB 24s | grade=0.971 inner_auc=0.990 vs conf_auc=0.980
+03:59:14 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+03:59:38 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.987 n_val=10137 vram=0.00GB 24s | grade=0.967 inner_auc=0.989 vs conf_auc=0.981
+03:59:46 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+04:00:09 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.989 n_val=10052 vram=0.00GB 23s | grade=0.970 inner_auc=0.984 vs conf_auc=0.974
+04:00:17 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+04:00:40 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.987 n_val=10216 vram=0.00GB 23s | grade=0.969 inner_auc=0.983 vs conf_auc=0.982
+04:00:48 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+04:01:08 [enc/text/enron_spam] vote=0.991 uniform=0.988 best1=0.988 n_val=10061 vram=0.00GB 20s | grade=0.969 inner_auc=0.983 vs conf_auc=0.973
+04:01:14 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+04:01:32 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10005 vram=0.00GB 18s | grade=0.968 inner_auc=0.983 vs conf_auc=0.983
+04:01:38 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+04:01:56 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.986 n_val=10164 vram=0.00GB 18s | grade=0.966 inner_auc=0.987 vs conf_auc=0.989
+04:02:03 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+04:02:22 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10212 vram=0.00GB 19s | grade=0.973 inner_auc=0.974 vs conf_auc=0.966
+04:02:28 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+04:02:47 [enc/text/enron_spam] vote=0.991 uniform=0.984 best1=0.987 n_val=10148 vram=0.00GB 19s | grade=0.969 inner_auc=0.987 vs conf_auc=0.975
+04:02:53 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+04:03:12 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10162 vram=0.00GB 19s | grade=0.970 inner_auc=0.984 vs conf_auc=0.970
+04:03:18 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+04:03:37 [enc/text/enron_spam] vote=0.988 uniform=0.986 best1=0.986 n_val=10185 vram=0.00GB 19s | grade=0.961 inner_auc=0.990 vs conf_auc=0.986
+04:03:43 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+04:04:01 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.987 n_val=10203 vram=0.00GB 18s | grade=0.970 inner_auc=0.980 vs conf_auc=0.973
+04:04:08 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+04:04:26 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.985 n_val=10278 vram=0.00GB 19s | grade=0.969 inner_auc=0.988 vs conf_auc=0.982
+04:04:33 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+04:04:51 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.986 n_val=10099 vram=0.00GB 19s | grade=0.966 inner_auc=0.986 vs conf_auc=0.977
+04:04:57 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+04:05:16 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.988 n_val=10045 vram=0.00GB 19s | grade=0.967 inner_auc=0.996 vs conf_auc=0.993
+04:05:23 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+04:05:41 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.987 n_val=10214 vram=0.00GB 18s | grade=0.967 inner_auc=0.982 vs conf_auc=0.978
+04:05:47 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+04:06:10 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.988 n_val=10070 vram=0.00GB 23s | grade=0.971 inner_auc=0.987 vs conf_auc=0.982
+04:06:20 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+04:06:48 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.986 n_val=10208 vram=0.00GB 29s | grade=0.972 inner_auc=0.976 vs conf_auc=0.944
+04:06:57 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+04:07:27 [enc/text/enron_spam] vote=0.987 uniform=0.984 best1=0.984 n_val=10117 vram=0.00GB 30s | grade=0.966 inner_auc=0.984 vs conf_auc=0.981
+04:07:37 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+04:08:06 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.986 n_val=10230 vram=0.00GB 29s | grade=0.971 inner_auc=0.993 vs conf_auc=0.990
+04:08:16 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+04:08:45 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.988 n_val=10113 vram=0.00GB 29s | grade=0.969 inner_auc=0.976 vs conf_auc=0.954
+04:08:55 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+04:09:25 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.986 n_val=10061 vram=0.00GB 29s | grade=0.967 inner_auc=0.981 vs conf_auc=0.970
+04:09:34 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+04:10:04 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.986 n_val=9993 vram=0.00GB 30s | grade=0.971 inner_auc=0.987 vs conf_auc=0.984
+04:10:14 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+04:10:43 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.986 n_val=10148 vram=0.00GB 29s | grade=0.968 inner_auc=0.976 vs conf_auc=0.962
+04:10:54 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+04:11:24 [enc/text/enron_spam] vote=0.991 uniform=0.985 best1=0.988 n_val=10040 vram=0.00GB 30s | grade=0.968 inner_auc=0.975 vs conf_auc=0.918
+04:11:33 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+04:12:03 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.986 n_val=10010 vram=0.00GB 30s | grade=0.966 inner_auc=0.993 vs conf_auc=0.990
+04:12:13 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+04:12:43 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10240 vram=0.00GB 30s | grade=0.969 inner_auc=0.958 vs conf_auc=0.936
+04:12:53 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+04:13:21 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.988 n_val=10166 vram=0.00GB 29s | grade=0.968 inner_auc=0.985 vs conf_auc=0.977
+04:13:32 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+04:14:01 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.986 n_val=10062 vram=0.00GB 29s | grade=0.970 inner_auc=0.981 vs conf_auc=0.951
+04:14:11 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+04:14:41 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.987 n_val=10036 vram=0.00GB 30s | grade=0.967 inner_auc=0.990 vs conf_auc=0.987
+04:14:51 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+04:15:21 [enc/text/enron_spam] vote=0.990 uniform=0.984 best1=0.987 n_val=10252 vram=0.00GB 30s | grade=0.970 inner_auc=0.979 vs conf_auc=0.969
+04:15:31 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+04:16:01 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=10185 vram=0.00GB 30s | grade=0.969 inner_auc=0.994 vs conf_auc=0.986
+04:16:11 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+04:16:39 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.987 n_val=10071 vram=0.00GB 29s | grade=0.972 inner_auc=0.988 vs conf_auc=0.984
+04:16:50 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+04:17:20 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.987 n_val=10203 vram=0.00GB 30s | grade=0.973 inner_auc=0.987 vs conf_auc=0.988
+04:17:30 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+04:17:59 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.988 n_val=10101 vram=0.00GB 30s | grade=0.971 inner_auc=0.988 vs conf_auc=0.985
+04:18:11 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+04:18:40 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.988 n_val=10237 vram=0.00GB 29s | grade=0.971 inner_auc=0.990 vs conf_auc=0.982
+04:18:50 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+04:19:20 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.989 n_val=10121 vram=0.00GB 29s | grade=0.972 inner_auc=0.989 vs conf_auc=0.990
+04:19:30 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+04:19:59 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.988 n_val=10188 vram=0.00GB 29s | grade=0.968 inner_auc=0.987 vs conf_auc=0.984
+04:20:09 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+04:20:38 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.986 n_val=9966 vram=0.00GB 30s | grade=0.971 inner_auc=0.976 vs conf_auc=0.959
+04:20:46 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+04:21:08 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.988 n_val=10073 vram=0.00GB 22s | grade=0.972 inner_auc=0.989 vs conf_auc=0.975
+04:21:17 ===== CYCLE 149 (OUTER -> INNER -> FEEDBACK) =====
+04:21:39 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.986 n_val=10093 vram=0.00GB 22s | grade=0.969 inner_auc=0.992 vs conf_auc=0.987
+04:21:47 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+04:22:10 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.988 n_val=10187 vram=0.00GB 23s | grade=0.972 inner_auc=0.982 vs conf_auc=0.980
+04:22:18 ===== CYCLE 151 (OUTER -> INNER -> FEEDBACK) =====
+04:22:41 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.987 n_val=10039 vram=0.00GB 23s | grade=0.969 inner_auc=0.988 vs conf_auc=0.988
+04:22:49 ===== CYCLE 152 (OUTER -> INNER -> FEEDBACK) =====
+04:23:11 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.986 n_val=9909 vram=0.00GB 22s | grade=0.968 inner_auc=0.989 vs conf_auc=0.954
+04:23:19 ===== CYCLE 153 (OUTER -> INNER -> FEEDBACK) =====
+04:23:42 [enc/text/enron_spam] vote=0.991 uniform=0.987 best1=0.989 n_val=10233 vram=0.00GB 23s | grade=0.970 inner_auc=0.972 vs conf_auc=0.961
+04:23:50 ===== CYCLE 154 (OUTER -> INNER -> FEEDBACK) =====
+04:24:13 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=9926 vram=0.00GB 23s | grade=0.970 inner_auc=0.990 vs conf_auc=0.981
+04:24:21 ===== CYCLE 155 (OUTER -> INNER -> FEEDBACK) =====
+04:24:43 [enc/text/enron_spam] vote=0.991 uniform=0.987 best1=0.989 n_val=10107 vram=0.00GB 22s | grade=0.972 inner_auc=0.985 vs conf_auc=0.978
+04:24:51 ===== CYCLE 156 (OUTER -> INNER -> FEEDBACK) =====
+04:25:13 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.987 n_val=10219 vram=0.00GB 22s | grade=0.969 inner_auc=0.991 vs conf_auc=0.987
+04:25:21 ===== CYCLE 157 (OUTER -> INNER -> FEEDBACK) =====
+04:25:43 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.987 n_val=10186 vram=0.00GB 22s | grade=0.973 inner_auc=0.988 vs conf_auc=0.976
+04:25:51 ===== CYCLE 158 (OUTER -> INNER -> FEEDBACK) =====
+04:26:14 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=10010 vram=0.00GB 22s | grade=0.974 inner_auc=0.979 vs conf_auc=0.973
+04:26:22 ===== CYCLE 159 (OUTER -> INNER -> FEEDBACK) =====
+04:26:44 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=10132 vram=0.00GB 23s | grade=0.969 inner_auc=0.986 vs conf_auc=0.982
+04:26:52 ===== CYCLE 160 (OUTER -> INNER -> FEEDBACK) =====
+04:27:15 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.989 n_val=10150 vram=0.00GB 23s | grade=0.967 inner_auc=0.992 vs conf_auc=0.989
+04:27:23 ===== CYCLE 161 (OUTER -> INNER -> FEEDBACK) =====
+04:27:45 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10239 vram=0.00GB 23s | grade=0.974 inner_auc=0.984 vs conf_auc=0.946
+04:27:54 ===== CYCLE 162 (OUTER -> INNER -> FEEDBACK) =====
+04:28:16 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.987 n_val=10222 vram=0.00GB 22s | grade=0.971 inner_auc=0.982 vs conf_auc=0.974
+04:28:24 ===== CYCLE 163 (OUTER -> INNER -> FEEDBACK) =====
+04:28:46 [enc/text/enron_spam] vote=0.991 uniform=0.985 best1=0.989 n_val=10066 vram=0.00GB 22s | grade=0.967 inner_auc=0.992 vs conf_auc=0.989
+04:28:54 ===== CYCLE 164 (OUTER -> INNER -> FEEDBACK) =====
+04:29:17 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=10082 vram=0.00GB 23s | grade=0.974 inner_auc=0.990 vs conf_auc=0.988
+04:29:25 ===== CYCLE 165 (OUTER -> INNER -> FEEDBACK) =====
+04:29:48 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.987 n_val=10065 vram=0.00GB 23s | grade=0.970 inner_auc=0.993 vs conf_auc=0.989
+04:29:55 ===== CYCLE 166 (OUTER -> INNER -> FEEDBACK) =====
+04:30:18 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10176 vram=0.00GB 23s | grade=0.965 inner_auc=0.988 vs conf_auc=0.986
+04:30:26 ===== CYCLE 167 (OUTER -> INNER -> FEEDBACK) =====
+04:30:49 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.987 n_val=10129 vram=0.00GB 22s | grade=0.969 inner_auc=0.991 vs conf_auc=0.988
+04:30:57 ===== CYCLE 168 (OUTER -> INNER -> FEEDBACK) =====
+04:31:19 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.986 n_val=10094 vram=0.00GB 23s | grade=0.970 inner_auc=0.986 vs conf_auc=0.980
+04:31:28 ===== CYCLE 169 (OUTER -> INNER -> FEEDBACK) =====
+04:31:51 [enc/text/enron_spam] vote=0.987 uniform=0.984 best1=0.985 n_val=10237 vram=0.00GB 23s | grade=0.964 inner_auc=0.992 vs conf_auc=0.989
+04:31:59 ===== CYCLE 170 (OUTER -> INNER -> FEEDBACK) =====
+04:32:22 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.986 n_val=10133 vram=0.00GB 23s | grade=0.973 inner_auc=0.985 vs conf_auc=0.981
+04:32:30 ===== CYCLE 171 (OUTER -> INNER -> FEEDBACK) =====
+04:32:52 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.989 n_val=10121 vram=0.00GB 22s | grade=0.970 inner_auc=0.987 vs conf_auc=0.985
+04:33:00 ===== CYCLE 172 (OUTER -> INNER -> FEEDBACK) =====
+04:33:23 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.988 n_val=9994 vram=0.00GB 23s | grade=0.967 inner_auc=0.988 vs conf_auc=0.974
+04:33:31 ===== CYCLE 173 (OUTER -> INNER -> FEEDBACK) =====
+04:33:54 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.988 n_val=10228 vram=0.00GB 22s | grade=0.966 inner_auc=0.988 vs conf_auc=0.984
+04:34:02 ===== CYCLE 174 (OUTER -> INNER -> FEEDBACK) =====
+04:34:25 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.987 n_val=10118 vram=0.00GB 23s | grade=0.973 inner_auc=0.979 vs conf_auc=0.984
+04:34:33 ===== CYCLE 175 (OUTER -> INNER -> FEEDBACK) =====
+04:34:55 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.985 n_val=10085 vram=0.00GB 22s | grade=0.966 inner_auc=0.985 vs conf_auc=0.977
+04:35:04 ===== CYCLE 176 (OUTER -> INNER -> FEEDBACK) =====
+04:35:27 [enc/text/enron_spam] vote=0.989 uniform=0.987 best1=0.988 n_val=10304 vram=0.00GB 23s | grade=0.973 inner_auc=0.980 vs conf_auc=0.977
+04:35:36 ===== CYCLE 177 (OUTER -> INNER -> FEEDBACK) =====
+04:36:01 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.988 n_val=10074 vram=0.00GB 25s | grade=0.977 inner_auc=0.978 vs conf_auc=0.968
+04:36:11 ===== CYCLE 178 (OUTER -> INNER -> FEEDBACK) =====
+04:36:40 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10043 vram=0.00GB 30s | grade=0.970 inner_auc=0.991 vs conf_auc=0.988
+04:36:51 ===== CYCLE 179 (OUTER -> INNER -> FEEDBACK) =====
+04:37:18 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10066 vram=0.00GB 27s | grade=0.970 inner_auc=0.990 vs conf_auc=0.987
+04:37:29 ===== CYCLE 180 (OUTER -> INNER -> FEEDBACK) =====
+04:37:56 [enc/text/enron_spam] vote=0.989 uniform=0.988 best1=0.988 n_val=10087 vram=0.00GB 28s | grade=0.971 inner_auc=0.981 vs conf_auc=0.966
+04:38:06 ===== CYCLE 181 (OUTER -> INNER -> FEEDBACK) =====
+04:38:36 [enc/text/enron_spam] vote=0.991 uniform=0.985 best1=0.989 n_val=10155 vram=0.00GB 31s | grade=0.968 inner_auc=0.979 vs conf_auc=0.961
+04:38:48 ===== CYCLE 182 (OUTER -> INNER -> FEEDBACK) =====
+04:39:16 [enc/text/enron_spam] vote=0.992 uniform=0.989 best1=0.988 n_val=10017 vram=0.00GB 28s | grade=0.968 inner_auc=0.992 vs conf_auc=0.991
+04:39:26 ===== CYCLE 183 (OUTER -> INNER -> FEEDBACK) =====
+04:39:54 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.989 n_val=10002 vram=0.00GB 28s | grade=0.973 inner_auc=0.984 vs conf_auc=0.984
+04:40:04 ===== CYCLE 184 (OUTER -> INNER -> FEEDBACK) =====
+04:40:35 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.988 n_val=10136 vram=0.00GB 31s | grade=0.965 inner_auc=0.990 vs conf_auc=0.986
+04:40:47 ===== CYCLE 185 (OUTER -> INNER -> FEEDBACK) =====
+04:41:15 [enc/text/enron_spam] vote=0.990 uniform=0.984 best1=0.988 n_val=10032 vram=0.00GB 28s | grade=0.963 inner_auc=0.991 vs conf_auc=0.987
+04:41:26 ===== CYCLE 186 (OUTER -> INNER -> FEEDBACK) =====
+04:41:54 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.988 n_val=10184 vram=0.00GB 28s | grade=0.968 inner_auc=0.994 vs conf_auc=0.987
+04:42:03 ===== CYCLE 187 (OUTER -> INNER -> FEEDBACK) =====
+04:42:35 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.987 n_val=10124 vram=0.00GB 31s | grade=0.974 inner_auc=0.983 vs conf_auc=0.973
+04:42:44 ===== CYCLE 188 (OUTER -> INNER -> FEEDBACK) =====
+04:43:12 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.988 n_val=10133 vram=0.00GB 28s | grade=0.970 inner_auc=0.974 vs conf_auc=0.943
+04:43:22 ===== CYCLE 189 (OUTER -> INNER -> FEEDBACK) =====
+04:43:48 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.986 n_val=10166 vram=0.00GB 26s | grade=0.966 inner_auc=0.985 vs conf_auc=0.978
+04:43:58 ===== CYCLE 190 (OUTER -> INNER -> FEEDBACK) =====
+04:44:26 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.988 n_val=10016 vram=0.00GB 28s | grade=0.968 inner_auc=0.986 vs conf_auc=0.979
+04:44:35 ===== CYCLE 191 (OUTER -> INNER -> FEEDBACK) =====
+04:45:00 [enc/text/enron_spam] vote=0.991 uniform=0.988 best1=0.988 n_val=10200 vram=0.00GB 25s | grade=0.969 inner_auc=0.993 vs conf_auc=0.992
+04:45:10 ===== CYCLE 192 (OUTER -> INNER -> FEEDBACK) =====
+04:45:35 [enc/text/enron_spam] vote=0.991 uniform=0.987 best1=0.989 n_val=10007 vram=0.00GB 25s | grade=0.968 inner_auc=0.986 vs conf_auc=0.979
+04:45:44 ===== CYCLE 193 (OUTER -> INNER -> FEEDBACK) =====
+04:46:14 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.986 n_val=10000 vram=0.00GB 29s | grade=0.972 inner_auc=0.983 vs conf_auc=0.974
+04:46:23 ===== CYCLE 194 (OUTER -> INNER -> FEEDBACK) =====
+04:46:49 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=10091 vram=0.00GB 25s | grade=0.972 inner_auc=0.986 vs conf_auc=0.985
+04:46:58 ===== CYCLE 195 (OUTER -> INNER -> FEEDBACK) =====
+04:47:23 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.989 n_val=10135 vram=0.00GB 25s | grade=0.969 inner_auc=0.988 vs conf_auc=0.987
+04:47:33 ===== CYCLE 196 (OUTER -> INNER -> FEEDBACK) =====
+04:48:01 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10008 vram=0.00GB 28s | grade=0.972 inner_auc=0.989 vs conf_auc=0.990
+04:48:11 ===== CYCLE 197 (OUTER -> INNER -> FEEDBACK) =====
+04:48:40 [enc/text/enron_spam] vote=0.989 uniform=0.983 best1=0.987 n_val=10101 vram=0.00GB 29s | grade=0.969 inner_auc=0.982 vs conf_auc=0.972
+04:48:49 ===== CYCLE 198 (OUTER -> INNER -> FEEDBACK) =====
+04:49:14 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10117 vram=0.00GB 25s | grade=0.972 inner_auc=0.989 vs conf_auc=0.986
+04:49:23 ===== CYCLE 199 (OUTER -> INNER -> FEEDBACK) =====
+04:49:49 [enc/text/enron_spam] vote=0.992 uniform=0.986 best1=0.989 n_val=10124 vram=0.00GB 25s | grade=0.972 inner_auc=0.980 vs conf_auc=0.937
+04:50:00 ===== CYCLE 200 (OUTER -> INNER -> FEEDBACK) =====
+04:50:26 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10161 vram=0.00GB 26s | grade=0.970 inner_auc=0.973 vs conf_auc=0.983
+04:50:36 ===== CYCLE 201 (OUTER -> INNER -> FEEDBACK) =====
+04:51:02 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.988 n_val=10184 vram=0.00GB 26s | grade=0.967 inner_auc=0.978 vs conf_auc=0.972
+04:51:12 ===== CYCLE 202 (OUTER -> INNER -> FEEDBACK) =====
+04:51:37 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.988 n_val=10103 vram=0.00GB 25s | grade=0.969 inner_auc=0.988 vs conf_auc=0.982
+04:51:49 ===== CYCLE 203 (OUTER -> INNER -> FEEDBACK) =====
+04:52:15 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.987 n_val=10034 vram=0.00GB 25s | grade=0.970 inner_auc=0.985 vs conf_auc=0.981
+04:52:25 ===== CYCLE 204 (OUTER -> INNER -> FEEDBACK) =====
+04:52:49 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.987 n_val=10287 vram=0.00GB 25s | grade=0.967 inner_auc=0.975 vs conf_auc=0.975
+04:52:59 ===== CYCLE 205 (OUTER -> INNER -> FEEDBACK) =====
+04:53:25 [enc/text/enron_spam] vote=0.991 uniform=0.987 best1=0.990 n_val=9995 vram=0.00GB 25s | grade=0.972 inner_auc=0.980 vs conf_auc=0.971
+04:53:36 ===== CYCLE 206 (OUTER -> INNER -> FEEDBACK) =====
+04:54:02 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.988 n_val=10201 vram=0.00GB 27s | grade=0.970 inner_auc=0.992 vs conf_auc=0.991
+04:54:12 ===== CYCLE 207 (OUTER -> INNER -> FEEDBACK) =====
+04:54:37 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.987 n_val=10078 vram=0.00GB 26s | grade=0.964 inner_auc=0.985 vs conf_auc=0.984
+04:54:47 ===== CYCLE 208 (OUTER -> INNER -> FEEDBACK) =====
+04:55:12 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.988 n_val=10165 vram=0.00GB 26s | grade=0.969 inner_auc=0.988 vs conf_auc=0.988
+04:55:25 ===== CYCLE 209 (OUTER -> INNER -> FEEDBACK) =====
+04:55:50 [enc/text/enron_spam] vote=0.991 uniform=0.988 best1=0.988 n_val=10091 vram=0.00GB 26s | grade=0.971 inner_auc=0.985 vs conf_auc=0.975
+04:56:00 ===== CYCLE 210 (OUTER -> INNER -> FEEDBACK) =====
+04:56:26 [enc/text/enron_spam] vote=0.992 uniform=0.987 best1=0.990 n_val=10125 vram=0.00GB 25s | grade=0.968 inner_auc=0.988 vs conf_auc=0.983
+04:56:35 ===== CYCLE 211 (OUTER -> INNER -> FEEDBACK) =====
+04:57:01 [enc/text/enron_spam] vote=0.988 uniform=0.986 best1=0.986 n_val=9999 vram=0.00GB 26s | grade=0.965 inner_auc=0.982 vs conf_auc=0.988
+04:57:14 ===== CYCLE 212 (OUTER -> INNER -> FEEDBACK) =====
+04:57:40 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.988 n_val=10090 vram=0.00GB 26s | grade=0.968 inner_auc=0.995 vs conf_auc=0.988
+04:57:50 ===== CYCLE 213 (OUTER -> INNER -> FEEDBACK) =====
+04:58:15 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.986 n_val=10122 vram=0.00GB 25s | grade=0.971 inner_auc=0.988 vs conf_auc=0.982
+04:58:25 ===== CYCLE 214 (OUTER -> INNER -> FEEDBACK) =====
+04:58:51 [enc/text/enron_spam] vote=0.988 uniform=0.986 best1=0.986 n_val=10157 vram=0.00GB 26s | grade=0.969 inner_auc=0.990 vs conf_auc=0.984
+04:59:03 ===== CYCLE 215 (OUTER -> INNER -> FEEDBACK) =====
+04:59:29 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.988 n_val=10128 vram=0.00GB 25s | grade=0.968 inner_auc=0.987 vs conf_auc=0.984
+04:59:39 ===== CYCLE 216 (OUTER -> INNER -> FEEDBACK) =====
+05:00:04 [enc/text/enron_spam] vote=0.991 uniform=0.987 best1=0.988 n_val=10051 vram=0.00GB 25s | grade=0.969 inner_auc=0.982 vs conf_auc=0.975
+05:00:14 ===== CYCLE 217 (OUTER -> INNER -> FEEDBACK) =====
+05:00:41 [enc/text/enron_spam] vote=0.989 uniform=0.983 best1=0.986 n_val=9993 vram=0.00GB 27s | grade=0.968 inner_auc=0.983 vs conf_auc=0.971
+05:00:54 ===== CYCLE 218 (OUTER -> INNER -> FEEDBACK) =====
+05:01:20 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.987 n_val=10129 vram=0.00GB 26s | grade=0.970 inner_auc=0.990 vs conf_auc=0.983
+05:01:30 ===== CYCLE 219 (OUTER -> INNER -> FEEDBACK) =====
+05:01:55 [enc/text/enron_spam] vote=0.990 uniform=0.984 best1=0.988 n_val=10076 vram=0.00GB 26s | grade=0.967 inner_auc=0.986 vs conf_auc=0.987
+05:02:05 RUN COMPLETE
+15:09:43 NI run auto_cpu_039 on CPU; hours=2.0 smoke=False
+15:09:43 explicit task list: ['enc/text/enron_spam']
+15:09:56 [resume] from checkpoint: next cycle 220, rounds 220, 220 metric rows, inner net restored
+15:09:56 ===== CYCLE 220 (OUTER-ONLY BOOTSTRAP) =====
+15:09:58 [data] enc/text/enron_spam: n=33716 C=2 D=384 shards=1
+15:14:14 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=10103 vram=0.00GB 256s
+15:15:02 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 220, "n_records": 10103, "n_val": 1979, "base_rate": 0.9883779883384705, "inner": {"auc": 0.9834622566017605, "ece": 0.005256572588638202, "brier": 0.00764471897855401, "acc80": 1.0}, "outer_conf": {"auc": 0.9829287810082689, "ece": 0.012525554164724558, "brier": 0.00865122489631176, "acc80": 1.0}}
+15:15:02 ===== CYCLE 221 (OUTER -> INNER -> FEEDBACK) =====
+15:19:47 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.986 n_val=10100 vram=0.00GB 286s | grade=0.968 inner_auc=0.990 vs conf_auc=0.984
+15:20:10 ===== CYCLE 222 (OUTER -> INNER -> FEEDBACK) =====
+15:24:16 [enc/text/enron_spam] vote=0.992 uniform=0.988 best1=0.989 n_val=10129 vram=0.00GB 246s | grade=0.968 inner_auc=0.973 vs conf_auc=0.951
+15:24:35 ===== CYCLE 223 (OUTER -> INNER -> FEEDBACK) =====
+15:27:40 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.986 n_val=10093 vram=0.00GB 186s | grade=0.965 inner_auc=0.986 vs conf_auc=0.978
+15:27:59 ===== CYCLE 224 (OUTER -> INNER -> FEEDBACK) =====
+15:31:10 [enc/text/enron_spam] vote=0.990 uniform=0.984 best1=0.987 n_val=10254 vram=0.00GB 190s | grade=0.964 inner_auc=0.983 vs conf_auc=0.978
+15:31:34 ===== CYCLE 225 (OUTER -> INNER -> FEEDBACK) =====
+15:35:08 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.986 n_val=10029 vram=0.00GB 214s | grade=0.968 inner_auc=0.992 vs conf_auc=0.989
+15:35:28 ===== CYCLE 226 (OUTER -> INNER -> FEEDBACK) =====
+15:39:03 [enc/text/enron_spam] vote=0.991 uniform=0.985 best1=0.989 n_val=9974 vram=0.00GB 215s | grade=0.969 inner_auc=0.984 vs conf_auc=0.981
+15:39:26 ===== CYCLE 227 (OUTER -> INNER -> FEEDBACK) =====
+15:43:05 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.987 n_val=10192 vram=0.00GB 219s | grade=0.967 inner_auc=0.988 vs conf_auc=0.985
+15:43:26 ===== CYCLE 228 (OUTER -> INNER -> FEEDBACK) =====
+15:47:11 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=9947 vram=0.00GB 224s | grade=0.967 inner_auc=0.991 vs conf_auc=0.978
+15:47:31 ===== CYCLE 229 (OUTER -> INNER -> FEEDBACK) =====
+15:51:01 [enc/text/enron_spam] vote=0.988 uniform=0.982 best1=0.986 n_val=10087 vram=0.00GB 210s | grade=0.968 inner_auc=0.990 vs conf_auc=0.980
+15:51:24 ===== CYCLE 230 (OUTER -> INNER -> FEEDBACK) =====
+15:54:53 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.987 n_val=9925 vram=0.00GB 209s | grade=0.970 inner_auc=0.975 vs conf_auc=0.953
+15:55:16 ===== CYCLE 231 (OUTER -> INNER -> FEEDBACK) =====
+15:58:35 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.988 n_val=10127 vram=0.00GB 198s | grade=0.967 inner_auc=0.989 vs conf_auc=0.983
+15:58:55 ===== CYCLE 232 (OUTER -> INNER -> FEEDBACK) =====
+16:02:10 [enc/text/enron_spam] vote=0.988 uniform=0.986 best1=0.987 n_val=10104 vram=0.00GB 195s | grade=0.966 inner_auc=0.988 vs conf_auc=0.982
+16:02:32 ===== CYCLE 233 (OUTER -> INNER -> FEEDBACK) =====
+16:05:57 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.987 n_val=10110 vram=0.00GB 205s | grade=0.969 inner_auc=0.987 vs conf_auc=0.977
+16:06:18 ===== CYCLE 234 (OUTER -> INNER -> FEEDBACK) =====
+16:09:14 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=10150 vram=0.00GB 175s | grade=0.971 inner_auc=0.978 vs conf_auc=0.965
+16:09:31 ===== CYCLE 235 (OUTER -> INNER -> FEEDBACK) =====
+16:12:17 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10184 vram=0.00GB 166s | grade=0.966 inner_auc=0.985 vs conf_auc=0.979
+16:12:37 ===== CYCLE 236 (OUTER -> INNER -> FEEDBACK) =====
+16:15:18 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.984 n_val=10063 vram=0.00GB 160s | grade=0.966 inner_auc=0.965 vs conf_auc=0.950
+16:15:37 ===== CYCLE 237 (OUTER -> INNER -> FEEDBACK) =====
+16:18:22 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.986 n_val=10184 vram=0.00GB 164s | grade=0.974 inner_auc=0.983 vs conf_auc=0.979
+16:18:41 ===== CYCLE 238 (OUTER -> INNER -> FEEDBACK) =====
+16:21:27 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.987 n_val=10119 vram=0.00GB 166s | grade=0.961 inner_auc=0.980 vs conf_auc=0.963
+16:21:46 ===== CYCLE 239 (OUTER -> INNER -> FEEDBACK) =====
+16:24:35 [enc/text/enron_spam] vote=0.988 uniform=0.983 best1=0.986 n_val=10062 vram=0.00GB 169s | grade=0.968 inner_auc=0.994 vs conf_auc=0.990
+16:24:54 ===== CYCLE 240 (OUTER -> INNER -> FEEDBACK) =====
+16:27:41 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.987 n_val=10118 vram=0.00GB 167s | grade=0.969 inner_auc=0.992 vs conf_auc=0.986
+16:28:01 ===== CYCLE 241 (OUTER -> INNER -> FEEDBACK) =====
+16:30:42 [enc/text/enron_spam] vote=0.988 uniform=0.983 best1=0.987 n_val=10193 vram=0.00GB 161s | grade=0.968 inner_auc=0.993 vs conf_auc=0.984
+16:31:03 ===== CYCLE 242 (OUTER -> INNER -> FEEDBACK) =====
+16:33:44 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.987 n_val=9992 vram=0.00GB 161s | grade=0.968 inner_auc=0.975 vs conf_auc=0.921
+16:34:02 ===== CYCLE 243 (OUTER -> INNER -> FEEDBACK) =====
+16:36:53 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.988 n_val=10166 vram=0.00GB 171s | grade=0.968 inner_auc=0.985 vs conf_auc=0.974
+16:37:13 ===== CYCLE 244 (OUTER -> INNER -> FEEDBACK) =====
+16:40:01 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.988 n_val=10168 vram=0.00GB 168s | grade=0.971 inner_auc=0.977 vs conf_auc=0.957
+16:40:24 ===== CYCLE 245 (OUTER -> INNER -> FEEDBACK) =====
+16:43:32 [enc/text/enron_spam] vote=0.991 uniform=0.988 best1=0.987 n_val=10212 vram=0.00GB 188s | grade=0.964 inner_auc=0.980 vs conf_auc=0.978
+16:43:56 ===== CYCLE 246 (OUTER -> INNER -> FEEDBACK) =====
+16:47:06 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.986 n_val=9998 vram=0.00GB 190s | grade=0.970 inner_auc=0.989 vs conf_auc=0.984
+16:47:28 ===== CYCLE 247 (OUTER -> INNER -> FEEDBACK) =====
+16:50:32 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.987 n_val=10067 vram=0.00GB 185s | grade=0.966 inner_auc=0.992 vs conf_auc=0.989
+16:50:56 ===== CYCLE 248 (OUTER -> INNER -> FEEDBACK) =====
+16:54:04 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=10240 vram=0.00GB 187s | grade=0.972 inner_auc=0.985 vs conf_auc=0.977
+16:54:25 ===== CYCLE 249 (OUTER -> INNER -> FEEDBACK) =====
+16:57:35 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.988 n_val=10105 vram=0.00GB 190s | grade=0.973 inner_auc=0.990 vs conf_auc=0.984
+16:57:58 ===== CYCLE 250 (OUTER -> INNER -> FEEDBACK) =====
+17:01:14 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10081 vram=0.00GB 197s | grade=0.967 inner_auc=0.989 vs conf_auc=0.985
+17:01:37 ===== CYCLE 251 (OUTER -> INNER -> FEEDBACK) =====
+17:05:00 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10149 vram=0.00GB 203s | grade=0.968 inner_auc=0.981 vs conf_auc=0.980
+17:05:27 ===== CYCLE 252 (OUTER -> INNER -> FEEDBACK) =====
+17:08:45 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.986 n_val=10095 vram=0.00GB 198s | grade=0.969 inner_auc=0.984 vs conf_auc=0.976
+17:09:09 ===== CYCLE 253 (OUTER -> INNER -> FEEDBACK) =====
+17:11:59 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.988 n_val=10044 vram=0.00GB 170s | grade=0.966 inner_auc=0.987 vs conf_auc=0.985
+17:12:23 RUN COMPLETE
+08:31:40 NI run auto_cpu_039 on CPU; hours=2.0 smoke=False
+08:31:40 explicit task list: ['enc/text/enron_spam']
+08:31:49 [resume] from checkpoint: next cycle 254, rounds 254, 254 metric rows, inner net restored
+08:31:49 ===== CYCLE 254 (OUTER-ONLY BOOTSTRAP) =====
+08:31:49 [data] enc/text/enron_spam: n=33716 C=2 D=384 shards=1
+08:35:13 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.987 n_val=10074 vram=0.00GB 204s
+08:35:57 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 254, "n_records": 10074, "n_val": 2027, "base_rate": 0.992106556892395, "inner": {"auc": 0.9879102436598707, "ece": 0.0035257433574659575, "brier": 0.005505023058503866, "acc80": 1.0}, "outer_conf": {"auc": 0.9865738438587768, "ece": 0.011405636597338367, "brier": 0.006690326612442732, "acc80": 1.0}}
+08:35:57 ===== CYCLE 255 (OUTER -> INNER -> FEEDBACK) =====
+08:39:29 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.989 n_val=10139 vram=0.00GB 212s | grade=0.967 inner_auc=0.989 vs conf_auc=0.984
+08:39:51 ===== CYCLE 256 (OUTER -> INNER -> FEEDBACK) =====
+08:43:38 [enc/text/enron_spam] vote=0.991 uniform=0.988 best1=0.988 n_val=10125 vram=0.00GB 227s | grade=0.967 inner_auc=0.992 vs conf_auc=0.985
+08:44:02 ===== CYCLE 257 (OUTER -> INNER -> FEEDBACK) =====
+08:47:12 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.987 n_val=9919 vram=0.00GB 190s | grade=0.962 inner_auc=0.983 vs conf_auc=0.978
+08:47:28 ===== CYCLE 258 (OUTER -> INNER -> FEEDBACK) =====
+22:56:12 NI run auto_cpu_039 on CPU; hours=2.0 smoke=False
+22:56:12 explicit task list: ['enc/text/enron_spam']
+22:56:26 [resume] from checkpoint: next cycle 258, rounds 258, 258 metric rows, inner net restored
+22:56:26 ===== CYCLE 258 (OUTER-ONLY BOOTSTRAP) =====
+22:56:27 [data] enc/text/enron_spam: n=33716 C=2 D=384 shards=1
+23:00:42 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.988 n_val=10197 vram=0.00GB 255s
+23:01:36 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 258, "n_records": 10197, "n_val": 1956, "base_rate": 0.9943763017654419, "inner": {"auc": 0.9895302640803926, "ece": 0.0034242644448953174, "brier": 0.003753337310627103, "acc80": 1.0}, "outer_conf": {"auc": 0.977518111708343, "ece": 0.009928973083115794, "brier": 0.005642525386065245, "acc80": 1.0}}
+23:01:36 ===== CYCLE 259 (OUTER -> INNER -> FEEDBACK) =====
+23:05:52 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=10106 vram=0.00GB 256s | grade=0.970 inner_auc=0.991 vs conf_auc=0.987
+23:06:22 ===== CYCLE 260 (OUTER -> INNER -> FEEDBACK) =====
+23:10:41 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.987 n_val=10035 vram=0.00GB 259s | grade=0.974 inner_auc=0.986 vs conf_auc=0.985
+23:11:07 ===== CYCLE 261 (OUTER -> INNER -> FEEDBACK) =====
+23:15:41 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.988 n_val=10140 vram=0.00GB 274s | grade=0.971 inner_auc=0.987 vs conf_auc=0.978
+23:16:15 ===== CYCLE 262 (OUTER -> INNER -> FEEDBACK) =====
+23:21:34 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.989 n_val=10134 vram=0.00GB 319s | grade=0.965 inner_auc=0.991 vs conf_auc=0.979
+23:22:08 ===== CYCLE 263 (OUTER -> INNER -> FEEDBACK) =====
+23:27:28 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10111 vram=0.00GB 319s | grade=0.971 inner_auc=0.990 vs conf_auc=0.984
+23:28:04 ===== CYCLE 264 (OUTER -> INNER -> FEEDBACK) =====
+23:33:34 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.987 n_val=9970 vram=0.00GB 330s | grade=0.969 inner_auc=0.983 vs conf_auc=0.986
+23:34:07 ===== CYCLE 265 (OUTER -> INNER -> FEEDBACK) =====
+23:39:43 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.987 n_val=10004 vram=0.00GB 336s | grade=0.969 inner_auc=0.990 vs conf_auc=0.990
+23:40:20 ===== CYCLE 266 (OUTER -> INNER -> FEEDBACK) =====
+23:45:39 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10105 vram=0.00GB 319s | grade=0.978 inner_auc=0.985 vs conf_auc=0.976
+23:46:13 ===== CYCLE 267 (OUTER -> INNER -> FEEDBACK) =====
+06:23:34 NI run auto_cpu_039 on CPU; hours=2.0 smoke=False
+06:23:34 explicit task list: ['enc/text/enron_spam']
+06:23:42 [resume] from checkpoint: next cycle 267, rounds 267, 267 metric rows, inner net restored
+06:23:42 ===== CYCLE 267 (OUTER-ONLY BOOTSTRAP) =====
+06:23:42 [data] enc/text/enron_spam: n=33716 C=2 D=384 shards=1
+06:25:59 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10211 vram=0.00GB 137s
+06:26:35 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 267, "n_records": 10211, "n_val": 1995, "base_rate": 0.991478681564331, "inner": {"auc": 0.9900969487896271, "ece": 0.005571539061410087, "brier": 0.006337245460599661, "acc80": 1.0}, "outer_conf": {"auc": 0.9860227205138881, "ece": 0.010294418989267563, "brier": 0.006802864372730255, "acc80": 1.0}}
+06:26:35 ===== CYCLE 268 (OUTER -> INNER -> FEEDBACK) =====
+06:29:40 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.987 n_val=9989 vram=0.00GB 185s | grade=0.965 inner_auc=0.987 vs conf_auc=0.980
+06:30:01 ===== CYCLE 269 (OUTER -> INNER -> FEEDBACK) =====
+06:33:09 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.988 n_val=10104 vram=0.00GB 188s | grade=0.969 inner_auc=0.984 vs conf_auc=0.981
+06:33:32 ===== CYCLE 270 (OUTER -> INNER -> FEEDBACK) =====
+06:36:33 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.988 n_val=10173 vram=0.00GB 181s | grade=0.968 inner_auc=0.982 vs conf_auc=0.976
+06:36:55 ===== CYCLE 271 (OUTER -> INNER -> FEEDBACK) =====
+06:40:29 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.987 n_val=10125 vram=0.00GB 215s | grade=0.969 inner_auc=0.984 vs conf_auc=0.982
+06:40:56 ===== CYCLE 272 (OUTER -> INNER -> FEEDBACK) =====
+06:44:07 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10241 vram=0.00GB 190s | grade=0.967 inner_auc=0.988 vs conf_auc=0.979
+06:44:30 ===== CYCLE 273 (OUTER -> INNER -> FEEDBACK) =====
+06:47:51 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.986 n_val=10010 vram=0.00GB 201s | grade=0.967 inner_auc=0.992 vs conf_auc=0.990
+06:48:16 ===== CYCLE 274 (OUTER -> INNER -> FEEDBACK) =====
+06:51:42 [enc/text/enron_spam] vote=0.991 uniform=0.985 best1=0.987 n_val=10125 vram=0.00GB 206s | grade=0.972 inner_auc=0.984 vs conf_auc=0.981
+06:52:06 ===== CYCLE 275 (OUTER -> INNER -> FEEDBACK) =====
+06:55:38 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10032 vram=0.00GB 212s | grade=0.967 inner_auc=0.988 vs conf_auc=0.985
+06:56:03 ===== CYCLE 276 (OUTER -> INNER -> FEEDBACK) =====
+06:59:36 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.987 n_val=10064 vram=0.00GB 213s | grade=0.966 inner_auc=0.993 vs conf_auc=0.992
+06:59:59 ===== CYCLE 277 (OUTER -> INNER -> FEEDBACK) =====
+07:03:17 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.987 n_val=10063 vram=0.00GB 198s | grade=0.970 inner_auc=0.979 vs conf_auc=0.937
+07:03:43 ===== CYCLE 278 (OUTER -> INNER -> FEEDBACK) =====
+07:07:12 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.987 n_val=10137 vram=0.00GB 209s | grade=0.971 inner_auc=0.992 vs conf_auc=0.986
+07:07:39 ===== CYCLE 279 (OUTER -> INNER -> FEEDBACK) =====
+07:10:48 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.989 n_val=10083 vram=0.00GB 190s | grade=0.972 inner_auc=0.990 vs conf_auc=0.974
+07:11:14 ===== CYCLE 280 (OUTER -> INNER -> FEEDBACK) =====
+07:15:10 [enc/text/enron_spam] vote=0.991 uniform=0.987 best1=0.988 n_val=10101 vram=0.00GB 236s | grade=0.964 inner_auc=0.984 vs conf_auc=0.978
+07:15:34 ===== CYCLE 281 (OUTER -> INNER -> FEEDBACK) =====
+07:19:18 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.987 n_val=10193 vram=0.00GB 225s | grade=0.968 inner_auc=0.989 vs conf_auc=0.985
+07:19:45 ===== CYCLE 282 (OUTER -> INNER -> FEEDBACK) =====
+07:23:38 [enc/text/enron_spam] vote=0.991 uniform=0.987 best1=0.987 n_val=10134 vram=0.00GB 232s | grade=0.967 inner_auc=0.991 vs conf_auc=0.985
+07:24:02 ===== CYCLE 283 (OUTER -> INNER -> FEEDBACK) =====
+07:27:13 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.987 n_val=10110 vram=0.00GB 191s | grade=0.970 inner_auc=0.989 vs conf_auc=0.988
+07:27:40 ===== CYCLE 284 (OUTER -> INNER -> FEEDBACK) =====
+07:31:17 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.988 n_val=10215 vram=0.00GB 216s | grade=0.970 inner_auc=0.985 vs conf_auc=0.974
+07:31:47 ===== CYCLE 285 (OUTER -> INNER -> FEEDBACK) =====
+07:35:11 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.989 n_val=10153 vram=0.00GB 204s | grade=0.972 inner_auc=0.989 vs conf_auc=0.985
+07:35:34 ===== CYCLE 286 (OUTER -> INNER -> FEEDBACK) =====
+07:38:46 [enc/text/enron_spam] vote=0.988 uniform=0.985 best1=0.986 n_val=10185 vram=0.00GB 192s | grade=0.969 inner_auc=0.989 vs conf_auc=0.982
+07:39:12 ===== CYCLE 287 (OUTER -> INNER -> FEEDBACK) =====
+07:42:22 [enc/text/enron_spam] vote=0.991 uniform=0.987 best1=0.990 n_val=10102 vram=0.00GB 190s | grade=0.971 inner_auc=0.992 vs conf_auc=0.982
+07:42:45 ===== CYCLE 288 (OUTER -> INNER -> FEEDBACK) =====
+07:46:04 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10030 vram=0.00GB 199s | grade=0.969 inner_auc=0.987 vs conf_auc=0.985
+07:46:32 ===== CYCLE 289 (OUTER -> INNER -> FEEDBACK) =====
+07:49:46 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.986 n_val=10202 vram=0.00GB 194s | grade=0.970 inner_auc=0.989 vs conf_auc=0.983
+07:50:10 ===== CYCLE 290 (OUTER -> INNER -> FEEDBACK) =====
+07:53:52 [enc/text/enron_spam] vote=0.991 uniform=0.988 best1=0.990 n_val=10133 vram=0.00GB 222s | grade=0.967 inner_auc=0.984 vs conf_auc=0.976
+07:54:16 ===== CYCLE 291 (OUTER -> INNER -> FEEDBACK) =====
+07:57:30 [enc/text/enron_spam] vote=0.988 uniform=0.986 best1=0.985 n_val=9951 vram=0.00GB 194s | grade=0.968 inner_auc=0.984 vs conf_auc=0.984
+07:57:54 ===== CYCLE 292 (OUTER -> INNER -> FEEDBACK) =====
+08:01:31 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.988 n_val=10200 vram=0.00GB 216s | grade=0.970 inner_auc=0.987 vs conf_auc=0.981
+08:02:10 ===== CYCLE 293 (OUTER -> INNER -> FEEDBACK) =====
+08:06:06 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.988 n_val=10153 vram=0.00GB 236s | grade=0.969 inner_auc=0.994 vs conf_auc=0.988
+08:06:40 ===== CYCLE 294 (OUTER -> INNER -> FEEDBACK) =====
+08:09:51 [enc/text/enron_spam] vote=0.989 uniform=0.983 best1=0.987 n_val=10092 vram=0.00GB 191s | grade=0.973 inner_auc=0.977 vs conf_auc=0.977
+08:10:19 ===== CYCLE 295 (OUTER -> INNER -> FEEDBACK) =====
+08:14:05 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.988 n_val=10152 vram=0.00GB 226s | grade=0.968 inner_auc=0.978 vs conf_auc=0.946
+08:14:28 ===== CYCLE 296 (OUTER -> INNER -> FEEDBACK) =====
+08:18:12 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.987 n_val=10273 vram=0.00GB 224s | grade=0.972 inner_auc=0.984 vs conf_auc=0.976
+08:18:41 ===== CYCLE 297 (OUTER -> INNER -> FEEDBACK) =====
+08:22:15 [enc/text/enron_spam] vote=0.990 uniform=0.984 best1=0.987 n_val=9952 vram=0.00GB 213s | grade=0.965 inner_auc=0.987 vs conf_auc=0.975
+08:22:45 ===== CYCLE 298 (OUTER -> INNER -> FEEDBACK) =====
+08:24:42 [enc/text/enron_spam] vote=0.990 uniform=0.984 best1=0.988 n_val=10007 vram=0.00GB 117s | grade=0.970 inner_auc=0.989 vs conf_auc=0.984
+08:24:57 RUN COMPLETE
+06:18:22 NI run auto_cpu_039 on CPU; hours=2.0 smoke=False
+06:18:22 explicit task list: ['enc/text/enron_spam']
+06:18:28 [resume] from checkpoint: next cycle 299, rounds 299, 299 metric rows, inner net restored
+06:18:28 ===== CYCLE 299 (OUTER-ONLY BOOTSTRAP) =====
+06:18:28 [data] enc/text/enron_spam: n=33716 C=2 D=384 shards=1
+06:19:24 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.988 n_val=10048 vram=0.00GB 56s
+06:19:53 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 299, "n_records": 10048, "n_val": 2053, "base_rate": 0.9907452464103699, "inner": {"auc": 0.9788076385654402, "ece": 0.0046414366537225115, "brier": 0.007326123304665089, "acc80": 1.0}, "outer_conf": {"auc": 0.9785230036743777, "ece": 0.009940084804863799, "brier": 0.007297092117369175, "acc80": 1.0}}
+06:19:53 ===== CYCLE 300 (OUTER -> INNER -> FEEDBACK) =====
+06:21:45 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10098 vram=0.00GB 112s | grade=0.975 inner_auc=0.991 vs conf_auc=0.988
+06:22:05 ===== CYCLE 301 (OUTER -> INNER -> FEEDBACK) =====
+06:24:45 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.988 n_val=10108 vram=0.00GB 160s | grade=0.976 inner_auc=0.980 vs conf_auc=0.990
+06:25:04 ===== CYCLE 302 (OUTER -> INNER -> FEEDBACK) =====
+06:27:40 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.986 n_val=10090 vram=0.00GB 156s | grade=0.969 inner_auc=0.982 vs conf_auc=0.968
+06:28:01 ===== CYCLE 303 (OUTER -> INNER -> FEEDBACK) =====
+06:30:37 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.988 n_val=10025 vram=0.00GB 157s | grade=0.967 inner_auc=0.982 vs conf_auc=0.976
+06:31:00 ===== CYCLE 304 (OUTER -> INNER -> FEEDBACK) =====
+06:33:34 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=10141 vram=0.00GB 154s | grade=0.970 inner_auc=0.981 vs conf_auc=0.979
+06:33:55 ===== CYCLE 305 (OUTER -> INNER -> FEEDBACK) =====
+06:36:28 [enc/text/enron_spam] vote=0.986 uniform=0.983 best1=0.984 n_val=10134 vram=0.00GB 154s | grade=0.971 inner_auc=0.988 vs conf_auc=0.983
+06:36:49 ===== CYCLE 306 (OUTER -> INNER -> FEEDBACK) =====
+06:39:56 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.987 n_val=9912 vram=0.00GB 187s | grade=0.973 inner_auc=0.985 vs conf_auc=0.987
+06:40:16 ===== CYCLE 307 (OUTER -> INNER -> FEEDBACK) =====
+06:43:16 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.987 n_val=10246 vram=0.00GB 180s | grade=0.969 inner_auc=0.981 vs conf_auc=0.979
+06:43:39 ===== CYCLE 308 (OUTER -> INNER -> FEEDBACK) =====
+06:46:37 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.988 n_val=10044 vram=0.00GB 178s | grade=0.971 inner_auc=0.984 vs conf_auc=0.976
+06:46:59 ===== CYCLE 309 (OUTER -> INNER -> FEEDBACK) =====
+06:49:41 [enc/text/enron_spam] vote=0.990 uniform=0.984 best1=0.986 n_val=10235 vram=0.00GB 161s | grade=0.965 inner_auc=0.990 vs conf_auc=0.986
+06:50:02 ===== CYCLE 310 (OUTER -> INNER -> FEEDBACK) =====
+06:52:48 [enc/text/enron_spam] vote=0.988 uniform=0.984 best1=0.987 n_val=10105 vram=0.00GB 166s | grade=0.968 inner_auc=0.982 vs conf_auc=0.982
+06:53:09 ===== CYCLE 311 (OUTER -> INNER -> FEEDBACK) =====
+06:56:11 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10070 vram=0.00GB 181s | grade=0.972 inner_auc=0.983 vs conf_auc=0.984
+06:56:32 ===== CYCLE 312 (OUTER -> INNER -> FEEDBACK) =====
+06:59:27 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.986 n_val=10200 vram=0.00GB 175s | grade=0.972 inner_auc=0.992 vs conf_auc=0.988
+06:59:49 ===== CYCLE 313 (OUTER -> INNER -> FEEDBACK) =====
+07:02:47 [enc/text/enron_spam] vote=0.989 uniform=0.984 best1=0.988 n_val=10139 vram=0.00GB 178s | grade=0.971 inner_auc=0.972 vs conf_auc=0.974
+07:03:09 ===== CYCLE 314 (OUTER -> INNER -> FEEDBACK) =====
+07:06:24 [enc/text/enron_spam] vote=0.990 uniform=0.988 best1=0.988 n_val=9888 vram=0.00GB 195s | grade=0.972 inner_auc=0.982 vs conf_auc=0.979
+07:06:51 ===== CYCLE 315 (OUTER -> INNER -> FEEDBACK) =====
+07:10:03 [enc/text/enron_spam] vote=0.987 uniform=0.984 best1=0.986 n_val=9985 vram=0.00GB 192s | grade=0.970 inner_auc=0.986 vs conf_auc=0.980
+07:10:28 ===== CYCLE 316 (OUTER -> INNER -> FEEDBACK) =====
+07:13:37 [enc/text/enron_spam] vote=0.988 uniform=0.983 best1=0.987 n_val=9983 vram=0.00GB 189s | grade=0.967 inner_auc=0.985 vs conf_auc=0.979
+07:13:58 ===== CYCLE 317 (OUTER -> INNER -> FEEDBACK) =====
+07:16:42 [enc/text/enron_spam] vote=0.987 uniform=0.985 best1=0.986 n_val=10048 vram=0.00GB 164s | grade=0.969 inner_auc=0.976 vs conf_auc=0.979
+07:17:03 ===== CYCLE 318 (OUTER -> INNER -> FEEDBACK) =====
+07:19:53 [enc/text/enron_spam] vote=0.991 uniform=0.988 best1=0.988 n_val=10106 vram=0.00GB 170s | grade=0.967 inner_auc=0.989 vs conf_auc=0.986
+07:20:11 ===== CYCLE 319 (OUTER -> INNER -> FEEDBACK) =====
+07:22:57 [enc/text/enron_spam] vote=0.989 uniform=0.986 best1=0.987 n_val=10175 vram=0.00GB 165s | grade=0.971 inner_auc=0.988 vs conf_auc=0.982
+07:23:17 ===== CYCLE 320 (OUTER -> INNER -> FEEDBACK) =====
+07:26:01 [enc/text/enron_spam] vote=0.991 uniform=0.987 best1=0.988 n_val=10009 vram=0.00GB 163s | grade=0.973 inner_auc=0.982 vs conf_auc=0.966
+07:26:25 ===== CYCLE 321 (OUTER -> INNER -> FEEDBACK) =====
+07:29:07 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=10107 vram=0.00GB 161s | grade=0.970 inner_auc=0.987 vs conf_auc=0.984
+07:29:29 ===== CYCLE 322 (OUTER -> INNER -> FEEDBACK) =====
+07:32:12 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.988 n_val=10095 vram=0.00GB 163s | grade=0.970 inner_auc=0.987 vs conf_auc=0.984
+07:32:33 ===== CYCLE 323 (OUTER -> INNER -> FEEDBACK) =====
+07:35:12 [enc/text/enron_spam] vote=0.990 uniform=0.983 best1=0.986 n_val=10244 vram=0.00GB 159s | grade=0.971 inner_auc=0.989 vs conf_auc=0.979
+07:35:36 ===== CYCLE 324 (OUTER -> INNER -> FEEDBACK) =====
+07:38:14 [enc/text/enron_spam] vote=0.991 uniform=0.987 best1=0.988 n_val=9954 vram=0.00GB 158s | grade=0.969 inner_auc=0.989 vs conf_auc=0.982
+07:38:38 ===== CYCLE 325 (OUTER -> INNER -> FEEDBACK) =====
+07:41:11 [enc/text/enron_spam] vote=0.990 uniform=0.989 best1=0.988 n_val=10055 vram=0.00GB 153s | grade=0.972 inner_auc=0.987 vs conf_auc=0.988
+07:41:35 ===== CYCLE 326 (OUTER -> INNER -> FEEDBACK) =====
+07:44:14 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=10191 vram=0.00GB 159s | grade=0.974 inner_auc=0.987 vs conf_auc=0.980
+07:44:37 ===== CYCLE 327 (OUTER -> INNER -> FEEDBACK) =====
+07:47:20 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=10058 vram=0.00GB 163s | grade=0.966 inner_auc=0.988 vs conf_auc=0.976
+07:47:41 ===== CYCLE 328 (OUTER -> INNER -> FEEDBACK) =====
+07:50:30 [enc/text/enron_spam] vote=0.990 uniform=0.987 best1=0.987 n_val=10160 vram=0.00GB 169s | grade=0.972 inner_auc=0.990 vs conf_auc=0.987
+07:50:52 ===== CYCLE 329 (OUTER -> INNER -> FEEDBACK) =====
+07:53:35 [enc/text/enron_spam] vote=0.991 uniform=0.986 best1=0.988 n_val=10143 vram=0.00GB 162s | grade=0.974 inner_auc=0.977 vs conf_auc=0.966
+07:53:58 ===== CYCLE 330 (OUTER -> INNER -> FEEDBACK) =====
+07:56:43 [enc/text/enron_spam] vote=0.990 uniform=0.984 best1=0.987 n_val=10157 vram=0.00GB 165s | grade=0.972 inner_auc=0.984 vs conf_auc=0.973
+07:57:06 ===== CYCLE 331 (OUTER -> INNER -> FEEDBACK) =====
+07:59:48 [enc/text/enron_spam] vote=0.989 uniform=0.985 best1=0.987 n_val=10106 vram=0.00GB 161s | grade=0.969 inner_auc=0.989 vs conf_auc=0.987
+08:00:10 ===== CYCLE 332 (OUTER -> INNER -> FEEDBACK) =====
+08:02:55 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.988 n_val=10028 vram=0.00GB 165s | grade=0.971 inner_auc=0.987 vs conf_auc=0.985
+08:03:17 ===== CYCLE 333 (OUTER -> INNER -> FEEDBACK) =====
+23:53:47 NI run auto_cpu_039 on CPU; hours=2.0 smoke=False
+23:53:47 explicit task list: ['enc/text/enron_spam']
+23:53:59 [resume] from checkpoint: next cycle 333, rounds 333, 333 metric rows, inner net restored
+23:53:59 ===== CYCLE 333 (OUTER-ONLY BOOTSTRAP) =====
+23:53:59 [data] enc/text/enron_spam: n=33716 C=2 D=384 shards=1
+23:56:42 [enc/text/enron_spam] vote=0.990 uniform=0.986 best1=0.987 n_val=10057 vram=0.00GB 162s
+23:57:19 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 333, "n_records": 10057, "n_val": 2014, "base_rate": 0.9895730018615723, "inner": {"auc": 0.983728764963085, "ece": 0.006167320029619552, "brier": 0.008364534005522728, "acc80": 1.0}, "outer_conf": {"auc": 0.9701335627075718, "ece": 0.004410692839305237, "brier": 0.008423411287367344, "acc80": 0.9993792772293091}}
+23:57:20 ===== CYCLE 334 (OUTER -> INNER -> FEEDBACK) =====
+00:00:20 [enc/text/enron_spam] vote=0.990 uniform=0.985 best1=0.987 n_val=10048 vram=0.00GB 180s | grade=0.974 inner_auc=0.980 vs conf_auc=0.946
+00:00:42 ===== CYCLE 335 (OUTER -> INNER -> FEEDBACK) =====
+00:03:14 [enc/text/enron_spam] vote=0.990 uniform=0.988 best1=0.987 n_val=10078 vram=0.00GB 152s | grade=0.971 inner_auc=0.983 vs conf_auc=0.980
+00:03:38 ===== CYCLE 336 (OUTER -> INNER -> FEEDBACK) =====

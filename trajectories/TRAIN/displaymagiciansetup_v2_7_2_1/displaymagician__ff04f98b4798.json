@@ -1,0 +1,286 @@
+{
+   "app_metadata": {
+      "app_name": "DisplayMagicianSetup v2.7.2.1",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Set up DisplayMagician to manage display and audio configurations for games and applications.",
+   "prerequisite_state": "User has downloaded and is installing DisplayMagicianSetup_v.exe.",
+   "total_steps": 9,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the latest DisplayMagicianSetup_v.exe from the list of DisplayMagician releases.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User navigates to the releases page and sees the latest version of DisplayMagicianSetup_v.exe."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Double-click the DisplayMagicianSetup_v.exe file to start the installation.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "DisplayMagicianSetup window opens."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Follow the instructions shown during the installation process.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Installation completes and DisplayMagician starts."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click on the 'Display Profiles' button to open the Display Profiles window.",
+         "ui_target": {
+            "element_name": "Display Profiles",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Display Profiles",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Display Profiles window opens showing the current display layout."
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Use 'Windows Display Settings', 'NVIDIA Control Panel', 'AMD Adrenalin', or 'Intel Graphics Command Center' to configure your display(s) as desired.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Display layout is configured as desired."
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Swap back to DisplayMagician (ALT-TAB) and verify the new display configuration is shown in the Display Profile window.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "alt"
+            ],
+            "text_payload": "tab"
+         },
+         "expected_state_change": "DisplayMagician window is focused and the new display configuration is visible."
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Click the 'Save As/Rename' button to save the current display configuration as a new Display Profile.",
+         "ui_target": {
+            "element_name": "Save As/Rename",
+            "automation_id": null,
+            "hierarchical_path": "Display Profiles window > Save As/Rename",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "New Display Profile is saved and shown in the list."
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Repeat the process to add each different display configuration you want to use in any of your games or applications.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Additional display configurations are saved and available."
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Click the 'Game Shortcuts' button to create a new Game Shortcut.",
+         "ui_target": {
+            "element_name": "Game Shortcuts",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Game Shortcuts",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Shortcut Library window opens."
+      }
+   ],
+   "_meta": {
+      "source_app": "DisplayMagicianSetup v2.7.2.1",
+      "app_key": "displaymagiciansetup_v2_7_2_1",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "DisplayMagician",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:38:22Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target",
+         "step5_ungrounded_target",
+         "step6_ungrounded_target",
+         "step8_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,664 @@
+02:43:51 NI run overnight_text_1107_0243 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=9.0 smoke=False
+02:43:51 waiting for the first fill stage (seed shards for every modality)...
+02:43:53 [fill] stage 0 complete
+02:43:53 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+02:43:54 [data] text/ag_news: n=14000 C=4 D=2048 shards=14
+02:44:00 [text/ag_news] vote=0.843 uniform=0.843 best1=0.839 n_val=4161 vram=0.34GB 6s
+02:44:03 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 4161, "n_val": 813, "base_rate": 0.8487085103988647, "inner": {"auc": 0.8778484741369152, "ece": 0.02968170417777433, "brier": 0.08709739148616791, "acc80": 0.9384615421295166}, "outer_conf": {"auc": 0.8504772004241782, "ece": 0.23935259653193489, "brier": 0.15840880572795868, "acc80": 0.9338461756706238}}
+02:44:03 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+02:44:07 [text/ag_news] vote=0.844 uniform=0.844 best1=0.841 n_val=4239 vram=0.45GB 5s | grade=0.845 inner_auc=0.871 vs conf_auc=0.840
+02:44:09 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+02:44:13 [text/ag_news] vote=0.844 uniform=0.840 best1=0.839 n_val=4165 vram=0.45GB 5s | grade=0.853 inner_auc=0.870 vs conf_auc=0.855
+02:44:15 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+02:44:20 [text/ag_news] vote=0.855 uniform=0.845 best1=0.843 n_val=4229 vram=0.45GB 5s | grade=0.854 inner_auc=0.843 vs conf_auc=0.830
+02:44:22 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+02:44:26 [text/ag_news] vote=0.850 uniform=0.839 best1=0.841 n_val=4271 vram=0.45GB 5s | grade=0.862 inner_auc=0.819 vs conf_auc=0.801
+02:44:28 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+02:44:33 [text/ag_news] vote=0.863 uniform=0.852 best1=0.845 n_val=4189 vram=0.45GB 5s | grade=0.864 inner_auc=0.848 vs conf_auc=0.839
+02:44:34 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+02:44:39 [text/ag_news] vote=0.858 uniform=0.845 best1=0.843 n_val=4206 vram=0.45GB 5s | grade=0.870 inner_auc=0.843 vs conf_auc=0.814
+02:44:41 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+02:44:46 [text/ag_news] vote=0.861 uniform=0.843 best1=0.836 n_val=4256 vram=0.45GB 5s | grade=0.873 inner_auc=0.834 vs conf_auc=0.835
+02:44:48 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+02:44:52 [text/ag_news] vote=0.861 uniform=0.843 best1=0.841 n_val=4137 vram=0.46GB 5s | grade=0.870 inner_auc=0.843 vs conf_auc=0.820
+02:44:54 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+02:44:59 [text/ag_news] vote=0.869 uniform=0.850 best1=0.845 n_val=4255 vram=0.46GB 5s | grade=0.867 inner_auc=0.816 vs conf_auc=0.806
+02:45:01 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+02:45:05 [text/ag_news] vote=0.860 uniform=0.849 best1=0.837 n_val=4253 vram=0.45GB 5s | grade=0.869 inner_auc=0.838 vs conf_auc=0.808
+02:45:07 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+02:45:12 [text/ag_news] vote=0.859 uniform=0.840 best1=0.840 n_val=4189 vram=0.45GB 5s | grade=0.875 inner_auc=0.858 vs conf_auc=0.845
+02:45:14 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+02:45:18 [text/ag_news] vote=0.862 uniform=0.849 best1=0.837 n_val=4216 vram=0.45GB 5s | grade=0.875 inner_auc=0.828 vs conf_auc=0.819
+02:45:20 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+02:45:25 [text/ag_news] vote=0.858 uniform=0.846 best1=0.838 n_val=4308 vram=0.45GB 5s | grade=0.872 inner_auc=0.817 vs conf_auc=0.802
+02:45:27 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+02:45:32 [text/ag_news] vote=0.858 uniform=0.849 best1=0.843 n_val=4257 vram=0.45GB 5s | grade=0.876 inner_auc=0.854 vs conf_auc=0.848
+02:45:33 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+02:45:38 [text/ag_news] vote=0.861 uniform=0.842 best1=0.845 n_val=4216 vram=0.45GB 5s | grade=0.877 inner_auc=0.812 vs conf_auc=0.817
+02:45:40 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+02:45:45 [text/ag_news] vote=0.857 uniform=0.839 best1=0.840 n_val=4179 vram=0.45GB 5s | grade=0.877 inner_auc=0.825 vs conf_auc=0.807
+02:45:47 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+02:45:52 [text/ag_news] vote=0.852 uniform=0.837 best1=0.837 n_val=4128 vram=0.46GB 5s | grade=0.872 inner_auc=0.838 vs conf_auc=0.806
+02:45:54 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+02:45:58 [text/ag_news] vote=0.852 uniform=0.851 best1=0.838 n_val=4183 vram=0.46GB 5s | grade=0.876 inner_auc=0.852 vs conf_auc=0.845
+02:46:00 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+02:46:05 [text/ag_news] vote=0.861 uniform=0.856 best1=0.847 n_val=4172 vram=0.45GB 5s | grade=0.871 inner_auc=0.854 vs conf_auc=0.818
+02:46:07 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+02:46:12 [text/ag_news] vote=0.856 uniform=0.843 best1=0.840 n_val=4256 vram=0.45GB 5s | grade=0.874 inner_auc=0.878 vs conf_auc=0.867
+02:46:13 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+02:46:18 [text/ag_news] vote=0.856 uniform=0.848 best1=0.846 n_val=4139 vram=0.46GB 5s | grade=0.875 inner_auc=0.888 vs conf_auc=0.835
+02:46:20 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+02:46:25 [text/ag_news] vote=0.847 uniform=0.841 best1=0.835 n_val=4301 vram=0.46GB 5s | grade=0.872 inner_auc=0.866 vs conf_auc=0.830
+02:46:26 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+02:46:31 [text/ag_news] vote=0.851 uniform=0.845 best1=0.841 n_val=4165 vram=0.46GB 5s | grade=0.874 inner_auc=0.863 vs conf_auc=0.815
+02:46:33 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+02:46:38 [text/ag_news] vote=0.846 uniform=0.845 best1=0.835 n_val=4328 vram=0.45GB 5s | grade=0.874 inner_auc=0.876 vs conf_auc=0.829
+02:46:40 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+02:46:44 [text/ag_news] vote=0.853 uniform=0.851 best1=0.838 n_val=4214 vram=0.45GB 5s | grade=0.873 inner_auc=0.826 vs conf_auc=0.792
+02:46:46 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+02:46:51 [text/ag_news] vote=0.851 uniform=0.847 best1=0.840 n_val=4230 vram=0.45GB 5s | grade=0.875 inner_auc=0.852 vs conf_auc=0.821
+02:46:53 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+02:46:57 [text/ag_news] vote=0.855 uniform=0.840 best1=0.841 n_val=4194 vram=0.45GB 5s | grade=0.875 inner_auc=0.867 vs conf_auc=0.829
+02:46:59 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+02:47:04 [text/ag_news] vote=0.856 uniform=0.854 best1=0.848 n_val=4185 vram=0.45GB 5s | grade=0.879 inner_auc=0.869 vs conf_auc=0.816
+02:47:05 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+02:47:10 [text/ag_news] vote=0.852 uniform=0.849 best1=0.840 n_val=4243 vram=0.45GB 5s | grade=0.877 inner_auc=0.838 vs conf_auc=0.794
+02:47:12 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+02:47:17 [text/ag_news] vote=0.863 uniform=0.853 best1=0.851 n_val=4222 vram=0.45GB 5s | grade=0.872 inner_auc=0.846 vs conf_auc=0.793
+02:47:18 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+02:47:23 [text/ag_news] vote=0.856 uniform=0.847 best1=0.844 n_val=4280 vram=0.45GB 5s | grade=0.874 inner_auc=0.853 vs conf_auc=0.802
+02:47:25 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+02:47:30 [text/ag_news] vote=0.845 uniform=0.840 best1=0.840 n_val=4098 vram=0.46GB 5s | grade=0.874 inner_auc=0.855 vs conf_auc=0.806
+02:47:31 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+02:47:36 [text/ag_news] vote=0.852 uniform=0.849 best1=0.841 n_val=4164 vram=0.46GB 5s | grade=0.875 inner_auc=0.869 vs conf_auc=0.834
+02:47:38 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+02:47:43 [text/ag_news] vote=0.849 uniform=0.840 best1=0.841 n_val=4240 vram=0.45GB 5s | grade=0.875 inner_auc=0.817 vs conf_auc=0.801
+02:47:45 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+02:47:49 [text/ag_news] vote=0.845 uniform=0.837 best1=0.836 n_val=4189 vram=0.45GB 5s | grade=0.877 inner_auc=0.881 vs conf_auc=0.823
+02:47:51 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+02:47:56 [text/ag_news] vote=0.859 uniform=0.855 best1=0.851 n_val=4253 vram=0.45GB 5s | grade=0.869 inner_auc=0.867 vs conf_auc=0.830
+02:47:58 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+02:48:03 [text/ag_news] vote=0.839 uniform=0.839 best1=0.829 n_val=4230 vram=0.45GB 5s | grade=0.867 inner_auc=0.865 vs conf_auc=0.826
+02:48:04 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+02:48:09 [text/ag_news] vote=0.840 uniform=0.839 best1=0.830 n_val=4213 vram=0.45GB 5s | grade=0.875 inner_auc=0.860 vs conf_auc=0.829
+02:48:11 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+02:48:16 [text/ag_news] vote=0.861 uniform=0.854 best1=0.851 n_val=4106 vram=0.46GB 5s | grade=0.865 inner_auc=0.859 vs conf_auc=0.823
+02:48:18 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+02:48:24 [text/ag_news] vote=0.853 uniform=0.847 best1=0.845 n_val=4210 vram=0.46GB 6s | grade=0.873 inner_auc=0.840 vs conf_auc=0.810
+02:48:26 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+02:48:32 [text/ag_news] vote=0.846 uniform=0.841 best1=0.841 n_val=4159 vram=0.45GB 6s | grade=0.873 inner_auc=0.847 vs conf_auc=0.822
+02:48:34 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+02:48:40 [text/ag_news] vote=0.844 uniform=0.843 best1=0.840 n_val=4180 vram=0.45GB 6s | grade=0.875 inner_auc=0.853 vs conf_auc=0.829
+02:48:42 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+02:48:48 [text/ag_news] vote=0.848 uniform=0.847 best1=0.837 n_val=4178 vram=0.45GB 6s | grade=0.878 inner_auc=0.828 vs conf_auc=0.782
+02:48:50 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+02:48:56 [text/ag_news] vote=0.855 uniform=0.847 best1=0.847 n_val=4262 vram=0.45GB 6s | grade=0.870 inner_auc=0.860 vs conf_auc=0.801
+02:48:58 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+02:49:01 [fill] text/ag_news shard 14/40 ok 8s
+02:49:04 [text/ag_news] vote=0.844 uniform=0.838 best1=0.836 n_val=4231 vram=0.45GB 6s | grade=0.874 inner_auc=0.845 vs conf_auc=0.829
+02:49:06 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+02:49:07 [data] text/ag_news: n=15000 C=4 D=2048 shards=15
+02:49:09 [fill] text/ag_news shard 15/40 ok 8s
+02:49:13 [text/ag_news] vote=0.847 uniform=0.842 best1=0.838 n_val=4500 vram=0.47GB 6s | grade=0.875 inner_auc=0.852 vs conf_auc=0.793
+02:49:15 [fill] text/ag_news shard 16/40 ok 6s
+02:49:15 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+02:49:16 [data] text/ag_news: n=17000 C=4 D=2048 shards=17
+02:49:21 [fill] text/ag_news shard 17/40 ok 6s
+02:49:22 [text/ag_news] vote=0.850 uniform=0.849 best1=0.841 n_val=5069 vram=0.50GB 6s | grade=0.880 inner_auc=0.894 vs conf_auc=0.858
+02:49:24 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+02:49:25 [data] text/ag_news: n=18000 C=4 D=2048 shards=18
+02:49:32 [text/ag_news] vote=0.854 uniform=0.852 best1=0.846 n_val=5488 vram=0.53GB 7s | grade=0.878 inner_auc=0.846 vs conf_auc=0.810
+02:49:34 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+02:49:41 [text/ag_news] vote=0.855 uniform=0.853 best1=0.845 n_val=5385 vram=0.54GB 7s | grade=0.879 inner_auc=0.862 vs conf_auc=0.813
+02:49:43 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+02:49:49 [text/ag_news] vote=0.858 uniform=0.856 best1=0.848 n_val=5326 vram=0.54GB 7s | grade=0.876 inner_auc=0.872 vs conf_auc=0.828
+02:49:51 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+02:49:58 [text/ag_news] vote=0.854 uniform=0.850 best1=0.845 n_val=5290 vram=0.54GB 7s | grade=0.876 inner_auc=0.872 vs conf_auc=0.820
+02:50:00 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+02:50:07 [text/ag_news] vote=0.859 uniform=0.848 best1=0.852 n_val=5359 vram=0.54GB 7s | grade=0.877 inner_auc=0.853 vs conf_auc=0.823
+02:50:10 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+02:50:16 [text/ag_news] vote=0.860 uniform=0.859 best1=0.850 n_val=5435 vram=0.54GB 7s | grade=0.879 inner_auc=0.856 vs conf_auc=0.798
+02:50:18 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+02:50:25 [text/ag_news] vote=0.855 uniform=0.855 best1=0.848 n_val=5197 vram=0.54GB 7s | grade=0.879 inner_auc=0.849 vs conf_auc=0.822
+02:50:28 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+02:50:34 [text/ag_news] vote=0.851 uniform=0.855 best1=0.842 n_val=5476 vram=0.54GB 7s | grade=0.880 inner_auc=0.861 vs conf_auc=0.812
+02:50:37 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+02:50:43 [text/ag_news] vote=0.852 uniform=0.848 best1=0.848 n_val=5445 vram=0.54GB 7s | grade=0.877 inner_auc=0.866 vs conf_auc=0.823
+02:50:45 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+02:50:53 [text/ag_news] vote=0.843 uniform=0.842 best1=0.837 n_val=5360 vram=0.54GB 7s | grade=0.877 inner_auc=0.863 vs conf_auc=0.820
+02:50:55 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+02:51:02 [text/ag_news] vote=0.859 uniform=0.861 best1=0.850 n_val=5379 vram=0.54GB 7s | grade=0.871 inner_auc=0.875 vs conf_auc=0.833
+02:51:02 [fill] text/ag_news shard 18/40 ok 101s
+02:51:04 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+02:51:04 [data] text/ag_news: n=19000 C=4 D=2048 shards=19
+02:51:08 [fill] text/ag_news shard 19/40 ok 6s
+02:51:12 [text/ag_news] vote=0.861 uniform=0.859 best1=0.851 n_val=5667 vram=0.55GB 7s | grade=0.878 inner_auc=0.849 vs conf_auc=0.793
+02:51:14 [fill] text/ag_news shard 20/40 ok 6s
+02:51:14 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+02:51:15 [data] text/ag_news: n=21000 C=4 D=2048 shards=21
+02:51:21 [fill] text/ag_news shard 21/40 ok 8s
+02:51:24 [text/ag_news] vote=0.858 uniform=0.852 best1=0.849 n_val=6303 vram=0.58GB 9s | grade=0.882 inner_auc=0.858 vs conf_auc=0.806
+02:51:26 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+02:51:27 [data] text/ag_news: n=22000 C=4 D=2048 shards=22
+02:51:36 [text/ag_news] vote=0.854 uniform=0.843 best1=0.847 n_val=6705 vram=0.61GB 9s | grade=0.878 inner_auc=0.870 vs conf_auc=0.829
+02:51:39 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+02:51:48 [text/ag_news] vote=0.861 uniform=0.860 best1=0.854 n_val=6646 vram=0.62GB 9s | grade=0.878 inner_auc=0.865 vs conf_auc=0.841
+02:51:51 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+02:52:00 [text/ag_news] vote=0.852 uniform=0.848 best1=0.846 n_val=6639 vram=0.62GB 9s | grade=0.880 inner_auc=0.864 vs conf_auc=0.821
+02:52:03 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+02:52:12 [text/ag_news] vote=0.865 uniform=0.854 best1=0.859 n_val=6635 vram=0.62GB 9s | grade=0.877 inner_auc=0.878 vs conf_auc=0.834
+02:52:14 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+02:52:23 [text/ag_news] vote=0.859 uniform=0.854 best1=0.852 n_val=6626 vram=0.62GB 9s | grade=0.882 inner_auc=0.848 vs conf_auc=0.798
+02:52:26 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+02:52:35 [text/ag_news] vote=0.864 uniform=0.860 best1=0.854 n_val=6490 vram=0.62GB 9s | grade=0.882 inner_auc=0.862 vs conf_auc=0.821
+02:52:38 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+02:52:47 [text/ag_news] vote=0.862 uniform=0.857 best1=0.854 n_val=6624 vram=0.62GB 9s | grade=0.884 inner_auc=0.847 vs conf_auc=0.810
+02:52:49 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+02:52:58 [text/ag_news] vote=0.856 uniform=0.847 best1=0.851 n_val=6700 vram=0.62GB 9s | grade=0.882 inner_auc=0.872 vs conf_auc=0.822
+02:53:01 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+02:53:02 [fill] text/ag_news shard 22/40 ok 101s
+02:53:08 [fill] text/ag_news shard 23/40 ok 6s
+02:53:10 [text/ag_news] vote=0.858 uniform=0.861 best1=0.850 n_val=6480 vram=0.62GB 9s | grade=0.883 inner_auc=0.873 vs conf_auc=0.845
+02:53:13 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+02:53:14 [data] text/ag_news: n=24000 C=4 D=2048 shards=24
+02:53:21 [fill] text/ag_news shard 24/40 ok 13s
+02:53:24 [text/ag_news] vote=0.856 uniform=0.852 best1=0.850 n_val=7240 vram=0.66GB 10s | grade=0.885 inner_auc=0.875 vs conf_auc=0.818
+02:53:26 [fill] text/ag_news shard 25/40 ok 5s
+02:53:26 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+02:53:27 [data] text/ag_news: n=26000 C=4 D=2048 shards=26
+02:53:37 [text/ag_news] vote=0.857 uniform=0.850 best1=0.850 n_val=7820 vram=0.71GB 10s | grade=0.883 inner_auc=0.878 vs conf_auc=0.814
+02:53:40 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+02:53:50 [text/ag_news] vote=0.860 uniform=0.859 best1=0.850 n_val=7847 vram=0.72GB 10s | grade=0.885 inner_auc=0.855 vs conf_auc=0.813
+02:53:53 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+02:54:03 [text/ag_news] vote=0.863 uniform=0.858 best1=0.852 n_val=7820 vram=0.72GB 10s | grade=0.882 inner_auc=0.860 vs conf_auc=0.830
+02:54:05 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+02:54:16 [text/ag_news] vote=0.859 uniform=0.856 best1=0.852 n_val=7967 vram=0.72GB 10s | grade=0.883 inner_auc=0.866 vs conf_auc=0.812
+02:54:18 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+02:54:29 [text/ag_news] vote=0.859 uniform=0.861 best1=0.852 n_val=8007 vram=0.72GB 10s | grade=0.884 inner_auc=0.872 vs conf_auc=0.823
+02:54:32 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+02:54:41 [text/ag_news] vote=0.861 uniform=0.858 best1=0.853 n_val=7898 vram=0.72GB 10s | grade=0.885 inner_auc=0.873 vs conf_auc=0.816
+02:54:44 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+02:54:54 [text/ag_news] vote=0.856 uniform=0.850 best1=0.848 n_val=7811 vram=0.72GB 10s | grade=0.885 inner_auc=0.861 vs conf_auc=0.822
+02:54:57 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+02:55:07 [text/ag_news] vote=0.852 uniform=0.849 best1=0.843 n_val=7967 vram=0.72GB 10s | grade=0.884 inner_auc=0.866 vs conf_auc=0.821
+02:55:07 [fill] text/ag_news shard 26/40 ok 101s
+02:55:09 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+02:55:10 [data] text/ag_news: n=27000 C=4 D=2048 shards=27
+02:55:13 [fill] text/ag_news shard 27/40 ok 6s
+02:55:18 [fill] text/ag_news shard 28/40 ok 6s
+02:55:21 [text/ag_news] vote=0.860 uniform=0.852 best1=0.853 n_val=7987 vram=0.74GB 11s | grade=0.884 inner_auc=0.857 vs conf_auc=0.815
+02:55:23 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+02:55:24 [data] text/ag_news: n=29000 C=4 D=2048 shards=29
+02:55:24 [fill] text/ag_news shard 29/40 ok 6s
+02:55:35 [text/ag_news] vote=0.861 uniform=0.857 best1=0.855 n_val=8737 vram=0.79GB 11s | grade=0.885 inner_auc=0.877 vs conf_auc=0.826
+02:55:38 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+02:55:39 [data] text/ag_news: n=30000 C=4 D=2048 shards=30
+02:55:50 [text/ag_news] vote=0.860 uniform=0.861 best1=0.855 n_val=9097 vram=0.82GB 11s | grade=0.885 inner_auc=0.866 vs conf_auc=0.834
+02:55:52 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+02:56:04 [text/ag_news] vote=0.861 uniform=0.859 best1=0.856 n_val=9026 vram=0.83GB 12s | grade=0.885 inner_auc=0.867 vs conf_auc=0.818
+02:56:07 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+02:56:18 [text/ag_news] vote=0.859 uniform=0.862 best1=0.854 n_val=8868 vram=0.83GB 12s | grade=0.886 inner_auc=0.897 vs conf_auc=0.844
+02:56:21 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+02:56:32 [text/ag_news] vote=0.858 uniform=0.853 best1=0.852 n_val=8914 vram=0.83GB 11s | grade=0.886 inner_auc=0.860 vs conf_auc=0.809
+02:56:35 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+02:56:46 [text/ag_news] vote=0.859 uniform=0.862 best1=0.852 n_val=9031 vram=0.83GB 11s | grade=0.884 inner_auc=0.883 vs conf_auc=0.831
+02:56:49 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+02:57:01 [text/ag_news] vote=0.857 uniform=0.856 best1=0.849 n_val=9018 vram=0.83GB 11s | grade=0.886 inner_auc=0.878 vs conf_auc=0.834
+02:57:03 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+02:57:06 [fill] text/ag_news shard 30/40 ok 102s
+02:57:12 [fill] text/ag_news shard 31/40 ok 6s
+02:57:15 [text/ag_news] vote=0.860 uniform=0.859 best1=0.852 n_val=9078 vram=0.83GB 11s | grade=0.886 inner_auc=0.881 vs conf_auc=0.838
+02:57:17 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+02:57:18 [data] text/ag_news: n=32000 C=4 D=2048 shards=32
+02:57:21 [fill] text/ag_news shard 32/40 ok 9s
+02:57:30 [text/ag_news] vote=0.860 uniform=0.860 best1=0.855 n_val=9625 vram=0.86GB 12s | grade=0.886 inner_auc=0.863 vs conf_auc=0.806
+02:57:33 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+02:57:34 [data] text/ag_news: n=33000 C=4 D=2048 shards=33
+02:57:46 [text/ag_news] vote=0.866 uniform=0.863 best1=0.859 n_val=9772 vram=0.90GB 12s | grade=0.885 inner_auc=0.876 vs conf_auc=0.827
+02:57:49 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+02:58:02 [text/ag_news] vote=0.863 uniform=0.861 best1=0.855 n_val=9922 vram=0.91GB 13s | grade=0.886 inner_auc=0.856 vs conf_auc=0.805
+02:58:05 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+02:58:17 [text/ag_news] vote=0.867 uniform=0.864 best1=0.859 n_val=9898 vram=0.91GB 12s | grade=0.886 inner_auc=0.883 vs conf_auc=0.819
+02:58:20 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+02:58:32 [text/ag_news] vote=0.867 uniform=0.864 best1=0.859 n_val=9784 vram=0.91GB 12s | grade=0.886 inner_auc=0.879 vs conf_auc=0.818
+02:58:35 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+02:58:47 [text/ag_news] vote=0.864 uniform=0.863 best1=0.858 n_val=9895 vram=0.91GB 12s | grade=0.887 inner_auc=0.864 vs conf_auc=0.812
+02:58:50 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+02:59:02 [fill] text/ag_news shard 33/40 ok 101s
+02:59:02 [text/ag_news] vote=0.861 uniform=0.864 best1=0.856 n_val=9945 vram=0.91GB 13s | grade=0.886 inner_auc=0.872 vs conf_auc=0.823
+02:59:05 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+02:59:06 [data] text/ag_news: n=34000 C=4 D=2048 shards=34
+02:59:07 [fill] text/ag_news shard 34/40 ok 5s
+02:59:13 [fill] text/ag_news shard 35/40 ok 5s
+02:59:18 [fill] text/ag_news shard 36/40 ok 6s
+02:59:19 [text/ag_news] vote=0.861 uniform=0.857 best1=0.854 n_val=10357 vram=0.92GB 13s | grade=0.885 inner_auc=0.867 vs conf_auc=0.824
+02:59:22 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+02:59:23 [data] text/ag_news: n=37000 C=4 D=2048 shards=37
+02:59:36 [text/ag_news] vote=0.869 uniform=0.863 best1=0.865 n_val=11086 vram=0.99GB 13s | grade=0.883 inner_auc=0.870 vs conf_auc=0.810
+02:59:39 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+02:59:53 [text/ag_news] vote=0.865 uniform=0.863 best1=0.859 n_val=11064 vram=1.01GB 14s | grade=0.884 inner_auc=0.890 vs conf_auc=0.829
+02:59:55 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+03:00:09 [text/ag_news] vote=0.868 uniform=0.866 best1=0.860 n_val=11239 vram=1.01GB 14s | grade=0.884 inner_auc=0.859 vs conf_auc=0.816
+03:00:12 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+03:00:26 [text/ag_news] vote=0.866 uniform=0.865 best1=0.861 n_val=11085 vram=1.01GB 14s | grade=0.886 inner_auc=0.857 vs conf_auc=0.814
+03:00:29 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+03:00:42 [text/ag_news] vote=0.870 uniform=0.864 best1=0.863 n_val=11022 vram=1.01GB 14s | grade=0.886 inner_auc=0.873 vs conf_auc=0.817
+03:00:45 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+03:00:59 [text/ag_news] vote=0.863 uniform=0.865 best1=0.858 n_val=11150 vram=1.01GB 14s | grade=0.884 inner_auc=0.869 vs conf_auc=0.821
+03:00:59 [fill] text/ag_news shard 37/40 ok 101s
+03:01:02 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+03:01:03 [data] text/ag_news: n=38000 C=4 D=2048 shards=38
+03:01:05 [fill] text/ag_news shard 38/40 ok 6s
+03:01:11 [fill] text/ag_news shard 39/40 ok 5s
+03:01:11 [fill] stage 1 complete
+03:01:17 [text/ag_news] vote=0.869 uniform=0.866 best1=0.864 n_val=11401 vram=1.03GB 14s | grade=0.887 inner_auc=0.858 vs conf_auc=0.821
+03:01:19 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+03:01:20 [data] text/ag_news: n=40000 C=4 D=2048 shards=40
+03:01:35 [text/ag_news] vote=0.874 uniform=0.870 best1=0.867 n_val=11984 vram=1.07GB 15s | grade=0.885 inner_auc=0.889 vs conf_auc=0.845
+03:01:38 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+03:01:53 [text/ag_news] vote=0.868 uniform=0.867 best1=0.863 n_val=11961 vram=1.09GB 15s | grade=0.885 inner_auc=0.873 vs conf_auc=0.819
+03:01:56 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+03:02:11 [text/ag_news] vote=0.864 uniform=0.858 best1=0.859 n_val=11979 vram=1.09GB 15s | grade=0.885 inner_auc=0.873 vs conf_auc=0.819
+03:02:14 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+03:02:28 [text/ag_news] vote=0.873 uniform=0.866 best1=0.867 n_val=12091 vram=1.09GB 15s | grade=0.883 inner_auc=0.882 vs conf_auc=0.821
+03:02:31 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+03:02:46 [text/ag_news] vote=0.867 uniform=0.863 best1=0.860 n_val=11964 vram=1.09GB 15s | grade=0.883 inner_auc=0.872 vs conf_auc=0.834
+03:02:50 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+03:03:04 [text/ag_news] vote=0.865 uniform=0.864 best1=0.859 n_val=11983 vram=1.09GB 15s | grade=0.887 inner_auc=0.860 vs conf_auc=0.816
+03:03:07 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+03:03:22 [text/ag_news] vote=0.871 uniform=0.868 best1=0.865 n_val=11970 vram=1.09GB 15s | grade=0.885 inner_auc=0.862 vs conf_auc=0.819
+03:03:25 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+03:03:40 [text/ag_news] vote=0.873 uniform=0.866 best1=0.868 n_val=12090 vram=1.09GB 15s | grade=0.887 inner_auc=0.891 vs conf_auc=0.843
+03:03:43 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+03:03:58 [text/ag_news] vote=0.866 uniform=0.863 best1=0.861 n_val=11935 vram=1.09GB 15s | grade=0.884 inner_auc=0.869 vs conf_auc=0.828
+03:04:02 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+03:04:16 [text/ag_news] vote=0.870 uniform=0.868 best1=0.864 n_val=11981 vram=1.09GB 14s | grade=0.885 inner_auc=0.860 vs conf_auc=0.813
+03:04:19 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+03:04:34 [text/ag_news] vote=0.868 uniform=0.866 best1=0.863 n_val=11987 vram=1.09GB 15s | grade=0.887 inner_auc=0.870 vs conf_auc=0.833
+03:04:37 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+03:04:52 [text/ag_news] vote=0.874 uniform=0.868 best1=0.869 n_val=12095 vram=1.09GB 15s | grade=0.884 inner_auc=0.854 vs conf_auc=0.807
+03:04:55 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+03:05:10 [text/ag_news] vote=0.872 uniform=0.869 best1=0.866 n_val=11820 vram=1.09GB 15s | grade=0.886 inner_auc=0.867 vs conf_auc=0.824
+03:05:13 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+03:05:28 [text/ag_news] vote=0.871 uniform=0.869 best1=0.865 n_val=11989 vram=1.09GB 15s | grade=0.888 inner_auc=0.877 vs conf_auc=0.812
+03:05:31 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+03:05:46 [text/ag_news] vote=0.871 uniform=0.867 best1=0.866 n_val=11993 vram=1.09GB 15s | grade=0.887 inner_auc=0.875 vs conf_auc=0.837
+03:05:49 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+03:06:04 [text/ag_news] vote=0.863 uniform=0.866 best1=0.857 n_val=12031 vram=1.09GB 15s | grade=0.884 inner_auc=0.875 vs conf_auc=0.824
+03:06:07 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+03:06:17 [fill] text/ag_news shard 40/80 ok 6s
+03:06:22 [fill] text/ag_news shard 41/80 ok 5s
+03:06:22 [text/ag_news] vote=0.868 uniform=0.867 best1=0.861 n_val=12055 vram=1.09GB 15s | grade=0.884 inner_auc=0.882 vs conf_auc=0.832
+03:06:25 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+03:06:26 [data] text/ag_news: n=42000 C=4 D=2048 shards=42
+03:06:27 [fill] text/ag_news shard 42/80 ok 5s
+03:06:32 [fill] text/ag_news shard 43/80 ok 5s
+03:06:37 [fill] text/ag_news shard 44/80 ok 5s
+03:06:42 [text/ag_news] vote=0.869 uniform=0.870 best1=0.863 n_val=12510 vram=1.13GB 16s | grade=0.887 inner_auc=0.866 vs conf_auc=0.809
+03:06:45 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+03:06:46 [data] text/ag_news: n=45000 C=4 D=2048 shards=45
+03:07:03 [text/ag_news] vote=0.876 uniform=0.872 best1=0.870 n_val=13509 vram=1.20GB 17s | grade=0.884 inner_auc=0.879 vs conf_auc=0.821
+03:07:06 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+03:07:23 [text/ag_news] vote=0.876 uniform=0.872 best1=0.870 n_val=13704 vram=1.22GB 17s | grade=0.889 inner_auc=0.871 vs conf_auc=0.814
+03:07:26 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+03:07:43 [text/ag_news] vote=0.872 uniform=0.868 best1=0.866 n_val=13605 vram=1.22GB 17s | grade=0.886 inner_auc=0.877 vs conf_auc=0.837
+03:07:46 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+03:08:03 [text/ag_news] vote=0.870 uniform=0.865 best1=0.865 n_val=13617 vram=1.22GB 17s | grade=0.886 inner_auc=0.863 vs conf_auc=0.818
+03:08:06 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+03:08:18 [fill] text/ag_news shard 45/80 ok 100s
+03:08:23 [text/ag_news] vote=0.872 uniform=0.868 best1=0.865 n_val=13405 vram=1.22GB 17s | grade=0.887 inner_auc=0.873 vs conf_auc=0.823
+03:08:24 [fill] text/ag_news shard 46/80 ok 6s
+03:08:26 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+03:08:27 [data] text/ag_news: n=47000 C=4 D=2048 shards=47
+03:08:29 [fill] text/ag_news shard 47/80 ok 5s
+03:08:45 [text/ag_news] vote=0.871 uniform=0.871 best1=0.865 n_val=14133 vram=1.25GB 17s | grade=0.885 inner_auc=0.856 vs conf_auc=0.807
+03:08:48 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+03:08:49 [data] text/ag_news: n=48000 C=4 D=2048 shards=48
+03:09:06 [text/ag_news] vote=0.873 uniform=0.870 best1=0.869 n_val=14395 vram=1.29GB 17s | grade=0.886 inner_auc=0.873 vs conf_auc=0.831
+03:09:10 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+03:09:27 [text/ag_news] vote=0.869 uniform=0.867 best1=0.864 n_val=14470 vram=1.29GB 17s | grade=0.885 inner_auc=0.877 vs conf_auc=0.813
+03:09:31 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+03:09:48 [text/ag_news] vote=0.870 uniform=0.868 best1=0.865 n_val=14362 vram=1.30GB 18s | grade=0.889 inner_auc=0.871 vs conf_auc=0.824
+03:09:52 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+03:10:10 [text/ag_news] vote=0.876 uniform=0.872 best1=0.871 n_val=14488 vram=1.29GB 18s | grade=0.887 inner_auc=0.873 vs conf_auc=0.838
+03:10:14 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+03:10:15 [fill] text/ag_news shard 48/80 ok 106s
+03:10:20 [fill] text/ag_news shard 49/80 ok 6s
+03:10:26 [fill] text/ag_news shard 50/80 ok 5s
+03:10:31 [fill] text/ag_news shard 51/80 ok 6s
+03:10:32 [text/ag_news] vote=0.870 uniform=0.868 best1=0.864 n_val=14403 vram=1.30GB 18s | grade=0.886 inner_auc=0.891 vs conf_auc=0.831
+03:10:35 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+03:10:37 [data] text/ag_news: n=52000 C=4 D=2048 shards=52
+03:10:37 [fill] text/ag_news shard 52/80 ok 6s
+03:10:55 [text/ag_news] vote=0.878 uniform=0.877 best1=0.873 n_val=15533 vram=1.37GB 19s | grade=0.885 inner_auc=0.885 vs conf_auc=0.831
+03:10:59 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+03:11:01 [data] text/ag_news: n=53000 C=4 D=2048 shards=53
+03:11:21 [text/ag_news] vote=0.878 uniform=0.871 best1=0.872 n_val=15956 vram=1.42GB 20s | grade=0.887 inner_auc=0.877 vs conf_auc=0.817
+03:11:24 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+03:11:43 [text/ag_news] vote=0.877 uniform=0.872 best1=0.871 n_val=15763 vram=1.43GB 19s | grade=0.888 inner_auc=0.871 vs conf_auc=0.826
+03:11:47 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+03:12:06 [text/ag_news] vote=0.877 uniform=0.872 best1=0.872 n_val=16007 vram=1.43GB 19s | grade=0.887 inner_auc=0.866 vs conf_auc=0.828
+03:12:10 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+03:12:18 [fill] text/ag_news shard 53/80 ok 101s
+03:12:24 [fill] text/ag_news shard 54/80 ok 6s
+03:12:29 [fill] text/ag_news shard 55/80 ok 6s
+03:12:29 [text/ag_news] vote=0.876 uniform=0.872 best1=0.870 n_val=15912 vram=1.43GB 20s | grade=0.887 inner_auc=0.889 vs conf_auc=0.836
+03:12:32 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+03:12:35 [data] text/ag_news: n=56000 C=4 D=2048 shards=56
+03:12:54 [text/ag_news] vote=0.876 uniform=0.868 best1=0.872 n_val=16646 vram=1.48GB 20s | grade=0.888 inner_auc=0.859 vs conf_auc=0.807
+03:12:58 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+03:13:18 [text/ag_news] vote=0.879 uniform=0.876 best1=0.873 n_val=16871 vram=1.50GB 20s | grade=0.885 inner_auc=0.866 vs conf_auc=0.816
+03:13:22 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+03:13:42 [text/ag_news] vote=0.879 uniform=0.875 best1=0.873 n_val=16840 vram=1.50GB 20s | grade=0.889 inner_auc=0.872 vs conf_auc=0.825
+03:13:45 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+03:14:05 [text/ag_news] vote=0.876 uniform=0.870 best1=0.871 n_val=16592 vram=1.51GB 20s | grade=0.886 inner_auc=0.874 vs conf_auc=0.815
+03:14:09 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+03:14:11 [fill] text/ag_news shard 56/80 ok 102s
+03:14:17 [fill] text/ag_news shard 57/80 ok 6s
+03:14:22 [fill] text/ag_news shard 58/80 ok 5s
+03:14:28 [fill] text/ag_news shard 59/80 ok 6s
+03:14:29 [text/ag_news] vote=0.880 uniform=0.875 best1=0.875 n_val=16679 vram=1.51GB 20s | grade=0.883 inner_auc=0.866 vs conf_auc=0.829
+03:14:32 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+03:14:34 [data] text/ag_news: n=60000 C=4 D=2048 shards=60
+03:14:55 [text/ag_news] vote=0.879 uniform=0.873 best1=0.874 n_val=17971 vram=1.58GB 21s | grade=0.887 inner_auc=0.862 vs conf_auc=0.816
+03:14:58 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+03:15:19 [text/ag_news] vote=0.876 uniform=0.872 best1=0.871 n_val=17999 vram=1.61GB 21s | grade=0.885 inner_auc=0.875 vs conf_auc=0.819
+03:15:22 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+03:15:43 [text/ag_news] vote=0.878 uniform=0.871 best1=0.872 n_val=17918 vram=1.61GB 21s | grade=0.886 inner_auc=0.863 vs conf_auc=0.827
+03:15:47 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+03:16:08 [text/ag_news] vote=0.879 uniform=0.874 best1=0.874 n_val=17923 vram=1.61GB 21s | grade=0.887 inner_auc=0.877 vs conf_auc=0.822
+03:16:09 [fill] text/ag_news shard 60/80 ok 101s
+03:16:12 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+03:16:13 [data] text/ag_news: n=61000 C=4 D=2048 shards=61
+03:16:15 [fill] text/ag_news shard 61/80 ok 6s
+03:16:20 [fill] text/ag_news shard 62/80 ok 5s
+03:16:26 [fill] text/ag_news shard 63/80 ok 6s
+03:16:31 [fill] text/ag_news shard 64/80 ok 5s
+03:16:34 [text/ag_news] vote=0.881 uniform=0.876 best1=0.876 n_val=18225 vram=1.63GB 21s | grade=0.886 inner_auc=0.885 vs conf_auc=0.832
+03:16:36 [fill] text/ag_news shard 65/80 ok 5s
+03:16:37 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+03:16:40 [data] text/ag_news: n=66000 C=4 D=2048 shards=66
+03:17:01 [text/ag_news] vote=0.880 uniform=0.874 best1=0.875 n_val=19697 vram=1.73GB 22s | grade=0.887 inner_auc=0.869 vs conf_auc=0.827
+03:17:05 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+03:17:27 [text/ag_news] vote=0.879 uniform=0.876 best1=0.875 n_val=20015 vram=1.76GB 22s | grade=0.887 inner_auc=0.882 vs conf_auc=0.822
+03:17:30 ===== CYCLE 149 (OUTER -> INNER -> FEEDBACK) =====
+03:17:52 [text/ag_news] vote=0.879 uniform=0.875 best1=0.874 n_val=19928 vram=1.76GB 22s | grade=0.886 inner_auc=0.884 vs conf_auc=0.827
+03:17:55 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+03:18:17 [fill] text/ag_news shard 66/80 ok 101s
+03:18:17 [text/ag_news] vote=0.876 uniform=0.872 best1=0.872 n_val=19638 vram=1.77GB 22s | grade=0.885 inner_auc=0.879 vs conf_auc=0.828
+03:18:21 ===== CYCLE 151 (OUTER -> INNER -> FEEDBACK) =====
+03:18:23 [data] text/ag_news: n=67000 C=4 D=2048 shards=67
+03:18:23 [fill] text/ag_news shard 67/80 ok 6s
+03:18:28 [fill] text/ag_news shard 68/80 ok 6s
+03:18:45 [text/ag_news] vote=0.880 uniform=0.879 best1=0.876 n_val=20041 vram=1.78GB 22s | grade=0.884 inner_auc=0.886 vs conf_auc=0.848
+03:18:48 ===== CYCLE 152 (OUTER -> INNER -> FEEDBACK) =====
+03:18:50 [data] text/ag_news: n=69000 C=4 D=2048 shards=69
+03:19:12 [text/ag_news] vote=0.879 uniform=0.870 best1=0.874 n_val=20716 vram=1.83GB 22s | grade=0.886 inner_auc=0.865 vs conf_auc=0.817
+03:19:16 ===== CYCLE 153 (OUTER -> INNER -> FEEDBACK) =====
+03:19:39 [text/ag_news] vote=0.884 uniform=0.881 best1=0.878 n_val=20570 vram=1.84GB 23s | grade=0.883 inner_auc=0.885 vs conf_auc=0.817
+03:19:43 ===== CYCLE 154 (OUTER -> INNER -> FEEDBACK) =====
+03:20:05 [text/ag_news] vote=0.881 uniform=0.876 best1=0.876 n_val=20756 vram=1.84GB 22s | grade=0.885 inner_auc=0.880 vs conf_auc=0.826
+03:20:09 ===== CYCLE 155 (OUTER -> INNER -> FEEDBACK) =====
+03:20:09 [fill] text/ag_news shard 69/80 ok 101s
+03:20:15 [fill] text/ag_news shard 70/80 ok 6s
+03:20:21 [fill] text/ag_news shard 71/80 ok 6s
+03:20:26 [fill] text/ag_news shard 72/80 ok 6s
+03:20:31 [text/ag_news] vote=0.881 uniform=0.874 best1=0.877 n_val=20649 vram=1.84GB 23s | grade=0.885 inner_auc=0.865 vs conf_auc=0.821
+03:20:32 [fill] text/ag_news shard 73/80 ok 5s
+03:20:35 ===== CYCLE 156 (OUTER -> INNER -> FEEDBACK) =====
+03:20:37 [data] text/ag_news: n=74000 C=4 D=2048 shards=74
+03:20:37 [fill] text/ag_news shard 74/80 ok 6s
+03:21:01 [text/ag_news] vote=0.880 uniform=0.874 best1=0.876 n_val=22330 vram=1.93GB 23s | grade=0.885 inner_auc=0.871 vs conf_auc=0.817
+03:21:04 ===== CYCLE 157 (OUTER -> INNER -> FEEDBACK) =====
+03:21:07 [data] text/ag_news: n=75000 C=4 D=2048 shards=75
+03:21:30 [text/ag_news] vote=0.879 uniform=0.873 best1=0.874 n_val=22763 vram=1.99GB 24s | grade=0.883 inner_auc=0.882 vs conf_auc=0.830
+03:21:34 ===== CYCLE 158 (OUTER -> INNER -> FEEDBACK) =====
+03:21:58 [text/ag_news] vote=0.882 uniform=0.875 best1=0.877 n_val=22579 vram=2.00GB 23s | grade=0.884 inner_auc=0.865 vs conf_auc=0.815
+03:22:01 ===== CYCLE 159 (OUTER -> INNER -> FEEDBACK) =====
+03:22:18 [fill] text/ag_news shard 75/80 ok 100s
+03:22:23 [fill] text/ag_news shard 76/80 ok 6s
+03:22:24 [text/ag_news] vote=0.880 uniform=0.875 best1=0.874 n_val=22664 vram=2.00GB 23s | grade=0.884 inner_auc=0.865 vs conf_auc=0.808
+03:22:28 ===== CYCLE 160 (OUTER -> INNER -> FEEDBACK) =====
+03:22:31 [data] text/ag_news: n=77000 C=4 D=2048 shards=77
+03:22:31 [fill] text/ag_news shard 77/80 ok 8s
+03:22:37 [fill] text/ag_news shard 78/80 ok 6s
+03:22:55 [text/ag_news] vote=0.882 uniform=0.878 best1=0.877 n_val=23185 vram=2.03GB 24s | grade=0.884 inner_auc=0.872 vs conf_auc=0.812
+03:22:58 ===== CYCLE 161 (OUTER -> INNER -> FEEDBACK) =====
+03:23:01 [data] text/ag_news: n=79000 C=4 D=2048 shards=79
+03:23:26 [text/ag_news] vote=0.882 uniform=0.876 best1=0.878 n_val=23707 vram=2.09GB 25s | grade=0.885 inner_auc=0.873 vs conf_auc=0.814
+03:23:29 ===== CYCLE 162 (OUTER -> INNER -> FEEDBACK) =====
+03:23:54 [text/ag_news] vote=0.883 uniform=0.878 best1=0.879 n_val=24008 vram=2.10GB 24s | grade=0.884 inner_auc=0.879 vs conf_auc=0.826
+03:23:58 ===== CYCLE 163 (OUTER -> INNER -> FEEDBACK) =====
+03:24:18 [fill] text/ag_news shard 79/80 ok 101s
+03:24:18 [fill] stage 2 complete
+03:24:22 [text/ag_news] vote=0.885 uniform=0.880 best1=0.880 n_val=23607 vram=2.10GB 24s | grade=0.883 inner_auc=0.873 vs conf_auc=0.820
+03:24:25 ===== CYCLE 164 (OUTER -> INNER -> FEEDBACK) =====
+03:24:28 [data] text/ag_news: n=80000 C=4 D=2048 shards=80
+03:24:53 [text/ag_news] vote=0.881 uniform=0.876 best1=0.877 n_val=24017 vram=2.12GB 25s | grade=0.882 inner_auc=0.877 vs conf_auc=0.819
+03:24:56 ===== CYCLE 165 (OUTER -> INNER -> FEEDBACK) =====
+03:25:21 [text/ag_news] vote=0.882 uniform=0.875 best1=0.878 n_val=24065 vram=2.13GB 25s | grade=0.883 inner_auc=0.865 vs conf_auc=0.818
+03:25:25 ===== CYCLE 166 (OUTER -> INNER -> FEEDBACK) =====
+03:25:50 [text/ag_news] vote=0.881 uniform=0.878 best1=0.876 n_val=24139 vram=2.12GB 25s | grade=0.883 inner_auc=0.882 vs conf_auc=0.829
+03:25:54 ===== CYCLE 167 (OUTER -> INNER -> FEEDBACK) =====
+03:26:18 [text/ag_news] vote=0.883 uniform=0.880 best1=0.878 n_val=23857 vram=2.13GB 25s | grade=0.882 inner_auc=0.872 vs conf_auc=0.832
+03:26:22 ===== CYCLE 168 (OUTER -> INNER -> FEEDBACK) =====
+03:26:47 [text/ag_news] vote=0.883 uniform=0.877 best1=0.879 n_val=24007 vram=2.13GB 25s | grade=0.884 inner_auc=0.878 vs conf_auc=0.820
+03:26:51 ===== CYCLE 169 (OUTER -> INNER -> FEEDBACK) =====
+03:27:16 [text/ag_news] vote=0.882 uniform=0.878 best1=0.878 n_val=24259 vram=2.12GB 25s | grade=0.883 inner_auc=0.867 vs conf_auc=0.819
+03:27:19 ===== CYCLE 170 (OUTER -> INNER -> FEEDBACK) =====
+03:27:44 [text/ag_news] vote=0.885 uniform=0.882 best1=0.879 n_val=23834 vram=2.13GB 25s | grade=0.881 inner_auc=0.878 vs conf_auc=0.818
+03:27:48 ===== CYCLE 171 (OUTER -> INNER -> FEEDBACK) =====
+03:28:13 [text/ag_news] vote=0.884 uniform=0.878 best1=0.880 n_val=24212 vram=2.12GB 25s | grade=0.884 inner_auc=0.861 vs conf_auc=0.812
+03:28:17 ===== CYCLE 172 (OUTER -> INNER -> FEEDBACK) =====
+03:28:42 [text/ag_news] vote=0.883 uniform=0.877 best1=0.879 n_val=23946 vram=2.13GB 25s | grade=0.883 inner_auc=0.868 vs conf_auc=0.814
+03:28:46 ===== CYCLE 173 (OUTER -> INNER -> FEEDBACK) =====
+03:29:12 [text/ag_news] vote=0.885 uniform=0.881 best1=0.880 n_val=24263 vram=2.12GB 25s | grade=0.882 inner_auc=0.887 vs conf_auc=0.827
+03:29:16 ===== CYCLE 174 (OUTER -> INNER -> FEEDBACK) =====
+03:29:23 [fill] text/ag_news shard 80/120 ok 5s
+03:29:29 [fill] text/ag_news shard 81/120 ok 6s
+03:29:34 [fill] text/ag_news shard 82/120 ok 5s
+03:29:39 [fill] text/ag_news shard 83/120 ok 5s
+03:29:41 [text/ag_news] vote=0.880 uniform=0.874 best1=0.876 n_val=23881 vram=2.13GB 25s | grade=0.882 inner_auc=0.873 vs conf_auc=0.834
+03:29:45 ===== CYCLE 175 (OUTER -> INNER -> FEEDBACK) =====
+03:29:46 [data] text/ag_news: n=84000 C=4 D=2048 shards=84
+03:30:12 [text/ag_news] vote=0.885 uniform=0.880 best1=0.880 n_val=24996 vram=2.20GB 26s | grade=0.881 inner_auc=0.872 vs conf_auc=0.823
+03:30:16 ===== CYCLE 176 (OUTER -> INNER -> FEEDBACK) =====
+03:30:42 [text/ag_news] vote=0.884 uniform=0.878 best1=0.879 n_val=25325 vram=2.23GB 26s | grade=0.881 inner_auc=0.875 vs conf_auc=0.820
+03:30:46 ===== CYCLE 177 (OUTER -> INNER -> FEEDBACK) =====
+03:31:12 [text/ag_news] vote=0.884 uniform=0.880 best1=0.880 n_val=25318 vram=2.23GB 26s | grade=0.883 inner_auc=0.869 vs conf_auc=0.811
+03:31:16 ===== CYCLE 178 (OUTER -> INNER -> FEEDBACK) =====
+03:31:20 [fill] text/ag_news shard 84/120 ok 101s
+03:31:26 [fill] text/ag_news shard 85/120 ok 6s
+03:31:31 [fill] text/ag_news shard 86/120 ok 6s
+03:31:37 [fill] text/ag_news shard 87/120 ok 5s
+03:31:42 [text/ag_news] vote=0.885 uniform=0.880 best1=0.881 n_val=25440 vram=2.23GB 26s | grade=0.883 inner_auc=0.869 vs conf_auc=0.822
+03:31:42 [fill] text/ag_news shard 88/120 ok 6s
+03:31:46 ===== CYCLE 179 (OUTER -> INNER -> FEEDBACK) =====
+03:31:49 [data] text/ag_news: n=89000 C=4 D=2048 shards=89
+03:32:17 [text/ag_news] vote=0.888 uniform=0.884 best1=0.884 n_val=26798 vram=2.32GB 28s | grade=0.881 inner_auc=0.873 vs conf_auc=0.816
+03:32:21 ===== CYCLE 180 (OUTER -> INNER -> FEEDBACK) =====
+03:32:49 [text/ag_news] vote=0.882 uniform=0.881 best1=0.878 n_val=26450 vram=2.37GB 28s | grade=0.879 inner_auc=0.873 vs conf_auc=0.815
+03:32:53 ===== CYCLE 181 (OUTER -> INNER -> FEEDBACK) =====
+03:33:21 [text/ag_news] vote=0.886 uniform=0.882 best1=0.881 n_val=26704 vram=2.36GB 27s | grade=0.879 inner_auc=0.866 vs conf_auc=0.807
+03:33:25 [fill] text/ag_news shard 89/120 ok 103s
+03:33:25 ===== CYCLE 182 (OUTER -> INNER -> FEEDBACK) =====
+03:33:28 [data] text/ag_news: n=90000 C=4 D=2048 shards=90
+03:33:36 [fill] text/ag_news shard 90/120 ok 11s
+03:33:44 [fill] text/ag_news shard 91/120 ok 8s
+03:33:50 [fill] text/ag_news shard 92/120 ok 6s
+03:33:56 [fill] text/ag_news shard 93/120 ok 6s
+03:33:56 [text/ag_news] vote=0.884 uniform=0.878 best1=0.881 n_val=26787 vram=2.38GB 28s | grade=0.882 inner_auc=0.869 vs conf_auc=0.806
+03:34:00 ===== CYCLE 183 (OUTER -> INNER -> FEEDBACK) =====
+03:34:03 [data] text/ag_news: n=94000 C=4 D=2048 shards=94
+03:34:32 [text/ag_news] vote=0.885 uniform=0.883 best1=0.881 n_val=28322 vram=2.46GB 29s | grade=0.881 inner_auc=0.881 vs conf_auc=0.831
+03:34:36 ===== CYCLE 184 (OUTER -> INNER -> FEEDBACK) =====
+03:35:05 [text/ag_news] vote=0.890 uniform=0.888 best1=0.885 n_val=28311 vram=2.49GB 29s | grade=0.879 inner_auc=0.869 vs conf_auc=0.825
+03:35:09 ===== CYCLE 185 (OUTER -> INNER -> FEEDBACK) =====
+03:35:36 [fill] text/ag_news shard 94/120 ok 101s
+03:35:38 [text/ag_news] vote=0.890 uniform=0.882 best1=0.885 n_val=28009 vram=2.50GB 29s | grade=0.881 inner_auc=0.867 vs conf_auc=0.815
+03:35:42 ===== CYCLE 186 (OUTER -> INNER -> FEEDBACK) =====
+03:35:42 [fill] text/ag_news shard 95/120 ok 6s
+03:35:43 [data] text/ag_news: n=95000 C=4 D=2048 shards=95
+03:35:48 [fill] text/ag_news shard 96/120 ok 6s
+03:36:13 [text/ag_news] vote=0.886 uniform=0.882 best1=0.882 n_val=28549 vram=2.51GB 30s | grade=0.879 inner_auc=0.881 vs conf_auc=0.824
+03:36:17 ===== CYCLE 187 (OUTER -> INNER -> FEEDBACK) =====
+03:36:20 [data] text/ag_news: n=97000 C=4 D=2048 shards=97
+03:36:49 [text/ag_news] vote=0.886 uniform=0.880 best1=0.882 n_val=29105 vram=2.55GB 29s | grade=0.879 inner_auc=0.876 vs conf_auc=0.819
+03:36:54 ===== CYCLE 188 (OUTER -> INNER -> FEEDBACK) =====
+03:37:24 [text/ag_news] vote=0.886 uniform=0.881 best1=0.881 n_val=29105 vram=2.57GB 30s | grade=0.879 inner_auc=0.861 vs conf_auc=0.808
+03:37:28 ===== CYCLE 189 (OUTER -> INNER -> FEEDBACK) =====
+03:37:44 [fill] text/ag_news shard 97/120 ok 117s
+03:37:50 [fill] text/ag_news shard 98/120 ok 5s
+03:37:55 [fill] text/ag_news shard 99/120 ok 5s
+03:37:58 [text/ag_news] vote=0.888 uniform=0.883 best1=0.883 n_val=29042 vram=2.57GB 30s | grade=0.877 inner_auc=0.883 vs conf_auc=0.817
+03:38:02 ===== CYCLE 190 (OUTER -> INNER -> FEEDBACK) =====
+03:38:07 [data] text/ag_news: n=100000 C=4 D=2048 shards=100
+03:38:38 [text/ag_news] vote=0.888 uniform=0.883 best1=0.883 n_val=29926 vram=2.63GB 30s | grade=0.879 inner_auc=0.872 vs conf_auc=0.818
+03:38:42 ===== CYCLE 191 (OUTER -> INNER -> FEEDBACK) =====
+03:39:12 [text/ag_news] vote=0.886 uniform=0.882 best1=0.881 n_val=30245 vram=2.64GB 30s | grade=0.878 inner_auc=0.880 vs conf_auc=0.825
+03:39:17 ===== CYCLE 192 (OUTER -> INNER -> FEEDBACK) =====
+03:39:38 [fill] text/ag_news shard 100/120 ok 103s
+03:39:43 [fill] text/ag_news shard 101/120 ok 6s
+03:39:47 [text/ag_news] vote=0.888 uniform=0.883 best1=0.883 n_val=30001 vram=2.65GB 31s | grade=0.879 inner_auc=0.873 vs conf_auc=0.818
+03:39:49 [fill] text/ag_news shard 102/120 ok 6s
+03:39:52 ===== CYCLE 193 (OUTER -> INNER -> FEEDBACK) =====
+03:39:55 [data] text/ag_news: n=103000 C=4 D=2048 shards=103
+03:40:26 [text/ag_news] vote=0.891 uniform=0.886 best1=0.886 n_val=30877 vram=2.70GB 31s | grade=0.878 inner_auc=0.866 vs conf_auc=0.807
+03:40:30 ===== CYCLE 194 (OUTER -> INNER -> FEEDBACK) =====
+03:41:02 [text/ag_news] vote=0.885 uniform=0.879 best1=0.881 n_val=30455 vram=2.73GB 31s | grade=0.876 inner_auc=0.870 vs conf_auc=0.820
+03:41:06 ===== CYCLE 195 (OUTER -> INNER -> FEEDBACK) =====
+03:41:30 [fill] text/ag_news shard 103/120 ok 101s
+03:41:35 [fill] text/ag_news shard 104/120 ok 5s
+03:41:38 [text/ag_news] vote=0.889 uniform=0.885 best1=0.885 n_val=30767 vram=2.73GB 32s | grade=0.876 inner_auc=0.888 vs conf_auc=0.837
+03:41:40 [fill] text/ag_news shard 105/120 ok 5s
+03:41:42 ===== CYCLE 196 (OUTER -> INNER -> FEEDBACK) =====
+03:41:46 [fill] text/ag_news shard 106/120 ok 6s
+03:41:46 [data] text/ag_news: n=106000 C=4 D=2048 shards=106
+03:41:51 [fill] text/ag_news shard 107/120 ok 5s
+03:42:18 [text/ag_news] vote=0.890 uniform=0.886 best1=0.885 n_val=31536 vram=2.78GB 32s | grade=0.877 inner_auc=0.880 vs conf_auc=0.818
+03:42:23 ===== CYCLE 197 (OUTER -> INNER -> FEEDBACK) =====
+03:42:26 [data] text/ag_news: n=108000 C=4 D=2048 shards=108
+03:42:59 [text/ag_news] vote=0.889 uniform=0.884 best1=0.885 n_val=32366 vram=2.84GB 33s | grade=0.877 inner_auc=0.896 vs conf_auc=0.845
+03:43:03 ===== CYCLE 198 (OUTER -> INNER -> FEEDBACK) =====
+03:43:31 [fill] text/ag_news shard 108/120 ok 100s
+03:43:36 [fill] text/ag_news shard 109/120 ok 5s
+03:43:37 [text/ag_news] vote=0.886 uniform=0.882 best1=0.881 n_val=32414 vram=2.85GB 34s | grade=0.876 inner_auc=0.872 vs conf_auc=0.830
+03:43:42 [fill] text/ag_news shard 110/120 ok 5s
+03:43:42 ===== CYCLE 199 (OUTER -> INNER -> FEEDBACK) =====
+03:43:45 [data] text/ag_news: n=111000 C=4 D=2048 shards=111
+03:43:47 [fill] text/ag_news shard 111/120 ok 6s
+03:43:53 [fill] text/ag_news shard 112/120 ok 6s
+03:44:19 [text/ag_news] vote=0.889 uniform=0.884 best1=0.885 n_val=33252 vram=2.91GB 34s | grade=0.875 inner_auc=0.872 vs conf_auc=0.815
+03:44:23 ===== CYCLE 200 (OUTER -> INNER -> FEEDBACK) =====
+03:44:26 [data] text/ag_news: n=113000 C=4 D=2048 shards=113
+03:45:00 [text/ag_news] vote=0.888 uniform=0.884 best1=0.884 n_val=34049 vram=2.97GB 34s | grade=0.875 inner_auc=0.883 vs conf_auc=0.823
+03:45:05 ===== CYCLE 201 (OUTER -> INNER -> FEEDBACK) =====
+03:45:34 [fill] text/ag_news shard 113/120 ok 101s
+03:45:39 [fill] text/ag_news shard 114/120 ok 6s
+03:45:40 [text/ag_news] vote=0.890 uniform=0.887 best1=0.886 n_val=33861 vram=2.98GB 35s | grade=0.875 inner_auc=0.891 vs conf_auc=0.834
+03:45:45 ===== CYCLE 202 (OUTER -> INNER -> FEEDBACK) =====
+03:45:45 [fill] text/ag_news shard 115/120 ok 6s
+03:45:48 [data] text/ag_news: n=115000 C=4 D=2048 shards=115
+03:45:51 [fill] text/ag_news shard 116/120 ok 5s
+03:45:56 [fill] text/ag_news shard 117/120 ok 6s
+03:46:23 [text/ag_news] vote=0.889 uniform=0.886 best1=0.886 n_val=34532 vram=3.02GB 35s | grade=0.875 inner_auc=0.876 vs conf_auc=0.819
+03:46:28 ===== CYCLE 203 (OUTER -> INNER -> FEEDBACK) =====
+03:46:32 [data] text/ag_news: n=118000 C=4 D=2048 shards=118
+03:47:09 [text/ag_news] vote=0.891 uniform=0.888 best1=0.887 n_val=35353 vram=3.09GB 37s | grade=0.873 inner_auc=0.883 vs conf_auc=0.831
+03:47:13 ===== CYCLE 204 (OUTER -> INNER -> FEEDBACK) =====
+03:47:37 [fill] text/ag_news shard 118/120 ok 101s
+03:47:43 [fill] text/ag_news shard 119/120 ok 5s
+03:47:43 [fill] stage 3 complete
+03:47:50 [text/ag_news] vote=0.891 uniform=0.885 best1=0.887 n_val=35418 vram=3.12GB 36s | grade=0.874 inner_auc=0.879 vs conf_auc=0.818
+03:47:55 ===== CYCLE 205 (OUTER -> INNER -> FEEDBACK) =====
+03:47:58 [data] text/ag_news: n=120000 C=4 D=2048 shards=120
+03:48:35 [text/ag_news] vote=0.892 uniform=0.887 best1=0.888 n_val=36052 vram=3.15GB 37s | grade=0.873 inner_auc=0.872 vs conf_auc=0.816
+03:48:40 ===== CYCLE 206 (OUTER -> INNER -> FEEDBACK) =====
+03:49:17 [text/ag_news] vote=0.891 uniform=0.886 best1=0.886 n_val=35965 vram=3.17GB 37s | grade=0.873 inner_auc=0.885 vs conf_auc=0.834
+03:49:21 ===== CYCLE 207 (OUTER -> INNER -> FEEDBACK) =====
+03:49:58 [text/ag_news] vote=0.888 uniform=0.885 best1=0.883 n_val=36171 vram=3.16GB 37s | grade=0.872 inner_auc=0.888 vs conf_auc=0.821
+03:50:03 ===== CYCLE 208 (OUTER -> INNER -> FEEDBACK) =====
+03:50:40 [text/ag_news] vote=0.892 uniform=0.886 best1=0.887 n_val=35846 vram=3.17GB 37s | grade=0.872 inner_auc=0.878 vs conf_auc=0.812
+03:50:45 ===== CYCLE 209 (OUTER -> INNER -> FEEDBACK) =====
+03:51:22 [text/ag_news] vote=0.892 uniform=0.887 best1=0.887 n_val=35974 vram=3.17GB 37s | grade=0.875 inner_auc=0.881 vs conf_auc=0.818
+03:51:27 ===== CYCLE 210 (OUTER -> INNER -> FEEDBACK) =====
+03:52:05 [text/ag_news] vote=0.891 uniform=0.886 best1=0.887 n_val=35943 vram=3.17GB 37s | grade=0.874 inner_auc=0.878 vs conf_auc=0.819
+03:52:10 ===== CYCLE 211 (OUTER -> INNER -> FEEDBACK) =====
+03:52:47 [text/ag_news] vote=0.890 uniform=0.886 best1=0.886 n_val=36143 vram=3.17GB 37s | grade=0.874 inner_auc=0.876 vs conf_auc=0.818
+03:52:52 ===== CYCLE 212 (OUTER -> INNER -> FEEDBACK) =====
+03:53:29 [text/ag_news] vote=0.887 uniform=0.884 best1=0.883 n_val=36019 vram=3.17GB 38s | grade=0.873 inner_auc=0.886 vs conf_auc=0.832
+03:53:34 ===== CYCLE 213 (OUTER -> INNER -> FEEDBACK) =====
+03:54:12 [text/ag_news] vote=0.889 uniform=0.885 best1=0.885 n_val=35705 vram=3.17GB 37s | grade=0.873 inner_auc=0.879 vs conf_auc=0.825
+03:54:17 ===== CYCLE 214 (OUTER -> INNER -> FEEDBACK) =====
+03:54:54 [text/ag_news] vote=0.892 uniform=0.887 best1=0.888 n_val=35805 vram=3.17GB 37s | grade=0.873 inner_auc=0.867 vs conf_auc=0.809
+03:54:59 ===== CYCLE 215 (OUTER -> INNER -> FEEDBACK) =====
+03:55:35 [text/ag_news] vote=0.892 uniform=0.887 best1=0.887 n_val=36184 vram=3.16GB 36s | grade=0.873 inner_auc=0.891 vs conf_auc=0.837
+03:55:40 ===== CYCLE 216 (OUTER -> INNER -> FEEDBACK) =====
+03:56:17 [text/ag_news] vote=0.890 uniform=0.887 best1=0.886 n_val=36109 vram=3.17GB 37s | grade=0.873 inner_auc=0.891 vs conf_auc=0.826
+03:56:22 ===== CYCLE 217 (OUTER -> INNER -> FEEDBACK) =====
+03:56:59 [text/ag_news] vote=0.891 uniform=0.887 best1=0.886 n_val=35976 vram=3.17GB 37s | grade=0.874 inner_auc=0.878 vs conf_auc=0.816
+03:57:04 ===== CYCLE 218 (OUTER -> INNER -> FEEDBACK) =====
+03:57:42 [text/ag_news] vote=0.890 uniform=0.887 best1=0.886 n_val=36039 vram=3.17GB 37s | grade=0.874 inner_auc=0.873 vs conf_auc=0.823
+03:57:47 ===== CYCLE 219 (OUTER -> INNER -> FEEDBACK) =====
+03:58:24 [text/ag_news] vote=0.889 uniform=0.888 best1=0.884 n_val=35970 vram=3.17GB 37s | grade=0.873 inner_auc=0.883 vs conf_auc=0.822
+03:58:29 ===== CYCLE 220 (OUTER -> INNER -> FEEDBACK) =====
+03:59:07 [text/ag_news] vote=0.891 uniform=0.886 best1=0.887 n_val=36151 vram=3.17GB 37s | grade=0.873 inner_auc=0.872 vs conf_auc=0.823
+03:59:12 ===== CYCLE 221 (OUTER -> INNER -> FEEDBACK) =====
+03:59:49 [text/ag_news] vote=0.894 uniform=0.888 best1=0.889 n_val=35797 vram=3.17GB 37s | grade=0.872 inner_auc=0.870 vs conf_auc=0.806
+03:59:54 ===== CYCLE 222 (OUTER -> INNER -> FEEDBACK) =====
+04:00:31 [text/ag_news] vote=0.891 uniform=0.886 best1=0.886 n_val=36010 vram=3.17GB 37s | grade=0.873 inner_auc=0.883 vs conf_auc=0.823
+04:00:36 ===== CYCLE 223 (OUTER -> INNER -> FEEDBACK) =====
+04:01:14 [text/ag_news] vote=0.892 uniform=0.886 best1=0.888 n_val=36153 vram=3.17GB 38s | grade=0.873 inner_auc=0.886 vs conf_auc=0.822
+04:01:19 ===== CYCLE 224 (OUTER -> INNER -> FEEDBACK) =====
+05:07:03 [text/ag_news] vote=0.891 uniform=0.888 best1=0.887 n_val=36121 vram=3.17GB 3944s | grade=0.871 inner_auc=0.882 vs conf_auc=0.828
+05:07:08 ===== CYCLE 225 (OUTER -> INNER -> FEEDBACK) =====
+05:07:41 [text/ag_news] vote=0.890 uniform=0.887 best1=0.887 n_val=35899 vram=3.17GB 33s | grade=0.872 inner_auc=0.879 vs conf_auc=0.827
+05:07:46 ===== CYCLE 226 (OUTER -> INNER -> FEEDBACK) =====
+05:08:19 [text/ag_news] vote=0.892 uniform=0.886 best1=0.888 n_val=35959 vram=3.17GB 33s | grade=0.872 inner_auc=0.882 vs conf_auc=0.830
+05:08:23 ===== CYCLE 227 (OUTER -> INNER -> FEEDBACK) =====
+05:08:56 [text/ag_news] vote=0.889 uniform=0.884 best1=0.884 n_val=35872 vram=3.17GB 32s | grade=0.871 inner_auc=0.879 vs conf_auc=0.831
+05:09:00 ===== CYCLE 228 (OUTER -> INNER -> FEEDBACK) =====
+05:09:33 [text/ag_news] vote=0.890 uniform=0.887 best1=0.886 n_val=36265 vram=3.16GB 33s | grade=0.872 inner_auc=0.882 vs conf_auc=0.826
+05:09:38 ===== CYCLE 229 (OUTER -> INNER -> FEEDBACK) =====
+06:53:19 [text/ag_news] vote=0.890 uniform=0.889 best1=0.886 n_val=35829 vram=3.17GB 6221s | grade=0.776 inner_auc=0.883 vs conf_auc=0.817
+06:53:23 ===== CYCLE 230 (OUTER -> INNER -> FEEDBACK) =====
+06:54:18 [text/ag_news] vote=0.892 uniform=0.889 best1=0.887 n_val=35812 vram=3.17GB 55s | grade=0.872 inner_auc=0.879 vs conf_auc=0.827
+06:54:23 ===== CYCLE 231 (OUTER -> INNER -> FEEDBACK) =====
+06:55:09 [text/ag_news] vote=0.892 uniform=0.887 best1=0.888 n_val=36183 vram=3.17GB 46s | grade=0.873 inner_auc=0.876 vs conf_auc=0.809
+06:55:14 ===== CYCLE 232 (OUTER -> INNER -> FEEDBACK) =====
+06:56:00 [text/ag_news] vote=0.890 uniform=0.887 best1=0.887 n_val=35988 vram=3.17GB 47s | grade=0.873 inner_auc=0.887 vs conf_auc=0.832
+06:56:05 ===== CYCLE 233 (OUTER -> INNER -> FEEDBACK) =====
+06:56:53 [text/ag_news] vote=0.891 uniform=0.885 best1=0.887 n_val=36171 vram=3.16GB 48s | grade=0.873 inner_auc=0.875 vs conf_auc=0.826
+06:56:58 ===== CYCLE 234 (OUTER -> INNER -> FEEDBACK) =====
+06:57:47 [text/ag_news] vote=0.891 uniform=0.885 best1=0.888 n_val=35992 vram=3.17GB 49s | grade=0.872 inner_auc=0.880 vs conf_auc=0.833
+06:57:53 ===== CYCLE 235 (OUTER -> INNER -> FEEDBACK) =====
+06:59:20 [text/ag_news] vote=0.891 uniform=0.884 best1=0.887 n_val=36037 vram=3.17GB 87s | grade=0.873 inner_auc=0.875 vs conf_auc=0.812
+06:59:25 ===== CYCLE 236 (OUTER -> INNER -> FEEDBACK) =====
+07:00:12 [text/ag_news] vote=0.891 uniform=0.888 best1=0.886 n_val=35948 vram=3.17GB 47s | grade=0.873 inner_auc=0.877 vs conf_auc=0.825
+07:00:17 ===== CYCLE 237 (OUTER -> INNER -> FEEDBACK) =====
+07:01:04 [text/ag_news] vote=0.890 uniform=0.888 best1=0.886 n_val=36110 vram=3.17GB 47s | grade=0.873 inner_auc=0.878 vs conf_auc=0.820
+07:01:09 ===== CYCLE 238 (OUTER -> INNER -> FEEDBACK) =====
+07:05:13 [text/ag_news] vote=0.890 uniform=0.886 best1=0.886 n_val=36083 vram=3.17GB 244s | grade=0.873 inner_auc=0.884 vs conf_auc=0.833
+07:05:18 ===== CYCLE 239 (OUTER -> INNER -> FEEDBACK) =====
+07:06:37 [text/ag_news] vote=0.891 uniform=0.886 best1=0.886 n_val=35923 vram=3.17GB 79s | grade=0.872 inner_auc=0.887 vs conf_auc=0.832
+07:06:42 ===== CYCLE 240 (OUTER -> INNER -> FEEDBACK) =====
+07:07:30 [text/ag_news] vote=0.891 uniform=0.885 best1=0.888 n_val=35959 vram=3.17GB 48s | grade=0.874 inner_auc=0.883 vs conf_auc=0.820
+07:07:35 ===== CYCLE 241 (OUTER -> INNER -> FEEDBACK) =====
+07:08:22 [text/ag_news] vote=0.894 uniform=0.889 best1=0.890 n_val=36002 vram=3.17GB 47s | grade=0.872 inner_auc=0.871 vs conf_auc=0.819
+07:08:27 ===== CYCLE 242 (OUTER -> INNER -> FEEDBACK) =====
+07:09:18 [text/ag_news] vote=0.891 uniform=0.886 best1=0.887 n_val=36032 vram=3.17GB 51s | grade=0.873 inner_auc=0.879 vs conf_auc=0.816
+07:09:23 ===== CYCLE 243 (OUTER -> INNER -> FEEDBACK) =====
+07:11:07 [text/ag_news] vote=0.891 uniform=0.884 best1=0.887 n_val=35933 vram=3.17GB 104s | grade=0.873 inner_auc=0.881 vs conf_auc=0.826
+07:11:12 ===== CYCLE 244 (OUTER -> INNER -> FEEDBACK) =====
+07:12:06 [text/ag_news] vote=0.888 uniform=0.886 best1=0.885 n_val=35918 vram=3.17GB 55s | grade=0.873 inner_auc=0.877 vs conf_auc=0.819
+07:12:11 ===== CYCLE 245 (OUTER -> INNER -> FEEDBACK) =====
+07:12:59 [text/ag_news] vote=0.891 uniform=0.887 best1=0.887 n_val=35856 vram=3.17GB 47s | grade=0.872 inner_auc=0.875 vs conf_auc=0.817
+07:13:03 ===== CYCLE 246 (OUTER -> INNER -> FEEDBACK) =====
+07:13:54 [text/ag_news] vote=0.890 uniform=0.887 best1=0.886 n_val=35840 vram=3.17GB 50s | grade=0.873 inner_auc=0.885 vs conf_auc=0.834
+07:13:59 ===== CYCLE 247 (OUTER -> INNER -> FEEDBACK) =====
+07:15:12 [text/ag_news] vote=0.888 uniform=0.885 best1=0.884 n_val=36062 vram=3.17GB 73s | grade=0.872 inner_auc=0.890 vs conf_auc=0.828
+07:15:17 ===== CYCLE 248 (OUTER -> INNER -> FEEDBACK) =====
+07:16:04 [text/ag_news] vote=0.893 uniform=0.889 best1=0.888 n_val=35951 vram=3.17GB 47s | grade=0.870 inner_auc=0.884 vs conf_auc=0.825
+07:16:09 ===== CYCLE 249 (OUTER -> INNER -> FEEDBACK) =====
+07:16:56 [text/ag_news] vote=0.890 uniform=0.885 best1=0.886 n_val=35815 vram=3.17GB 47s | grade=0.872 inner_auc=0.887 vs conf_auc=0.830
+07:17:01 ===== CYCLE 250 (OUTER -> INNER -> FEEDBACK) =====

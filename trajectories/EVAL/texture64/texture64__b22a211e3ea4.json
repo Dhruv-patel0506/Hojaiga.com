@@ -1,0 +1,293 @@
+{
+   "app_metadata": {
+      "app_name": "Texture64",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Navigate and use the Texture64 application features",
+   "prerequisite_state": "Texture64 application is open and loaded with an N64 texture",
+   "total_steps": 8,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Right-click image to bring up context menu",
+         "ui_target": {
+            "element_name": "Image",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Image",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Context menu appears with options to export and set palette offset"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click 'Export to image file'",
+         "ui_target": {
+            "element_name": "Export to image file",
+            "automation_id": null,
+            "hierarchical_path": "Context menu > Export to image file",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Save dialog appears to select file path and format"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Left-click to change offset to clicked pixel",
+         "ui_target": {
+            "element_name": "Image",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Image",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Offset changes to the pixel coordinates of the clicked location"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Scroll up/down by four rows of image",
+         "ui_target": {
+            "element_name": "Image",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Image",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  -16
+               ]
+            ],
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Image scrolls up by four rows"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Scroll by entire image using Ctrl modifier",
+         "ui_target": {
+            "element_name": "Image",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Image",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  -1024
+               ]
+            ],
+            "button": "none",
+            "modifiers": [
+               "Ctrl"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "Image scrolls up by the full height"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Scroll by one row using Alt modifier",
+         "ui_target": {
+            "element_name": "Image",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Image",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  -16
+               ]
+            ],
+            "button": "none",
+            "modifiers": [
+               "Alt"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "Image scrolls up by one row"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Scroll by one pixel using Shift modifier",
+         "ui_target": {
+            "element_name": "Image",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Image",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  -1
+               ]
+            ],
+            "button": "none",
+            "modifiers": [
+               "Shift"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "Image scrolls up by one pixel"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Click 'Open...' [Ctrl-O] or drag and drop to open a binary file",
+         "ui_target": {
+            "element_name": "Open...",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Open...",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [
+               "Ctrl"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "File dialog opens to select N64 texture file"
+      }
+   ],
+   "_meta": {
+      "source_app": "Texture64",
+      "app_key": "texture64",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "Texture64",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:40:06Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

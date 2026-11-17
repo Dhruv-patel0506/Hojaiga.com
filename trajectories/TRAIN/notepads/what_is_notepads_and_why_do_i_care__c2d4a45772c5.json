@@ -1,0 +1,81 @@
+{
+   "app_metadata": {
+      "app_name": "Notepads",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Download and install Notepads from the Microsoft Store",
+   "prerequisite_state": "User is on the Microsoft Store or has command line access",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Go to the Microsoft Store",
+         "ui_target": {
+            "element_name": "Microsoft Store",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Microsoft Store logo or app icon is visible"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click on the 'Download' button for Notepads",
+         "ui_target": {
+            "element_name": "Download Notepads",
+            "automation_id": null,
+            "hierarchical_path": "Microsoft Store > Notepads > Download",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Notepads app is being downloaded and installed"
+      }
+   ],
+   "_meta": {
+      "source_app": "Notepads",
+      "app_key": "notepads",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "What is Notepads and why do I care?",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:38:12Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

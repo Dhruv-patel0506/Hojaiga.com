@@ -1,0 +1,94 @@
+{
+   "app_metadata": {
+      "app_name": "Wyvern",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "cli",
+   "high_level_task": "Provide a quickstart guide for the Wyvern CLI tool",
+   "prerequisite_state": "No application window or document is open; user is at the command line",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the latest release for your platform from GitHub Releases",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "https://github.com/randlee/wyvern/releases"
+         },
+         "expected_state_change": "User navigates to the GitHub Releases page"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Extract the archive",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "tar -xzf wyvern_<version>_x86_64-unknown-linux-gnu.tar.gz"
+         },
+         "expected_state_change": "Archive is extracted"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Add the extract bin directory to your PATH",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "export PATH=$PATH:/path/to/wyvern/bin"
+         },
+         "expected_state_change": "PATH environment variable is updated"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Try the default viewer (embedded)",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "wyvern '{"
+         }
+      },
+      {
+         "": ""
+      },
+      ""
+   ],
+   "_meta": {
+      "source_app": "Wyvern",
+      "app_key": "wyvern",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Wyvern",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:41:26Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target",
+         "step4_no_expected_state_change",
+         "step4_ungrounded_target",
+         "step5_no_action",
+         "step5_no_expected_state_change",
+         "step5_ungrounded_target",
+         "step6_not_object"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,62 @@
+{
+   "app_metadata": {
+      "app_name": "Flacoutcpp",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "cli",
+   "high_level_task": "Guide on how to build and use the flacoutcpp tool from source",
+   "prerequisite_state": "Terminal or command prompt open",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Create a build directory and navigate into it",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Current directory changes to the build directory"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run CMake to configure the build",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "cmake -DCMAKE_BUILD_TYPE=Release .."
+         },
+         "expected_state_change": "CMake configuration is generated and the build process is ready to be executed"
+      }
+   ],
+   "_meta": {
+      "source_app": "Flacoutcpp",
+      "app_key": "flacoutcpp",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "flacoutcpp",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:18:07Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

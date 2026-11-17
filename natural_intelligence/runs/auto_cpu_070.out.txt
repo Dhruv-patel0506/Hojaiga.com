@@ -1,0 +1,87 @@
+08:25:34 NI run auto_cpu_070 on CPU; hours=2.0 smoke=False
+08:25:34 explicit task list: ['enc2/image/oxford_iiit_pet']
+08:25:34 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+08:25:34 [data] enc2/image/oxford_iiit_pet: n=7349 C=37 D=1536 shards=1
+08:09:17 NI run auto_cpu_070 on CPU; hours=2.0 smoke=False
+08:09:17 explicit task list: ['enc2/image/oxford_iiit_pet']
+08:09:17 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+08:09:18 [data] enc2/image/oxford_iiit_pet: n=7349 C=37 D=1536 shards=1
+08:11:17 [enc2/image/oxford_iiit_pet] vote=0.938 uniform=0.936 best1=0.941 n_val=2249 vram=0.00GB 120s
+08:11:55 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 2249, "n_val": 448, "base_rate": 0.9241071343421936, "inner": {"auc": 0.9390451832907076, "ece": 0.024184954652030553, "brier": 0.04311944916844368, "acc80": 0.9860334992408752}, "outer_conf": {"auc": 0.9231315714691674, "ece": 0.034583502083218524, "brier": 0.04928268864750862, "acc80": 0.9804469347000122}}
+08:11:55 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+08:15:06 [enc2/image/oxford_iiit_pet] vote=0.942 uniform=0.938 best1=0.941 n_val=2260 vram=0.00GB 191s | grade=0.963 inner_auc=0.911 vs conf_auc=0.889
+08:15:29 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+08:18:38 [enc2/image/oxford_iiit_pet] vote=0.941 uniform=0.935 best1=0.944 n_val=2159 vram=0.00GB 189s | grade=0.959 inner_auc=0.914 vs conf_auc=0.909
+08:18:59 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+08:21:57 [enc2/image/oxford_iiit_pet] vote=0.947 uniform=0.944 best1=0.950 n_val=2184 vram=0.00GB 178s | grade=0.962 inner_auc=0.968 vs conf_auc=0.957
+08:22:20 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+08:25:12 [enc2/image/oxford_iiit_pet] vote=0.942 uniform=0.938 best1=0.942 n_val=2172 vram=0.00GB 172s | grade=0.957 inner_auc=0.933 vs conf_auc=0.927
+08:25:35 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+08:28:33 [enc2/image/oxford_iiit_pet] vote=0.937 uniform=0.934 best1=0.938 n_val=2228 vram=0.00GB 178s | grade=0.956 inner_auc=0.939 vs conf_auc=0.925
+08:28:53 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+08:31:47 [enc2/image/oxford_iiit_pet] vote=0.947 uniform=0.944 best1=0.948 n_val=2268 vram=0.00GB 174s | grade=0.955 inner_auc=0.936 vs conf_auc=0.922
+08:32:11 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+08:34:57 [enc2/image/oxford_iiit_pet] vote=0.951 uniform=0.948 best1=0.945 n_val=2251 vram=0.00GB 166s | grade=0.960 inner_auc=0.880 vs conf_auc=0.885
+08:35:19 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+08:38:11 [enc2/image/oxford_iiit_pet] vote=0.945 uniform=0.946 best1=0.942 n_val=2192 vram=0.00GB 172s | grade=0.960 inner_auc=0.926 vs conf_auc=0.909
+08:38:33 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+08:41:27 [enc2/image/oxford_iiit_pet] vote=0.947 uniform=0.941 best1=0.946 n_val=2188 vram=0.00GB 174s | grade=0.953 inner_auc=0.947 vs conf_auc=0.927
+08:41:47 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+08:44:43 [enc2/image/oxford_iiit_pet] vote=0.949 uniform=0.946 best1=0.951 n_val=2183 vram=0.00GB 175s | grade=0.966 inner_auc=0.949 vs conf_auc=0.932
+08:45:06 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+08:47:51 [enc2/image/oxford_iiit_pet] vote=0.944 uniform=0.941 best1=0.948 n_val=2240 vram=0.00GB 166s | grade=0.965 inner_auc=0.959 vs conf_auc=0.947
+08:48:12 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+08:51:02 [enc2/image/oxford_iiit_pet] vote=0.947 uniform=0.946 best1=0.949 n_val=2202 vram=0.00GB 170s | grade=0.967 inner_auc=0.948 vs conf_auc=0.928
+08:51:28 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+08:54:23 [enc2/image/oxford_iiit_pet] vote=0.945 uniform=0.942 best1=0.945 n_val=2196 vram=0.00GB 175s | grade=0.960 inner_auc=0.910 vs conf_auc=0.909
+08:54:45 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+08:57:35 [enc2/image/oxford_iiit_pet] vote=0.949 uniform=0.945 best1=0.945 n_val=2253 vram=0.00GB 171s | grade=0.959 inner_auc=0.944 vs conf_auc=0.933
+08:57:56 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+09:00:32 [enc2/image/oxford_iiit_pet] vote=0.948 uniform=0.943 best1=0.952 n_val=2180 vram=0.00GB 156s | grade=0.962 inner_auc=0.951 vs conf_auc=0.948
+09:00:56 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+09:03:27 [enc2/image/oxford_iiit_pet] vote=0.946 uniform=0.947 best1=0.945 n_val=2273 vram=0.00GB 151s | grade=0.963 inner_auc=0.925 vs conf_auc=0.937
+09:03:48 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+09:06:30 [enc2/image/oxford_iiit_pet] vote=0.947 uniform=0.944 best1=0.950 n_val=2213 vram=0.00GB 162s | grade=0.962 inner_auc=0.940 vs conf_auc=0.927
+09:06:50 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+09:09:35 [enc2/image/oxford_iiit_pet] vote=0.946 uniform=0.941 best1=0.945 n_val=2241 vram=0.00GB 165s | grade=0.964 inner_auc=0.966 vs conf_auc=0.954
+09:09:55 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+09:12:39 [enc2/image/oxford_iiit_pet] vote=0.948 uniform=0.947 best1=0.948 n_val=2265 vram=0.00GB 164s | grade=0.961 inner_auc=0.940 vs conf_auc=0.928
+09:12:56 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+09:15:28 [enc2/image/oxford_iiit_pet] vote=0.947 uniform=0.939 best1=0.947 n_val=2189 vram=0.00GB 151s | grade=0.960 inner_auc=0.928 vs conf_auc=0.913
+09:15:48 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+09:18:22 [enc2/image/oxford_iiit_pet] vote=0.947 uniform=0.942 best1=0.946 n_val=2240 vram=0.00GB 154s | grade=0.965 inner_auc=0.906 vs conf_auc=0.899
+09:18:41 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+09:21:14 [enc2/image/oxford_iiit_pet] vote=0.952 uniform=0.948 best1=0.954 n_val=2219 vram=0.00GB 153s | grade=0.959 inner_auc=0.926 vs conf_auc=0.899
+09:21:32 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+09:24:04 [enc2/image/oxford_iiit_pet] vote=0.941 uniform=0.939 best1=0.938 n_val=2188 vram=0.00GB 151s | grade=0.951 inner_auc=0.930 vs conf_auc=0.904
+09:24:22 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+09:26:53 [enc2/image/oxford_iiit_pet] vote=0.949 uniform=0.945 best1=0.948 n_val=2295 vram=0.00GB 151s | grade=0.958 inner_auc=0.921 vs conf_auc=0.896
+09:27:12 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+09:29:43 [enc2/image/oxford_iiit_pet] vote=0.949 uniform=0.944 best1=0.948 n_val=2171 vram=0.00GB 151s | grade=0.961 inner_auc=0.917 vs conf_auc=0.919
+09:30:03 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+09:32:37 [enc2/image/oxford_iiit_pet] vote=0.948 uniform=0.947 best1=0.946 n_val=2226 vram=0.00GB 154s | grade=0.962 inner_auc=0.894 vs conf_auc=0.899
+09:32:55 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+09:35:25 [enc2/image/oxford_iiit_pet] vote=0.949 uniform=0.945 best1=0.949 n_val=2259 vram=0.00GB 149s | grade=0.962 inner_auc=0.926 vs conf_auc=0.916
+09:35:45 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+09:38:16 [enc2/image/oxford_iiit_pet] vote=0.950 uniform=0.943 best1=0.950 n_val=2129 vram=0.00GB 152s | grade=0.959 inner_auc=0.923 vs conf_auc=0.918
+09:38:36 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+09:41:21 [enc2/image/oxford_iiit_pet] vote=0.947 uniform=0.940 best1=0.944 n_val=2162 vram=0.00GB 164s | grade=0.961 inner_auc=0.933 vs conf_auc=0.916
+09:41:45 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+09:44:26 [enc2/image/oxford_iiit_pet] vote=0.944 uniform=0.941 best1=0.945 n_val=2214 vram=0.00GB 161s | grade=0.960 inner_auc=0.930 vs conf_auc=0.916
+09:44:48 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+09:47:29 [enc2/image/oxford_iiit_pet] vote=0.943 uniform=0.941 best1=0.948 n_val=2132 vram=0.00GB 161s | grade=0.958 inner_auc=0.904 vs conf_auc=0.911
+09:47:49 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+09:50:29 [enc2/image/oxford_iiit_pet] vote=0.949 uniform=0.947 best1=0.949 n_val=2232 vram=0.00GB 160s | grade=0.957 inner_auc=0.956 vs conf_auc=0.952
+09:50:50 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+09:53:39 [enc2/image/oxford_iiit_pet] vote=0.952 uniform=0.949 best1=0.950 n_val=2174 vram=0.00GB 169s | grade=0.960 inner_auc=0.928 vs conf_auc=0.909
+09:54:01 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+09:56:48 [enc2/image/oxford_iiit_pet] vote=0.948 uniform=0.942 best1=0.948 n_val=2173 vram=0.00GB 167s | grade=0.957 inner_auc=0.895 vs conf_auc=0.882
+09:57:07 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+09:59:47 [enc2/image/oxford_iiit_pet] vote=0.942 uniform=0.944 best1=0.942 n_val=2204 vram=0.00GB 159s | grade=0.955 inner_auc=0.922 vs conf_auc=0.917
+10:00:10 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+10:02:53 [enc2/image/oxford_iiit_pet] vote=0.944 uniform=0.937 best1=0.945 n_val=2241 vram=0.00GB 163s | grade=0.957 inner_auc=0.947 vs conf_auc=0.947
+10:03:12 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+10:05:57 [enc2/image/oxford_iiit_pet] vote=0.947 uniform=0.941 best1=0.944 n_val=2206 vram=0.00GB 165s | grade=0.956 inner_auc=0.909 vs conf_auc=0.898
+10:06:18 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+10:09:04 [enc2/image/oxford_iiit_pet] vote=0.951 uniform=0.946 best1=0.951 n_val=2131 vram=0.00GB 166s | grade=0.957 inner_auc=0.940 vs conf_auc=0.927
+10:09:28 RUN COMPLETE

@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "OpenNetMeter",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Uninstall OpenNetMeter",
+   "prerequisite_state": "OpenNetMeter is installed on the system.",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Uninstall OpenNetMeter from the control panel",
+         "ui_target": {
+            "element_name": "Uninstall",
+            "automation_id": null,
+            "hierarchical_path": "Control Panel > Programs and Features > Uninstall a program > OpenNetMeter",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The uninstallation process for OpenNetMeter starts."
+      }
+   ],
+   "_meta": {
+      "source_app": "OpenNetMeter",
+      "app_key": "opennetmeter",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "OpenNetMeter",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:52:31Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,164 @@
+{
+   "app_metadata": {
+      "app_name": "Upgit",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "cli",
+   "high_level_task": "Guide on how to use the Upgit tool for file upload and configuration",
+   "prerequisite_state": "The user has downloaded and unzipped the Upgit tool and has a basic understanding of the command-line interface",
+   "total_steps": 12,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the latest zip from Releases",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "CLICK_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "https://github.com/pluveto/upgit/releases"
+         },
+         "expected_state_change": "The user navigates to the Upgit Releases page"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Choose the appropriate zip file based on the user's operating system",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "The user selects the correct zip file for their system"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Unzip the downloaded file",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "The user unzips the file to a desired location"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Rename the binary to `upgit` (for Windows users, `upgit.exe`)",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "The binary file is renamed to `upgit` (or `upgit.exe` for Windows)"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Save the binary to a preferred directory",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "The binary is saved to a user-specified directory"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Add the directory to the `PATH` environment variable",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "The directory containing `upgit` is added to the `PATH` environment variable"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Run `upgit update` to replace the binary with the latest stable GitHub release",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "upgit update"
+         },
+         "expected_state_change": "The binary is updated to the latest stable release"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Run `upgit update --beta` or `--alpha` to opt into beta or alpha channels",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "upgit update --beta"
+         },
+         "expected_state_change": "The binary is updated to the beta or alpha channel release"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Run `upgit init` to write a GitHub `config.toml` and print the path",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "upgit init"
+         },
+         "expected_state_change": "A `config.toml` file is created and the path is printed"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Fill in the `config.toml` file with the provided sample",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "The `config.toml` file is filled with the sample configuration"
+      },
+      {
+         "step_id": 11,
+         "low_level_instruction": "Run `upgit` to upload a file with custom renaming rules",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "upgit logo.png"
+         },
+         "expected_state_change": "The file `logo.png` is uploaded with the specified renaming rules"
+      },
+      {
+         "step_id": 12,
+         "low_level_instruction": "Run `upgit` with target directory to upload a file to a remote folder",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "upgit logo.png -t /my_images/demo"
+         },
+         "expected_state_change": "The file `logo.png` is uploaded to the remote folder `/my_images/demo`"
+      }
+   ],
+   "_meta": {
+      "source_app": "Upgit",
+      "app_key": "upgit",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "![upgit](https://cdn.jsdelivr.net/gh/pluveto/upgit/logo.png)",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:33:10Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target",
+         "step4_ungrounded_target",
+         "step5_ungrounded_target",
+         "step6_ungrounded_target",
+         "step7_ungrounded_target",
+         "step8_ungrounded_target",
+         "step9_ungrounded_target",
+         "step10_ungrounded_target",
+         "step11_ungrounded_target",
+         "step12_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

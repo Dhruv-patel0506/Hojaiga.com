@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "Audacity",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure advanced mixing options for exporting audio",
+   "prerequisite_state": "Audacity is open and the Export Audio dialog is visible",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click on the Configure button in the Export Audio dialog",
+         "ui_target": {
+            "element_name": "Configure",
+            "automation_id": null,
+            "hierarchical_path": "Export Audio dialog > Configure button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Advanced Mixing Options dialog appears"
+      }
+   ],
+   "_meta": {
+      "source_app": "Audacity",
+      "app_key": "audacity",
+      "dataset_split": "TRAIN",
+      "category": "Audio Editor",
+      "guide_title": "Advanced Mixing Options - Audacity Manual",
+      "source_status": "extracted_weak",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:03:57Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

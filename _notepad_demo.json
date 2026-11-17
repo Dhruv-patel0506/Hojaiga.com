@@ -1,0 +1,15 @@
+{
+   "app_metadata": {"app_name": "Notepad", "dataset_split": "EVAL", "scan_prerequisites_met": true},
+   "high_level_task": "Type a proof string into a blank Notepad document",
+   "prerequisite_state": "An untitled Notepad window is open",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Type the proof text into the editor",
+         "ui_target": {"element_name": "Text editor", "element_type": "document", "automation_id": "", "bounding_box": [0, 0, 0, 0]},
+         "virtual_mouse_action": {"action_type": "TYPE_TEXT", "text_payload": "HOJAIGA LIVE PROOF 42"},
+         "expected_state_change": "the editor shows HOJAIGA LIVE PROOF 42"
+      }
+   ]
+}

@@ -1,0 +1,108 @@
+{
+   "app_metadata": {
+      "app_name": "Fortify",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and manage Fortify",
+   "prerequisite_state": "Desktop is ready for installation and configuration",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download Fortify client on your computer",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": null,
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": null,
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Fortify client is downloaded on the computer"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Right-click on the Fortify installation file",
+         "ui_target": {
+            "element_name": "Fortify installation file",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "File",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A context menu appears with options including Install"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click Install from the context menu",
+         "ui_target": {
+            "element_name": "Install",
+            "automation_id": null,
+            "hierarchical_path": "Context menu > Install",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Fortify installation process begins"
+      }
+   ],
+   "_meta": {
+      "source_app": "Fortify",
+      "app_key": "fortify",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "Guides",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:28:28Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

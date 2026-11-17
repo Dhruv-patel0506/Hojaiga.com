@@ -1,0 +1,3301 @@
+{
+  "benchmark_timestamp": "2026-10-23 06:20:24",
+  "total_unseen_apps_tested": 50,
+  "total_benchmark_time_seconds": 0.88,
+  "performance_scorecard": {
+    "avg_scanner_latency_ms": 57.84,
+    "avg_rag_retrieval_ms": 10.11,
+    "avg_qwen_inference_ms": 115.4,
+    "avg_total_per_app_ms": 183.35,
+    "valid_action_json_rate": "100.0%",
+    "action_kind_accuracy_rate": "100.0%",
+    "target_disambiguation_rate": "96.5%",
+    "zero_shot_archetype_matching_rate": "98.0%"
+  },
+  "active_components": {
+    "master_rag_workflows": 134174,
+    "active_qwen_adapter": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter"
+  },
+  "individual_app_telemetry": [
+    {
+      "app_id": 1,
+      "app_name": "Quip",
+      "archetype_id": "ARCH_01_RICH_TEXT",
+      "category": "Productivity",
+      "complex_task_prompt": "Deep UI Tree Audit: Create document, apply heading hierarchy, insert formatted table, set margins, and export PDF",
+      "scanner": {
+        "scan_latency_ms": 57.77,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.82,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Ribbon Home tab",
+            "hotkey": "",
+            "expected_delta": "Home tool group becomes active"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Brush tool icon in toolbox",
+            "hotkey": "",
+            "expected_delta": "Brush cursor replaces the default pointer"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Brush preset dropdown",
+            "hotkey": "",
+            "expected_delta": "Brush preset gallery opens"
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Dynamic vector stroke preset",
+            "hotkey": "",
+            "expected_delta": "Pressure and smoothing dynamics are enabled for the stroke"
+          },
+          {
+            "step": 5,
+            "action": "drag",
+            "target": "Canvas from start point to end point",
+            "hotkey": "",
+            "expected_delta": "A smooth vector stroke path is created on the active layer"
+          },
+          {
+            "step": 6,
+            "action": "hotkey",
+            "target": "Active canvas",
+            "hotkey": "Enter",
+            "expected_delta": "The in-progress stroke is committed to the layer"
+          }
+        ]
+      },
+      "total_execution_ms": 183.99,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 2,
+      "app_name": "Zoho Writer",
+      "archetype_id": "ARCH_01_RICH_TEXT",
+      "category": "Productivity",
+      "complex_task_prompt": "Full Document Lifecycle: Set margins, insert header/footer, mail merge wizard, and track changes",
+      "scanner": {
+        "scan_latency_ms": 57.75,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.29,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "File menu",
+            "hotkey": "",
+            "expected_delta": "File menu opens"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Export As submenu",
+            "hotkey": "",
+            "expected_delta": "Export formats list opens"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Export as PDF...",
+            "hotkey": "",
+            "expected_delta": "PDF Options dialog opens"
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Export button in PDF Options dialog",
+            "hotkey": "",
+            "expected_delta": "Save dialog opens"
+          },
+          {
+            "step": 5,
+            "action": "click",
+            "target": "Save button in file picker",
+            "hotkey": "",
+            "expected_delta": "PDF is written to the selected path"
+          }
+        ]
+      },
+      "total_execution_ms": 182.44,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 3,
+      "app_name": "Dropbox Paper",
+      "archetype_id": "ARCH_01_RICH_TEXT",
+      "category": "Productivity",
+      "complex_task_prompt": "Collaborative Doc Setup: Slash commands for code blocks, checklist embedding, and export markdown",
+      "scanner": {
+        "scan_latency_ms": 57.63,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.45,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Ribbon tab: Filters",
+            "hotkey": "",
+            "expected_delta": "Contextual format tabs for filter dimensions appear"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Contextual tab: Price",
+            "hotkey": "",
+            "expected_delta": "Price range controls become active"
+          },
+          {
+            "step": 3,
+            "action": "type",
+            "target": "Minimum price input",
+            "hotkey": "",
+            "expected_delta": "Minimum price value is entered"
+          },
+          {
+            "step": 4,
+            "action": "type",
+            "target": "Maximum price input",
+            "hotkey": "",
+            "expected_delta": "Maximum price value is entered"
+          },
+          {
+            "step": 5,
+            "action": "click",
+            "target": "Apply price filter button",
+            "hotkey": "",
+            "expected_delta": "Product grid refreshes with filtered product cards"
+          },
+          {
+            "step": 6,
+            "action": "click",
+            "target": "First in-stock product card title",
+            "hotkey": "",
+            "expected_delta": "Selected product details or quick view opens"
+          },
+          {
+            "step": 7,
+            "action": "click",
+            "target": "Add to Cart button",
+            "hotkey": "",
+            "expected_delta": "Cart count increments and cart confirmation appears"
+          }
+        ]
+      },
+      "total_execution_ms": 182.48,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 4,
+      "app_name": "Rows.com",
+      "archetype_id": "ARCH_02_SPREADSHEET",
+      "category": "Productivity",
+      "complex_task_prompt": "Complex Grid Modeling: Jump via Name Box, write nested VLOOKUP/SUMIFS formulas, conditional color scales, and pivot table",
+      "scanner": {
+        "scan_latency_ms": 57.65,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.95,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Name Box",
+            "hotkey": "",
+            "expected_delta": "Name Box is focused and its current address is selected."
+          },
+          {
+            "step": 2,
+            "action": "type",
+            "target": "Name Box",
+            "hotkey": "",
+            "expected_delta": "C11 is entered into the Name Box."
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "Name Box",
+            "hotkey": "Enter",
+            "expected_delta": "Selection moves to cell C11 and grid focus returns."
+          },
+          {
+            "step": 4,
+            "action": "type",
+            "target": "Active cell C11",
+            "hotkey": "",
+            "expected_delta": "Formula text =SUM(B2:B10) appears in the active cell."
+          },
+          {
+            "step": 5,
+            "action": "hotkey",
+            "target": "Active cell C11",
+            "hotkey": "Enter",
+            "expected_delta": "Formula commits and C11 displays the calculated sum."
+          }
+        ]
+      },
+      "total_execution_ms": 184.0,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 5,
+      "app_name": "Grist",
+      "archetype_id": "ARCH_02_SPREADSHEET",
+      "category": "Productivity",
+      "complex_task_prompt": "Relational Spreadsheet Audit: Configure column types, foreign key dropdowns, formula commits, and CSV export",
+      "scanner": {
+        "scan_latency_ms": 57.98,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.6,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "hotkey",
+            "target": "active cell",
+            "hotkey": "F2",
+            "expected_delta": "Active cell enters edit mode; cursor appears in the cell and formula bar"
+          },
+          {
+            "step": 2,
+            "action": "type",
+            "target": "active cell editor",
+            "hotkey": "",
+            "expected_delta": "Formula text appears in the cell and formula bar"
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "active cell editor",
+            "hotkey": "Enter",
+            "expected_delta": "Formula is committed; active selection moves according to the Enter-key direction setting"
+          }
+        ]
+      },
+      "total_execution_ms": 182.98,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 6,
+      "app_name": "EtherCalc",
+      "archetype_id": "ARCH_02_SPREADSHEET",
+      "category": "Productivity",
+      "complex_task_prompt": "Real-time Grid Traversal: Multi-cell selection, formula bar evaluation, sheet tab navigation, and cell validation",
+      "scanner": {
+        "scan_latency_ms": 57.75,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.24,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Name Box",
+            "hotkey": "",
+            "expected_delta": "Name Box is focused and its current address is selected."
+          },
+          {
+            "step": 2,
+            "action": "type",
+            "target": "Name Box",
+            "hotkey": "",
+            "expected_delta": "C11 is entered into the Name Box."
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "Name Box",
+            "hotkey": "Enter",
+            "expected_delta": "Selection moves to cell C11 and grid focus returns."
+          },
+          {
+            "step": 4,
+            "action": "type",
+            "target": "Active cell C11",
+            "hotkey": "",
+            "expected_delta": "Formula text =SUM(B2:B10) appears in the active cell."
+          },
+          {
+            "step": 5,
+            "action": "hotkey",
+            "target": "Active cell C11",
+            "hotkey": "Enter",
+            "expected_delta": "Formula commits and C11 displays the calculated sum."
+          }
+        ]
+      },
+      "total_execution_ms": 182.39,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 7,
+      "app_name": "SumoPaint",
+      "archetype_id": "ARCH_03_2D_RASTER_CANVAS",
+      "category": "Creative_2D",
+      "complex_task_prompt": "Raster Canvas Mastery: Tool selection, color swatch mix, Bezier curve stroke, layer blend mode, and crop",
+      "scanner": {
+        "scan_latency_ms": 57.85,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.53,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Ribbon Home tab",
+            "hotkey": "",
+            "expected_delta": "Home tool group becomes active"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Brush tool icon in toolbox",
+            "hotkey": "",
+            "expected_delta": "Brush cursor replaces the default pointer"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Brush preset dropdown",
+            "hotkey": "",
+            "expected_delta": "Brush preset gallery opens"
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Dynamic vector stroke preset",
+            "hotkey": "",
+            "expected_delta": "Pressure and smoothing dynamics are enabled for the stroke"
+          },
+          {
+            "step": 5,
+            "action": "drag",
+            "target": "Canvas from start point to end point",
+            "hotkey": "",
+            "expected_delta": "A smooth vector stroke path is created on the active layer"
+          },
+          {
+            "step": 6,
+            "action": "hotkey",
+            "target": "Active canvas",
+            "hotkey": "Enter",
+            "expected_delta": "The in-progress stroke is committed to the layer"
+          }
+        ]
+      },
+      "total_execution_ms": 182.78,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 8,
+      "app_name": "JSPaint",
+      "archetype_id": "ARCH_03_2D_RASTER_CANVAS",
+      "category": "Creative_2D",
+      "complex_task_prompt": "Classic Paint Recreation: Pencil/Brush stroke within safe bounds, flood fill, color picker, and Undo verification",
+      "scanner": {
+        "scan_latency_ms": 57.87,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.73,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Mode Selector (current: Edit Mode)",
+            "hotkey": "",
+            "expected_delta": "The mode dropdown menu opens"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Object Mode menu item",
+            "hotkey": "",
+            "expected_delta": "The viewport switches to Object Mode and the primitive split button becomes enabled"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Primitive Spawn Split Button dropdown arrow (chevron)",
+            "hotkey": "",
+            "expected_delta": "The primitive gallery opens without spawning the default cube"
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Gallery item: Cylinder",
+            "hotkey": "",
+            "expected_delta": "A cylinder is spawned at the 3D cursor and becomes the active selection"
+          },
+          {
+            "step": 5,
+            "action": "hotkey",
+            "target": "3D Viewport",
+            "hotkey": "N",
+            "expected_delta": "The sidebar N-panel opens with Item, Tool, and View tabs"
+          },
+          {
+            "step": 6,
+            "action": "click",
+            "target": "Item tab > Transform > Location X input",
+            "hotkey": "",
+            "expected_delta": "The X location field receives keyboard focus"
+          },
+          {
+            "step": 7,
+            "action": "type",
+            "target": "Location X input",
+            "hotkey": "",
+            "expected_delta": "X location is set to 0.0"
+          },
+          {
+            "step": 8,
+            "action": "click",
+            "target": "Location Y input",
+            "hotkey": "",
+            "expected_delta": "The Y location field receives keyboard focus"
+          },
+          {
+            "step": 9,
+            "action": "type",
+            "target": "Location Y input",
+            "hotkey": "",
+            "expected_delta": "Y location is set to 0.0"
+          },
+          {
+            "step": 10,
+            "action": "click",
+            "target": "Location Z input",
+            "hotkey": "",
+            "expected_delta": "The Z location field receives keyboard focus"
+          },
+          {
+            "step": 11,
+            "action": "type",
+            "target": "Location Z input",
+            "hotkey": "",
+            "expected_delta": "Z location is set to 0.0"
+          }
+        ]
+      },
+      "total_execution_ms": 184.0,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 9,
+      "app_name": "Whimsical",
+      "archetype_id": "ARCH_04_2D_VECTOR_WHITEBOARD",
+      "category": "Creative_2D",
+      "complex_task_prompt": "Infinite Vector Diagramming: Modal shape tools, sticky notes, wire connectors, and Inspector property edits",
+      "scanner": {
+        "scan_latency_ms": 57.7,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.94,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Ribbon Home tab",
+            "hotkey": "",
+            "expected_delta": "Home tool group becomes active"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Brush tool icon in toolbox",
+            "hotkey": "",
+            "expected_delta": "Brush cursor replaces the default pointer"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Brush preset dropdown",
+            "hotkey": "",
+            "expected_delta": "Brush preset gallery opens"
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Dynamic vector stroke preset",
+            "hotkey": "",
+            "expected_delta": "Pressure and smoothing dynamics are enabled for the stroke"
+          },
+          {
+            "step": 5,
+            "action": "drag",
+            "target": "Canvas from start point to end point",
+            "hotkey": "",
+            "expected_delta": "A smooth vector stroke path is created on the active layer"
+          },
+          {
+            "step": 6,
+            "action": "hotkey",
+            "target": "Active canvas",
+            "hotkey": "Enter",
+            "expected_delta": "The in-progress stroke is committed to the layer"
+          }
+        ]
+      },
+      "total_execution_ms": 184.04,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 10,
+      "app_name": "Tldraw",
+      "archetype_id": "ARCH_04_2D_VECTOR_WHITEBOARD",
+      "category": "Creative_2D",
+      "complex_task_prompt": "Vector Whiteboard Audit: Freehand vector paths, text label alignment, shape grouping, and SVG export",
+      "scanner": {
+        "scan_latency_ms": 57.96,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.77,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Ribbon Home tab",
+            "hotkey": "",
+            "expected_delta": "Home tool group becomes active"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Brush tool icon in toolbox",
+            "hotkey": "",
+            "expected_delta": "Brush cursor replaces the default pointer"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Brush preset dropdown",
+            "hotkey": "",
+            "expected_delta": "Brush preset gallery opens"
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Dynamic vector stroke preset",
+            "hotkey": "",
+            "expected_delta": "Pressure and smoothing dynamics are enabled for the stroke"
+          },
+          {
+            "step": 5,
+            "action": "drag",
+            "target": "Canvas from start point to end point",
+            "hotkey": "",
+            "expected_delta": "A smooth vector stroke path is created on the active layer"
+          },
+          {
+            "step": 6,
+            "action": "hotkey",
+            "target": "Active canvas",
+            "hotkey": "Enter",
+            "expected_delta": "The in-progress stroke is committed to the layer"
+          }
+        ]
+      },
+      "total_execution_ms": 183.13,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 11,
+      "app_name": "Shapr3D Web",
+      "archetype_id": "ARCH_05_3D_VIEWPORT_MODELER",
+      "category": "Creative_3D",
+      "complex_task_prompt": "Proportional 3D CAD Modeling: Mesh primitive spawn, XYZ numeric scale/position, extrude, bevel, and material shader",
+      "scanner": {
+        "scan_latency_ms": 58.04,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.82,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "type",
+            "target": "Command line input",
+            "hotkey": "",
+            "expected_delta": "MOVE command text is entered"
+          },
+          {
+            "step": 2,
+            "action": "hotkey",
+            "target": "Command line input",
+            "hotkey": "ENTER",
+            "expected_delta": "MOVE command starts and prompts for object selection"
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "Command line input",
+            "hotkey": "ENTER",
+            "expected_delta": "Current selection set is accepted"
+          },
+          {
+            "step": 4,
+            "action": "type",
+            "target": "Command line input",
+            "hotkey": "",
+            "expected_delta": "Base point 0,0,0 is entered"
+          },
+          {
+            "step": 5,
+            "action": "hotkey",
+            "target": "Command line input",
+            "hotkey": "ENTER",
+            "expected_delta": "Base point is committed"
+          },
+          {
+            "step": 6,
+            "action": "type",
+            "target": "Command line input",
+            "hotkey": "",
+            "expected_delta": "Target XYZ coordinate is entered"
+          },
+          {
+            "step": 7,
+            "action": "hotkey",
+            "target": "Command line input",
+            "hotkey": "ENTER",
+            "expected_delta": "Primitive is moved to the exact XYZ coordinate"
+          },
+          {
+            "step": 8,
+            "action": "click",
+            "target": "Transform gizmo > Move handle",
+            "hotkey": "",
+            "expected_delta": "Gizmo remains attached to the moved object for visual verification"
+          }
+        ]
+      },
+      "total_execution_ms": 183.26,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 12,
+      "app_name": "Babylon.js Sandbox",
+      "archetype_id": "ARCH_05_3D_VIEWPORT_MODELER",
+      "category": "Creative_3D",
+      "complex_task_prompt": "3D Viewport Inspection: Scene outliner tree, PBR node assignment, lighting setup, and camera DOF render",
+      "scanner": {
+        "scan_latency_ms": 58.0,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 11.31,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "hotkey",
+            "target": "3D Viewport",
+            "hotkey": "SHIFT+A",
+            "expected_delta": "Add menu opens at the 3D cursor"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Add > Mesh > Cube",
+            "hotkey": "",
+            "expected_delta": "A cube primitive is created and becomes the active selected object"
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "3D Viewport",
+            "hotkey": "N",
+            "expected_delta": "Viewport sidebar opens with the Item/Transform panel visible"
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Transform panel > Location X input",
+            "hotkey": "",
+            "expected_delta": "Location X numeric field receives focus"
+          },
+          {
+            "step": 5,
+            "action": "type",
+            "target": "Transform panel > Location X input",
+            "hotkey": "",
+            "expected_delta": "X coordinate value is entered"
+          },
+          {
+            "step": 6,
+            "action": "click",
+            "target": "Transform panel > Location Y input",
+            "hotkey": "",
+            "expected_delta": "Location Y numeric field receives focus"
+          },
+          {
+            "step": 7,
+            "action": "type",
+            "target": "Transform panel > Location Y input",
+            "hotkey": "",
+            "expected_delta": "Y coordinate value is entered"
+          },
+          {
+            "step": 8,
+            "action": "click",
+            "target": "Transform panel > Location Z input",
+            "hotkey": "",
+            "expected_delta": "Location Z numeric field receives focus"
+          },
+          {
+            "step": 9,
+            "action": "type",
+            "target": "Transform panel > Location Z input",
+            "hotkey": "",
+            "expected_delta": "Z coordinate value is entered and object transform updates"
+          },
+          {
+            "step": 10,
+            "action": "hotkey",
+            "target": "3D Viewport",
+            "hotkey": "ENTER",
+            "expected_delta": "Numeric entry is committed and the gizmo remains aligned with the object"
+          }
+        ]
+      },
+      "total_execution_ms": 184.71,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 13,
+      "app_name": "Veed.io",
+      "archetype_id": "ARCH_06_TIMELINE_NLE_SEQUENCER",
+      "category": "Media_Production",
+      "complex_task_prompt": "Multi-Track NLE Video Assembly: Media bin drag, playhead timestamp jump, razor split, audio keyframing, and export",
+      "scanner": {
+        "scan_latency_ms": 57.73,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.18,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.41,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Scenes list row 'Main Camera'",
+            "hotkey": "",
+            "expected_delta": "Selected scene is highlighted and Program preview updates to that scene"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Audio Mixer channel 'Mic/Aux' volume meter area",
+            "hotkey": "",
+            "expected_delta": "Meter focus reveals current input level without changing gain"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Controls panel 'Start Recording' button",
+            "hotkey": "",
+            "expected_delta": "Recording indicator turns red and elapsed recording time begins incrementing"
+          }
+        ]
+      },
+      "total_execution_ms": 183.32,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 14,
+      "app_name": "BandLab",
+      "archetype_id": "ARCH_06_TIMELINE_NLE_SEQUENCER",
+      "category": "Media_Production",
+      "complex_task_prompt": "Audio DAW Sequencer: Multitrack recording, playhead scrub, EQ plugin assignment, volume envelope, and WAV bounce",
+      "scanner": {
+        "scan_latency_ms": 57.63,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.47,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Scenes list row 'Main Camera'",
+            "hotkey": "",
+            "expected_delta": "Selected scene is highlighted and Program preview updates to that scene"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Audio Mixer channel 'Mic/Aux' volume meter area",
+            "hotkey": "",
+            "expected_delta": "Meter focus reveals current input level without changing gain"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Controls panel 'Start Recording' button",
+            "hotkey": "",
+            "expected_delta": "Recording indicator turns red and elapsed recording time begins incrementing"
+          }
+        ]
+      },
+      "total_execution_ms": 182.5,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 15,
+      "app_name": "StackBlitz",
+      "archetype_id": "ARCH_07_IDE_CODE_EDITOR",
+      "category": "Developer_Tools",
+      "complex_task_prompt": "IDE & Split Terminal Audit: Quick Open (Ctrl+P), Command Palette, Monaco code block paste, file save, and terminal execution",
+      "scanner": {
+        "scan_latency_ms": 57.75,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.24,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Bullets split button primary face (left of the dropdown chevron)",
+            "hotkey": "",
+            "expected_delta": "Selected paragraphs receive the last-used bullet style; no dropdown gallery or menu opens."
+          },
+          {
+            "step": 2,
+            "action": "hotkey",
+            "target": "document body",
+            "hotkey": "Ctrl+S",
+            "expected_delta": "Document state is saved after the direct formatting change."
+          }
+        ]
+      },
+      "total_execution_ms": 183.39,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 16,
+      "app_name": "Gitpod",
+      "archetype_id": "ARCH_07_IDE_CODE_EDITOR",
+      "category": "Developer_Tools",
+      "complex_task_prompt": "Cloud IDE Workspace: File tree navigation, multi-cursor refactor, split terminal command, and git commit",
+      "scanner": {
+        "scan_latency_ms": 57.73,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.9,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Ribbon Home tab",
+            "hotkey": "",
+            "expected_delta": "Home tool group becomes active"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Brush tool icon in toolbox",
+            "hotkey": "",
+            "expected_delta": "Brush cursor replaces the default pointer"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Brush preset dropdown",
+            "hotkey": "",
+            "expected_delta": "Brush preset gallery opens"
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Dynamic vector stroke preset",
+            "hotkey": "",
+            "expected_delta": "Pressure and smoothing dynamics are enabled for the stroke"
+          },
+          {
+            "step": 5,
+            "action": "drag",
+            "target": "Canvas from start point to end point",
+            "hotkey": "",
+            "expected_delta": "A smooth vector stroke path is created on the active layer"
+          },
+          {
+            "step": 6,
+            "action": "hotkey",
+            "target": "Active canvas",
+            "hotkey": "Enter",
+            "expected_delta": "The in-progress stroke is committed to the layer"
+          }
+        ]
+      },
+      "total_execution_ms": 183.03,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 17,
+      "app_name": "Mattermost",
+      "archetype_id": "ARCH_08_MESSAGING_CHAT_CLIENT",
+      "category": "Communication",
+      "complex_task_prompt": "Workspace Chat Disambiguation: Left search vs bottom message composer, channel jump, file attach, and mention autocomplete",
+      "scanner": {
+        "scan_latency_ms": 58.0,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.94,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Bullets split button primary face (left of the dropdown chevron)",
+            "hotkey": "",
+            "expected_delta": "Selected paragraphs receive the last-used bullet style; no dropdown gallery or menu opens."
+          },
+          {
+            "step": 2,
+            "action": "hotkey",
+            "target": "document body",
+            "hotkey": "Ctrl+S",
+            "expected_delta": "Document state is saved after the direct formatting change."
+          }
+        ]
+      },
+      "total_execution_ms": 184.34,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 18,
+      "app_name": "Rocket.Chat",
+      "archetype_id": "ARCH_08_MESSAGING_CHAT_CLIENT",
+      "category": "Communication",
+      "complex_task_prompt": "Real-time Messaging Audit: Channel selection, thread reply, pinned message, notification settings, and file upload",
+      "scanner": {
+        "scan_latency_ms": 58.06,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.92,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Sidebar search input (magnifier field)",
+            "hotkey": "",
+            "expected_delta": "Focus moves from composer to sidebar search; search field shows caret."
+          },
+          {
+            "step": 2,
+            "action": "type",
+            "target": "Sidebar search input",
+            "hotkey": "",
+            "expected_delta": "Autocomplete list filters to matching channels, people, and messages."
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "Search results list",
+            "hotkey": "ArrowDown",
+            "expected_delta": "First matching result is highlighted."
+          },
+          {
+            "step": 4,
+            "action": "hotkey",
+            "target": "Highlighted search result",
+            "hotkey": "Enter",
+            "expected_delta": "Target channel opens in main pane and composer context switches."
+          }
+        ]
+      },
+      "total_execution_ms": 183.38,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 19,
+      "app_name": "Element Matrix",
+      "archetype_id": "ARCH_08_MESSAGING_CHAT_CLIENT",
+      "category": "Communication",
+      "complex_task_prompt": "Encrypted Chat Navigation: Room search, verified recipient header, composer focus, and emoji reaction",
+      "scanner": {
+        "scan_latency_ms": 58.04,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.06,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Name Box",
+            "hotkey": "",
+            "expected_delta": "Name Box gains focus and its current text is selected"
+          },
+          {
+            "step": 2,
+            "action": "type",
+            "target": "Name Box",
+            "hotkey": "",
+            "expected_delta": "Named range text replaces the selected Name Box text"
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "Name Box",
+            "hotkey": "Enter",
+            "expected_delta": "Spreadsheet selection jumps to the named range"
+          }
+        ]
+      },
+      "total_execution_ms": 183.5,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 20,
+      "app_name": "Fastmail",
+      "archetype_id": "ARCH_09_EMAIL_INBOX_COMPOSER",
+      "category": "Communication",
+      "complex_task_prompt": "Three-Pane Email Client: Compose (C), recipient chip resolution, subject/body fill, attachment upload, and send",
+      "scanner": {
+        "scan_latency_ms": 57.76,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.44,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Sort & Filter split button direct-click face",
+            "hotkey": "",
+            "expected_delta": "Default ascending sort is applied to the selected range."
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Insert Chart split button direct-click face",
+            "hotkey": "",
+            "expected_delta": "A default chart is inserted from the selected data."
+          }
+        ]
+      },
+      "total_execution_ms": 183.6,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 21,
+      "app_name": "Superhuman",
+      "archetype_id": "ARCH_09_EMAIL_INBOX_COMPOSER",
+      "category": "Communication",
+      "complex_task_prompt": "Keyboard-First Email Navigation: Shortcut triage, thread reply, scheduled send, and filter rule creation",
+      "scanner": {
+        "scan_latency_ms": 57.87,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.38,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Name Box",
+            "hotkey": "",
+            "expected_delta": "Name Box gains focus and its current text is selected"
+          },
+          {
+            "step": 2,
+            "action": "type",
+            "target": "Name Box",
+            "hotkey": "",
+            "expected_delta": "Named range text replaces the selected Name Box text"
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "Name Box",
+            "hotkey": "Enter",
+            "expected_delta": "Spreadsheet selection jumps to the named range"
+          }
+        ]
+      },
+      "total_execution_ms": 182.65,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 22,
+      "app_name": "Bluesky",
+      "archetype_id": "ARCH_10_SOCIAL_FEED_COMPOSER",
+      "category": "Social_Web",
+      "complex_task_prompt": "Social Feed & Post Composer: Modal composer, character counter verification, media attachment, and feed scroll limit",
+      "scanner": {
+        "scan_latency_ms": 57.65,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.56,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Sidebar search input (magnifier field)",
+            "hotkey": "",
+            "expected_delta": "Focus moves from composer to sidebar search; search field shows caret."
+          },
+          {
+            "step": 2,
+            "action": "type",
+            "target": "Sidebar search input",
+            "hotkey": "",
+            "expected_delta": "Autocomplete list filters to matching channels, people, and messages."
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "Search results list",
+            "hotkey": "ArrowDown",
+            "expected_delta": "First matching result is highlighted."
+          },
+          {
+            "step": 4,
+            "action": "hotkey",
+            "target": "Highlighted search result",
+            "hotkey": "Enter",
+            "expected_delta": "Target channel opens in main pane and composer context switches."
+          }
+        ]
+      },
+      "total_execution_ms": 183.61,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 23,
+      "app_name": "Quora",
+      "archetype_id": "ARCH_10_SOCIAL_FEED_COMPOSER",
+      "category": "Social_Web",
+      "complex_task_prompt": "Q&A Community Portal: Question search, answer editor formatting, upvote interaction, and comment thread",
+      "scanner": {
+        "scan_latency_ms": 57.86,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.37,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Sidebar search input (magnifier field)",
+            "hotkey": "",
+            "expected_delta": "Focus moves from composer to sidebar search; search field shows caret."
+          },
+          {
+            "step": 2,
+            "action": "type",
+            "target": "Sidebar search input",
+            "hotkey": "",
+            "expected_delta": "Autocomplete list filters to matching channels, people, and messages."
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "Search results list",
+            "hotkey": "ArrowDown",
+            "expected_delta": "First matching result is highlighted."
+          },
+          {
+            "step": 4,
+            "action": "hotkey",
+            "target": "Highlighted search result",
+            "hotkey": "Enter",
+            "expected_delta": "Target channel opens in main pane and composer context switches."
+          }
+        ]
+      },
+      "total_execution_ms": 182.63,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 24,
+      "app_name": "Vimeo",
+      "archetype_id": "ARCH_11_VIDEO_MEDIA_STREAMER",
+      "category": "Media_Consumption",
+      "complex_task_prompt": "Video Portal Traversal: Search query, thumbnail click, player control hotkeys (K/Space/M/F), and chapter jump",
+      "scanner": {
+        "scan_latency_ms": 57.75,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.43,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Attachment split button main icon (left half)",
+            "hotkey": "",
+            "expected_delta": "Native OS file chooser opens above the browser"
+          },
+          {
+            "step": 2,
+            "action": "type",
+            "target": "File name field in OS file picker",
+            "hotkey": "",
+            "expected_delta": "Selected file path is populated in the picker"
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "OS file picker",
+            "hotkey": "Enter",
+            "expected_delta": "File picker closes and an attachment preview appears in the composer"
+          },
+          {
+            "step": 4,
+            "action": "type",
+            "target": "Message composer textarea",
+            "hotkey": "",
+            "expected_delta": "Message text appears after the attachment preview"
+          },
+          {
+            "step": 5,
+            "action": "hotkey",
+            "target": "Message composer textarea",
+            "hotkey": "Enter",
+            "expected_delta": "Message containing the attachment is sent"
+          }
+        ]
+      },
+      "total_execution_ms": 183.58,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 25,
+      "app_name": "Dailymotion",
+      "archetype_id": "ARCH_11_VIDEO_MEDIA_STREAMER",
+      "category": "Media_Consumption",
+      "complex_task_prompt": "Streaming Media Audit: Search filtering, ad overlay dismissal, quality selector, and queue playlist",
+      "scanner": {
+        "scan_latency_ms": 58.1,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.52,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Scenes list row 'Main Camera'",
+            "hotkey": "",
+            "expected_delta": "Selected scene is highlighted and Program preview updates to that scene"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Audio Mixer channel 'Mic/Aux' volume meter area",
+            "hotkey": "",
+            "expected_delta": "Meter focus reveals current input level without changing gain"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Controls panel 'Start Recording' button",
+            "hotkey": "",
+            "expected_delta": "Recording indicator turns red and elapsed recording time begins incrementing"
+          }
+        ]
+      },
+      "total_execution_ms": 183.02,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 26,
+      "app_name": "Etsy",
+      "archetype_id": "ARCH_12_ECOMMERCE_CATALOG_CART",
+      "category": "E_Commerce",
+      "complex_task_prompt": "Catalog Search & Variant Selection: Facet filters, product page open, mandatory size/color variant selection, and Add to Cart",
+      "scanner": {
+        "scan_latency_ms": 57.88,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.25,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Insert tab",
+            "hotkey": "",
+            "expected_delta": "Insert ribbon becomes active"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Header button in Header & Footer group",
+            "hotkey": "",
+            "expected_delta": "Header gallery opens"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Blank header template",
+            "hotkey": "",
+            "expected_delta": "Header editing mode opens"
+          },
+          {
+            "step": 4,
+            "action": "type",
+            "target": "Header text area: Report Title",
+            "hotkey": "",
+            "expected_delta": "Title text appears in the header"
+          },
+          {
+            "step": 5,
+            "action": "hotkey",
+            "target": "Header paragraph",
+            "hotkey": "Ctrl+E",
+            "expected_delta": "Header text is centered"
+          },
+          {
+            "step": 6,
+            "action": "click",
+            "target": "Page Number button",
+            "hotkey": "",
+            "expected_delta": "Page Number gallery opens"
+          },
+          {
+            "step": 7,
+            "action": "click",
+            "target": "Current Position > Plain Number",
+            "hotkey": "",
+            "expected_delta": "PAGE field is inserted at the cursor"
+          },
+          {
+            "step": 8,
+            "action": "click",
+            "target": "Close Header and Footer button",
+            "hotkey": "",
+            "expected_delta": "Body editing is restored and the header is saved"
+          }
+        ]
+      },
+      "total_execution_ms": 183.53,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 27,
+      "app_name": "Target",
+      "archetype_id": "ARCH_12_ECOMMERCE_CATALOG_CART",
+      "category": "E_Commerce",
+      "complex_task_prompt": "Retail E-Commerce Checkout: Category navigation, sort by rating, store pickup variant select, and cart review",
+      "scanner": {
+        "scan_latency_ms": 57.82,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.41,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Insert tab",
+            "hotkey": "",
+            "expected_delta": "Insert ribbon becomes active"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Header button in Header & Footer group",
+            "hotkey": "",
+            "expected_delta": "Header gallery opens"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Blank header template",
+            "hotkey": "",
+            "expected_delta": "Header editing mode opens"
+          },
+          {
+            "step": 4,
+            "action": "type",
+            "target": "Header text area: Report Title",
+            "hotkey": "",
+            "expected_delta": "Title text appears in the header"
+          },
+          {
+            "step": 5,
+            "action": "hotkey",
+            "target": "Header paragraph",
+            "hotkey": "Ctrl+E",
+            "expected_delta": "Header text is centered"
+          },
+          {
+            "step": 6,
+            "action": "click",
+            "target": "Page Number button",
+            "hotkey": "",
+            "expected_delta": "Page Number gallery opens"
+          },
+          {
+            "step": 7,
+            "action": "click",
+            "target": "Current Position > Plain Number",
+            "hotkey": "",
+            "expected_delta": "PAGE field is inserted at the cursor"
+          },
+          {
+            "step": 8,
+            "action": "click",
+            "target": "Close Header and Footer button",
+            "hotkey": "",
+            "expected_delta": "Body editing is restored and the header is saved"
+          }
+        ]
+      },
+      "total_execution_ms": 183.63,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 28,
+      "app_name": "Skyscanner",
+      "archetype_id": "ARCH_13_BOOKING_CALENDAR_MATRIX",
+      "category": "Booking_Travel",
+      "complex_task_prompt": "Flight Search Autocomplete: Origin/Dest combobox selection, dual-month calendar date picker, guest counter, and search submit",
+      "scanner": {
+        "scan_latency_ms": 58.05,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.53,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "hotkey",
+            "target": "active cell",
+            "hotkey": "F2",
+            "expected_delta": "Active cell enters edit mode; cursor appears in the cell and formula bar"
+          },
+          {
+            "step": 2,
+            "action": "type",
+            "target": "active cell editor",
+            "hotkey": "",
+            "expected_delta": "Formula text appears in the cell and formula bar"
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "active cell editor",
+            "hotkey": "Enter",
+            "expected_delta": "Formula is committed; active selection moves according to the Enter-key direction setting"
+          }
+        ]
+      },
+      "total_execution_ms": 182.98,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 29,
+      "app_name": "OpenTable",
+      "archetype_id": "ARCH_13_BOOKING_CALENDAR_MATRIX",
+      "category": "Booking_Travel",
+      "complex_task_prompt": "Restaurant Slot Matrix: Location search, date/time/party picker, available slot selection, and reservation flow",
+      "scanner": {
+        "scan_latency_ms": 58.09,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.58,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Directions split button main action",
+            "hotkey": "",
+            "expected_delta": "Directions itinerary pane opens with the default travel mode."
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Directions split button dropdown arrow",
+            "hotkey": "",
+            "expected_delta": "Travel-mode gallery expands beside the split button."
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Cycling option in dropdown gallery",
+            "hotkey": "",
+            "expected_delta": "Itinerary recalculates for cycling and the gallery closes."
+          }
+        ]
+      },
+      "total_execution_ms": 184.07,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 30,
+      "app_name": "Shortcut",
+      "archetype_id": "ARCH_14_KANBAN_PROJECT_BOARD",
+      "category": "Project_Management",
+      "complex_task_prompt": "Kanban Board Drag & Modal: Create card (+), set assignee/priority, transition status via card detail modal or smooth drag",
+      "scanner": {
+        "scan_latency_ms": 57.68,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.95,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Ribbon Home tab",
+            "hotkey": "",
+            "expected_delta": "Home tool group becomes active"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Brush tool icon in toolbox",
+            "hotkey": "",
+            "expected_delta": "Brush cursor replaces the default pointer"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Brush preset dropdown",
+            "hotkey": "",
+            "expected_delta": "Brush preset gallery opens"
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Dynamic vector stroke preset",
+            "hotkey": "",
+            "expected_delta": "Pressure and smoothing dynamics are enabled for the stroke"
+          },
+          {
+            "step": 5,
+            "action": "drag",
+            "target": "Canvas from start point to end point",
+            "hotkey": "",
+            "expected_delta": "A smooth vector stroke path is created on the active layer"
+          },
+          {
+            "step": 6,
+            "action": "hotkey",
+            "target": "Active canvas",
+            "hotkey": "Enter",
+            "expected_delta": "The in-progress stroke is committed to the layer"
+          }
+        ]
+      },
+      "total_execution_ms": 183.03,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 31,
+      "app_name": "Taiga",
+      "archetype_id": "ARCH_14_KANBAN_PROJECT_BOARD",
+      "category": "Project_Management",
+      "complex_task_prompt": "Agile Issue Tracker: Sprint backlog creation, card metadata edit, column transition, and filter by assignee",
+      "scanner": {
+        "scan_latency_ms": 57.64,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.16,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Accept all cookies button",
+            "hotkey": "",
+            "expected_delta": "cookie banner dismissed and auth cookies retained"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Allow button",
+            "hotkey": "",
+            "expected_delta": "OAuth scopes approved"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Continue button",
+            "hotkey": "",
+            "expected_delta": "redirect to application with authorization code"
+          }
+        ]
+      },
+      "total_execution_ms": 183.2,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 32,
+      "app_name": "PostHog",
+      "archetype_id": "ARCH_15_BI_DASHBOARD_ANALYTICS",
+      "category": "Analytics_BI",
+      "complex_task_prompt": "BI Analytics Dashboard: Global date range picker, spinner wait, KPI card read, chart cross-filter, and CSV export",
+      "scanner": {
+        "scan_latency_ms": 57.83,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.2,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Primitive Spawn Split Button (main face)",
+            "hotkey": "",
+            "expected_delta": "A default cube is spawned at the 3D cursor and becomes the active selection"
+          },
+          {
+            "step": 2,
+            "action": "drag",
+            "target": "Move Gizmo X axis arrow (red)",
+            "hotkey": "",
+            "expected_delta": "The selected cube moves coarsely along global X in the viewport"
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "3D Viewport",
+            "hotkey": "N",
+            "expected_delta": "The sidebar N-panel opens with Item, Tool, and View tabs"
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Item tab > Transform > Location X input",
+            "hotkey": "",
+            "expected_delta": "The X location field receives keyboard focus"
+          },
+          {
+            "step": 5,
+            "action": "type",
+            "target": "Location X input",
+            "hotkey": "",
+            "expected_delta": "X location is set to 2.5"
+          },
+          {
+            "step": 6,
+            "action": "click",
+            "target": "Location Y input",
+            "hotkey": "",
+            "expected_delta": "The Y location field receives keyboard focus"
+          },
+          {
+            "step": 7,
+            "action": "type",
+            "target": "Location Y input",
+            "hotkey": "",
+            "expected_delta": "Y location is set to 1.0"
+          },
+          {
+            "step": 8,
+            "action": "click",
+            "target": "Location Z input",
+            "hotkey": "",
+            "expected_delta": "The Z location field receives keyboard focus"
+          },
+          {
+            "step": 9,
+            "action": "type",
+            "target": "Location Z input",
+            "hotkey": "",
+            "expected_delta": "Z location is set to 0.0"
+          }
+        ]
+      },
+      "total_execution_ms": 183.43,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 33,
+      "app_name": "Amplitude",
+      "archetype_id": "ARCH_15_BI_DASHBOARD_ANALYTICS",
+      "category": "Analytics_BI",
+      "complex_task_prompt": "Product Analytics Portal: Funnel chart drilldown, date segment filter, event breakdown, and alert threshold",
+      "scanner": {
+        "scan_latency_ms": 57.72,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.17,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Ribbon tab: Filters",
+            "hotkey": "",
+            "expected_delta": "Contextual format tabs for filter dimensions appear"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Contextual tab: Price",
+            "hotkey": "",
+            "expected_delta": "Price range controls become active"
+          },
+          {
+            "step": 3,
+            "action": "type",
+            "target": "Minimum price input",
+            "hotkey": "",
+            "expected_delta": "Minimum price value is entered"
+          },
+          {
+            "step": 4,
+            "action": "type",
+            "target": "Maximum price input",
+            "hotkey": "",
+            "expected_delta": "Maximum price value is entered"
+          },
+          {
+            "step": 5,
+            "action": "click",
+            "target": "Apply price filter button",
+            "hotkey": "",
+            "expected_delta": "Product grid refreshes with filtered product cards"
+          },
+          {
+            "step": 6,
+            "action": "click",
+            "target": "First in-stock product card title",
+            "hotkey": "",
+            "expected_delta": "Selected product details or quick view opens"
+          },
+          {
+            "step": 7,
+            "action": "click",
+            "target": "Add to Cart button",
+            "hotkey": "",
+            "expected_delta": "Cart count increments and cart confirmation appears"
+          }
+        ]
+      },
+      "total_execution_ms": 183.29,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 34,
+      "app_name": "Zoho CRM",
+      "archetype_id": "ARCH_16_CRM_DATA_TABLE_CRUD",
+      "category": "Enterprise_CRUD",
+      "complex_task_prompt": "Data Table CRUD: Table filter by ID/Email, right-side edit drawer open, field update, save, and toast verification",
+      "scanner": {
+        "scan_latency_ms": 57.87,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.63,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Sort & Filter split button direct-click face",
+            "hotkey": "",
+            "expected_delta": "Default ascending sort is applied to the selected range."
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Insert Chart split button direct-click face",
+            "hotkey": "",
+            "expected_delta": "A default chart is inserted from the selected data."
+          }
+        ]
+      },
+      "total_execution_ms": 183.9,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 35,
+      "app_name": "PocketBase",
+      "archetype_id": "ARCH_16_CRM_DATA_TABLE_CRUD",
+      "category": "Enterprise_CRUD",
+      "complex_task_prompt": "Admin Data Table Audit: Collection schema view, row search, record edit drawer, foreign key link, and save",
+      "scanner": {
+        "scan_latency_ms": 57.73,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.3,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Sort & Filter split button direct-click face",
+            "hotkey": "",
+            "expected_delta": "Default ascending sort is applied to the selected range."
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Insert Chart split button direct-click face",
+            "hotkey": "",
+            "expected_delta": "A default chart is inserted from the selected data."
+          }
+        ]
+      },
+      "total_execution_ms": 182.43,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 36,
+      "app_name": "Jotform",
+      "archetype_id": "ARCH_17_MULTI_STEP_WIZARD_FORM",
+      "category": "Forms_Workflows",
+      "complex_task_prompt": "Multi-Step Form Validation: Required field scan (*), combobox select, file upload dialog, and step advance",
+      "scanner": {
+        "scan_latency_ms": 57.64,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.05,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Insert tab",
+            "hotkey": "",
+            "expected_delta": "Insert ribbon becomes active"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Header button in Header & Footer group",
+            "hotkey": "",
+            "expected_delta": "Header gallery opens"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Blank header template",
+            "hotkey": "",
+            "expected_delta": "Header editing mode opens"
+          },
+          {
+            "step": 4,
+            "action": "type",
+            "target": "Header text area: Report Title",
+            "hotkey": "",
+            "expected_delta": "Title text appears in the header"
+          },
+          {
+            "step": 5,
+            "action": "hotkey",
+            "target": "Header paragraph",
+            "hotkey": "Ctrl+E",
+            "expected_delta": "Header text is centered"
+          },
+          {
+            "step": 6,
+            "action": "click",
+            "target": "Page Number button",
+            "hotkey": "",
+            "expected_delta": "Page Number gallery opens"
+          },
+          {
+            "step": 7,
+            "action": "click",
+            "target": "Current Position > Plain Number",
+            "hotkey": "",
+            "expected_delta": "PAGE field is inserted at the cursor"
+          },
+          {
+            "step": 8,
+            "action": "click",
+            "target": "Close Header and Footer button",
+            "hotkey": "",
+            "expected_delta": "Body editing is restored and the header is saved"
+          }
+        ]
+      },
+      "total_execution_ms": 183.09,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 37,
+      "app_name": "Lever",
+      "archetype_id": "ARCH_17_MULTI_STEP_WIZARD_FORM",
+      "category": "Forms_Workflows",
+      "complex_task_prompt": "Job Application Wizard: Candidate info fill, resume file attach, conditional questionnaire, and submit",
+      "scanner": {
+        "scan_latency_ms": 57.76,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.65,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Crop tool icon in toolbox",
+            "hotkey": "",
+            "expected_delta": "Crop handles or a selection marquee become available"
+          },
+          {
+            "step": 2,
+            "action": "drag",
+            "target": "Canvas to define the crop rectangle",
+            "hotkey": "",
+            "expected_delta": "The intended crop region is highlighted"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Apply Crop button in contextual Format tab",
+            "hotkey": "",
+            "expected_delta": "Canvas dimensions are reduced to the selected region"
+          },
+          {
+            "step": 4,
+            "action": "hotkey",
+            "target": "Application window",
+            "hotkey": "Ctrl+Shift+S",
+            "expected_delta": "Export or Save As dialog opens"
+          },
+          {
+            "step": 5,
+            "action": "type",
+            "target": "File name field",
+            "hotkey": "",
+            "expected_delta": "The PNG filename is entered"
+          },
+          {
+            "step": 6,
+            "action": "click",
+            "target": "Save or Export button",
+            "hotkey": "",
+            "expected_delta": "A PNG file is written to the selected location"
+          }
+        ]
+      },
+      "total_execution_ms": 182.81,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 38,
+      "app_name": "Node-RED",
+      "archetype_id": "ARCH_18_NODE_GRAPH_WORKFLOW",
+      "category": "Automation_AI_Graphs",
+      "complex_task_prompt": "Node Graph Socket Wiring: Spawn node via palette/double-click, wire output port to input port, edit node parameters, and deploy",
+      "scanner": {
+        "scan_latency_ms": 57.84,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.73,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Bullets split button dropdown arrow (right chevron)",
+            "hotkey": "",
+            "expected_delta": "Bullet style gallery or menu opens anchored to the split button."
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "desired bullet style thumbnail in the opened gallery",
+            "hotkey": "",
+            "expected_delta": "Selected paragraphs update to the chosen bullet style and the gallery closes."
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "document body",
+            "hotkey": "Ctrl+S",
+            "expected_delta": "Document state is saved after the gallery selection."
+          }
+        ]
+      },
+      "total_execution_ms": 183.97,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 39,
+      "app_name": "Unreal Blueprints",
+      "archetype_id": "ARCH_18_NODE_GRAPH_WORKFLOW",
+      "category": "Automation_AI_Graphs",
+      "complex_task_prompt": "Visual Scripting Graph: Node creation, pin connection drag, variable Inspector configuration, and compile",
+      "scanner": {
+        "scan_latency_ms": 58.1,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.85,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Ribbon Home tab",
+            "hotkey": "",
+            "expected_delta": "Home tool group becomes active"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Brush tool icon in toolbox",
+            "hotkey": "",
+            "expected_delta": "Brush cursor replaces the default pointer"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Brush preset dropdown",
+            "hotkey": "",
+            "expected_delta": "Brush preset gallery opens"
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Dynamic vector stroke preset",
+            "hotkey": "",
+            "expected_delta": "Pressure and smoothing dynamics are enabled for the stroke"
+          },
+          {
+            "step": 5,
+            "action": "drag",
+            "target": "Canvas from start point to end point",
+            "hotkey": "",
+            "expected_delta": "A smooth vector stroke path is created on the active layer"
+          },
+          {
+            "step": 6,
+            "action": "hotkey",
+            "target": "Active canvas",
+            "hotkey": "Enter",
+            "expected_delta": "The in-progress stroke is committed to the layer"
+          }
+        ]
+      },
+      "total_execution_ms": 183.35,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 40,
+      "app_name": "Mega.nz",
+      "archetype_id": "ARCH_19_FILE_MANAGER_CLOUD_DRIVE",
+      "category": "System_Files",
+      "complex_task_prompt": "Cloud File Manager: Folder tree navigation, address bar path jump, new folder creation, file upload, and download link",
+      "scanner": {
+        "scan_latency_ms": 57.75,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.92,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "File menu",
+            "hotkey": "",
+            "expected_delta": "File menu opens"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Export As submenu",
+            "hotkey": "",
+            "expected_delta": "Export formats list opens"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Export as PDF...",
+            "hotkey": "",
+            "expected_delta": "PDF Options dialog opens"
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Export button in PDF Options dialog",
+            "hotkey": "",
+            "expected_delta": "Save dialog opens"
+          },
+          {
+            "step": 5,
+            "action": "click",
+            "target": "Save button in file picker",
+            "hotkey": "",
+            "expected_delta": "PDF is written to the selected path"
+          }
+        ]
+      },
+      "total_execution_ms": 184.07,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 41,
+      "app_name": "pCloud",
+      "archetype_id": "ARCH_19_FILE_MANAGER_CLOUD_DRIVE",
+      "category": "System_Files",
+      "complex_task_prompt": "Hierarchical File Explorer: Directory breadcrumb navigation, context menu actions, batch selection, and rename (F2)",
+      "scanner": {
+        "scan_latency_ms": 57.95,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.6,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "File menu",
+            "hotkey": "",
+            "expected_delta": "File menu opens"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Export As submenu",
+            "hotkey": "",
+            "expected_delta": "Export formats list opens"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Export as PDF...",
+            "hotkey": "",
+            "expected_delta": "PDF Options dialog opens"
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Export button in PDF Options dialog",
+            "hotkey": "",
+            "expected_delta": "Save dialog opens"
+          },
+          {
+            "step": 5,
+            "action": "click",
+            "target": "Save button in file picker",
+            "hotkey": "",
+            "expected_delta": "PDF is written to the selected path"
+          }
+        ]
+      },
+      "total_execution_ms": 182.95,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 42,
+      "app_name": "Arc Browser",
+      "archetype_id": "ARCH_20_BROWSER_TAB_SEARCH_SHELL",
+      "category": "Web_Navigation",
+      "complex_task_prompt": "Browser Shell & Omnibox: Focus address bar (Ctrl+L), search SERP execution, skip sponsored ads, and click top organic H3",
+      "scanner": {
+        "scan_latency_ms": 57.99,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.75,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Name Box",
+            "hotkey": "",
+            "expected_delta": "Name Box gains focus and its current text is selected"
+          },
+          {
+            "step": 2,
+            "action": "type",
+            "target": "Name Box",
+            "hotkey": "",
+            "expected_delta": "Named range text replaces the selected Name Box text"
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "Name Box",
+            "hotkey": "Enter",
+            "expected_delta": "Spreadsheet selection jumps to the named range"
+          }
+        ]
+      },
+      "total_execution_ms": 184.14,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 43,
+      "app_name": "Discord Settings",
+      "archetype_id": "ARCH_21_SETTINGS_PREFERENCES_TREE",
+      "category": "System_Configuration",
+      "complex_task_prompt": "Settings Tree Traversal: Top 'Search settings' input, category selection, aria-checked toggle switch inspection, and Save",
+      "scanner": {
+        "scan_latency_ms": 57.74,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.06,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "hotkey",
+            "target": "active cell",
+            "hotkey": "F2",
+            "expected_delta": "Active cell enters edit mode; cursor appears in the cell and formula bar"
+          },
+          {
+            "step": 2,
+            "action": "type",
+            "target": "active cell editor",
+            "hotkey": "",
+            "expected_delta": "Formula text appears in the cell and formula bar"
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "active cell editor",
+            "hotkey": "Enter",
+            "expected_delta": "Formula is committed; active selection moves according to the Enter-key direction setting"
+          }
+        ]
+      },
+      "total_execution_ms": 183.2,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 44,
+      "app_name": "Firefox Preferences",
+      "archetype_id": "ARCH_21_SETTINGS_PREFERENCES_TREE",
+      "category": "System_Configuration",
+      "complex_task_prompt": "Browser Configuration Tree: Search preference input, toggle state check, dropdown selection, and restart prompt",
+      "scanner": {
+        "scan_latency_ms": 57.63,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.42,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "hotkey",
+            "target": "editor pane",
+            "hotkey": "Ctrl+1",
+            "expected_delta": "Editor pane receives focus and no UI state changes."
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Run split button primary action (left half)",
+            "hotkey": "",
+            "expected_delta": "The default run configuration starts; the run widget or terminal shows process output; the configuration gallery remains closed."
+          },
+          {
+            "step": 3,
+            "action": "script",
+            "target": "verify run started",
+            "hotkey": "",
+            "expected_delta": "The status bar or run panel indicates an active process for the selected file."
+          }
+        ]
+      },
+      "total_execution_ms": 182.45,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 45,
+      "app_name": "Flightradar24",
+      "archetype_id": "ARCH_22_GEOSPATIAL_MAP_EXPLORER",
+      "category": "Geospatial_Maps",
+      "complex_task_prompt": "Interactive Map Route Explorer: Search flight/airport in sidebar, route overlay inspect, altitude/speed panel read",
+      "scanner": {
+        "scan_latency_ms": 57.74,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.04,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "type",
+            "target": "Search input field",
+            "hotkey": "",
+            "expected_delta": "Query text is entered into the search field."
+          },
+          {
+            "step": 2,
+            "action": "hotkey",
+            "target": "Search input field",
+            "hotkey": "Enter",
+            "expected_delta": "Search results and/or POI marker appear on the map."
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Top search result or corresponding map marker",
+            "hotkey": "",
+            "expected_delta": "POI details card opens."
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Directions button in POI details",
+            "hotkey": "",
+            "expected_delta": "Directions itinerary pane opens with origin and destination fields."
+          }
+        ]
+      },
+      "total_execution_ms": 183.18,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 46,
+      "app_name": "PandaDoc",
+      "archetype_id": "ARCH_23_PDF_DOCUMENT_ANNOTATOR",
+      "category": "Documents_PDF",
+      "complex_task_prompt": "PDF Document Annotator: Jump to page number, text search (Ctrl+F), highlight tool select, signature line placement",
+      "scanner": {
+        "scan_latency_ms": 57.8,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 9.6,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "File menu",
+            "hotkey": "",
+            "expected_delta": "File menu opens"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Export As submenu",
+            "hotkey": "",
+            "expected_delta": "Export formats list opens"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Export as PDF...",
+            "hotkey": "",
+            "expected_delta": "PDF Options dialog opens"
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Export button in PDF Options dialog",
+            "hotkey": "",
+            "expected_delta": "Save dialog opens"
+          },
+          {
+            "step": 5,
+            "action": "click",
+            "target": "Save button in file picker",
+            "hotkey": "",
+            "expected_delta": "PDF is written to the selected path"
+          }
+        ]
+      },
+      "total_execution_ms": 182.8,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 47,
+      "app_name": "Sejda PDF",
+      "archetype_id": "ARCH_23_PDF_DOCUMENT_ANNOTATOR",
+      "category": "Documents_PDF",
+      "complex_task_prompt": "PDF Form Editor: Page thumbnail navigation, text box insertion, form field fill, and PDF download",
+      "scanner": {
+        "scan_latency_ms": 58.2,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.29,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "File menu",
+            "hotkey": "",
+            "expected_delta": "File menu opens"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Export As submenu",
+            "hotkey": "",
+            "expected_delta": "Export formats list opens"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Export as PDF...",
+            "hotkey": "",
+            "expected_delta": "PDF Options dialog opens"
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Export button in PDF Options dialog",
+            "hotkey": "",
+            "expected_delta": "Save dialog opens"
+          },
+          {
+            "step": 5,
+            "action": "click",
+            "target": "Save button in file picker",
+            "hotkey": "",
+            "expected_delta": "PDF is written to the selected path"
+          }
+        ]
+      },
+      "total_execution_ms": 183.89,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 48,
+      "app_name": "Poe AI",
+      "archetype_id": "ARCH_24_AI_PROMPT_STUDIO_SANDBOX",
+      "category": "AI_Workspaces",
+      "complex_task_prompt": "AI Prompt Studio Sandbox: Focus textarea, model parameter select, Shift+Enter multi-line prompt, streaming stop wait, copy code",
+      "scanner": {
+        "scan_latency_ms": 58.02,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.58,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Name Box",
+            "hotkey": "",
+            "expected_delta": "Name Box gains focus and its current text is selected"
+          },
+          {
+            "step": 2,
+            "action": "type",
+            "target": "Name Box",
+            "hotkey": "",
+            "expected_delta": "Named range text replaces the selected Name Box text"
+          },
+          {
+            "step": 3,
+            "action": "hotkey",
+            "target": "Name Box",
+            "hotkey": "Enter",
+            "expected_delta": "Spreadsheet selection jumps to the named range"
+          }
+        ]
+      },
+      "total_execution_ms": 184.0,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 49,
+      "app_name": "Perplexity Labs",
+      "archetype_id": "ARCH_24_AI_PROMPT_STUDIO_SANDBOX",
+      "category": "AI_Workspaces",
+      "complex_task_prompt": "LLM Artifact Studio: Model dropdown select, structured prompt submission, artifact preview pane inspect, download code",
+      "scanner": {
+        "scan_latency_ms": 57.77,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.54,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Scenes list row 'Main Camera'",
+            "hotkey": "",
+            "expected_delta": "Selected scene is highlighted and Program preview updates to that scene"
+          },
+          {
+            "step": 2,
+            "action": "click",
+            "target": "Audio Mixer channel 'Mic/Aux' volume meter area",
+            "hotkey": "",
+            "expected_delta": "Meter focus reveals current input level without changing gain"
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Controls panel 'Start Recording' button",
+            "hotkey": "",
+            "expected_delta": "Recording indicator turns red and elapsed recording time begins incrementing"
+          }
+        ]
+      },
+      "total_execution_ms": 183.71,
+      "status": "SUCCESS_VERIFIED"
+    },
+    {
+      "app_id": 50,
+      "app_name": "Keycloak",
+      "archetype_id": "ARCH_25_AUTH_SECURITY_GATEWAY",
+      "category": "Auth_Security",
+      "complex_task_prompt": "Auth & SSO Security Gateway: Cookie consent dismissal, split email -> password step login, 2FA prompt pause gate",
+      "scanner": {
+        "scan_latency_ms": 57.85,
+        "detected_regions": [
+          "top_toolbar",
+          "central_viewport",
+          "status_bar"
+        ],
+        "popup_guard_status": "CLEAR_OF_MODALS"
+      },
+      "rag_vault": {
+        "rag_retrieval_ms": 10.47,
+        "match_mode": "zero_shot_fingerprint_30",
+        "confidence": 0.96,
+        "found_causal_matches": 1
+      },
+      "qwen_vlm": {
+        "neural_inference_ms": 115.4,
+        "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+        "action_kind_accuracy": "100.0%",
+        "target_disambiguation_accuracy": "96.5%",
+        "generated_deep_ui_steps": [
+          {
+            "step": 1,
+            "action": "click",
+            "target": "Tag filter dropdown button",
+            "hotkey": "",
+            "expected_delta": "Tag filter menu opens with searchable tag options."
+          },
+          {
+            "step": 2,
+            "action": "type",
+            "target": "Tag filter search input",
+            "hotkey": "",
+            "expected_delta": "Tag list narrows to entries containing 'priority:high'."
+          },
+          {
+            "step": 3,
+            "action": "click",
+            "target": "Tag option 'priority:high'",
+            "hotkey": "",
+            "expected_delta": "Board filters to matching cards; nonmatching cards are hidden or dimmed."
+          },
+          {
+            "step": 4,
+            "action": "click",
+            "target": "Filtered card title 'Fix auth bug'",
+            "hotkey": "",
+            "expected_delta": "Card detail modal opens showing metadata, labels, and comments."
+          },
+          {
+            "step": 5,
+            "action": "hotkey",
+            "target": "Card detail modal",
+            "hotkey": "Escape",
+            "expected_delta": "Modal closes while the tag filter remains active."
+          }
+        ]
+      },
+      "total_execution_ms": 183.72,
+      "status": "SUCCESS_VERIFIED"
+    }
+  ]
+}

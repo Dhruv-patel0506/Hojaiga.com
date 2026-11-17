@@ -1,0 +1,56 @@
+{
+   "app_metadata": {
+      "app_name": "EntraChecks",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "non_gui",
+   "high_level_task": "Install prerequisites for EntraChecks via PowerShell",
+   "prerequisite_state": "PowerShell as Administrator is open",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install the Microsoft Graph SDK",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Install-Module Microsoft.Graph -Scope CurrentUser -Force -AllowClobber"
+         },
+         "expected_state_change": "Microsoft.Graph module is installed"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Install Azure modules",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Install-Module Az.Accounts -Scope CurrentUser -Force\nInstall-Module Az.PolicyInsights -Scope CurrentUser -Force\nInstall-Module Az.Resources -Scope CurrentUser -Force\nInstall-Module Az.Security -Scope CurrentUser -Force"
+         },
+         "expected_state_change": "Azure modules are installed"
+      }
+   ],
+   "_meta": {
+      "source_app": "EntraChecks",
+      "app_key": "entrachecks",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "EntraChecks — Microsoft Cloud Compliance Assessment Toolkit",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:57:45Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

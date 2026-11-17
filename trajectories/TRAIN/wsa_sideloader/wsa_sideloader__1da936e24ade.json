@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "WSA Sideloader",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install an APK file using WSA Sideloader",
+   "prerequisite_state": "WSA Sideloader application is open and Windows Subsystem for Android is enabled and running",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Choose the file you want to install",
+         "ui_target": {
+            "element_name": "File",
+            "automation_id": null,
+            "hierarchical_path": "Main window > File",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The File dropdown opens showing Install, Uninstall, and other options"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click the Install button",
+         "ui_target": {
+            "element_name": "Install",
+            "automation_id": null,
+            "hierarchical_path": "Main window > File > Install",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected APK file starts installing and a progress bar appears"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Allow the ADB connection if prompted",
+         "ui_target": {
+            "element_name": "Allow",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Allow ADB connection",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The installation process continues and the app is installed on WSA"
+      }
+   ],
+   "_meta": {
+      "source_app": "WSA Sideloader",
+      "app_key": "wsa_sideloader",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "WSA Sideloader",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:31:49Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

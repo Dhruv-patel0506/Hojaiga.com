@@ -1,0 +1,139 @@
+{
+   "app_metadata": {
+      "app_name": "WorkFlowy",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Understand the basic features of WorkFlowy",
+   "prerequisite_state": "WorkFlowy is open and the user is on the help/get-started page",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Press Enter to add a new item",
+         "ui_target": {
+            "element_name": "Document",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Press Enter to add a new item"
+         },
+         "expected_state_change": "A new item is added to the document"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Press Tab to indent an item",
+         "ui_target": {
+            "element_name": "Document",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Tab"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected item is indented, becoming a child of the item above"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click any bullet to focus on it",
+         "ui_target": {
+            "element_name": "Bullet",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The focused bullet becomes the entire document, and other items are hidden"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click the breadcrumb to zoom back out",
+         "ui_target": {
+            "element_name": "Breadcrumb",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The document reverts to its original view, showing all items"
+      }
+   ],
+   "_meta": {
+      "source_app": "WorkFlowy",
+      "app_key": "workflowy",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Get started",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:06:13Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

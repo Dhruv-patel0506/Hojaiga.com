@@ -1,0 +1,146 @@
+{
+ "app": "calculator",
+ "started": "2026-11-02 06:54:24",
+ "phases": {
+  "read": {
+   "store": {
+    "Microsoft.WindowsCalculator": {
+     "key": "calculator",
+     "ui_words": 1166,
+     "views": 32,
+     "chunks": 44
+    }
+   },
+   "seconds": 7.3,
+   "level": "explored"
+  },
+  "map": {
+   "ran": true,
+   "seconds": 15.5,
+   "level": "explored",
+   "commands": 62,
+   "with_shortcut": 0,
+   "dialogs": 0,
+   "layout_controls": 36,
+   "state_variables": 1,
+   "frontier": {
+    "total": 37,
+    "by_status": {
+     "explored": 25,
+     "failed": 2,
+     "no_effect": 5,
+     "skipped": 1,
+     "unsafe": 4
+    },
+    "explorable": 32,
+    "explored_n": 30,
+    "explored_fraction": 0.938
+   }
+  },
+  "ask": {
+   "asked": 4,
+   "answered": 4,
+   "items": [
+    {
+     "q": "In calculator, how do I use Equals?",
+     "status": "ANSWERED",
+     "answer": "To use Equals in the calculator, simply press the '=' key or 'Enter' on your keyboard after entering the numbers and any operation [6][7]."
+    },
+    {
+     "q": "In calculator, how do I use Multiply by?",
+     "status": "ANSWERED",
+     "answer": "To use Multiply by in the Calculator, first ensure the app is in **Standard** mode [5]. Once in Standard mode, you can enter numbers and use the multiply button (usually labeled \u00d7) to multiply the numbers. NOT IN EVIDENCE: specific steps to"
+    },
+    {
+     "q": "In calculator, how do I use Seven?",
+     "status": "ANSWERED",
+     "answer": "To use Seven in the calculator, you can simply type '7' on your keyboard [4]. If you are referring to a specific mode or function related to 'Seven', more context would be needed as the evidence does not provide detailed steps for using 'Se"
+    },
+    {
+     "q": "In calculator, how do I use Six?",
+     "status": "ANSWERED",
+     "answer": "In the calculator, to use Six, you need to first switch to the appropriate mode. The evidence indicates that Six is one of the modes available in the calculator [1]. To switch to the mode that includes Six, you can use the hamburger menu. O"
+    }
+   ],
+   "seconds": 28.3
+  },
+  "practice": {
+   "written": 6,
+   "levels": [
+    {
+     "level": 1,
+     "proven": 0,
+     "of": 2
+    },
+    {
+     "level": 1,
+     "proven": 0,
+     "of": 2
+    },
+    {
+     "level": 1,
+     "proven": 0,
+     "of": 2
+    }
+   ],
+   "highest_level_proven": 0,
+   "tried": 6,
+   "proven_done": 0,
+   "kept_training_rows": 0,
+   "results": [
+    {
+     "task": "open calculator, type '7 + 5 =', the app should show 12",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 222.9,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'calculator': NEEDS_HUMAN (window hwnd=1969114), 3 verified-loop steps in 211.1s\n    - 'type \"7 + 5 =\"' -> NOT DONE (HITL)\n    - 'press Enter' -"
+    },
+    {
+     "task": "open calculator, type '3 X 4 =', the app should show 12",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 313.9,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'calculator': NEEDS_HUMAN (window hwnd=4785206), 3 verified-loop steps in 305.9s\n    - 'type \"'3 X 4 =', the app should show 12\"' -> NOT DONE (H"
+    },
+    {
+     "task": "open calculator, type '6 * 7 =', the app should show 42",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 27.3,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'calculator': NEEDS_HUMAN (window hwnd=5637316), 3 verified-loop steps in 17.6s\n    - 'type \"'6 * 7 =', the app should show 42\"' -> NOT DONE (HI"
+    },
+    {
+     "task": "open calculator, type '2 + 3 * 4 =', then press Equals, the app should show 14",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 316.1,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'calculator': NEEDS_HUMAN (window hwnd=6883620), 3 verified-loop steps in 304.8s\n    - 'type '2 + 3 * 4 ='' -> NOT DONE (HITL)\n    - 'press Equa"
+    },
+    {
+     "task": "open calculator, type '1 + 2 + 3 + 4 + 5 =', the app should show 15",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 219.6,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'calculator': NEEDS_HUMAN (window hwnd=5375974), 3 verified-loop steps in 206.6s\n    - 'type \"1 + 2 + 3 + 4 + 5 =\"' -> NOT DONE (HITL)\n    - 'cl"
+    },
+    {
+     "task": "open calculator, type '9 - 4 - 3 - 2 =', then press Equals, the app should show 0",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 30.3,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'calculator': NEEDS_HUMAN (window hwnd=6817482), 3 verified-loop steps in 18.9s\n    - 'type '9 - 4 - 3 - 2 ='' -> NOT DONE (HITL)\n    - 'press E"
+    }
+   ],
+   "seconds": 1144.8
+  }
+ },
+ "app_key": "calculator",
+ "exe": "C:\\Program Files\\WindowsApps\\Microsoft.WindowsCalculator_11.2607.0.0_x64__8wekyb3d8bbwe\\CalculatorApp.exe",
+ "readiness": {
+  "knows_commands": true,
+  "answers_questions": "4/4",
+  "proven_tasks": "0/6",
+  "verdict": "not ready: nothing proven yet"
+ },
+ "seconds": 1201.1
+}

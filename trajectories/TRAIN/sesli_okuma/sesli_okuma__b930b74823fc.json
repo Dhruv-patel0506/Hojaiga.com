@@ -1,0 +1,314 @@
+{
+   "app_metadata": {
+      "app_name": "Sesli Okuma",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide on how to use Sesli Okuma, a text-to-speech tool for Windows.",
+   "prerequisite_state": "Sesli Okuma is installed and running in the system tray.",
+   "total_steps": 10,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click the tray icon to open the settings panel.",
+         "ui_target": {
+            "element_name": "Tray icon",
+            "automation_id": null,
+            "hierarchical_path": "System tray > Sesli Okuma icon",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The settings panel opens with options for shortcut, voices, reading speed, and interface language."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select the shortcut key for reading text.",
+         "ui_target": {
+            "element_name": "Shortcut key field",
+            "automation_id": null,
+            "hierarchical_path": "Settings panel > Shortcut key",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The field is highlighted, indicating it is ready for input."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Type the desired shortcut key (e.g., Ctrl + Alt + S).",
+         "ui_target": {
+            "element_name": "Shortcut key field",
+            "automation_id": null,
+            "hierarchical_path": "Settings panel > Shortcut key",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Ctrl + Alt + S"
+         },
+         "expected_state_change": "The shortcut key is set and the field is cleared."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click the 'Save' button to apply the changes.",
+         "ui_target": {
+            "element_name": "Save button",
+            "automation_id": null,
+            "hierarchical_path": "Settings panel > Save button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The settings are saved and the panel closes."
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Select text in any application.",
+         "ui_target": {
+            "element_name": "Selected text",
+            "automation_id": null,
+            "hierarchical_path": "Any application > Selected text",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The text is selected."
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Press the shortcut key (Ctrl + Alt + S) to read the selected text.",
+         "ui_target": {
+            "element_name": "None",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Alt"
+            ],
+            "text_payload": "S"
+         },
+         "expected_state_change": "The selected text is read aloud."
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Press the shortcut key again to stop reading.",
+         "ui_target": {
+            "element_name": "None",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Alt"
+            ],
+            "text_payload": "S"
+         },
+         "expected_state_change": "Reading stops."
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Press the shortcut key twice to read the clipboard content.",
+         "ui_target": {
+            "element_name": "None",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Alt"
+            ],
+            "text_payload": "S S"
+         },
+         "expected_state_change": "The clipboard content is read aloud."
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Click the tray icon to open the settings panel.",
+         "ui_target": {
+            "element_name": "Tray icon",
+            "automation_id": null,
+            "hierarchical_path": "System tray > Sesli Okuma icon",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The settings panel opens with options for shortcut, voices, reading speed, and interface language."
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Click the 'Exit' option to quit Sesli Okuma.",
+         "ui_target": {
+            "element_name": "Exit option",
+            "automation_id": null,
+            "hierarchical_path": "Settings panel > Exit",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Sesli Okuma is closed."
+      }
+   ],
+   "_meta": {
+      "source_app": "Sesli Okuma",
+      "app_key": "sesli_okuma",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Sesli Okuma",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:01:27Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

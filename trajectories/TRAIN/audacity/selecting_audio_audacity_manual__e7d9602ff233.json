@@ -1,0 +1,321 @@
+{
+   "app_metadata": {
+      "app_name": "Audacity",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Selecting audio regions in Audacity",
+   "prerequisite_state": "Audacity is open and a project is loaded",
+   "total_steps": 10,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Select the entire project using the shortcut Ctrl + A",
+         "ui_target": {
+            "element_name": "Selection tool",
+            "automation_id": null,
+            "hierarchical_path": "Tools Toolbar > Selection tool",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [
+               "Ctrl"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The entire project is selected, indicated by the blue Track Control Panel background of all tracks"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Double-click anywhere in the track to select the entire track",
+         "ui_target": {
+            "element_name": "Track Control Panel",
+            "automation_id": null,
+            "hierarchical_path": "Track Control Panel",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DOUBLE_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The entire track is selected, indicated by the blue Track Control Panel background"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click the left mouse button anywhere inside an audio track, then drag to the other edge of the selection",
+         "ui_target": {
+            "element_name": "Track Control Panel",
+            "automation_id": null,
+            "hierarchical_path": "Track Control Panel",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selection starts at the clicked point"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Drag the mouse to the other edge of the selection",
+         "ui_target": {
+            "element_name": "Track Control Panel",
+            "automation_id": null,
+            "hierarchical_path": "Track Control Panel",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selection ends at the dragged point"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Release the mouse button to finalize the selection",
+         "ui_target": {
+            "element_name": "Track Control Panel",
+            "automation_id": null,
+            "hierarchical_path": "Track Control Panel",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RELEASE",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected region is highlighted in the waveform"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Double-click in the waveform to select the entire track",
+         "ui_target": {
+            "element_name": "Waveform",
+            "automation_id": null,
+            "hierarchical_path": "Track Control Panel > Waveform",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DOUBLE_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The entire track is selected, indicated by the blue Track Control Panel background"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Single-click in the white space of the Track Control Panel to select the entire track",
+         "ui_target": {
+            "element_name": "Track Control Panel",
+            "automation_id": null,
+            "hierarchical_path": "Track Control Panel",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The entire track is selected, indicated by the blue Track Control Panel background"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Use the Selection Toolbar to make precise selections",
+         "ui_target": {
+            "element_name": "Selection Toolbar",
+            "automation_id": null,
+            "hierarchical_path": "Selection Toolbar",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Selection Toolbar is activated, allowing precise selection"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Use the keyboard to modify the selection",
+         "ui_target": {
+            "element_name": "Track Control Panel",
+            "automation_id": null,
+            "hierarchical_path": "Track Control Panel",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Shift"
+            ],
+            "text_payload": "Left"
+         },
+         "expected_state_change": "The selection is extended to the left from the cursor point"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Use the keyboard to modify the selection",
+         "ui_target": {
+            "element_name": "Track Control Panel",
+            "automation_id": null,
+            "hierarchical_path": "Track Control Panel",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Shift"
+            ],
+            "text_payload": "Left"
+         },
+         "expected_state_change": "The selection is contracted from the right edge"
+      }
+   ],
+   "_meta": {
+      "source_app": "Audacity",
+      "app_key": "audacity",
+      "dataset_split": "TRAIN",
+      "category": "Audio Editor",
+      "guide_title": "Selecting Audio - Audacity Manual",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:06:26Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

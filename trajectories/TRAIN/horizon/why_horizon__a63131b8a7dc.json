@@ -1,0 +1,204 @@
+{
+   "app_metadata": {
+      "app_name": "Horizon",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Start a new workspace with a shell panel and explore basic features",
+   "prerequisite_state": "Horizon is installed and the application is open on its start screen",
+   "total_steps": 6,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Ctrl+double-click empty canvas",
+         "ui_target": {
+            "element_name": "Canvas",
+            "automation_id": null,
+            "hierarchical_path": "Canvas",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [
+               "Ctrl"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "A preset list appears, allowing the user to select a panel type"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select 'Shell' from the preset list",
+         "ui_target": {
+            "element_name": "Shell",
+            "automation_id": null,
+            "hierarchical_path": "Canvas > Preset List > Shell",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A shell panel opens in the workspace"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Press Ctrl+Shift+N for another shell panel",
+         "ui_target": {
+            "element_name": "Shell",
+            "automation_id": null,
+            "hierarchical_path": "Canvas > Preset List > Shell",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Shift"
+            ],
+            "text_payload": "N"
+         },
+         "expected_state_change": "Another shell panel opens in the workspace"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click 'Rows' in the workspace header",
+         "ui_target": {
+            "element_name": "Rows",
+            "automation_id": null,
+            "hierarchical_path": "Workspace Header > Rows",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The workspace is arranged in rows"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Press Ctrl+Shift+9 to fit the workspace into view",
+         "ui_target": {
+            "element_name": "Fit to Workspace",
+            "automation_id": null,
+            "hierarchical_path": "Canvas > Fit to Workspace",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Shift"
+            ],
+            "text_payload": "9"
+         },
+         "expected_state_change": "The workspace is resized to fit the canvas"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Close Horizon and reopen it the next day",
+         "ui_target": {
+            "element_name": "Close",
+            "automation_id": null,
+            "hierarchical_path": "Application Menu > Close",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Alt",
+               "F4"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The session, layout, canvas pan/zoom, and terminal history are restored"
+      }
+   ],
+   "_meta": {
+      "source_app": "Horizon",
+      "app_key": "horizon",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Why Horizon?",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:30:34Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,167 @@
+{
+   "app_metadata": {
+      "app_name": "F95Checker",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure F95Checker",
+   "prerequisite_state": "No application is open",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Extract the F95Checker archive",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The archive is extracted to a folder"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run F95Checker on Windows",
+         "ui_target": {
+            "element_name": "F95Checker.exe",
+            "automation_id": null,
+            "hierarchical_path": "Start menu > F95Checker > F95Checker.exe (or desktop shortcut)",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "F95Checker application window opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Run F95Checker on Linux",
+         "ui_target": {
+            "element_name": "F95Checker",
+            "automation_id": null,
+            "hierarchical_path": "Terminal > Run > F95Checker",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "F95Checker application window opens"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Run F95Checker on macOS",
+         "ui_target": {
+            "element_name": "F95Checker.app",
+            "automation_id": null,
+            "hierarchical_path": "Finder > F95Checker.app > Open",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "F95Checker application window opens"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Run F95Checker from source",
+         "ui_target": {
+            "element_name": "main.py",
+            "automation_id": null,
+            "hierarchical_path": "Terminal > Run > python3 main.py",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "F95Checker application window opens"
+      }
+   ],
+   "_meta": {
+      "source_app": "F95Checker",
+      "app_key": "f95checker",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "F95Checker",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:12:17Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

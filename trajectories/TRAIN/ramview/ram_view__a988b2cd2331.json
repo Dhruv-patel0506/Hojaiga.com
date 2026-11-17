@@ -1,0 +1,55 @@
+{
+   "app_metadata": {
+      "app_name": "RAMView",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and launch RAMView via Windows Package Manager",
+   "prerequisite_state": "Windows 10 (1809+) or Windows 11 (64-bit) is installed",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Run the command to install RAMView via WinGet",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install Ahmadhassan806.RAMView"
+         },
+         "expected_state_change": "RAMView is installed and added to the Start Menu and Desktop"
+      }
+   ],
+   "_meta": {
+      "source_app": "RAMView",
+      "app_key": "ramview",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "RAM VIEW 🪟📊",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:33:59Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

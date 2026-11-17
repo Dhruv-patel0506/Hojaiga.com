@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "Calculator",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Access and explore the Windows Calculator",
+   "prerequisite_state": "Windows operating system is running",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Press Windows + R to open the Run dialog",
+         "ui_target": {
+            "element_name": "Run",
+            "automation_id": null,
+            "hierarchical_path": "Start menu > Run",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Run dialog opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Type 'calc' and press Enter",
+         "ui_target": {
+            "element_name": "Enter",
+            "automation_id": null,
+            "hierarchical_path": "Run dialog > Enter",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Calculator window opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click the menu icon to open the mode selection",
+         "ui_target": {
+            "element_name": "Menu",
+            "automation_id": null,
+            "hierarchical_path": "Calculator window > Menu",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Calculator modes dropdown appears"
+      }
+   ],
+   "_meta": {
+      "source_app": "Calculator",
+      "app_key": "calculator",
+      "dataset_split": "TRAIN",
+      "category": "System App",
+      "guide_title": "Complete Guide to Using the Windows Calculator Effectively",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T19:17:44Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

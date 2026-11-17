@@ -1,0 +1,628 @@
+03:05:02 NI run auto_cpu_040 on CPU; hours=2.0 smoke=False
+03:05:02 explicit task list: ['enc/text/bbc_news']
+03:05:02 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+03:05:02 [data] enc/text/bbc_news: n=2225 C=5 D=384 shards=1
+03:05:32 [enc/text/bbc_news] vote=0.967 uniform=0.967 best1=0.970 n_val=668 vram=0.00GB 30s
+03:05:38 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 668, "n_val": 125, "base_rate": 0.9760000109672546, "inner": {"auc": 0.9016393442622951, "ece": 0.03035407495498657, "brier": 0.025346338748931885, "acc80": 1.0}, "outer_conf": {"auc": 0.8989071038251366, "ece": 0.021700767040252686, "brier": 0.02481812983751297, "acc80": 0.9900000095367432}}
+03:05:38 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+03:06:07 [enc/text/bbc_news] vote=0.976 uniform=0.976 best1=0.969 n_val=675 vram=0.00GB 29s | grade=0.973 inner_auc=0.854 vs conf_auc=0.805
+03:06:13 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+03:06:43 [enc/text/bbc_news] vote=0.966 uniform=0.966 best1=0.966 n_val=696 vram=0.00GB 30s | grade=0.959 inner_auc=0.905 vs conf_auc=0.896
+03:06:49 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+03:07:20 [enc/text/bbc_news] vote=0.980 uniform=0.985 best1=0.980 n_val=651 vram=0.00GB 31s | grade=0.961 inner_auc=nan vs conf_auc=nan
+03:07:27 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+03:07:59 [enc/text/bbc_news] vote=0.973 uniform=0.973 best1=0.971 n_val=677 vram=0.00GB 32s | grade=0.973 inner_auc=nan vs conf_auc=nan
+03:08:05 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+03:08:36 [enc/text/bbc_news] vote=0.981 uniform=0.981 best1=0.978 n_val=642 vram=0.00GB 31s | grade=0.964 inner_auc=nan vs conf_auc=nan
+03:08:42 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+03:09:13 [enc/text/bbc_news] vote=0.974 uniform=0.972 best1=0.969 n_val=681 vram=0.00GB 31s | grade=0.968 inner_auc=0.948 vs conf_auc=0.934
+03:09:20 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+03:09:51 [enc/text/bbc_news] vote=0.972 uniform=0.972 best1=0.969 n_val=669 vram=0.00GB 31s | grade=0.958 inner_auc=0.941 vs conf_auc=0.933
+03:09:57 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+03:10:28 [enc/text/bbc_news] vote=0.969 uniform=0.968 best1=0.966 n_val=678 vram=0.00GB 31s | grade=0.972 inner_auc=0.810 vs conf_auc=0.908
+03:10:34 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+03:11:05 [enc/text/bbc_news] vote=0.969 uniform=0.969 best1=0.963 n_val=674 vram=0.00GB 31s | grade=0.974 inner_auc=0.934 vs conf_auc=0.965
+03:11:12 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+03:11:43 [enc/text/bbc_news] vote=0.971 uniform=0.968 best1=0.968 n_val=621 vram=0.00GB 31s | grade=0.968 inner_auc=0.857 vs conf_auc=0.927
+03:11:49 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+03:12:21 [enc/text/bbc_news] vote=0.974 uniform=0.974 best1=0.971 n_val=648 vram=0.00GB 31s | grade=0.968 inner_auc=0.922 vs conf_auc=0.951
+03:12:27 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+03:12:58 [enc/text/bbc_news] vote=0.986 uniform=0.986 best1=0.980 n_val=646 vram=0.00GB 31s | grade=0.971 inner_auc=0.939 vs conf_auc=0.977
+03:13:05 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+03:13:36 [enc/text/bbc_news] vote=0.974 uniform=0.977 best1=0.973 n_val=699 vram=0.00GB 31s | grade=0.966 inner_auc=0.937 vs conf_auc=0.877
+03:13:42 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+03:14:14 [enc/text/bbc_news] vote=0.977 uniform=0.977 best1=0.973 n_val=657 vram=0.00GB 32s | grade=0.976 inner_auc=0.885 vs conf_auc=0.922
+03:14:20 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+03:14:52 [enc/text/bbc_news] vote=0.988 uniform=0.990 best1=0.981 n_val=671 vram=0.00GB 31s | grade=0.946 inner_auc=nan vs conf_auc=nan
+03:14:58 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+03:15:29 [enc/text/bbc_news] vote=0.975 uniform=0.975 best1=0.971 n_val=649 vram=0.00GB 31s | grade=0.955 inner_auc=0.951 vs conf_auc=0.937
+03:15:36 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+03:16:09 [enc/text/bbc_news] vote=0.983 uniform=0.982 best1=0.977 n_val=653 vram=0.00GB 33s | grade=0.959 inner_auc=0.925 vs conf_auc=0.906
+03:16:15 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+03:16:47 [enc/text/bbc_news] vote=0.971 uniform=0.971 best1=0.967 n_val=664 vram=0.00GB 32s | grade=0.963 inner_auc=0.842 vs conf_auc=0.913
+03:16:54 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+03:17:29 [enc/text/bbc_news] vote=0.963 uniform=0.963 best1=0.960 n_val=674 vram=0.00GB 35s | grade=0.949 inner_auc=0.903 vs conf_auc=0.917
+03:17:35 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+03:18:09 [enc/text/bbc_news] vote=0.979 uniform=0.979 best1=0.973 n_val=657 vram=0.00GB 34s | grade=0.957 inner_auc=0.911 vs conf_auc=0.894
+03:18:15 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+03:18:45 [enc/text/bbc_news] vote=0.972 uniform=0.972 best1=0.969 n_val=706 vram=0.00GB 30s | grade=0.957 inner_auc=0.781 vs conf_auc=0.901
+03:18:51 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+03:19:21 [enc/text/bbc_news] vote=0.977 uniform=0.978 best1=0.974 n_val=695 vram=0.00GB 30s | grade=0.961 inner_auc=0.887 vs conf_auc=0.883
+03:19:27 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+03:19:57 [enc/text/bbc_news] vote=0.980 uniform=0.979 best1=0.979 n_val=662 vram=0.00GB 30s | grade=0.974 inner_auc=nan vs conf_auc=nan
+03:20:03 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+03:20:33 [enc/text/bbc_news] vote=0.961 uniform=0.959 best1=0.961 n_val=660 vram=0.00GB 30s | grade=0.950 inner_auc=0.898 vs conf_auc=0.903
+03:20:39 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+03:21:10 [enc/text/bbc_news] vote=0.968 uniform=0.968 best1=0.965 n_val=660 vram=0.00GB 31s | grade=0.949 inner_auc=0.902 vs conf_auc=0.874
+03:21:15 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+03:21:48 [enc/text/bbc_news] vote=0.980 uniform=0.980 best1=0.973 n_val=654 vram=0.00GB 33s | grade=0.960 inner_auc=0.810 vs conf_auc=0.885
+03:21:54 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+03:22:35 [enc/text/bbc_news] vote=0.973 uniform=0.973 best1=0.969 n_val=636 vram=0.00GB 41s | grade=0.959 inner_auc=0.919 vs conf_auc=0.858
+03:22:45 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+03:23:17 [enc/text/bbc_news] vote=0.974 uniform=0.974 best1=0.974 n_val=651 vram=0.00GB 31s | grade=0.960 inner_auc=0.918 vs conf_auc=0.947
+03:23:23 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+03:23:52 [enc/text/bbc_news] vote=0.968 uniform=0.969 best1=0.961 n_val=685 vram=0.00GB 30s | grade=0.965 inner_auc=0.758 vs conf_auc=0.856
+03:23:58 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+03:24:28 [enc/text/bbc_news] vote=0.969 uniform=0.969 best1=0.965 n_val=680 vram=0.00GB 30s | grade=0.966 inner_auc=0.894 vs conf_auc=0.904
+03:24:34 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+03:25:03 [enc/text/bbc_news] vote=0.973 uniform=0.973 best1=0.969 n_val=677 vram=0.00GB 30s | grade=0.973 inner_auc=0.868 vs conf_auc=0.888
+03:25:09 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+03:25:39 [enc/text/bbc_news] vote=0.976 uniform=0.976 best1=0.973 n_val=661 vram=0.00GB 30s | grade=0.964 inner_auc=0.882 vs conf_auc=0.884
+03:25:46 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+03:26:16 [enc/text/bbc_news] vote=0.968 uniform=0.968 best1=0.966 n_val=648 vram=0.00GB 30s | grade=0.959 inner_auc=0.948 vs conf_auc=0.959
+03:26:22 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+03:26:51 [enc/text/bbc_news] vote=0.975 uniform=0.981 best1=0.973 n_val=669 vram=0.00GB 30s | grade=0.965 inner_auc=0.971 vs conf_auc=0.969
+03:26:57 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+03:27:27 [enc/text/bbc_news] vote=0.985 uniform=0.982 best1=0.977 n_val=656 vram=0.00GB 30s | grade=0.967 inner_auc=0.858 vs conf_auc=0.907
+03:27:33 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+03:28:03 [enc/text/bbc_news] vote=0.969 uniform=0.968 best1=0.972 n_val=712 vram=0.00GB 30s | grade=0.965 inner_auc=0.906 vs conf_auc=0.893
+03:28:09 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+03:28:38 [enc/text/bbc_news] vote=0.972 uniform=0.970 best1=0.970 n_val=676 vram=0.00GB 29s | grade=0.959 inner_auc=0.951 vs conf_auc=0.924
+03:28:44 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+03:29:14 [enc/text/bbc_news] vote=0.975 uniform=0.975 best1=0.977 n_val=684 vram=0.00GB 29s | grade=0.967 inner_auc=0.830 vs conf_auc=0.747
+03:29:20 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+03:29:50 [enc/text/bbc_news] vote=0.967 uniform=0.965 best1=0.961 n_val=658 vram=0.00GB 30s | grade=0.953 inner_auc=0.955 vs conf_auc=0.963
+03:29:55 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+03:30:26 [enc/text/bbc_news] vote=0.985 uniform=0.985 best1=0.981 n_val=678 vram=0.00GB 30s | grade=0.966 inner_auc=0.874 vs conf_auc=0.897
+03:30:31 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+03:31:01 [enc/text/bbc_news] vote=0.976 uniform=0.978 best1=0.978 n_val=626 vram=0.00GB 30s | grade=0.963 inner_auc=0.975 vs conf_auc=0.940
+03:31:07 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+03:31:37 [enc/text/bbc_news] vote=0.973 uniform=0.975 best1=0.972 n_val=677 vram=0.00GB 30s | grade=0.964 inner_auc=0.591 vs conf_auc=0.878
+03:31:43 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+03:32:12 [enc/text/bbc_news] vote=0.965 uniform=0.966 best1=0.957 n_val=652 vram=0.00GB 30s | grade=0.966 inner_auc=0.961 vs conf_auc=0.965
+03:32:19 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+03:32:48 [enc/text/bbc_news] vote=0.960 uniform=0.965 best1=0.959 n_val=651 vram=0.00GB 30s | grade=0.955 inner_auc=0.852 vs conf_auc=0.898
+03:32:54 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+03:33:24 [enc/text/bbc_news] vote=0.973 uniform=0.974 best1=0.973 n_val=663 vram=0.00GB 30s | grade=0.976 inner_auc=0.968 vs conf_auc=0.995
+03:33:30 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+03:34:00 [enc/text/bbc_news] vote=0.974 uniform=0.974 best1=0.970 n_val=622 vram=0.00GB 30s | grade=0.957 inner_auc=0.857 vs conf_auc=0.853
+03:34:06 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+03:34:36 [enc/text/bbc_news] vote=0.970 uniform=0.972 best1=0.967 n_val=641 vram=0.00GB 30s | grade=0.955 inner_auc=0.757 vs conf_auc=0.904
+03:34:41 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+03:35:11 [enc/text/bbc_news] vote=0.979 uniform=0.982 best1=0.973 n_val=670 vram=0.00GB 30s | grade=0.956 inner_auc=0.951 vs conf_auc=0.947
+03:35:17 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+03:35:47 [enc/text/bbc_news] vote=0.984 uniform=0.982 best1=0.981 n_val=672 vram=0.00GB 30s | grade=0.957 inner_auc=0.977 vs conf_auc=0.969
+03:35:53 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+03:36:23 [enc/text/bbc_news] vote=0.965 uniform=0.970 best1=0.965 n_val=598 vram=0.00GB 30s | grade=0.945 inner_auc=0.982 vs conf_auc=0.979
+03:36:29 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+03:36:59 [enc/text/bbc_news] vote=0.973 uniform=0.973 best1=0.971 n_val=661 vram=0.00GB 30s | grade=0.955 inner_auc=0.892 vs conf_auc=0.925
+03:37:05 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+03:37:35 [enc/text/bbc_news] vote=0.977 uniform=0.977 best1=0.972 n_val=684 vram=0.00GB 30s | grade=0.964 inner_auc=0.947 vs conf_auc=0.939
+03:37:41 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+03:38:11 [enc/text/bbc_news] vote=0.977 uniform=0.980 best1=0.980 n_val=693 vram=0.00GB 30s | grade=0.964 inner_auc=nan vs conf_auc=nan
+03:38:16 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+03:38:47 [enc/text/bbc_news] vote=0.971 uniform=0.974 best1=0.969 n_val=621 vram=0.00GB 30s | grade=0.962 inner_auc=0.985 vs conf_auc=0.956
+03:38:52 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+03:39:22 [enc/text/bbc_news] vote=0.974 uniform=0.975 best1=0.972 n_val=644 vram=0.00GB 30s | grade=0.971 inner_auc=0.931 vs conf_auc=0.946
+03:39:29 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+03:39:58 [enc/text/bbc_news] vote=0.967 uniform=0.967 best1=0.970 n_val=690 vram=0.00GB 30s | grade=0.959 inner_auc=0.966 vs conf_auc=0.966
+03:40:05 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+03:40:34 [enc/text/bbc_news] vote=0.978 uniform=0.980 best1=0.980 n_val=650 vram=0.00GB 30s | grade=0.958 inner_auc=nan vs conf_auc=nan
+03:40:40 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+03:41:10 [enc/text/bbc_news] vote=0.976 uniform=0.975 best1=0.973 n_val=673 vram=0.00GB 30s | grade=0.971 inner_auc=0.960 vs conf_auc=0.942
+03:41:16 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+03:41:46 [enc/text/bbc_news] vote=0.965 uniform=0.975 best1=0.969 n_val=653 vram=0.00GB 30s | grade=0.955 inner_auc=0.992 vs conf_auc=0.987
+03:41:52 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+03:42:22 [enc/text/bbc_news] vote=0.972 uniform=0.974 best1=0.974 n_val=648 vram=0.00GB 30s | grade=0.971 inner_auc=0.881 vs conf_auc=0.923
+03:42:28 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+03:42:58 [enc/text/bbc_news] vote=0.969 uniform=0.972 best1=0.969 n_val=702 vram=0.00GB 30s | grade=0.969 inner_auc=0.942 vs conf_auc=0.910
+03:43:04 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+03:43:34 [enc/text/bbc_news] vote=0.971 uniform=0.971 best1=0.968 n_val=631 vram=0.00GB 30s | grade=0.961 inner_auc=0.921 vs conf_auc=0.910
+03:43:40 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+03:44:10 [enc/text/bbc_news] vote=0.977 uniform=0.979 best1=0.972 n_val=706 vram=0.00GB 30s | grade=0.953 inner_auc=0.824 vs conf_auc=0.838
+03:44:16 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+03:44:46 [enc/text/bbc_news] vote=0.969 uniform=0.970 best1=0.964 n_val=637 vram=0.00GB 30s | grade=0.944 inner_auc=0.904 vs conf_auc=0.941
+03:44:52 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+03:45:22 [enc/text/bbc_news] vote=0.980 uniform=0.980 best1=0.979 n_val=666 vram=0.00GB 30s | grade=0.967 inner_auc=0.947 vs conf_auc=0.945
+03:45:28 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+03:45:58 [enc/text/bbc_news] vote=0.972 uniform=0.972 best1=0.966 n_val=676 vram=0.00GB 30s | grade=0.954 inner_auc=nan vs conf_auc=nan
+03:46:03 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+03:46:33 [enc/text/bbc_news] vote=0.970 uniform=0.968 best1=0.960 n_val=693 vram=0.00GB 30s | grade=0.960 inner_auc=0.980 vs conf_auc=0.984
+03:46:39 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+03:47:09 [enc/text/bbc_news] vote=0.977 uniform=0.977 best1=0.966 n_val=697 vram=0.00GB 30s | grade=0.959 inner_auc=0.922 vs conf_auc=0.921
+03:47:15 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+03:47:45 [enc/text/bbc_news] vote=0.964 uniform=0.963 best1=0.966 n_val=698 vram=0.00GB 29s | grade=0.954 inner_auc=0.919 vs conf_auc=0.914
+03:47:51 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+03:48:21 [enc/text/bbc_news] vote=0.963 uniform=0.966 best1=0.966 n_val=644 vram=0.00GB 30s | grade=0.966 inner_auc=0.864 vs conf_auc=0.888
+03:48:27 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+03:48:57 [enc/text/bbc_news] vote=0.975 uniform=0.976 best1=0.978 n_val=723 vram=0.00GB 29s | grade=0.947 inner_auc=0.800 vs conf_auc=0.879
+03:49:03 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+03:49:33 [enc/text/bbc_news] vote=0.976 uniform=0.979 best1=0.971 n_val=662 vram=0.00GB 30s | grade=0.967 inner_auc=0.712 vs conf_auc=0.896
+03:49:38 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+03:50:09 [enc/text/bbc_news] vote=0.964 uniform=0.966 best1=0.965 n_val=676 vram=0.00GB 30s | grade=0.952 inner_auc=0.927 vs conf_auc=0.924
+03:50:14 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+03:50:45 [enc/text/bbc_news] vote=0.972 uniform=0.972 best1=0.966 n_val=726 vram=0.00GB 30s | grade=0.960 inner_auc=0.879 vs conf_auc=0.940
+03:50:50 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+03:51:20 [enc/text/bbc_news] vote=0.985 uniform=0.982 best1=0.976 n_val=679 vram=0.00GB 30s | grade=0.954 inner_auc=0.879 vs conf_auc=0.883
+03:51:26 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+03:51:56 [enc/text/bbc_news] vote=0.979 uniform=0.980 best1=0.977 n_val=662 vram=0.00GB 30s | grade=0.957 inner_auc=nan vs conf_auc=nan
+03:52:03 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+03:52:32 [enc/text/bbc_news] vote=0.963 uniform=0.969 best1=0.963 n_val=681 vram=0.00GB 30s | grade=0.946 inner_auc=0.874 vs conf_auc=0.941
+03:52:39 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+03:53:08 [enc/text/bbc_news] vote=0.978 uniform=0.978 best1=0.971 n_val=650 vram=0.00GB 29s | grade=0.966 inner_auc=0.819 vs conf_auc=0.900
+03:53:14 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+03:53:44 [enc/text/bbc_news] vote=0.972 uniform=0.974 best1=0.971 n_val=653 vram=0.00GB 30s | grade=0.960 inner_auc=0.992 vs conf_auc=0.990
+03:53:50 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+03:54:20 [enc/text/bbc_news] vote=0.968 uniform=0.971 best1=0.967 n_val=693 vram=0.00GB 30s | grade=0.949 inner_auc=0.905 vs conf_auc=0.894
+03:54:26 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+03:54:56 [enc/text/bbc_news] vote=0.975 uniform=0.975 best1=0.972 n_val=674 vram=0.00GB 30s | grade=0.968 inner_auc=0.866 vs conf_auc=0.827
+03:55:02 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+03:55:32 [enc/text/bbc_news] vote=0.961 uniform=0.966 best1=0.965 n_val=647 vram=0.00GB 30s | grade=0.953 inner_auc=0.922 vs conf_auc=0.941
+03:55:38 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+03:56:08 [enc/text/bbc_news] vote=0.983 uniform=0.981 best1=0.976 n_val=695 vram=0.00GB 30s | grade=0.957 inner_auc=0.941 vs conf_auc=0.938
+03:56:14 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+03:56:44 [enc/text/bbc_news] vote=0.973 uniform=0.974 best1=0.975 n_val=691 vram=0.00GB 30s | grade=0.958 inner_auc=0.958 vs conf_auc=0.918
+03:56:50 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+03:57:20 [enc/text/bbc_news] vote=0.967 uniform=0.970 best1=0.969 n_val=643 vram=0.00GB 30s | grade=0.967 inner_auc=0.887 vs conf_auc=0.887
+03:57:26 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+03:57:57 [enc/text/bbc_news] vote=0.986 uniform=0.984 best1=0.979 n_val=623 vram=0.00GB 30s | grade=0.954 inner_auc=0.950 vs conf_auc=0.929
+03:58:03 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+03:58:32 [enc/text/bbc_news] vote=0.970 uniform=0.977 best1=0.969 n_val=642 vram=0.00GB 30s | grade=0.962 inner_auc=0.715 vs conf_auc=0.860
+03:58:39 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+03:59:08 [enc/text/bbc_news] vote=0.973 uniform=0.976 best1=0.970 n_val=661 vram=0.00GB 30s | grade=0.968 inner_auc=0.906 vs conf_auc=0.921
+03:59:15 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+03:59:45 [enc/text/bbc_news] vote=0.973 uniform=0.979 best1=0.969 n_val=674 vram=0.00GB 30s | grade=0.952 inner_auc=0.948 vs conf_auc=0.950
+03:59:50 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+04:00:19 [enc/text/bbc_news] vote=0.972 uniform=0.975 best1=0.972 n_val=712 vram=0.00GB 29s | grade=0.955 inner_auc=0.976 vs conf_auc=0.985
+04:00:25 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+04:00:53 [enc/text/bbc_news] vote=0.961 uniform=0.966 best1=0.958 n_val=645 vram=0.00GB 28s | grade=0.943 inner_auc=0.973 vs conf_auc=0.970
+04:00:58 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+04:01:22 [enc/text/bbc_news] vote=0.974 uniform=0.976 best1=0.974 n_val=657 vram=0.00GB 24s | grade=0.959 inner_auc=0.884 vs conf_auc=0.938
+04:01:26 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+04:01:49 [enc/text/bbc_news] vote=0.964 uniform=0.964 best1=0.957 n_val=724 vram=0.00GB 23s | grade=0.959 inner_auc=0.940 vs conf_auc=0.941
+04:01:54 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+04:02:18 [enc/text/bbc_news] vote=0.982 uniform=0.982 best1=0.980 n_val=658 vram=0.00GB 24s | grade=0.951 inner_auc=0.887 vs conf_auc=0.902
+04:02:23 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+04:02:46 [enc/text/bbc_news] vote=0.972 uniform=0.975 best1=0.972 n_val=687 vram=0.00GB 23s | grade=0.955 inner_auc=0.962 vs conf_auc=0.962
+04:02:51 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+04:03:15 [enc/text/bbc_news] vote=0.958 uniform=0.959 best1=0.953 n_val=637 vram=0.00GB 23s | grade=0.951 inner_auc=0.957 vs conf_auc=0.955
+04:03:19 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+04:03:43 [enc/text/bbc_news] vote=0.975 uniform=0.978 best1=0.972 n_val=674 vram=0.00GB 24s | grade=0.949 inner_auc=0.900 vs conf_auc=0.910
+04:03:47 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+04:04:11 [enc/text/bbc_news] vote=0.972 uniform=0.972 best1=0.968 n_val=714 vram=0.00GB 24s | grade=0.954 inner_auc=0.747 vs conf_auc=0.890
+04:04:15 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+04:04:39 [enc/text/bbc_news] vote=0.961 uniform=0.964 best1=0.969 n_val=669 vram=0.00GB 24s | grade=0.955 inner_auc=0.918 vs conf_auc=0.940
+04:04:44 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+04:05:07 [enc/text/bbc_news] vote=0.969 uniform=0.968 best1=0.969 n_val=687 vram=0.00GB 23s | grade=0.953 inner_auc=0.878 vs conf_auc=0.929
+04:05:12 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+04:05:35 [enc/text/bbc_news] vote=0.968 uniform=0.968 best1=0.959 n_val=657 vram=0.00GB 23s | grade=0.957 inner_auc=0.904 vs conf_auc=0.905
+04:05:40 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+04:06:07 [enc/text/bbc_news] vote=0.978 uniform=0.978 best1=0.974 n_val=682 vram=0.00GB 26s | grade=0.964 inner_auc=0.742 vs conf_auc=0.887
+04:06:12 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+04:06:48 [enc/text/bbc_news] vote=0.979 uniform=0.979 best1=0.981 n_val=669 vram=0.00GB 35s | grade=0.958 inner_auc=0.996 vs conf_auc=0.980
+04:06:54 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+04:07:30 [enc/text/bbc_news] vote=0.977 uniform=0.979 best1=0.976 n_val=657 vram=0.00GB 35s | grade=0.967 inner_auc=0.804 vs conf_auc=0.911
+04:07:37 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+04:08:12 [enc/text/bbc_news] vote=0.964 uniform=0.964 best1=0.966 n_val=644 vram=0.00GB 35s | grade=0.947 inner_auc=0.859 vs conf_auc=0.917
+04:08:20 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+04:08:56 [enc/text/bbc_news] vote=0.974 uniform=0.972 best1=0.972 n_val=646 vram=0.00GB 36s | grade=0.958 inner_auc=0.816 vs conf_auc=0.656
+04:09:02 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+04:09:38 [enc/text/bbc_news] vote=0.982 uniform=0.979 best1=0.977 n_val=665 vram=0.00GB 36s | grade=0.963 inner_auc=0.856 vs conf_auc=0.781
+04:09:45 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+04:10:21 [enc/text/bbc_news] vote=0.977 uniform=0.976 best1=0.977 n_val=664 vram=0.00GB 36s | grade=0.958 inner_auc=0.959 vs conf_auc=0.938
+04:10:28 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+04:11:05 [enc/text/bbc_news] vote=0.971 uniform=0.974 best1=0.970 n_val=662 vram=0.00GB 36s | grade=0.960 inner_auc=0.926 vs conf_auc=0.932
+04:11:11 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+04:11:47 [enc/text/bbc_news] vote=0.965 uniform=0.965 best1=0.962 n_val=665 vram=0.00GB 35s | grade=0.974 inner_auc=0.798 vs conf_auc=0.910
+04:11:55 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+04:12:30 [enc/text/bbc_news] vote=0.973 uniform=0.969 best1=0.970 n_val=673 vram=0.00GB 36s | grade=0.967 inner_auc=0.932 vs conf_auc=0.912
+04:12:38 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+04:13:14 [enc/text/bbc_news] vote=0.971 uniform=0.971 best1=0.967 n_val=656 vram=0.00GB 35s | grade=0.963 inner_auc=0.836 vs conf_auc=0.792
+04:13:21 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+04:13:57 [enc/text/bbc_news] vote=0.960 uniform=0.961 best1=0.963 n_val=642 vram=0.00GB 36s | grade=0.951 inner_auc=0.919 vs conf_auc=0.928
+04:14:04 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+04:14:40 [enc/text/bbc_news] vote=0.977 uniform=0.977 best1=0.973 n_val=658 vram=0.00GB 36s | grade=0.965 inner_auc=0.968 vs conf_auc=0.961
+04:14:47 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+04:15:23 [enc/text/bbc_news] vote=0.961 uniform=0.964 best1=0.964 n_val=635 vram=0.00GB 36s | grade=0.953 inner_auc=0.714 vs conf_auc=0.841
+04:15:30 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+04:16:05 [enc/text/bbc_news] vote=0.969 uniform=0.974 best1=0.972 n_val=646 vram=0.00GB 35s | grade=0.963 inner_auc=0.951 vs conf_auc=0.949
+04:16:13 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+04:16:48 [enc/text/bbc_news] vote=0.975 uniform=0.975 best1=0.968 n_val=709 vram=0.00GB 35s | grade=0.972 inner_auc=0.887 vs conf_auc=0.947
+04:16:55 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+04:17:31 [enc/text/bbc_news] vote=0.965 uniform=0.971 best1=0.960 n_val=680 vram=0.00GB 36s | grade=0.949 inner_auc=0.914 vs conf_auc=0.911
+04:17:38 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+04:18:14 [enc/text/bbc_news] vote=0.963 uniform=0.963 best1=0.960 n_val=679 vram=0.00GB 36s | grade=0.961 inner_auc=0.946 vs conf_auc=0.936
+04:18:21 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+04:18:57 [enc/text/bbc_news] vote=0.974 uniform=0.975 best1=0.971 n_val=649 vram=0.00GB 36s | grade=0.957 inner_auc=0.947 vs conf_auc=0.930
+04:19:04 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+04:19:39 [enc/text/bbc_news] vote=0.959 uniform=0.963 best1=0.961 n_val=711 vram=0.00GB 35s | grade=0.951 inner_auc=0.721 vs conf_auc=0.834
+04:19:47 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+04:20:22 [enc/text/bbc_news] vote=0.967 uniform=0.970 best1=0.962 n_val=627 vram=0.00GB 36s | grade=0.948 inner_auc=0.934 vs conf_auc=0.942
+04:20:30 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+04:20:58 [enc/text/bbc_news] vote=0.968 uniform=0.963 best1=0.966 n_val=655 vram=0.00GB 28s | grade=0.953 inner_auc=0.925 vs conf_auc=0.954
+04:21:04 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+04:21:31 [enc/text/bbc_news] vote=0.972 uniform=0.974 best1=0.971 n_val=650 vram=0.00GB 27s | grade=0.958 inner_auc=0.935 vs conf_auc=0.890
+04:21:37 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+04:22:05 [enc/text/bbc_news] vote=0.975 uniform=0.975 best1=0.971 n_val=682 vram=0.00GB 27s | grade=0.964 inner_auc=0.935 vs conf_auc=0.931
+04:22:11 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+04:22:39 [enc/text/bbc_news] vote=0.973 uniform=0.976 best1=0.969 n_val=621 vram=0.00GB 28s | grade=0.958 inner_auc=0.955 vs conf_auc=0.972
+04:22:44 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+04:23:12 [enc/text/bbc_news] vote=0.976 uniform=0.976 best1=0.973 n_val=676 vram=0.00GB 28s | grade=0.969 inner_auc=0.838 vs conf_auc=0.795
+04:23:17 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+04:23:45 [enc/text/bbc_news] vote=0.974 uniform=0.973 best1=0.970 n_val=695 vram=0.00GB 27s | grade=0.964 inner_auc=0.547 vs conf_auc=0.818
+04:23:50 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+04:24:18 [enc/text/bbc_news] vote=0.969 uniform=0.972 best1=0.971 n_val=680 vram=0.00GB 28s | grade=0.964 inner_auc=0.891 vs conf_auc=0.919
+04:24:23 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+04:24:51 [enc/text/bbc_news] vote=0.972 uniform=0.972 best1=0.969 n_val=708 vram=0.00GB 28s | grade=0.957 inner_auc=0.970 vs conf_auc=0.955
+04:24:56 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+04:25:23 [enc/text/bbc_news] vote=0.979 uniform=0.978 best1=0.974 n_val=623 vram=0.00GB 28s | grade=0.960 inner_auc=0.868 vs conf_auc=0.909
+04:25:29 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+04:25:57 [enc/text/bbc_news] vote=0.975 uniform=0.975 best1=0.970 n_val=638 vram=0.00GB 28s | grade=0.953 inner_auc=0.950 vs conf_auc=0.956
+04:26:02 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+04:26:29 [enc/text/bbc_news] vote=0.969 uniform=0.969 best1=0.969 n_val=678 vram=0.00GB 27s | grade=0.964 inner_auc=0.944 vs conf_auc=0.947
+04:26:34 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+04:27:02 [enc/text/bbc_news] vote=0.970 uniform=0.974 best1=0.971 n_val=724 vram=0.00GB 28s | grade=0.967 inner_auc=0.978 vs conf_auc=0.968
+04:27:08 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+04:27:35 [enc/text/bbc_news] vote=0.971 uniform=0.976 best1=0.975 n_val=666 vram=0.00GB 27s | grade=0.963 inner_auc=0.979 vs conf_auc=0.984
+04:27:41 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+04:28:08 [enc/text/bbc_news] vote=0.969 uniform=0.967 best1=0.961 n_val=670 vram=0.00GB 27s | grade=0.955 inner_auc=0.906 vs conf_auc=0.883
+04:28:13 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+04:28:41 [enc/text/bbc_news] vote=0.972 uniform=0.972 best1=0.970 n_val=667 vram=0.00GB 27s | grade=0.968 inner_auc=0.930 vs conf_auc=0.885
+04:28:46 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+04:29:14 [enc/text/bbc_news] vote=0.975 uniform=0.978 best1=0.979 n_val=667 vram=0.00GB 28s | grade=0.950 inner_auc=0.972 vs conf_auc=0.951
+04:29:19 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+04:29:46 [enc/text/bbc_news] vote=0.972 uniform=0.975 best1=0.972 n_val=676 vram=0.00GB 27s | grade=0.971 inner_auc=0.911 vs conf_auc=0.930
+04:29:52 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+04:30:19 [enc/text/bbc_news] vote=0.972 uniform=0.976 best1=0.966 n_val=708 vram=0.00GB 27s | grade=0.961 inner_auc=0.962 vs conf_auc=0.977
+04:30:25 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+04:30:52 [enc/text/bbc_news] vote=0.962 uniform=0.962 best1=0.965 n_val=704 vram=0.00GB 27s | grade=0.953 inner_auc=0.850 vs conf_auc=0.914
+04:30:58 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+04:31:25 [enc/text/bbc_news] vote=0.970 uniform=0.971 best1=0.967 n_val=627 vram=0.00GB 28s | grade=0.954 inner_auc=0.907 vs conf_auc=0.913
+04:31:30 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+04:31:58 [enc/text/bbc_news] vote=0.975 uniform=0.975 best1=0.976 n_val=678 vram=0.00GB 28s | grade=0.958 inner_auc=0.939 vs conf_auc=0.986
+04:32:03 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+04:32:31 [enc/text/bbc_news] vote=0.974 uniform=0.976 best1=0.970 n_val=662 vram=0.00GB 28s | grade=0.971 inner_auc=0.902 vs conf_auc=0.889
+04:32:36 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+04:33:03 [enc/text/bbc_news] vote=0.970 uniform=0.966 best1=0.973 n_val=677 vram=0.00GB 27s | grade=0.960 inner_auc=0.812 vs conf_auc=0.887
+04:33:09 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+04:33:36 [enc/text/bbc_news] vote=0.967 uniform=0.966 best1=0.966 n_val=646 vram=0.00GB 27s | grade=0.979 inner_auc=0.928 vs conf_auc=0.913
+04:33:42 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+04:34:09 [enc/text/bbc_news] vote=0.972 uniform=0.972 best1=0.971 n_val=685 vram=0.00GB 27s | grade=0.964 inner_auc=0.909 vs conf_auc=0.884
+04:34:14 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+04:34:42 [enc/text/bbc_news] vote=0.973 uniform=0.975 best1=0.969 n_val=673 vram=0.00GB 27s | grade=0.952 inner_auc=0.961 vs conf_auc=0.978
+04:34:47 ===== CYCLE 149 (OUTER -> INNER -> FEEDBACK) =====
+04:35:14 [enc/text/bbc_news] vote=0.973 uniform=0.972 best1=0.972 n_val=633 vram=0.00GB 27s | grade=0.940 inner_auc=0.933 vs conf_auc=0.940
+04:35:21 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+04:35:50 [enc/text/bbc_news] vote=0.979 uniform=0.978 best1=0.975 n_val=672 vram=0.00GB 29s | grade=0.953 inner_auc=0.954 vs conf_auc=0.931
+04:35:56 ===== CYCLE 151 (OUTER -> INNER -> FEEDBACK) =====
+04:36:27 [enc/text/bbc_news] vote=0.978 uniform=0.979 best1=0.976 n_val=667 vram=0.00GB 31s | grade=0.946 inner_auc=0.970 vs conf_auc=0.974
+04:36:35 ===== CYCLE 152 (OUTER -> INNER -> FEEDBACK) =====
+04:37:09 [enc/text/bbc_news] vote=0.972 uniform=0.972 best1=0.966 n_val=669 vram=0.00GB 33s | grade=0.958 inner_auc=0.883 vs conf_auc=0.859
+04:37:16 ===== CYCLE 153 (OUTER -> INNER -> FEEDBACK) =====
+04:37:48 [enc/text/bbc_news] vote=0.979 uniform=0.976 best1=0.972 n_val=670 vram=0.00GB 32s | grade=0.959 inner_auc=0.933 vs conf_auc=0.922
+04:37:55 ===== CYCLE 154 (OUTER -> INNER -> FEEDBACK) =====
+04:38:27 [enc/text/bbc_news] vote=0.973 uniform=0.973 best1=0.972 n_val=677 vram=0.00GB 33s | grade=0.953 inner_auc=0.940 vs conf_auc=0.910
+04:38:35 ===== CYCLE 155 (OUTER -> INNER -> FEEDBACK) =====
+04:39:09 [enc/text/bbc_news] vote=0.975 uniform=0.975 best1=0.969 n_val=706 vram=0.00GB 34s | grade=0.961 inner_auc=0.875 vs conf_auc=0.869
+04:39:16 ===== CYCLE 156 (OUTER -> INNER -> FEEDBACK) =====
+04:39:49 [enc/text/bbc_news] vote=0.987 uniform=0.985 best1=0.981 n_val=680 vram=0.00GB 33s | grade=0.958 inner_auc=0.959 vs conf_auc=0.911
+04:39:56 ===== CYCLE 157 (OUTER -> INNER -> FEEDBACK) =====
+04:40:31 [enc/text/bbc_news] vote=0.973 uniform=0.979 best1=0.970 n_val=659 vram=0.00GB 35s | grade=0.924 inner_auc=0.929 vs conf_auc=0.911
+04:40:38 ===== CYCLE 158 (OUTER -> INNER -> FEEDBACK) =====
+04:41:13 [enc/text/bbc_news] vote=0.972 uniform=0.973 best1=0.970 n_val=674 vram=0.00GB 34s | grade=0.962 inner_auc=0.891 vs conf_auc=0.827
+04:41:19 ===== CYCLE 159 (OUTER -> INNER -> FEEDBACK) =====
+04:41:52 [enc/text/bbc_news] vote=0.973 uniform=0.973 best1=0.973 n_val=633 vram=0.00GB 33s | grade=0.948 inner_auc=0.991 vs conf_auc=0.982
+04:41:58 ===== CYCLE 160 (OUTER -> INNER -> FEEDBACK) =====
+04:42:34 [enc/text/bbc_news] vote=0.987 uniform=0.987 best1=0.981 n_val=700 vram=0.00GB 35s | grade=0.948 inner_auc=0.915 vs conf_auc=0.797
+04:42:40 ===== CYCLE 161 (OUTER -> INNER -> FEEDBACK) =====
+04:43:13 [enc/text/bbc_news] vote=0.968 uniform=0.971 best1=0.967 n_val=664 vram=0.00GB 33s | grade=0.954 inner_auc=0.963 vs conf_auc=0.951
+04:43:20 ===== CYCLE 162 (OUTER -> INNER -> FEEDBACK) =====
+04:43:51 [enc/text/bbc_news] vote=0.975 uniform=0.979 best1=0.975 n_val=670 vram=0.00GB 31s | grade=0.958 inner_auc=1.000 vs conf_auc=0.996
+04:43:57 ===== CYCLE 163 (OUTER -> INNER -> FEEDBACK) =====
+04:44:29 [enc/text/bbc_news] vote=0.972 uniform=0.968 best1=0.966 n_val=685 vram=0.00GB 32s | grade=0.959 inner_auc=0.924 vs conf_auc=0.919
+04:44:35 ===== CYCLE 164 (OUTER -> INNER -> FEEDBACK) =====
+04:45:04 [enc/text/bbc_news] vote=0.975 uniform=0.976 best1=0.974 n_val=680 vram=0.00GB 29s | grade=0.942 inner_auc=0.987 vs conf_auc=0.973
+04:45:11 ===== CYCLE 165 (OUTER -> INNER -> FEEDBACK) =====
+04:45:40 [enc/text/bbc_news] vote=0.970 uniform=0.972 best1=0.972 n_val=676 vram=0.00GB 30s | grade=0.972 inner_auc=0.928 vs conf_auc=0.914
+04:45:46 ===== CYCLE 166 (OUTER -> INNER -> FEEDBACK) =====
+04:46:19 [enc/text/bbc_news] vote=0.975 uniform=0.977 best1=0.977 n_val=682 vram=0.00GB 33s | grade=0.957 inner_auc=0.909 vs conf_auc=0.843
+04:46:25 ===== CYCLE 167 (OUTER -> INNER -> FEEDBACK) =====
+04:46:55 [enc/text/bbc_news] vote=0.976 uniform=0.981 best1=0.975 n_val=670 vram=0.00GB 30s | grade=0.966 inner_auc=0.866 vs conf_auc=0.898
+04:47:01 ===== CYCLE 168 (OUTER -> INNER -> FEEDBACK) =====
+04:47:31 [enc/text/bbc_news] vote=0.965 uniform=0.968 best1=0.966 n_val=678 vram=0.00GB 30s | grade=0.957 inner_auc=0.966 vs conf_auc=0.951
+04:47:37 ===== CYCLE 169 (OUTER -> INNER -> FEEDBACK) =====
+04:48:09 [enc/text/bbc_news] vote=0.965 uniform=0.965 best1=0.962 n_val=684 vram=0.00GB 32s | grade=0.941 inner_auc=0.902 vs conf_auc=0.883
+04:48:16 ===== CYCLE 170 (OUTER -> INNER -> FEEDBACK) =====
+04:48:48 [enc/text/bbc_news] vote=0.965 uniform=0.971 best1=0.962 n_val=661 vram=0.00GB 32s | grade=0.934 inner_auc=0.884 vs conf_auc=0.850
+04:48:53 ===== CYCLE 171 (OUTER -> INNER -> FEEDBACK) =====
+04:49:23 [enc/text/bbc_news] vote=0.977 uniform=0.978 best1=0.974 n_val=694 vram=0.00GB 30s | grade=0.956 inner_auc=1.000 vs conf_auc=0.979
+04:49:29 ===== CYCLE 172 (OUTER -> INNER -> FEEDBACK) =====
+04:50:01 [enc/text/bbc_news] vote=0.976 uniform=0.979 best1=0.975 n_val=668 vram=0.00GB 32s | grade=0.959 inner_auc=0.962 vs conf_auc=0.965
+04:50:07 ===== CYCLE 173 (OUTER -> INNER -> FEEDBACK) =====
+04:50:38 [enc/text/bbc_news] vote=0.970 uniform=0.972 best1=0.972 n_val=668 vram=0.00GB 30s | grade=0.934 inner_auc=0.953 vs conf_auc=0.961
+04:50:44 ===== CYCLE 174 (OUTER -> INNER -> FEEDBACK) =====
+04:51:14 [enc/text/bbc_news] vote=0.973 uniform=0.976 best1=0.977 n_val=708 vram=0.00GB 30s | grade=0.953 inner_auc=0.935 vs conf_auc=0.890
+04:51:20 ===== CYCLE 175 (OUTER -> INNER -> FEEDBACK) =====
+04:51:52 [enc/text/bbc_news] vote=0.969 uniform=0.968 best1=0.964 n_val=718 vram=0.00GB 32s | grade=0.955 inner_auc=0.956 vs conf_auc=0.923
+04:51:59 ===== CYCLE 176 (OUTER -> INNER -> FEEDBACK) =====
+04:52:28 [enc/text/bbc_news] vote=0.981 uniform=0.985 best1=0.978 n_val=670 vram=0.00GB 29s | grade=0.938 inner_auc=0.992 vs conf_auc=1.000
+04:52:34 ===== CYCLE 177 (OUTER -> INNER -> FEEDBACK) =====
+04:53:04 [enc/text/bbc_news] vote=0.964 uniform=0.968 best1=0.964 n_val=665 vram=0.00GB 30s | grade=0.944 inner_auc=0.967 vs conf_auc=0.972
+04:53:10 ===== CYCLE 178 (OUTER -> INNER -> FEEDBACK) =====
+04:53:42 [enc/text/bbc_news] vote=0.973 uniform=0.976 best1=0.970 n_val=668 vram=0.00GB 32s | grade=0.949 inner_auc=0.932 vs conf_auc=0.948
+04:53:48 ===== CYCLE 179 (OUTER -> INNER -> FEEDBACK) =====
+04:54:18 [enc/text/bbc_news] vote=0.984 uniform=0.984 best1=0.978 n_val=624 vram=0.00GB 30s | grade=0.963 inner_auc=0.978 vs conf_auc=0.944
+04:54:24 ===== CYCLE 180 (OUTER -> INNER -> FEEDBACK) =====
+04:54:53 [enc/text/bbc_news] vote=0.973 uniform=0.973 best1=0.968 n_val=691 vram=0.00GB 30s | grade=0.959 inner_auc=0.900 vs conf_auc=0.908
+04:54:59 ===== CYCLE 181 (OUTER -> INNER -> FEEDBACK) =====
+04:55:31 [enc/text/bbc_news] vote=0.965 uniform=0.965 best1=0.967 n_val=666 vram=0.00GB 32s | grade=0.962 inner_auc=0.922 vs conf_auc=0.926
+04:55:37 ===== CYCLE 182 (OUTER -> INNER -> FEEDBACK) =====
+04:56:07 [enc/text/bbc_news] vote=0.975 uniform=0.974 best1=0.971 n_val=682 vram=0.00GB 30s | grade=0.955 inner_auc=0.891 vs conf_auc=0.778
+04:56:13 ===== CYCLE 183 (OUTER -> INNER -> FEEDBACK) =====
+04:56:43 [enc/text/bbc_news] vote=0.964 uniform=0.967 best1=0.967 n_val=663 vram=0.00GB 30s | grade=0.944 inner_auc=0.812 vs conf_auc=0.910
+04:56:48 ===== CYCLE 184 (OUTER -> INNER -> FEEDBACK) =====
+04:57:22 [enc/text/bbc_news] vote=0.977 uniform=0.978 best1=0.978 n_val=684 vram=0.00GB 34s | grade=0.955 inner_auc=0.969 vs conf_auc=0.940
+04:57:28 ===== CYCLE 185 (OUTER -> INNER -> FEEDBACK) =====
+04:57:58 [enc/text/bbc_news] vote=0.968 uniform=0.971 best1=0.971 n_val=648 vram=0.00GB 30s | grade=0.953 inner_auc=0.926 vs conf_auc=0.926
+04:58:04 ===== CYCLE 186 (OUTER -> INNER -> FEEDBACK) =====
+04:58:33 [enc/text/bbc_news] vote=0.971 uniform=0.966 best1=0.962 n_val=654 vram=0.00GB 30s | grade=0.969 inner_auc=0.812 vs conf_auc=0.742
+04:58:39 ===== CYCLE 187 (OUTER -> INNER -> FEEDBACK) =====
+04:59:11 [enc/text/bbc_news] vote=0.967 uniform=0.970 best1=0.964 n_val=662 vram=0.00GB 32s | grade=0.952 inner_auc=0.970 vs conf_auc=0.949
+04:59:17 ===== CYCLE 188 (OUTER -> INNER -> FEEDBACK) =====
+04:59:47 [enc/text/bbc_news] vote=0.978 uniform=0.980 best1=0.975 n_val=651 vram=0.00GB 30s | grade=0.954 inner_auc=0.930 vs conf_auc=0.946
+04:59:53 ===== CYCLE 189 (OUTER -> INNER -> FEEDBACK) =====
+05:00:23 [enc/text/bbc_news] vote=0.974 uniform=0.977 best1=0.971 n_val=663 vram=0.00GB 30s | grade=0.947 inner_auc=0.933 vs conf_auc=0.937
+05:00:29 ===== CYCLE 190 (OUTER -> INNER -> FEEDBACK) =====
+05:01:01 [enc/text/bbc_news] vote=0.969 uniform=0.973 best1=0.967 n_val=702 vram=0.00GB 33s | grade=0.961 inner_auc=0.939 vs conf_auc=0.908
+05:01:07 ===== CYCLE 191 (OUTER -> INNER -> FEEDBACK) =====
+05:01:37 [enc/text/bbc_news] vote=0.970 uniform=0.976 best1=0.970 n_val=675 vram=0.00GB 30s | grade=0.954 inner_auc=0.965 vs conf_auc=0.968
+05:01:43 ===== CYCLE 192 (OUTER -> INNER -> FEEDBACK) =====
+05:02:12 [enc/text/bbc_news] vote=0.980 uniform=0.977 best1=0.973 n_val=709 vram=0.00GB 29s | grade=0.943 inner_auc=0.910 vs conf_auc=0.896
+05:02:18 ===== CYCLE 193 (OUTER -> INNER -> FEEDBACK) =====
+05:02:46 [enc/text/bbc_news] vote=0.968 uniform=0.969 best1=0.966 n_val=684 vram=0.00GB 29s | grade=0.955 inner_auc=0.776 vs conf_auc=0.835
+05:02:52 ===== CYCLE 194 (OUTER -> INNER -> FEEDBACK) =====
+05:03:22 [enc/text/bbc_news] vote=0.973 uniform=0.976 best1=0.970 n_val=660 vram=0.00GB 30s | grade=0.965 inner_auc=0.771 vs conf_auc=0.882
+05:03:28 ===== CYCLE 195 (OUTER -> INNER -> FEEDBACK) =====
+05:03:58 [enc/text/bbc_news] vote=0.972 uniform=0.974 best1=0.974 n_val=645 vram=0.00GB 30s | grade=0.950 inner_auc=0.938 vs conf_auc=0.928
+05:04:04 ===== CYCLE 196 (OUTER -> INNER -> FEEDBACK) =====
+05:04:37 [enc/text/bbc_news] vote=0.984 uniform=0.987 best1=0.976 n_val=674 vram=0.00GB 32s | grade=0.962 inner_auc=1.000 vs conf_auc=1.000
+05:04:42 ===== CYCLE 197 (OUTER -> INNER -> FEEDBACK) =====
+05:05:12 [enc/text/bbc_news] vote=0.970 uniform=0.974 best1=0.966 n_val=624 vram=0.00GB 30s | grade=0.960 inner_auc=0.912 vs conf_auc=0.884
+05:05:19 RUN COMPLETE
+15:10:32 NI run auto_cpu_040 on CPU; hours=2.0 smoke=False
+15:10:32 explicit task list: ['enc/text/bbc_news']
+15:10:47 [resume] from checkpoint: next cycle 198, rounds 198, 198 metric rows, inner net restored
+15:10:47 ===== CYCLE 198 (OUTER-ONLY BOOTSTRAP) =====
+15:10:47 [data] enc/text/bbc_news: n=2225 C=5 D=384 shards=1
+15:17:04 [enc/text/bbc_news] vote=0.960 uniform=0.968 best1=0.965 n_val=655 vram=0.00GB 377s
+15:17:38 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 198, "n_records": 655, "n_val": 141, "base_rate": 0.9645389914512634, "inner": {"auc": 0.9382352941176471, "ece": 0.026204420742413678, "brier": 0.026928085833787918, "acc80": 1.0}, "outer_conf": {"auc": 0.9308823529411765, "ece": 0.027537196663254538, "brier": 0.029516834765672684, "acc80": 1.0}}
+15:17:38 ===== CYCLE 199 (OUTER -> INNER -> FEEDBACK) =====
+15:22:55 [enc/text/bbc_news] vote=0.973 uniform=0.979 best1=0.979 n_val=672 vram=0.00GB 317s | grade=0.945 inner_auc=0.980 vs conf_auc=0.983
+15:23:13 ===== CYCLE 200 (OUTER -> INNER -> FEEDBACK) =====
+15:27:37 [enc/text/bbc_news] vote=0.974 uniform=0.971 best1=0.971 n_val=651 vram=0.00GB 264s | grade=0.950 inner_auc=0.942 vs conf_auc=0.927
+15:27:56 ===== CYCLE 201 (OUTER -> INNER -> FEEDBACK) =====
+15:32:21 [enc/text/bbc_news] vote=0.972 uniform=0.975 best1=0.967 n_val=670 vram=0.00GB 265s | grade=0.967 inner_auc=0.919 vs conf_auc=0.888
+15:32:42 ===== CYCLE 202 (OUTER -> INNER -> FEEDBACK) =====
+15:36:49 [enc/text/bbc_news] vote=0.973 uniform=0.975 best1=0.969 n_val=671 vram=0.00GB 247s | grade=0.956 inner_auc=0.956 vs conf_auc=0.943
+15:37:09 ===== CYCLE 203 (OUTER -> INNER -> FEEDBACK) =====
+15:41:46 [enc/text/bbc_news] vote=0.973 uniform=0.971 best1=0.968 n_val=626 vram=0.00GB 277s | grade=0.952 inner_auc=0.971 vs conf_auc=0.956
+15:42:09 ===== CYCLE 204 (OUTER -> INNER -> FEEDBACK) =====
+15:46:26 [enc/text/bbc_news] vote=0.977 uniform=0.980 best1=0.974 n_val=702 vram=0.00GB 257s | grade=0.953 inner_auc=0.933 vs conf_auc=0.944
+15:46:52 ===== CYCLE 205 (OUTER -> INNER -> FEEDBACK) =====
+15:51:33 [enc/text/bbc_news] vote=0.970 uniform=0.970 best1=0.966 n_val=677 vram=0.00GB 282s | grade=0.960 inner_auc=0.932 vs conf_auc=0.927
+15:51:57 ===== CYCLE 206 (OUTER -> INNER -> FEEDBACK) =====
+15:56:28 [enc/text/bbc_news] vote=0.964 uniform=0.965 best1=0.967 n_val=691 vram=0.00GB 270s | grade=0.949 inner_auc=0.812 vs conf_auc=0.905
+15:56:48 ===== CYCLE 207 (OUTER -> INNER -> FEEDBACK) =====
+16:00:17 [enc/text/bbc_news] vote=0.974 uniform=0.972 best1=0.971 n_val=611 vram=0.00GB 209s | grade=0.977 inner_auc=0.842 vs conf_auc=0.891
+16:00:37 ===== CYCLE 208 (OUTER -> INNER -> FEEDBACK) =====
+16:05:01 [enc/text/bbc_news] vote=0.968 uniform=0.971 best1=0.961 n_val=665 vram=0.00GB 263s | grade=0.967 inner_auc=0.705 vs conf_auc=0.870
+16:05:28 ===== CYCLE 209 (OUTER -> INNER -> FEEDBACK) =====
+16:09:20 [enc/text/bbc_news] vote=0.972 uniform=0.978 best1=0.974 n_val=651 vram=0.00GB 232s | grade=0.972 inner_auc=0.782 vs conf_auc=0.863
+16:09:37 ===== CYCLE 210 (OUTER -> INNER -> FEEDBACK) =====
+16:12:41 [enc/text/bbc_news] vote=0.976 uniform=0.981 best1=0.975 n_val=674 vram=0.00GB 184s | grade=0.962 inner_auc=0.803 vs conf_auc=0.945
+16:13:00 ===== CYCLE 211 (OUTER -> INNER -> FEEDBACK) =====
+16:16:23 [enc/text/bbc_news] vote=0.967 uniform=0.965 best1=0.970 n_val=661 vram=0.00GB 203s | grade=0.970 inner_auc=0.931 vs conf_auc=0.942
+16:16:43 ===== CYCLE 212 (OUTER -> INNER -> FEEDBACK) =====
+16:19:36 [enc/text/bbc_news] vote=0.974 uniform=0.982 best1=0.973 n_val=665 vram=0.00GB 173s | grade=0.963 inner_auc=nan vs conf_auc=nan
+16:19:55 ===== CYCLE 213 (OUTER -> INNER -> FEEDBACK) =====
+16:23:23 [enc/text/bbc_news] vote=0.978 uniform=0.981 best1=0.980 n_val=647 vram=0.00GB 208s | grade=0.969 inner_auc=0.897 vs conf_auc=0.905
+16:23:42 ===== CYCLE 214 (OUTER -> INNER -> FEEDBACK) =====
+16:27:13 [enc/text/bbc_news] vote=0.951 uniform=0.958 best1=0.954 n_val=636 vram=0.00GB 212s | grade=0.960 inner_auc=0.847 vs conf_auc=0.899
+16:27:34 ===== CYCLE 215 (OUTER -> INNER -> FEEDBACK) =====
+16:30:46 [enc/text/bbc_news] vote=0.971 uniform=0.973 best1=0.970 n_val=627 vram=0.00GB 192s | grade=0.960 inner_auc=0.984 vs conf_auc=0.935
+16:31:07 ===== CYCLE 216 (OUTER -> INNER -> FEEDBACK) =====
+16:34:37 [enc/text/bbc_news] vote=0.963 uniform=0.963 best1=0.963 n_val=683 vram=0.00GB 210s | grade=0.969 inner_auc=0.803 vs conf_auc=0.908
+16:34:59 ===== CYCLE 217 (OUTER -> INNER -> FEEDBACK) =====
+16:38:33 [enc/text/bbc_news] vote=0.978 uniform=0.977 best1=0.975 n_val=681 vram=0.00GB 214s | grade=0.972 inner_auc=0.936 vs conf_auc=0.885
+16:38:52 ===== CYCLE 218 (OUTER -> INNER -> FEEDBACK) =====
+16:42:42 [enc/text/bbc_news] vote=0.961 uniform=0.962 best1=0.957 n_val=633 vram=0.00GB 230s | grade=0.956 inner_auc=0.902 vs conf_auc=0.849
+16:43:04 ===== CYCLE 219 (OUTER -> INNER -> FEEDBACK) =====
+16:46:39 [enc/text/bbc_news] vote=0.971 uniform=0.972 best1=0.966 n_val=681 vram=0.00GB 215s | grade=0.969 inner_auc=0.962 vs conf_auc=0.950
+16:47:01 ===== CYCLE 220 (OUTER -> INNER -> FEEDBACK) =====
+16:50:50 [enc/text/bbc_news] vote=0.967 uniform=0.967 best1=0.968 n_val=627 vram=0.00GB 229s | grade=0.971 inner_auc=0.917 vs conf_auc=0.908
+16:51:10 ===== CYCLE 221 (OUTER -> INNER -> FEEDBACK) =====
+16:55:04 [enc/text/bbc_news] vote=0.968 uniform=0.969 best1=0.966 n_val=678 vram=0.00GB 234s | grade=0.970 inner_auc=0.929 vs conf_auc=0.917
+16:55:24 ===== CYCLE 222 (OUTER -> INNER -> FEEDBACK) =====
+16:59:25 [enc/text/bbc_news] vote=0.971 uniform=0.973 best1=0.970 n_val=655 vram=0.00GB 242s | grade=0.969 inner_auc=0.919 vs conf_auc=0.919
+16:59:46 ===== CYCLE 223 (OUTER -> INNER -> FEEDBACK) =====
+17:03:49 [enc/text/bbc_news] vote=0.975 uniform=0.977 best1=0.980 n_val=690 vram=0.00GB 243s | grade=0.977 inner_auc=0.925 vs conf_auc=0.947
+17:04:10 ===== CYCLE 224 (OUTER -> INNER -> FEEDBACK) =====
+17:08:02 [enc/text/bbc_news] vote=0.975 uniform=0.981 best1=0.977 n_val=641 vram=0.00GB 232s | grade=0.966 inner_auc=0.839 vs conf_auc=0.944
+17:08:27 ===== CYCLE 225 (OUTER -> INNER -> FEEDBACK) =====
+17:12:00 [enc/text/bbc_news] vote=0.964 uniform=0.969 best1=0.963 n_val=667 vram=0.00GB 213s | grade=0.951 inner_auc=0.921 vs conf_auc=0.874
+17:12:21 RUN COMPLETE
+08:32:36 NI run auto_cpu_040 on CPU; hours=2.0 smoke=False
+08:32:36 explicit task list: ['enc/text/bbc_news']
+08:32:48 [resume] from checkpoint: next cycle 226, rounds 226, 226 metric rows, inner net restored
+08:32:48 ===== CYCLE 226 (OUTER-ONLY BOOTSTRAP) =====
+08:32:49 [data] enc/text/bbc_news: n=2225 C=5 D=384 shards=1
+08:37:07 [enc/text/bbc_news] vote=0.970 uniform=0.971 best1=0.968 n_val=664 vram=0.00GB 258s
+08:37:37 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 226, "n_records": 664, "n_val": 153, "base_rate": 0.9673202633857727, "inner": {"auc": 0.8324324324324325, "ece": 0.030223911007245384, "brier": 0.025708375498652458, "acc80": 0.9918032884597778}, "outer_conf": {"auc": 0.9243243243243243, "ece": 0.01512074587391872, "brier": 0.025655921548604965, "acc80": 0.9918032884597778}}
+08:37:37 ===== CYCLE 227 (OUTER -> INNER -> FEEDBACK) =====
+08:42:00 [enc/text/bbc_news] vote=0.970 uniform=0.970 best1=0.966 n_val=697 vram=0.00GB 264s | grade=0.965 inner_auc=0.508 vs conf_auc=0.604
+08:42:21 ===== CYCLE 228 (OUTER -> INNER -> FEEDBACK) =====
+08:46:38 [enc/text/bbc_news] vote=0.971 uniform=0.971 best1=0.968 n_val=663 vram=0.00GB 257s | grade=0.967 inner_auc=0.743 vs conf_auc=0.904
+08:47:07 ===== CYCLE 229 (OUTER -> INNER -> FEEDBACK) =====
+22:57:01 NI run auto_cpu_040 on CPU; hours=2.0 smoke=False
+22:57:02 explicit task list: ['enc/text/bbc_news']
+22:57:17 [resume] from checkpoint: next cycle 229, rounds 229, 229 metric rows, inner net restored
+22:57:17 ===== CYCLE 229 (OUTER-ONLY BOOTSTRAP) =====
+22:57:17 [data] enc/text/bbc_news: n=2225 C=5 D=384 shards=1
+23:02:49 [enc/text/bbc_news] vote=0.962 uniform=0.963 best1=0.964 n_val=702 vram=0.00GB 332s
+23:03:26 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 229, "n_records": 702, "n_val": 138, "base_rate": 0.9637681245803833, "inner": {"auc": 0.9609022556390977, "ece": 0.029601269874019898, "brier": 0.028643738478422165, "acc80": 1.0}, "outer_conf": {"auc": 0.9548872180451128, "ece": 0.03316253164540166, "brier": 0.028931427747011185, "acc80": 1.0}}
+23:03:26 ===== CYCLE 230 (OUTER -> INNER -> FEEDBACK) =====
+23:08:56 [enc/text/bbc_news] vote=0.963 uniform=0.965 best1=0.959 n_val=684 vram=0.00GB 330s | grade=0.966 inner_auc=0.908 vs conf_auc=0.857
+23:09:21 ===== CYCLE 231 (OUTER -> INNER -> FEEDBACK) =====
+23:15:01 [enc/text/bbc_news] vote=0.981 uniform=0.980 best1=0.975 n_val=640 vram=0.00GB 341s | grade=0.967 inner_auc=1.000 vs conf_auc=0.992
+23:15:38 ===== CYCLE 232 (OUTER -> INNER -> FEEDBACK) =====
+23:22:37 [enc/text/bbc_news] vote=0.970 uniform=0.973 best1=0.967 n_val=661 vram=0.00GB 419s | grade=0.972 inner_auc=0.633 vs conf_auc=0.942
+23:23:13 ===== CYCLE 233 (OUTER -> INNER -> FEEDBACK) =====
+23:30:40 [enc/text/bbc_news] vote=0.968 uniform=0.969 best1=0.965 n_val=683 vram=0.00GB 447s | grade=0.967 inner_auc=0.808 vs conf_auc=0.880
+23:31:11 ===== CYCLE 234 (OUTER -> INNER -> FEEDBACK) =====
+23:38:22 [enc/text/bbc_news] vote=0.967 uniform=0.969 best1=0.972 n_val=641 vram=0.00GB 430s | grade=0.979 inner_auc=0.703 vs conf_auc=0.900
+23:38:57 ===== CYCLE 235 (OUTER -> INNER -> FEEDBACK) =====
+23:46:29 [enc/text/bbc_news] vote=0.971 uniform=0.975 best1=0.972 n_val=682 vram=0.00GB 451s | grade=0.968 inner_auc=0.970 vs conf_auc=0.939
+23:47:02 ===== CYCLE 236 (OUTER -> INNER -> FEEDBACK) =====
+06:24:25 NI run auto_cpu_040 on CPU; hours=2.0 smoke=False
+06:24:25 explicit task list: ['enc/text/bbc_news']
+06:24:34 [resume] from checkpoint: next cycle 236, rounds 236, 236 metric rows, inner net restored
+06:24:34 ===== CYCLE 236 (OUTER-ONLY BOOTSTRAP) =====
+06:24:34 [data] enc/text/bbc_news: n=2225 C=5 D=384 shards=1
+06:27:51 [enc/text/bbc_news] vote=0.969 uniform=0.972 best1=0.972 n_val=667 vram=0.00GB 197s
+06:28:17 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 236, "n_records": 667, "n_val": 118, "base_rate": 0.9830508232116699, "inner": {"auc": 0.9353448275862069, "ece": 0.023655567128779524, "brier": 0.01678628660738468, "acc80": 1.0}, "outer_conf": {"auc": 0.9698275862068966, "ece": 0.03198291538125378, "brier": 0.016070112586021423, "acc80": 1.0}}
+06:28:17 ===== CYCLE 237 (OUTER -> INNER -> FEEDBACK) =====
+06:32:18 [enc/text/bbc_news] vote=0.965 uniform=0.968 best1=0.967 n_val=691 vram=0.00GB 241s | grade=0.976 inner_auc=0.864 vs conf_auc=0.944
+06:32:36 ===== CYCLE 238 (OUTER -> INNER -> FEEDBACK) =====
+06:35:58 [enc/text/bbc_news] vote=0.982 uniform=0.986 best1=0.977 n_val=709 vram=0.00GB 202s | grade=0.966 inner_auc=0.953 vs conf_auc=0.944
+06:36:21 ===== CYCLE 239 (OUTER -> INNER -> FEEDBACK) =====
+06:40:36 [enc/text/bbc_news] vote=0.973 uniform=0.976 best1=0.969 n_val=677 vram=0.00GB 255s | grade=0.964 inner_auc=0.933 vs conf_auc=0.849
+06:41:03 ===== CYCLE 240 (OUTER -> INNER -> FEEDBACK) =====
+06:44:55 [enc/text/bbc_news] vote=0.975 uniform=0.975 best1=0.970 n_val=667 vram=0.00GB 233s | grade=0.976 inner_auc=0.938 vs conf_auc=0.934
+06:45:20 ===== CYCLE 241 (OUTER -> INNER -> FEEDBACK) =====
+06:49:49 [enc/text/bbc_news] vote=0.974 uniform=0.977 best1=0.970 n_val=661 vram=0.00GB 269s | grade=0.976 inner_auc=0.871 vs conf_auc=0.930
+06:50:13 ===== CYCLE 242 (OUTER -> INNER -> FEEDBACK) =====
+06:54:09 [enc/text/bbc_news] vote=0.973 uniform=0.973 best1=0.970 n_val=702 vram=0.00GB 236s | grade=0.970 inner_auc=0.918 vs conf_auc=0.888
+06:54:34 ===== CYCLE 243 (OUTER -> INNER -> FEEDBACK) =====
+06:59:09 [enc/text/bbc_news] vote=0.969 uniform=0.978 best1=0.973 n_val=640 vram=0.00GB 275s | grade=0.968 inner_auc=0.936 vs conf_auc=0.923
+06:59:35 ===== CYCLE 244 (OUTER -> INNER -> FEEDBACK) =====
+07:03:05 [enc/text/bbc_news] vote=0.980 uniform=0.978 best1=0.977 n_val=639 vram=0.00GB 210s | grade=0.955 inner_auc=0.504 vs conf_auc=0.800
+07:03:31 ===== CYCLE 245 (OUTER -> INNER -> FEEDBACK) =====
+07:07:48 [enc/text/bbc_news] vote=0.974 uniform=0.978 best1=0.975 n_val=683 vram=0.00GB 258s | grade=0.964 inner_auc=0.929 vs conf_auc=0.908
+07:08:11 ===== CYCLE 246 (OUTER -> INNER -> FEEDBACK) =====
+07:12:39 [enc/text/bbc_news] vote=0.965 uniform=0.968 best1=0.965 n_val=650 vram=0.00GB 269s | grade=0.969 inner_auc=0.858 vs conf_auc=0.868
+07:13:05 ===== CYCLE 247 (OUTER -> INNER -> FEEDBACK) =====
+07:17:45 [enc/text/bbc_news] vote=0.976 uniform=0.979 best1=0.977 n_val=660 vram=0.00GB 280s | grade=0.964 inner_auc=0.940 vs conf_auc=0.914
+07:18:12 ===== CYCLE 248 (OUTER -> INNER -> FEEDBACK) =====
+07:22:35 [enc/text/bbc_news] vote=0.960 uniform=0.970 best1=0.966 n_val=705 vram=0.00GB 263s | grade=0.953 inner_auc=0.800 vs conf_auc=0.927
+07:23:00 ===== CYCLE 249 (OUTER -> INNER -> FEEDBACK) =====
+07:26:56 [enc/text/bbc_news] vote=0.970 uniform=0.971 best1=0.968 n_val=664 vram=0.00GB 236s | grade=0.965 inner_auc=0.961 vs conf_auc=0.971
+07:27:23 ===== CYCLE 250 (OUTER -> INNER -> FEEDBACK) =====
+07:31:52 [enc/text/bbc_news] vote=0.970 uniform=0.973 best1=0.968 n_val=661 vram=0.00GB 269s | grade=0.964 inner_auc=0.952 vs conf_auc=0.948
+07:32:18 ===== CYCLE 251 (OUTER -> INNER -> FEEDBACK) =====
+07:36:27 [enc/text/bbc_news] vote=0.966 uniform=0.973 best1=0.967 n_val=674 vram=0.00GB 249s | grade=0.962 inner_auc=0.984 vs conf_auc=0.959
+07:36:51 ===== CYCLE 252 (OUTER -> INNER -> FEEDBACK) =====
+07:40:58 [enc/text/bbc_news] vote=0.980 uniform=0.983 best1=0.982 n_val=657 vram=0.00GB 247s | grade=0.963 inner_auc=0.902 vs conf_auc=0.841
+07:41:20 ===== CYCLE 253 (OUTER -> INNER -> FEEDBACK) =====
+07:45:13 [enc/text/bbc_news] vote=0.973 uniform=0.974 best1=0.974 n_val=660 vram=0.00GB 233s | grade=0.973 inner_auc=0.906 vs conf_auc=0.910
+07:45:37 ===== CYCLE 254 (OUTER -> INNER -> FEEDBACK) =====
+07:49:47 [enc/text/bbc_news] vote=0.981 uniform=0.981 best1=0.981 n_val=671 vram=0.00GB 250s | grade=0.967 inner_auc=0.959 vs conf_auc=0.870
+07:50:09 ===== CYCLE 255 (OUTER -> INNER -> FEEDBACK) =====
+07:54:13 [enc/text/bbc_news] vote=0.974 uniform=0.975 best1=0.972 n_val=684 vram=0.00GB 244s | grade=0.956 inner_auc=0.855 vs conf_auc=0.758
+07:54:38 ===== CYCLE 256 (OUTER -> INNER -> FEEDBACK) =====
+07:58:48 [enc/text/bbc_news] vote=0.975 uniform=0.978 best1=0.975 n_val=668 vram=0.00GB 250s | grade=0.967 inner_auc=0.946 vs conf_auc=0.938
+07:59:18 ===== CYCLE 257 (OUTER -> INNER -> FEEDBACK) =====
+08:04:07 [enc/text/bbc_news] vote=0.976 uniform=0.978 best1=0.972 n_val=670 vram=0.00GB 289s | grade=0.967 inner_auc=0.950 vs conf_auc=0.928
+08:04:41 ===== CYCLE 258 (OUTER -> INNER -> FEEDBACK) =====
+08:08:59 [enc/text/bbc_news] vote=0.971 uniform=0.974 best1=0.971 n_val=645 vram=0.00GB 258s | grade=0.970 inner_auc=0.870 vs conf_auc=0.902
+08:09:24 ===== CYCLE 259 (OUTER -> INNER -> FEEDBACK) =====
+08:14:10 [enc/text/bbc_news] vote=0.978 uniform=0.979 best1=0.981 n_val=668 vram=0.00GB 286s | grade=0.971 inner_auc=0.917 vs conf_auc=0.880
+08:14:32 ===== CYCLE 260 (OUTER -> INNER -> FEEDBACK) =====
+08:19:31 [enc/text/bbc_news] vote=0.979 uniform=0.975 best1=0.974 n_val=653 vram=0.00GB 300s | grade=0.961 inner_auc=1.000 vs conf_auc=0.960
+08:19:58 ===== CYCLE 261 (OUTER -> INNER -> FEEDBACK) =====
+08:23:51 [enc/text/bbc_news] vote=0.969 uniform=0.969 best1=0.965 n_val=651 vram=0.00GB 233s | grade=0.958 inner_auc=0.951 vs conf_auc=0.943
+08:24:09 ===== CYCLE 262 (OUTER -> INNER -> FEEDBACK) =====
+08:26:15 [enc/text/bbc_news] vote=0.975 uniform=0.975 best1=0.974 n_val=641 vram=0.00GB 126s | grade=0.966 inner_auc=0.907 vs conf_auc=0.911
+06:19:09 NI run auto_cpu_040 on CPU; hours=2.0 smoke=False
+06:19:09 explicit task list: ['enc/text/bbc_news']
+06:19:13 [resume] from checkpoint: next cycle 262, rounds 262, 263 metric rows, inner net restored
+06:19:13 ===== CYCLE 262 (OUTER-ONLY BOOTSTRAP) =====
+06:19:13 [data] enc/text/bbc_news: n=2225 C=5 D=384 shards=1
+06:20:51 [enc/text/bbc_news] vote=0.975 uniform=0.975 best1=0.974 n_val=641 vram=0.00GB 99s
+06:21:14 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 262, "n_records": 641, "n_val": 125, "base_rate": 0.984000027179718, "inner": {"auc": 0.9065040650406504, "ece": 0.03470230722427368, "brier": 0.022845832630991936, "acc80": 1.0}, "outer_conf": {"auc": 0.9105691056910569, "ece": 0.028824204921722413, "brier": 0.02066119574010372, "acc80": 1.0}}
+06:21:14 ===== CYCLE 263 (OUTER -> INNER -> FEEDBACK) =====
+06:24:24 [enc/text/bbc_news] vote=0.975 uniform=0.976 best1=0.972 n_val=669 vram=0.00GB 190s | grade=0.959 inner_auc=0.842 vs conf_auc=0.897
+06:24:44 ===== CYCLE 264 (OUTER -> INNER -> FEEDBACK) =====
+06:27:50 [enc/text/bbc_news] vote=0.963 uniform=0.967 best1=0.969 n_val=699 vram=0.00GB 187s | grade=0.956 inner_auc=0.981 vs conf_auc=0.963
+06:28:10 ===== CYCLE 265 (OUTER -> INNER -> FEEDBACK) =====
+06:31:12 [enc/text/bbc_news] vote=0.964 uniform=0.970 best1=0.965 n_val=689 vram=0.00GB 182s | grade=0.972 inner_auc=0.823 vs conf_auc=0.896
+06:31:32 ===== CYCLE 266 (OUTER -> INNER -> FEEDBACK) =====
+06:34:38 [enc/text/bbc_news] vote=0.980 uniform=0.980 best1=0.977 n_val=694 vram=0.00GB 186s | grade=0.966 inner_auc=0.944 vs conf_auc=0.989
+06:34:58 ===== CYCLE 267 (OUTER -> INNER -> FEEDBACK) =====
+06:38:29 [enc/text/bbc_news] vote=0.969 uniform=0.971 best1=0.971 n_val=681 vram=0.00GB 211s | grade=0.967 inner_auc=0.826 vs conf_auc=0.959
+06:38:51 ===== CYCLE 268 (OUTER -> INNER -> FEEDBACK) =====
+06:42:34 [enc/text/bbc_news] vote=0.968 uniform=0.973 best1=0.971 n_val=692 vram=0.00GB 223s | grade=0.967 inner_auc=0.954 vs conf_auc=0.958
+06:42:59 ===== CYCLE 269 (OUTER -> INNER -> FEEDBACK) =====
+06:46:47 [enc/text/bbc_news] vote=0.976 uniform=0.981 best1=0.975 n_val=673 vram=0.00GB 228s | grade=0.964 inner_auc=0.924 vs conf_auc=0.992
+06:47:08 ===== CYCLE 270 (OUTER -> INNER -> FEEDBACK) =====
+06:50:31 [enc/text/bbc_news] vote=0.966 uniform=0.969 best1=0.965 n_val=655 vram=0.00GB 203s | grade=0.968 inner_auc=0.969 vs conf_auc=0.981
+06:50:53 ===== CYCLE 271 (OUTER -> INNER -> FEEDBACK) =====
+06:54:27 [enc/text/bbc_news] vote=0.975 uniform=0.979 best1=0.973 n_val=677 vram=0.00GB 215s | grade=0.964 inner_auc=0.848 vs conf_auc=0.941
+06:54:49 ===== CYCLE 272 (OUTER -> INNER -> FEEDBACK) =====
+06:58:25 [enc/text/bbc_news] vote=0.967 uniform=0.968 best1=0.964 n_val=697 vram=0.00GB 215s | grade=0.958 inner_auc=0.592 vs conf_auc=0.882
+06:58:48 ===== CYCLE 273 (OUTER -> INNER -> FEEDBACK) =====
+07:02:36 [enc/text/bbc_news] vote=0.975 uniform=0.976 best1=0.973 n_val=714 vram=0.00GB 228s | grade=0.970 inner_auc=0.957 vs conf_auc=0.953
+07:02:57 ===== CYCLE 274 (OUTER -> INNER -> FEEDBACK) =====
+07:06:50 [enc/text/bbc_news] vote=0.975 uniform=0.977 best1=0.972 n_val=707 vram=0.00GB 233s | grade=0.974 inner_auc=0.953 vs conf_auc=0.900
+07:07:14 ===== CYCLE 275 (OUTER -> INNER -> FEEDBACK) =====
+07:10:46 [enc/text/bbc_news] vote=0.975 uniform=0.983 best1=0.972 n_val=649 vram=0.00GB 212s | grade=0.970 inner_auc=0.955 vs conf_auc=0.948
+07:11:07 ===== CYCLE 276 (OUTER -> INNER -> FEEDBACK) =====
+07:14:48 [enc/text/bbc_news] vote=0.960 uniform=0.966 best1=0.960 n_val=671 vram=0.00GB 221s | grade=0.952 inner_auc=0.862 vs conf_auc=0.937
+07:15:12 ===== CYCLE 277 (OUTER -> INNER -> FEEDBACK) =====
+07:18:24 [enc/text/bbc_news] vote=0.972 uniform=0.976 best1=0.971 n_val=721 vram=0.00GB 192s | grade=0.951 inner_auc=0.936 vs conf_auc=0.904
+07:18:45 ===== CYCLE 278 (OUTER -> INNER -> FEEDBACK) =====
+07:21:54 [enc/text/bbc_news] vote=0.957 uniform=0.960 best1=0.957 n_val=632 vram=0.00GB 190s | grade=0.957 inner_auc=0.792 vs conf_auc=0.898
+07:22:15 ===== CYCLE 279 (OUTER -> INNER -> FEEDBACK) =====
+07:25:27 [enc/text/bbc_news] vote=0.968 uniform=0.972 best1=0.972 n_val=678 vram=0.00GB 193s | grade=0.957 inner_auc=0.971 vs conf_auc=0.911
+07:25:51 ===== CYCLE 280 (OUTER -> INNER -> FEEDBACK) =====
+07:29:01 [enc/text/bbc_news] vote=0.976 uniform=0.976 best1=0.973 n_val=632 vram=0.00GB 189s | grade=0.969 inner_auc=0.974 vs conf_auc=0.961
+07:29:20 ===== CYCLE 281 (OUTER -> INNER -> FEEDBACK) =====
+07:32:11 [enc/text/bbc_news] vote=0.979 uniform=0.981 best1=0.975 n_val=631 vram=0.00GB 170s | grade=0.956 inner_auc=0.949 vs conf_auc=0.941
+07:32:31 ===== CYCLE 282 (OUTER -> INNER -> FEEDBACK) =====
+07:35:36 [enc/text/bbc_news] vote=0.960 uniform=0.961 best1=0.960 n_val=673 vram=0.00GB 186s | grade=0.950 inner_auc=0.926 vs conf_auc=0.895
+07:35:57 ===== CYCLE 283 (OUTER -> INNER -> FEEDBACK) =====
+07:38:51 [enc/text/bbc_news] vote=0.973 uniform=0.971 best1=0.974 n_val=694 vram=0.00GB 173s | grade=0.964 inner_auc=0.893 vs conf_auc=0.843
+07:39:11 ===== CYCLE 284 (OUTER -> INNER -> FEEDBACK) =====
+07:42:28 [enc/text/bbc_news] vote=0.962 uniform=0.964 best1=0.965 n_val=687 vram=0.00GB 197s | grade=0.960 inner_auc=0.961 vs conf_auc=0.920
+07:42:51 ===== CYCLE 285 (OUTER -> INNER -> FEEDBACK) =====
+07:46:01 [enc/text/bbc_news] vote=0.964 uniform=0.970 best1=0.966 n_val=666 vram=0.00GB 190s | grade=0.953 inner_auc=0.791 vs conf_auc=0.935
+07:46:24 ===== CYCLE 286 (OUTER -> INNER -> FEEDBACK) =====
+07:49:21 [enc/text/bbc_news] vote=0.959 uniform=0.961 best1=0.961 n_val=686 vram=0.00GB 177s | grade=0.954 inner_auc=0.763 vs conf_auc=0.898
+07:49:41 ===== CYCLE 287 (OUTER -> INNER -> FEEDBACK) =====
+07:52:39 [enc/text/bbc_news] vote=0.971 uniform=0.971 best1=0.969 n_val=701 vram=0.00GB 178s | grade=0.967 inner_auc=0.949 vs conf_auc=0.932
+07:52:59 ===== CYCLE 288 (OUTER -> INNER -> FEEDBACK) =====
+07:56:24 [enc/text/bbc_news] vote=0.966 uniform=0.968 best1=0.969 n_val=686 vram=0.00GB 205s | grade=0.968 inner_auc=0.938 vs conf_auc=0.927
+07:56:46 ===== CYCLE 289 (OUTER -> INNER -> FEEDBACK) =====
+08:00:01 [enc/text/bbc_news] vote=0.974 uniform=0.975 best1=0.972 n_val=648 vram=0.00GB 195s | grade=0.973 inner_auc=0.941 vs conf_auc=0.906
+08:00:21 ===== CYCLE 290 (OUTER -> INNER -> FEEDBACK) =====
+08:03:44 [enc/text/bbc_news] vote=0.971 uniform=0.971 best1=0.964 n_val=685 vram=0.00GB 203s | grade=0.964 inner_auc=0.764 vs conf_auc=0.872
+08:04:06 ===== CYCLE 291 (OUTER -> INNER -> FEEDBACK) =====
+23:55:21 NI run auto_cpu_040 on CPU; hours=2.0 smoke=False
+23:55:21 explicit task list: ['enc/text/bbc_news']
+23:55:28 [resume] from checkpoint: next cycle 291, rounds 291, 292 metric rows, inner net restored
+23:55:28 ===== CYCLE 291 (OUTER-ONLY BOOTSTRAP) =====
+23:55:28 [data] enc/text/bbc_news: n=2225 C=5 D=384 shards=1
+23:58:40 [enc/text/bbc_news] vote=0.980 uniform=0.980 best1=0.974 n_val=685 vram=0.00GB 192s
+23:59:08 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 291, "n_records": 685, "n_val": 144, "base_rate": 0.9861111044883728, "inner": {"auc": 0.8556338028169014, "ece": 0.023252363420195047, "brier": 0.016488464549183846, "acc80": 0.991304337978363}, "outer_conf": {"auc": 0.8450704225352113, "ece": 0.030563313100073073, "brier": 0.01967860385775566, "acc80": 0.991304337978363}}
+23:59:08 ===== CYCLE 292 (OUTER -> INNER -> FEEDBACK) =====
+00:02:36 [enc/text/bbc_news] vote=0.971 uniform=0.977 best1=0.970 n_val=688 vram=0.00GB 208s | grade=0.954 inner_auc=0.705 vs conf_auc=0.898
+00:02:54 ===== CYCLE 293 (OUTER -> INNER -> FEEDBACK) =====

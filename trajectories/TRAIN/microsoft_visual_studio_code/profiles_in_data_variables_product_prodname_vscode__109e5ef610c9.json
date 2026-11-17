@@ -1,0 +1,305 @@
+{
+   "app_metadata": {
+      "app_name": "Microsoft Visual Studio Code",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Create and manage Profiles in Microsoft Visual Studio Code to customize settings, extensions, and UI layout for different workflows.",
+   "prerequisite_state": "Microsoft Visual Studio Code is open and running.",
+   "total_steps": 10,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the File menu",
+         "ui_target": {
+            "element_name": "File",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The File dropdown opens showing Preferences, Settings, etc."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select Preferences > Profiles",
+         "ui_target": {
+            "element_name": "Profiles",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File > Preferences > Profiles",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Profiles editor opens in a modal overlay."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click the New Profile button",
+         "ui_target": {
+            "element_name": "New Profile",
+            "automation_id": null,
+            "hierarchical_path": "Profiles editor > New Profile",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The New Profile form opens."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Enter a profile name",
+         "ui_target": {
+            "element_name": "Profile Name",
+            "automation_id": null,
+            "hierarchical_path": "New Profile form > Profile Name",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "MyProfile"
+         },
+         "expected_state_change": "The profile name field is populated with the entered text."
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Choose an icon for the profile",
+         "ui_target": {
+            "element_name": "Icon",
+            "automation_id": null,
+            "hierarchical_path": "New Profile form > Icon",
+            "element_type": "ComboBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The icon selection dialog opens."
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Select a profile template or existing profile to copy from",
+         "ui_target": {
+            "element_name": "Copy From",
+            "automation_id": null,
+            "hierarchical_path": "New Profile form > Copy From",
+            "element_type": "ComboBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The copy from options are displayed."
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Preview the new profile",
+         "ui_target": {
+            "element_name": "Preview",
+            "automation_id": null,
+            "hierarchical_path": "New Profile form > Preview",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A new window opens with the new profile applied."
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Create the new profile",
+         "ui_target": {
+            "element_name": "Create",
+            "automation_id": null,
+            "hierarchical_path": "New Profile form > Create",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The new profile is created and the Profiles editor updates to show the new profile."
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Switch to the new profile",
+         "ui_target": {
+            "element_name": "Use this Profile for Current Window",
+            "automation_id": null,
+            "hierarchical_path": "Profiles editor > Use this Profile for Current Window",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The current window switches to the new profile."
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Open a new window with the profile",
+         "ui_target": {
+            "element_name": "New Window with Profile",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File > New Window with Profile",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A new window opens with the profile applied."
+      }
+   ],
+   "_meta": {
+      "source_app": "Microsoft Visual Studio Code",
+      "app_key": "microsoft_visual_studio_code",
+      "dataset_split": "TRAIN",
+      "category": "Code Editor",
+      "guide_title": "Profiles in {% data variables.product.prodname_vscode %}",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:17:13Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

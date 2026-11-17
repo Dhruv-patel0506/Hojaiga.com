@@ -1,0 +1,345 @@
+01:53:01 NI run auto_gpu_041 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+01:53:01 explicit task list: ['enc/text/amazon_polarity']
+01:53:01 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+01:53:03 [data] enc/text/amazon_polarity: n=119986 C=2 D=384 shards=1
+01:53:51 [enc/text/amazon_polarity] vote=0.877 uniform=0.872 best1=0.877 n_val=35886 vram=0.99GB 48s
+01:54:06 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 35886, "n_val": 7427, "base_rate": 0.8755890727043152, "inner": {"auc": 0.8375831201450147, "ece": 0.007858533388643481, "brier": 0.08875813335180283, "acc80": 0.9372159838676453}, "outer_conf": {"auc": 0.8202337349461754, "ece": 0.03721436221361706, "brier": 0.09327799081802368, "acc80": 0.9316613078117371}}
+01:54:06 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+01:54:32 [enc/text/amazon_polarity] vote=0.876 uniform=0.871 best1=0.876 n_val=36098 vram=1.16GB 26s | grade=0.908 inner_auc=0.838 vs conf_auc=0.832
+01:54:36 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+01:54:59 [enc/text/amazon_polarity] vote=0.879 uniform=0.874 best1=0.875 n_val=35963 vram=1.16GB 23s | grade=0.903 inner_auc=0.832 vs conf_auc=0.824
+01:55:03 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+01:55:26 [enc/text/amazon_polarity] vote=0.878 uniform=0.872 best1=0.878 n_val=35910 vram=1.16GB 24s | grade=0.903 inner_auc=0.834 vs conf_auc=0.821
+01:55:30 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+01:55:56 [enc/text/amazon_polarity] vote=0.879 uniform=0.872 best1=0.877 n_val=36157 vram=1.16GB 26s | grade=0.907 inner_auc=0.830 vs conf_auc=0.817
+01:56:00 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+01:56:26 [enc/text/amazon_polarity] vote=0.878 uniform=0.872 best1=0.879 n_val=35947 vram=1.16GB 25s | grade=0.906 inner_auc=0.839 vs conf_auc=0.830
+01:56:30 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+01:56:56 [enc/text/amazon_polarity] vote=0.877 uniform=0.871 best1=0.877 n_val=35793 vram=1.16GB 26s | grade=0.908 inner_auc=0.832 vs conf_auc=0.824
+01:57:02 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+01:58:22 [enc/text/amazon_polarity] vote=0.879 uniform=0.873 best1=0.880 n_val=35777 vram=1.16GB 80s | grade=0.906 inner_auc=0.832 vs conf_auc=0.823
+01:58:36 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+01:59:58 [enc/text/amazon_polarity] vote=0.878 uniform=0.871 best1=0.878 n_val=36033 vram=1.16GB 82s | grade=0.907 inner_auc=0.830 vs conf_auc=0.825
+02:00:15 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+02:01:01 [enc/text/amazon_polarity] vote=0.879 uniform=0.872 best1=0.877 n_val=35922 vram=1.16GB 47s | grade=0.906 inner_auc=0.831 vs conf_auc=0.825
+02:01:06 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+02:01:38 [enc/text/amazon_polarity] vote=0.878 uniform=0.871 best1=0.875 n_val=36013 vram=1.16GB 32s | grade=0.906 inner_auc=0.832 vs conf_auc=0.828
+02:01:43 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+02:02:14 [enc/text/amazon_polarity] vote=0.877 uniform=0.869 best1=0.878 n_val=36343 vram=1.16GB 30s | grade=0.908 inner_auc=0.832 vs conf_auc=0.826
+02:02:19 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+02:02:50 [enc/text/amazon_polarity] vote=0.876 uniform=0.869 best1=0.876 n_val=35809 vram=1.16GB 31s | grade=0.907 inner_auc=0.828 vs conf_auc=0.824
+02:02:56 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+02:04:22 [enc/text/amazon_polarity] vote=0.879 uniform=0.873 best1=0.878 n_val=36351 vram=1.16GB 85s | grade=0.907 inner_auc=0.829 vs conf_auc=0.823
+02:04:37 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+02:05:59 [enc/text/amazon_polarity] vote=0.880 uniform=0.873 best1=0.878 n_val=35928 vram=1.16GB 82s | grade=0.907 inner_auc=0.831 vs conf_auc=0.829
+02:06:18 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+02:06:56 [enc/text/amazon_polarity] vote=0.879 uniform=0.873 best1=0.878 n_val=35813 vram=1.16GB 38s | grade=0.907 inner_auc=0.837 vs conf_auc=0.832
+02:07:01 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+02:07:30 [enc/text/amazon_polarity] vote=0.878 uniform=0.873 best1=0.877 n_val=35929 vram=1.16GB 29s | grade=0.908 inner_auc=0.829 vs conf_auc=0.825
+02:07:35 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+02:08:00 [enc/text/amazon_polarity] vote=0.878 uniform=0.872 best1=0.876 n_val=35884 vram=1.16GB 26s | grade=0.909 inner_auc=0.831 vs conf_auc=0.828
+02:08:05 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+02:08:33 [enc/text/amazon_polarity] vote=0.878 uniform=0.871 best1=0.877 n_val=36030 vram=1.16GB 29s | grade=0.908 inner_auc=0.839 vs conf_auc=0.834
+02:08:39 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+02:09:53 [enc/text/amazon_polarity] vote=0.877 uniform=0.871 best1=0.876 n_val=36086 vram=1.16GB 74s | grade=0.909 inner_auc=0.838 vs conf_auc=0.834
+02:10:11 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+02:10:47 [enc/text/amazon_polarity] vote=0.877 uniform=0.870 best1=0.876 n_val=35906 vram=1.16GB 36s | grade=0.909 inner_auc=0.824 vs conf_auc=0.822
+02:10:52 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+02:11:17 [enc/text/amazon_polarity] vote=0.879 uniform=0.872 best1=0.878 n_val=35738 vram=1.16GB 26s | grade=0.909 inner_auc=0.835 vs conf_auc=0.832
+02:11:22 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+02:11:51 [enc/text/amazon_polarity] vote=0.877 uniform=0.871 best1=0.876 n_val=36269 vram=1.16GB 29s | grade=0.910 inner_auc=0.840 vs conf_auc=0.838
+02:11:57 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+02:12:24 [enc/text/amazon_polarity] vote=0.878 uniform=0.872 best1=0.876 n_val=36287 vram=1.16GB 28s | grade=0.910 inner_auc=0.838 vs conf_auc=0.835
+02:12:30 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+02:12:54 [enc/text/amazon_polarity] vote=0.878 uniform=0.871 best1=0.876 n_val=35576 vram=1.16GB 25s | grade=0.910 inner_auc=0.835 vs conf_auc=0.832
+02:12:59 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+02:13:23 [enc/text/amazon_polarity] vote=0.878 uniform=0.871 best1=0.876 n_val=36151 vram=1.16GB 24s | grade=0.911 inner_auc=0.828 vs conf_auc=0.826
+02:13:29 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+02:13:56 [enc/text/amazon_polarity] vote=0.879 uniform=0.873 best1=0.877 n_val=36031 vram=1.16GB 28s | grade=0.910 inner_auc=0.834 vs conf_auc=0.830
+02:14:02 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+02:14:31 [enc/text/amazon_polarity] vote=0.876 uniform=0.869 best1=0.876 n_val=35941 vram=1.16GB 29s | grade=0.909 inner_auc=0.838 vs conf_auc=0.835
+02:14:36 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+02:15:03 [enc/text/amazon_polarity] vote=0.876 uniform=0.868 best1=0.875 n_val=36028 vram=1.16GB 27s | grade=0.909 inner_auc=0.833 vs conf_auc=0.830
+02:15:08 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+02:15:37 [enc/text/amazon_polarity] vote=0.874 uniform=0.870 best1=0.874 n_val=35780 vram=1.16GB 29s | grade=0.907 inner_auc=0.839 vs conf_auc=0.834
+02:15:44 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+02:16:13 [enc/text/amazon_polarity] vote=0.879 uniform=0.871 best1=0.877 n_val=35880 vram=1.16GB 29s | grade=0.908 inner_auc=0.827 vs conf_auc=0.823
+02:16:19 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+02:16:47 [enc/text/amazon_polarity] vote=0.878 uniform=0.872 best1=0.878 n_val=35934 vram=1.16GB 28s | grade=0.911 inner_auc=0.838 vs conf_auc=0.831
+02:16:52 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+02:17:21 [enc/text/amazon_polarity] vote=0.877 uniform=0.873 best1=0.876 n_val=35922 vram=1.16GB 29s | grade=0.909 inner_auc=0.835 vs conf_auc=0.829
+02:17:28 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+02:17:56 [enc/text/amazon_polarity] vote=0.878 uniform=0.872 best1=0.876 n_val=36020 vram=1.16GB 28s | grade=0.910 inner_auc=0.829 vs conf_auc=0.823
+02:18:03 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+02:18:31 [enc/text/amazon_polarity] vote=0.880 uniform=0.873 best1=0.879 n_val=36175 vram=1.16GB 28s | grade=0.909 inner_auc=0.828 vs conf_auc=0.824
+02:18:37 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+02:19:02 [enc/text/amazon_polarity] vote=0.878 uniform=0.870 best1=0.876 n_val=35766 vram=1.16GB 26s | grade=0.910 inner_auc=0.831 vs conf_auc=0.827
+02:19:09 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+02:19:37 [enc/text/amazon_polarity] vote=0.876 uniform=0.873 best1=0.875 n_val=36255 vram=1.16GB 29s | grade=0.908 inner_auc=0.821 vs conf_auc=0.816
+02:19:44 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+02:20:14 [enc/text/amazon_polarity] vote=0.877 uniform=0.872 best1=0.876 n_val=36192 vram=1.16GB 30s | grade=0.910 inner_auc=0.834 vs conf_auc=0.830
+02:20:19 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+02:20:43 [enc/text/amazon_polarity] vote=0.877 uniform=0.872 best1=0.876 n_val=36196 vram=1.16GB 24s | grade=0.912 inner_auc=0.842 vs conf_auc=0.834
+02:20:48 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+02:21:14 [enc/text/amazon_polarity] vote=0.875 uniform=0.869 best1=0.875 n_val=35906 vram=1.16GB 27s | grade=0.909 inner_auc=0.831 vs conf_auc=0.830
+02:21:20 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+02:21:49 [enc/text/amazon_polarity] vote=0.878 uniform=0.872 best1=0.877 n_val=35928 vram=1.16GB 28s | grade=0.908 inner_auc=0.833 vs conf_auc=0.827
+02:21:54 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+02:22:19 [enc/text/amazon_polarity] vote=0.877 uniform=0.869 best1=0.876 n_val=36001 vram=1.16GB 25s | grade=0.910 inner_auc=0.834 vs conf_auc=0.828
+02:22:24 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+02:22:49 [enc/text/amazon_polarity] vote=0.879 uniform=0.872 best1=0.879 n_val=35999 vram=1.16GB 25s | grade=0.909 inner_auc=0.824 vs conf_auc=0.818
+02:22:55 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+02:23:24 [enc/text/amazon_polarity] vote=0.878 uniform=0.869 best1=0.877 n_val=35948 vram=1.16GB 28s | grade=0.911 inner_auc=0.827 vs conf_auc=0.821
+02:23:29 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+02:23:57 [enc/text/amazon_polarity] vote=0.877 uniform=0.869 best1=0.877 n_val=36063 vram=1.16GB 28s | grade=0.910 inner_auc=0.826 vs conf_auc=0.818
+02:24:03 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+02:24:28 [enc/text/amazon_polarity] vote=0.878 uniform=0.871 best1=0.876 n_val=35788 vram=1.16GB 25s | grade=0.910 inner_auc=0.835 vs conf_auc=0.831
+02:24:34 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+02:25:02 [enc/text/amazon_polarity] vote=0.877 uniform=0.872 best1=0.876 n_val=36005 vram=1.16GB 28s | grade=0.911 inner_auc=0.837 vs conf_auc=0.831
+02:25:09 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+02:25:37 [enc/text/amazon_polarity] vote=0.878 uniform=0.872 best1=0.876 n_val=35949 vram=1.16GB 28s | grade=0.909 inner_auc=0.836 vs conf_auc=0.828
+02:25:43 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+02:26:07 [enc/text/amazon_polarity] vote=0.876 uniform=0.870 best1=0.876 n_val=36128 vram=1.16GB 24s | grade=0.909 inner_auc=0.832 vs conf_auc=0.825
+02:26:12 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+02:26:38 [enc/text/amazon_polarity] vote=0.875 uniform=0.868 best1=0.874 n_val=35696 vram=1.16GB 26s | grade=0.908 inner_auc=0.843 vs conf_auc=0.835
+02:26:44 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+02:27:12 [enc/text/amazon_polarity] vote=0.878 uniform=0.872 best1=0.877 n_val=35990 vram=1.16GB 28s | grade=0.909 inner_auc=0.839 vs conf_auc=0.829
+02:27:18 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+02:27:44 [enc/text/amazon_polarity] vote=0.876 uniform=0.871 best1=0.876 n_val=36043 vram=1.16GB 25s | grade=0.908 inner_auc=0.831 vs conf_auc=0.825
+02:27:48 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+02:28:14 [enc/text/amazon_polarity] vote=0.877 uniform=0.871 best1=0.877 n_val=36226 vram=1.16GB 25s | grade=0.910 inner_auc=0.829 vs conf_auc=0.817
+02:28:20 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+02:28:49 [enc/text/amazon_polarity] vote=0.876 uniform=0.870 best1=0.875 n_val=36161 vram=1.16GB 29s | grade=0.909 inner_auc=0.833 vs conf_auc=0.822
+02:28:55 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+02:29:23 [enc/text/amazon_polarity] vote=0.877 uniform=0.870 best1=0.877 n_val=35991 vram=1.16GB 28s | grade=0.910 inner_auc=0.836 vs conf_auc=0.826
+02:29:28 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+02:29:52 [enc/text/amazon_polarity] vote=0.876 uniform=0.870 best1=0.876 n_val=35715 vram=1.16GB 24s | grade=0.909 inner_auc=0.829 vs conf_auc=0.821
+02:29:59 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+02:30:28 [enc/text/amazon_polarity] vote=0.877 uniform=0.869 best1=0.877 n_val=35859 vram=1.16GB 28s | grade=0.909 inner_auc=0.824 vs conf_auc=0.816
+02:30:35 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+02:31:03 [enc/text/amazon_polarity] vote=0.876 uniform=0.871 best1=0.874 n_val=35986 vram=1.16GB 28s | grade=0.910 inner_auc=0.834 vs conf_auc=0.822
+02:31:10 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+02:31:35 [enc/text/amazon_polarity] vote=0.879 uniform=0.872 best1=0.878 n_val=35922 vram=1.16GB 25s | grade=0.909 inner_auc=0.827 vs conf_auc=0.819
+02:31:40 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+02:32:09 [enc/text/amazon_polarity] vote=0.879 uniform=0.873 best1=0.878 n_val=35882 vram=1.16GB 29s | grade=0.910 inner_auc=0.835 vs conf_auc=0.826
+02:32:15 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+02:32:44 [enc/text/amazon_polarity] vote=0.877 uniform=0.869 best1=0.876 n_val=35917 vram=1.16GB 29s | grade=0.909 inner_auc=0.833 vs conf_auc=0.823
+02:32:50 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+02:33:16 [enc/text/amazon_polarity] vote=0.877 uniform=0.870 best1=0.876 n_val=36046 vram=1.16GB 26s | grade=0.910 inner_auc=0.836 vs conf_auc=0.824
+02:33:22 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+02:33:49 [enc/text/amazon_polarity] vote=0.879 uniform=0.873 best1=0.879 n_val=35751 vram=1.16GB 28s | grade=0.909 inner_auc=0.817 vs conf_auc=0.805
+02:33:57 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+02:34:25 [enc/text/amazon_polarity] vote=0.876 uniform=0.871 best1=0.876 n_val=36071 vram=1.16GB 28s | grade=0.908 inner_auc=0.833 vs conf_auc=0.822
+02:34:32 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+02:34:58 [enc/text/amazon_polarity] vote=0.878 uniform=0.872 best1=0.877 n_val=35816 vram=1.16GB 25s | grade=0.909 inner_auc=0.829 vs conf_auc=0.815
+02:35:04 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+02:35:30 [enc/text/amazon_polarity] vote=0.877 uniform=0.870 best1=0.877 n_val=35856 vram=1.16GB 26s | grade=0.909 inner_auc=0.828 vs conf_auc=0.818
+02:35:36 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+02:36:05 [enc/text/amazon_polarity] vote=0.876 uniform=0.870 best1=0.875 n_val=36404 vram=1.16GB 28s | grade=0.909 inner_auc=0.830 vs conf_auc=0.818
+02:36:11 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+02:36:38 [enc/text/amazon_polarity] vote=0.879 uniform=0.870 best1=0.878 n_val=36291 vram=1.16GB 27s | grade=0.910 inner_auc=0.829 vs conf_auc=0.818
+02:36:44 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+02:37:08 [enc/text/amazon_polarity] vote=0.875 uniform=0.870 best1=0.875 n_val=36303 vram=1.16GB 24s | grade=0.907 inner_auc=0.834 vs conf_auc=0.823
+02:37:14 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+02:37:44 [enc/text/amazon_polarity] vote=0.876 uniform=0.869 best1=0.876 n_val=36090 vram=1.16GB 29s | grade=0.910 inner_auc=0.832 vs conf_auc=0.817
+02:37:51 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+02:38:18 [enc/text/amazon_polarity] vote=0.876 uniform=0.871 best1=0.876 n_val=36015 vram=1.16GB 28s | grade=0.909 inner_auc=0.832 vs conf_auc=0.821
+02:38:25 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+02:38:48 [enc/text/amazon_polarity] vote=0.879 uniform=0.875 best1=0.879 n_val=35928 vram=1.16GB 23s | grade=0.909 inner_auc=0.840 vs conf_auc=0.828
+02:38:56 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+02:39:23 [enc/text/amazon_polarity] vote=0.877 uniform=0.871 best1=0.876 n_val=35957 vram=1.16GB 26s | grade=0.909 inner_auc=0.821 vs conf_auc=0.807
+02:39:30 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+02:39:56 [enc/text/amazon_polarity] vote=0.874 uniform=0.867 best1=0.873 n_val=35987 vram=1.16GB 26s | grade=0.907 inner_auc=0.837 vs conf_auc=0.826
+02:40:02 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+02:40:26 [enc/text/amazon_polarity] vote=0.878 uniform=0.874 best1=0.877 n_val=36145 vram=1.16GB 24s | grade=0.909 inner_auc=0.830 vs conf_auc=0.821
+02:40:34 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+02:41:01 [enc/text/amazon_polarity] vote=0.877 uniform=0.872 best1=0.876 n_val=36093 vram=1.16GB 27s | grade=0.909 inner_auc=0.830 vs conf_auc=0.820
+02:41:10 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+02:41:35 [enc/text/amazon_polarity] vote=0.877 uniform=0.871 best1=0.876 n_val=36076 vram=1.16GB 25s | grade=0.911 inner_auc=0.813 vs conf_auc=0.800
+02:41:42 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+02:42:09 [enc/text/amazon_polarity] vote=0.877 uniform=0.870 best1=0.876 n_val=36092 vram=1.16GB 27s | grade=0.911 inner_auc=0.838 vs conf_auc=0.828
+02:42:22 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+02:43:01 [enc/text/amazon_polarity] vote=0.877 uniform=0.870 best1=0.877 n_val=35962 vram=1.16GB 40s | grade=0.912 inner_auc=0.835 vs conf_auc=0.824
+02:43:13 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+02:43:53 [enc/text/amazon_polarity] vote=0.877 uniform=0.872 best1=0.877 n_val=35668 vram=1.16GB 40s | grade=0.910 inner_auc=0.829 vs conf_auc=0.816
+02:44:03 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+02:44:41 [enc/text/amazon_polarity] vote=0.875 uniform=0.871 best1=0.875 n_val=35987 vram=1.16GB 38s | grade=0.908 inner_auc=0.834 vs conf_auc=0.823
+02:44:53 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+02:45:32 [enc/text/amazon_polarity] vote=0.876 uniform=0.868 best1=0.875 n_val=35998 vram=1.16GB 39s | grade=0.909 inner_auc=0.838 vs conf_auc=0.826
+02:45:42 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+02:46:21 [enc/text/amazon_polarity] vote=0.875 uniform=0.870 best1=0.875 n_val=36088 vram=1.16GB 39s | grade=0.908 inner_auc=0.823 vs conf_auc=0.811
+02:46:33 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+02:47:11 [enc/text/amazon_polarity] vote=0.874 uniform=0.868 best1=0.873 n_val=36120 vram=1.16GB 38s | grade=0.908 inner_auc=0.823 vs conf_auc=0.812
+02:47:23 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+02:48:03 [enc/text/amazon_polarity] vote=0.878 uniform=0.874 best1=0.877 n_val=35995 vram=1.16GB 41s | grade=0.909 inner_auc=0.832 vs conf_auc=0.819
+02:48:15 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+02:48:55 [enc/text/amazon_polarity] vote=0.875 uniform=0.870 best1=0.874 n_val=35846 vram=1.16GB 40s | grade=0.909 inner_auc=0.821 vs conf_auc=0.810
+02:49:06 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+02:49:45 [enc/text/amazon_polarity] vote=0.876 uniform=0.869 best1=0.876 n_val=35917 vram=1.16GB 39s | grade=0.910 inner_auc=0.838 vs conf_auc=0.826
+02:49:56 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+02:50:36 [enc/text/amazon_polarity] vote=0.880 uniform=0.873 best1=0.879 n_val=35974 vram=1.16GB 40s | grade=0.909 inner_auc=0.836 vs conf_auc=0.826
+02:50:48 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+02:51:23 [enc/text/amazon_polarity] vote=0.876 uniform=0.870 best1=0.875 n_val=36020 vram=1.16GB 35s | grade=0.908 inner_auc=0.838 vs conf_auc=0.829
+02:51:30 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+02:52:00 [enc/text/amazon_polarity] vote=0.877 uniform=0.870 best1=0.877 n_val=35835 vram=1.16GB 30s | grade=0.909 inner_auc=0.829 vs conf_auc=0.821
+02:52:08 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+02:52:36 [enc/text/amazon_polarity] vote=0.877 uniform=0.869 best1=0.877 n_val=36189 vram=1.16GB 28s | grade=0.911 inner_auc=0.823 vs conf_auc=0.811
+02:52:46 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+02:53:12 [enc/text/amazon_polarity] vote=0.876 uniform=0.870 best1=0.875 n_val=35855 vram=1.16GB 27s | grade=0.910 inner_auc=0.834 vs conf_auc=0.825
+02:53:20 RUN COMPLETE
+21:28:15 NI run auto_gpu_041 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+21:28:15 explicit task list: ['enc/text/amazon_polarity']
+21:28:27 [resume] from checkpoint: next cycle 92, rounds 92, 92 metric rows, inner net restored
+21:28:27 ===== CYCLE 92 (OUTER-ONLY BOOTSTRAP) =====
+21:28:29 [data] enc/text/amazon_polarity: n=119986 C=2 D=384 shards=1
+21:29:40 [enc/text/amazon_polarity] vote=0.876 uniform=0.870 best1=0.876 n_val=35961 vram=0.99GB 71s
+21:30:04 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 92, "n_records": 35961, "n_val": 7237, "base_rate": 0.8832389116287231, "inner": {"auc": 0.8189243581103598, "ece": 0.010443366659400839, "brier": 0.0875810906291008, "acc80": 0.937122106552124}, "outer_conf": {"auc": 0.8066473624575098, "ece": 0.011228067276638252, "brier": 0.08909726142883301, "acc80": 0.9347037672996521}}
+21:30:04 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+21:31:23 [enc/text/amazon_polarity] vote=0.880 uniform=0.872 best1=0.879 n_val=35969 vram=1.16GB 79s | grade=0.910 inner_auc=0.828 vs conf_auc=0.820
+21:31:35 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+21:32:59 [enc/text/amazon_polarity] vote=0.878 uniform=0.874 best1=0.878 n_val=35981 vram=1.16GB 84s | grade=0.910 inner_auc=0.825 vs conf_auc=0.814
+21:33:13 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+21:34:33 [enc/text/amazon_polarity] vote=0.875 uniform=0.869 best1=0.875 n_val=35864 vram=1.16GB 80s | grade=0.908 inner_auc=0.822 vs conf_auc=0.812
+21:34:46 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+21:36:11 [enc/text/amazon_polarity] vote=0.876 uniform=0.870 best1=0.876 n_val=35980 vram=1.16GB 85s | grade=0.909 inner_auc=0.839 vs conf_auc=0.829
+21:36:24 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+21:37:46 [enc/text/amazon_polarity] vote=0.875 uniform=0.871 best1=0.875 n_val=35928 vram=1.16GB 82s | grade=0.911 inner_auc=0.838 vs conf_auc=0.829
+21:38:00 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+21:39:16 [enc/text/amazon_polarity] vote=0.879 uniform=0.871 best1=0.878 n_val=36038 vram=1.16GB 76s | grade=0.908 inner_auc=0.831 vs conf_auc=0.822
+21:39:29 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+21:40:49 [enc/text/amazon_polarity] vote=0.875 uniform=0.870 best1=0.875 n_val=36149 vram=1.16GB 81s | grade=0.907 inner_auc=0.844 vs conf_auc=0.832
+21:41:04 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+21:42:24 [enc/text/amazon_polarity] vote=0.877 uniform=0.870 best1=0.877 n_val=35854 vram=1.16GB 80s | grade=0.909 inner_auc=0.835 vs conf_auc=0.821
+21:42:37 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+21:43:46 [enc/text/amazon_polarity] vote=0.878 uniform=0.871 best1=0.878 n_val=36113 vram=1.16GB 70s | grade=0.910 inner_auc=0.833 vs conf_auc=0.822
+21:44:01 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+21:45:22 [enc/text/amazon_polarity] vote=0.877 uniform=0.871 best1=0.876 n_val=35823 vram=1.16GB 82s | grade=0.909 inner_auc=0.828 vs conf_auc=0.817
+21:45:37 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+21:47:08 [enc/text/amazon_polarity] vote=0.877 uniform=0.870 best1=0.876 n_val=36066 vram=1.16GB 91s | grade=0.910 inner_auc=0.839 vs conf_auc=0.827
+21:47:22 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+21:48:46 [enc/text/amazon_polarity] vote=0.873 uniform=0.871 best1=0.873 n_val=36003 vram=1.16GB 84s | grade=0.906 inner_auc=0.833 vs conf_auc=0.821
+21:48:59 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+21:50:23 [enc/text/amazon_polarity] vote=0.875 uniform=0.869 best1=0.875 n_val=35598 vram=1.16GB 84s | grade=0.908 inner_auc=0.834 vs conf_auc=0.824
+21:50:38 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+21:52:00 [enc/text/amazon_polarity] vote=0.875 uniform=0.870 best1=0.875 n_val=35918 vram=1.16GB 82s | grade=0.910 inner_auc=0.830 vs conf_auc=0.816
+21:52:15 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+21:53:32 [enc/text/amazon_polarity] vote=0.878 uniform=0.871 best1=0.878 n_val=35907 vram=1.16GB 78s | grade=0.909 inner_auc=0.830 vs conf_auc=0.820
+21:53:46 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+21:55:09 [enc/text/amazon_polarity] vote=0.877 uniform=0.872 best1=0.877 n_val=35955 vram=1.16GB 82s | grade=0.909 inner_auc=0.838 vs conf_auc=0.828
+21:55:23 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+21:56:48 [enc/text/amazon_polarity] vote=0.876 uniform=0.869 best1=0.876 n_val=36115 vram=1.16GB 84s | grade=0.909 inner_auc=0.832 vs conf_auc=0.820
+21:57:03 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+21:58:21 [enc/text/amazon_polarity] vote=0.877 uniform=0.870 best1=0.877 n_val=35869 vram=1.16GB 78s | grade=0.910 inner_auc=0.832 vs conf_auc=0.818
+21:58:36 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+21:59:57 [enc/text/amazon_polarity] vote=0.879 uniform=0.874 best1=0.878 n_val=36093 vram=1.16GB 82s | grade=0.909 inner_auc=0.844 vs conf_auc=0.831
+22:00:14 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+22:01:45 [enc/text/amazon_polarity] vote=0.876 uniform=0.871 best1=0.875 n_val=36022 vram=1.16GB 91s | grade=0.908 inner_auc=0.833 vs conf_auc=0.821
+22:02:04 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+22:03:36 [enc/text/amazon_polarity] vote=0.876 uniform=0.872 best1=0.875 n_val=36189 vram=1.16GB 92s | grade=0.909 inner_auc=0.838 vs conf_auc=0.824
+22:03:51 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+22:05:30 [enc/text/amazon_polarity] vote=0.879 uniform=0.872 best1=0.879 n_val=36350 vram=1.16GB 98s | grade=0.909 inner_auc=0.836 vs conf_auc=0.825
+22:05:48 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+22:07:29 [enc/text/amazon_polarity] vote=0.877 uniform=0.871 best1=0.877 n_val=35918 vram=1.16GB 102s | grade=0.908 inner_auc=0.829 vs conf_auc=0.818
+22:07:46 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+22:09:22 [enc/text/amazon_polarity] vote=0.875 uniform=0.871 best1=0.875 n_val=36000 vram=1.16GB 96s | grade=0.910 inner_auc=0.829 vs conf_auc=0.813
+22:09:38 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+22:11:04 [enc/text/amazon_polarity] vote=0.878 uniform=0.873 best1=0.878 n_val=36064 vram=1.16GB 86s | grade=0.910 inner_auc=0.838 vs conf_auc=0.827
+22:11:23 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+22:13:02 [enc/text/amazon_polarity] vote=0.876 uniform=0.869 best1=0.876 n_val=36301 vram=1.16GB 98s | grade=0.908 inner_auc=0.828 vs conf_auc=0.816
+22:13:26 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+22:15:02 [enc/text/amazon_polarity] vote=0.878 uniform=0.871 best1=0.877 n_val=36038 vram=1.16GB 96s | grade=0.909 inner_auc=0.842 vs conf_auc=0.832
+22:15:19 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+22:16:40 [enc/text/amazon_polarity] vote=0.876 uniform=0.869 best1=0.875 n_val=36091 vram=1.16GB 81s | grade=0.910 inner_auc=0.841 vs conf_auc=0.829
+22:16:56 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+22:18:13 [enc/text/amazon_polarity] vote=0.877 uniform=0.872 best1=0.876 n_val=36140 vram=1.16GB 77s | grade=0.910 inner_auc=0.840 vs conf_auc=0.829
+22:18:31 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+22:20:01 [enc/text/amazon_polarity] vote=0.876 uniform=0.870 best1=0.875 n_val=36367 vram=1.16GB 90s | grade=0.910 inner_auc=0.839 vs conf_auc=0.828
+22:20:20 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+22:21:46 [enc/text/amazon_polarity] vote=0.878 uniform=0.872 best1=0.877 n_val=36080 vram=1.16GB 86s | grade=0.910 inner_auc=0.840 vs conf_auc=0.828
+22:22:04 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+22:23:15 [enc/text/amazon_polarity] vote=0.877 uniform=0.871 best1=0.876 n_val=35918 vram=1.16GB 71s | grade=0.910 inner_auc=0.831 vs conf_auc=0.817
+22:23:33 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+22:25:02 [enc/text/amazon_polarity] vote=0.879 uniform=0.873 best1=0.878 n_val=36123 vram=1.16GB 88s | grade=0.911 inner_auc=0.833 vs conf_auc=0.820
+22:25:20 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+22:26:23 [enc/text/amazon_polarity] vote=0.876 uniform=0.872 best1=0.875 n_val=35839 vram=1.16GB 63s | grade=0.909 inner_auc=0.845 vs conf_auc=0.831
+22:26:35 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+22:27:53 [enc/text/amazon_polarity] vote=0.875 uniform=0.870 best1=0.874 n_val=35971 vram=1.16GB 79s | grade=0.910 inner_auc=0.842 vs conf_auc=0.827
+22:28:12 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+22:29:17 [enc/text/amazon_polarity] vote=0.879 uniform=0.871 best1=0.878 n_val=35808 vram=1.16GB 65s | grade=0.909 inner_auc=0.841 vs conf_auc=0.830
+22:29:30 RUN COMPLETE
+22:06:19 NI run auto_gpu_041 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+22:06:19 explicit task list: ['enc/text/amazon_polarity']
+22:06:32 [resume] from checkpoint: next cycle 129, rounds 129, 129 metric rows, inner net restored
+22:06:32 ===== CYCLE 129 (OUTER-ONLY BOOTSTRAP) =====
+22:06:34 [data] enc/text/amazon_polarity: n=119986 C=2 D=384 shards=1
+22:08:09 [enc/text/amazon_polarity] vote=0.876 uniform=0.871 best1=0.876 n_val=35823 vram=0.99GB 94s
+22:08:42 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 129, "n_records": 35823, "n_val": 7356, "base_rate": 0.8807775974273682, "inner": {"auc": 0.835818396176191, "ece": 0.008179352432894539, "brier": 0.0860658586025238, "acc80": 0.9403467178344727}, "outer_conf": {"auc": 0.826062906860037, "ece": 0.012886946351389447, "brier": 0.08763416111469269, "acc80": 0.9386471509933472}}
+22:08:42 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+22:10:34 [enc/text/amazon_polarity] vote=0.876 uniform=0.873 best1=0.876 n_val=35783 vram=1.16GB 111s | grade=0.910 inner_auc=0.828 vs conf_auc=0.818
+22:10:55 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+22:12:40 [enc/text/amazon_polarity] vote=0.879 uniform=0.874 best1=0.878 n_val=36007 vram=1.16GB 105s | grade=0.910 inner_auc=0.832 vs conf_auc=0.822
+22:13:01 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+22:14:40 [enc/text/amazon_polarity] vote=0.878 uniform=0.872 best1=0.877 n_val=35742 vram=1.16GB 99s | grade=0.911 inner_auc=0.823 vs conf_auc=0.812
+22:14:55 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+22:16:25 [enc/text/amazon_polarity] vote=0.876 uniform=0.869 best1=0.875 n_val=35822 vram=1.16GB 90s | grade=0.909 inner_auc=0.840 vs conf_auc=0.830
+22:16:41 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+22:18:20 [enc/text/amazon_polarity] vote=0.880 uniform=0.874 best1=0.880 n_val=35840 vram=1.16GB 99s | grade=0.909 inner_auc=0.833 vs conf_auc=0.824
+22:18:37 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+22:20:22 [enc/text/amazon_polarity] vote=0.876 uniform=0.869 best1=0.876 n_val=36090 vram=1.16GB 105s | grade=0.909 inner_auc=0.835 vs conf_auc=0.823
+22:20:42 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+22:22:15 [enc/text/amazon_polarity] vote=0.876 uniform=0.873 best1=0.875 n_val=35781 vram=1.16GB 94s | grade=0.908 inner_auc=0.847 vs conf_auc=0.836
+22:22:31 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+22:24:00 [enc/text/amazon_polarity] vote=0.876 uniform=0.868 best1=0.876 n_val=36046 vram=1.16GB 90s | grade=0.910 inner_auc=0.834 vs conf_auc=0.822
+22:24:18 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+22:26:05 [enc/text/amazon_polarity] vote=0.878 uniform=0.871 best1=0.878 n_val=36138 vram=1.16GB 107s | grade=0.911 inner_auc=0.840 vs conf_auc=0.831
+22:26:27 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+22:28:35 [enc/text/amazon_polarity] vote=0.876 uniform=0.869 best1=0.875 n_val=36133 vram=1.16GB 128s | grade=0.907 inner_auc=0.839 vs conf_auc=0.825
+22:28:55 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+22:30:50 [enc/text/amazon_polarity] vote=0.878 uniform=0.872 best1=0.878 n_val=35978 vram=1.16GB 115s | grade=0.911 inner_auc=0.834 vs conf_auc=0.821
+22:31:08 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+22:33:02 [enc/text/amazon_polarity] vote=0.878 uniform=0.871 best1=0.877 n_val=36020 vram=1.16GB 114s | grade=0.909 inner_auc=0.842 vs conf_auc=0.829
+22:33:24 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+22:35:27 [enc/text/amazon_polarity] vote=0.878 uniform=0.872 best1=0.877 n_val=36150 vram=1.16GB 123s | grade=0.911 inner_auc=0.836 vs conf_auc=0.823
+22:35:52 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+22:37:58 [enc/text/amazon_polarity] vote=0.875 uniform=0.868 best1=0.875 n_val=36306 vram=1.16GB 126s | grade=0.908 inner_auc=0.842 vs conf_auc=0.833
+22:38:17 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+22:40:05 [enc/text/amazon_polarity] vote=0.878 uniform=0.874 best1=0.877 n_val=36029 vram=1.16GB 108s | grade=0.909 inner_auc=0.835 vs conf_auc=0.822
+22:40:28 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+22:42:31 [enc/text/amazon_polarity] vote=0.875 uniform=0.870 best1=0.875 n_val=36228 vram=1.16GB 123s | grade=0.909 inner_auc=0.834 vs conf_auc=0.821
+22:42:55 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+22:45:06 [enc/text/amazon_polarity] vote=0.876 uniform=0.870 best1=0.875 n_val=36256 vram=1.16GB 131s | grade=0.910 inner_auc=0.836 vs conf_auc=0.824
+22:45:29 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+22:47:24 [enc/text/amazon_polarity] vote=0.876 uniform=0.870 best1=0.877 n_val=35971 vram=1.16GB 115s | grade=0.911 inner_auc=0.840 vs conf_auc=0.826
+22:47:43 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+22:49:38 [enc/text/amazon_polarity] vote=0.877 uniform=0.870 best1=0.876 n_val=36112 vram=1.16GB 115s | grade=0.911 inner_auc=0.842 vs conf_auc=0.829
+22:49:58 ===== CYCLE 149 (OUTER -> INNER -> FEEDBACK) =====
+22:52:04 [enc/text/amazon_polarity] vote=0.875 uniform=0.869 best1=0.875 n_val=36286 vram=1.16GB 126s | grade=0.910 inner_auc=0.826 vs conf_auc=0.811
+22:52:23 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+22:54:20 [enc/text/amazon_polarity] vote=0.877 uniform=0.873 best1=0.877 n_val=36211 vram=1.16GB 117s | grade=0.911 inner_auc=0.824 vs conf_auc=0.808
+22:54:43 ===== CYCLE 151 (OUTER -> INNER -> FEEDBACK) =====
+22:56:31 [enc/text/amazon_polarity] vote=0.880 uniform=0.872 best1=0.879 n_val=36128 vram=1.16GB 109s | grade=0.911 inner_auc=0.828 vs conf_auc=0.818
+22:56:52 ===== CYCLE 152 (OUTER -> INNER -> FEEDBACK) =====
+22:58:47 [enc/text/amazon_polarity] vote=0.878 uniform=0.874 best1=0.878 n_val=36420 vram=1.16GB 115s | grade=0.912 inner_auc=0.835 vs conf_auc=0.824
+22:59:09 ===== CYCLE 153 (OUTER -> INNER -> FEEDBACK) =====
+23:01:05 [enc/text/amazon_polarity] vote=0.876 uniform=0.870 best1=0.875 n_val=35772 vram=1.16GB 115s | grade=0.908 inner_auc=0.835 vs conf_auc=0.826
+23:01:25 ===== CYCLE 154 (OUTER -> INNER -> FEEDBACK) =====
+23:03:26 [enc/text/amazon_polarity] vote=0.879 uniform=0.872 best1=0.879 n_val=35868 vram=1.16GB 121s | grade=0.910 inner_auc=0.834 vs conf_auc=0.825
+23:03:49 ===== CYCLE 155 (OUTER -> INNER -> FEEDBACK) =====
+23:05:49 [enc/text/amazon_polarity] vote=0.877 uniform=0.872 best1=0.877 n_val=35927 vram=1.16GB 120s | grade=0.910 inner_auc=0.834 vs conf_auc=0.822
+23:06:11 ===== CYCLE 156 (OUTER -> INNER -> FEEDBACK) =====
+23:08:07 [enc/text/amazon_polarity] vote=0.876 uniform=0.871 best1=0.875 n_val=36059 vram=1.16GB 116s | grade=0.909 inner_auc=0.829 vs conf_auc=0.819
+23:08:32 RUN COMPLETE
+02:10:26 NI run auto_gpu_041 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+02:10:26 explicit task list: ['enc/text/amazon_polarity']
+02:10:39 [resume] from checkpoint: next cycle 157, rounds 157, 157 metric rows, inner net restored
+02:10:39 ===== CYCLE 157 (OUTER-ONLY BOOTSTRAP) =====
+02:10:41 [data] enc/text/amazon_polarity: n=119986 C=2 D=384 shards=1
+02:12:27 [enc/text/amazon_polarity] vote=0.876 uniform=0.868 best1=0.875 n_val=35794 vram=0.99GB 106s
+02:12:55 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 157, "n_records": 35794, "n_val": 7143, "base_rate": 0.8808623552322388, "inner": {"auc": 0.821651708509416, "ece": 0.0074201846813664925, "brier": 0.08762887120246887, "acc80": 0.9383969306945801}, "outer_conf": {"auc": 0.8045951884884691, "ece": 0.008650490913206868, "brier": 0.08971057087182999, "acc80": 0.9347217082977295}}
+02:12:55 ===== CYCLE 158 (OUTER -> INNER -> FEEDBACK) =====
+02:14:42 [enc/text/amazon_polarity] vote=0.877 uniform=0.874 best1=0.877 n_val=35991 vram=1.16GB 107s | grade=0.909 inner_auc=0.832 vs conf_auc=0.822
+02:15:02 ===== CYCLE 159 (OUTER -> INNER -> FEEDBACK) =====
+02:16:55 [enc/text/amazon_polarity] vote=0.878 uniform=0.873 best1=0.878 n_val=35932 vram=1.16GB 112s | grade=0.911 inner_auc=0.823 vs conf_auc=0.810
+02:17:13 ===== CYCLE 160 (OUTER -> INNER -> FEEDBACK) =====
+02:19:13 [enc/text/amazon_polarity] vote=0.876 uniform=0.871 best1=0.876 n_val=35872 vram=1.16GB 121s | grade=0.909 inner_auc=0.816 vs conf_auc=0.807
+02:19:34 ===== CYCLE 161 (OUTER -> INNER -> FEEDBACK) =====

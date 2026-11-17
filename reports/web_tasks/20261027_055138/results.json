@@ -1,0 +1,378 @@
+{
+ "stamp": "20261027_055138",
+ "summary": {
+  "tasks": 8,
+  "cold": {
+   "success": "6/8",
+   "success_rate": 0.75,
+   "mean_clicks_when_ok": 1.7,
+   "mean_seconds_all": 8.2
+  },
+  "pool": {
+   "success": "6/8",
+   "success_rate": 0.75,
+   "mean_clicks_when_ok": 1.7,
+   "mean_seconds_all": 7.2
+  },
+  "retrieval_top1_correct": "7/8",
+  "retrieval_in_top3": "8/8",
+  "pool_found_nothing": 0,
+  "pool_healed_after_a_stale_path": 1,
+  "pool_ok_by_stored_path_alone": 5,
+  "mean_retrieval_ms": 398,
+  "pool_failures_by_reason": {
+   "the pool had no": 0,
+   "step '": 0,
+   "could not click": 0,
+   "the page did not": 0
+  }
+ },
+ "results": [
+  {
+   "task": {
+    "host": "coursera.org",
+    "site": "Coursera",
+    "url": "https://coursera.org",
+    "category": "",
+    "chain": [
+     "Explore our catalog",
+     "Business"
+    ],
+    "label": "Business Intelligence Analyst",
+    "outcome": "opened a new page",
+    "expect_title": "Coursera | Online Courses From Top Universities. Join for Fr",
+    "expect_items": [],
+    "stored_goal": "Go to the Business Intelligence Analyst page on Coursera via Explore our catalog",
+    "id": 1,
+    "question": "How do I get to Business Intelligence Analyst on Coursera?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 11.0,
+    "picture": "task_01_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Business Intelligence Analyst page on Coursera via Explore our catalog",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 526,
+    "pid": "d5d2dfdcb90f27eb9bc9",
+    "seconds": 11.1,
+    "picture": "task_01_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "weather.gov",
+    "site": "Weather",
+    "url": "https://weather.gov",
+    "category": "",
+    "chain": [
+     "Weather Safety"
+    ],
+    "label": "Weather Safety",
+    "outcome": "opened a new page",
+    "expect_title": "Safety",
+    "expect_items": [],
+    "stored_goal": "Go to the Weather Safety page on Weather",
+    "id": 2,
+    "question": "How do I get to Weather Safety on Weather?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "seconds": 9.5,
+    "picture": "task_02_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "healed": true,
+    "skipped": [
+     "Weather Safety"
+    ],
+    "fallback_clicks": 2,
+    "retrieved": "Go to the Weather Safety page on Weather",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 318,
+    "pid": "f12e7b194abc776b987e",
+    "seconds": 4.7,
+    "picture": "task_02_pool_ok.png",
+    "filed_correction": true
+   }
+  },
+  {
+   "task": {
+    "host": "lobste.rs",
+    "site": "Lobste",
+    "url": "https://lobste.rs",
+    "category": "",
+    "chain": [
+     "Recent"
+    ],
+    "label": "Recent",
+    "outcome": "opened a new page",
+    "expect_title": "Recent Stories | Lobsters",
+    "expect_items": [],
+    "stored_goal": "Go to the Recent page on Lobste",
+    "id": 3,
+    "question": "How do I get to Recent on Lobste?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 3.8,
+    "picture": "task_03_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Recent page on Lobste",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 377,
+    "pid": "c7ea7ea4befe8fc74b41",
+    "seconds": 4.0,
+    "picture": "task_03_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "loc.gov",
+    "site": "Loc",
+    "url": "https://loc.gov",
+    "category": "",
+    "chain": [
+     "Global Menu",
+     "About"
+    ],
+    "label": "About",
+    "outcome": "opened a new page",
+    "expect_title": "About the Library of Congress | Library of Congress",
+    "expect_items": [],
+    "stored_goal": "Go to the About page on Loc via Global Menu",
+    "id": 4,
+    "question": "How do I get to About on Loc?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 3.3,
+    "picture": "task_04_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the About page on Loc via Global Menu",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 333,
+    "pid": "932e5f11e5273cbc3df5",
+    "seconds": 8.4,
+    "picture": "task_04_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "en.wikipedia.org",
+    "site": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Help:Contents",
+    "category": "",
+    "chain": [
+     "View source"
+    ],
+    "label": "View source",
+    "outcome": "opened a new page",
+    "expect_title": "View source for Help:Contents - Wikipedia",
+    "expect_items": [],
+    "stored_goal": "Go to the View source page on Wikipedia",
+    "id": 5,
+    "question": "How do I get to View source on Wikipedia?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 5.5,
+    "picture": "task_05_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the View source page on Wikipedia",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 410,
+    "pid": "30cfa3469d26565cfe09",
+    "seconds": 4.6,
+    "picture": "task_05_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "substack.com",
+    "site": "Substack",
+    "url": "https://substack.com",
+    "category": "",
+    "chain": [
+     "Subscriptions"
+    ],
+    "label": "Subscriptions",
+    "outcome": "opened a dialog",
+    "expect_title": "",
+    "expect_items": [
+     "close",
+     "Email",
+     "Sign in with password",
+     "Continue"
+    ],
+    "stored_goal": "Open Subscriptions on Substack",
+    "id": 6,
+    "question": "How do I open Subscriptions on Substack?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 4.7,
+    "picture": "task_06_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "the stored path failed (skipped ['Subscriptions']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "Subscriptions"
+    ],
+    "fallback_clicks": 0,
+    "retrieved": "Open Subscriptions on Substack",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 347,
+    "pid": "ec73137129911f23a604",
+    "seconds": 4.5,
+    "picture": "task_06_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "notion.so",
+    "site": "Notion",
+    "url": "https://notion.so",
+    "category": "",
+    "chain": [
+     "Pricing"
+    ],
+    "label": "Pricing",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Sign up",
+     "Get started",
+     "Watch video \u2192",
+     "Contact Sales"
+    ],
+    "stored_goal": "Open the Pricing menu on Notion",
+    "id": 7,
+    "question": "I want to see the Pricing menu on Notion. What do I click?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 4,
+    "why": "",
+    "seconds": 11.0,
+    "picture": "task_07_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Open the Click to show simpler choices menu on Notion via Pricing > Cookie settings > More options \u00bb",
+    "retrieved_correct": false,
+    "in_top3": true,
+    "retrieval_ms": 399,
+    "pid": "b141984601c2a4eef4e1",
+    "seconds": 9.0,
+    "picture": "task_07_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "github.com",
+    "site": "Github",
+    "url": "https://github.com",
+    "category": "",
+    "chain": [
+     "Issues"
+    ],
+    "label": "Issues Plan and track work",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Join for free",
+     "Continue with Team",
+     "Start a free trial",
+     "Contact Sales"
+    ],
+    "stored_goal": "Open the Issues Plan and track work menu on Github",
+    "id": 8,
+    "question": "I want to see the Issues Plan and track work menu on Github. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 7,
+    "why": "nothing on the page matches",
+    "seconds": 16.8,
+    "picture": "task_08_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 5,
+    "why": "the stored path failed (skipped ['Issues Plan and track work']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "Issues Plan and track work"
+    ],
+    "fallback_clicks": 5,
+    "retrieved": "Open the Issues Plan and track work menu on Github",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 471,
+    "pid": "bd2411a916b59ac18712",
+    "seconds": 11.1,
+    "picture": "task_08_pool_fail.png",
+    "filed_correction": false
+   }
+  }
+ ]
+}

@@ -1,0 +1,112 @@
+{
+   "app_metadata": {
+      "app_name": "GIF-Overlay",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure GIF-Overlay",
+   "prerequisite_state": "No application is open",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download GIF-Overlay via WinGet",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Win",
+               "G"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The command prompt or terminal opens with the installation command running"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run the installer for manual download",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The download starts for the installer file"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Open the context menu and select 'Open With' for a .gif file",
+         "ui_target": {
+            "element_name": "Right-click menu",
+            "automation_id": null,
+            "hierarchical_path": "File Explorer > Context Menu",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'Open With' dialog appears"
+      }
+   ],
+   "_meta": {
+      "source_app": "GIF-Overlay",
+      "app_key": "gif_overlay",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "GIF Overlay - Minimalist GIF & Image Viewer",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:38:41Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

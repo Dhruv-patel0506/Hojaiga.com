@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HoJaiga</title>
+<style>
+:root{
+  --bg:#0e1116; --panel:#161b22; --panel2:#1c232d; --line:#262e3a; --text:#e6edf3; --muted:#8b98a8;
+  --accent:#4cc9a6; --accent2:#7c8cff; --warn:#f2b84b; --bad:#ff6b6b; --radius:12px;
+}
+@media (prefers-color-scheme: light){
+  :root{--bg:#f4f6f9;--panel:#ffffff;--panel2:#eef1f5;--line:#d9dee6;--text:#18202a;--muted:#5d6b7c;--accent:#0f9d7a;--accent2:#4a5bd8;--warn:#b7791f;--bad:#c53030;}
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.45 "Segoe UI",system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden}
+header{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+.logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;color:#06110d;font-weight:800}
+h1{font-size:15px;margin:0;font-weight:650;letter-spacing:.2px}
+.pill{margin-left:auto;padding:3px 10px;border-radius:99px;font-size:12px;border:1px solid var(--line);color:var(--muted);background:var(--panel2)}
+.pill.scanning,.pill.delegating{color:var(--warn);border-color:var(--warn)}
+.pill.ready{color:var(--accent);border-color:var(--accent)}
+.pill.touring{color:var(--accent2);border-color:var(--accent2)}
+.target{display:flex;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.target input{flex:1;min-width:0}
+input,button{font:inherit;color:var(--text)}
+input[type=text],.target input{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;outline:none}
+input:focus{border-color:var(--accent)}
+button{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:#06110d;border-color:var(--accent);font-weight:650}
+button:disabled{opacity:.45;cursor:default}
+main{flex:1;min-height:0;display:flex;flex-direction:column;overflow-y:auto;padding:12px 14px;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px}
+.card h2{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:600}
+.bar{height:8px;border-radius:99px;background:var(--panel2);overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .35s}
+.counters{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
+.counters div{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:6px 4px;text-align:center}
+.counters b{display:block;font-size:18px;font-variant-numeric:tabular-nums}
+.counters span{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.log{margin-top:8px;max-height:92px;overflow:auto;font:12px/1.5 Consolas,monospace;color:var(--muted)}
+.log div::before{content:"› ";color:var(--accent)}
+.curr{display:grid;gap:6px}
+.sec{display:flex;gap:8px;align-items:center;padding:7px 9px;border-radius:9px;border:1px solid var(--line);background:var(--panel2)}
+.sec .n{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;background:var(--panel);color:var(--muted);border:1px solid var(--line)}
+.sec.now{border-color:var(--accent2);box-shadow:0 0 0 1px var(--accent2) inset}
+.sec.now .n{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+.sec.done .n{background:var(--accent);color:#06110d;border-color:var(--accent)}
+.sec small{margin-left:auto;color:var(--muted)}
+.step{border-left:3px solid var(--accent2)}
+.step .t{font-weight:650;margin-bottom:2px}
+.step .m{color:var(--muted);font-size:12px;margin-bottom:6px}
+.chat{display:flex;flex-direction:column;gap:8px}
+.msg{max-width:94%;padding:9px 11px;border-radius:12px;border:1px solid var(--line);white-space:pre-wrap}
+.msg.ai{background:var(--panel);align-self:flex-start}
+.msg.me{background:var(--accent2);color:#fff;border-color:var(--accent2);align-self:flex-end}
+.msg.err{border-color:var(--bad);color:var(--bad)}
+.opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.controls{display:flex;flex-wrap:wrap;gap:6px}
+footer{border-top:1px solid var(--line);background:var(--panel);padding:10px 14px;display:flex;gap:8px}
+footer input{flex:1;min-width:0}
+.hint{color:var(--muted);font-size:12px;padding:0 14px 8px}
+.hidden{display:none!important}
+.dl{white-space:pre-wrap;font:12px/1.5 Consolas,monospace;color:var(--muted)}
+.ok{color:var(--accent)} .no{color:var(--bad)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">H</div><h1>HoJaiga <span style="color:var(--muted);font-weight:400">companion</span></h1>
+  <span id="pill" class="pill">idle</span>
+</header>
+
+<div class="target">
+  <input id="target" list="apps" placeholder="Pick or type a program to learn (Notepad, Paint, ...)" autocomplete="off">
+  <datalist id="apps"></datalist>
+  <button id="scan" class="primary">Scan</button>
+  <button id="newbtn" title="End this session">New</button>
+</div>
+
+<main id="main">
+  <section class="card hidden" id="scancard">
+    <h2>Live scan</h2>
+    <div class="bar"><i id="pct"></i></div>
+    <div class="counters">
+      <div><b id="c_regions">0</b><span>regions</span></div>
+      <div><b id="c_controls">0</b><span>controls</span></div>
+      <div><b id="c_menus">0</b><span>menus</span></div>
+      <div><b id="c_dialogs">0</b><span>dialogs</span></div>
+      <div><b id="c_shortcuts">0</b><span>shortcuts</span></div>
+    </div>
+    <div class="log" id="log"></div>
+  </section>
+
+  <section class="card hidden" id="currcard">
+    <h2>Full-app curriculum</h2>
+    <div class="curr" id="curr"></div>
+  </section>
+
+  <section class="card step hidden" id="stepcard">
+    <h2>Now showing</h2>
+    <div class="t" id="st_t"></div>
+    <div class="m" id="st_m"></div>
+    <div id="st_x"></div>
+    <div class="controls" style="margin-top:10px">
+      <button id="b_repeat">&#8634; Repeat</button>
+      <button id="b_next" class="primary">Next &#9654;</button>
+      <button id="b_auto">Autoplay</button>
+      <button id="b_voice">Voice: off</button>
+      <button id="b_stop">Stop tour</button>
+    </div>
+  </section>
+
+  <section class="chat" id="chat"></section>
+</main>
+<div class="hint" id="hint">Ask “where is Find?”, “how do I save?”, or tell me a task: “type hello for me”.</div>
+<footer>
+  <input id="say" type="text" placeholder="Talk to HoJaiga ..." autocomplete="off">
+  <button id="send" class="primary">Send</button>
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+let curSec = -1, steps = 0;
+const api = (p, body) => fetch(p, {method: body === undefined ? 'GET' : 'POST', headers: {'Content-Type': 'application/json'}, body: body === undefined ? undefined : JSON.stringify(body)}).then(r => r.json());
+
+function add(cls, text, opts){
+  const d = document.createElement('div'); d.className = 'msg ' + cls; d.textContent = text;
+  if (opts && opts.length){
+    const o = document.createElement('div'); o.className = 'opts';
+    opts.forEach(t => { const b = document.createElement('button'); b.textContent = t; b.onclick = () => { send(t); o.remove(); }; o.appendChild(b); });
+    d.appendChild(o);
+  }
+  $('chat').appendChild(d); $('main').scrollTop = $('main').scrollHeight; return d;
+}
+function send(text){ if (!text.trim()) return; api('/api/chat', {text}); $('say').value = ''; }
+function setState(s){
+  const p = $('pill'); p.textContent = s; p.className = 'pill ' + s;
+  $('scan').disabled = (s === 'scanning' || s === 'touring' || s === 'delegating');
+  $('stepcard').classList.toggle('hidden', s !== 'touring');
+  if (s !== 'touring') document.querySelectorAll('.sec').forEach(e => e.classList.remove('now'));
+}
+function counters(c){ for (const k of ['regions','controls','menus','dialogs','shortcuts']) $('c_' + k).textContent = c[k] ?? 0; }
+function curriculum(secs){
+  $('currcard').classList.remove('hidden'); const box = $('curr'); box.innerHTML = '';
+  secs.forEach((s, i) => { const d = document.createElement('div'); d.className = 'sec'; d.id = 'sec' + i; d.innerHTML = `<span class="n">${i + 1}</span><span>${s.title}</span><small>${s.steps.length}</small>`; box.appendChild(d); });
+}
+
+const es = new EventSource('/api/events');
+es.addEventListener('reset', () => { $('chat').innerHTML = ''; $('currcard').classList.add('hidden'); $('scancard').classList.add('hidden'); setState('idle'); });
+es.addEventListener('status', e => { const d = JSON.parse(e.data); setState(d.state); if (d.counts) counters(d.counts); if (d.voice !== undefined) $('b_voice').textContent = 'Voice: ' + (d.voice ? 'on' : 'off'); });
+es.addEventListener('progress', e => { const d = JSON.parse(e.data); $('scancard').classList.remove('hidden'); if (d.pct !== undefined) $('pct').style.width = d.pct + '%';
+  const l = document.createElement('div'); l.textContent = d.text; $('log').appendChild(l); $('log').scrollTop = 1e9; });
+es.addEventListener('counters', e => counters(JSON.parse(e.data).counts));
+es.addEventListener('curriculum', e => curriculum(JSON.parse(e.data).sections));
+es.addEventListener('ask', e => { const d = JSON.parse(e.data); add('ai', d.text, d.options); });
+es.addEventListener('say', e => { const d = JSON.parse(e.data); add('ai', d.text); });
+es.addEventListener('user', e => add('me', JSON.parse(e.data).text));
+es.addEventListener('answer', e => {});
+es.addEventListener('error', e => { try { add('ai err', JSON.parse(e.data).text); } catch (x) {} });
+es.addEventListener('section', e => { const d = JSON.parse(e.data); document.querySelectorAll('.sec').forEach((el, i) => { el.classList.toggle('now', i === d.index); el.classList.toggle('done', i < d.index); }); });
+es.addEventListener('step', e => { const d = JSON.parse(e.data); $('st_t').textContent = d.title; $('st_m').textContent = `${d.section} — step ${d.index + 1} of ${d.total}`; $('st_x').textContent = d.text; });
+es.addEventListener('delegate', e => { const d = JSON.parse(e.data); const v = d.verification || {};
+  let t = `Task: ${d.task}\nVerified ${v.done || 0}/${v.total || 0} steps` + (v.rollbacks ? `, ${v.rollbacks} undone` : '') + (v.caught ? `, ${v.caught} problems caught` : '') + '\n';
+  (d.steps || []).forEach(s => { t += `${s.status === 'done' ? '✔' : '✘'} ${s.goal} (${s.source}, ${Math.round(s.ms)} ms)\n`; });
+  if (d.read_back) t += '\nOn screen now: ' + d.read_back.slice(0, 160) + '…';
+  add('ai', t); });
+
+$('scan').onclick = () => { const t = $('target').value.trim(); if (!t) return; $('chat').innerHTML = ''; $('log').innerHTML = ''; $('pct').style.width = '0'; $('scancard').classList.remove('hidden'); $('currcard').classList.add('hidden'); api('/api/start', {target: t}).then(r => { if (!r.ok) add('ai err', r.error); }); };
+$('newbtn').onclick = () => api('/api/new', {});
+$('send').onclick = () => send($('say').value);
+$('say').addEventListener('keydown', e => { if (e.key === 'Enter') send($('say').value); });
+$('target').addEventListener('keydown', e => { if (e.key === 'Enter') $('scan').click(); });
+$('b_next').onclick = () => api('/api/control', {action: 'next'});
+$('b_repeat').onclick = () => api('/api/control', {action: 'repeat'});
+$('b_stop').onclick = () => api('/api/control', {action: 'stop'});
+$('b_voice').onclick = () => api('/api/control', {action: 'voice'});
+$('b_auto').onclick = () => { api('/api/control', {action: 'autoplay'}); $('b_auto').classList.toggle('primary'); };
+api('/api/apps').then(list => { const dl = $('apps'); list.forEach(n => { const o = document.createElement('option'); o.value = n; dl.appendChild(o); }); });
+api('/api/state').then(s => setState(s.state));
+</script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+{
+   "app_metadata": {
+      "app_name": "Microsoft Visual Studio Code",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Navigate and use code editor features in Microsoft Visual Studio Code",
+   "prerequisite_state": "Microsoft Visual Studio Code is open and a file is open in the editor",
+   "total_steps": 10,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the Quick Open dialog",
+         "ui_target": {
+            "element_name": "Quick Open",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Quick Open",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Quick Open dialog opens showing a search bar and a list of open files"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Type a file name to open a specific file",
+         "ui_target": {
+            "element_name": "Search bar in Quick Open",
+            "automation_id": null,
+            "hierarchical_path": "Quick Open dialog > Search bar",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "example_file.js"
+         },
+         "expected_state_change": "The list of open files filters to show only files matching the search term"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Select a file from the Quick Open list",
+         "ui_target": {
+            "element_name": "example_file.js in Quick Open",
+            "automation_id": null,
+            "hierarchical_path": "Quick Open dialog > example_file.js",
+            "element_type": "ListItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected file opens in the editor"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Use the Breadcrumbs to navigate to a specific file",
+         "ui_target": {
+            "element_name": "Breadcrumbs",
+            "automation_id": null,
+            "hierarchical_path": "Editor > Breadcrumbs",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Breadcrumbs display the current file path and allow navigation to other files and symbols"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Navigate to a file in the Breadcrumbs",
+         "ui_target": {
+            "element_name": "example_file.js in Breadcrumbs",
+            "automation_id": null,
+            "hierarchical_path": "Breadcrumbs > example_file.js",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected file opens in the editor"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Use the Go to Definition command",
+         "ui_target": {
+            "element_name": "Go to Definition",
+            "automation_id": null,
+            "hierarchical_path": "Editor context menu > Go to Definition",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The definition of the symbol under the cursor opens in the editor"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Use the Go to Type Definition command",
+         "ui_target": {
+            "element_name": "Go to Type Definition",
+            "automation_id": null,
+            "hierarchical_path": "Command Palette > Go to Type Definition",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The type definition of the symbol under the cursor opens in the editor"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Use the Go to Symbol command",
+         "ui_target": {
+            "element_name": "Go to Symbol",
+            "automation_id": null,
+            "hierarchical_path": "Command Palette > Go to Symbol",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Go to Symbol dialog opens, allowing navigation to symbols in the current file"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Type a symbol name to navigate to it",
+         "ui_target": {
+            "element_name": "Search bar in Go to Symbol",
+            "automation_id": null,
+            "hierarchical_path": "Go to Symbol dialog > Search bar",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "example_function"
+         },
+         "expected_state_change": "The list of symbols filters to show only symbols matching the search term"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Select a symbol from the Go to Symbol list",
+         "ui_target": {
+            "element_name": "example_function in Go to Symbol",
+            "automation_id": null,
+            "hierarchical_path": "Go to Symbol dialog > example_function",
+            "element_type": "ListItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected symbol opens in the editor"
+      }
+   ],
+   "_meta": {
+      "source_app": "Microsoft Visual Studio Code",
+      "app_key": "microsoft_visual_studio_code",
+      "dataset_split": "TRAIN",
+      "category": "Code Editor",
+      "guide_title": "Code Navigation",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:11:39Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

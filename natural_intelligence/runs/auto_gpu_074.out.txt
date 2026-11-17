@@ -1,0 +1,75 @@
+14:53:48 NI run auto_gpu_074 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+14:53:48 explicit task list: ['enc2/image/cifar100']
+14:53:48 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+14:53:51 [data] enc2/image/cifar100: n=60000 C=100 D=1536 shards=1
+14:54:39 [enc2/image/cifar100] vote=0.899 uniform=0.895 best1=0.893 n_val=17915 vram=1.38GB 49s
+14:54:53 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 17915, "n_val": 3609, "base_rate": 0.8988639712333679, "inner": {"auc": 0.9183913821934699, "ece": 0.011837798799626811, "brier": 0.05910709500312805, "acc80": 0.9785244464874268}, "outer_conf": {"auc": 0.9149021164468016, "ece": 0.024155678210512163, "brier": 0.06311254948377609, "acc80": 0.9726359248161316}}
+14:54:53 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+14:55:48 [enc2/image/cifar100] vote=0.897 uniform=0.894 best1=0.892 n_val=17831 vram=1.75GB 55s | grade=0.911 inner_auc=0.914 vs conf_auc=0.908
+14:55:57 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+14:56:57 [enc2/image/cifar100] vote=0.898 uniform=0.894 best1=0.893 n_val=17974 vram=1.74GB 60s | grade=0.917 inner_auc=0.920 vs conf_auc=0.914
+14:57:09 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+14:58:22 [enc2/image/cifar100] vote=0.893 uniform=0.891 best1=0.889 n_val=18015 vram=1.74GB 73s | grade=0.915 inner_auc=0.932 vs conf_auc=0.917
+14:58:36 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+15:00:07 [enc2/image/cifar100] vote=0.895 uniform=0.892 best1=0.891 n_val=17869 vram=1.74GB 91s | grade=0.915 inner_auc=0.928 vs conf_auc=0.916
+15:00:23 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+15:01:50 [enc2/image/cifar100] vote=0.900 uniform=0.896 best1=0.895 n_val=18332 vram=1.73GB 87s | grade=0.913 inner_auc=0.927 vs conf_auc=0.919
+15:02:06 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+15:03:35 [enc2/image/cifar100] vote=0.903 uniform=0.895 best1=0.901 n_val=18170 vram=1.73GB 89s | grade=0.910 inner_auc=0.920 vs conf_auc=0.913
+15:03:47 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+15:05:13 [enc2/image/cifar100] vote=0.900 uniform=0.896 best1=0.897 n_val=18022 vram=1.74GB 86s | grade=0.909 inner_auc=0.935 vs conf_auc=0.929
+15:05:29 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+15:07:05 [enc2/image/cifar100] vote=0.897 uniform=0.892 best1=0.893 n_val=18038 vram=1.74GB 96s | grade=0.913 inner_auc=0.923 vs conf_auc=0.919
+15:07:18 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+15:08:43 [enc2/image/cifar100] vote=0.896 uniform=0.892 best1=0.891 n_val=18099 vram=1.74GB 85s | grade=0.915 inner_auc=0.934 vs conf_auc=0.926
+15:08:57 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+15:10:24 [enc2/image/cifar100] vote=0.901 uniform=0.899 best1=0.896 n_val=17977 vram=1.74GB 87s | grade=0.915 inner_auc=0.933 vs conf_auc=0.924
+15:10:42 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+15:12:18 [enc2/image/cifar100] vote=0.897 uniform=0.894 best1=0.895 n_val=18012 vram=1.74GB 95s | grade=0.914 inner_auc=0.930 vs conf_auc=0.924
+15:12:37 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+15:14:18 [enc2/image/cifar100] vote=0.895 uniform=0.893 best1=0.891 n_val=17806 vram=1.74GB 101s | grade=0.915 inner_auc=0.931 vs conf_auc=0.924
+15:14:34 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+15:15:58 [enc2/image/cifar100] vote=0.899 uniform=0.898 best1=0.896 n_val=17961 vram=1.74GB 83s | grade=0.916 inner_auc=0.924 vs conf_auc=0.920
+15:16:12 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+15:17:49 [enc2/image/cifar100] vote=0.896 uniform=0.897 best1=0.893 n_val=18095 vram=1.74GB 97s | grade=0.915 inner_auc=0.929 vs conf_auc=0.920
+15:18:08 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+15:19:42 [enc2/image/cifar100] vote=0.897 uniform=0.897 best1=0.893 n_val=18141 vram=1.74GB 95s | grade=0.917 inner_auc=0.931 vs conf_auc=0.923
+15:19:59 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+15:21:32 [enc2/image/cifar100] vote=0.895 uniform=0.893 best1=0.893 n_val=17872 vram=1.74GB 93s | grade=0.913 inner_auc=0.927 vs conf_auc=0.919
+15:21:50 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+15:23:19 [enc2/image/cifar100] vote=0.896 uniform=0.895 best1=0.892 n_val=18091 vram=1.74GB 89s | grade=0.916 inner_auc=0.927 vs conf_auc=0.917
+15:23:33 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+15:24:58 [enc2/image/cifar100] vote=0.896 uniform=0.895 best1=0.893 n_val=18058 vram=1.74GB 85s | grade=0.914 inner_auc=0.935 vs conf_auc=0.927
+15:25:13 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+15:26:45 [enc2/image/cifar100] vote=0.898 uniform=0.896 best1=0.894 n_val=17927 vram=1.74GB 92s | grade=0.914 inner_auc=0.929 vs conf_auc=0.919
+15:27:00 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+15:28:21 [enc2/image/cifar100] vote=0.897 uniform=0.895 best1=0.895 n_val=17793 vram=1.75GB 80s | grade=0.916 inner_auc=0.928 vs conf_auc=0.919
+15:28:38 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+15:30:12 [enc2/image/cifar100] vote=0.898 uniform=0.897 best1=0.895 n_val=18003 vram=1.74GB 95s | grade=0.914 inner_auc=0.918 vs conf_auc=0.910
+15:30:33 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+15:32:18 [enc2/image/cifar100] vote=0.897 uniform=0.899 best1=0.894 n_val=18184 vram=1.74GB 105s | grade=0.915 inner_auc=0.926 vs conf_auc=0.919
+15:32:39 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+15:34:14 [enc2/image/cifar100] vote=0.901 uniform=0.901 best1=0.899 n_val=17959 vram=1.74GB 95s | grade=0.913 inner_auc=0.930 vs conf_auc=0.926
+15:34:31 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+15:35:54 [enc2/image/cifar100] vote=0.898 uniform=0.896 best1=0.896 n_val=18056 vram=1.74GB 83s | grade=0.911 inner_auc=0.942 vs conf_auc=0.935
+15:36:13 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+15:37:50 [enc2/image/cifar100] vote=0.892 uniform=0.891 best1=0.890 n_val=17988 vram=1.74GB 97s | grade=0.907 inner_auc=0.927 vs conf_auc=0.922
+15:38:09 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+15:39:35 [enc2/image/cifar100] vote=0.898 uniform=0.897 best1=0.897 n_val=17968 vram=1.74GB 86s | grade=0.907 inner_auc=0.924 vs conf_auc=0.915
+15:39:51 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+15:41:24 [enc2/image/cifar100] vote=0.896 uniform=0.895 best1=0.894 n_val=17940 vram=1.74GB 93s | grade=0.910 inner_auc=0.930 vs conf_auc=0.923
+15:41:42 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+15:43:12 [enc2/image/cifar100] vote=0.897 uniform=0.893 best1=0.892 n_val=18223 vram=1.73GB 91s | grade=0.906 inner_auc=0.913 vs conf_auc=0.901
+15:43:28 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+15:45:01 [enc2/image/cifar100] vote=0.895 uniform=0.896 best1=0.893 n_val=18130 vram=1.74GB 93s | grade=0.908 inner_auc=0.927 vs conf_auc=0.917
+15:45:20 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+15:46:57 [enc2/image/cifar100] vote=0.893 uniform=0.891 best1=0.891 n_val=17923 vram=1.74GB 97s | grade=0.907 inner_auc=0.930 vs conf_auc=0.922
+15:47:15 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+15:48:45 [enc2/image/cifar100] vote=0.899 uniform=0.899 best1=0.898 n_val=18242 vram=1.73GB 90s | grade=0.908 inner_auc=0.927 vs conf_auc=0.921
+15:49:06 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+15:50:52 [enc2/image/cifar100] vote=0.899 uniform=0.897 best1=0.898 n_val=17845 vram=1.74GB 106s | grade=0.911 inner_auc=0.925 vs conf_auc=0.916
+15:51:12 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+15:53:03 [enc2/image/cifar100] vote=0.893 uniform=0.892 best1=0.892 n_val=18160 vram=1.73GB 111s | grade=0.903 inner_auc=0.928 vs conf_auc=0.920
+15:53:18 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+15:54:44 [enc2/image/cifar100] vote=0.896 uniform=0.896 best1=0.894 n_val=17929 vram=1.74GB 86s | grade=0.906 inner_auc=0.921 vs conf_auc=0.913
+15:55:02 RUN COMPLETE

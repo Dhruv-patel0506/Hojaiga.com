@@ -1,0 +1,56 @@
+{
+   "app_metadata": {
+      "app_name": "disk4n6",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "cli",
+   "high_level_task": "Install and run the disk4n6 tool to analyze a disk image or the live system.",
+   "prerequisite_state": "No specific application or document state is required before running the guide.",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install the disk4n6 tool using Cargo",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "cargo install disk-forensic"
+         },
+         "expected_state_change": "The terminal outputs the installation progress and once complete, the disk4n6 tool is installed."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run the disk4n6 tool to analyze the live system",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "disk4n6"
+         },
+         "expected_state_change": "The terminal outputs the overview of the live system, including storage details and acquisition-integrity findings."
+      }
+   ],
+   "_meta": {
+      "source_app": "disk4n6",
+      "app_key": "disk4n6",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "disk-forensic",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:03:14Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

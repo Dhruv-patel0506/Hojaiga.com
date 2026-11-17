@@ -1,0 +1,249 @@
+{
+   "app_metadata": {
+      "app_name": "Simple Sticky Notes",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Navigate through the basic features and settings of Simple Sticky Notes",
+   "prerequisite_state": "Simple Sticky Notes is running and the user is at the home screen",
+   "total_steps": 8,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Double-click on the simple sticky notes system tray icon",
+         "ui_target": {
+            "element_name": "System tray icon",
+            "automation_id": null,
+            "hierarchical_path": "Taskbar > Notification area > Simple Sticky Notes icon",
+            "element_type": "SystemTrayIcon",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DOUBLE_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A new sticky note is created and displayed"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Right-click on the simple sticky notes system tray icon and select New Note",
+         "ui_target": {
+            "element_name": "New Note",
+            "automation_id": null,
+            "hierarchical_path": "Taskbar > Notification area > Simple Sticky Notes icon > Context menu > New Note",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A new sticky note is created and displayed"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click the Note Menu button and then select Delete",
+         "ui_target": {
+            "element_name": "Note Menu",
+            "automation_id": null,
+            "hierarchical_path": "Sticky note > Note Menu button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Delete option is selected from the Note Menu"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click the Note Menu button and then select Hide",
+         "ui_target": {
+            "element_name": "Note Menu",
+            "automation_id": null,
+            "hierarchical_path": "Sticky note > Note Menu button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Hide option is selected from the Note Menu"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Right-click on the note area",
+         "ui_target": {
+            "element_name": "Note Area",
+            "automation_id": null,
+            "hierarchical_path": "Sticky note > Note Area",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The text editing/formatting menu is opened"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Right-click on the note area and click the checkbox icon to create a checklist",
+         "ui_target": {
+            "element_name": "Checkbox icon",
+            "automation_id": null,
+            "hierarchical_path": "Sticky note > Note Area > Insert section > Checkbox icon",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A checkbox is inserted into the note area"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Right-click the tray icon and select Explorer",
+         "ui_target": {
+            "element_name": "Explorer",
+            "automation_id": null,
+            "hierarchical_path": "Taskbar > Notification area > Simple Sticky Notes icon > Context menu > Explorer",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Explorer window is opened"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Right-click the tray icon and select Settings",
+         "ui_target": {
+            "element_name": "Settings",
+            "automation_id": null,
+            "hierarchical_path": "Taskbar > Notification area > Simple Sticky Notes icon > Context menu > Settings",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Settings window is opened"
+      }
+   ],
+   "_meta": {
+      "source_app": "Simple Sticky Notes",
+      "app_key": "simple_sticky_notes",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Simple Sticky Notes Quick Start Tutorial",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:15:41Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,35 @@
+feat(scan): know what a button DOES - deep app knowledge, live-proven on OBS/Word/PowerPoint
+
+User: "it scans the button, but it doesn't know how it works." Surface listing was
+fast; the child windows behind buttons, their contents and the 2-3 step paths
+through them (OBS: Sources '+' -> Add Source dialog -> Display Capture) were never
+learned because production probed nothing and gallery dropdowns were skipped.
+
+- organ_48 compose_paths: BFS over REAL observed transitions (baseline -> dialog ->
+  item) serializes recipes into bm_templates, source=observed only (OBS: 31 composed;
+  match_template("add display capture source to my scene") -> add--display-capture).
+- organ_48 knowledge_quality + organ_01 surfacing: every scan prints observed-effect
+  counts, not fake totals ("8/301 commands OBSERVED, 12 transitions, 5 dialogs
+  mapped (185 controls inside), 31 step-recipes, 0 surfaces unopened").
+- organ_50 per-tab gallery reveal: Office virtualizes a tab's controls once its tab
+  is left - cached UIA elements throw COMError "unable to invoke subscribers" (64
+  measured failures) - so each tab's MenuItem/SplitButton galleries now expand while
+  that tab is ACTIVE, galleries sorted first, stats cumulative. PowerPoint: 61
+  galleries opened / 493 rows (More Options, Layout, Table 42 dims, Colors 160);
+  Word: 59 opened / 148 rows (Themes, Colors, Symbol, Shapes, More Options, WordArt).
+- organ_63 startup-modal guard: apps open a modal AFTER the scan returns (measured:
+  OBS's crash prompt, unowned Qt window invisible to EnumWindows); the learner then
+  saw ONE frontier row - the dialog's OK - and "converged" on it. The guard triggers
+  on <5 ENABLED operables or a message-box class, clears owned popups + same-pid
+  siblings + GW_ENABLEDPOPUP/GetGUIThreadInfo handles + a bounded UIA fallback
+  (capture, Escape, WM_CLOSE - never a button), re-snapshots, and if a modal still
+  survives REFUSES to explore that pass: stopped="exploration blocked", never
+  converged. scan_learner persists blocked runs as partial (resumable: the next scan
+  re-arms) - a blocked pass can no longer poison an app version forever.
+- scan_learner startup-modal hygiene: 3-pass watch (4 s apart) at learner start,
+  captures any already-open dialog as knowledge (via="(already open when learning
+  began)") before dismissing it.
+- Live benchmarks (no mocks): OBS scratch/_obs_deep_bench.py FULL PASS - "DEEP
+  KNOWLEDGE CHAIN: WORKING end to end"; blocked-state honesty proven live too
+  (partial + stopped=["exploration blocked", ...] + re-arm). Word/PPT gallery legs
+  as measured above. Regression ANY1/LM1/SCK1: see body appended after the run.

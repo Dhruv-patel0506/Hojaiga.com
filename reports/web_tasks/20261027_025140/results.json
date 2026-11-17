@@ -1,0 +1,375 @@
+{
+ "stamp": "20261027_025140",
+ "summary": {
+  "tasks": 8,
+  "cold": {
+   "success": "6/8",
+   "success_rate": 0.75,
+   "mean_clicks_when_ok": 1.5,
+   "mean_seconds_all": 5.1
+  },
+  "pool": {
+   "success": "6/8",
+   "success_rate": 0.75,
+   "mean_clicks_when_ok": 1.7,
+   "mean_seconds_all": 5.2
+  },
+  "retrieval_top1_correct": "8/8",
+  "retrieval_in_top3": "8/8",
+  "pool_found_nothing": 0,
+  "pool_healed_after_a_stale_path": 1,
+  "pool_ok_by_stored_path_alone": 5,
+  "mean_retrieval_ms": 147,
+  "pool_failures_by_reason": {
+   "the pool had no": 0,
+   "step '": 0,
+   "could not click": 0,
+   "the page did not": 0
+  }
+ },
+ "results": [
+  {
+   "task": {
+    "host": "coursera.org",
+    "site": "Coursera",
+    "url": "https://coursera.org",
+    "category": "",
+    "chain": [
+     "Software Engineering & IT"
+    ],
+    "label": "Software Engineering & IT",
+    "outcome": "opened a new page",
+    "expect_title": "Explore Career Paths: Find Courses and Build Skills by Job R",
+    "expect_items": [],
+    "stored_goal": "Go to the Software Engineering & IT page on Coursera",
+    "id": 1,
+    "question": "How do I get to Software Engineering & IT on Coursera?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 3,
+    "why": "",
+    "seconds": 12.2,
+    "picture": "task_01_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 3,
+    "why": "",
+    "healed": true,
+    "skipped": [],
+    "fallback_clicks": 2,
+    "retrieved": "Open the Software Engineering menu on Coursera",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 50,
+    "pid": "176b11a705db3ab4d976",
+    "seconds": 10.4,
+    "picture": "task_01_pool_ok.png",
+    "filed_correction": true
+   }
+  },
+  {
+   "task": {
+    "host": "docs.python.org",
+    "site": "Python",
+    "url": "https://docs.python.org",
+    "category": "",
+    "chain": [
+     "bytes literal"
+    ],
+    "label": "bytes literal",
+    "outcome": "opened a new page",
+    "expect_title": "2. Lexical analysis \u2014 Python 3.15.2 documentation",
+    "expect_items": [],
+    "stored_goal": "Go to the bytes literal page on Python",
+    "id": 2,
+    "question": "How do I get to bytes literal on Python?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 1.0,
+    "picture": "task_02_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "the stored path failed (skipped ['bytes literal']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "bytes literal"
+    ],
+    "fallback_clicks": 0,
+    "retrieved": "Go to the bytes literal page on Python",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 231,
+    "pid": "299e212180cb23c3f9d2",
+    "seconds": 1.2,
+    "picture": "task_02_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "github.com",
+    "site": "Github",
+    "url": "https://github.com",
+    "category": "",
+    "chain": [
+     "Pricing"
+    ],
+    "label": "Pricing",
+    "outcome": "opened a new page",
+    "expect_title": "GitHub \u00b7 Plans & pricing for every developer and team \u00b7 GitH",
+    "expect_items": [],
+    "stored_goal": "Go to the Pricing page on Github",
+    "id": 3,
+    "question": "How do I get to Pricing on Github?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 4.2,
+    "picture": "task_03_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Pricing page on Github",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 25,
+    "pid": "8a7dd6ba377b241c430b",
+    "seconds": 3.1,
+    "picture": "task_03_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "archive.org",
+    "site": "Archive",
+    "url": "https://archive.org",
+    "category": "",
+    "chain": [
+     "TEXTS",
+     "Government Documents"
+    ],
+    "label": "Government Documents",
+    "outcome": "opened a new page",
+    "expect_title": "Internet Archive: Digital Library of Free & Borrowable Texts",
+    "expect_items": [],
+    "stored_goal": "Go to the Government Documents page on Archive via TEXTS",
+    "id": 4,
+    "question": "How do I get to Government Documents on Archive?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 7.4,
+    "picture": "task_04_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Government Documents page on Archive via TEXTS",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 206,
+    "pid": "d4520e63f5acefb1ec4a",
+    "seconds": 10.7,
+    "picture": "task_04_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "gov.uk",
+    "site": "Gov",
+    "url": "https://gov.uk",
+    "category": "",
+    "chain": [
+     "Contents",
+     "Benefits"
+    ],
+    "label": "Benefits",
+    "outcome": "opened a new page",
+    "expect_title": "Benefits - GOV.UK",
+    "expect_items": [],
+    "stored_goal": "Go to the Benefits page on Gov via Contents",
+    "id": 5,
+    "question": "How do I get to Benefits on Gov?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 2.7,
+    "picture": "task_05_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [
+     "Contents"
+    ],
+    "retrieved": "Go to the Benefits page on Gov via Contents",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 139,
+    "pid": "193c30253bf5317e8ac5",
+    "seconds": 1.8,
+    "picture": "task_05_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "lichess.org",
+    "site": "Lichess",
+    "url": "https://lichess.org",
+    "category": "",
+    "chain": [
+     "Quick pairing"
+    ],
+    "label": "Quick pairing",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "105,085 players",
+     "46,487 games in play",
+     "Kazakh_Pod_Kumysom 2999 0:34 GM AVS2000 "
+    ],
+    "stored_goal": "Open the Quick pairing menu on Lichess",
+    "id": 6,
+    "question": "I want to see the Quick pairing menu on Lichess. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 3,
+    "why": "nothing on the page matches",
+    "seconds": 3.4,
+    "picture": "task_06_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 4,
+    "why": "the stored path failed (skipped []) and the live page did not help",
+    "healed": false,
+    "skipped": [],
+    "fallback_clicks": 3,
+    "retrieved": "Open the Quick pairing menu on Lichess",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 209,
+    "pid": "dcba1371104fec3001ce",
+    "seconds": 4.2,
+    "picture": "task_06_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "gitlab.com",
+    "site": "Gitlab",
+    "url": "https://gitlab.com",
+    "category": "",
+    "chain": [
+     "Resources"
+    ],
+    "label": "Resources",
+    "outcome": "opens on hover",
+    "expect_title": "",
+    "expect_items": [
+     "Well Architected",
+     "View all resources",
+     "What\u2019s new in GitLab Stay updated with o"
+    ],
+    "stored_goal": "Hover over Resources on Gitlab to open its menu",
+    "id": 7,
+    "question": "How do I open the Resources menu on Gitlab?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 7.0,
+    "picture": "task_07_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Hover over Resources on Gitlab to open its menu",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 140,
+    "pid": "ea8b7487ca85ae5527c2",
+    "seconds": 7.3,
+    "picture": "task_07_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "cloudconvert.com",
+    "site": "Cloudconvert",
+    "url": "https://cloudconvert.com",
+    "category": "",
+    "chain": [
+     "API",
+     "File Conversion API"
+    ],
+    "label": "File Conversion API",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Try it Out",
+     "Show all supported conversion formats",
+     "Learn more",
+     "Try it now"
+    ],
+    "stored_goal": "Open the File Conversion API menu on Cloudconvert via API",
+    "id": 8,
+    "question": "I want to see the File Conversion API menu on Cloudconvert. What do I click?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "seconds": 3.1,
+    "picture": "task_08_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Open the File Conversion API menu on Cloudconvert via API",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 177,
+    "pid": "64e286ad126cf709839a",
+    "seconds": 3.1,
+    "picture": "task_08_pool_ok.png",
+    "filed_correction": false
+   }
+  }
+ ]
+}

@@ -1,0 +1,350 @@
+{
+   "app_metadata": {
+      "app_name": "CyrFlip",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide the user through the installation and basic usage of CyrFlip.",
+   "prerequisite_state": "No application is open.",
+   "total_steps": 11,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the Microsoft Store.",
+         "ui_target": {
+            "element_name": "Microsoft Store",
+            "automation_id": null,
+            "hierarchical_path": "Start menu > Microsoft Store",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Microsoft Store opens."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Search for 'CyrFlip' in the Microsoft Store.",
+         "ui_target": {
+            "element_name": "Search bar",
+            "automation_id": null,
+            "hierarchical_path": "Microsoft Store > Search bar",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "CyrFlip"
+         },
+         "expected_state_change": "Search results for 'CyrFlip' appear."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click on the 'CyrFlip' app in the search results.",
+         "ui_target": {
+            "element_name": "CyrFlip",
+            "automation_id": null,
+            "hierarchical_path": "Microsoft Store > Search results > CyrFlip",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The app details page for CyrFlip opens."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click the 'Get' button to install CyrFlip from the Microsoft Store.",
+         "ui_target": {
+            "element_name": "Get",
+            "automation_id": null,
+            "hierarchical_path": "Microsoft Store > App details > Get",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "CyrFlip starts downloading and installing."
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Wait for the installation to complete.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "CyrFlip is installed and ready to use."
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Launch CyrFlip from the Start menu.",
+         "ui_target": {
+            "element_name": "CyrFlip",
+            "automation_id": null,
+            "hierarchical_path": "Start menu > CyrFlip",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "CyrFlip opens and shows the active keyboard layout in the system tray."
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Select some text in a document or application.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "SELECT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected text is highlighted."
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Press 'Ctrl+Shift+F12' to convert the selected text.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Shift"
+            ],
+            "text_payload": "F12"
+         },
+         "expected_state_change": "The selected text is converted to the opposite layout."
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Select some text in a document or application.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "SELECT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected text is highlighted."
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Press 'Ctrl+Shift+F11' to fix the case of the selected text.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Shift"
+            ],
+            "text_payload": "F11"
+         },
+         "expected_state_change": "The case of the selected text is inverted."
+      },
+      {
+         "step_id": 11,
+         "low_level_instruction": "Press 'Ctrl+Shift+Alt+N' to create a quick note.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Shift",
+               "Alt"
+            ],
+            "text_payload": "N"
+         },
+         "expected_state_change": "A quick note window opens, allowing you to type or paste text."
+      }
+   ],
+   "_meta": {
+      "source_app": "CyrFlip",
+      "app_key": "cyrflip",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "CyrFlip",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:07:03Z",
+      "schema_warnings": [
+         "step5_ungrounded_target",
+         "step7_ungrounded_target",
+         "step8_ungrounded_target",
+         "step9_ungrounded_target",
+         "step10_ungrounded_target",
+         "step11_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

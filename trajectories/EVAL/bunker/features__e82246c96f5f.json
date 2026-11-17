@@ -1,0 +1,164 @@
+{
+   "app_metadata": {
+      "app_name": "Bunker",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "high_level_task": "Install and configure Bunker on Windows",
+   "prerequisite_state": "Windows machine with internet access",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install Bunker via winget",
+         "ui_target": {
+            "element_name": "winget",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install bunker"
+         },
+         "expected_state_change": "Bunker installation starts"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run Bunker --init",
+         "ui_target": {
+            "element_name": "cmd",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "bunker --init"
+         },
+         "expected_state_change": "Config file is created at %USERPROFILE%\\.bunker\\config.yaml"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Open config.yaml in Notepad",
+         "ui_target": {
+            "element_name": "Notepad",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "notepad \"$env:USERPROFILE\\.bunker\\config.yaml\""
+         },
+         "expected_state_change": "config.yaml file opens in Notepad"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Run Bunker with default config",
+         "ui_target": {
+            "element_name": "cmd",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "bunker"
+         },
+         "expected_state_change": "Bunker starts with the default config"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Verify Bunker is running",
+         "ui_target": {
+            "element_name": "cmd",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "netstat -an | findstr \":8080\""
+         },
+         "expected_state_change": "Bunker is listening on port 8080"
+      }
+   ],
+   "_meta": {
+      "source_app": "Bunker",
+      "app_key": "bunker",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "Features",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T13:03:54Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

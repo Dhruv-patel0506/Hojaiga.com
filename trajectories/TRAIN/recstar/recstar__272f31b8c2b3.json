@@ -1,0 +1,249 @@
+{
+   "app_metadata": {
+      "app_name": "Recstar",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Start a new recording session in Recstar",
+   "prerequisite_state": "Recstar is installed and launched on the desktop",
+   "total_steps": 8,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click the '+' button to create a new session",
+         "ui_target": {
+            "element_name": "New Session",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Toolbar > New Session",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A new session is created and is ready for reclist import"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click the '...' button to import a reclist",
+         "ui_target": {
+            "element_name": "Import Reclist",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Toolbar > Import Reclist",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A file dialog opens to select the reclist file"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Select the reclist file and click 'Open'",
+         "ui_target": {
+            "element_name": "Open Button",
+            "automation_id": null,
+            "hierarchical_path": "File dialog > Open Button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected reclist is imported and the session is updated"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click the imported item to create the session",
+         "ui_target": {
+            "element_name": "Imported Reclist Item",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Session List > Imported Reclist Item",
+            "element_type": "ListItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The session is created and the reclist is loaded"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Click the music note button to import and select a BGM file",
+         "ui_target": {
+            "element_name": "BGM Import",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Toolbar > BGM Import",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A file dialog opens to select the BGM file"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Select the BGM file and click 'Open'",
+         "ui_target": {
+            "element_name": "Open Button",
+            "automation_id": null,
+            "hierarchical_path": "File dialog > Open Button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected BGM file is imported and the session is updated"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Click the record button to start recording",
+         "ui_target": {
+            "element_name": "Record",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Toolbar > Record",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Recording starts and the record button changes to a stop button"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Click the audio graph to listen back to the recorded files",
+         "ui_target": {
+            "element_name": "Audio Graph",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Audio Graph",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The recorded files are played back"
+      }
+   ],
+   "_meta": {
+      "source_app": "Recstar",
+      "app_key": "recstar",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "RecStar",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:59:49Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

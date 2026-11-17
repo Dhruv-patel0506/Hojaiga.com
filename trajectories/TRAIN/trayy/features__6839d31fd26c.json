@@ -1,0 +1,202 @@
+{
+   "app_metadata": {
+      "app_name": "Trayy",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure and use Trayy to manage applications in the system tray",
+   "prerequisite_state": "Trayy application is unzipped and `Trayy.exe` and `hook.dll` are in the same folder",
+   "total_steps": 7,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download and unzip Trayy",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Trayy files are extracted to the chosen location"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run Trayy.exe",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Trayy application window opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Select 'Do not show on Taskbar'",
+         "ui_target": {
+            "element_name": "Do not show on Taskbar",
+            "automation_id": null,
+            "hierarchical_path": "Settings > Do not show on Taskbar",
+            "element_type": "CheckBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The checkbox is checked"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Select 'Send to Tray also when Closed'",
+         "ui_target": {
+            "element_name": "Send to Tray also when Closed",
+            "automation_id": null,
+            "hierarchical_path": "Settings > Send to Tray also when Closed",
+            "element_type": "CheckBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The checkbox is checked"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Add an app to the list",
+         "ui_target": {
+            "element_name": "Add",
+            "automation_id": null,
+            "hierarchical_path": "Settings > Add",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A new entry is added to the list"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Configure the app capture method",
+         "ui_target": {
+            "element_name": "N",
+            "automation_id": null,
+            "hierarchical_path": "Settings > Capture Method > N",
+            "element_type": "RadioButton",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'N' radio button is selected"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Save the settings",
+         "ui_target": {
+            "element_name": "Save",
+            "automation_id": null,
+            "hierarchical_path": "Settings > Save",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Settings are saved and the application window closes"
+      }
+   ],
+   "_meta": {
+      "source_app": "Trayy",
+      "app_key": "trayy",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "🎯 Features",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:38:11Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,34 @@
+BEFORE: {"dialogs": 5, "transitions": 12, "recipes": 31, "learned": 8, "frontier_explored": 1}
+quality before: 8/301 commands OBSERVED (not just listed), 12 transitions, 5 dialogs mapped (185 controls inside them), 31 step-recipes composed, 0 surfaces still unopened
+[bench] reset learn_state + frontier (kept commands/transitions/dialogs for honest deltas)
+[CREWAI] ScrapeGraphAI integration loaded OK
+[bench] scan #1 returned in 40.4s | learner line: * behavior learning: RUNNING in background (invisible, resumable, ~120.0s; dialogs get opened, read and closed again) - scan this app again later for deeper knowledge | quality line: * 8/301 commands OBSERVED (not just listed), 12 transitions, 5 dialogs mapped (185 controls inside them), 31 step-recipes composed, 0 surfaces still unopened
+[bench] run1 status: learning | 
+[bench] run1 status: complete | 
+AFTER RUN1: {"dialogs": 5, "transitions": 12, "recipes": 31, "learned": 8, "frontier_explored": 1}
+[bench] run2 status: complete | 
+AFTER RUN2: {"dialogs": 5, "transitions": 12, "recipes": 31, "learned": 8, "frontier_explored": 1}
+[dialog] via 'Audio Mixer > OBSApp.OBSBasic.mixerDoc > OBS' title 'Advanced Audio Properties' items: ['System']
+[dialog] via 'Controls > OBSApp.OBSBasic.controls > OBSApp' title 'Settings' items: ['System', 'General', 'Appearance', 'Stream', 'Output', 'Audio', 'Video', 'Hotkeys', 'Accessibility', 'Advanced']
+[dialog] via 'OBSApp.OBSBasic.scenesDo > OBSApp.OBSBasic.s' title 'Filters for 'Scene'' items: ['System']
+[dialog] via 'Scenes > Float' title 'Scenes' items: ['Scene']
+[dialog] via 'OBSApp.OBSBasic.sourcesD > OBSApp.OBSBasic.s' title 'Add Source' items: ['System', 'Recently Created', 'Application Audio Capture (BETA)', 'Audio Input Capture', 'Audio Output Capture', 'Browser', 'Color', 'Display Capture', 'Game Capture', 'Image', 'Image Slide Show', 'Media']
+[bench] composed recipes (31): ['add--system', 'add--recently-created', 'add--application-audio-capture-beta', 'add--audio-input-capture', 'add--audio-output-capture', 'add--browser', 'add--color', 'add--display-capture', 'add--game-capture', 'add--image', 'add--image-slide-show', 'add--media', 'add--scene', 'add--text-gdi', 'add--video-capture-device', 'add--window-capture', 'add--deprecated', 'add--text-freetype-2', 'float--scene', 'open-scene-filters--system', 'settings--system', 'settings--general', 'settings--appearance', 'settings--stream']
+QUALITY: 8/301 commands OBSERVED (not just listed), 12 transitions, 5 dialogs mapped (185 controls inside them), 31 step-recipes composed, 0 surfaces still unopened
+learn_state stats: {"budget_s": 120.0, "idle_wait_s": 0.0, "sib_rejected": ["GDI+ Hook Window Class|'GDI+ Window (obs'|vis=0|a=1"], "pause_points": 0, "paused_for_user": false, "converged": true, "n_runs": 1, "commands": 301, "learned": 8, "transitions": 12, "regions": 2, "frontier": {"total": 1, "by_status": {"explored": 1}, "explorable": 1, "explored_n": 1, "explored_fraction": 1.0}, "stopped": ["exhausted"], "unwind_failures": [{"button": 1}], "paths_composed": 31, "quality": "8/301 commands OBSERVED (not just listed), 12 transitions, 5 dialogs mapped (185 controls inside them), 31 step-recipes composed, 0 su
+[bench] match -> add--display-capture
+
+================ RESULT ================
+PASS  scan reported the background learner
+PASS  learner reached a finished state
+PASS  dialog schemas OBSERVED and persisted
+PASS  transitions recorded (a button's EFFECT)
+PASS  commands promoted to learned (earned)
+FAIL  frontier surfaces explored
+PASS  recipes composed from observed dialogs
+PASS  'add display capture source' goal finds a composed recipe
+DEEP KNOWLEDGE CHAIN: PARTIAL - ['frontier surfaces explored']
+(capture-family items seen: True; sample: ['System', 'System', 'General', 'Appearance', 'Stream', 'Output', 'Audio', 'Video', 'Hotkeys', 'Accessibility', 'Advanced', 'System', 'Scene', 'System', 'Recently Created', 'Application Audio Capture (BETA)'])
+[bench] terminated obs64 pid 34336
+[bench] terminated obs64 pid 28492
+[bench] done in 51s

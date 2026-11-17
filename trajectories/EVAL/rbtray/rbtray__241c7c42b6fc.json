@@ -1,0 +1,98 @@
+{
+   "app_metadata": {
+      "app_name": "RBTray",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Provide instructions on how to use RBTray to minimize windows to the system tray and exit the application.",
+   "prerequisite_state": "RBTray is not running.",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the appropriate 64-bit or 32-bit binaries of RBTray.",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": null
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Double-click RBTray.exe to start the application.",
+         "ui_target": {
+            "element_name": "RBTray.exe",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "RBTray application window opens."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Minimize a program to the system tray by right-clicking the program's minimize button, or hold down Shift and right-click the program's title bar, or press Control-Alt-Down.",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "A system tray icon appears for the minimized program."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Restore the program's window by single-clicking the program's icon in the system tray, or right-click the tray icon and select Restore Window.",
+         "ui_target": {
+            "element_name": "System tray icon",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "ListItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The program's window is restored."
+      }
+   ],
+   "_meta": {
+      "source_app": "RBTray",
+      "app_key": "rbtray",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "RBTray",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:00:53Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step3_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

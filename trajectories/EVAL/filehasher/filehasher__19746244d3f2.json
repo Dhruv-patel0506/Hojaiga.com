@@ -1,0 +1,230 @@
+{
+   "app_metadata": {
+      "app_name": "FileHasher",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure and run FileHasher to hash files and folders with various options",
+   "prerequisite_state": "FileHasher application is open and ready for user interaction",
+   "total_steps": 7,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click on the **Browse File…** button",
+         "ui_target": {
+            "element_name": "Browse File…",
+            "automation_id": null,
+            "hierarchical_path": "Main window > File menu > Browse File…",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A file picker dialog opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click on the **Browse Folder…** button",
+         "ui_target": {
+            "element_name": "Browse Folder…",
+            "automation_id": null,
+            "hierarchical_path": "Main window > File menu > Browse Folder…",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A folder picker dialog opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Type or paste a path into the path box",
+         "ui_target": {
+            "element_name": "Path box",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Path box",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "C:\\path\\to\\file"
+         },
+         "expected_state_change": "The path is displayed in the path box"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Drag and drop a file or folder onto the path box",
+         "ui_target": {
+            "element_name": "Path box",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Path box",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The path is updated to reflect the dropped file or folder"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Click on the **Scan all file types** checkbox",
+         "ui_target": {
+            "element_name": "Scan all file types",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Scan all file types checkbox",
+            "element_type": "CheckBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The checkbox is toggled"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Click on the **Choose a hash algorithm** radio button",
+         "ui_target": {
+            "element_name": "SHA256",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Hash Algorithm group > SHA256 radio button",
+            "element_type": "RadioButton",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "SHA256 is selected as the hash algorithm"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Click on the **Export results to CSV** checkbox",
+         "ui_target": {
+            "element_name": "Export results to CSV",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Export results to CSV checkbox",
+            "element_type": "CheckBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The checkbox is toggled"
+      }
+   ],
+   "_meta": {
+      "source_app": "FileHasher",
+      "app_key": "filehasher",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "FileHasher",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:05:32Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

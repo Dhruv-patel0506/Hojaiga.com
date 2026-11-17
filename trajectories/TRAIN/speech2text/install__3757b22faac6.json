@@ -1,0 +1,41 @@
+{
+   "app_metadata": {
+      "app_name": "speech2text",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "cli",
+   "high_level_task": "Install the speech2text application",
+   "prerequisite_state": "No application installed",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install the speech2text application using winget",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install ozas.speech2text"
+         },
+         "expected_state_change": "speech2text is installed on the system"
+      }
+   ],
+   "_meta": {
+      "source_app": "speech2text",
+      "app_key": "speech2text",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Install",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:26:06Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

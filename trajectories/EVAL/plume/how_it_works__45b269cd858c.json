@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "Plume",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure Plume settings and start using the application",
+   "prerequisite_state": "Plume is installed and launched, showing the system tray icon",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click the tray icon to show/hide the overlay",
+         "ui_target": {
+            "element_name": "Tray icon",
+            "automation_id": null,
+            "hierarchical_path": "System tray > Plume icon",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Plume overlay appears or disappears"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Start typing in any application",
+         "ui_target": {
+            "element_name": "Focused text field",
+            "automation_id": null,
+            "hierarchical_path": "Active window > Focused text field",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "test"
+         },
+         "expected_state_change": "Suggestion chips appear in the Plume overlay"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click a chip to copy or insert the suggestion",
+         "ui_target": {
+            "element_name": "Suggestion chip",
+            "automation_id": null,
+            "hierarchical_path": "Plume overlay > Suggestion chip",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected suggestion is inserted into the focused text field"
+      }
+   ],
+   "_meta": {
+      "source_app": "Plume",
+      "app_key": "plume",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "How It Works",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:55:48Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

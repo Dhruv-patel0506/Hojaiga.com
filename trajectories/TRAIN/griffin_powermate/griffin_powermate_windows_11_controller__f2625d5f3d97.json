@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "Griffin PowerMate",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide the user through the Quick Start steps for running the Griffin PowerMate application on Windows 11.",
+   "prerequisite_state": "The user has downloaded the PowerMate application and Zadig driver software.",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install the WinUSB driver on the PowerMate with Zadig.",
+         "ui_target": {
+            "element_name": "Zadig",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The PowerMate is re-bound to the WinUSB driver."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Download / copy `PowerMate.exe` and double-click it.",
+         "ui_target": {
+            "element_name": "PowerMate.exe",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Griffin PowerMate application window appears."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Right-click the tray icon → Settings to customize.",
+         "ui_target": {
+            "element_name": "Settings",
+            "automation_id": null,
+            "hierarchical_path": "System tray icon > Context menu > Settings",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Settings window opens."
+      }
+   ],
+   "_meta": {
+      "source_app": "Griffin PowerMate",
+      "app_key": "griffin_powermate",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Griffin PowerMate — Windows 11 Controller",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:28:10Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

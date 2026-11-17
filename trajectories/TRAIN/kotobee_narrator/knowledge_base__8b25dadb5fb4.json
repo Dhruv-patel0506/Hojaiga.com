@@ -1,0 +1,81 @@
+{
+   "app_metadata": {
+      "app_name": "Kotobee Narrator",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Get to Know the Kotobee Narrator Dashboard and Create a New Audiobook",
+   "prerequisite_state": "Kotobee Narrator is open on its start screen",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click on the 'Create a New Audiobook' button",
+         "ui_target": {
+            "element_name": "Create a New Audiobook",
+            "automation_id": null,
+            "hierarchical_path": "Dashboard > Create a New Audiobook",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Narrator Dashboard navigates to the New Audiobook creation screen"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click on the 'Next' button to proceed",
+         "ui_target": {
+            "element_name": "Next",
+            "automation_id": null,
+            "hierarchical_path": "New Audiobook Creation Screen > Next",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Narrator Dashboard navigates to the next step in the Audiobook creation process"
+      }
+   ],
+   "_meta": {
+      "source_app": "Kotobee Narrator",
+      "app_key": "kotobee_narrator",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Knowledge base",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:59:09Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

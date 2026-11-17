@@ -1,0 +1,225 @@
+{
+   "app_metadata": {
+      "app_name": "BluetoothHandsFreeToggle",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide the user through the Quick start steps of the BluetoothHandsFreeToggle application.",
+   "prerequisite_state": "BluetoothHandsFreeToggle application is downloaded and executable file is available.",
+   "total_steps": 7,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download `BluetoothHandsFreeToggle.exe` from the latest release.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User navigates to the download link and can download the file."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Close Call of Duty, Warzone, Discord, browsers, OBS, recording tools, and other applications that may be using the headset microphone.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "All specified applications are closed."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Run the executable.",
+         "ui_target": {
+            "element_name": "BluetoothHandsFreeToggle",
+            "automation_id": null,
+            "hierarchical_path": "Desktop > BluetoothHandsFreeToggle",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The application window opens."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Start with `[2] Soft reset`.",
+         "ui_target": {
+            "element_name": "2",
+            "automation_id": null,
+            "hierarchical_path": "Interactive menu > 2",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The application performs a soft reset."
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "If Windows immediately returns to low-quality audio, confirm that no application is still using the headset microphone.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User checks the system for any application using the headset microphone."
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Use `[3] Hard mode` when you want to prioritize playback quality completely.",
+         "ui_target": {
+            "element_name": "3",
+            "automation_id": null,
+            "hierarchical_path": "Interactive menu > 3",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The application enters Hard mode."
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Use `[4] Restore` to leave Hard mode and return the previous HFP service state.",
+         "ui_target": {
+            "element_name": "4",
+            "automation_id": null,
+            "hierarchical_path": "Interactive menu > 4",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The application restores the previous HFP service state."
+      }
+   ],
+   "_meta": {
+      "source_app": "BluetoothHandsFreeToggle",
+      "app_key": "bluetoothhandsfreetoggle",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "App demo 🎬",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T19:11:37Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step5_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

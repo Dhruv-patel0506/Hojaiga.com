@@ -1,0 +1,115 @@
+{
+ "app": "paint",
+ "started": "2026-11-02 03:13:28",
+ "phases": {
+  "read": {
+   "store": {
+    "Microsoft.Paint": {
+     "key": "paint",
+     "ui_words": 814,
+     "views": 55,
+     "chunks": 45
+    }
+   },
+   "seconds": 6.7,
+   "level": "live-scanned"
+  },
+  "map": {
+   "ran": true,
+   "seconds": 46.8,
+   "level": "explored",
+   "commands": 365,
+   "with_shortcut": 38,
+   "dialogs": 8,
+   "layout_controls": 444,
+   "state_variables": 1,
+   "frontier": {
+    "total": 14,
+    "by_status": {
+     "explored": 6,
+     "no_effect": 1,
+     "open": 5,
+     "unsafe": 2
+    },
+    "explorable": 12,
+    "explored_n": 7,
+    "explored_fraction": 0.583
+   }
+  },
+  "ask": {
+   "asked": 4,
+   "answered": 0,
+   "items": [
+    {
+     "q": "In paint, how do I use 100%?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about paint (91 documents, 9 procedures, 0 shortcuts). instructions for using 100% in Paint. Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In paint, how do I use 1000%?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about paint (91 documents, 9 procedures, 0 shortcuts). how to use 1000% in Paint Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In paint, how do I use 12.5%?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about paint (91 documents, 9 procedures, 0 shortcuts). how to use 12.5% in the Paint application. Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In paint, how do I use 200%?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about paint (91 documents, 9 procedures, 0 shortcuts). how to use 200% in Paint Reverse engineering or scanning it more would fill this in."
+    }
+   ],
+   "seconds": 110.0
+  },
+  "practice": {
+   "written": 5,
+   "tried": 5,
+   "proven_done": 0,
+   "kept_training_rows": 0,
+   "results": [
+    {
+     "task": "open paint, Zoom > 100%, View > Always show toolbar, Black, Brushes, ButtonControl, File > System > File > Save as > BMP picture, D:\\new_automation\\data\\practice\\paint\\task1.bmp",
+     "status": "FAILED",
+     "seconds": 133.5,
+     "proof": "[{'file': 'D:\\\\new_automation\\\\data\\\\practice\\\\paint\\\\task1.bmp', 'ok': False, 'why': 'missing or wrong: a paint window, a black brush, a ButtonControl', 'items': [{'content': 'a paint window', 'where': '', 'format': '', 'found': False}, {'content': 'a black brush', 'where': '', 'format': '', 'found"
+    },
+    {
+     "task": "open paint, Zoom > 25%, View > Automatically hide toolbar, Blue-grey, list > Brown, File > System > File > Save as > BMP picture, D:\\new_automation\\data\\practice\\paint\\task2.bmp",
+     "status": "FAILED",
+     "seconds": 89.0,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'paint': BLOCKED (window hwnd=6490116), 8 verified-loop steps in 42.3s\n    - 'click Zoom' -> DONE (PASS) [WEAK evidence: the UI changed, nothing"
+    },
+    {
+     "task": "open paint, Zoom > 500%, File > System > View > Always show toolbar, File > System > File > Save as > BMP picture, D:\\new_automation\\data\\practice\\paint\\task3.bmp",
+     "status": "FAILED",
+     "seconds": 102.9,
+     "proof": "[{'file': 'D:\\\\new_automation\\\\data\\\\practice\\\\paint\\\\task3.bmp', 'ok': False, 'why': 'missing or wrong: toolbar, BMP picture', 'items': [{'content': 'toolbar', 'where': '', 'format': '', 'found': False}, {'content': 'BMP picture', 'where': '', 'format': '', 'found': False}], 'sees': 'The image is c"
+    },
+    {
+     "task": "open paint, Zoom > 75%, File > System > View > Always show toolbar, Black, list > Cloud callout, File > System > File > Save as > BMP picture, D:\\new_automation\\data\\practice\\paint\\task4.bmp",
+     "status": "FAILED",
+     "seconds": 75.2,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'paint': BLOCKED (window hwnd=8325100), 5 verified-loop steps in 63.9s\n    - 'open the file D:\\new_automation\\data\\practice\\paint\\task4.bmp' -> "
+    },
+    {
+     "task": "open paint, Zoom > 300%, View > Always show toolbar, Brown, Brushes, ScrollViewer > Brushes, File > System > File > Save as > BMP picture, D:\\new_automation\\data\\practice\\paint\\task5.bmp",
+     "status": "FAILED",
+     "seconds": 52.8,
+     "proof": "[{'file': 'D:\\\\new_automation\\\\data\\\\practice\\\\paint\\\\task5.bmp', 'ok': False, 'why': 'the file was not saved'}]"
+    }
+   ],
+   "seconds": 465.4
+  }
+ },
+ "app_key": "paint",
+ "exe": "C:\\Program Files\\WindowsApps\\Microsoft.Paint_11.2605.81.0_x64__8wekyb3d8bbwe\\PaintApp\\mspaint.exe",
+ "readiness": {
+  "knows_commands": true,
+  "answers_questions": "0/4",
+  "proven_tasks": "0/5",
+  "verdict": "not ready: nothing proven yet"
+ },
+ "seconds": 636.6
+}

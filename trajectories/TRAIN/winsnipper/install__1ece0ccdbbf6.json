@@ -1,0 +1,55 @@
+{
+   "app_metadata": {
+      "app_name": "WinSnipper",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install WinSnipper via an AI agent",
+   "prerequisite_state": "No WinSnipper application is installed, and .NET 8 Desktop Runtime is not installed.",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the latest release of WinSnipper from GitHub and save it to %LOCALAPPDATA%\\WinSnipper\\",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The latest WinSnipper.exe or WinSnipper-OCR.exe is downloaded and saved to %LOCALAPPDATA%\\WinSnipper\\"
+      }
+   ],
+   "_meta": {
+      "source_app": "WinSnipper",
+      "app_key": "winsnipper",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Install",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:57:04Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

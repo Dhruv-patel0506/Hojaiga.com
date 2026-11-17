@@ -1,0 +1,324 @@
+18:24:42 NI run auto_gpu_010 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+18:24:42 explicit task list: ['enc/text/yahoo_answers_topics']
+18:24:42 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+05:11:28 NI run auto_gpu_010 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+05:11:28 explicit task list: ['enc/text/yahoo_answers_topics']
+05:11:28 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+05:11:29 [data] enc/text/yahoo_answers_topics: n=119962 C=10 D=384 shards=1
+05:12:04 [enc/text/yahoo_answers_topics] vote=0.739 uniform=0.735 best1=0.733 n_val=35823 vram=1.00GB 34s
+05:12:13 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 35823, "n_val": 7097, "base_rate": 0.7401719093322754, "inner": {"auc": 0.8070110644346191, "ece": 0.018134034956964584, "brier": 0.14831200242042542, "acc80": 0.8233221769332886}, "outer_conf": {"auc": 0.7942260449869984, "ece": 0.03813538086721725, "brier": 0.15405091643333435, "acc80": 0.819446861743927}}
+05:12:13 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+05:12:47 [enc/text/yahoo_answers_topics] vote=0.736 uniform=0.732 best1=0.730 n_val=35879 vram=1.16GB 34s | grade=0.886 inner_auc=0.808 vs conf_auc=0.796
+05:12:52 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+05:13:25 [enc/text/yahoo_answers_topics] vote=0.739 uniform=0.736 best1=0.737 n_val=35999 vram=1.16GB 33s | grade=0.887 inner_auc=0.818 vs conf_auc=0.806
+05:13:30 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+05:14:05 [enc/text/yahoo_answers_topics] vote=0.739 uniform=0.734 best1=0.732 n_val=35825 vram=1.16GB 35s | grade=0.885 inner_auc=0.812 vs conf_auc=0.804
+05:14:09 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+05:14:45 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.736 best1=0.735 n_val=36069 vram=1.16GB 35s | grade=0.888 inner_auc=0.813 vs conf_auc=0.803
+05:14:50 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+05:15:21 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.736 best1=0.736 n_val=36077 vram=1.16GB 31s | grade=0.888 inner_auc=0.811 vs conf_auc=0.801
+05:15:27 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+05:15:56 [enc/text/yahoo_answers_topics] vote=0.739 uniform=0.733 best1=0.730 n_val=35918 vram=1.16GB 30s | grade=0.888 inner_auc=0.815 vs conf_auc=0.805
+05:16:03 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+05:16:34 [enc/text/yahoo_answers_topics] vote=0.737 uniform=0.731 best1=0.732 n_val=35941 vram=1.16GB 31s | grade=0.884 inner_auc=0.816 vs conf_auc=0.805
+05:16:39 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+05:17:09 [enc/text/yahoo_answers_topics] vote=0.734 uniform=0.730 best1=0.730 n_val=36262 vram=1.16GB 30s | grade=0.888 inner_auc=0.810 vs conf_auc=0.800
+05:17:14 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+05:17:42 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.736 best1=0.733 n_val=36125 vram=1.16GB 28s | grade=0.882 inner_auc=0.814 vs conf_auc=0.805
+05:17:46 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+05:18:18 [enc/text/yahoo_answers_topics] vote=0.740 uniform=0.734 best1=0.733 n_val=35948 vram=1.16GB 32s | grade=0.888 inner_auc=0.809 vs conf_auc=0.802
+05:18:24 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+05:18:56 [enc/text/yahoo_answers_topics] vote=0.739 uniform=0.734 best1=0.733 n_val=36116 vram=1.16GB 32s | grade=0.889 inner_auc=0.809 vs conf_auc=0.801
+05:19:02 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+05:19:32 [enc/text/yahoo_answers_topics] vote=0.740 uniform=0.735 best1=0.733 n_val=36099 vram=1.16GB 30s | grade=0.888 inner_auc=0.805 vs conf_auc=0.797
+05:19:38 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+05:20:05 [enc/text/yahoo_answers_topics] vote=0.736 uniform=0.729 best1=0.730 n_val=35824 vram=1.16GB 27s | grade=0.887 inner_auc=0.815 vs conf_auc=0.808
+05:20:08 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+05:20:34 [enc/text/yahoo_answers_topics] vote=0.738 uniform=0.734 best1=0.728 n_val=35988 vram=1.16GB 26s | grade=0.885 inner_auc=0.804 vs conf_auc=0.799
+05:20:40 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+05:21:10 [enc/text/yahoo_answers_topics] vote=0.745 uniform=0.739 best1=0.735 n_val=36125 vram=1.16GB 30s | grade=0.883 inner_auc=0.815 vs conf_auc=0.808
+05:21:17 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+05:21:50 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.735 best1=0.733 n_val=36269 vram=1.16GB 33s | grade=0.885 inner_auc=0.810 vs conf_auc=0.806
+05:21:56 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+05:22:28 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.738 best1=0.734 n_val=35923 vram=1.16GB 32s | grade=0.886 inner_auc=0.805 vs conf_auc=0.799
+05:22:33 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+05:23:03 [enc/text/yahoo_answers_topics] vote=0.739 uniform=0.733 best1=0.733 n_val=36013 vram=1.16GB 30s | grade=0.887 inner_auc=0.816 vs conf_auc=0.809
+05:23:09 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+05:23:41 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.736 best1=0.734 n_val=35818 vram=1.16GB 32s | grade=0.888 inner_auc=0.816 vs conf_auc=0.809
+05:23:47 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+05:24:20 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.735 best1=0.733 n_val=35909 vram=1.16GB 33s | grade=0.888 inner_auc=0.812 vs conf_auc=0.807
+05:24:26 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+05:24:54 [enc/text/yahoo_answers_topics] vote=0.740 uniform=0.734 best1=0.733 n_val=36205 vram=1.16GB 28s | grade=0.888 inner_auc=0.810 vs conf_auc=0.805
+05:25:00 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+05:25:32 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.737 best1=0.733 n_val=35843 vram=1.16GB 32s | grade=0.885 inner_auc=0.806 vs conf_auc=0.800
+05:25:38 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+05:26:06 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.736 best1=0.735 n_val=35814 vram=1.16GB 28s | grade=0.888 inner_auc=0.804 vs conf_auc=0.800
+05:26:12 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+05:26:43 [enc/text/yahoo_answers_topics] vote=0.740 uniform=0.732 best1=0.732 n_val=35955 vram=1.16GB 31s | grade=0.888 inner_auc=0.807 vs conf_auc=0.801
+05:26:50 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+05:27:22 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.736 best1=0.733 n_val=36199 vram=1.16GB 32s | grade=0.887 inner_auc=0.814 vs conf_auc=0.809
+05:27:28 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+05:27:59 [enc/text/yahoo_answers_topics] vote=0.739 uniform=0.733 best1=0.732 n_val=36019 vram=1.16GB 32s | grade=0.886 inner_auc=0.813 vs conf_auc=0.809
+05:28:06 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+05:28:34 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.735 best1=0.732 n_val=36149 vram=1.16GB 28s | grade=0.886 inner_auc=0.809 vs conf_auc=0.805
+05:28:39 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+05:29:11 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.735 best1=0.734 n_val=36141 vram=1.16GB 32s | grade=0.887 inner_auc=0.814 vs conf_auc=0.811
+05:29:17 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+05:29:53 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.735 best1=0.734 n_val=36024 vram=1.16GB 36s | grade=0.887 inner_auc=0.802 vs conf_auc=0.799
+05:29:59 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+05:30:30 [enc/text/yahoo_answers_topics] vote=0.739 uniform=0.731 best1=0.730 n_val=36064 vram=1.16GB 31s | grade=0.887 inner_auc=0.808 vs conf_auc=0.806
+05:30:37 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+05:31:09 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.736 best1=0.736 n_val=35923 vram=1.16GB 32s | grade=0.886 inner_auc=0.816 vs conf_auc=0.813
+05:31:16 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+05:31:45 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.733 best1=0.734 n_val=36090 vram=1.16GB 29s | grade=0.888 inner_auc=0.811 vs conf_auc=0.807
+05:31:51 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+05:32:26 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.737 best1=0.734 n_val=35811 vram=1.16GB 35s | grade=0.885 inner_auc=0.805 vs conf_auc=0.801
+05:32:33 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+05:33:03 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.738 best1=0.735 n_val=36187 vram=1.16GB 30s | grade=0.887 inner_auc=0.813 vs conf_auc=0.810
+05:33:08 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+05:33:40 [enc/text/yahoo_answers_topics] vote=0.745 uniform=0.736 best1=0.734 n_val=36179 vram=1.16GB 32s | grade=0.888 inner_auc=0.814 vs conf_auc=0.812
+05:33:47 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+05:34:17 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.736 best1=0.732 n_val=35977 vram=1.16GB 30s | grade=0.885 inner_auc=0.813 vs conf_auc=0.810
+05:34:24 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+05:34:57 [enc/text/yahoo_answers_topics] vote=0.737 uniform=0.732 best1=0.731 n_val=36102 vram=1.16GB 34s | grade=0.876 inner_auc=0.807 vs conf_auc=0.804
+05:35:06 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+05:35:40 [enc/text/yahoo_answers_topics] vote=0.740 uniform=0.733 best1=0.732 n_val=35857 vram=1.16GB 34s | grade=0.887 inner_auc=0.809 vs conf_auc=0.806
+05:35:46 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+05:36:16 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.734 best1=0.732 n_val=35987 vram=1.16GB 30s | grade=0.887 inner_auc=0.811 vs conf_auc=0.809
+05:36:24 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+05:36:57 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.738 best1=0.737 n_val=36004 vram=1.16GB 33s | grade=0.886 inner_auc=0.817 vs conf_auc=0.813
+05:37:04 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+05:37:39 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.735 best1=0.734 n_val=35912 vram=1.16GB 35s | grade=0.889 inner_auc=0.811 vs conf_auc=0.806
+05:37:48 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+05:38:20 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.737 best1=0.732 n_val=35999 vram=1.16GB 32s | grade=0.887 inner_auc=0.814 vs conf_auc=0.811
+05:38:27 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+05:39:02 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.735 best1=0.734 n_val=35860 vram=1.16GB 35s | grade=0.887 inner_auc=0.808 vs conf_auc=0.804
+05:39:09 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+05:39:34 [enc/text/yahoo_answers_topics] vote=0.740 uniform=0.735 best1=0.732 n_val=35956 vram=1.16GB 24s | grade=0.887 inner_auc=0.803 vs conf_auc=0.801
+05:39:40 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+05:40:12 [enc/text/yahoo_answers_topics] vote=0.740 uniform=0.735 best1=0.731 n_val=35649 vram=1.16GB 32s | grade=0.888 inner_auc=0.808 vs conf_auc=0.805
+05:40:19 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+05:40:52 [enc/text/yahoo_answers_topics] vote=0.740 uniform=0.733 best1=0.729 n_val=35628 vram=1.16GB 33s | grade=0.889 inner_auc=0.809 vs conf_auc=0.805
+05:41:00 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+05:41:36 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.734 best1=0.731 n_val=35919 vram=1.16GB 36s | grade=0.887 inner_auc=0.807 vs conf_auc=0.803
+05:41:43 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+05:42:19 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.733 best1=0.733 n_val=36007 vram=1.16GB 36s | grade=0.887 inner_auc=0.808 vs conf_auc=0.804
+05:42:27 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+05:43:03 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.733 best1=0.733 n_val=35917 vram=1.16GB 36s | grade=0.888 inner_auc=0.812 vs conf_auc=0.809
+05:43:10 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+05:43:47 [enc/text/yahoo_answers_topics] vote=0.747 uniform=0.739 best1=0.736 n_val=36315 vram=1.16GB 37s | grade=0.886 inner_auc=0.814 vs conf_auc=0.812
+05:43:55 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+05:44:33 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.735 best1=0.735 n_val=36084 vram=1.16GB 37s | grade=0.886 inner_auc=0.808 vs conf_auc=0.806
+05:44:40 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+05:45:18 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.738 best1=0.735 n_val=36123 vram=1.16GB 37s | grade=0.887 inner_auc=0.805 vs conf_auc=0.802
+05:45:26 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+05:46:03 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.736 best1=0.733 n_val=36147 vram=1.16GB 37s | grade=0.887 inner_auc=0.814 vs conf_auc=0.810
+05:46:11 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+05:46:48 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.737 best1=0.733 n_val=35981 vram=1.16GB 37s | grade=0.888 inner_auc=0.806 vs conf_auc=0.803
+05:46:56 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+05:47:34 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.735 best1=0.735 n_val=35869 vram=1.16GB 37s | grade=0.888 inner_auc=0.811 vs conf_auc=0.808
+05:47:42 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+05:48:20 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.735 best1=0.732 n_val=36101 vram=1.16GB 38s | grade=0.888 inner_auc=0.815 vs conf_auc=0.813
+05:48:28 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+05:49:06 [enc/text/yahoo_answers_topics] vote=0.745 uniform=0.737 best1=0.734 n_val=36128 vram=1.16GB 38s | grade=0.886 inner_auc=0.812 vs conf_auc=0.810
+05:49:14 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+05:49:48 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.736 best1=0.734 n_val=35981 vram=1.16GB 34s | grade=0.888 inner_auc=0.818 vs conf_auc=0.816
+05:49:55 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+05:50:26 [enc/text/yahoo_answers_topics] vote=0.739 uniform=0.732 best1=0.730 n_val=35895 vram=1.16GB 31s | grade=0.887 inner_auc=0.816 vs conf_auc=0.814
+05:50:35 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+05:51:07 [enc/text/yahoo_answers_topics] vote=0.737 uniform=0.733 best1=0.728 n_val=36067 vram=1.16GB 32s | grade=0.888 inner_auc=0.815 vs conf_auc=0.812
+05:51:14 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+05:51:47 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.738 best1=0.734 n_val=36079 vram=1.16GB 33s | grade=0.886 inner_auc=0.812 vs conf_auc=0.810
+05:51:54 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+05:52:29 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.738 best1=0.734 n_val=35622 vram=1.16GB 34s | grade=0.889 inner_auc=0.806 vs conf_auc=0.803
+05:52:36 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+05:53:07 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.737 best1=0.734 n_val=35988 vram=1.16GB 31s | grade=0.888 inner_auc=0.814 vs conf_auc=0.813
+05:53:14 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+05:53:47 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.733 best1=0.732 n_val=35926 vram=1.16GB 33s | grade=0.890 inner_auc=0.808 vs conf_auc=0.806
+05:53:55 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+05:54:26 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.738 best1=0.735 n_val=35838 vram=1.16GB 31s | grade=0.887 inner_auc=0.802 vs conf_auc=0.798
+05:54:33 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+05:55:08 [enc/text/yahoo_answers_topics] vote=0.745 uniform=0.737 best1=0.733 n_val=36036 vram=1.16GB 34s | grade=0.889 inner_auc=0.816 vs conf_auc=0.814
+05:55:16 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+05:55:48 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.736 best1=0.734 n_val=36078 vram=1.16GB 32s | grade=0.887 inner_auc=0.824 vs conf_auc=0.822
+05:55:57 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+05:56:32 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.735 best1=0.732 n_val=35982 vram=1.16GB 36s | grade=0.888 inner_auc=0.819 vs conf_auc=0.815
+05:56:40 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+05:57:12 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.737 best1=0.734 n_val=35973 vram=1.16GB 32s | grade=0.889 inner_auc=0.805 vs conf_auc=0.802
+05:57:21 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+05:57:56 [enc/text/yahoo_answers_topics] vote=0.739 uniform=0.731 best1=0.731 n_val=35931 vram=1.16GB 35s | grade=0.888 inner_auc=0.814 vs conf_auc=0.811
+05:58:04 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+05:58:35 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.734 best1=0.731 n_val=36020 vram=1.16GB 30s | grade=0.888 inner_auc=0.812 vs conf_auc=0.809
+05:58:43 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+05:59:16 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.735 best1=0.734 n_val=35995 vram=1.16GB 33s | grade=0.886 inner_auc=0.812 vs conf_auc=0.809
+05:59:25 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+05:59:55 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.734 best1=0.733 n_val=35964 vram=1.16GB 31s | grade=0.888 inner_auc=0.807 vs conf_auc=0.803
+06:00:04 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+06:00:38 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.736 best1=0.732 n_val=35794 vram=1.16GB 34s | grade=0.888 inner_auc=0.807 vs conf_auc=0.804
+06:00:47 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+06:01:19 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.733 best1=0.730 n_val=35613 vram=1.17GB 32s | grade=0.888 inner_auc=0.810 vs conf_auc=0.806
+06:01:28 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+06:02:02 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.737 best1=0.732 n_val=36025 vram=1.16GB 34s | grade=0.888 inner_auc=0.808 vs conf_auc=0.804
+06:02:11 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+06:02:42 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.733 best1=0.733 n_val=35990 vram=1.16GB 30s | grade=0.889 inner_auc=0.804 vs conf_auc=0.801
+06:02:51 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+06:03:27 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.738 best1=0.734 n_val=35878 vram=1.16GB 35s | grade=0.887 inner_auc=0.815 vs conf_auc=0.811
+06:03:35 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+06:04:07 [enc/text/yahoo_answers_topics] vote=0.746 uniform=0.739 best1=0.738 n_val=35913 vram=1.16GB 32s | grade=0.887 inner_auc=0.810 vs conf_auc=0.807
+06:04:17 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+06:04:52 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.735 best1=0.734 n_val=36282 vram=1.16GB 35s | grade=0.889 inner_auc=0.807 vs conf_auc=0.803
+06:05:01 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+06:05:31 [enc/text/yahoo_answers_topics] vote=0.740 uniform=0.732 best1=0.732 n_val=35835 vram=1.16GB 31s | grade=0.887 inner_auc=0.810 vs conf_auc=0.806
+06:05:40 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+06:06:12 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.737 best1=0.734 n_val=35805 vram=1.16GB 32s | grade=0.887 inner_auc=0.806 vs conf_auc=0.802
+06:06:19 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+06:06:51 [enc/text/yahoo_answers_topics] vote=0.745 uniform=0.738 best1=0.737 n_val=36403 vram=1.16GB 31s | grade=0.888 inner_auc=0.801 vs conf_auc=0.796
+06:07:01 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+06:07:36 [enc/text/yahoo_answers_topics] vote=0.745 uniform=0.736 best1=0.734 n_val=36334 vram=1.16GB 35s | grade=0.889 inner_auc=0.814 vs conf_auc=0.811
+06:07:46 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+06:08:19 [enc/text/yahoo_answers_topics] vote=0.740 uniform=0.733 best1=0.733 n_val=35821 vram=1.16GB 34s | grade=0.888 inner_auc=0.816 vs conf_auc=0.814
+06:08:29 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+06:09:04 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.736 best1=0.735 n_val=35931 vram=1.16GB 35s | grade=0.887 inner_auc=0.809 vs conf_auc=0.806
+06:09:13 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+06:09:43 [enc/text/yahoo_answers_topics] vote=0.738 uniform=0.733 best1=0.729 n_val=36190 vram=1.16GB 29s | grade=0.888 inner_auc=0.805 vs conf_auc=0.802
+06:09:52 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+06:10:28 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.735 best1=0.733 n_val=35888 vram=1.16GB 35s | grade=0.885 inner_auc=0.809 vs conf_auc=0.806
+06:10:37 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+06:11:11 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.736 best1=0.732 n_val=35801 vram=1.16GB 34s | grade=0.889 inner_auc=0.806 vs conf_auc=0.802
+06:11:21 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+06:11:56 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.734 best1=0.734 n_val=35802 vram=1.16GB 35s | grade=0.889 inner_auc=0.812 vs conf_auc=0.808
+06:12:06 RUN COMPLETE
+21:37:35 NI run auto_gpu_010 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+21:37:35 explicit task list: ['enc/text/yahoo_answers_topics']
+21:37:45 [resume] from checkpoint: next cycle 91, rounds 91, 91 metric rows, inner net restored
+21:37:45 ===== CYCLE 91 (OUTER-ONLY BOOTSTRAP) =====
+21:37:47 [data] enc/text/yahoo_answers_topics: n=119962 C=10 D=384 shards=1
+21:38:59 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.738 best1=0.735 n_val=36050 vram=0.99GB 72s
+21:39:21 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 91, "n_records": 36050, "n_val": 7133, "base_rate": 0.7348941564559937, "inner": {"auc": 0.8173448457935751, "ece": 0.009321382527521512, "brier": 0.14615808427333832, "acc80": 0.8226428031921387}, "outer_conf": {"auc": 0.8155887009511712, "ece": 0.04896456241131363, "brier": 0.1495899260044098, "acc80": 0.8243953585624695}}
+21:39:21 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+21:40:41 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.736 best1=0.733 n_val=36122 vram=1.16GB 80s | grade=0.888 inner_auc=0.810 vs conf_auc=0.806
+21:40:54 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+21:42:14 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.737 best1=0.733 n_val=36160 vram=1.16GB 80s | grade=0.887 inner_auc=0.815 vs conf_auc=0.811
+21:42:27 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+21:43:35 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.739 best1=0.733 n_val=35851 vram=1.16GB 68s | grade=0.887 inner_auc=0.812 vs conf_auc=0.807
+21:43:49 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+21:45:08 [enc/text/yahoo_answers_topics] vote=0.740 uniform=0.733 best1=0.730 n_val=35878 vram=1.16GB 80s | grade=0.886 inner_auc=0.808 vs conf_auc=0.805
+21:45:23 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+21:46:49 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.735 best1=0.735 n_val=36118 vram=1.16GB 86s | grade=0.886 inner_auc=0.807 vs conf_auc=0.804
+21:47:06 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+21:48:28 [enc/text/yahoo_answers_topics] vote=0.738 uniform=0.730 best1=0.730 n_val=36029 vram=1.16GB 83s | grade=0.887 inner_auc=0.801 vs conf_auc=0.797
+21:48:43 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+21:50:06 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.735 best1=0.732 n_val=36052 vram=1.16GB 83s | grade=0.887 inner_auc=0.814 vs conf_auc=0.811
+21:50:19 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+21:51:42 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.737 best1=0.735 n_val=36085 vram=1.16GB 82s | grade=0.889 inner_auc=0.811 vs conf_auc=0.807
+21:51:55 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+21:53:14 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.733 best1=0.733 n_val=35875 vram=1.16GB 78s | grade=0.888 inner_auc=0.804 vs conf_auc=0.801
+21:53:27 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+21:54:47 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.733 best1=0.734 n_val=36152 vram=1.16GB 80s | grade=0.888 inner_auc=0.811 vs conf_auc=0.808
+21:55:03 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+21:56:25 [enc/text/yahoo_answers_topics] vote=0.739 uniform=0.735 best1=0.730 n_val=36178 vram=1.16GB 83s | grade=0.888 inner_auc=0.812 vs conf_auc=0.808
+21:56:40 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+21:58:00 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.735 best1=0.732 n_val=35814 vram=1.16GB 79s | grade=0.887 inner_auc=0.810 vs conf_auc=0.806
+21:58:13 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+21:59:33 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.736 best1=0.733 n_val=36254 vram=1.16GB 80s | grade=0.889 inner_auc=0.810 vs conf_auc=0.807
+21:59:48 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+22:01:14 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.735 best1=0.733 n_val=36034 vram=1.16GB 86s | grade=0.888 inner_auc=0.801 vs conf_auc=0.797
+22:01:30 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+22:03:12 [enc/text/yahoo_answers_topics] vote=0.745 uniform=0.740 best1=0.735 n_val=35884 vram=1.16GB 102s | grade=0.887 inner_auc=0.805 vs conf_auc=0.802
+22:03:26 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+22:05:00 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.734 best1=0.731 n_val=36299 vram=1.16GB 93s | grade=0.887 inner_auc=0.813 vs conf_auc=0.810
+22:05:15 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+22:07:03 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.733 best1=0.733 n_val=36005 vram=1.16GB 108s | grade=0.890 inner_auc=0.812 vs conf_auc=0.808
+22:07:19 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+22:08:51 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.734 best1=0.731 n_val=35871 vram=1.16GB 92s | grade=0.889 inner_auc=0.822 vs conf_auc=0.818
+22:09:06 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+22:10:36 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.734 best1=0.733 n_val=35973 vram=1.16GB 90s | grade=0.888 inner_auc=0.815 vs conf_auc=0.810
+22:10:51 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+22:12:31 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.734 best1=0.735 n_val=36048 vram=1.16GB 100s | grade=0.888 inner_auc=0.807 vs conf_auc=0.802
+22:12:49 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+22:14:36 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.739 best1=0.736 n_val=35945 vram=1.16GB 107s | grade=0.890 inner_auc=0.808 vs conf_auc=0.802
+22:14:52 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+22:16:15 [enc/text/yahoo_answers_topics] vote=0.739 uniform=0.732 best1=0.731 n_val=35996 vram=1.16GB 83s | grade=0.886 inner_auc=0.812 vs conf_auc=0.811
+22:16:29 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+22:17:44 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.737 best1=0.735 n_val=36253 vram=1.16GB 75s | grade=0.887 inner_auc=0.812 vs conf_auc=0.806
+22:18:00 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+22:19:25 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.737 best1=0.733 n_val=35967 vram=1.16GB 85s | grade=0.889 inner_auc=0.812 vs conf_auc=0.808
+22:19:44 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+22:21:15 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.731 best1=0.732 n_val=36019 vram=1.16GB 91s | grade=0.887 inner_auc=0.808 vs conf_auc=0.804
+22:21:32 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+22:22:48 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.732 best1=0.734 n_val=36107 vram=1.16GB 76s | grade=0.889 inner_auc=0.814 vs conf_auc=0.810
+22:23:03 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+22:24:29 [enc/text/yahoo_answers_topics] vote=0.740 uniform=0.733 best1=0.730 n_val=35846 vram=1.16GB 86s | grade=0.889 inner_auc=0.803 vs conf_auc=0.801
+22:24:49 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+22:26:05 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.737 best1=0.732 n_val=35994 vram=1.16GB 77s | grade=0.888 inner_auc=0.803 vs conf_auc=0.798
+22:26:16 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+22:27:19 [enc/text/yahoo_answers_topics] vote=0.747 uniform=0.738 best1=0.736 n_val=35853 vram=1.16GB 64s | grade=0.887 inner_auc=0.801 vs conf_auc=0.797
+22:27:37 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+22:28:57 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.738 best1=0.735 n_val=35994 vram=1.16GB 80s | grade=0.886 inner_auc=0.816 vs conf_auc=0.810
+22:29:09 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+22:30:26 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.738 best1=0.735 n_val=36067 vram=1.16GB 77s | grade=0.889 inner_auc=0.819 vs conf_auc=0.814
+22:30:48 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+22:32:33 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.735 best1=0.734 n_val=36134 vram=1.16GB 105s | grade=0.889 inner_auc=0.803 vs conf_auc=0.799
+22:32:47 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+22:34:08 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.734 best1=0.734 n_val=35896 vram=1.16GB 82s | grade=0.889 inner_auc=0.822 vs conf_auc=0.816
+22:34:25 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+22:35:54 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.735 best1=0.733 n_val=36035 vram=1.16GB 89s | grade=0.889 inner_auc=0.806 vs conf_auc=0.801
+22:36:14 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+22:37:45 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.736 best1=0.732 n_val=36065 vram=1.16GB 92s | grade=0.887 inner_auc=0.816 vs conf_auc=0.810
+22:38:04 RUN COMPLETE
+14:04:45 NI run auto_gpu_010 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+14:04:45 explicit task list: ['enc/text/yahoo_answers_topics']
+14:05:08 [resume] from checkpoint: next cycle 127, rounds 127, 127 metric rows, inner net restored
+14:05:08 ===== CYCLE 127 (OUTER-ONLY BOOTSTRAP) =====
+14:05:11 [data] enc/text/yahoo_answers_topics: n=119962 C=10 D=384 shards=1
+14:07:44 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.736 best1=0.735 n_val=36100 vram=0.99GB 153s
+14:08:29 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 127, "n_records": 36100, "n_val": 7215, "base_rate": 0.734026312828064, "inner": {"auc": 0.8113563935301147, "ece": 0.013500207685300731, "brier": 0.14868050813674927, "acc80": 0.8206860423088074}, "outer_conf": {"auc": 0.8079350693258227, "ece": 0.0416256777689181, "brier": 0.1517122983932495, "acc80": 0.8206860423088074}}
+14:08:29 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+14:10:59 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.737 best1=0.734 n_val=36174 vram=1.16GB 150s | grade=0.888 inner_auc=0.812 vs conf_auc=0.808
+14:11:21 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+14:14:00 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.733 best1=0.733 n_val=35883 vram=1.16GB 159s | grade=0.888 inner_auc=0.803 vs conf_auc=0.800
+14:14:17 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+14:16:27 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.734 best1=0.733 n_val=35502 vram=1.17GB 130s | grade=0.890 inner_auc=0.803 vs conf_auc=0.798
+14:16:47 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+14:19:11 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.734 best1=0.732 n_val=36126 vram=1.16GB 143s | grade=0.889 inner_auc=0.806 vs conf_auc=0.802
+14:19:31 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+14:21:39 [enc/text/yahoo_answers_topics] vote=0.739 uniform=0.732 best1=0.730 n_val=35859 vram=1.16GB 127s | grade=0.888 inner_auc=0.812 vs conf_auc=0.806
+14:22:01 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+14:24:30 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.735 best1=0.733 n_val=36042 vram=1.16GB 149s | grade=0.886 inner_auc=0.812 vs conf_auc=0.807
+14:24:50 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+14:27:09 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.739 best1=0.733 n_val=35696 vram=1.16GB 138s | grade=0.888 inner_auc=0.810 vs conf_auc=0.805
+14:27:31 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+14:29:49 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.735 best1=0.732 n_val=36013 vram=1.16GB 139s | grade=0.888 inner_auc=0.808 vs conf_auc=0.805
+14:30:10 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+14:32:15 [enc/text/yahoo_answers_topics] vote=0.744 uniform=0.738 best1=0.735 n_val=36016 vram=1.16GB 126s | grade=0.887 inner_auc=0.816 vs conf_auc=0.812
+14:32:35 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+14:34:38 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.733 best1=0.734 n_val=35916 vram=1.16GB 123s | grade=0.887 inner_auc=0.815 vs conf_auc=0.809
+14:34:57 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+14:36:48 [enc/text/yahoo_answers_topics] vote=0.745 uniform=0.737 best1=0.735 n_val=36133 vram=1.16GB 111s | grade=0.887 inner_auc=0.807 vs conf_auc=0.803
+14:37:07 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+14:39:06 [enc/text/yahoo_answers_topics] vote=0.740 uniform=0.732 best1=0.731 n_val=35746 vram=1.16GB 119s | grade=0.887 inner_auc=0.812 vs conf_auc=0.805
+14:39:24 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+14:41:12 [enc/text/yahoo_answers_topics] vote=0.742 uniform=0.736 best1=0.733 n_val=36474 vram=1.16GB 107s | grade=0.889 inner_auc=0.821 vs conf_auc=0.815
+14:41:31 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+14:43:36 [enc/text/yahoo_answers_topics] vote=0.740 uniform=0.734 best1=0.731 n_val=35899 vram=1.16GB 125s | grade=0.888 inner_auc=0.809 vs conf_auc=0.801
+14:43:59 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+14:45:38 [enc/text/yahoo_answers_topics] vote=0.740 uniform=0.734 best1=0.733 n_val=35868 vram=1.16GB 99s | grade=0.888 inner_auc=0.817 vs conf_auc=0.812
+14:45:53 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+14:47:29 [enc/text/yahoo_answers_topics] vote=0.740 uniform=0.737 best1=0.733 n_val=36124 vram=1.16GB 96s | grade=0.889 inner_auc=0.809 vs conf_auc=0.805
+14:47:50 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+14:49:29 [enc/text/yahoo_answers_topics] vote=0.738 uniform=0.733 best1=0.732 n_val=35864 vram=1.16GB 99s | grade=0.888 inner_auc=0.810 vs conf_auc=0.806
+14:49:46 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+14:51:37 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.737 best1=0.733 n_val=35994 vram=1.16GB 110s | grade=0.885 inner_auc=0.813 vs conf_auc=0.809
+14:51:58 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+14:53:39 [enc/text/yahoo_answers_topics] vote=0.738 uniform=0.732 best1=0.731 n_val=35958 vram=1.16GB 101s | grade=0.887 inner_auc=0.812 vs conf_auc=0.808
+14:53:55 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+14:55:30 [enc/text/yahoo_answers_topics] vote=0.741 uniform=0.734 best1=0.734 n_val=35769 vram=1.16GB 95s | grade=0.888 inner_auc=0.811 vs conf_auc=0.805
+14:55:48 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+14:57:35 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.734 best1=0.735 n_val=35958 vram=1.16GB 106s | grade=0.889 inner_auc=0.806 vs conf_auc=0.802
+14:57:58 ===== CYCLE 149 (OUTER -> INNER -> FEEDBACK) =====
+14:59:47 [enc/text/yahoo_answers_topics] vote=0.739 uniform=0.733 best1=0.731 n_val=36015 vram=1.16GB 110s | grade=0.888 inner_auc=0.810 vs conf_auc=0.806
+15:00:09 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+15:02:04 [enc/text/yahoo_answers_topics] vote=0.738 uniform=0.733 best1=0.731 n_val=35987 vram=1.16GB 116s | grade=0.887 inner_auc=0.816 vs conf_auc=0.814
+15:02:26 ===== CYCLE 151 (OUTER -> INNER -> FEEDBACK) =====
+15:04:23 [enc/text/yahoo_answers_topics] vote=0.743 uniform=0.734 best1=0.734 n_val=36032 vram=1.16GB 116s | grade=0.887 inner_auc=0.809 vs conf_auc=0.805
+15:04:48 RUN COMPLETE

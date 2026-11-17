@@ -1,0 +1,81 @@
+{
+   "app_metadata": {
+      "app_name": "ViVeTool GUI",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide on how to use ViVeTool GUI to manage Windows features",
+   "prerequisite_state": "ViVeTool GUI is open and the user is on the main window",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Select the Build for which you want to enable or disable features for",
+         "ui_target": {
+            "element_name": "Build Selection",
+            "automation_id": null,
+            "hierarchical_path": "Main Window > Build Selection",
+            "element_type": "ComboBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Build Selection dropdown opens, allowing the user to choose a specific build"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Wait for the build to load, open one of the Groups by pressing the Arrow, and select the Feature that you are looking for",
+         "ui_target": {
+            "element_name": "Group Arrow",
+            "automation_id": null,
+            "hierarchical_path": "Main Window > Group Arrow",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected Group opens, displaying the available features"
+      }
+   ],
+   "_meta": {
+      "source_app": "ViVeTool GUI",
+      "app_key": "vivetool_gui",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "ViVeTool GUI <img src=\"/images/icons8-advertisement-page-96.png\" alt=\"ViVeTool GUI Logo\" width=\"32\"/>",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:31:01Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

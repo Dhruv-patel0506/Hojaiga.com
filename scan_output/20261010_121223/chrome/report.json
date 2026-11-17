@@ -1,0 +1,4093 @@
+{
+ "app": "chrome",
+ "name": "chrome",
+ "tier": 1,
+ "mode": "full",
+ "scenario": "chrome profile",
+ "started": "2026-10-10 12:24:24",
+ "phases": {
+  "target": {
+   "display": "Google Chrome",
+   "id": "Chrome",
+   "exe": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+   "packaged": false,
+   "chromium": "browser"
+  },
+  "state": {
+   "packaged": false,
+   "family": ""
+  },
+  "launch": {
+   "launched": true,
+   "hwnd": 329206,
+   "notes": [
+    "browser launched with a throw-away profile",
+    "stable"
+   ],
+   "launch_s": 2.0,
+   "cdp_port": 53065,
+   "pid": 24148,
+   "title": "about:blank - Google Chrome"
+  },
+  "park": "parked",
+  "tree": {
+   "nodes": 235,
+   "waited_s": 0.0,
+   "frame_only": false
+  },
+  "start_s": 3.6,
+  "deep_scan": {
+   "profile": {
+    "family": "chromium-browser",
+    "evidence": [
+     "window class Chrome_WidgetWin_1"
+    ],
+    "window_class": "Chrome_WidgetWin_1",
+    "process": "chrome",
+    "framework_id": "Win32",
+    "route_prior": [
+     "adapter",
+     "control",
+     "shortcut"
+    ],
+    "expected_a11y": "sparse",
+    "adapters": [
+     "cdp"
+    ],
+    "note": "UIA tree appears after the first query (and always with --force-renderer-accessibility); the DevTools protocol sees the page itself"
+   },
+   "nodes": 235,
+   "interactive": 47,
+   "named": 54,
+   "depth": 10,
+   "native_menu_items": 0,
+   "state": "rich",
+   "waited_s": 1.58,
+   "settled": true,
+   "notes": [
+    "a tree cannot see closed drop-downs and menus: those come from native menus, the guide, or opening them (owned windows only)"
+   ]
+  },
+  "vision_scan": {
+   "vision_model": false,
+   "seconds": 2.5,
+   "elements": 25,
+   "named": 25,
+   "by_source": {
+    "uia": 25,
+    "cv": 14,
+    "ocr": 1
+   },
+   "regions": 6,
+   "path": "full:quick"
+  },
+  "catalog": {
+   "app": "chrome",
+   "verbs": 22,
+   "with_shortcut": 2,
+   "tooltips": 1,
+   "menus": [
+    "Saved Tab Groups",
+    "view 1000",
+    "work area"
+   ],
+   "sources": {
+    "uia": 24,
+    "cdp": 8,
+    "menu-expand": 8
+   },
+   "conflicts": 0,
+   "safety": {
+    "safe": 20,
+    "commit": 0,
+    "runtime": 0,
+    "sensitive": 0,
+    "unsafe": 2
+   },
+   "archetype": "browser_web",
+   "seconds": 0.001
+  },
+  "cdp": {
+   "browser": "Chrome/155.0.8059.40",
+   "commands": 8,
+   "hazards_known": 1,
+   "pages": 27,
+   "page_verbs": 483,
+   "edges": 21,
+   "listed": 107,
+   "relevant": 27,
+   "by_page": {
+    "chrome://app-settings/": 1,
+    "chrome://apps/": 7,
+    "chrome://batch-upload/": 6,
+    "chrome://bookmarks/": 5,
+    "chrome://browser-switch/": 0,
+    "chrome://certificate-manager/": 7,
+    "chrome://chrome-urls/": 113,
+    "chrome://default-browser/": 0,
+    "chrome://device-log/": 24,
+    "chrome://downloads/": 2,
+    "chrome://extensions/": 18,
+    "chrome://history/": 7,
+    "chrome://managed-user-profile-notice/": 1,
+    "chrome://new-tab-page-third-party/": 2,
+    "chrome://new-tab-page/": 13,
+    "chrome://password-manager/": 8,
+    "chrome://print/": 11,
+    "chrome://profile-customization/": 19,
+    "chrome://saved-tab-groups-unsupported/": 0,
+    "chrome://settings/": 22,
+    "chrome://site-engagement/": 2,
+    "chrome://view-cert/": 2,
+    "chrome://whats-new/": 0,
+    "chrome://certificate-manager/clientcerts": 5,
+    "chrome://certificate-manager/crscerts": 231,
+    "chrome://certificate-manager/localcerts": 7,
+    "chrome://extensions/shortcuts": 5
+   },
+   "seconds": 154.9
+  },
+  "menus": {
+   "openers": 1,
+   "opened": 1,
+   "items": 8,
+   "dialog_openers": 0,
+   "submenus": 0,
+   "failed": [
+    "time budget reached"
+   ],
+   "skipped": [],
+   "seconds": 13.4,
+   "by_opener": {
+    "Documents (OneDrive)": 8
+   }
+  },
+  "catalog_after_menus": {
+   "app": "chrome",
+   "verbs": 559,
+   "with_shortcut": 2,
+   "tooltips": 1,
+   "menus": [
+    "Browser",
+    "Documents (OneDrive)",
+    "Saved Tab Groups",
+    "page: Apps",
+    "page: Bookmarks",
+    "page: Certificate Manager",
+    "page: Chrome URLs",
+    "page: Device Log",
+    "page: Download history",
+    "page: Extensions",
+    "page: Google Password Manager",
+    "page: History",
+    "page: New Tab",
+    "page: Settings"
+   ],
+   "sources": {
+    "uia": 24,
+    "cdp": 8,
+    "menu-expand": 8
+   },
+   "conflicts": 0,
+   "safety": {
+    "safe": 549,
+    "commit": 0,
+    "runtime": 0,
+    "sensitive": 8,
+    "unsafe": 2
+   },
+   "archetype": "browser_web",
+   "seconds": 0.001
+  },
+  "ui_map": [
+   {
+    "path": "Documents (OneDrive)",
+    "kind": "menu",
+    "count": 8,
+    "items": [
+     "ActivePresenter (OneDrive)",
+     "ActivePresenter Templates (OneDrive)",
+     "Cline (OneDrive)",
+     "Custom Office Templates (OneDrive)",
+     "Default (OneDrive)",
+     "Default Project (OneDrive)",
+     "GitHub (OneDrive)",
+     "Medal (OneDrive)"
+    ],
+    "depth": 1
+   }
+  ],
+  "tree_picture": {
+   "nodes": 580,
+   "levels": 16,
+   "by_depth": {
+    "0": 1,
+    "1": 3,
+    "2": 10,
+    "3": 10,
+    "4": 15,
+    "5": 29,
+    "6": 42,
+    "7": 84,
+    "8": 136,
+    "9": 118,
+    "10": 36,
+    "11": 7,
+    "12": 31,
+    "13": 42,
+    "14": 13,
+    "15": 3
+   },
+   "top_roles": {
+    "button": 123,
+    "pane": 110,
+    "text": 89,
+    "treeitem": 85,
+    "group": 46,
+    "edit": 44,
+    "image": 11,
+    "splitbutton": 10
+   }
+  },
+  "perceive_s": 179.7,
+  "guide": {
+   "docs": 77,
+   "runnable_procedures": 30
+  },
+  "close": {
+   "how": "close"
+  },
+  "state_after": {
+   "temp_removed": 1
+  }
+ },
+ "checkpoints": [
+  {
+   "n": 1,
+   "tag": "launched",
+   "file": "checkpoints/cp_01_launched.png",
+   "at_s": 3.4
+  },
+  {
+   "n": 2,
+   "tag": "after_scan_home",
+   "file": "checkpoints/cp_02_after_scan_home.png",
+   "at_s": 183.4
+  },
+  {
+   "n": 3,
+   "tag": "task01_ok_Manage Dark mode in Chrome",
+   "file": "checkpoints/cp_03_task01_ok_Manage_Dark_mode_in_Chrome.png",
+   "at_s": 251.5
+  },
+  {
+   "n": 4,
+   "tag": "task02_ok_Change your browser’s color",
+   "file": "checkpoints/cp_04_task02_ok_Change_your_browser_s_color.png",
+   "at_s": 283.8
+  },
+  {
+   "n": 5,
+   "tag": "task03_failed_Choose your homepage",
+   "file": "checkpoints/cp_05_task03_failed_Choose_your_homepage.png",
+   "at_s": 333.9
+  },
+  {
+   "n": 6,
+   "tag": "task04_failed_Remove a profile",
+   "file": "checkpoints/cp_06_task04_failed_Remove_a_profile.png",
+   "at_s": 361.0
+  },
+  {
+   "n": 7,
+   "tag": "task05_ok_Set Chrome as your default web browser",
+   "file": "checkpoints/cp_07_task05_ok_Set_Chrome_as_your_default_web_browser.png",
+   "at_s": 387.1
+  },
+  {
+   "n": 8,
+   "tag": "task06_failed_Open your bookmarks",
+   "file": "checkpoints/cp_08_task06_failed_Open_your_bookmarks.png",
+   "at_s": 410.0
+  },
+  {
+   "n": 9,
+   "tag": "task07_failed_Set your startup page",
+   "file": "checkpoints/cp_09_task07_failed_Set_your_startup_page.png",
+   "at_s": 443.8
+  },
+  {
+   "n": 10,
+   "tag": "task08_failed_Customize your New Tab page",
+   "file": "checkpoints/cp_10_task08_failed_Customize_your_New_Tab_page.png",
+   "at_s": 474.4
+  },
+  {
+   "n": 11,
+   "tag": "task09_failed_Make Chrome your default browser",
+   "file": "checkpoints/cp_11_task09_failed_Make_Chrome_your_default_browser.png",
+   "at_s": 506.1
+  },
+  {
+   "n": 12,
+   "tag": "task10_failed_Set your startup page",
+   "file": "checkpoints/cp_12_task10_failed_Set_your_startup_page.png",
+   "at_s": 527.3
+  },
+  {
+   "n": 13,
+   "tag": "task11_failed_Add bookmarks to Chrome",
+   "file": "checkpoints/cp_13_task11_failed_Add_bookmarks_to_Chrome.png",
+   "at_s": 550.0
+  },
+  {
+   "n": 14,
+   "tag": "task12_blocked_Manage web app settings",
+   "file": "checkpoints/cp_14_task12_blocked_Manage_web_app_settings.png",
+   "at_s": 560.9
+  },
+  {
+   "n": 15,
+   "tag": "task13_failed_Add a custom background image",
+   "file": "checkpoints/cp_15_task13_failed_Add_a_custom_background_image.png",
+   "at_s": 591.2
+  },
+  {
+   "n": 16,
+   "tag": "task14_ok_Manage your windows",
+   "file": "checkpoints/cp_16_task14_ok_Manage_your_windows.png",
+   "at_s": 596.3
+  },
+  {
+   "n": 17,
+   "tag": "task15_blocked_Close from the tab strip",
+   "file": "checkpoints/cp_17_task15_blocked_Close_from_the_tab_strip.png",
+   "at_s": 598.1
+  },
+  {
+   "n": 18,
+   "tag": "task16_failed_From the tab switcher",
+   "file": "checkpoints/cp_18_task16_failed_From_the_tab_switcher.png",
+   "at_s": 609.8
+  },
+  {
+   "n": 19,
+   "tag": "task17_blocked_Add a bookmark",
+   "file": "checkpoints/cp_19_task17_blocked_Add_a_bookmark.png",
+   "at_s": 611.7
+  },
+  {
+   "n": 20,
+   "tag": "task18_blocked_Search the web in Chrome",
+   "file": "checkpoints/cp_20_task18_blocked_Search_the_web_in_Chrome.png",
+   "at_s": 613.6
+  },
+  {
+   "n": 21,
+   "tag": "task19_blocked_Delete a saved page from your Reading List",
+   "file": "checkpoints/cp_21_task19_blocked_Delete_a_saved_page_from_your_Readi.png",
+   "at_s": 615.6
+  },
+  {
+   "n": 22,
+   "tag": "task20_blocked_To save with Drive for desktop:",
+   "file": "checkpoints/cp_22_task20_blocked_To_save_with_Drive_for_desktop_.png",
+   "at_s": 617.4
+  },
+  {
+   "n": 23,
+   "tag": "task21_failed_Manage app name and icon updates",
+   "file": "checkpoints/cp_23_task21_failed_Manage_app_name_and_icon_updates.png",
+   "at_s": 637.4
+  },
+  {
+   "n": 24,
+   "tag": "task22_blocked_Search with Google Lens",
+   "file": "checkpoints/cp_24_task22_blocked_Search_with_Google_Lens.png",
+   "at_s": 639.3
+  },
+  {
+   "n": 25,
+   "tag": "task23_failed_Delete a bookmark",
+   "file": "checkpoints/cp_25_task23_failed_Delete_a_bookmark.png",
+   "at_s": 650.8
+  },
+  {
+   "n": 26,
+   "tag": "task24_failed_Set your default search engine",
+   "file": "checkpoints/cp_26_task24_failed_Set_your_default_search_engine.png",
+   "at_s": 690.5
+  },
+  {
+   "n": 27,
+   "tag": "task25_blocked_From the tab switcher",
+   "file": "checkpoints/cp_27_task25_blocked_From_the_tab_switcher.png",
+   "at_s": 692.2
+  },
+  {
+   "n": 28,
+   "tag": "task26_failed_Download a file",
+   "file": "checkpoints/cp_28_task26_failed_Download_a_file.png",
+   "at_s": 714.1
+  },
+  {
+   "n": 29,
+   "tag": "task27_failed_Download a file",
+   "file": "checkpoints/cp_29_task27_failed_Download_a_file.png",
+   "at_s": 760.9
+  },
+  {
+   "n": 30,
+   "tag": "task28_failed_Turn off the ad blocker",
+   "file": "checkpoints/cp_30_task28_failed_Turn_off_the_ad_blocker.png",
+   "at_s": 782.5
+  },
+  {
+   "n": 31,
+   "tag": "task29_failed_Change your default sound permissions on your computer",
+   "file": "checkpoints/cp_31_task29_failed_Change_your_default_sound_permission.png",
+   "at_s": 804.0
+  },
+  {
+   "n": 32,
+   "tag": "task30_failed_Find a bookmark",
+   "file": "checkpoints/cp_32_task30_failed_Find_a_bookmark.png",
+   "at_s": 814.6
+  },
+  {
+   "n": 33,
+   "tag": "end_of_run",
+   "file": "checkpoints/cp_33_end_of_run.png",
+   "at_s": 814.8
+  }
+ ],
+ "seconds": 814.8,
+ "ledger": [
+  {
+   "goal": "How to install Chrome",
+   "cite": "Download and install Google Chrome > How to install Chrome",
+   "source": "https://support.google.com/chrome/answer/95346?hl=en&ref_topic=7439538",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "only says to open the application"
+  },
+  {
+   "goal": "Install Chrome offline",
+   "cite": "Download and install Google Chrome > How to install Chrome > Install Chrome offline",
+   "source": "https://support.google.com/chrome/answer/95346?hl=en&ref_topic=7439538",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "describes launching / updating the application, not using it"
+  },
+  {
+   "goal": "Install and use Chrome on Linux",
+   "cite": "Download and install Google Chrome > How to install Chrome > Install and use Chrome on Linux",
+   "source": "https://support.google.com/chrome/answer/95346?hl=en&ref_topic=7439538",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "describes launching / updating the application, not using it"
+  },
+  {
+   "goal": "Create or manage your Google Account in Chrome",
+   "cite": "Create or manage your Google Account in Chrome",
+   "source": "https://support.google.com/chrome/answer/10668644?hl=en&ref_topic=7439538",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "When you sign in",
+   "cite": "Sign in to Chrome > When you sign in",
+   "source": "https://support.google.com/chrome/answer/185277?hl=en&ref_topic=7439538",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "only says to open the application"
+  },
+  {
+   "goal": "When you sign in",
+   "cite": "Sign in to Chrome > When you sign in",
+   "source": "https://support.google.com/chrome/answer/185277?hl=en&ref_topic=7439538",
+   "steps": 5,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "When you sign in",
+   "cite": "Sign in to Chrome > When you sign in",
+   "source": "https://support.google.com/chrome/answer/185277?hl=en&ref_topic=7439538",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Make Chrome your default browser",
+   "cite": "Make Chrome your default browser",
+   "source": "https://support.google.com/chrome/answer/95417?hl=en&ref_topic=7439538",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control)"
+  },
+  {
+   "goal": "Related resources",
+   "cite": "Make Chrome your default browser > Related resources",
+   "source": "https://support.google.com/chrome/answer/95417?hl=en&ref_topic=7439538",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Improve your productivity",
+   "cite": "Use Chrome at home > Improve your productivity",
+   "source": "https://support.google.com/chrome/answer/9795973?hl=en&ref_topic=7439538",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Find help for common problems",
+   "cite": "Use Chrome at home > Find help for common problems",
+   "source": "https://support.google.com/chrome/answer/9795973?hl=en&ref_topic=7439538",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Check'; no such control is in the applicati)"
+  },
+  {
+   "goal": "Sign out of your Google Account from Chrome",
+   "cite": "Sign out of Chrome > Sign out of your Google Account from Chrome",
+   "source": "https://support.google.com/chrome/answer/9159867?hl=en&ref_topic=7439538",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Sign out'; no such control is in the applic)"
+  },
+  {
+   "goal": "Manage Chrome sign-in preferences",
+   "cite": "Sign out of Chrome > Manage Chrome sign-in preferences",
+   "source": "https://support.google.com/chrome/answer/9159867?hl=en&ref_topic=7439538",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "(untitled)",
+   "cite": "(untitled)",
+   "source": "https://support.google.com/chrome/answer/13849185?hl=en&ref_topic=7439538",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Use Maps in Chrome",
+   "cite": "Check location info & directions in Chrome > Use Maps in Chrome",
+   "source": "https://support.google.com/chrome/answer/13849185?hl=en&ref_topic=7439538",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'View with Google Maps on Chrome'; no such c)"
+  },
+  {
+   "goal": "Use Chrome Actions in your searches",
+   "cite": "Use Chrome Actions to learn more about locations > Use Chrome Actions in your searches",
+   "source": "https://support.google.com/chrome/answer/14506197?hl=en&ref_topic=7439538",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Action chip'; no such control is in the app)"
+  },
+  {
+   "goal": "Adjust your zoom settings",
+   "cite": "About search engine choice screens in Chrome > Adjust your zoom settings",
+   "source": "https://support.google.com/chrome/answer/15290248?hl=en&ref_topic=7439538",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control)"
+  },
+  {
+   "goal": "(untitled)",
+   "cite": "(untitled)",
+   "source": "https://support.google.com/chrome/answer/15523892?hl=en&ref_topic=7439538",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Set up Chrome for iPhone or iPad",
+   "cite": "Set up Chrome for iPhone or iPad",
+   "source": "https://support.google.com/chrome/answer/15523892?hl=en&ref_topic=7439538",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Download Chrome",
+   "cite": "Set up Chrome for iPhone or iPad > Download Chrome",
+   "source": "https://support.google.com/chrome/answer/15523892?hl=en&ref_topic=7439538",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "describes launching / updating the application, not using it"
+  },
+  {
+   "goal": "Sign in to Chrome",
+   "cite": "Set up Chrome for iPhone or iPad > Sign in to Chrome",
+   "source": "https://support.google.com/chrome/answer/15523892?hl=en&ref_topic=7439538",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Choose your address bar layout",
+   "cite": "Set up Chrome for iPhone or iPad > Choose your address bar layout",
+   "source": "https://support.google.com/chrome/answer/15523892?hl=en&ref_topic=7439538",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Address bar'; no such control is in the app; the manual says 'Top'; no such control is in the application)"
+  },
+  {
+   "goal": "Add Chrome to your dock",
+   "cite": "Set up Chrome for iPhone or iPad > Add Chrome to your dock",
+   "source": "https://support.google.com/chrome/answer/15523892?hl=en&ref_topic=7439538",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface ('Drag the app to your home screen and release it.' needs a p; the manual says 'Edit Home Screen'; no such control is in th)"
+  },
+  {
+   "goal": "On a Chromebook",
+   "cite": "Import Chrome bookmarks & settings > Add bookmarks to Chrome > On a Chromebook",
+   "source": "https://support.google.com/chrome/answer/96816?hl=en&ref_topic=7439637",
+   "steps": 4,
+   "grounded": 0.333,
+   "disposition": "skipped",
+   "reason": "its first step ('Bookmarks and listsBookmark manager') matches no control and only 33% of the steps do"
+  },
+  {
+   "goal": "Move or export bookmarks to another browser",
+   "cite": "Import Chrome bookmarks & settings > Move or export bookmarks to another browser",
+   "source": "https://support.google.com/chrome/answer/96816?hl=en&ref_topic=7439637",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Bookmarks and listsBookmark Manager'; no su; the manual says 'Export Bookmarks'; no such control is in th)"
+  },
+  {
+   "goal": "Create a shortcut for Chrome",
+   "cite": "Create a shortcut for Chrome",
+   "source": "https://support.google.com/chrome/answer/6204307?hl=en&ref_topic=7439637",
+   "steps": 6,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface ('From the bottom of your Home screen, swipe up.' needs a poi; 'Drag the app where you want it and release it.' needs a poi)"
+  },
+  {
+   "goal": "Related resources",
+   "cite": "Create a shortcut for Chrome > Related resources",
+   "source": "https://support.google.com/chrome/answer/6204307?hl=en&ref_topic=7439637",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Google'; no such control is in the applicat)"
+  },
+  {
+   "goal": "Add a new profile",
+   "cite": "Manage Chrome with multiple profiles > Add a new profile",
+   "source": "https://support.google.com/chrome/answer/2364824?hl=en&ref_topic=7439637",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Switch to another profile",
+   "cite": "Manage Chrome with multiple profiles > Switch to another profile",
+   "source": "https://support.google.com/chrome/answer/2364824?hl=en&ref_topic=7439637",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Profile'; no such control is in the applica; the step names no control)"
+  },
+  {
+   "goal": "Manage Chrome profiles",
+   "cite": "Manage Chrome with multiple profiles > Manage Chrome profiles",
+   "source": "https://support.google.com/chrome/answer/2364824?hl=en&ref_topic=7439637",
+   "steps": 4,
+   "grounded": 0.333,
+   "disposition": "skipped",
+   "reason": "its first step ('Profile') matches no control and only 33% of the steps do"
+  },
+  {
+   "goal": "Change a name, photo, or color",
+   "cite": "Manage Chrome with multiple profiles > Change a name, photo, or color",
+   "source": "https://support.google.com/chrome/answer/2364824?hl=en&ref_topic=7439637",
+   "steps": 5,
+   "grounded": 0.25,
+   "disposition": "skipped",
+   "reason": "its first step ('Profile') matches no control and only 25% of the steps do"
+  },
+  {
+   "goal": "(untitled)",
+   "cite": "(untitled)",
+   "source": "https://support.google.com/chrome/answer/95314?hl=en&ref_topic=7439637",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Set your startup page",
+   "cite": "Set your homepage and startup page > Set your startup page",
+   "source": "https://support.google.com/chrome/answer/95314?hl=en&ref_topic=7439637",
+   "steps": 6,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Edit a bookmark",
+   "cite": "Create, find and edit bookmarks in Chrome > Edit a bookmark",
+   "source": "https://support.google.com/chrome/answer/188842?hl=en&ref_topic=7439637",
+   "steps": 6,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Bookmarks and lists Bookmark Manager'; no s; the manual says 'Edit'; no such control is in the applicatio)"
+  },
+  {
+   "goal": "Create a new bookmark folder",
+   "cite": "Create, find and edit bookmarks in Chrome > Create a new bookmark folder",
+   "source": "https://support.google.com/chrome/answer/188842?hl=en&ref_topic=7439637",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Bookmarks and listsBookmark Manager'; no su; the manual says 'Add new folder'; no such control is in the )"
+  },
+  {
+   "goal": "Sort your bookmarks",
+   "cite": "Create, find and edit bookmarks in Chrome > Sort your bookmarks",
+   "source": "https://support.google.com/chrome/answer/188842?hl=en&ref_topic=7439637",
+   "steps": 7,
+   "grounded": 0.2,
+   "disposition": "skipped",
+   "reason": "its first step ('Bookmarks and listsBookmark Manager') matches no control and only 20% of the steps do"
+  },
+  {
+   "goal": "Move your bookmarks",
+   "cite": "Create, find and edit bookmarks in Chrome > Move your bookmarks",
+   "source": "https://support.google.com/chrome/answer/188842?hl=en&ref_topic=7439637",
+   "steps": 7,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Bookmarks and lists Bookmark Manager'; no s; 'Drag a bookmark up or down, or drag a bookmark into a folde)"
+  },
+  {
+   "goal": "Get your bookmarks, passwords, and more on all your devices",
+   "cite": "Get your bookmarks, passwords, and more on all your devices",
+   "source": "https://support.google.com/chrome/answer/165139?hl=en&ref_topic=7439637",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Choose what info is saved in your Google Account",
+   "cite": "Get your bookmarks, passwords, and more on all your devices > Choose what info is saved in your Google Account",
+   "source": "https://support.google.com/chrome/answer/165139?hl=en&ref_topic=7439637",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Save existing info in your account",
+   "cite": "Get your bookmarks, passwords, and more on all your devices > Save existing info in your account",
+   "source": "https://support.google.com/chrome/answer/165139?hl=en&ref_topic=7439637",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Keep your info private with a passphrase",
+   "cite": "Get your bookmarks, passwords, and more on all your devices > Keep your info private with a passphrase",
+   "source": "https://support.google.com/chrome/answer/165139?hl=en&ref_topic=7439637",
+   "steps": 7,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Step 1: Remove the passphrase",
+   "cite": "Get your bookmarks, passwords, and more on all your devices > Keep your info private with a passphrase > Step 1: Remove the passphrase",
+   "source": "https://support.google.com/chrome/answer/165139?hl=en&ref_topic=7439637",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Step 2: Make a new passphrase (optional)",
+   "cite": "Get your bookmarks, passwords, and more on all your devices > Keep your info private with a passphrase > Step 2: Make a new passphrase (optional)",
+   "source": "https://support.google.com/chrome/answer/165139?hl=en&ref_topic=7439637",
+   "steps": 7,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Find your Chrome info on all your devices",
+   "cite": "Get your bookmarks, passwords, and more on all your devices > Find your Chrome info on all your devices",
+   "source": "https://support.google.com/chrome/answer/165139?hl=en&ref_topic=7439637",
+   "steps": 6,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "describes launching / updating the application, not using it"
+  },
+  {
+   "goal": "Find your Chrome info on all your devices",
+   "cite": "Get your bookmarks, passwords, and more on all your devices > Find your Chrome info on all your devices",
+   "source": "https://support.google.com/chrome/answer/165139?hl=en&ref_topic=7439637",
+   "steps": 11,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "describes launching / updating the application, not using it"
+  },
+  {
+   "goal": "Open Guest mode",
+   "cite": "Browse Chrome as a guest > Open Guest mode",
+   "source": "https://support.google.com/chrome/answer/6130773?hl=en&ref_topic=7439637",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Profile'; no such control is in the applica; the manual says 'Guest profile'; no such control is in the a)"
+  },
+  {
+   "goal": "Exit Guest mode",
+   "cite": "Browse Chrome as a guest > Exit Guest mode",
+   "source": "https://support.google.com/chrome/answer/6130773?hl=en&ref_topic=7439637",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Profile'; no such control is in the applica; the manual says 'Close guest'; no such control is in the app)"
+  },
+  {
+   "goal": "(untitled)",
+   "cite": "(untitled)",
+   "source": "https://support.google.com/chrome/answer/14181646?hl=en&ref_topic=7439637",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Manage third-party sign-in prompts",
+   "cite": "Learn about third-party sign-in > Manage third-party sign-in prompts",
+   "source": "https://support.google.com/chrome/answer/14264742?hl=en&ref_topic=7439637",
+   "steps": 5,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Manage tabs in Chrome",
+   "cite": "Manage tabs in Chrome",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control)"
+  },
+  {
+   "goal": "Open a tab or window",
+   "cite": "Manage tabs in Chrome > Open a tab or window",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 5,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'More New'; no such control is in the applic; the manual says 'Inactive tabs'; no such control is in the a)"
+  },
+  {
+   "goal": "Open a tab or window",
+   "cite": "Manage tabs in Chrome > Open a tab or window",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Open in new tab in group'; no such control )"
+  },
+  {
+   "goal": "Manage and organize your tabs",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 6,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Switch'; no such control is in the applicat; 'Swipe to the tab you want and tap it.' needs a pointer gest)"
+  },
+  {
+   "goal": "Pin from the tab strip",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > Pin from the tab strip",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 9,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Ctrl'; no such control is in the applicatio)"
+  },
+  {
+   "goal": "Pin from the tab strip",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > Pin from the tab strip",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Pin tabs'; no such control is in the applic; the manual says 'Pin'; no such control is in the application)"
+  },
+  {
+   "goal": "Pin a tab within a group",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > Pin a tab within a group",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Pin'; no such control is in the application)"
+  },
+  {
+   "goal": "Pin from the tab switcher",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > Pin from the tab switcher",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 9,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Switch'; no such control is in the applicat; the manual says 'Pin'; no such control is in the application)"
+  },
+  {
+   "goal": "Pin from the tab switcher",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > Pin from the tab switcher",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 9,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual names Shift+F10, but the application never prints)"
+  },
+  {
+   "goal": "Unpin from the tab strip",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > Unpin from the tab strip",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 11,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'With a mouse'; no such control is in the ap; the manual says 'With a keyboard'; no such control is in the)"
+  },
+  {
+   "goal": "Unpin from the tab strip",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > Unpin from the tab strip",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Unpin tabs'; no such control is in the appl; the manual says 'Unpin'; no such control is in the applicati)"
+  },
+  {
+   "goal": "Unpin from the tab switcher",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > Unpin from the tab switcher",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 9,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Switch'; no such control is in the applicat; the manual says 'Unpin'; no such control is in the applicati)"
+  },
+  {
+   "goal": "Unpin from the tab switcher",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > Unpin from the tab switcher",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 10,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual names Shift+F10, but the application never prints)"
+  },
+  {
+   "goal": "From the context menu",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > From the context menu",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 4,
+   "grounded": 0.333,
+   "disposition": "skipped",
+   "reason": "its first step ('open the tab you want.') matches no control and only 33% of the steps do"
+  },
+  {
+   "goal": "From the tab switcher",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > From the tab switcher",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 9,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "From the tab switcher",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > From the tab switcher",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 10,
+   "grounded": 0.2,
+   "disposition": "skipped",
+   "reason": "its first step ('left of the') matches no control and only 20% of the steps do"
+  },
+  {
+   "goal": "From the tab switcher",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > From the tab switcher",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 10,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "From the tab switcher",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > From the tab switcher",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 5,
+   "grounded": 0.25,
+   "disposition": "skipped",
+   "reason": "its first step ('Switch') matches no control and only 25% of the steps do"
+  },
+  {
+   "goal": "From the tab switcher",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > From the tab switcher",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 8,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "From the tab switcher",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > From the tab switcher",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 8,
+   "grounded": 0.143,
+   "disposition": "skipped",
+   "reason": "its first step ('Select tabs') matches no control and only 14% of the steps do"
+  },
+  {
+   "goal": "Close a tab or window",
+   "cite": "Manage tabs in Chrome > Close a tab or window",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Switch'; no such control is in the applicat; 'At the top right of the tab you want to close, tap Close . )"
+  },
+  {
+   "goal": "Close from the tab strip",
+   "cite": "Manage tabs in Chrome > Close a tab or window > Close from the tab strip",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 9,
+   "grounded": 0.125,
+   "disposition": "skipped",
+   "reason": "its first step ('With a mouse') matches no control and only 12% of the steps do"
+  },
+  {
+   "goal": "Close from the tab switcher",
+   "cite": "Manage tabs in Chrome > Close a tab or window > Close from the tab switcher",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 9,
+   "grounded": 0.25,
+   "disposition": "skipped",
+   "reason": "its first step ('Switch') matches no control and only 25% of the steps do"
+  },
+  {
+   "goal": "Close from the tab switcher",
+   "cite": "Manage tabs in Chrome > Close a tab or window > Close from the tab switcher",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 14,
+   "grounded": 0.273,
+   "disposition": "skipped",
+   "reason": "its first step ('To open the menu') matches no control and only 27% of the steps do"
+  },
+  {
+   "goal": "Close from the tab switcher",
+   "cite": "Manage tabs in Chrome > Close a tab or window > Close from the tab switcher",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 9,
+   "grounded": 0.25,
+   "disposition": "skipped",
+   "reason": "its first step ('Select tabs') matches no control and only 25% of the steps do"
+  },
+  {
+   "goal": "Move a tab from the menu",
+   "cite": "Manage tabs in Chrome > Manage your windows > Move a tab from the menu",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'window you want to move the'; no such contr; the manual says 'Move'; no such control is in the applicatio)"
+  },
+  {
+   "goal": "Move a tab by drag and drop",
+   "cite": "Manage tabs in Chrome > Manage your windows > Move a tab by drag and drop",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 7,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface ('drag it to the other window.' needs a pointer gesture on th; the manual says 'window you want to move the'; no such contr)"
+  },
+  {
+   "goal": "Move a tab by drag and drop",
+   "cite": "Manage tabs in Chrome > Manage your windows > Move a tab by drag and drop",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 7,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Manage windowsInactive'; no such control is; the step names no control)"
+  },
+  {
+   "goal": "Move a tab by drag and drop",
+   "cite": "Manage tabs in Chrome > Manage your windows > Move a tab by drag and drop",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 8,
+   "grounded": 0.429,
+   "disposition": "skipped",
+   "reason": "its first step ('Manage windows') matches no control and only 43% of the steps do"
+  },
+  {
+   "goal": "Move a tab by drag and drop",
+   "cite": "Manage tabs in Chrome > Manage your windows > Move a tab by drag and drop",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control)"
+  },
+  {
+   "goal": "Move a tab by drag and drop",
+   "cite": "Manage tabs in Chrome > Manage your windows > Move a tab by drag and drop",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control)"
+  },
+  {
+   "goal": "Search the web in Chrome",
+   "cite": "Search the web in Chrome",
+   "source": "https://support.google.com/chrome/answer/95440?hl=en&ref_topic=7439636",
+   "steps": 6,
+   "grounded": 0.25,
+   "disposition": "skipped",
+   "reason": "its first step ('Find and edit Find') matches no control and only 25% of the steps do"
+  },
+  {
+   "goal": "Search the web in Chrome",
+   "cite": "Search the web in Chrome",
+   "source": "https://support.google.com/chrome/answer/95440?hl=en&ref_topic=7439636",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the step names no control)"
+  },
+  {
+   "goal": "Search the web in Chrome",
+   "cite": "Search the web in Chrome",
+   "source": "https://support.google.com/chrome/answer/95440?hl=en&ref_topic=7439636",
+   "steps": 9,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'New'; no such control is in the application; the step names no control)"
+  },
+  {
+   "goal": "Set default search engine and site search shortcuts",
+   "cite": "Set default search engine and site search shortcuts",
+   "source": "https://support.google.com/chrome/answer/95426?hl=en&ref_topic=7439636",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control)"
+  },
+  {
+   "goal": "Fill out text fields",
+   "cite": "Set default search engine and site search shortcuts > Manage search engines and site shortcuts > Fill out text fields",
+   "source": "https://support.google.com/chrome/answer/95426?hl=en&ref_topic=7439636",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says '%s'; no such control is in the application')"
+  },
+  {
+   "goal": "Download a file",
+   "cite": "Download a file",
+   "source": "https://support.google.com/chrome/answer/95759?hl=en&ref_topic=7439636",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control)"
+  },
+  {
+   "goal": "Download a file",
+   "cite": "Download a file",
+   "source": "https://support.google.com/chrome/answer/95759?hl=en&ref_topic=7439636",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (policy: the Professor never chooses the user's own files; the manual says 'Save'; no such control is in the applicatio)"
+  },
+  {
+   "goal": "Download a file",
+   "cite": "Download a file",
+   "source": "https://support.google.com/chrome/answer/95759?hl=en&ref_topic=7439636",
+   "steps": 5,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'PDF'; no such control is in the application; the manual says 'Edited'; no such control is in the applicat)"
+  },
+  {
+   "goal": "Download a file",
+   "cite": "Download a file",
+   "source": "https://support.google.com/chrome/answer/95759?hl=en&ref_topic=7439636",
+   "steps": 6,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Recent'; no such control is in the applicat)"
+  },
+  {
+   "goal": "Save a page from Chrome to read later",
+   "cite": "Read pages later & offline > Save a page from Chrome to read later",
+   "source": "https://support.google.com/chrome/answer/7343019?hl=en&ref_topic=7439636",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Reading List'; no such control is in the ap)"
+  },
+  {
+   "goal": "Save a page from another app",
+   "cite": "Read pages later & offline > Save a page from Chrome to read later > Save a page from another app",
+   "source": "https://support.google.com/chrome/answer/7343019?hl=en&ref_topic=7439636",
+   "steps": 7,
+   "grounded": 0.143,
+   "disposition": "skipped",
+   "reason": "its first step ('open the app.') matches no control and only 14% of the steps do"
+  },
+  {
+   "goal": "Read a saved page in your Reading List",
+   "cite": "Read pages later & offline > Read a saved page in your Reading List",
+   "source": "https://support.google.com/chrome/answer/7343019?hl=en&ref_topic=7439636",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the step names no control)"
+  },
+  {
+   "goal": "Allow ads on specific sites",
+   "cite": "Visit a site by turning off Chrome's ad blocker > Turn off the ad blocker > Allow ads on specific sites",
+   "source": "https://support.google.com/chrome/answer/7632919?hl=en&ref_topic=7439636",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Site settings'; no such control is in the a)"
+  },
+  {
+   "goal": "Print from a standard printer",
+   "cite": "Print from Chrome > Print from a standard printer",
+   "source": "https://support.google.com/chrome/answer/1069693?hl=en&ref_topic=7439636",
+   "steps": 5,
+   "grounded": 0.25,
+   "disposition": "skipped",
+   "reason": "its first step ('Open the page, image, or file ') matches no control and only 25% of the steps do"
+  },
+  {
+   "goal": "To save from Print Preview",
+   "cite": "Print from Chrome > Save to Google Drive from print preview > To save from Print Preview",
+   "source": "https://support.google.com/chrome/answer/1069693?hl=en&ref_topic=7439636",
+   "steps": 5,
+   "grounded": 0.25,
+   "disposition": "skipped",
+   "reason": "its first step ('Open the page, image, or file ') matches no control and only 25% of the steps do"
+  },
+  {
+   "goal": "Manage Dark mode on your device",
+   "cite": "Browse in Dark mode or Dark theme > Manage Dark mode in Chrome > Manage Dark mode on your device",
+   "source": "https://support.google.com/chrome/answer/9275525?hl=en&ref_topic=7439636",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Dark'; no such control is in the applicatio)"
+  },
+  {
+   "goal": "Share tabs in Chrome",
+   "cite": "Share tabs in Chrome",
+   "source": "https://support.google.com/chrome/answer/10051760?hl=en&ref_topic=7439636",
+   "steps": 9,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Share tabs in Chrome",
+   "cite": "Share tabs in Chrome",
+   "source": "https://support.google.com/chrome/answer/10051760?hl=en&ref_topic=7439636",
+   "steps": 5,
+   "grounded": 0.25,
+   "disposition": "skipped",
+   "reason": "its first step ('Go to the page you want to sha') matches no control and only 25% of the steps do"
+  },
+  {
+   "goal": "Share or link to quotes & text in Chrome",
+   "cite": "Share or link to quotes & text in Chrome",
+   "source": "https://support.google.com/chrome/answer/10256233?hl=en&ref_topic=7439636",
+   "steps": 6,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the step names no control)"
+  },
+  {
+   "goal": "Install a web app",
+   "cite": "Use web apps > Install a web app",
+   "source": "https://support.google.com/chrome/answer/9658361?hl=en&ref_topic=7439636",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "describes launching / updating the application, not using it"
+  },
+  {
+   "goal": "Uninstall a web app",
+   "cite": "Use web apps > Uninstall a web app",
+   "source": "https://support.google.com/chrome/answer/9658361?hl=en&ref_topic=7439636",
+   "steps": 7,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Manage your apps in Chrome",
+   "cite": "Use web apps > Manage your apps in Chrome",
+   "source": "https://support.google.com/chrome/answer/9658361?hl=en&ref_topic=7439636",
+   "steps": 8,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Related resources",
+   "cite": "Use web apps > Related resources",
+   "source": "https://support.google.com/chrome/answer/9658361?hl=en&ref_topic=7439636",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "only says to open the application"
+  },
+  {
+   "goal": "Play music or sound across Chrome tabs",
+   "cite": "Control your music, videos, and more > Play music or sound across Chrome tabs",
+   "source": "https://support.google.com/chrome/answer/9692215?hl=en&ref_topic=7439636",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Media'; no such control is in the applicati)"
+  },
+  {
+   "goal": "Watch a video across Chrome tabs",
+   "cite": "Control your music, videos, and more > Watch a video across Chrome tabs",
+   "source": "https://support.google.com/chrome/answer/9692215?hl=en&ref_topic=7439636",
+   "steps": 7,
+   "grounded": 0.25,
+   "disposition": "skipped",
+   "reason": "its first step ('Media') matches no control and only 25% of the steps do"
+  },
+  {
+   "goal": "Watch a video across Chrome tabs",
+   "cite": "Control your music, videos, and more > Watch a video across Chrome tabs",
+   "source": "https://support.google.com/chrome/answer/9692215?hl=en&ref_topic=7439636",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Privacy and securitySite settings'; no such; the manual says 'Additional permission settingsAutomatic pic)"
+  },
+  {
+   "goal": "Cast media to available devices",
+   "cite": "Control your music, videos, and more > Cast media to available devices",
+   "source": "https://support.google.com/chrome/answer/9692215?hl=en&ref_topic=7439636",
+   "steps": 6,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the step names no control)"
+  },
+  {
+   "goal": "Turn features on or off",
+   "cite": "Test experimental features in Chrome > Turn features on or off",
+   "source": "https://support.google.com/chrome/answer/10612145?hl=en&ref_topic=7439636",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Experiments'; no such control is in the app; the manual says 'Enabled'; no such control is in the applica)"
+  },
+  {
+   "goal": "Give feedback on features",
+   "cite": "Test experimental features in Chrome > Give feedback on features",
+   "source": "https://support.google.com/chrome/answer/10612145?hl=en&ref_topic=7439636",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Experiments'; no such control is in the app; the manual says 'Send Feedback'; no such control is in the a)"
+  },
+  {
+   "goal": "Manage Chrome side panel",
+   "cite": "Manage Chrome side panel",
+   "source": "https://support.google.com/chrome/answer/13156494?hl=en&ref_topic=7439636",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'SettingsAppearance'; no such control is in ; the manual says 'Side'; no such control is in the applicatio)"
+  },
+  {
+   "goal": "Pin a specific side panel",
+   "cite": "Manage Chrome side panel > Pin a specific side panel",
+   "source": "https://support.google.com/chrome/answer/13156494?hl=en&ref_topic=7439636",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the step names no control)"
+  },
+  {
+   "goal": "Unpin a specific side panel",
+   "cite": "Manage Chrome side panel > Unpin a specific side panel",
+   "source": "https://support.google.com/chrome/answer/13156494?hl=en&ref_topic=7439636",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Profile'; no such control is in the applica; the manual says 'Unpin'; no such control is in the applicati)"
+  },
+  {
+   "goal": "Create themes with AI",
+   "cite": "Customize your New Tab page in Chrome > Customize your New Tab page > Create themes with AI",
+   "source": "https://support.google.com/chrome/answer/11032183?hl=en&ref_topic=7439636",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Turn cards on or off",
+   "cite": "Customize your New Tab page in Chrome > Customize your New Tab page > Turn cards on or off",
+   "source": "https://support.google.com/chrome/answer/11032183?hl=en&ref_topic=7439636",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Customize'; no such control is in the appli; the manual says 'CardsCustomize Cards'; no such control is i)"
+  },
+  {
+   "goal": "Open all results",
+   "cite": "Customize your New Tab page in Chrome > Customize your New Tab page > Open all results",
+   "source": "https://support.google.com/chrome/answer/11032183?hl=en&ref_topic=7439636",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Open all in a new tab group'; no such contr)"
+  },
+  {
+   "goal": "Hide a specific card",
+   "cite": "Customize your New Tab page in Chrome > Customize your New Tab page > Hide a specific card",
+   "source": "https://support.google.com/chrome/answer/11032183?hl=en&ref_topic=7439636",
+   "steps": 6,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Hide the Drive priority card on your New Tab page",
+   "cite": "Customize your New Tab page in Chrome > Customize your New Tab page > Hide the Drive priority card on your New Tab page",
+   "source": "https://support.google.com/chrome/answer/11032183?hl=en&ref_topic=7439636",
+   "steps": 5,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Drive priority'; no such control is in the )"
+  },
+  {
+   "goal": "Show footer on New Tab page",
+   "cite": "Customize your New Tab page in Chrome > Customize your New Tab page > Show footer on New Tab page",
+   "source": "https://support.google.com/chrome/answer/11032183?hl=en&ref_topic=7439636",
+   "steps": 4,
+   "grounded": 0.333,
+   "disposition": "skipped",
+   "reason": "its first step ('Open a new tab or window.') matches no control and only 33% of the steps do"
+  },
+  {
+   "goal": "Hide footer on New Tab page",
+   "cite": "Customize your New Tab page in Chrome > Customize your New Tab page > Hide footer on New Tab page",
+   "source": "https://support.google.com/chrome/answer/11032183?hl=en&ref_topic=7439636",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the step names no control)"
+  },
+  {
+   "goal": "Use the Gemini web app in Chrome",
+   "cite": "Use the Gemini web app to get answers in Chrome > Use the Gemini web app in Chrome",
+   "source": "https://support.google.com/chrome/answer/14886647?hl=en&ref_topic=7439636",
+   "steps": 5,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "describes starting the application (Start menu), not using it"
+  },
+  {
+   "goal": "Create shortcuts to websites",
+   "cite": "Create shortcuts for websites in Chrome > Create shortcuts to websites",
+   "source": "https://support.google.com/chrome/answer/15085120?hl=en&ref_topic=7439636",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Cast, save, and share Create shortcut'; no )"
+  },
+  {
+   "goal": "Search with Google Lens",
+   "cite": "Search with Google Lens in Chrome > Search with Google Lens",
+   "source": "https://support.google.com/chrome/answer/15086890?hl=en&ref_topic=7439636",
+   "steps": 6,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Search this tab with Google Lens'; no such )"
+  },
+  {
+   "goal": "Additional ways to search with Google Lens",
+   "cite": "Search with Google Lens in Chrome > Search with Google Lens > Additional ways to search with Google Lens",
+   "source": "https://support.google.com/chrome/answer/15086890?hl=en&ref_topic=7439636",
+   "steps": 5,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Ask Google about this page'; no such contro)"
+  },
+  {
+   "goal": "Status dashboard",
+   "cite": "Developer > Status dashboard",
+   "source": "https://support.google.com/?visit_id=639271797039600946-2935977394&rd=1",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Main'; no such control is in the applicatio)"
+  },
+  {
+   "goal": "Follow a security",
+   "cite": "Follow & compare securities > Follow a security",
+   "source": "https://support.google.com/websearch/answer/7579076?hl=en&visit_id=639271797850008389-3504541530&rd=1",
+   "steps": 5,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Dow Jones Industrial Average'; no such cont)"
+  },
+  {
+   "goal": "Compare securities",
+   "cite": "Follow & compare securities > Compare securities",
+   "source": "https://support.google.com/websearch/answer/7579076?hl=en&visit_id=639271797850008389-3504541530&rd=1",
+   "steps": 5,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Dow Jones Industrial Average'; no such cont)"
+  },
+  {
+   "goal": "Stop following a security",
+   "cite": "Follow & compare securities > Stop following a security",
+   "source": "https://support.google.com/websearch/answer/7579076?hl=en&visit_id=639271797850008389-3504541530&rd=1",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Dow Jones Industrial Average'; no such cont)"
+  },
+  {
+   "goal": "Compare markets",
+   "cite": "Follow & compare securities > Compare markets",
+   "source": "https://support.google.com/websearch/answer/7579076?hl=en&visit_id=639271797850008389-3504541530&rd=1",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the step names no control)"
+  },
+  {
+   "goal": "Create a custom watchlist",
+   "cite": "Follow & compare securities > Create a custom watchlist",
+   "source": "https://support.google.com/websearch/answer/7579076?hl=en&visit_id=639271797850008389-3504541530&rd=1",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'New watchlist'; no such control is in the a)"
+  },
+  {
+   "goal": "Browse news related to a watchlist",
+   "cite": "Follow & compare securities > Browse news related to a watchlist",
+   "source": "https://support.google.com/websearch/answer/7579076?hl=en&visit_id=639271797850008389-3504541530&rd=1",
+   "steps": 3,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Your watchlists'; no such control is in the)"
+  },
+  {
+   "goal": "Rename or delete a custom watchlist",
+   "cite": "Follow & compare securities > Rename or delete a custom watchlist",
+   "source": "https://support.google.com/websearch/answer/7579076?hl=en&visit_id=639271797850008389-3504541530&rd=1",
+   "steps": 4,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Your watchlists'; no such control is in the)"
+  },
+  {
+   "goal": "(untitled)",
+   "cite": "(untitled)",
+   "source": "https://support.google.com/chromecast?hl=en",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "blocked",
+   "reason": "policy: the section needs the user's account / subscription / a service plan"
+  },
+  {
+   "goal": "Choose a Google product",
+   "cite": "Choose a Google product",
+   "source": "https://support.google.com/chromecast?hl=en",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Help Center'; no such control is in the app)"
+  },
+  {
+   "goal": "Read, download, cite, link, or translate a book or magazine",
+   "cite": "How to use classic Google Books > Read, download, cite, link, or translate a book or magazine",
+   "source": "https://support.google.com/websearch/answer/43729?visit_id=639271798080646424-3862027886&hl=en&rd=1",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'Google Books'; no such control is in the ap; the step names no control)"
+  },
+  {
+   "goal": "Download a book",
+   "cite": "How to use classic Google Books > Read, download, cite, link, or translate a book or magazine > Download a book",
+   "source": "https://support.google.com/websearch/answer/43729?visit_id=639271798080646424-3862027886&hl=en&rd=1",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'eBook - Read at no cost'; no such control i; the manual says 'PDF'; no such control is in the application)"
+  },
+  {
+   "goal": "Cite a book",
+   "cite": "How to use classic Google Books > Read, download, cite, link, or translate a book or magazine > Cite a book",
+   "source": "https://support.google.com/websearch/answer/43729?visit_id=639271798080646424-3862027886&hl=en&rd=1",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'About this book'; no such control is in the; the manual says 'Bibliographic information'; no such control)"
+  },
+  {
+   "goal": "Copy or translate part of a book",
+   "cite": "How to use classic Google Books > Read, download, cite, link, or translate a book or magazine > Copy or translate part of a book",
+   "source": "https://support.google.com/websearch/answer/43729?visit_id=639271798080646424-3862027886&hl=en&rd=1",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the step names no control)"
+  },
+  {
+   "goal": "Fix common problems",
+   "cite": "How to use classic Google Books > Fix common problems",
+   "source": "https://support.google.com/websearch/answer/43729?visit_id=639271798080646424-3862027886&hl=en&rd=1",
+   "steps": 2,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control; the manual says 'Google Books'; no such control is in the ap)"
+  },
+  {
+   "goal": "To upload to Drive with the Drive website:",
+   "cite": "Print from Chrome > Save to Google Drive from print preview > To upload to Drive with the Drive website:",
+   "source": "https://support.google.com/chrome/answer/1069693?hl=en&ref_topic=7439636",
+   "steps": 5,
+   "grounded": 0.2,
+   "disposition": "skipped",
+   "reason": "beyond the per-run task cap"
+  },
+  {
+   "goal": "Move a tab by drag and drop",
+   "cite": "Manage tabs in Chrome > Manage your windows > Move a tab by drag and drop",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 6,
+   "grounded": 0.167,
+   "disposition": "skipped",
+   "reason": "beyond the per-run task cap"
+  },
+  {
+   "goal": "Manage search engines and site shortcuts",
+   "cite": "Set default search engine and site search shortcuts > Manage search engines and site shortcuts",
+   "source": "https://support.google.com/chrome/answer/95426?hl=en&ref_topic=7439636",
+   "steps": 6,
+   "grounded": 0.167,
+   "disposition": "skipped",
+   "reason": "beyond the per-run task cap"
+  },
+  {
+   "goal": "Manage Dark mode in Chrome",
+   "cite": "Browse in Dark mode or Dark theme > Manage Dark mode in Chrome",
+   "source": "https://support.google.com/chrome/answer/9275525?hl=en&ref_topic=7439636",
+   "steps": 2,
+   "grounded": 1.0,
+   "disposition": "ok",
+   "reason": ""
+  },
+  {
+   "goal": "Change your browser’s color",
+   "cite": "Customize your New Tab page in Chrome > Customize your New Tab page > Change your browser’s color",
+   "source": "https://support.google.com/chrome/answer/11032183?hl=en&ref_topic=7439636",
+   "steps": 2,
+   "grounded": 1.0,
+   "disposition": "ok",
+   "reason": ""
+  },
+  {
+   "goal": "Choose your homepage",
+   "cite": "Set your homepage and startup page > Choose your homepage",
+   "source": "https://support.google.com/chrome/answer/95314?hl=en&ref_topic=7439637",
+   "steps": 3,
+   "grounded": 0.667,
+   "disposition": "failed",
+   "reason": "the manual says 'Show Home'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+  },
+  {
+   "goal": "Remove a profile",
+   "cite": "Manage Chrome with multiple profiles > Remove a profile",
+   "source": "https://support.google.com/chrome/answer/2364824?hl=en&ref_topic=7439637",
+   "steps": 5,
+   "grounded": 0.6,
+   "disposition": "failed",
+   "reason": "the manual says 'Profile'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+  },
+  {
+   "goal": "Set Chrome as your default web browser",
+   "cite": "Make Chrome your default browser > Set Chrome as your default web browser",
+   "source": "https://support.google.com/chrome/answer/95417?hl=en&ref_topic=7439538",
+   "steps": 2,
+   "grounded": 0.5,
+   "disposition": "ok",
+   "reason": ""
+  },
+  {
+   "goal": "Open your bookmarks",
+   "cite": "Import Chrome bookmarks & settings > Open your bookmarks",
+   "source": "https://support.google.com/chrome/answer/96816?hl=en&ref_topic=7439637",
+   "steps": 2,
+   "grounded": 0.5,
+   "disposition": "failed",
+   "reason": "the manual says 'Bookmarks and lists Bookmark manager'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+  },
+  {
+   "goal": "Customize your New Tab page",
+   "cite": "Customize your New Tab page in Chrome > Customize your New Tab page",
+   "source": "https://support.google.com/chrome/answer/11032183?hl=en&ref_topic=7439636",
+   "steps": 5,
+   "grounded": 0.4,
+   "disposition": "failed",
+   "reason": "the manual says 'My shortcuts'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+  },
+  {
+   "goal": "Make Chrome your default browser",
+   "cite": "Set up Chrome for iPhone or iPad > Make Chrome your default browser",
+   "source": "https://support.google.com/chrome/answer/15523892?hl=en&ref_topic=7439538",
+   "steps": 3,
+   "grounded": 0.333,
+   "disposition": "failed",
+   "reason": "the manual says 'Go toSettings...Default Browser App'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+  },
+  {
+   "goal": "Add bookmarks to Chrome",
+   "cite": "Import Chrome bookmarks & settings > Add bookmarks to Chrome",
+   "source": "https://support.google.com/chrome/answer/96816?hl=en&ref_topic=7439637",
+   "steps": 4,
+   "grounded": 0.25,
+   "disposition": "failed",
+   "reason": "no route produced a visible effect | tried: adapter:cdp: Import bookmarks and settings -> 'Import bookmarks and settings' is not on the current page (about:blank) nor on chrome://settings/"
+  },
+  {
+   "goal": "Manage web app settings",
+   "cite": "Use web apps > Manage web app settings",
+   "source": "https://support.google.com/chrome/answer/9658361?hl=en&ref_topic=7439636",
+   "steps": 4,
+   "grounded": 0.25,
+   "disposition": "blocked",
+   "reason": "underspecified: the step names no control"
+  },
+  {
+   "goal": "Add a custom background image",
+   "cite": "Customize your New Tab page in Chrome > Customize your New Tab page > Add a custom background image",
+   "source": "https://support.google.com/chrome/answer/11032183?hl=en&ref_topic=7439636",
+   "steps": 4,
+   "grounded": 0.25,
+   "disposition": "failed",
+   "reason": "the manual says 'Change theme'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+  },
+  {
+   "goal": "Manage your windows",
+   "cite": "Manage tabs in Chrome > Manage your windows",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps": 1,
+   "grounded": 1.0,
+   "disposition": "ok",
+   "reason": ""
+  },
+  {
+   "goal": "Add a bookmark",
+   "cite": "Create, find and edit bookmarks in Chrome > Add a bookmark",
+   "source": "https://support.google.com/chrome/answer/188842?hl=en&ref_topic=7439637",
+   "steps": 2,
+   "grounded": 0.5,
+   "disposition": "blocked",
+   "reason": "underspecified: the step names no control"
+  },
+  {
+   "goal": "Delete a saved page from your Reading List",
+   "cite": "Read pages later & offline > Delete a saved page from your Reading List",
+   "source": "https://support.google.com/chrome/answer/7343019?hl=en&ref_topic=7439636",
+   "steps": 2,
+   "grounded": 0.5,
+   "disposition": "blocked",
+   "reason": "underspecified: the step names no control"
+  },
+  {
+   "goal": "To save with Drive for desktop:",
+   "cite": "Print from Chrome > Save to Google Drive from print preview > To save with Drive for desktop:",
+   "source": "https://support.google.com/chrome/answer/1069693?hl=en&ref_topic=7439636",
+   "steps": 2,
+   "grounded": 0.5,
+   "disposition": "blocked",
+   "reason": "'Save as PDF' is sensitive; waiting for a human yes"
+  },
+  {
+   "goal": "Manage app name and icon updates",
+   "cite": "Use web apps > Manage app name and icon updates",
+   "source": "https://support.google.com/chrome/answer/9658361?hl=en&ref_topic=7439636",
+   "steps": 2,
+   "grounded": 0.5,
+   "disposition": "failed",
+   "reason": "the manual says 'Review app update'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+  },
+  {
+   "goal": "Delete a bookmark",
+   "cite": "Create, find and edit bookmarks in Chrome > Delete a bookmark",
+   "source": "https://support.google.com/chrome/answer/188842?hl=en&ref_topic=7439637",
+   "steps": 4,
+   "grounded": 0.5,
+   "disposition": "failed",
+   "reason": "the manual says 'Bookmarks and lists Bookmark Manager'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+  },
+  {
+   "goal": "Set your default search engine",
+   "cite": "Set default search engine and site search shortcuts > Set your default search engine",
+   "source": "https://support.google.com/chrome/answer/95426?hl=en&ref_topic=7439636",
+   "steps": 4,
+   "grounded": 0.5,
+   "disposition": "failed",
+   "reason": "the manual says 'Change'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+  },
+  {
+   "goal": "Turn off the ad blocker",
+   "cite": "Visit a site by turning off Chrome's ad blocker > Turn off the ad blocker",
+   "source": "https://support.google.com/chrome/answer/7632919?hl=en&ref_topic=7439636",
+   "steps": 4,
+   "grounded": 0.25,
+   "disposition": "failed",
+   "reason": "the manual says 'Privacy and securitySite settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+  },
+  {
+   "goal": "Change your default sound permissions on your computer",
+   "cite": "Control your music, videos, and more > Change your default sound permissions on your computer",
+   "source": "https://support.google.com/chrome/answer/9692215?hl=en&ref_topic=7439636",
+   "steps": 4,
+   "grounded": 0.25,
+   "disposition": "failed",
+   "reason": "the manual says 'Privacy and securitySite settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+  },
+  {
+   "goal": "Find a bookmark",
+   "cite": "Create, find and edit bookmarks in Chrome > Find a bookmark",
+   "source": "https://support.google.com/chrome/answer/188842?hl=en&ref_topic=7439637",
+   "steps": 8,
+   "grounded": 0.25,
+   "disposition": "failed",
+   "reason": "editor is read-only | tried: text:posted -> postmessage-wm_char->Chrome_WidgetWin_1 (10 chars); text:uia -> editor is read-only"
+  }
+ ],
+ "ledger_counts": {
+  "blocked": 34,
+  "failed": 13,
+  "ok": 4,
+  "skipped": 111
+ },
+ "tasks": [
+  {
+   "goal": "Manage Dark mode in Chrome",
+   "cite": "Browse in Dark mode or Dark theme > Manage Dark mode in Chrome",
+   "source": "https://support.google.com/chrome/answer/9275525?hl=en&ref_topic=7439636",
+   "steps_in_guide": 2,
+   "grounded": 1.0,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "no_effect",
+     "why": "no route produced a visible effect | tried: adapter:cdp: Appearance -> 'Appearance' is not on the current page (chrome://new-tab-page/) nor on chrome://settings/; adapter:cdp: Appearance -> 'Appearance' is not on the current page (chrome://settings/) nor on chrome://settings/",
+     "remedy": "re-laid-out the parked window; re-read the tree (477 nodes)",
+     "steps": 2,
+     "done": 1,
+     "seconds": 22.5,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Customize Chrome",
+       "status": "done",
+       "route": "adapter:cdp: Customize Chrome",
+       "effect": "context_change",
+       "summary": "text 'Extensions <chrome://extensions/> || abo' -> 'New Tab <chrome://new-tab-page/> || abou'; text 'Extensions <chrome://extensions/>' -> 'New Tab <chrome://ne",
+       "vision_ok": null,
+       "ms": 9466
+      },
+      {
+       "step": 2,
+       "verb": "Appearance",
+       "status": "no_effect",
+       "route": "",
+       "effect": "",
+       "summary": "no route produced a visible effect",
+       "vision_ok": null,
+       "ms": 12594
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\01_Manage_Dark_mode_in_Chrome_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ok",
+     "why": "",
+     "remedy": "",
+     "steps": 2,
+     "done": 2,
+     "seconds": 30.6,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Customize Chrome",
+       "status": "done",
+       "route": "adapter:cdp: Customize Chrome",
+       "effect": "context_change",
+       "summary": "text 'about:blank <about:blank>' -> 'New Tab <chrome://new-tab-page/>'; text 'about:blank <about:blank>' -> 'New Tab <chrome://new-tab-page/>'; text '97d170e155",
+       "vision_ok": null,
+       "ms": 14740
+      },
+      {
+       "step": 2,
+       "verb": "Appearance",
+       "status": "done",
+       "route": "adapter:cdp: Appearance",
+       "effect": "state_change",
+       "summary": "text 'New Tab <chrome://new-tab-page/>' -> 'Settings - Appearance <chrome://settings'; text 'New Tab <chrome://new-tab-page/>' -> 'Settings - Appearance <chrome",
+       "vision_ok": null,
+       "ms": 15389
+      }
+     ]
+    }
+   ],
+   "final": "ok"
+  },
+  {
+   "goal": "Change your browser’s color",
+   "cite": "Customize your New Tab page in Chrome > Customize your New Tab page > Change your browser’s color",
+   "source": "https://support.google.com/chrome/answer/11032183?hl=en&ref_topic=7439636",
+   "steps_in_guide": 2,
+   "grounded": 1.0,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ok",
+     "why": "",
+     "remedy": "",
+     "steps": 2,
+     "done": 2,
+     "seconds": 28.3,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Customize Chrome",
+       "status": "done",
+       "route": "adapter:cdp: Customize Chrome",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'New Tab <chrome://new-tab-page/>'; text 'about:blank <about:blank>' -> 'New Tab <chrome://new-tab-page/>'; text '97d170e155",
+       "vision_ok": null,
+       "ms": 13117
+      },
+      {
+       "step": 2,
+       "verb": "Appearance",
+       "status": "done",
+       "route": "adapter:cdp: Appearance",
+       "effect": "state_change",
+       "summary": "text 'New Tab <chrome://new-tab-page/>' -> 'Settings - Appearance <chrome://settings'; text 'New Tab <chrome://new-tab-page/>' -> 'Settings - Appearance <chrome",
+       "vision_ok": null,
+       "ms": 14723
+      }
+     ]
+    }
+   ],
+   "final": "ok"
+  },
+  {
+   "goal": "Choose your homepage",
+   "cite": "Set your homepage and startup page > Choose your homepage",
+   "source": "https://support.google.com/chrome/answer/95314?hl=en&ref_topic=7439637",
+   "steps_in_guide": 3,
+   "grounded": 0.667,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ungrounded",
+     "why": "the manual says 'Show Home'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (535 nodes); re-scanned; 2 new verbs in the catalog",
+     "steps": 3,
+     "done": 1,
+     "seconds": 12.0,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Settings",
+       "status": "done",
+       "route": "adapter:cdp: Settings",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text '97d170e1550e' ->",
+       "vision_ok": null,
+       "ms": 9929
+      },
+      {
+       "step": 2,
+       "verb": "Under \"Appearance,\" turn on **Show Home button**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Show Home'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Show Home'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\03_Choose_your_homepage_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ungrounded",
+     "why": "the manual says 'Show Home'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (535 nodes); re-scanned; 0 new verbs in the catalog | repeated identically: no further attempts",
+     "steps": 3,
+     "done": 1,
+     "seconds": 11.6,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Settings",
+       "status": "done",
+       "route": "adapter:cdp: Settings",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text '97d170e1550e' ->",
+       "vision_ok": null,
+       "ms": 9830
+      },
+      {
+       "step": 2,
+       "verb": "Under \"Appearance,\" turn on **Show Home button**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Show Home'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Show Home'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\03_Choose_your_homepage_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Remove a profile",
+   "cite": "Manage Chrome with multiple profiles > Remove a profile",
+   "source": "https://support.google.com/chrome/answer/2364824?hl=en&ref_topic=7439637",
+   "steps_in_guide": 5,
+   "grounded": 0.6,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ungrounded",
+     "why": "the manual says 'Profile'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (535 nodes); re-scanned; 0 new verbs in the catalog",
+     "steps": 5,
+     "done": 0,
+     "seconds": 1.8,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "select Profile .",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Profile'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Profile'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\04_Remove_a_profile_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ungrounded",
+     "why": "the manual says 'Profile'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (535 nodes); re-scanned; 0 new verbs in the catalog | repeated identically: no further attempts",
+     "steps": 5,
+     "done": 0,
+     "seconds": 1.7,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "select Profile .",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Profile'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Profile'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\04_Remove_a_profile_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Set Chrome as your default web browser",
+   "cite": "Make Chrome your default browser > Set Chrome as your default web browser",
+   "source": "https://support.google.com/chrome/answer/95417?hl=en&ref_topic=7439538",
+   "steps_in_guide": 2,
+   "grounded": 0.5,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ok",
+     "why": "",
+     "remedy": "",
+     "steps": 2,
+     "done": 2,
+     "seconds": 22.6,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "chrome://default-browser",
+       "status": "done",
+       "route": "adapter:cdp: chrome://default-browser",
+       "effect": "context_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Set Chrome as your default bro <chrome:/'; text 'about:blank <about:blank>' -> 'Set Chrome as your default browser <chro'; ",
+       "vision_ok": null,
+       "ms": 14291
+      },
+      {
+       "step": 2,
+       "verb": "Chrome",
+       "status": "done",
+       "route": "control:Chrome",
+       "effect": "context_change",
+       "summary": "text 'Name=Videos[6]' -> 'Name'; text 'Search Box' -> 'Search Box=[0]'; text 'Address and search bar' -> 'Address and search bar=chrome://profile-'; added Horiz",
+       "vision_ok": null,
+       "ms": 7900
+      }
+     ]
+    }
+   ],
+   "final": "ok"
+  },
+  {
+   "goal": "Open your bookmarks",
+   "cite": "Import Chrome bookmarks & settings > Open your bookmarks",
+   "source": "https://support.google.com/chrome/answer/96816?hl=en&ref_topic=7439637",
+   "steps_in_guide": 2,
+   "grounded": 0.5,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ungrounded",
+     "why": "the manual says 'Bookmarks and lists Bookmark manager'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (536 nodes); re-scanned; 9 new verbs in the catalog",
+     "steps": 2,
+     "done": 0,
+     "seconds": 1.0,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "select More **Bookmarks and lists Bookmark manager**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Bookmarks and lists Bookmark manager'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Bookmarks and lists Bookmark manager'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\06_Open_your_bookmarks_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ungrounded",
+     "why": "the manual says 'Bookmarks and lists Bookmark manager'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (540 nodes); re-scanned; 0 new verbs in the catalog | repeated identically: no further attempts",
+     "steps": 2,
+     "done": 0,
+     "seconds": 1.2,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "select More **Bookmarks and lists Bookmark manager**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Bookmarks and lists Bookmark manager'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Bookmarks and lists Bookmark manager'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\06_Open_your_bookmarks_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Set your startup page",
+   "cite": "Set your homepage and startup page > Set your startup page",
+   "source": "https://support.google.com/chrome/answer/95314?hl=en&ref_topic=7439637",
+   "steps_in_guide": 2,
+   "grounded": 0.5,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ungrounded",
+     "why": "the manual says 'Show on startup'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog",
+     "steps": 2,
+     "done": 1,
+     "seconds": 9.9,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "chrome://profile-customization",
+       "status": "done",
+       "route": "adapter:cdp: chrome://profile-customization",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text 'about:blank <about:blank>' -> 'chrome://profile-customization <chrome:/'; text 'about:blank <about:blank>' -> 'chrome://profile-customiza",
+       "vision_ok": null,
+       "ms": 9397
+      },
+      {
+       "step": 2,
+       "verb": "check **Show on startup**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Show on startup'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Show on startup'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\07_Set_your_startup_page_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ungrounded",
+     "why": "the manual says 'Show on startup'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog | repeated identically: no further attempts",
+     "steps": 2,
+     "done": 1,
+     "seconds": 10.8,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "chrome://profile-customization",
+       "status": "done",
+       "route": "adapter:cdp: chrome://profile-customization",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'chrome://profile-customization <chrome:/'; text 'about:blank <about:blank>' -> 'chrome://profile-customization <chrome:/'; ",
+       "vision_ok": null,
+       "ms": 10264
+      },
+      {
+       "step": 2,
+       "verb": "check **Show on startup**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Show on startup'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Show on startup'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\07_Set_your_startup_page_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Customize your New Tab page",
+   "cite": "Customize your New Tab page in Chrome > Customize your New Tab page",
+   "source": "https://support.google.com/chrome/answer/11032183?hl=en&ref_topic=7439636",
+   "steps_in_guide": 5,
+   "grounded": 0.4,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ungrounded",
+     "why": "the manual says 'My shortcuts'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog",
+     "steps": 5,
+     "done": 1,
+     "seconds": 9.2,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Customize Chrome",
+       "status": "done",
+       "route": "adapter:cdp: Customize Chrome",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'New Tab <chrome://new-tab-page/>'; text 'about:blank <about:blank>' -> 'New Tab <chrome://new-tab-page/>'; text '97d170e155",
+       "vision_ok": null,
+       "ms": 8628
+      },
+      {
+       "step": 2,
+       "verb": "Under “Shortcuts,” select **My shortcuts** or **Most visited sites**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'My shortcuts'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'My shortcuts'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Show shortcuts'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\08_Customize_your_New_Tab_page_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ungrounded",
+     "why": "the manual says 'My shortcuts'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog | repeated identically: no further attempts",
+     "steps": 5,
+     "done": 1,
+     "seconds": 9.0,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Customize Chrome",
+       "status": "done",
+       "route": "adapter:cdp: Customize Chrome",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'New Tab <chrome://new-tab-page/>'; text 'about:blank <about:blank>' -> 'New Tab <chrome://new-tab-page/>'; text '97d170e155",
+       "vision_ok": null,
+       "ms": 8495
+      },
+      {
+       "step": 2,
+       "verb": "Under “Shortcuts,” select **My shortcuts** or **Most visited sites**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'My shortcuts'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'My shortcuts'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Show shortcuts'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\08_Customize_your_New_Tab_page_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Make Chrome your default browser",
+   "cite": "Set up Chrome for iPhone or iPad > Make Chrome your default browser",
+   "source": "https://support.google.com/chrome/answer/15523892?hl=en&ref_topic=7439538",
+   "steps_in_guide": 3,
+   "grounded": 0.333,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ungrounded",
+     "why": "the manual says 'Go toSettings...Default Browser App'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog",
+     "steps": 3,
+     "done": 1,
+     "seconds": 9.6,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Default browser",
+       "status": "done",
+       "route": "adapter:cdp: Default browser",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Settings - Default browser <chrome://set'; text 'about:blank <about:blank>' -> 'Settings - Default browser <chrome://set'; ",
+       "vision_ok": null,
+       "ms": 9017
+      },
+      {
+       "step": 2,
+       "verb": "Tap **Go toSettings...Default Browser App**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Go toSettings...Default Browser App'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Go toSettings...Default Browser App'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\09_Make_Chrome_your_default_browser_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ungrounded",
+     "why": "the manual says 'Go toSettings...Default Browser App'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog | repeated identically: no further attempts",
+     "steps": 3,
+     "done": 1,
+     "seconds": 9.8,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Default browser",
+       "status": "done",
+       "route": "adapter:cdp: Default browser",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Settings - Default browser <chrome://set'; text 'about:blank <about:blank>' -> 'Settings - Default browser <chrome://set'; ",
+       "vision_ok": null,
+       "ms": 9093
+      },
+      {
+       "step": 2,
+       "verb": "Tap **Go toSettings...Default Browser App**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Go toSettings...Default Browser App'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Go toSettings...Default Browser App'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\09_Make_Chrome_your_default_browser_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Set your startup page",
+   "cite": "Set your homepage and startup page > Set your startup page",
+   "source": "https://support.google.com/chrome/answer/95314?hl=en&ref_topic=7439637",
+   "steps_in_guide": 11,
+   "grounded": 0.273,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ungrounded",
+     "why": "the manual says 'Privacy and securitySite settingsAdditional content settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog",
+     "steps": 11,
+     "done": 1,
+     "seconds": 4.5,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Settings",
+       "status": "done",
+       "route": "adapter:cdp: Settings",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text '97d170e1550e' ->",
+       "vision_ok": null,
+       "ms": 3745
+      },
+      {
+       "step": 2,
+       "verb": "select **Privacy and securitySite settingsAdditional content settings**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Privacy and securitySite settingsAdditional content settings'; no such control is in the application's catalog (it may sit in a menu or dialog ",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Privacy and securitySite settingsAdditional content settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'On-device site data'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Delete'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Open a specific page or set of pages'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Add a new page'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\10_Set_your_startup_page_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ungrounded",
+     "why": "the manual says 'Privacy and securitySite settingsAdditional content settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog | repeated identically: no further attempts",
+     "steps": 11,
+     "done": 1,
+     "seconds": 4.5,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Settings",
+       "status": "done",
+       "route": "adapter:cdp: Settings",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text '97d170e1550e' ->",
+       "vision_ok": null,
+       "ms": 3823
+      },
+      {
+       "step": 2,
+       "verb": "select **Privacy and securitySite settingsAdditional content settings**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Privacy and securitySite settingsAdditional content settings'; no such control is in the application's catalog (it may sit in a menu or dialog ",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Privacy and securitySite settingsAdditional content settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'On-device site data'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Delete'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Open a specific page or set of pages'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Add a new page'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\10_Set_your_startup_page_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Add bookmarks to Chrome",
+   "cite": "Import Chrome bookmarks & settings > Add bookmarks to Chrome",
+   "source": "https://support.google.com/chrome/answer/96816?hl=en&ref_topic=7439637",
+   "steps_in_guide": 4,
+   "grounded": 0.25,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "no_effect",
+     "why": "no route produced a visible effect | tried: adapter:cdp: Import bookmarks and settings -> 'Import bookmarks and settings' is not on the current page (about:blank) nor on chrome://settings/",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes)",
+     "steps": 4,
+     "done": 0,
+     "seconds": 7.3,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Import bookmarks and settings",
+       "status": "no_effect",
+       "route": "",
+       "effect": "",
+       "summary": "no route produced a visible effect",
+       "vision_ok": null,
+       "ms": 7007
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Choose file'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "policy: the Professor never chooses the user's own files",
+        "the manual says 'OpenDone'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\11_Add_bookmarks_to_Chrome_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "no_effect",
+     "why": "no route produced a visible effect | tried: adapter:cdp: Import bookmarks and settings -> 'Import bookmarks and settings' is not on the current page (about:blank) nor on chrome://settings/",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes) | repeated identically: no further attempts",
+     "steps": 4,
+     "done": 0,
+     "seconds": 7.3,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Import bookmarks and settings",
+       "status": "no_effect",
+       "route": "",
+       "effect": "",
+       "summary": "no route produced a visible effect",
+       "vision_ok": null,
+       "ms": 7005
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Choose file'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "policy: the Professor never chooses the user's own files",
+        "the manual says 'OpenDone'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\11_Add_bookmarks_to_Chrome_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Manage web app settings",
+   "cite": "Use web apps > Manage web app settings",
+   "source": "https://support.google.com/chrome/answer/9658361?hl=en&ref_topic=7439636",
+   "steps_in_guide": 4,
+   "grounded": 0.25,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "underspecified: the step names no control",
+     "remedy": "",
+     "steps": 4,
+     "done": 1,
+     "seconds": 8.6,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Continue",
+       "status": "done",
+       "route": "adapter:cdp: Continue",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Welcome to your new profile <chrome://ma'; text 'about:blank <about:blank>' -> 'Welcome to your new profile <chrome://ma'; ",
+       "vision_ok": null,
+       "ms": 8189
+      },
+      {
+       "step": 2,
+       "verb": "select More .",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the step names no control",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the step names no control",
+        "the manual says 'App infoSettings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "Add a custom background image",
+   "cite": "Customize your New Tab page in Chrome > Customize your New Tab page > Add a custom background image",
+   "source": "https://support.google.com/chrome/answer/11032183?hl=en&ref_topic=7439636",
+   "steps_in_guide": 4,
+   "grounded": 0.25,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ungrounded",
+     "why": "the manual says 'Change theme'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog",
+     "steps": 4,
+     "done": 1,
+     "seconds": 9.1,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Customize Chrome",
+       "status": "done",
+       "route": "adapter:cdp: Customize Chrome",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'New Tab <chrome://new-tab-page/>'; text 'about:blank <about:blank>' -> 'New Tab <chrome://new-tab-page/>'; text '97d170e155",
+       "vision_ok": null,
+       "ms": 8619
+      },
+      {
+       "step": 2,
+       "verb": "Under “Appearance,” select **Change theme**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Change theme'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Change theme'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control",
+        "policy: the Professor never chooses the user's own files"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\13_Add_a_custom_background_image_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ungrounded",
+     "why": "the manual says 'Change theme'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog | repeated identically: no further attempts",
+     "steps": 4,
+     "done": 1,
+     "seconds": 9.0,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Customize Chrome",
+       "status": "done",
+       "route": "adapter:cdp: Customize Chrome",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'New Tab <chrome://new-tab-page/>'; text 'about:blank <about:blank>' -> 'New Tab <chrome://new-tab-page/>'; text '97d170e155",
+       "vision_ok": null,
+       "ms": 8526
+      },
+      {
+       "step": 2,
+       "verb": "Under “Appearance,” select **Change theme**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Change theme'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Change theme'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control",
+        "policy: the Professor never chooses the user's own files"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\13_Add_a_custom_background_image_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Manage your windows",
+   "cite": "Manage tabs in Chrome > Manage your windows",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps_in_guide": 1,
+   "grounded": 1.0,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ok",
+     "why": "",
+     "remedy": "",
+     "steps": 1,
+     "done": 1,
+     "seconds": 3.1,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "New window",
+       "status": "done",
+       "route": "adapter:cdp: New window",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); text 'about:blank <about:blank>' -> 'about:blank <about:blank> || about:blank'",
+       "vision_ok": null,
+       "ms": 2715
+      }
+     ]
+    }
+   ],
+   "final": "ok"
+  },
+  {
+   "goal": "Close from the tab strip",
+   "cite": "Manage tabs in Chrome > Close a tab or window > Close from the tab strip",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps_in_guide": 2,
+   "grounded": 1.0,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "'Close tab' is unsafe; waiting for a human yes",
+     "remedy": "",
+     "steps": 2,
+     "done": 0,
+     "seconds": 0.3,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Close tab",
+       "status": "needs_human",
+       "route": "",
+       "effect": "",
+       "summary": "'Close tab' is unsafe; waiting for a human yes",
+       "vision_ok": null,
+       "ms": 0
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "From the tab switcher",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > From the tab switcher",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps_in_guide": 10,
+   "grounded": 0.6,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ungrounded",
+     "why": "the manual says 'Switch'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 1 new verbs in the catalog",
+     "steps": 10,
+     "done": 0,
+     "seconds": 0.5,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Tap Switch tabs .",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Switch'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Switch'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control",
+        "the manual says 'New'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\16_From_the_tab_switcher_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ungrounded",
+     "why": "the manual says 'Switch'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog | repeated identically: no further attempts",
+     "steps": 10,
+     "done": 0,
+     "seconds": 0.5,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Tap Switch tabs .",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Switch'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Switch'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control",
+        "the manual says 'New'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\16_From_the_tab_switcher_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Add a bookmark",
+   "cite": "Create, find and edit bookmarks in Chrome > Add a bookmark",
+   "source": "https://support.google.com/chrome/answer/188842?hl=en&ref_topic=7439637",
+   "steps_in_guide": 2,
+   "grounded": 0.5,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "underspecified: the step names no control",
+     "remedy": "",
+     "steps": 2,
+     "done": 0,
+     "seconds": 0.5,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Go to the site you want to visit again in the future.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the step names no control",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the step names no control"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "Search the web in Chrome",
+   "cite": "Search the web in Chrome",
+   "source": "https://support.google.com/chrome/answer/95440?hl=en&ref_topic=7439636",
+   "steps_in_guide": 2,
+   "grounded": 0.5,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "underspecified: the step names no control",
+     "remedy": "",
+     "steps": 2,
+     "done": 0,
+     "seconds": 0.5,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "enter your search.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the step names no control",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the step names no control"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "Delete a saved page from your Reading List",
+   "cite": "Read pages later & offline > Delete a saved page from your Reading List",
+   "source": "https://support.google.com/chrome/answer/7343019?hl=en&ref_topic=7439636",
+   "steps_in_guide": 2,
+   "grounded": 0.5,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "underspecified: the step names no control",
+     "remedy": "",
+     "steps": 2,
+     "done": 0,
+     "seconds": 0.5,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Tap More Reading List .",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the step names no control",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the step names no control"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "To save with Drive for desktop:",
+   "cite": "Print from Chrome > Save to Google Drive from print preview > To save with Drive for desktop:",
+   "source": "https://support.google.com/chrome/answer/1069693?hl=en&ref_topic=7439636",
+   "steps_in_guide": 2,
+   "grounded": 0.5,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "'Save as PDF' is sensitive; waiting for a human yes",
+     "remedy": "",
+     "steps": 2,
+     "done": 0,
+     "seconds": 0.3,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Save as PDF",
+       "status": "needs_human",
+       "route": "",
+       "effect": "",
+       "summary": "'Save as PDF' is sensitive; waiting for a human yes",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Drive for desktop'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "Manage app name and icon updates",
+   "cite": "Use web apps > Manage app name and icon updates",
+   "source": "https://support.google.com/chrome/answer/9658361?hl=en&ref_topic=7439636",
+   "steps_in_guide": 2,
+   "grounded": 0.5,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ungrounded",
+     "why": "the manual says 'Review app update'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog",
+     "steps": 2,
+     "done": 1,
+     "seconds": 3.9,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Apps",
+       "status": "done",
+       "route": "adapter:cdp: Apps",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Apps <chrome://apps/>'; text 'about:blank <about:blank>' -> 'Apps <chrome://apps/>'; text '97d170e1550e' -> 'f10f8a44a728';",
+       "vision_ok": null,
+       "ms": 3212
+      },
+      {
+       "step": 2,
+       "verb": "Select **Review app update**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Review app update'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Review app update'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\21_Manage_app_name_and_icon_updates_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ungrounded",
+     "why": "the manual says 'Review app update'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog | repeated identically: no further attempts",
+     "steps": 2,
+     "done": 1,
+     "seconds": 4.0,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Apps",
+       "status": "done",
+       "route": "adapter:cdp: Apps",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Apps <chrome://apps/>'; text 'about:blank <about:blank>' -> 'Apps <chrome://apps/>'; text '97d170e1550e' -> 'f10f8a44a728';",
+       "vision_ok": null,
+       "ms": 3305
+      },
+      {
+       "step": 2,
+       "verb": "Select **Review app update**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Review app update'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Review app update'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\21_Manage_app_name_and_icon_updates_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Search with Google Lens",
+   "cite": "Search with Google Lens in Chrome > Search with Google Lens",
+   "source": "https://support.google.com/chrome/answer/15086890?hl=en&ref_topic=7439636",
+   "steps_in_guide": 2,
+   "grounded": 0.5,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "underspecified: the step names no control",
+     "remedy": "",
+     "steps": 2,
+     "done": 0,
+     "seconds": 0.5,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Select anywhere in the live page area.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the step names no control",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the step names no control"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "Delete a bookmark",
+   "cite": "Create, find and edit bookmarks in Chrome > Delete a bookmark",
+   "source": "https://support.google.com/chrome/answer/188842?hl=en&ref_topic=7439637",
+   "steps_in_guide": 4,
+   "grounded": 0.5,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ungrounded",
+     "why": "the manual says 'Bookmarks and lists Bookmark Manager'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog",
+     "steps": 4,
+     "done": 0,
+     "seconds": 0.5,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "select More **Bookmarks and lists Bookmark Manager**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Bookmarks and lists Bookmark Manager'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Bookmarks and lists Bookmark Manager'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Bookmarks and listsShow all bookmarks'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\23_Delete_a_bookmark_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ungrounded",
+     "why": "the manual says 'Bookmarks and lists Bookmark Manager'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog | repeated identically: no further attempts",
+     "steps": 4,
+     "done": 0,
+     "seconds": 0.5,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "select More **Bookmarks and lists Bookmark Manager**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Bookmarks and lists Bookmark Manager'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Bookmarks and lists Bookmark Manager'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Bookmarks and listsShow all bookmarks'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\23_Delete_a_bookmark_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Set your default search engine",
+   "cite": "Set default search engine and site search shortcuts > Set your default search engine",
+   "source": "https://support.google.com/chrome/answer/95426?hl=en&ref_topic=7439636",
+   "steps_in_guide": 4,
+   "grounded": 0.5,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ungrounded",
+     "why": "the manual says 'Change'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog",
+     "steps": 4,
+     "done": 2,
+     "seconds": 12.0,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Settings",
+       "status": "done",
+       "route": "adapter:cdp: Settings",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text '97d170e1550e' ->",
+       "vision_ok": null,
+       "ms": 3632
+      },
+      {
+       "step": 2,
+       "verb": "Search engine",
+       "status": "done",
+       "route": "adapter:cdp: Search engine",
+       "effect": "state_change",
+       "summary": "text 'Settings <chrome://settings/>' -> 'Settings - Search engine <chrome://setti'; text 'Settings <chrome://settings/>' -> 'Settings - Search engine <chrome://",
+       "vision_ok": null,
+       "ms": 7740
+      },
+      {
+       "step": 3,
+       "verb": "Under \"Search engine,\" select **Change**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Change'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Change'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\24_Set_your_default_search_engine_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ungrounded",
+     "why": "the manual says 'Change'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog | repeated identically: no further attempts",
+     "steps": 4,
+     "done": 2,
+     "seconds": 13.4,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Settings",
+       "status": "done",
+       "route": "adapter:cdp: Settings",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text '97d170e1550e' ->",
+       "vision_ok": null,
+       "ms": 3847
+      },
+      {
+       "step": 2,
+       "verb": "Search engine",
+       "status": "done",
+       "route": "adapter:cdp: Search engine",
+       "effect": "state_change",
+       "summary": "text 'Settings <chrome://settings/>' -> 'Settings - Search engine <chrome://setti'; text 'Settings <chrome://settings/>' -> 'Settings - Search engine <chrome://",
+       "vision_ok": null,
+       "ms": 8855
+      },
+      {
+       "step": 3,
+       "verb": "Under \"Search engine,\" select **Change**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Change'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Change'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\24_Set_your_default_search_engine_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "From the tab switcher",
+   "cite": "Manage tabs in Chrome > Manage and organize your tabs > From the tab switcher",
+   "source": "https://support.google.com/chrome/answer/2391819?hl=en&ref_topic=7439636",
+   "steps_in_guide": 6,
+   "grounded": 0.5,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "'Close tab' is unsafe; waiting for a human yes",
+     "remedy": "",
+     "steps": 6,
+     "done": 0,
+     "seconds": 0.3,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Close tab",
+       "status": "needs_human",
+       "route": "",
+       "effect": "",
+       "summary": "'Close tab' is unsafe; waiting for a human yes",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Close all tabs and groups'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'SettingsTabs and tab groups'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Automatically open tab groups from other devices'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  },
+  {
+   "goal": "Download a file",
+   "cite": "Download a file",
+   "source": "https://support.google.com/chrome/answer/95759?hl=en&ref_topic=7439636",
+   "steps_in_guide": 5,
+   "grounded": 0.4,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ungrounded",
+     "why": "the manual says 'Privacy and securitySite Settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog",
+     "steps": 5,
+     "done": 1,
+     "seconds": 3.5,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Settings",
+       "status": "done",
+       "route": "adapter:cdp: Settings",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text '97d170e1550e' ->",
+       "vision_ok": null,
+       "ms": 2976
+      },
+      {
+       "step": 2,
+       "verb": "Click **Privacy and securitySite Settings**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Privacy and securitySite Settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Privacy and securitySite Settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Additional permissionsAutomatic downloads'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\26_Download_a_file_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ungrounded",
+     "why": "the manual says 'Privacy and securitySite Settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog | repeated identically: no further attempts",
+     "steps": 5,
+     "done": 1,
+     "seconds": 4.9,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Settings",
+       "status": "done",
+       "route": "adapter:cdp: Settings",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text '97d170e1550e' ->",
+       "vision_ok": null,
+       "ms": 4126
+      },
+      {
+       "step": 2,
+       "verb": "Click **Privacy and securitySite Settings**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Privacy and securitySite Settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Privacy and securitySite Settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Additional permissionsAutomatic downloads'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\26_Download_a_file_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Download a file",
+   "cite": "Download a file",
+   "source": "https://support.google.com/chrome/answer/95759?hl=en&ref_topic=7439636",
+   "steps_in_guide": 5,
+   "grounded": 0.4,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ungrounded",
+     "why": "the manual says 'Site SettingsAdditional content settingsPDF documents'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog",
+     "steps": 5,
+     "done": 2,
+     "seconds": 16.6,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Downloads",
+       "status": "done",
+       "route": "adapter:cdp: Downloads",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Settings - Downloads <chrome://settings/'; text 'about:blank <about:blank>' -> 'Settings - Downloads <chrome://settings/'; ",
+       "vision_ok": null,
+       "ms": 8595
+      },
+      {
+       "step": 2,
+       "verb": "Privacy and security",
+       "status": "done",
+       "route": "adapter:cdp: Privacy and security",
+       "effect": "state_change",
+       "summary": "text 'Settings - Downloads <chrome://settings/' -> 'Settings - Privacy and securit <chrome:/'; text 'Settings - Downloads <chrome://settings/' -> 'Settings - Pr",
+       "vision_ok": null,
+       "ms": 7292
+      },
+      {
+       "step": 3,
+       "verb": "Select **Site SettingsAdditional content settingsPDF documents**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Site SettingsAdditional content settingsPDF documents'; no such control is in the application's catalog (it may sit in a menu or dialog that is",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Site SettingsAdditional content settingsPDF documents'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'PDF'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\27_Download_a_file_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ungrounded",
+     "why": "the manual says 'Site SettingsAdditional content settingsPDF documents'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog | repeated identically: no further attempts",
+     "steps": 5,
+     "done": 2,
+     "seconds": 16.7,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Downloads",
+       "status": "done",
+       "route": "adapter:cdp: Downloads",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Settings - Downloads <chrome://settings/'; text 'about:blank <about:blank>' -> 'Settings - Downloads <chrome://settings/'; ",
+       "vision_ok": null,
+       "ms": 8683
+      },
+      {
+       "step": 2,
+       "verb": "Privacy and security",
+       "status": "done",
+       "route": "adapter:cdp: Privacy and security",
+       "effect": "state_change",
+       "summary": "text 'Settings - Downloads <chrome://settings/' -> 'Settings - Privacy and securit <chrome:/'; text 'Settings - Downloads <chrome://settings/' -> 'Settings - Pr",
+       "vision_ok": null,
+       "ms": 7321
+      },
+      {
+       "step": 3,
+       "verb": "Select **Site SettingsAdditional content settingsPDF documents**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Site SettingsAdditional content settingsPDF documents'; no such control is in the application's catalog (it may sit in a menu or dialog that is",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Site SettingsAdditional content settingsPDF documents'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'PDF'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\27_Download_a_file_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Turn off the ad blocker",
+   "cite": "Visit a site by turning off Chrome's ad blocker > Turn off the ad blocker",
+   "source": "https://support.google.com/chrome/answer/7632919?hl=en&ref_topic=7439636",
+   "steps_in_guide": 4,
+   "grounded": 0.25,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ungrounded",
+     "why": "the manual says 'Privacy and securitySite settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog",
+     "steps": 4,
+     "done": 1,
+     "seconds": 4.0,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Settings",
+       "status": "done",
+       "route": "adapter:cdp: Settings",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text '97d170e1550e' ->",
+       "vision_ok": null,
+       "ms": 3339
+      },
+      {
+       "step": 2,
+       "verb": "Select **Privacy and securitySite settings**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Privacy and securitySite settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Privacy and securitySite settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Additional content settings Intrusive ads'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Any site you visit can show any ad to you'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\28_Turn_off_the_ad_blocker_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ungrounded",
+     "why": "the manual says 'Privacy and securitySite settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog | repeated identically: no further attempts",
+     "steps": 4,
+     "done": 1,
+     "seconds": 4.1,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Settings",
+       "status": "done",
+       "route": "adapter:cdp: Settings",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text '97d170e1550e' ->",
+       "vision_ok": null,
+       "ms": 3451
+      },
+      {
+       "step": 2,
+       "verb": "Select **Privacy and securitySite settings**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Privacy and securitySite settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Privacy and securitySite settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Additional content settings Intrusive ads'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Any site you visit can show any ad to you'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\28_Turn_off_the_ad_blocker_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Change your default sound permissions on your computer",
+   "cite": "Control your music, videos, and more > Change your default sound permissions on your computer",
+   "source": "https://support.google.com/chrome/answer/9692215?hl=en&ref_topic=7439636",
+   "steps_in_guide": 4,
+   "grounded": 0.25,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ungrounded",
+     "why": "the manual says 'Privacy and securitySite settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog",
+     "steps": 4,
+     "done": 1,
+     "seconds": 3.9,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Settings",
+       "status": "done",
+       "route": "adapter:cdp: Settings",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text '97d170e1550e' ->",
+       "vision_ok": null,
+       "ms": 3291
+      },
+      {
+       "step": 2,
+       "verb": "Select **Privacy and securitySite settings**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Privacy and securitySite settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Privacy and securitySite settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Additional content settingsSound'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\29_Change_your_default_sound_permissions_on_your_computer_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "ungrounded",
+     "why": "the manual says 'Privacy and securitySite settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes); re-scanned; 0 new verbs in the catalog | repeated identically: no further attempts",
+     "steps": 4,
+     "done": 1,
+     "seconds": 4.1,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Settings",
+       "status": "done",
+       "route": "adapter:cdp: Settings",
+       "effect": "state_change",
+       "summary": "text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text 'about:blank <about:blank>' -> 'Settings <chrome://settings/>'; text '97d170e1550e' ->",
+       "vision_ok": null,
+       "ms": 3462
+      },
+      {
+       "step": 2,
+       "verb": "Select **Privacy and securitySite settings**.",
+       "status": "unknown",
+       "route": "",
+       "effect": "",
+       "summary": "the manual says 'Privacy and securitySite settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'Privacy and securitySite settings'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the manual says 'Additional content settingsSound'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\29_Change_your_default_sound_permissions_on_your_computer_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  },
+  {
+   "goal": "Find a bookmark",
+   "cite": "Create, find and edit bookmarks in Chrome > Find a bookmark",
+   "source": "https://support.google.com/chrome/answer/188842?hl=en&ref_topic=7439637",
+   "steps_in_guide": 8,
+   "grounded": 0.25,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "no_effect",
+     "why": "editor is read-only | tried: text:posted -> postmessage-wm_char->Chrome_WidgetWin_1 (10 chars); text:uia -> editor is read-only",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes)",
+     "steps": 8,
+     "done": 0,
+     "seconds": 2.2,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "@bookmarks",
+       "status": "no_effect",
+       "route": "text:posted",
+       "effect": "no_effect",
+       "summary": "editor is read-only",
+       "vision_ok": null,
+       "ms": 1911
+      },
+      {
+       "unknown_in_guide": [
+        "the step names no control",
+        "the step names no control",
+        "the manual says 'Bookmarks and listsBookmark Manager'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control",
+        "the manual says 'Bookmarks and listsShow all bookmarks'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\30_Find_a_bookmark_a1.png"
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "status": "no_effect",
+     "why": "editor is read-only | tried: text:posted -> postmessage-wm_char->Chrome_WidgetWin_1 (10 chars); text:uia -> editor is read-only",
+     "remedy": "re-laid-out the parked window; re-read the tree (369 nodes) | repeated identically: no further attempts",
+     "steps": 8,
+     "done": 0,
+     "seconds": 2.3,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "@bookmarks",
+       "status": "no_effect",
+       "route": "text:posted",
+       "effect": "no_effect",
+       "summary": "editor is read-only",
+       "vision_ok": null,
+       "ms": 1946
+      },
+      {
+       "unknown_in_guide": [
+        "the step names no control",
+        "the step names no control",
+        "the manual says 'Bookmarks and listsBookmark Manager'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control",
+        "the manual says 'Bookmarks and listsShow all bookmarks'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      },
+      {
+       "evidence": "D:\\new_automation\\scan_output\\20261010_121223\\chrome\\evidence\\30_Find_a_bookmark_a2.png"
+      }
+     ]
+    }
+   ],
+   "final": "failed"
+  }
+ ],
+ "counts": {
+  "ok": 4,
+  "blocked": 8,
+  "failed": 18
+ },
+ "ml": {
+  "outcome": {
+   "seen": 1584,
+   "updates": 5224,
+   "prequential_n": 1583,
+   "ok_accuracy": 0.8617,
+   "ok_baseline": 0.7581,
+   "effect_accuracy": 0.7467,
+   "effect_baseline": 0.4713,
+   "ok_brier": 0.1173,
+   "beats_baseline": true,
+   "parameters": 98646
+  },
+  "candidates": {
+   "seen": 31862,
+   "positives": 19814,
+   "updates": 6283,
+   "prequential_auc": 0.9588,
+   "parameters": 24625,
+   "sources": 3,
+   "ready_to_filter": false
+  },
+  "motor": {
+   "a": 0.1,
+   "b": 0.12,
+   "prior": {
+    "a": 0.1,
+    "b": 0.12
+   },
+   "learned_from_people": false,
+   "n": 0,
+   "r2": null,
+   "rmse": null
+  },
+  "events": {
+   "transitions": 107,
+   "scans": 42,
+   "replay_rounds": 273,
+   "checkpoints": 72
+  },
+  "training_now": false
+ },
+ "history": {
+  "transitions": 271,
+  "with_effect": 211,
+  "targets": 37,
+  "apps": 1,
+  "by_source": {
+   "guide": 244,
+   "menu-expand": 27
+  }
+ },
+ "pointer": {
+  "traces": 78,
+  "avg_planned_s": 0.527,
+  "avg_actual_s": 0.527,
+  "virtual": 0
+ },
+ "focus_returns": 2
+}

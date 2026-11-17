@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "Quick Shell for CmdPal",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Open and interact with Quick Shell for CmdPal",
+   "prerequisite_state": "Quick Shell for CmdPal is open and the Command Palette is visible",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open Command Palette and search for Quick Shell",
+         "ui_target": {
+            "element_name": "Command Palette",
+            "automation_id": null,
+            "hierarchical_path": "Application > Command Palette",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Command Palette is focused and ready for input"
+      }
+   ],
+   "_meta": {
+      "source_app": "Quick Shell for CmdPal",
+      "app_key": "quick_shell_for_cmdpal",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Quick Shell",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:46:05Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,221 @@
+{
+   "app_metadata": {
+      "app_name": "MoarShopBot",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure MoarShopBot to generate out-of-stock alerts and financial reports.",
+   "prerequisite_state": "Desktop environment with MoarShopBot files copied to a permanent location.",
+   "total_steps": 7,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Double-click MoarShopBot executable.",
+         "ui_target": {
+            "element_name": "MoarShopBot executable",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DOUBLE_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "MoarShopBot application opens."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click the 'More Info' link in the Windows Protected Your PC dialog.",
+         "ui_target": {
+            "element_name": "More Info link",
+            "automation_id": null,
+            "hierarchical_path": "Windows Protected Your PC dialog > More Info link",
+            "element_type": "Link",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "More information about the application is displayed."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click the 'Run Anyway' button in the Windows Protected Your PC dialog.",
+         "ui_target": {
+            "element_name": "Run Anyway button",
+            "automation_id": null,
+            "hierarchical_path": "Windows Protected Your PC dialog > Run Anyway button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "MoarShopBot application runs."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click 'Run' in MoarShopBot.",
+         "ui_target": {
+            "element_name": "Run",
+            "automation_id": null,
+            "hierarchical_path": "MoarShopBot window > Run",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "MoarShopBot displays old out-of-stock events."
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Click 'Edit' menu in MoarShopBot.",
+         "ui_target": {
+            "element_name": "Edit",
+            "automation_id": null,
+            "hierarchical_path": "MoarShopBot window > Edit",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Edit menu options are displayed."
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Click 'Edit Webhook' in MoarShopBot.",
+         "ui_target": {
+            "element_name": "Edit Webhook",
+            "automation_id": null,
+            "hierarchical_path": "MoarShopBot window > Edit > Edit Webhook",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Webhook configuration dialog opens."
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Copy the webhook URL from Discord and paste it into the MoarShopBot webhook URL field.",
+         "ui_target": {
+            "element_name": "Webhook URL field",
+            "automation_id": null,
+            "hierarchical_path": "MoarShopBot webhook configuration dialog > Webhook URL field",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "Paste the copied webhook URL here."
+         },
+         "expected_state_change": "Webhook URL is set in MoarShopBot."
+      }
+   ],
+   "_meta": {
+      "source_app": "MoarShopBot",
+      "app_key": "moarshopbot",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "MoarShopBot",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:11:09Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

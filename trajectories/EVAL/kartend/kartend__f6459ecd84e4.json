@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "Kartend",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install Kartend and set up a new library",
+   "prerequisite_state": "No application is open",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the Getting Started guide",
+         "ui_target": {
+            "element_name": "Getting Started",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Getting Started guide is highlighted or expanded"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click on the New Library Wizard link",
+         "ui_target": {
+            "element_name": "New Library Wizard",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The New Library Wizard opens in a new window"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Follow the instructions in the New Library Wizard to create a new library",
+         "ui_target": {
+            "element_name": "New Library Wizard",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Name: My New Library\nFolder: /path/to/my/library\nMedia Type: Games"
+         },
+         "expected_state_change": "A new library is created and the wizard closes"
+      }
+   ],
+   "_meta": {
+      "source_app": "Kartend",
+      "app_key": "kartend",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "Kartend",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:44:08Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

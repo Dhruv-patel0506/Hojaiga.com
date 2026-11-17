@@ -1,0 +1,146 @@
+{
+ "app": "calculator",
+ "started": "2026-11-02 09:17:38",
+ "phases": {
+  "read": {
+   "store": {
+    "Microsoft.WindowsCalculator": {
+     "key": "calculator",
+     "ui_words": 1166,
+     "views": 32,
+     "chunks": 44
+    }
+   },
+   "seconds": 8.6,
+   "level": "explored"
+  },
+  "map": {
+   "ran": true,
+   "seconds": 21.6,
+   "level": "explored",
+   "commands": 62,
+   "with_shortcut": 0,
+   "dialogs": 0,
+   "layout_controls": 36,
+   "state_variables": 1,
+   "frontier": {
+    "total": 37,
+    "by_status": {
+     "explored": 25,
+     "failed": 2,
+     "no_effect": 5,
+     "skipped": 1,
+     "unsafe": 4
+    },
+    "explorable": 32,
+    "explored_n": 30,
+    "explored_fraction": 0.938
+   }
+  },
+  "ask": {
+   "asked": 4,
+   "answered": 4,
+   "items": [
+    {
+     "q": "In calculator, how do I use Equals?",
+     "status": "ANSWERED",
+     "answer": "(the model's answer was not used because it cited nothing) Here is what I know (this is the evidence itself):\n- [1] commands found in the app: Turn calculation history on or off; Scientific Calculator; Standard Calculator; Programmer Calcul"
+    },
+    {
+     "q": "In calculator, how do I use Multiply by?",
+     "status": "ANSWERED",
+     "answer": "To use Multiply by in the calculator, you should first ensure the calculator is in **Standard** mode [2]. Then, enter the number you want to multiply by and press the **Multiply** button. After that, enter the number you wish to multiply wi"
+    },
+    {
+     "q": "In calculator, how do I use Seven?",
+     "status": "ANSWERED",
+     "answer": "(the model's answer was not used because it cited nothing) Here is what I know (this is the evidence itself):\n- [1] commands found in the app: Turn calculation history on or off; Scientific Calculator; Standard Calculator; Programmer Calcul"
+    },
+    {
+     "q": "In calculator, how do I use Six?",
+     "status": "ANSWERED",
+     "answer": "In the calculator, to use Six, you need to first switch to the appropriate mode. The evidence indicates that Six is one of the modes available in the calculator [1]. To switch to the mode that includes Six, you can press Alt + 1 to switch t"
+    }
+   ],
+   "seconds": 31.1
+  },
+  "practice": {
+   "written": 6,
+   "levels": [
+    {
+     "level": 1,
+     "proven": 0,
+     "of": 2
+    },
+    {
+     "level": 1,
+     "proven": 0,
+     "of": 2
+    },
+    {
+     "level": 1,
+     "proven": 0,
+     "of": 2
+    }
+   ],
+   "highest_level_proven": 0,
+   "tried": 6,
+   "proven_done": 0,
+   "kept_training_rows": 0,
+   "results": [
+    {
+     "task": "open calculator, type '7 + 5 =', the app should show 12",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 216.8,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'calculator': NEEDS_HUMAN (window hwnd=3017748), 3 verified-loop steps in 209.9s\n    - 'type \"7 + 5 =\"' -> NOT DONE (HITL)\n    note: model plan:"
+    },
+    {
+     "task": "open calculator, type '3 X 4 =', the app should show 12",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 45.2,
+     "proof": "[{'window': 4459986, 'ok': False, 'why': 'missing or wrong: 12 (display) [numeric]', 'items': [{'content': '12', 'where': 'display', 'format': 'numeric', 'found': False}], 'sees': '- The app or site is \"Calculator\".\\n- The page or document title is \"Standard\".\\n- The headings and section names are \""
+    },
+    {
+     "task": "open calculator, type '7 + 5 =', the app should show 12",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 203.2,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'calculator': NEEDS_HUMAN (window hwnd=9897832), 3 verified-loop steps in 197.4s\n    - 'type \"7 + 5 =\"' -> NOT DONE (HITL)\n    note: model plan:"
+    },
+    {
+     "task": "open calculator, type '9 - 3 =', the app should show 6",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 48.7,
+     "proof": "[{'window': 10094440, 'ok': False, 'why': 'missing or wrong: 9 - 3 = 6 (display area of the calculator app) [numeric]', 'items': [{'content': '9 - 3 = 6', 'where': 'display area of the calculator app', 'format': 'numeric', 'found': False}], 'sees': '- The app or site is the Calculator app.\\n- The pa"
+    },
+    {
+     "task": "open calculator, type '2 + 3 X 4 =', use the 'X' to the exponent feature for '3^2', the app should show 20",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 56.4,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'calculator': NEEDS_HUMAN\n    - 'type \"2 + 3 X 4 =\"' -> NOT DONE (NOT RUN)\n    - 'click X to the exponent' -> NOT DONE (NOT RUN)\n    - 'type \"3^"
+    },
+    {
+     "task": "open calculator, type '60 / 5 + 7 =', use the 'Degrees toggle' feature, the app should show 14",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 211.3,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'calculator': NEEDS_HUMAN (window hwnd=3739126), 3 verified-loop steps in 205.0s\n    - 'type \"60 / 5 + 7 =\"' -> NOT DONE (HITL)\n    - 'click Deg"
+    }
+   ],
+   "seconds": 791.5
+  }
+ },
+ "app_key": "calculator",
+ "exe": "C:\\Program Files\\WindowsApps\\Microsoft.WindowsCalculator_11.2607.0.0_x64__8wekyb3d8bbwe\\CalculatorApp.exe",
+ "readiness": {
+  "knows_commands": true,
+  "answers_questions": "4/4",
+  "proven_tasks": "0/6",
+  "verdict": "not ready: nothing proven yet"
+ },
+ "seconds": 859.7
+}

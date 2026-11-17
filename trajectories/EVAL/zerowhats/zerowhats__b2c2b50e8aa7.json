@@ -1,0 +1,55 @@
+{
+   "app_metadata": {
+      "app_name": "ZeroWhats",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install ZeroWhats on a Linux system",
+   "prerequisite_state": "User is on a Linux system with internet access",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the `.AppImage` file from the latest release",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Cursor hovers over the download link for the `.AppImage` file"
+      }
+   ],
+   "_meta": {
+      "source_app": "ZeroWhats",
+      "app_key": "zerowhats",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "ZeroWhats",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:32:32Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

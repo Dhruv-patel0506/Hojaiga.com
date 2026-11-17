@@ -1,0 +1,305 @@
+{
+   "app_metadata": {
+      "app_name": "Microsoft Visual Studio Code",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Demonstrate usage of smart actions in Microsoft Visual Studio Code",
+   "prerequisite_state": "Microsoft Visual Studio Code is open and ready for use",
+   "total_steps": 10,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the Source Control view",
+         "ui_target": {
+            "element_name": "Source Control",
+            "automation_id": null,
+            "hierarchical_path": "View > Source Control",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Source Control view opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Hover over the Source Control input box sparkle buttons",
+         "ui_target": {
+            "element_name": "Sparkle buttons in Source Control input box",
+            "automation_id": null,
+            "hierarchical_path": "Source Control view > Input box > Sparkle buttons",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Generate Commit Message option appears"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click the Generate Commit Message option",
+         "ui_target": {
+            "element_name": "Generate Commit Message option",
+            "automation_id": null,
+            "hierarchical_path": "Source Control view > Input box > Sparkle buttons > Generate Commit Message",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A commit message is generated and displayed"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Open the editor",
+         "ui_target": {
+            "element_name": "Editor",
+            "automation_id": null,
+            "hierarchical_path": "View > Editor",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The editor is open and ready for use"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Add a TODO comment in the editor",
+         "ui_target": {
+            "element_name": "Editor",
+            "automation_id": null,
+            "hierarchical_path": "Editor",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "TODO: Add implementation"
+         },
+         "expected_state_change": "The TODO comment is added to the editor"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Right-click the TODO comment",
+         "ui_target": {
+            "element_name": "TODO comment",
+            "automation_id": null,
+            "hierarchical_path": "Editor > TODO comment",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A Code Action menu appears"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Select Delegate to coding agent from the Code Action menu",
+         "ui_target": {
+            "element_name": "Delegate to coding agent",
+            "automation_id": null,
+            "hierarchical_path": "Editor > TODO comment > Code Action menu > Delegate to coding agent",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The coding agent starts and provides suggestions"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Open a Markdown file",
+         "ui_target": {
+            "element_name": "Markdown file",
+            "automation_id": null,
+            "hierarchical_path": "View > Markdown file",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Markdown file is open"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Put the cursor on an image link",
+         "ui_target": {
+            "element_name": "Image link in Markdown file",
+            "automation_id": null,
+            "hierarchical_path": "Markdown file > Image link",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The cursor is on the image link"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Select Generate alt text from the Code Action menu",
+         "ui_target": {
+            "element_name": "Generate alt text",
+            "automation_id": null,
+            "hierarchical_path": "Markdown file > Image link > Code Action menu > Generate alt text",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Alt text is generated and added to the image link"
+      }
+   ],
+   "_meta": {
+      "source_app": "Microsoft Visual Studio Code",
+      "app_key": "microsoft_visual_studio_code",
+      "dataset_split": "TRAIN",
+      "category": "Code Editor",
+      "guide_title": "AI smart actions in {% data variables.product.prodname_vscode %}",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:09:33Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

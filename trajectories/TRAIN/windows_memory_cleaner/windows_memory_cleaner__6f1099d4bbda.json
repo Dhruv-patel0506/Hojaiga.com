@@ -1,0 +1,156 @@
+{
+   "app_metadata": {
+      "app_name": "Windows Memory Cleaner",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Verify the effects of Windows Memory Cleaner using Resource Monitor",
+   "prerequisite_state": "Resource Monitor is open and the Memory tab is selected",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open Resource Monitor",
+         "ui_target": {
+            "element_name": "Start Menu",
+            "automation_id": null,
+            "hierarchical_path": "Start Menu",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Resource Monitor window opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Go to the Memory tab",
+         "ui_target": {
+            "element_name": "Memory",
+            "automation_id": null,
+            "hierarchical_path": "Resource Monitor > Memory",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Memory tab is selected in Resource Monitor"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Close a few large applications",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "resmon.exe"
+         },
+         "expected_state_change": "Resource Monitor window is closed and reopened"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Open Resource Monitor again",
+         "ui_target": {
+            "element_name": "Start Menu",
+            "automation_id": null,
+            "hierarchical_path": "Start Menu",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Resource Monitor window opens"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Go to the Memory tab again",
+         "ui_target": {
+            "element_name": "Memory",
+            "automation_id": null,
+            "hierarchical_path": "Resource Monitor > Memory",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Memory tab is selected in Resource Monitor"
+      }
+   ],
+   "_meta": {
+      "source_app": "Windows Memory Cleaner",
+      "app_key": "windows_memory_cleaner",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Windows Memory Cleaner",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:29:56Z",
+      "schema_warnings": [
+         "step3_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "Synix Control Panel",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install Synix Control Panel",
+   "prerequisite_state": "No specific application state required before starting the installation process",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install or open Synix. Choose the MSI, WinGet, or standalone version.",
+         "ui_target": {
+            "element_name": "Install or Open Synix",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Synix Control Panel application opens or installation process starts"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Add a server. Select a supported profile and give the server a name.",
+         "ui_target": {
+            "element_name": "Add Server",
+            "automation_id": null,
+            "hierarchical_path": "Main Window > Add Server",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Add Server dialog opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Choose your settings. Enter ports, player limits, passwords, map options, and other available settings.",
+         "ui_target": {
+            "element_name": "Settings",
+            "automation_id": null,
+            "hierarchical_path": "Add Server Dialog > Settings",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Enter ports, player limits, passwords, map options, and other available settings"
+         },
+         "expected_state_change": "Settings are entered and the server is configured"
+      }
+   ],
+   "_meta": {
+      "source_app": "Synix Control Panel",
+      "app_key": "synix_control_panel",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "🛸 Synix Control Panel",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:52:01Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,137 @@
+{
+   "app_metadata": {
+      "app_name": "NextAI Translator",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure NextAI Translator on Windows",
+   "prerequisite_state": "User is at the Windows desktop",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Go to the Latest Release page",
+         "ui_target": {
+            "element_name": "Latest Release",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User is on the Latest Release page"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Download the installation package ending in `.exe`",
+         "ui_target": {
+            "element_name": "Download",
+            "automation_id": null,
+            "hierarchical_path": "Download button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Download dialog opens or file is saved to disk"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Double click the downloaded file to install it",
+         "ui_target": {
+            "element_name": "Downloaded file",
+            "automation_id": null,
+            "hierarchical_path": "File explorer > Downloaded file",
+            "element_type": "File",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DOUBLE_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Installation process starts"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "If prompted as unsafe, click on `More Info` -> `Run Anyway` to proceed with the installation",
+         "ui_target": {
+            "element_name": "Run Anyway",
+            "automation_id": null,
+            "hierarchical_path": "UAC prompt > Run Anyway",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Installation process continues"
+      }
+   ],
+   "_meta": {
+      "source_app": "NextAI Translator",
+      "app_key": "nextai_translator",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Due to receiving a trademark ownership warning from OpenAI, this project and product has been renamed to nextai translator. We hope you understand.",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:25:46Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,277 @@
+{
+   "app_metadata": {
+      "app_name": "HASS.Agent .NET10",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure HASS.Agent .NET10 to connect to Home Assistant",
+   "prerequisite_state": "Windows 10 version 2004 or newer, Home Assistant with MQTT broker or WebSocket API, and the HASS.Agent.NET10-Integration integration installed",
+   "total_steps": 9,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install the Home Assistant integration, v1k70rk4/HASS.Agent.NET10-Integration",
+         "ui_target": {
+            "element_name": "HACS",
+            "automation_id": null,
+            "hierarchical_path": "Home Assistant > HACS",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The HACS menu opens, showing the default store"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Search for HASS.Agent in HACS",
+         "ui_target": {
+            "element_name": "Search",
+            "automation_id": null,
+            "hierarchical_path": "HACS > Search",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "HASS.Agent"
+         },
+         "expected_state_change": "Search results for HASS.Agent appear"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Download the HASS.Agent.NET10-Integration integration",
+         "ui_target": {
+            "element_name": "Download",
+            "automation_id": null,
+            "hierarchical_path": "HACS > Search > HASS.Agent.NET10-Integration > Download",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The integration is downloaded and installed"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Install the HASS.Agent.NET10 app with winget",
+         "ui_target": {
+            "element_name": "winget",
+            "automation_id": null,
+            "hierarchical_path": "Command Prompt or PowerShell > winget",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install v1k70rk4.HASSAgentNET10"
+         },
+         "expected_state_change": "The installation process starts"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Run the HASS.Agent.NET10 installer",
+         "ui_target": {
+            "element_name": "HASS.Agent.NET10",
+            "automation_id": null,
+            "hierarchical_path": "Start Menu > HASS.Agent.NET10",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The installer opens"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Open the tray icon and go to settings",
+         "ui_target": {
+            "element_name": "Tray Icon",
+            "automation_id": null,
+            "hierarchical_path": "System Tray > HASS.Agent.NET10",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The settings window opens"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Enable MQTT and enter broker address and credentials",
+         "ui_target": {
+            "element_name": "MQTT",
+            "automation_id": null,
+            "hierarchical_path": "Settings > MQTT",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "MQTT settings are configured"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Enable HA API and enter WebSocket connection details",
+         "ui_target": {
+            "element_name": "HA API",
+            "automation_id": null,
+            "hierarchical_path": "Settings > HA API",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "HA API settings are configured"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Configure capabilities, sensors, and other settings",
+         "ui_target": {
+            "element_name": "Capabilities",
+            "automation_id": null,
+            "hierarchical_path": "Settings > Capabilities",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Settings are configured"
+      }
+   ],
+   "_meta": {
+      "source_app": "HASS.Agent .NET10",
+      "app_key": "hass_agent_net10",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "HASS.Agent .NET10",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:56:38Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

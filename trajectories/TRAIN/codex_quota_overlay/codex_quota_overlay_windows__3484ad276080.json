@@ -1,0 +1,137 @@
+{
+   "app_metadata": {
+      "app_name": "Codex Quota Overlay",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure Codex Quota Overlay on Windows",
+   "prerequisite_state": "User is on the GitHub releases page for Codex Quota Overlay",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the Windows installer",
+         "ui_target": {
+            "element_name": "Download link",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Hyperlink",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User navigates to the download page for the Windows installer"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run the installer",
+         "ui_target": {
+            "element_name": "Downloaded installer file",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "File",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Installer opens and prompts for installation"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Install the application",
+         "ui_target": {
+            "element_name": "Install button",
+            "automation_id": null,
+            "hierarchical_path": "Installer window > Install button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Installation begins and the application is installed"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Launch the application",
+         "ui_target": {
+            "element_name": "Application icon in the notification area",
+            "automation_id": null,
+            "hierarchical_path": "Taskbar > Application icon",
+            "element_type": "Icon",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Codex Quota Overlay opens and the Quota Center dashboard is displayed"
+      }
+   ],
+   "_meta": {
+      "source_app": "Codex Quota Overlay",
+      "app_key": "codex_quota_overlay",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Codex Quota Overlay (Windows)",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:21:28Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

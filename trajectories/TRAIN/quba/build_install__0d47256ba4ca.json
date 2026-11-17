@@ -1,0 +1,56 @@
+{
+   "app_metadata": {
+      "app_name": "Quba",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "cli",
+   "high_level_task": "Build and run Quba-Viewer as a Flatpak",
+   "prerequisite_state": "Flatpak is installed",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install flatpak",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "flatpak"
+         },
+         "expected_state_change": "flatpak is installed"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Build and install Quba-Viewer as a Flatpak",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "cd flatpak && flatpak-builder build org.quba_viewer.Quba.yml --install-deps-from=flathub --force-clean --user --install"
+         },
+         "expected_state_change": "Quba-Viewer is installed as a Flatpak"
+      }
+   ],
+   "_meta": {
+      "source_app": "Quba",
+      "app_key": "quba",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Build & Install",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:38:51Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

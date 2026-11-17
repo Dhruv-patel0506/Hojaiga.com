@@ -1,0 +1,193 @@
+{
+   "app_metadata": {
+      "app_name": "SearchMate",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide the user through the basic usage and settings of SearchMate",
+   "prerequisite_state": "SearchMate is not running",
+   "total_steps": 6,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Press Ctrl+Space to open SearchMate",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Space"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "SearchMate application window opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Start typing to search",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "example"
+         },
+         "expected_state_change": "Search results for 'example' appear"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Use Up Arrow to navigate results",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Up"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected search result moves up"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Use Down Arrow to navigate results",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Down"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected search result moves down"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Press Enter to open the selected file",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Enter"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected file opens in the default application"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Press Escape to close SearchMate",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Escape"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "SearchMate application window closes"
+      }
+   ],
+   "_meta": {
+      "source_app": "SearchMate",
+      "app_key": "searchmate",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "SearchMate",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:46:56Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target",
+         "step4_ungrounded_target",
+         "step5_ungrounded_target",
+         "step6_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

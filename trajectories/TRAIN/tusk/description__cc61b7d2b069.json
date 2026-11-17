@@ -1,0 +1,165 @@
+{
+   "app_metadata": {
+      "app_name": "Tusk",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure Tusk",
+   "prerequisite_state": "No specific application state required before starting the installation process",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Head to the releases page",
+         "ui_target": {
+            "element_name": "Releases",
+            "automation_id": null,
+            "hierarchical_path": "N/A",
+            "element_type": "Link",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user is redirected to the releases page"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Download the appropriate installer",
+         "ui_target": {
+            "element_name": "Download button",
+            "automation_id": null,
+            "hierarchical_path": "Releases page > Download button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The installer starts downloading or the user is prompted to download"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Install Tusk using the downloaded installer",
+         "ui_target": {
+            "element_name": "Install button",
+            "automation_id": null,
+            "hierarchical_path": "Installer > Install button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Tusk is installed and the application opens"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Install Tusk using Snapcraft",
+         "ui_target": {
+            "element_name": "Snapcraft install button",
+            "automation_id": null,
+            "hierarchical_path": "Snapcraft page > Install button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Tusk is installed via Snapcraft and the application opens"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Install Tusk using Homebrew",
+         "ui_target": {
+            "element_name": "Homebrew install command",
+            "automation_id": null,
+            "hierarchical_path": "Homebrew page > Install command",
+            "element_type": "Text",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "brew cask install tusk"
+         },
+         "expected_state_change": "Tusk is installed via Homebrew and the application opens"
+      }
+   ],
+   "_meta": {
+      "source_app": "tusk",
+      "app_key": "tusk",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Description",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:56:35Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

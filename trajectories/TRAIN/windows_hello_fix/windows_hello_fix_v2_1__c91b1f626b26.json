@@ -1,0 +1,112 @@
+{
+   "app_metadata": {
+      "app_name": "Windows Hello Fix",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure Windows Hello Fix to manage the RGB camera for Windows Hello authentication.",
+   "prerequisite_state": "User is at the Windows Start Menu or File Explorer.",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the Windows Hello Fix installer from the Releases page.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Cursor hovers over the download link."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run the downloaded Windows Hello Fix installer.",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The installer wizard opens."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Select the appropriate payload based on the system architecture.",
+         "ui_target": {
+            "element_name": "x64",
+            "automation_id": null,
+            "hierarchical_path": "Wizard > Components",
+            "element_type": "RadioButton",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The x64 payload is selected."
+      }
+   ],
+   "_meta": {
+      "source_app": "Windows Hello Fix",
+      "app_key": "windows_hello_fix",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Windows Hello Fix v2.1 📸",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:13:01Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

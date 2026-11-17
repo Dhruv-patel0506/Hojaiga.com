@@ -1,0 +1,165 @@
+{
+   "app_metadata": {
+      "app_name": "Icaros",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and activate Icaros Shell Extensions",
+   "prerequisite_state": "Icaros is not installed or activated on the system",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open IcarosConfig.exe with administrative privileges",
+         "ui_target": {
+            "element_name": "IcarosConfig",
+            "automation_id": null,
+            "hierarchical_path": "IcarosConfig > Main Window",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "IcarosConfig window opens with the Activation Panel visible"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click on the 'Activation Panel' to change the state of the 'THUMBNAILING' component",
+         "ui_target": {
+            "element_name": "THUMBNAILING",
+            "automation_id": null,
+            "hierarchical_path": "IcarosConfig > Activation Panel > THUMBNAILING",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'THUMBNAILING' component state changes from DEACTIVATED to ACTIVATED"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click on the 'Activation Panel' to change the state of the 'PROPERTIES' component",
+         "ui_target": {
+            "element_name": "PROPERTIES",
+            "automation_id": null,
+            "hierarchical_path": "IcarosConfig > Activation Panel > PROPERTIES",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'PROPERTIES' component state changes from DEACTIVATED to ACTIVATED"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click on the 'CACHE' component to access the Cache settings",
+         "ui_target": {
+            "element_name": "CACHE",
+            "automation_id": null,
+            "hierarchical_path": "IcarosConfig > CACHE",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Cache settings page opens"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Click the 'Build Cache' button to start filling the cache with entries from the included locations",
+         "ui_target": {
+            "element_name": "Build Cache",
+            "automation_id": null,
+            "hierarchical_path": "IcarosConfig > CACHE > Build Cache",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The cache starts building and the IcarosConfig window remains open"
+      }
+   ],
+   "_meta": {
+      "source_app": "Icaros",
+      "app_key": "icaros",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "PLEASE NOTE that Icaros is, at this point in time, not open source, so this repository is for tracking issues, and downloading the latest releases of Icaros",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:16:05Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

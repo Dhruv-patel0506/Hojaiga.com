@@ -1,0 +1,137 @@
+{
+   "app_metadata": {
+      "app_name": "YASB GUI",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide on how to add a widget using a docs snippet in YASB GUI",
+   "prerequisite_state": "YASB GUI is open and the user is at the Widgets section",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Go to Widgets → Add Widget",
+         "ui_target": {
+            "element_name": "Widgets",
+            "automation_id": null,
+            "hierarchical_path": "Main menu > Widgets",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Add Widget option is selected, and the Options editor is displayed"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Pick the widget from the built-in list",
+         "ui_target": {
+            "element_name": "Weather",
+            "automation_id": null,
+            "hierarchical_path": "Options editor > Widget type",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected widget type is applied to the Options editor"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Paste only the options block from the docs into the Options editor",
+         "ui_target": {
+            "element_name": "Options editor",
+            "automation_id": null,
+            "hierarchical_path": "Options editor",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "label: \"<span>{icon}</span> {temp}\"\nlabel_alt: \"{location}: Min {min_temp}, Max {max_temp}\"\napi_key: \"YOUR_API_KEY\"\nshow_alerts: true\ntooltip: true\nupdate_interval: 600\nhide_decimal: true\nunits: metric\nmenu:\n  blur: true\n  round_corners: true\n  round_corners_type: normal\n  border_color: system\n  alignment: center\n  direction: down\n  offset_top: 6\n  offset_left: 0\nicons:\n  sunnyDay: \n  clearNight: \n  cloudyDay: \n  cloudyNight: \n  rainyDay: \n  rainyNight: \n  snowyIcy: \n  default: \ncallbacks:\n  on_left: toggle_menu"
+         },
+         "expected_state_change": "The options block is correctly entered into the editor"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Save the widget and hit Apply so YASB reloads the updated config",
+         "ui_target": {
+            "element_name": "Apply",
+            "automation_id": null,
+            "hierarchical_path": "Options editor > Apply",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The widget is saved and YASB is reloaded with the updated configuration"
+      }
+   ],
+   "_meta": {
+      "source_app": "YASB GUI",
+      "app_key": "yasb_gui",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "YASB GUI",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:41:57Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

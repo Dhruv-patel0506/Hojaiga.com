@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "ProseFlow",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure ProseFlow on a user's system",
+   "prerequisite_state": "User is on the ProseFlow official website",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the installer for the detected operating system",
+         "ui_target": {
+            "element_name": "Download button",
+            "automation_id": null,
+            "hierarchical_path": "Download section > Download button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Download dialog or progress bar appears"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Install ProseFlow by running the downloaded installer",
+         "ui_target": {
+            "element_name": "Install button",
+            "automation_id": null,
+            "hierarchical_path": "Installer window > Install button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "ProseFlow application is installed and runs"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Run the ProseFlow application",
+         "ui_target": {
+            "element_name": "ProseFlow application icon",
+            "automation_id": null,
+            "hierarchical_path": "System tray > ProseFlow application icon",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "ProseFlow application window opens"
+      }
+   ],
+   "_meta": {
+      "source_app": "ProseFlow",
+      "app_key": "proseflow",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "ProseFlow",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:22:45Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

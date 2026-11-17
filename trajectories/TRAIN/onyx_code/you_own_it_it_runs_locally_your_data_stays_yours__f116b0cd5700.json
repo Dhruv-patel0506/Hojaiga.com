@@ -1,0 +1,111 @@
+{
+   "app_metadata": {
+      "app_name": "Onyx Code",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure Onyx Code with a model and start the editor in Air-Gap Mode.",
+   "prerequisite_state": "No application is open. The user is at the system's desktop.",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download and install Onyx Code",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Onyx Code installer opens."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select a model during the Welcome wizard",
+         "ui_target": {
+            "element_name": "Recommended model",
+            "automation_id": null,
+            "hierarchical_path": "Welcome wizard > Recommended model",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected model is installed and the editor opens."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Start Onyx Code in Air-Gap Mode",
+         "ui_target": {
+            "element_name": "Air-Gap Mode toggle",
+            "automation_id": null,
+            "hierarchical_path": "Onyx Code window > Air-Gap Mode toggle",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Onyx Code enters Air-Gap Mode with the status badge visible."
+      }
+   ],
+   "_meta": {
+      "source_app": "Onyx Code",
+      "app_key": "onyx_code",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "You own it. It runs locally. Your data stays yours.",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:17:29Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

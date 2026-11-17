@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "PerfView",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Access the User's Guide in PerfView",
+   "prerequisite_state": "PerfView application is open and the Help menu is visible",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click on the Help menu",
+         "ui_target": {
+            "element_name": "Help",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Help",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Help menu dropdown opens showing User's Guide, About, and other options"
+      }
+   ],
+   "_meta": {
+      "source_app": "PerfView",
+      "app_key": "perfview",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "PerfView Overview",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:42:13Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,81 @@
+{
+   "app_metadata": {
+      "app_name": "LeopardWM",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install LeopardWM via package manager",
+   "prerequisite_state": "User is on a Windows 10/11 system with internet access",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install LeopardWM via Scoop",
+         "ui_target": {
+            "element_name": "scoop",
+            "automation_id": null,
+            "hierarchical_path": "Command Prompt > scoop",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Scoop is installed and added to PATH"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Install LeopardWM using Scoop",
+         "ui_target": {
+            "element_name": "extras/leopardwm",
+            "automation_id": null,
+            "hierarchical_path": "Command Prompt > scoop bucket add extras > scoop install extras/leopardwm",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "LeopardWM is installed and available on PATH"
+      }
+   ],
+   "_meta": {
+      "source_app": "LeopardWM",
+      "app_key": "leopardwm",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "LeopardWM",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:42:04Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

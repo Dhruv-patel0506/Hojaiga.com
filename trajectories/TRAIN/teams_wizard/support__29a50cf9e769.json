@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "Teams Wizard",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Enable Debug Logging and Troubleshoot Issues with Teams Wizard",
+   "prerequisite_state": "Teams Wizard is open and running",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Right click on the Systray icon",
+         "ui_target": {
+            "element_name": "Systray icon",
+            "automation_id": null,
+            "hierarchical_path": "System tray > Systray icon",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The context menu opens with options including 'Settings'"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select 'Settings' from the context menu",
+         "ui_target": {
+            "element_name": "Settings",
+            "automation_id": null,
+            "hierarchical_path": "System tray > Systray icon > Settings",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Settings window opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Enable Debug Logging in the General tab",
+         "ui_target": {
+            "element_name": "Enable Debug Logging",
+            "automation_id": null,
+            "hierarchical_path": "Settings > General > Enable Debug Logging",
+            "element_type": "CheckBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'Enable Debug Logging' checkbox is checked"
+      }
+   ],
+   "_meta": {
+      "source_app": "Teams Wizard",
+      "app_key": "teams_wizard",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Support",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:31:02Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

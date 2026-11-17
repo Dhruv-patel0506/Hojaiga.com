@@ -1,0 +1,863 @@
+{
+  "file": "adobe_rocast_updated_dataset_v3.csv",
+  "rows_in": 57005,
+  "dropped_duplicates": 0,
+  "role_mapping": [
+    {
+      "column": "company_id",
+      "role": "company",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "company_name",
+      "role": "company",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "ticker",
+      "role": "company",
+      "confidence": 1.0,
+      "status": "accepted"
+    },
+    {
+      "column": "exchange",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "main_country",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "niche",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "currency",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "fiscal_year_end",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "date",
+      "role": "date",
+      "confidence": 1.0,
+      "status": "accepted"
+    },
+    {
+      "column": "timestamp",
+      "role": "date",
+      "confidence": 1.0,
+      "status": "accepted"
+    },
+    {
+      "column": "report_date",
+      "role": "date",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "source_frequency",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "revenue_usd_m",
+      "role": "revenue",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "cost_of_revenue_usd_m",
+      "role": "revenue",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "operating_expense_usd_m",
+      "role": "cost",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "operating_income_usd_m",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "net_income_usd_m",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "cash_usd_m",
+      "role": "cash",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "total_debt_usd_m",
+      "role": "debt",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "total_assets_usd_m",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "equity_usd_m",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "operating_cash_flow_usd_m",
+      "role": "cash",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "capex_usd_m",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "shares_outstanding_m",
+      "role": "volume",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "restated_flag",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "open",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "high",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "low",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "close",
+      "role": "price",
+      "confidence": 1.0,
+      "status": "accepted"
+    },
+    {
+      "column": "adjusted_close",
+      "role": "price",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "volume",
+      "role": "volume",
+      "confidence": 1.0,
+      "status": "accepted"
+    },
+    {
+      "column": "market_cap_usd_bn",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "home_index_close",
+      "role": "index",
+      "confidence": 1.0,
+      "status": "accepted"
+    },
+    {
+      "column": "sector_index_close",
+      "role": "price",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "policy_rate_pct",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "cpi_index",
+      "role": "index",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "unemployment_rate_pct",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "consumer_confidence_index",
+      "role": "index",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "gdp_growth_pct",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "fx_rate_per_usd",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "bond_yield_10y_pct",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "event_id",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "event_name",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "event_category",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "primitive_demand",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "primitive_supply",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "primitive_monetary",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "primitive_fiscal",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "primitive_geopolitical",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "primitive_tech",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "primitive_regulatory",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "primitive_pandemic",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "decision_type",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "announced_date",
+      "role": "date",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "effective_date",
+      "role": "date",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "magnitude",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "short_description",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "record_provenance",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "daily_return",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "daily_volatility",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "sma_20",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "sma_50",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "sma_200",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "rsi_14",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "natr_14",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "ebitda_usd_m",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "ebitda_margin_pct",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "operating_margin_pct",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "net_margin_pct",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "eps_diluted_usd",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "pe_ratio",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "pb_ratio",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "ps_ratio",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "free_cash_flow_usd_m",
+      "role": "cash",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "adobe_digital_media_arr_usd_m",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "adobe_document_cloud_revenue_usd_m",
+      "role": "revenue",
+      "confidence": 0.8,
+      "status": "accepted"
+    },
+    {
+      "column": "adobe_creative_cloud_subscribers_m",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "target_next_period_return",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "target_next_period_direction",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    },
+    {
+      "column": "target_multi_period_fwd_return",
+      "role": null,
+      "confidence": 0.0,
+      "status": "none"
+    }
+  ],
+  "date_column": "date",
+  "dayfirst": false,
+  "date_parse_rate": 1.0,
+  "entity_source": "column company_id",
+  "primary_value_column": "revenue_usd_m",
+  "primary_role": "revenue",
+  "primary_guessed": false,
+  "aggregation": "sum",
+  "aux_columns": [
+    {
+      "column": "cost_of_revenue_usd_m",
+      "safe_name": "cost_of_revenue_usd_m",
+      "role": "revenue",
+      "aggregation": "sum"
+    },
+    {
+      "column": "operating_expense_usd_m",
+      "safe_name": "operating_expense_usd_m",
+      "role": "cost",
+      "aggregation": "sum"
+    },
+    {
+      "column": "operating_income_usd_m",
+      "safe_name": "operating_income_usd_m",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "net_income_usd_m",
+      "safe_name": "net_income_usd_m",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "cash_usd_m",
+      "safe_name": "cash_usd_m",
+      "role": "cash",
+      "aggregation": "last"
+    },
+    {
+      "column": "total_debt_usd_m",
+      "safe_name": "total_debt_usd_m",
+      "role": "debt",
+      "aggregation": "last"
+    },
+    {
+      "column": "total_assets_usd_m",
+      "safe_name": "total_assets_usd_m",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "equity_usd_m",
+      "safe_name": "equity_usd_m",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "operating_cash_flow_usd_m",
+      "safe_name": "operating_cash_flow_usd_m",
+      "role": "cash",
+      "aggregation": "last"
+    },
+    {
+      "column": "capex_usd_m",
+      "safe_name": "capex_usd_m",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "shares_outstanding_m",
+      "safe_name": "shares_outstanding_m",
+      "role": "volume",
+      "aggregation": "sum"
+    },
+    {
+      "column": "restated_flag",
+      "safe_name": "restated_flag",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "open",
+      "safe_name": "open",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "high",
+      "safe_name": "high",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "low",
+      "safe_name": "low",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "close",
+      "safe_name": "close",
+      "role": "price",
+      "aggregation": "last"
+    },
+    {
+      "column": "adjusted_close",
+      "safe_name": "adjusted_close",
+      "role": "price",
+      "aggregation": "last"
+    },
+    {
+      "column": "volume",
+      "safe_name": "volume",
+      "role": "volume",
+      "aggregation": "sum"
+    },
+    {
+      "column": "market_cap_usd_bn",
+      "safe_name": "market_cap_usd_bn",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "home_index_close",
+      "safe_name": "home_index_close",
+      "role": "index",
+      "aggregation": "last"
+    },
+    {
+      "column": "sector_index_close",
+      "safe_name": "sector_index_close",
+      "role": "price",
+      "aggregation": "last"
+    },
+    {
+      "column": "policy_rate_pct",
+      "safe_name": "policy_rate_pct",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "cpi_index",
+      "safe_name": "cpi_index",
+      "role": "index",
+      "aggregation": "last"
+    },
+    {
+      "column": "unemployment_rate_pct",
+      "safe_name": "unemployment_rate_pct",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "consumer_confidence_index",
+      "safe_name": "consumer_confidence_index",
+      "role": "index",
+      "aggregation": "last"
+    },
+    {
+      "column": "gdp_growth_pct",
+      "safe_name": "gdp_growth_pct",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "fx_rate_per_usd",
+      "safe_name": "fx_rate_per_usd",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "bond_yield_10y_pct",
+      "safe_name": "bond_yield_10y_pct",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "primitive_demand",
+      "safe_name": "primitive_demand",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "primitive_supply",
+      "safe_name": "primitive_supply",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "primitive_monetary",
+      "safe_name": "primitive_monetary",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "primitive_fiscal",
+      "safe_name": "primitive_fiscal",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "primitive_geopolitical",
+      "safe_name": "primitive_geopolitical",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "primitive_tech",
+      "safe_name": "primitive_tech",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "primitive_regulatory",
+      "safe_name": "primitive_regulatory",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "primitive_pandemic",
+      "safe_name": "primitive_pandemic",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "magnitude",
+      "safe_name": "magnitude",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "daily_return",
+      "safe_name": "daily_return",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "daily_volatility",
+      "safe_name": "daily_volatility",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "sma_20",
+      "safe_name": "sma_20",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "sma_50",
+      "safe_name": "sma_50",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "sma_200",
+      "safe_name": "sma_200",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "rsi_14",
+      "safe_name": "rsi_14",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "natr_14",
+      "safe_name": "natr_14",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "ebitda_usd_m",
+      "safe_name": "ebitda_usd_m",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "ebitda_margin_pct",
+      "safe_name": "ebitda_margin_pct",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "operating_margin_pct",
+      "safe_name": "operating_margin_pct",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "net_margin_pct",
+      "safe_name": "net_margin_pct",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "eps_diluted_usd",
+      "safe_name": "eps_diluted_usd",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "pe_ratio",
+      "safe_name": "pe_ratio",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "pb_ratio",
+      "safe_name": "pb_ratio",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "ps_ratio",
+      "safe_name": "ps_ratio",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "free_cash_flow_usd_m",
+      "safe_name": "free_cash_flow_usd_m",
+      "role": "cash",
+      "aggregation": "last"
+    },
+    {
+      "column": "adobe_digital_media_arr_usd_m",
+      "safe_name": "adobe_digital_media_arr_usd_m",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "adobe_document_cloud_revenue_usd_m",
+      "safe_name": "adobe_document_cloud_revenue_usd_m",
+      "role": "revenue",
+      "aggregation": "sum"
+    },
+    {
+      "column": "adobe_creative_cloud_subscribers_m",
+      "safe_name": "adobe_creative_cloud_subscribers_m",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "target_next_period_return",
+      "safe_name": "target_next_period_return",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "target_next_period_direction",
+      "safe_name": "target_next_period_direction",
+      "role": null,
+      "aggregation": "mean"
+    },
+    {
+      "column": "target_multi_period_fwd_return",
+      "safe_name": "target_multi_period_fwd_return",
+      "role": null,
+      "aggregation": "mean"
+    }
+  ],
+  "companies": {
+    "COMP_ADBE_001": {
+      "months": 202,
+      "first": "2010-01-01",
+      "last": "2026-10-01",
+      "missing_months": 0,
+      "missing_share": 0.0,
+      "gap_action": "interpolated"
+    }
+  },
+  "group": "sales_revenue",
+  "status": "ok"
+}

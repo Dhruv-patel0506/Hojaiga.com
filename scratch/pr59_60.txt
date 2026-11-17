@@ -1,0 +1,127 @@
+# ====================================================================================================================== PR59 clicking through hidden options
+def run_pr59() -> TestOutcome:
+    """PR59: the scan goes below the first menu level - submenus are entered to a bounded depth (and the person's own recent files are not), a button is clicked to reveal a dialog / page only when its
+    wording says so (never toggles, file pickers, web / account links, the document-changing verbs), and the hidden-options map lists every menu, submenu and dialog with its items"""
+    from types import SimpleNamespace as NS
+    from core_organs.professor import menus as MN, reveal as RV
+    from core_organs.professor.harvest import Catalog
+
+    J = lambda label, path=(), role="menuitem", pats=("invoke",): RV.judge(label, list(path), role, list(pats))
+    ok_open = [J("Page setup", ["File"]), J("Font", ["Edit"]), J("Settings", [], "button"), J("Insert table...", ["Table"]), J("Resize and skew", [], "button"), J("About", ["Help"]), J("Go to", ["Edit"]), J("Find", ["Edit"])]
+    refused = {"toggle": J("Word wrap", ["View"], pats=("toggle",)), "opener": J("Zoom", ["View"], pats=("expand",)), "web": J("Search with Bing", ["Edit"]), "picker": J("Open", ["File"]), "save": J("Save as...", ["File"]),
+               "print": J("Print", ["File"]), "exit": J("Exit", ["File"]), "recent": J("Recent files", ["File"]), "undo": J("Undo", ["Edit"]), "next": J("Find next", ["Edit"]), "avatar": J("User avatar", [], "button"),
+               "helplink": J("View help", ["Help"]), "plain": J("Banana", ["Edit"])}
+    # a fake interface: View > Zoom > More > Deep item, View > Recent (the person's files), a toggle
+    world = {"open": set()}
+    ITEMS = {"View": ["Zoom", "Recent", "Status bar"], "Zoom": ["Zoom in", "Zoom out", "More"], "More": ["Deep item"], "Recent": ["secret-file.txt"]}
+    EXP = {"Zoom", "Recent", "More"}
+    n_counter = [0]
+
+    def node(name):
+        n_counter[0] += 1
+        return NS(role="menuitem", name=name, pats=(["expand"] if name in EXP else (["toggle"] if name == "Status bar" else ["invoke"])), expand_state=(0 if name in EXP else -1), enabled=True, offscreen=False,
+                  aid="", help="", accel="", selected=False, toggle_state=-1, rect=(0, n_counter[0] * 10, 50, n_counter[0] * 10 + 9), ctype="MenuItemControl", ctrl=None, idx=n_counter[0])
+
+    def all_nodes():
+        out = []
+        for parent in ["View"] + sorted(world["open"] - {"View"}):
+            if parent in world["open"]:
+                out += [node(x) for x in ITEMS.get(parent, [])]
+        return out
+    real_expand, real_collapse = MN._expand, MN.collapse
+    MN._expand = lambda fx, n, deadline_s=2.0: (world["open"].add(n.name) or True, "UIA Expand")
+    MN.collapse = lambda n, deadline_s=1.5: (world["open"].discard(n.name) or True)
+    MN._await_items = lambda all_n, base, wait_s=2.0, step_s=0.25: (all_n(), [n for n in all_n() if MN._ident(n) not in base and n.name])
+    try:
+        world["open"].add("View")
+        cat = Catalog(app_key="fake")
+        rep = {"items": 0, "submenus": 0, "failed": [], "skipped": [], "by_opener": {}}
+        have = set()
+        top = all_nodes()
+        for n in top:
+            MN.add_item_verb(cat, have, ["View"], n)
+        view = NS(name="View", ident=None)
+        MN._descend(None, all_nodes, cat, have, NS(name="View"), top, ["View"], 1, 2, time.time() + 30, None, rep, lambda: world["open"].add("View"))
+        deep2 = len(cat.verbs)
+        cat2, rep2, have2 = Catalog(app_key="fake"), {"items": 0, "submenus": 0, "failed": [], "skipped": [], "by_opener": {}}, set()
+        world["open"] = {"View"}
+        for n in all_nodes():
+            MN.add_item_verb(cat2, have2, ["View"], n)
+        MN._descend(None, all_nodes, cat2, have2, NS(name="View"), all_nodes(), ["View"], 1, 1, time.time() + 30, None, rep2, lambda: world["open"].add("View"))
+    finally:
+        MN._expand, MN.collapse = real_expand, real_collapse
+    labels = {tuple(v.path): [x.label for x in cat.verbs if x.path == v.path] for v in cat.verbs}
+    cands, skipped = RV.collect([{"path": ["File"], "label": "Page setup", "role": "menuitem", "pats": ["invoke"], "aid": "", "enabled": True}, {"path": ["File"], "label": "Open", "role": "menuitem", "pats": ["invoke"], "aid": "", "enabled": True},
+                                 {"path": ["Edit"], "label": "Insert picture...", "role": "menuitem", "pats": ["invoke"], "aid": "", "enabled": True}], [])
+    mp = RV.build_map(cat, [{"path": "View > Zoom", "kind": "submenu"}])
+    checks = {"dialog_wording_is_clicked": all(r[0] for r in ok_open), "toggles_openers_web_files_and_edits_are_not": not any(r[0] for r in refused.values()),
+              "refusals_name_a_reason": all(r[1] for r in refused.values()), "only_look_alikes_are_listed_as_refused": refused["web"][2] and refused["picker"][2] and not refused["plain"][2] and not refused["undo"][2],
+              "submenu_entered_two_levels": ["Deep item"] in [labels.get(("View", "Zoom", "More"))] and "Zoom in" in labels.get(("View", "Zoom"), []),
+              "depth_is_bounded": ("View", "Zoom", "More") not in {tuple(v.path) for v in cat2.verbs} or "Deep item" not in [v.label for v in cat2.verbs],
+              "the_persons_files_stay_closed": "secret-file.txt" not in [v.label for v in cat.verbs] and any("Recent" in s["path"] for s in rep["skipped"]),
+              "candidates_exclude_file_pickers": [c.label for c in cands] == ["Page setup", "Insert picture..."] and any(s["path"].endswith("Open") for s in skipped),
+              "map_lists_menu_and_submenus": {r["path"]: r["kind"] for r in mp}.get("View > Zoom") == "submenu" and any(r["path"] == "View" and r["kind"] == "menu" for r in mp)}
+    return _verdict(checks, f"{deep2} verbs filed; skipped={rep['skipped']}; map={[(r['path'], r['kind']) for r in mp]}")
+
+
+# ====================================================================================================================== PR60 checklist + bundle
+def run_pr60() -> TestOutcome:
+    """PR60: the manual run keeps a RESUMABLE checklist - stages are read from the finished report, an application whose checkpoint says done is not run again (unless asked), a crash in one application
+    does not stop the next, and everything lands in one folder (pictures, INDEX.html, CHECKLIST.md, run.log, zip)"""
+    import tempfile
+    from core_organs.professor import checkpoints as CK, apprun as AR
+    from PIL import Image
+    good = {"phases": {"launch": {"launched": True}, "deep_scan": {"nodes": 60, "depth": 7, "state": "rich"}, "vision_scan": {"elements": 30, "vision_model": True}, "catalog_after_menus": {"verbs": 80},
+                       "menus": {"openers": 7, "opened": 7, "items": 50, "submenus": 2}, "options": {"tried": 6, "opened": 4, "dialogs": 1, "pages": 3}, "guide": {"runnable_procedures": 2}, "close": {}, "state_after": {}},
+            "ledger_counts": {"ok": 2, "blocked": 1, "skipped": 3}, "counts": {"ok": 2, "blocked": 1, "failed": 0}}
+    bad = json.loads(json.dumps(good))
+    bad["ledger_counts"] = {"ok": 1, "failed": 2}
+    bad["phases"]["options"] = {"tried": 1, "opened": 1, "tainted": True, "stopped": "could not prove the application is back"}
+    dead = {"result": "launch_failed", "phases": {"launch": {"launched": False, "notes": "no window"}}}
+    with tempfile.TemporaryDirectory() as tmp:
+        d1 = os.path.join(tmp, "a")
+        os.makedirs(os.path.join(d1, "checkpoints"))
+        for n in ("scan_1_first.png", "flyout_01_File.png", "option_01_page_Settings.png", os.path.join("checkpoints", "cp_01_launched.png")):
+            Image.new("RGB", (8, 8), (10, 20, 30)).save(os.path.join(d1, n))
+        s_good, s_bad, s_dead = CK.stage_states(good, d1), CK.stage_states(bad, d1), CK.stage_states(dead, d1)
+        st_good, st_bad, st_dead = CK.app_status(s_good, good), CK.app_status(s_bad, bad), CK.app_status(s_dead, dead)
+        # the run itself, with a fake AppRun: one application succeeds, one crashes, a second run skips the finished one
+        calls = []
+
+        class FakeRun:
+            def __init__(self, spec, **kw):
+                self.spec, self.kw = spec, kw
+
+            def run(self):
+                calls.append(self.spec.key)
+                if self.spec.key == "mspaint":
+                    raise RuntimeError("boom")
+                d = self.kw["out_dir"]
+                os.makedirs(os.path.join(d, "checkpoints"), exist_ok=True)
+                for n in ("scan_1_first.png", "flyout_01_File.png", "option_01_page_Settings.png", os.path.join("checkpoints", "cp_01_launched.png")):
+                    Image.new("RGB", (8, 8), (1, 2, 3)).save(os.path.join(d, n))
+                with open(os.path.join(d, "report.html"), "w") as fh:
+                    fh.write("<html></html>")
+                return json.loads(json.dumps(good))
+        real = (AR.AppRun, CK.STATE_PATH, CK.CHECKLIST_COPY, CK.DEFAULT_OUT)
+        AR.AppRun, CK.STATE_PATH, CK.CHECKLIST_COPY, CK.DEFAULT_OUT = FakeRun, os.path.join(tmp, "state.json"), os.path.join(tmp, "copy.md"), os.path.join(tmp, "out")
+        try:
+            r1 = CK.run(["notepad", "mspaint"], vision=False, out=os.path.join(tmp, "run1"))
+            st1 = CK.load_state()
+            r2 = CK.run(["notepad", "mspaint"], vision=False, out=os.path.join(tmp, "run2"))
+            r3 = CK.run(["notepad"], vision=False, again=True, out=os.path.join(tmp, "run3"), zip_it=False)
+        finally:
+            AR.AppRun, CK.STATE_PATH, CK.CHECKLIST_COPY, CK.DEFAULT_OUT = real
+        files1 = set(os.listdir(os.path.join(tmp, "run1")))
+        index = open(os.path.join(tmp, "run1", "INDEX.html"), encoding="utf-8").read()
+        md = open(os.path.join(tmp, "run1", "CHECKLIST.md"), encoding="utf-8").read()
+        checks = {"stages_read_from_report": all(s_good[k]["state"] == "ok" for k in ("launched", "tree_scan", "vision_scan", "menus", "options", "guide", "pictures")) and st_good == "done",
+                  "tainted_options_and_failed_guide_are_partial": s_bad["options"]["state"] == "partial" and s_bad["guide"]["state"] == "partial" and st_bad == "partial",
+                  "launch_failure_is_failed": st_dead == "failed" and s_dead["launched"]["state"] == "fail",
+                  "a_crash_does_not_stop_the_next_app": calls[:2] == ["notepad", "mspaint"] and st1["apps"]["notepad"]["status"] == "done" and st1["apps"]["mspaint"]["status"] == "failed",
+                  "done_is_not_run_again_failed_is": calls[2:] == ["mspaint", "notepad"] and r2["ran"] == ["mspaint"],
+                  "one_folder_with_everything": {"INDEX.html", "CHECKLIST.md", "run.log", "notepad", "mspaint"} <= files1 and bool(r1["zip"]) and os.path.basename(r1["zip"]) == "run1.zip",
+                  "index_links_pictures_and_report": "notepad/scan_1_first.png" in index and "notepad/report.html" in index and "notepad/checkpoints/cp_01_launched.png" in index,
+                  "checklist_shows_tiers_and_open_items": "| notepad | 1 |" in md and "What is still open" in md and "| winword | 2 |" in md}
+    return _verdict(checks, f"calls={calls} statuses={st_good}/{st_bad}/{st_dead} files={sorted(files1)}")
+

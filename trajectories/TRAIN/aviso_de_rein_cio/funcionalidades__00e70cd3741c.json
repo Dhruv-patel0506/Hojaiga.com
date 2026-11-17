@@ -1,0 +1,193 @@
+{
+   "app_metadata": {
+      "app_name": "Aviso de Reinício",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure and test the Aviso de Reinício application",
+   "prerequisite_state": "Aviso de Reinício is installed and running in the system tray",
+   "total_steps": 0,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Right-click on the Aviso de Reinício icon in the system tray",
+         "ui_target": {
+            "element_name": "Aviso de Reinício icon",
+            "automation_id": null,
+            "hierarchical_path": "System tray > Aviso de Reinício icon",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A context menu appears with options to open settings, test the popup, and view the log"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select 'Abrir configurações' from the context menu",
+         "ui_target": {
+            "element_name": "Abrir configurações",
+            "automation_id": null,
+            "hierarchical_path": "System tray > Context menu > Abrir configurações",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The settings window opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click on 'Testar pop-up agora' in the settings window",
+         "ui_target": {
+            "element_name": "Testar pop-up agora",
+            "automation_id": null,
+            "hierarchical_path": "Settings window > Testar pop-up agora",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A popup appears asking for confirmation to restart the computer"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click 'OK, adiar' in the popup",
+         "ui_target": {
+            "element_name": "OK, adiar",
+            "automation_id": null,
+            "hierarchical_path": "Popup > OK, adiar",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The popup returns after the configured delay"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Click 'Reiniciar agora' in the popup",
+         "ui_target": {
+            "element_name": "Reiniciar agora",
+            "automation_id": null,
+            "hierarchical_path": "Popup > Reiniciar agora",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The computer restarts in 10 seconds"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Close the settings window",
+         "ui_target": {
+            "element_name": "Close button",
+            "automation_id": null,
+            "hierarchical_path": "Settings window > Close button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The settings window closes"
+      }
+   ],
+   "_meta": {
+      "source_app": "Aviso de Reinício",
+      "app_key": "aviso_de_rein_cio",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Funcionalidades",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:58:20Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

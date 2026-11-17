@@ -1,0 +1,174 @@
+{
+   "app_metadata": {
+      "app_name": "gfgLock",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Quick start guide for gfgLock",
+   "prerequisite_state": "gfgLock application is open on its main window",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Drag and drop files onto the gfgLock window",
+         "ui_target": {
+            "element_name": "gfgLock window",
+            "automation_id": null,
+            "hierarchical_path": "gfgLock window",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  100,
+                  100
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Files are displayed in the gfgLock window"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select AES-256 GCM from the algorithm dropdown",
+         "ui_target": {
+            "element_name": "AES-256 GCM",
+            "automation_id": null,
+            "hierarchical_path": "gfgLock window > Algorithm dropdown",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "AES-256 GCM is selected as the encryption algorithm"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click the 'Encrypt' button",
+         "ui_target": {
+            "element_name": "Encrypt",
+            "automation_id": null,
+            "hierarchical_path": "gfgLock window > Encrypt button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Encryption process starts and real-time progress is shown"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Enter a password in the password field",
+         "ui_target": {
+            "element_name": "Password field",
+            "automation_id": null,
+            "hierarchical_path": "gfgLock window > Password field",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "my_secure_password123"
+         },
+         "expected_state_change": "Password is entered into the field"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Click the 'Start' button to begin encryption",
+         "ui_target": {
+            "element_name": "Start",
+            "automation_id": null,
+            "hierarchical_path": "gfgLock window > Start button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Encryption process begins and real-time progress is shown"
+      }
+   ],
+   "_meta": {
+      "source_app": "gfgLock",
+      "app_key": "gfglock",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "gfgLock",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:09:06Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

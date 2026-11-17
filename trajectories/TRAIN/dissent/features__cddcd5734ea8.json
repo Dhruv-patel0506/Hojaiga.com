@@ -1,0 +1,173 @@
+{
+   "app_metadata": {
+      "app_name": "Dissent",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Log into Dissent using a token",
+   "prerequisite_state": "Dissent is open and the user is on the login screen",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the Discord web app in your browser",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Discord web app is open in the user's browser"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Press F12 to open the Inspector",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "F12"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The Developer Tools (Inspector) are open"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Go to the Network tab",
+         "ui_target": {
+            "element_name": "Network",
+            "automation_id": null,
+            "hierarchical_path": "Inspector > Network",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Network tab is selected in the Developer Tools"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Press F5 to refresh the page",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "F5"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The page is refreshed"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Search for 'discord api' in the 'Filter URLs' text box",
+         "ui_target": {
+            "element_name": "Filter URLs",
+            "automation_id": null,
+            "hierarchical_path": "Inspector > Network > Filter URLs",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "discord api"
+         },
+         "expected_state_change": "The search results for 'discord api' are displayed"
+      }
+   ],
+   "_meta": {
+      "source_app": "Dissent",
+      "app_key": "dissent",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Features",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:34:42Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step4_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

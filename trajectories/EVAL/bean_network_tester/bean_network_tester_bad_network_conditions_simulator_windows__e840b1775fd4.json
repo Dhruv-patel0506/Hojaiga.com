@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "Bean Network Tester",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Start a network test scenario using a preset",
+   "prerequisite_state": "Bean Network Tester application is open and the user has selected a preset from the 'Profiles' list",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click on the START button to begin the selected network test scenario",
+         "ui_target": {
+            "element_name": "START",
+            "automation_id": null,
+            "hierarchical_path": "Control > START",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'Active' bar updates to show the current network test scenario, and the 'Statistics' tab updates to reflect the active settings"
+      }
+   ],
+   "_meta": {
+      "source_app": "Bean Network Tester",
+      "app_key": "bean_network_tester",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "Bean Network Tester 🫘 - bad network conditions simulator (Windows)",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:37:19Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

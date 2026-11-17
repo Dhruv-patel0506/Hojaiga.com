@@ -1,0 +1,666 @@
+09:24:44 NI run restart_image_1107_0924 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=4.0 smoke=False
+09:24:44 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+09:24:46 [data] image/cifar10: n=50000 C=10 D=384 shards=50
+09:25:11 [image/cifar10] vote=0.665 uniform=0.665 best1=0.683 n_val=14925 vram=0.42GB 26s
+09:25:21 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 14925, "n_val": 2957, "base_rate": 0.6635103225708008, "inner": {"auc": 0.8536136339188296, "ece": 0.02420920912663921, "brier": 0.14593501389026642, "acc80": 0.7687103748321533}, "outer_conf": {"auc": 0.7744881389618838, "ece": 0.19112136335158453, "brier": 0.2180020958185196, "acc80": 0.7361522316932678}}
+09:25:21 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+09:25:51 [image/cifar10] vote=0.653 uniform=0.653 best1=0.679 n_val=15052 vram=0.49GB 30s | grade=0.812 inner_auc=0.863 vs conf_auc=0.783
+09:25:55 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+09:26:28 [image/cifar10] vote=0.667 uniform=0.654 best1=0.672 n_val=14939 vram=0.49GB 34s | grade=0.812 inner_auc=0.848 vs conf_auc=0.779
+09:26:33 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+09:26:57 [image/cifar10] vote=0.683 uniform=0.662 best1=0.682 n_val=15074 vram=0.49GB 24s | grade=0.815 inner_auc=0.839 vs conf_auc=0.789
+09:27:03 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+09:27:37 [image/cifar10] vote=0.682 uniform=0.656 best1=0.676 n_val=14987 vram=0.49GB 34s | grade=0.826 inner_auc=0.820 vs conf_auc=0.792
+09:27:41 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+09:28:12 [image/cifar10] vote=0.692 uniform=0.660 best1=0.684 n_val=15072 vram=0.49GB 31s | grade=0.826 inner_auc=0.833 vs conf_auc=0.819
+09:28:17 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+09:28:48 [image/cifar10] vote=0.687 uniform=0.653 best1=0.678 n_val=14938 vram=0.49GB 31s | grade=0.832 inner_auc=0.835 vs conf_auc=0.815
+09:28:53 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+09:29:24 [image/cifar10] vote=0.691 uniform=0.658 best1=0.679 n_val=15051 vram=0.49GB 31s | grade=0.836 inner_auc=0.829 vs conf_auc=0.810
+09:29:30 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+09:30:00 [image/cifar10] vote=0.686 uniform=0.657 best1=0.675 n_val=15081 vram=0.49GB 30s | grade=0.840 inner_auc=0.827 vs conf_auc=0.808
+09:30:05 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+09:30:34 [image/cifar10] vote=0.690 uniform=0.660 best1=0.681 n_val=14978 vram=0.49GB 29s | grade=0.847 inner_auc=0.836 vs conf_auc=0.817
+09:30:40 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+09:31:10 [image/cifar10] vote=0.693 uniform=0.662 best1=0.684 n_val=14981 vram=0.49GB 30s | grade=0.850 inner_auc=0.823 vs conf_auc=0.802
+09:46:34 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+09:46:51 [image/cifar10] vote=0.688 uniform=0.656 best1=0.681 n_val=15023 vram=0.49GB 17s | grade=0.853 inner_auc=0.829 vs conf_auc=0.809
+09:46:53 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+09:47:13 [image/cifar10] vote=0.682 uniform=0.654 best1=0.674 n_val=15124 vram=0.49GB 20s | grade=0.854 inner_auc=0.832 vs conf_auc=0.811
+09:47:16 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+09:47:32 [image/cifar10] vote=0.692 uniform=0.662 best1=0.687 n_val=14915 vram=0.49GB 16s | grade=0.853 inner_auc=0.833 vs conf_auc=0.808
+09:47:34 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+09:47:51 [image/cifar10] vote=0.684 uniform=0.654 best1=0.676 n_val=14959 vram=0.49GB 17s | grade=0.856 inner_auc=0.823 vs conf_auc=0.799
+09:47:54 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+09:48:14 [image/cifar10] vote=0.684 uniform=0.662 best1=0.680 n_val=15167 vram=0.49GB 20s | grade=0.862 inner_auc=0.835 vs conf_auc=0.816
+09:48:16 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+09:48:31 [image/cifar10] vote=0.684 uniform=0.656 best1=0.680 n_val=15012 vram=0.49GB 15s | grade=0.862 inner_auc=0.832 vs conf_auc=0.812
+09:48:34 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+09:48:56 [image/cifar10] vote=0.678 uniform=0.654 best1=0.674 n_val=14966 vram=0.49GB 21s | grade=0.860 inner_auc=0.831 vs conf_auc=0.807
+09:48:59 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+09:49:12 [image/cifar10] vote=0.679 uniform=0.655 best1=0.675 n_val=15039 vram=0.49GB 13s | grade=0.863 inner_auc=0.821 vs conf_auc=0.797
+09:49:14 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+09:49:36 [image/cifar10] vote=0.680 uniform=0.657 best1=0.675 n_val=15162 vram=0.49GB 21s | grade=0.863 inner_auc=0.842 vs conf_auc=0.816
+09:49:39 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+09:49:55 [image/cifar10] vote=0.685 uniform=0.660 best1=0.683 n_val=14979 vram=0.49GB 16s | grade=0.862 inner_auc=0.843 vs conf_auc=0.815
+09:49:57 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+09:50:16 [image/cifar10] vote=0.685 uniform=0.663 best1=0.682 n_val=15015 vram=0.49GB 19s | grade=0.863 inner_auc=0.837 vs conf_auc=0.818
+09:50:20 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+09:50:38 [image/cifar10] vote=0.681 uniform=0.659 best1=0.677 n_val=15031 vram=0.49GB 18s | grade=0.861 inner_auc=0.826 vs conf_auc=0.800
+09:50:40 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+09:50:58 [image/cifar10] vote=0.685 uniform=0.659 best1=0.681 n_val=15094 vram=0.49GB 17s | grade=0.862 inner_auc=0.823 vs conf_auc=0.798
+09:51:01 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+09:51:21 [image/cifar10] vote=0.685 uniform=0.662 best1=0.682 n_val=15027 vram=0.49GB 20s | grade=0.863 inner_auc=0.837 vs conf_auc=0.809
+09:51:23 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+09:51:38 [image/cifar10] vote=0.677 uniform=0.657 best1=0.675 n_val=14933 vram=0.49GB 15s | grade=0.859 inner_auc=0.843 vs conf_auc=0.820
+09:51:42 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+09:52:03 [image/cifar10] vote=0.692 uniform=0.663 best1=0.688 n_val=14888 vram=0.49GB 22s | grade=0.856 inner_auc=0.826 vs conf_auc=0.799
+09:52:06 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+09:52:20 [image/cifar10] vote=0.680 uniform=0.660 best1=0.678 n_val=15063 vram=0.49GB 14s | grade=0.858 inner_auc=0.823 vs conf_auc=0.794
+09:52:23 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+09:52:44 [image/cifar10] vote=0.685 uniform=0.664 best1=0.682 n_val=15032 vram=0.49GB 21s | grade=0.862 inner_auc=0.830 vs conf_auc=0.798
+09:52:48 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+09:53:03 [image/cifar10] vote=0.685 uniform=0.661 best1=0.683 n_val=15060 vram=0.49GB 15s | grade=0.864 inner_auc=0.846 vs conf_auc=0.816
+09:53:05 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+09:53:26 [image/cifar10] vote=0.682 uniform=0.655 best1=0.677 n_val=14890 vram=0.49GB 20s | grade=0.862 inner_auc=0.833 vs conf_auc=0.804
+09:53:29 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+09:53:46 [image/cifar10] vote=0.685 uniform=0.657 best1=0.683 n_val=15125 vram=0.49GB 17s | grade=0.863 inner_auc=0.843 vs conf_auc=0.817
+09:53:48 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+09:54:06 [image/cifar10] vote=0.685 uniform=0.659 best1=0.683 n_val=14943 vram=0.49GB 18s | grade=0.864 inner_auc=0.834 vs conf_auc=0.802
+09:54:09 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+09:54:29 [image/cifar10] vote=0.680 uniform=0.655 best1=0.678 n_val=14912 vram=0.49GB 20s | grade=0.862 inner_auc=0.829 vs conf_auc=0.800
+09:54:31 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+09:54:47 [image/cifar10] vote=0.683 uniform=0.659 best1=0.682 n_val=14963 vram=0.49GB 16s | grade=0.863 inner_auc=0.843 vs conf_auc=0.821
+09:54:51 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+09:55:12 [image/cifar10] vote=0.677 uniform=0.651 best1=0.674 n_val=15215 vram=0.49GB 21s | grade=0.861 inner_auc=0.829 vs conf_auc=0.804
+09:55:15 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+09:55:28 [image/cifar10] vote=0.680 uniform=0.657 best1=0.677 n_val=15058 vram=0.49GB 14s | grade=0.863 inner_auc=0.851 vs conf_auc=0.820
+09:55:32 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+09:55:54 [image/cifar10] vote=0.683 uniform=0.656 best1=0.680 n_val=15008 vram=0.49GB 21s | grade=0.861 inner_auc=0.827 vs conf_auc=0.802
+09:55:57 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+09:56:11 [image/cifar10] vote=0.677 uniform=0.657 best1=0.672 n_val=14974 vram=0.49GB 14s | grade=0.862 inner_auc=0.844 vs conf_auc=0.815
+09:56:13 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+09:56:34 [image/cifar10] vote=0.682 uniform=0.657 best1=0.679 n_val=14941 vram=0.49GB 21s | grade=0.862 inner_auc=0.834 vs conf_auc=0.804
+09:56:38 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+09:56:55 [image/cifar10] vote=0.681 uniform=0.652 best1=0.677 n_val=15060 vram=0.49GB 17s | grade=0.864 inner_auc=0.839 vs conf_auc=0.814
+09:56:57 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+09:57:16 [image/cifar10] vote=0.683 uniform=0.660 best1=0.679 n_val=14982 vram=0.49GB 19s | grade=0.863 inner_auc=0.832 vs conf_auc=0.812
+09:57:20 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+09:57:39 [image/cifar10] vote=0.686 uniform=0.660 best1=0.683 n_val=14820 vram=0.49GB 19s | grade=0.862 inner_auc=0.816 vs conf_auc=0.793
+09:57:42 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+09:57:59 [image/cifar10] vote=0.680 uniform=0.658 best1=0.677 n_val=14810 vram=0.49GB 17s | grade=0.861 inner_auc=0.847 vs conf_auc=0.823
+09:58:02 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+09:58:23 [image/cifar10] vote=0.682 uniform=0.656 best1=0.679 n_val=15029 vram=0.49GB 21s | grade=0.863 inner_auc=0.836 vs conf_auc=0.808
+09:58:26 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+09:58:47 [image/cifar10] vote=0.685 uniform=0.661 best1=0.681 n_val=15116 vram=0.49GB 21s | grade=0.863 inner_auc=0.825 vs conf_auc=0.795
+09:58:51 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+09:59:13 [image/cifar10] vote=0.683 uniform=0.658 best1=0.681 n_val=15074 vram=0.49GB 22s | grade=0.865 inner_auc=0.834 vs conf_auc=0.804
+09:59:16 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+09:59:35 [image/cifar10] vote=0.683 uniform=0.659 best1=0.679 n_val=14996 vram=0.49GB 19s | grade=0.864 inner_auc=0.843 vs conf_auc=0.818
+09:59:38 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+10:00:00 [image/cifar10] vote=0.676 uniform=0.652 best1=0.675 n_val=14839 vram=0.49GB 22s | grade=0.861 inner_auc=0.823 vs conf_auc=0.799
+10:00:03 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+10:00:21 [image/cifar10] vote=0.684 uniform=0.665 best1=0.681 n_val=14891 vram=0.49GB 18s | grade=0.860 inner_auc=0.835 vs conf_auc=0.808
+10:00:25 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+10:00:46 [image/cifar10] vote=0.684 uniform=0.656 best1=0.682 n_val=15064 vram=0.49GB 21s | grade=0.863 inner_auc=0.834 vs conf_auc=0.803
+10:00:49 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+10:01:08 [image/cifar10] vote=0.685 uniform=0.662 best1=0.681 n_val=14905 vram=0.49GB 19s | grade=0.864 inner_auc=0.815 vs conf_auc=0.786
+10:01:12 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+10:01:31 [image/cifar10] vote=0.682 uniform=0.658 best1=0.680 n_val=15053 vram=0.49GB 19s | grade=0.863 inner_auc=0.847 vs conf_auc=0.820
+10:01:35 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+10:01:55 [image/cifar10] vote=0.680 uniform=0.660 best1=0.679 n_val=15240 vram=0.49GB 20s | grade=0.864 inner_auc=0.832 vs conf_auc=0.814
+10:01:59 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+10:02:22 [image/cifar10] vote=0.684 uniform=0.658 best1=0.678 n_val=15003 vram=0.49GB 23s | grade=0.862 inner_auc=0.823 vs conf_auc=0.799
+10:02:27 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+10:02:46 [image/cifar10] vote=0.695 uniform=0.661 best1=0.692 n_val=14879 vram=0.49GB 19s | grade=0.858 inner_auc=0.844 vs conf_auc=0.820
+10:02:49 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+10:03:14 [image/cifar10] vote=0.677 uniform=0.653 best1=0.675 n_val=14938 vram=0.49GB 25s | grade=0.857 inner_auc=0.837 vs conf_auc=0.804
+10:03:17 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+10:03:36 [image/cifar10] vote=0.679 uniform=0.649 best1=0.674 n_val=15150 vram=0.49GB 19s | grade=0.864 inner_auc=0.826 vs conf_auc=0.804
+10:03:41 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+10:04:00 [image/cifar10] vote=0.680 uniform=0.654 best1=0.677 n_val=14986 vram=0.49GB 18s | grade=0.865 inner_auc=0.830 vs conf_auc=0.805
+10:04:03 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+10:04:28 [image/cifar10] vote=0.690 uniform=0.661 best1=0.685 n_val=14903 vram=0.49GB 25s | grade=0.859 inner_auc=0.832 vs conf_auc=0.804
+10:04:31 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+10:04:51 [image/cifar10] vote=0.681 uniform=0.658 best1=0.679 n_val=15094 vram=0.49GB 20s | grade=0.859 inner_auc=0.849 vs conf_auc=0.826
+10:04:57 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+10:05:12 [image/cifar10] vote=0.684 uniform=0.660 best1=0.681 n_val=15073 vram=0.49GB 15s | grade=0.863 inner_auc=0.843 vs conf_auc=0.818
+10:05:15 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+10:05:40 [image/cifar10] vote=0.681 uniform=0.659 best1=0.678 n_val=15097 vram=0.49GB 25s | grade=0.864 inner_auc=0.834 vs conf_auc=0.806
+10:05:43 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+10:06:02 [image/cifar10] vote=0.684 uniform=0.657 best1=0.682 n_val=14915 vram=0.49GB 19s | grade=0.863 inner_auc=0.844 vs conf_auc=0.826
+10:06:08 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+10:06:23 [image/cifar10] vote=0.683 uniform=0.657 best1=0.679 n_val=14938 vram=0.49GB 15s | grade=0.864 inner_auc=0.835 vs conf_auc=0.812
+10:06:26 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+10:06:50 [image/cifar10] vote=0.675 uniform=0.651 best1=0.673 n_val=15055 vram=0.49GB 24s | grade=0.861 inner_auc=0.826 vs conf_auc=0.806
+10:06:53 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+10:07:12 [image/cifar10] vote=0.682 uniform=0.660 best1=0.680 n_val=14828 vram=0.49GB 19s | grade=0.860 inner_auc=0.830 vs conf_auc=0.807
+10:07:18 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+10:07:33 [image/cifar10] vote=0.680 uniform=0.655 best1=0.679 n_val=14821 vram=0.49GB 14s | grade=0.864 inner_auc=0.824 vs conf_auc=0.793
+10:07:35 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+10:08:00 [image/cifar10] vote=0.677 uniform=0.654 best1=0.673 n_val=15142 vram=0.49GB 24s | grade=0.863 inner_auc=0.834 vs conf_auc=0.809
+10:08:03 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+10:08:23 [image/cifar10] vote=0.686 uniform=0.660 best1=0.683 n_val=15011 vram=0.49GB 20s | grade=0.861 inner_auc=0.838 vs conf_auc=0.809
+10:08:29 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+10:08:43 [image/cifar10] vote=0.679 uniform=0.655 best1=0.677 n_val=15000 vram=0.49GB 14s | grade=0.861 inner_auc=0.835 vs conf_auc=0.805
+10:08:47 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+10:09:12 [image/cifar10] vote=0.685 uniform=0.658 best1=0.681 n_val=14876 vram=0.49GB 25s | grade=0.862 inner_auc=0.839 vs conf_auc=0.808
+10:09:15 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+10:09:33 [image/cifar10] vote=0.681 uniform=0.659 best1=0.678 n_val=14831 vram=0.49GB 19s | grade=0.861 inner_auc=0.842 vs conf_auc=0.816
+10:09:39 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+10:09:54 [image/cifar10] vote=0.690 uniform=0.661 best1=0.687 n_val=15081 vram=0.49GB 15s | grade=0.859 inner_auc=0.835 vs conf_auc=0.809
+10:09:57 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+10:10:22 [image/cifar10] vote=0.682 uniform=0.661 best1=0.678 n_val=14987 vram=0.49GB 25s | grade=0.861 inner_auc=0.840 vs conf_auc=0.816
+10:10:25 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+10:10:41 [image/cifar10] vote=0.680 uniform=0.658 best1=0.677 n_val=14874 vram=0.49GB 16s | grade=0.863 inner_auc=0.837 vs conf_auc=0.805
+10:10:46 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+10:11:04 [image/cifar10] vote=0.690 uniform=0.662 best1=0.687 n_val=14901 vram=0.49GB 17s | grade=0.859 inner_auc=0.825 vs conf_auc=0.794
+10:11:07 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+10:11:32 [image/cifar10] vote=0.685 uniform=0.657 best1=0.683 n_val=14831 vram=0.49GB 25s | grade=0.862 inner_auc=0.839 vs conf_auc=0.808
+10:11:35 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+10:11:50 [image/cifar10] vote=0.686 uniform=0.664 best1=0.684 n_val=15173 vram=0.49GB 15s | grade=0.864 inner_auc=0.831 vs conf_auc=0.807
+10:11:56 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+10:12:14 [image/cifar10] vote=0.683 uniform=0.656 best1=0.681 n_val=14916 vram=0.49GB 18s | grade=0.864 inner_auc=0.829 vs conf_auc=0.796
+10:12:17 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+10:12:41 [image/cifar10] vote=0.684 uniform=0.662 best1=0.681 n_val=14974 vram=0.49GB 25s | grade=0.864 inner_auc=0.832 vs conf_auc=0.802
+10:12:44 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+10:12:59 [image/cifar10] vote=0.684 uniform=0.660 best1=0.681 n_val=14855 vram=0.49GB 15s | grade=0.863 inner_auc=0.839 vs conf_auc=0.814
+10:13:05 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+10:13:24 [image/cifar10] vote=0.685 uniform=0.661 best1=0.682 n_val=15282 vram=0.48GB 18s | grade=0.864 inner_auc=0.832 vs conf_auc=0.806
+10:13:27 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+10:13:51 [image/cifar10] vote=0.690 uniform=0.660 best1=0.686 n_val=14829 vram=0.49GB 24s | grade=0.861 inner_auc=0.831 vs conf_auc=0.801
+10:13:54 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+10:14:07 [image/cifar10] vote=0.680 uniform=0.658 best1=0.678 n_val=15052 vram=0.49GB 13s | grade=0.859 inner_auc=0.838 vs conf_auc=0.821
+10:14:13 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+10:14:33 [image/cifar10] vote=0.685 uniform=0.660 best1=0.681 n_val=15057 vram=0.49GB 20s | grade=0.863 inner_auc=0.843 vs conf_auc=0.817
+10:14:36 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+10:15:00 [image/cifar10] vote=0.682 uniform=0.656 best1=0.680 n_val=15083 vram=0.49GB 24s | grade=0.863 inner_auc=0.841 vs conf_auc=0.816
+10:15:03 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+10:15:16 [image/cifar10] vote=0.679 uniform=0.659 best1=0.678 n_val=15088 vram=0.49GB 13s | grade=0.863 inner_auc=0.853 vs conf_auc=0.823
+10:15:22 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+10:15:43 [image/cifar10] vote=0.683 uniform=0.658 best1=0.678 n_val=15059 vram=0.49GB 20s | grade=0.863 inner_auc=0.835 vs conf_auc=0.814
+10:15:46 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+10:16:10 [image/cifar10] vote=0.685 uniform=0.660 best1=0.682 n_val=14932 vram=0.49GB 24s | grade=0.864 inner_auc=0.833 vs conf_auc=0.810
+10:16:13 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+10:16:27 [image/cifar10] vote=0.683 uniform=0.656 best1=0.680 n_val=15079 vram=0.49GB 13s | grade=0.864 inner_auc=0.824 vs conf_auc=0.801
+10:16:33 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+10:16:54 [image/cifar10] vote=0.683 uniform=0.656 best1=0.680 n_val=15000 vram=0.49GB 21s | grade=0.865 inner_auc=0.822 vs conf_auc=0.803
+10:16:57 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+10:17:22 [image/cifar10] vote=0.681 uniform=0.660 best1=0.676 n_val=14978 vram=0.49GB 26s | grade=0.863 inner_auc=0.840 vs conf_auc=0.813
+10:17:25 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+10:17:39 [image/cifar10] vote=0.678 uniform=0.650 best1=0.674 n_val=14998 vram=0.49GB 13s | grade=0.862 inner_auc=0.838 vs conf_auc=0.817
+10:17:45 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+10:18:04 [image/cifar10] vote=0.677 uniform=0.655 best1=0.675 n_val=15007 vram=0.49GB 19s | grade=0.863 inner_auc=0.834 vs conf_auc=0.808
+10:18:08 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+10:18:31 [image/cifar10] vote=0.682 uniform=0.659 best1=0.679 n_val=15056 vram=0.49GB 24s | grade=0.861 inner_auc=0.840 vs conf_auc=0.816
+10:18:34 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+10:18:48 [image/cifar10] vote=0.682 uniform=0.656 best1=0.681 n_val=14976 vram=0.49GB 14s | grade=0.864 inner_auc=0.837 vs conf_auc=0.818
+10:18:54 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+10:19:15 [image/cifar10] vote=0.679 uniform=0.658 best1=0.677 n_val=14803 vram=0.49GB 21s | grade=0.863 inner_auc=0.835 vs conf_auc=0.809
+10:19:18 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+10:19:42 [image/cifar10] vote=0.682 uniform=0.652 best1=0.678 n_val=14954 vram=0.49GB 24s | grade=0.862 inner_auc=0.834 vs conf_auc=0.813
+10:19:45 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+10:19:58 [image/cifar10] vote=0.679 uniform=0.654 best1=0.677 n_val=15094 vram=0.49GB 13s | grade=0.863 inner_auc=0.835 vs conf_auc=0.805
+10:20:05 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+10:20:26 [image/cifar10] vote=0.678 uniform=0.655 best1=0.675 n_val=15102 vram=0.49GB 21s | grade=0.864 inner_auc=0.837 vs conf_auc=0.811
+10:20:30 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+10:20:55 [image/cifar10] vote=0.677 uniform=0.651 best1=0.674 n_val=15032 vram=0.49GB 25s | grade=0.864 inner_auc=0.823 vs conf_auc=0.794
+10:20:58 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+10:21:13 [image/cifar10] vote=0.688 uniform=0.665 best1=0.684 n_val=14930 vram=0.49GB 15s | grade=0.859 inner_auc=0.829 vs conf_auc=0.799
+10:21:20 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+10:21:40 [image/cifar10] vote=0.680 uniform=0.655 best1=0.678 n_val=15058 vram=0.49GB 20s | grade=0.859 inner_auc=0.836 vs conf_auc=0.807
+10:21:43 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+10:22:07 [image/cifar10] vote=0.675 uniform=0.653 best1=0.672 n_val=14964 vram=0.49GB 24s | grade=0.861 inner_auc=0.839 vs conf_auc=0.822
+10:22:10 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+10:22:24 [image/cifar10] vote=0.681 uniform=0.655 best1=0.677 n_val=15115 vram=0.49GB 13s | grade=0.862 inner_auc=0.839 vs conf_auc=0.817
+10:22:28 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+10:22:51 [image/cifar10] vote=0.677 uniform=0.654 best1=0.675 n_val=15170 vram=0.49GB 23s | grade=0.861 inner_auc=0.839 vs conf_auc=0.814
+10:22:54 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+10:23:16 [image/cifar10] vote=0.678 uniform=0.659 best1=0.675 n_val=14985 vram=0.49GB 21s | grade=0.864 inner_auc=0.848 vs conf_auc=0.817
+10:23:21 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+10:23:34 [image/cifar10] vote=0.674 uniform=0.654 best1=0.673 n_val=15030 vram=0.49GB 13s | grade=0.863 inner_auc=0.850 vs conf_auc=0.827
+10:23:37 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+10:24:01 [image/cifar10] vote=0.683 uniform=0.657 best1=0.680 n_val=15120 vram=0.49GB 24s | grade=0.858 inner_auc=0.846 vs conf_auc=0.819
+10:24:05 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+10:24:25 [image/cifar10] vote=0.692 uniform=0.666 best1=0.689 n_val=14949 vram=0.49GB 20s | grade=0.859 inner_auc=0.846 vs conf_auc=0.819
+10:24:31 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+10:24:44 [image/cifar10] vote=0.683 uniform=0.662 best1=0.682 n_val=15014 vram=0.49GB 13s | grade=0.860 inner_auc=0.835 vs conf_auc=0.802
+10:24:48 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+10:25:12 [image/cifar10] vote=0.685 uniform=0.654 best1=0.682 n_val=15027 vram=0.49GB 24s | grade=0.863 inner_auc=0.834 vs conf_auc=0.808
+10:25:16 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+10:25:35 [image/cifar10] vote=0.679 uniform=0.649 best1=0.677 n_val=15168 vram=0.49GB 20s | grade=0.860 inner_auc=0.832 vs conf_auc=0.812
+10:25:42 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+10:25:54 [image/cifar10] vote=0.679 uniform=0.656 best1=0.675 n_val=14923 vram=0.49GB 13s | grade=0.864 inner_auc=0.837 vs conf_auc=0.816
+10:25:58 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+10:26:22 [image/cifar10] vote=0.689 uniform=0.663 best1=0.686 n_val=14897 vram=0.49GB 24s | grade=0.860 inner_auc=0.835 vs conf_auc=0.808
+10:26:26 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+10:26:43 [image/cifar10] vote=0.685 uniform=0.658 best1=0.683 n_val=14993 vram=0.49GB 18s | grade=0.863 inner_auc=0.835 vs conf_auc=0.809
+10:26:49 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+10:27:04 [image/cifar10] vote=0.680 uniform=0.659 best1=0.678 n_val=14911 vram=0.49GB 15s | grade=0.863 inner_auc=0.830 vs conf_auc=0.796
+10:27:08 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+10:27:33 [image/cifar10] vote=0.684 uniform=0.659 best1=0.681 n_val=14948 vram=0.49GB 25s | grade=0.863 inner_auc=0.832 vs conf_auc=0.813
+10:27:36 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+10:27:52 [image/cifar10] vote=0.675 uniform=0.654 best1=0.673 n_val=15016 vram=0.49GB 16s | grade=0.860 inner_auc=0.830 vs conf_auc=0.808
+10:27:59 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+10:28:15 [image/cifar10] vote=0.681 uniform=0.655 best1=0.678 n_val=15124 vram=0.49GB 16s | grade=0.861 inner_auc=0.830 vs conf_auc=0.801
+10:28:18 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+10:28:43 [image/cifar10] vote=0.683 uniform=0.657 best1=0.679 n_val=14889 vram=0.49GB 25s | grade=0.863 inner_auc=0.843 vs conf_auc=0.815
+10:28:47 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+10:29:03 [image/cifar10] vote=0.687 uniform=0.662 best1=0.686 n_val=14922 vram=0.49GB 16s | grade=0.862 inner_auc=0.832 vs conf_auc=0.812
+10:29:09 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+10:29:27 [image/cifar10] vote=0.683 uniform=0.659 best1=0.679 n_val=14982 vram=0.49GB 18s | grade=0.863 inner_auc=0.823 vs conf_auc=0.799
+10:29:30 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+10:29:55 [image/cifar10] vote=0.683 uniform=0.659 best1=0.682 n_val=14965 vram=0.49GB 25s | grade=0.866 inner_auc=0.823 vs conf_auc=0.794
+10:29:59 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+10:30:14 [image/cifar10] vote=0.679 uniform=0.656 best1=0.675 n_val=14944 vram=0.49GB 16s | grade=0.863 inner_auc=0.845 vs conf_auc=0.823
+10:30:21 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+10:30:39 [image/cifar10] vote=0.681 uniform=0.651 best1=0.679 n_val=14934 vram=0.49GB 18s | grade=0.861 inner_auc=0.841 vs conf_auc=0.822
+10:30:42 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+10:31:07 [image/cifar10] vote=0.685 uniform=0.659 best1=0.680 n_val=15009 vram=0.49GB 25s | grade=0.863 inner_auc=0.834 vs conf_auc=0.807
+10:31:11 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+10:31:26 [image/cifar10] vote=0.681 uniform=0.653 best1=0.679 n_val=14941 vram=0.49GB 15s | grade=0.861 inner_auc=0.834 vs conf_auc=0.810
+10:31:32 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+10:31:51 [image/cifar10] vote=0.686 uniform=0.661 best1=0.683 n_val=14898 vram=0.49GB 18s | grade=0.861 inner_auc=0.826 vs conf_auc=0.798
+10:31:54 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+10:32:20 [image/cifar10] vote=0.679 uniform=0.652 best1=0.677 n_val=14976 vram=0.49GB 25s | grade=0.862 inner_auc=0.824 vs conf_auc=0.802
+10:32:23 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+10:32:37 [image/cifar10] vote=0.690 uniform=0.664 best1=0.687 n_val=14982 vram=0.49GB 14s | grade=0.858 inner_auc=0.840 vs conf_auc=0.808
+10:32:44 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+10:33:04 [image/cifar10] vote=0.681 uniform=0.658 best1=0.678 n_val=15103 vram=0.49GB 20s | grade=0.860 inner_auc=0.841 vs conf_auc=0.811
+10:33:07 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+10:33:32 [image/cifar10] vote=0.680 uniform=0.657 best1=0.677 n_val=14737 vram=0.49GB 25s | grade=0.864 inner_auc=0.831 vs conf_auc=0.805
+10:33:35 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+10:33:49 [image/cifar10] vote=0.679 uniform=0.654 best1=0.675 n_val=15088 vram=0.49GB 14s | grade=0.864 inner_auc=0.840 vs conf_auc=0.807
+10:33:56 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+10:34:18 [image/cifar10] vote=0.681 uniform=0.657 best1=0.679 n_val=14945 vram=0.49GB 21s | grade=0.864 inner_auc=0.827 vs conf_auc=0.805
+10:34:21 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+10:34:45 [image/cifar10] vote=0.683 uniform=0.654 best1=0.679 n_val=15000 vram=0.49GB 23s | grade=0.862 inner_auc=0.837 vs conf_auc=0.810
+10:34:49 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+10:35:03 [image/cifar10] vote=0.682 uniform=0.656 best1=0.679 n_val=15039 vram=0.49GB 14s | grade=0.863 inner_auc=0.826 vs conf_auc=0.807
+10:35:07 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+10:35:33 [image/cifar10] vote=0.679 uniform=0.653 best1=0.676 n_val=15070 vram=0.49GB 26s | grade=0.862 inner_auc=0.842 vs conf_auc=0.818
+10:35:37 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+10:35:58 [image/cifar10] vote=0.684 uniform=0.654 best1=0.680 n_val=14879 vram=0.49GB 20s | grade=0.860 inner_auc=0.830 vs conf_auc=0.807
+10:36:05 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+10:37:23 [image/cifar10] vote=0.691 uniform=0.662 best1=0.688 n_val=14815 vram=0.49GB 79s | grade=0.860 inner_auc=0.824 vs conf_auc=0.798
+10:37:35 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+10:37:57 [image/cifar10] vote=0.676 uniform=0.649 best1=0.672 n_val=15030 vram=0.49GB 22s | grade=0.857 inner_auc=0.834 vs conf_auc=0.811
+10:38:01 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+10:38:24 [image/cifar10] vote=0.682 uniform=0.657 best1=0.679 n_val=14999 vram=0.49GB 23s | grade=0.862 inner_auc=0.836 vs conf_auc=0.808
+10:38:31 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+10:39:07 [image/cifar10] vote=0.685 uniform=0.661 best1=0.683 n_val=14939 vram=0.49GB 36s | grade=0.862 inner_auc=0.836 vs conf_auc=0.811
+10:39:14 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+10:39:32 [image/cifar10] vote=0.687 uniform=0.659 best1=0.683 n_val=15008 vram=0.49GB 18s | grade=0.864 inner_auc=0.829 vs conf_auc=0.797
+10:39:36 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+10:40:02 [image/cifar10] vote=0.679 uniform=0.653 best1=0.676 n_val=15244 vram=0.48GB 26s | grade=0.860 inner_auc=0.828 vs conf_auc=0.803
+10:40:06 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+10:40:20 [image/cifar10] vote=0.682 uniform=0.656 best1=0.679 n_val=15271 vram=0.49GB 14s | grade=0.865 inner_auc=0.820 vs conf_auc=0.794
+10:40:27 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+10:40:47 [image/cifar10] vote=0.682 uniform=0.658 best1=0.678 n_val=15021 vram=0.49GB 19s | grade=0.865 inner_auc=0.845 vs conf_auc=0.815
+10:40:51 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+10:41:18 [image/cifar10] vote=0.680 uniform=0.655 best1=0.678 n_val=15217 vram=0.48GB 27s | grade=0.864 inner_auc=0.823 vs conf_auc=0.795
+10:41:32 ===== CYCLE 149 (OUTER -> INNER -> FEEDBACK) =====
+10:42:03 [image/cifar10] vote=0.678 uniform=0.655 best1=0.676 n_val=14847 vram=0.49GB 31s | grade=0.864 inner_auc=0.838 vs conf_auc=0.809
+10:42:07 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+10:42:37 [image/cifar10] vote=0.681 uniform=0.656 best1=0.678 n_val=15046 vram=0.49GB 30s | grade=0.863 inner_auc=0.825 vs conf_auc=0.800
+10:42:46 ===== CYCLE 151 (OUTER -> INNER -> FEEDBACK) =====
+10:43:39 [image/cifar10] vote=0.680 uniform=0.652 best1=0.677 n_val=14930 vram=0.49GB 53s | grade=0.863 inner_auc=0.847 vs conf_auc=0.818
+10:43:49 ===== CYCLE 152 (OUTER -> INNER -> FEEDBACK) =====
+10:44:24 [image/cifar10] vote=0.672 uniform=0.654 best1=0.669 n_val=14975 vram=0.49GB 36s | grade=0.859 inner_auc=0.834 vs conf_auc=0.808
+10:44:32 ===== CYCLE 153 (OUTER -> INNER -> FEEDBACK) =====
+10:44:47 [image/cifar10] vote=0.687 uniform=0.661 best1=0.684 n_val=15076 vram=0.49GB 15s | grade=0.857 inner_auc=0.831 vs conf_auc=0.804
+10:44:51 ===== CYCLE 154 (OUTER -> INNER -> FEEDBACK) =====
+10:45:17 [image/cifar10] vote=0.682 uniform=0.653 best1=0.680 n_val=15114 vram=0.49GB 25s | grade=0.862 inner_auc=0.830 vs conf_auc=0.809
+10:45:21 ===== CYCLE 155 (OUTER -> INNER -> FEEDBACK) =====
+10:45:55 [image/cifar10] vote=0.683 uniform=0.658 best1=0.681 n_val=15120 vram=0.49GB 34s | grade=0.863 inner_auc=0.830 vs conf_auc=0.802
+10:46:05 ===== CYCLE 156 (OUTER -> INNER -> FEEDBACK) =====
+10:47:51 [image/cifar10] vote=0.688 uniform=0.663 best1=0.684 n_val=15133 vram=0.48GB 105s | grade=0.861 inner_auc=0.831 vs conf_auc=0.802
+10:48:00 ===== CYCLE 157 (OUTER -> INNER -> FEEDBACK) =====
+10:49:23 [image/cifar10] vote=0.679 uniform=0.656 best1=0.676 n_val=14829 vram=0.49GB 83s | grade=0.860 inner_auc=0.836 vs conf_auc=0.811
+10:49:34 ===== CYCLE 158 (OUTER -> INNER -> FEEDBACK) =====
+10:50:47 [image/cifar10] vote=0.681 uniform=0.659 best1=0.678 n_val=15132 vram=0.48GB 73s | grade=0.863 inner_auc=0.836 vs conf_auc=0.808
+10:50:55 ===== CYCLE 159 (OUTER -> INNER -> FEEDBACK) =====
+10:51:47 [image/cifar10] vote=0.675 uniform=0.652 best1=0.673 n_val=14982 vram=0.49GB 52s | grade=0.861 inner_auc=0.836 vs conf_auc=0.813
+10:51:56 ===== CYCLE 160 (OUTER -> INNER -> FEEDBACK) =====
+10:52:32 [image/cifar10] vote=0.681 uniform=0.657 best1=0.679 n_val=15118 vram=0.49GB 36s | grade=0.862 inner_auc=0.830 vs conf_auc=0.805
+10:52:36 ===== CYCLE 161 (OUTER -> INNER -> FEEDBACK) =====
+10:52:57 [image/cifar10] vote=0.689 uniform=0.656 best1=0.685 n_val=14856 vram=0.49GB 21s | grade=0.859 inner_auc=0.835 vs conf_auc=0.813
+10:53:04 ===== CYCLE 162 (OUTER -> INNER -> FEEDBACK) =====
+10:53:38 [image/cifar10] vote=0.688 uniform=0.661 best1=0.685 n_val=14973 vram=0.49GB 35s | grade=0.864 inner_auc=0.840 vs conf_auc=0.816
+10:53:46 ===== CYCLE 163 (OUTER -> INNER -> FEEDBACK) =====
+10:54:13 [image/cifar10] vote=0.681 uniform=0.656 best1=0.679 n_val=15051 vram=0.49GB 27s | grade=0.859 inner_auc=0.823 vs conf_auc=0.801
+10:54:17 ===== CYCLE 164 (OUTER -> INNER -> FEEDBACK) =====
+10:54:37 [image/cifar10] vote=0.684 uniform=0.659 best1=0.682 n_val=15083 vram=0.49GB 20s | grade=0.862 inner_auc=0.829 vs conf_auc=0.800
+10:54:44 ===== CYCLE 165 (OUTER -> INNER -> FEEDBACK) =====
+10:54:57 [image/cifar10] vote=0.679 uniform=0.651 best1=0.674 n_val=15073 vram=0.49GB 13s | grade=0.861 inner_auc=0.829 vs conf_auc=0.803
+10:55:01 ===== CYCLE 166 (OUTER -> INNER -> FEEDBACK) =====
+10:55:26 [image/cifar10] vote=0.682 uniform=0.655 best1=0.678 n_val=15112 vram=0.49GB 25s | grade=0.861 inner_auc=0.834 vs conf_auc=0.806
+10:55:31 ===== CYCLE 167 (OUTER -> INNER -> FEEDBACK) =====
+10:55:50 [image/cifar10] vote=0.685 uniform=0.661 best1=0.681 n_val=15130 vram=0.48GB 20s | grade=0.863 inner_auc=0.833 vs conf_auc=0.803
+10:55:57 ===== CYCLE 168 (OUTER -> INNER -> FEEDBACK) =====
+10:56:41 [image/cifar10] vote=0.684 uniform=0.656 best1=0.680 n_val=14984 vram=0.49GB 43s | grade=0.864 inner_auc=0.830 vs conf_auc=0.811
+10:56:45 ===== CYCLE 169 (OUTER -> INNER -> FEEDBACK) =====
+10:57:05 [image/cifar10] vote=0.685 uniform=0.664 best1=0.681 n_val=15036 vram=0.49GB 20s | grade=0.863 inner_auc=0.840 vs conf_auc=0.811
+10:57:13 ===== CYCLE 170 (OUTER -> INNER -> FEEDBACK) =====
+10:57:51 [image/cifar10] vote=0.677 uniform=0.658 best1=0.675 n_val=14855 vram=0.49GB 39s | grade=0.862 inner_auc=0.830 vs conf_auc=0.800
+10:58:01 ===== CYCLE 171 (OUTER -> INNER -> FEEDBACK) =====
+10:58:35 [image/cifar10] vote=0.683 uniform=0.656 best1=0.681 n_val=15165 vram=0.48GB 34s | grade=0.861 inner_auc=0.835 vs conf_auc=0.811
+10:58:45 ===== CYCLE 172 (OUTER -> INNER -> FEEDBACK) =====
+10:59:15 [image/cifar10] vote=0.683 uniform=0.655 best1=0.680 n_val=15079 vram=0.49GB 31s | grade=0.864 inner_auc=0.838 vs conf_auc=0.806
+10:59:24 ===== CYCLE 173 (OUTER -> INNER -> FEEDBACK) =====
+10:59:55 [image/cifar10] vote=0.684 uniform=0.658 best1=0.682 n_val=15001 vram=0.49GB 32s | grade=0.863 inner_auc=0.837 vs conf_auc=0.810
+11:00:04 ===== CYCLE 174 (OUTER -> INNER -> FEEDBACK) =====
+11:00:43 [image/cifar10] vote=0.679 uniform=0.652 best1=0.676 n_val=15047 vram=0.49GB 38s | grade=0.862 inner_auc=0.832 vs conf_auc=0.808
+11:00:57 ===== CYCLE 175 (OUTER -> INNER -> FEEDBACK) =====
+11:01:56 [image/cifar10] vote=0.678 uniform=0.653 best1=0.675 n_val=14836 vram=0.49GB 59s | grade=0.863 inner_auc=0.829 vs conf_auc=0.806
+11:02:07 ===== CYCLE 176 (OUTER -> INNER -> FEEDBACK) =====
+11:03:01 [image/cifar10] vote=0.686 uniform=0.664 best1=0.684 n_val=15060 vram=0.49GB 54s | grade=0.860 inner_auc=0.831 vs conf_auc=0.805
+11:03:26 ===== CYCLE 177 (OUTER -> INNER -> FEEDBACK) =====
+11:05:35 [image/cifar10] vote=0.686 uniform=0.664 best1=0.683 n_val=14965 vram=0.49GB 128s | grade=0.865 inner_auc=0.836 vs conf_auc=0.810
+11:05:45 ===== CYCLE 178 (OUTER -> INNER -> FEEDBACK) =====
+11:06:52 [image/cifar10] vote=0.682 uniform=0.657 best1=0.679 n_val=14901 vram=0.49GB 68s | grade=0.862 inner_auc=0.832 vs conf_auc=0.801
+11:07:06 ===== CYCLE 179 (OUTER -> INNER -> FEEDBACK) =====
+11:08:50 [image/cifar10] vote=0.681 uniform=0.654 best1=0.677 n_val=14842 vram=0.49GB 104s | grade=0.865 inner_auc=0.832 vs conf_auc=0.798
+11:08:59 ===== CYCLE 180 (OUTER -> INNER -> FEEDBACK) =====
+11:09:28 [image/cifar10] vote=0.679 uniform=0.651 best1=0.678 n_val=14931 vram=0.49GB 28s | grade=0.864 inner_auc=0.823 vs conf_auc=0.795
+11:09:37 ===== CYCLE 181 (OUTER -> INNER -> FEEDBACK) =====
+11:10:12 [image/cifar10] vote=0.678 uniform=0.652 best1=0.675 n_val=14992 vram=0.49GB 35s | grade=0.862 inner_auc=0.835 vs conf_auc=0.809
+11:10:23 ===== CYCLE 182 (OUTER -> INNER -> FEEDBACK) =====
+11:10:56 [image/cifar10] vote=0.689 uniform=0.663 best1=0.687 n_val=14822 vram=0.49GB 34s | grade=0.858 inner_auc=0.839 vs conf_auc=0.811
+11:11:07 ===== CYCLE 183 (OUTER -> INNER -> FEEDBACK) =====
+11:11:41 [image/cifar10] vote=0.688 uniform=0.661 best1=0.684 n_val=15122 vram=0.49GB 34s | grade=0.865 inner_auc=0.848 vs conf_auc=0.816
+11:11:50 ===== CYCLE 184 (OUTER -> INNER -> FEEDBACK) =====
+11:12:22 [image/cifar10] vote=0.673 uniform=0.652 best1=0.670 n_val=14812 vram=0.49GB 32s | grade=0.857 inner_auc=0.835 vs conf_auc=0.809
+11:12:32 ===== CYCLE 185 (OUTER -> INNER -> FEEDBACK) =====
+11:13:13 [image/cifar10] vote=0.684 uniform=0.664 best1=0.680 n_val=14985 vram=0.49GB 41s | grade=0.859 inner_auc=0.832 vs conf_auc=0.805
+11:13:28 ===== CYCLE 186 (OUTER -> INNER -> FEEDBACK) =====
+11:14:23 [image/cifar10] vote=0.684 uniform=0.661 best1=0.681 n_val=15070 vram=0.49GB 55s | grade=0.865 inner_auc=0.851 vs conf_auc=0.824
+11:14:44 ===== CYCLE 187 (OUTER -> INNER -> FEEDBACK) =====
+11:16:48 [image/cifar10] vote=0.685 uniform=0.661 best1=0.681 n_val=15055 vram=0.49GB 124s | grade=0.864 inner_auc=0.844 vs conf_auc=0.820
+11:17:53 ===== CYCLE 188 (OUTER -> INNER -> FEEDBACK) =====
+11:18:26 [image/cifar10] vote=0.687 uniform=0.662 best1=0.684 n_val=14984 vram=0.49GB 33s | grade=0.864 inner_auc=0.830 vs conf_auc=0.797
+11:18:35 ===== CYCLE 189 (OUTER -> INNER -> FEEDBACK) =====
+11:19:05 [image/cifar10] vote=0.684 uniform=0.660 best1=0.682 n_val=14880 vram=0.49GB 30s | grade=0.862 inner_auc=0.830 vs conf_auc=0.804
+11:19:16 ===== CYCLE 190 (OUTER -> INNER -> FEEDBACK) =====
+11:19:44 [image/cifar10] vote=0.685 uniform=0.663 best1=0.682 n_val=14851 vram=0.49GB 28s | grade=0.864 inner_auc=0.834 vs conf_auc=0.806
+11:19:48 ===== CYCLE 191 (OUTER -> INNER -> FEEDBACK) =====
+11:20:06 [image/cifar10] vote=0.682 uniform=0.656 best1=0.678 n_val=15099 vram=0.49GB 18s | grade=0.863 inner_auc=0.831 vs conf_auc=0.803
+11:20:14 ===== CYCLE 192 (OUTER -> INNER -> FEEDBACK) =====
+11:20:50 [image/cifar10] vote=0.680 uniform=0.657 best1=0.677 n_val=14886 vram=0.49GB 36s | grade=0.864 inner_auc=0.825 vs conf_auc=0.804
+11:20:58 ===== CYCLE 193 (OUTER -> INNER -> FEEDBACK) =====
+11:21:34 [image/cifar10] vote=0.686 uniform=0.664 best1=0.684 n_val=15052 vram=0.49GB 36s | grade=0.861 inner_auc=0.835 vs conf_auc=0.810
+11:21:42 ===== CYCLE 194 (OUTER -> INNER -> FEEDBACK) =====
+11:22:01 [image/cifar10] vote=0.684 uniform=0.655 best1=0.681 n_val=15015 vram=0.49GB 19s | grade=0.862 inner_auc=0.833 vs conf_auc=0.810
+11:22:06 ===== CYCLE 195 (OUTER -> INNER -> FEEDBACK) =====
+11:22:31 [image/cifar10] vote=0.680 uniform=0.650 best1=0.676 n_val=14983 vram=0.49GB 26s | grade=0.862 inner_auc=0.841 vs conf_auc=0.810
+11:22:42 ===== CYCLE 196 (OUTER -> INNER -> FEEDBACK) =====
+11:23:21 [image/cifar10] vote=0.684 uniform=0.658 best1=0.679 n_val=15103 vram=0.49GB 39s | grade=0.862 inner_auc=0.841 vs conf_auc=0.810
+11:23:31 ===== CYCLE 197 (OUTER -> INNER -> FEEDBACK) =====
+11:25:07 [image/cifar10] vote=0.677 uniform=0.651 best1=0.674 n_val=15059 vram=0.49GB 96s | grade=0.863 inner_auc=0.823 vs conf_auc=0.792
+11:25:39 ===== CYCLE 198 (OUTER -> INNER -> FEEDBACK) =====
+11:26:11 [image/cifar10] vote=0.682 uniform=0.661 best1=0.680 n_val=15106 vram=0.49GB 32s | grade=0.862 inner_auc=0.844 vs conf_auc=0.822
+11:26:24 ===== CYCLE 199 (OUTER -> INNER -> FEEDBACK) =====
+11:26:54 [image/cifar10] vote=0.678 uniform=0.646 best1=0.673 n_val=14952 vram=0.49GB 30s | grade=0.863 inner_auc=0.836 vs conf_auc=0.807
+11:26:58 ===== CYCLE 200 (OUTER -> INNER -> FEEDBACK) =====
+11:27:23 [image/cifar10] vote=0.682 uniform=0.655 best1=0.679 n_val=14916 vram=0.49GB 25s | grade=0.864 inner_auc=0.839 vs conf_auc=0.813
+11:27:31 ===== CYCLE 201 (OUTER -> INNER -> FEEDBACK) =====
+11:28:06 [image/cifar10] vote=0.688 uniform=0.664 best1=0.685 n_val=14917 vram=0.49GB 35s | grade=0.861 inner_auc=0.833 vs conf_auc=0.806
+11:28:14 ===== CYCLE 202 (OUTER -> INNER -> FEEDBACK) =====
+11:28:34 [image/cifar10] vote=0.689 uniform=0.661 best1=0.684 n_val=14836 vram=0.49GB 20s | grade=0.862 inner_auc=0.830 vs conf_auc=0.807
+11:28:39 ===== CYCLE 203 (OUTER -> INNER -> FEEDBACK) =====
+11:29:05 [image/cifar10] vote=0.680 uniform=0.655 best1=0.677 n_val=14937 vram=0.49GB 26s | grade=0.859 inner_auc=0.833 vs conf_auc=0.802
+11:29:09 ===== CYCLE 204 (OUTER -> INNER -> FEEDBACK) =====
+11:29:26 [image/cifar10] vote=0.678 uniform=0.658 best1=0.676 n_val=14984 vram=0.49GB 16s | grade=0.864 inner_auc=0.833 vs conf_auc=0.809
+11:29:33 ===== CYCLE 205 (OUTER -> INNER -> FEEDBACK) =====
+11:29:52 [image/cifar10] vote=0.684 uniform=0.658 best1=0.680 n_val=15071 vram=0.49GB 19s | grade=0.861 inner_auc=0.840 vs conf_auc=0.811
+11:29:57 ===== CYCLE 206 (OUTER -> INNER -> FEEDBACK) =====
+11:30:30 [image/cifar10] vote=0.681 uniform=0.660 best1=0.677 n_val=15103 vram=0.49GB 32s | grade=0.864 inner_auc=0.843 vs conf_auc=0.810
+11:30:42 ===== CYCLE 207 (OUTER -> INNER -> FEEDBACK) =====
+11:31:30 [image/cifar10] vote=0.683 uniform=0.663 best1=0.678 n_val=15034 vram=0.49GB 48s | grade=0.863 inner_auc=0.839 vs conf_auc=0.815
+11:31:36 ===== CYCLE 208 (OUTER -> INNER -> FEEDBACK) =====
+11:31:54 [image/cifar10] vote=0.680 uniform=0.657 best1=0.678 n_val=14983 vram=0.49GB 18s | grade=0.864 inner_auc=0.836 vs conf_auc=0.814
+11:32:05 ===== CYCLE 209 (OUTER -> INNER -> FEEDBACK) =====
+11:33:01 [image/cifar10] vote=0.680 uniform=0.656 best1=0.676 n_val=14871 vram=0.49GB 56s | grade=0.864 inner_auc=0.832 vs conf_auc=0.808
+11:33:09 ===== CYCLE 210 (OUTER -> INNER -> FEEDBACK) =====
+11:33:45 [image/cifar10] vote=0.682 uniform=0.656 best1=0.678 n_val=15094 vram=0.49GB 36s | grade=0.863 inner_auc=0.833 vs conf_auc=0.806
+11:33:53 ===== CYCLE 211 (OUTER -> INNER -> FEEDBACK) =====
+11:34:28 [image/cifar10] vote=0.686 uniform=0.659 best1=0.683 n_val=15075 vram=0.49GB 35s | grade=0.860 inner_auc=0.835 vs conf_auc=0.802
+11:34:36 ===== CYCLE 212 (OUTER -> INNER -> FEEDBACK) =====
+11:34:57 [image/cifar10] vote=0.678 uniform=0.656 best1=0.675 n_val=14947 vram=0.49GB 21s | grade=0.861 inner_auc=0.848 vs conf_auc=0.819
+11:35:02 ===== CYCLE 213 (OUTER -> INNER -> FEEDBACK) =====
+11:35:42 [image/cifar10] vote=0.687 uniform=0.658 best1=0.685 n_val=14982 vram=0.49GB 40s | grade=0.860 inner_auc=0.835 vs conf_auc=0.806
+11:35:53 ===== CYCLE 214 (OUTER -> INNER -> FEEDBACK) =====
+11:36:36 [image/cifar10] vote=0.684 uniform=0.659 best1=0.680 n_val=15000 vram=0.49GB 43s | grade=0.862 inner_auc=0.837 vs conf_auc=0.813
+11:36:41 ===== CYCLE 215 (OUTER -> INNER -> FEEDBACK) =====
+11:37:10 [image/cifar10] vote=0.687 uniform=0.659 best1=0.683 n_val=15092 vram=0.49GB 30s | grade=0.864 inner_auc=0.826 vs conf_auc=0.800
+11:37:36 ===== CYCLE 216 (OUTER -> INNER -> FEEDBACK) =====
+11:38:29 [image/cifar10] vote=0.681 uniform=0.657 best1=0.677 n_val=15005 vram=0.49GB 53s | grade=0.859 inner_auc=0.835 vs conf_auc=0.812
+11:38:44 ===== CYCLE 217 (OUTER -> INNER -> FEEDBACK) =====
+11:38:59 [image/cifar10] vote=0.684 uniform=0.658 best1=0.679 n_val=15012 vram=0.49GB 15s | grade=0.863 inner_auc=0.844 vs conf_auc=0.812
+11:39:05 ===== CYCLE 218 (OUTER -> INNER -> FEEDBACK) =====
+11:39:48 [image/cifar10] vote=0.687 uniform=0.661 best1=0.684 n_val=14989 vram=0.49GB 43s | grade=0.862 inner_auc=0.828 vs conf_auc=0.802
+11:39:56 ===== CYCLE 219 (OUTER -> INNER -> FEEDBACK) =====
+11:40:31 [image/cifar10] vote=0.684 uniform=0.652 best1=0.680 n_val=15121 vram=0.49GB 36s | grade=0.863 inner_auc=0.828 vs conf_auc=0.805
+11:40:39 ===== CYCLE 220 (OUTER -> INNER -> FEEDBACK) =====
+11:41:15 [image/cifar10] vote=0.682 uniform=0.659 best1=0.680 n_val=15009 vram=0.49GB 35s | grade=0.865 inner_auc=0.825 vs conf_auc=0.798
+11:41:20 ===== CYCLE 221 (OUTER -> INNER -> FEEDBACK) =====
+11:41:34 [image/cifar10] vote=0.681 uniform=0.654 best1=0.679 n_val=15096 vram=0.49GB 14s | grade=0.863 inner_auc=0.827 vs conf_auc=0.803
+11:41:42 ===== CYCLE 222 (OUTER -> INNER -> FEEDBACK) =====
+11:42:06 [image/cifar10] vote=0.684 uniform=0.656 best1=0.681 n_val=14892 vram=0.49GB 24s | grade=0.863 inner_auc=0.836 vs conf_auc=0.810
+11:42:14 ===== CYCLE 223 (OUTER -> INNER -> FEEDBACK) =====
+11:42:42 [image/cifar10] vote=0.687 uniform=0.664 best1=0.684 n_val=14983 vram=0.49GB 28s | grade=0.863 inner_auc=0.836 vs conf_auc=0.808
+11:42:51 ===== CYCLE 224 (OUTER -> INNER -> FEEDBACK) =====
+11:43:29 [image/cifar10] vote=0.685 uniform=0.662 best1=0.682 n_val=14867 vram=0.49GB 38s | grade=0.865 inner_auc=0.830 vs conf_auc=0.803
+11:43:35 ===== CYCLE 225 (OUTER -> INNER -> FEEDBACK) =====
+11:43:52 [image/cifar10] vote=0.678 uniform=0.653 best1=0.674 n_val=15196 vram=0.48GB 17s | grade=0.861 inner_auc=0.835 vs conf_auc=0.811
+11:43:58 ===== CYCLE 226 (OUTER -> INNER -> FEEDBACK) =====
+11:44:29 [image/cifar10] vote=0.685 uniform=0.662 best1=0.682 n_val=15005 vram=0.49GB 31s | grade=0.861 inner_auc=0.833 vs conf_auc=0.804
+11:44:36 ===== CYCLE 227 (OUTER -> INNER -> FEEDBACK) =====
+11:45:03 [image/cifar10] vote=0.680 uniform=0.662 best1=0.679 n_val=14876 vram=0.49GB 27s | grade=0.863 inner_auc=0.844 vs conf_auc=0.821
+11:45:08 ===== CYCLE 228 (OUTER -> INNER -> FEEDBACK) =====
+11:45:23 [image/cifar10] vote=0.681 uniform=0.658 best1=0.677 n_val=15063 vram=0.49GB 15s | grade=0.865 inner_auc=0.832 vs conf_auc=0.809
+11:45:30 ===== CYCLE 229 (OUTER -> INNER -> FEEDBACK) =====
+11:46:24 [image/cifar10] vote=0.680 uniform=0.657 best1=0.677 n_val=15116 vram=0.49GB 54s | grade=0.863 inner_auc=0.832 vs conf_auc=0.801
+11:46:34 ===== CYCLE 230 (OUTER -> INNER -> FEEDBACK) =====
+11:46:47 [image/cifar10] vote=0.683 uniform=0.660 best1=0.679 n_val=14978 vram=0.49GB 13s | grade=0.862 inner_auc=0.828 vs conf_auc=0.809
+11:46:52 ===== CYCLE 231 (OUTER -> INNER -> FEEDBACK) =====
+11:47:15 [image/cifar10] vote=0.680 uniform=0.653 best1=0.677 n_val=15009 vram=0.49GB 23s | grade=0.862 inner_auc=0.833 vs conf_auc=0.807
+11:47:19 ===== CYCLE 232 (OUTER -> INNER -> FEEDBACK) =====
+11:47:37 [image/cifar10] vote=0.682 uniform=0.657 best1=0.679 n_val=14841 vram=0.49GB 18s | grade=0.863 inner_auc=0.831 vs conf_auc=0.803
+11:47:43 ===== CYCLE 233 (OUTER -> INNER -> FEEDBACK) =====
+11:47:56 [image/cifar10] vote=0.681 uniform=0.653 best1=0.679 n_val=15085 vram=0.49GB 13s | grade=0.863 inner_auc=0.833 vs conf_auc=0.805
+11:48:01 ===== CYCLE 234 (OUTER -> INNER -> FEEDBACK) =====
+11:48:22 [image/cifar10] vote=0.680 uniform=0.659 best1=0.679 n_val=15076 vram=0.49GB 21s | grade=0.865 inner_auc=0.839 vs conf_auc=0.811
+11:48:26 ===== CYCLE 235 (OUTER -> INNER -> FEEDBACK) =====
+11:48:47 [image/cifar10] vote=0.691 uniform=0.660 best1=0.687 n_val=14979 vram=0.49GB 21s | grade=0.859 inner_auc=0.834 vs conf_auc=0.809
+11:48:51 ===== CYCLE 236 (OUTER -> INNER -> FEEDBACK) =====
+11:49:08 [image/cifar10] vote=0.683 uniform=0.656 best1=0.681 n_val=15019 vram=0.49GB 16s | grade=0.861 inner_auc=0.833 vs conf_auc=0.803
+11:49:16 ===== CYCLE 237 (OUTER -> INNER -> FEEDBACK) =====
+11:49:38 [image/cifar10] vote=0.683 uniform=0.649 best1=0.680 n_val=14960 vram=0.49GB 21s | grade=0.864 inner_auc=0.829 vs conf_auc=0.796
+11:49:42 ===== CYCLE 238 (OUTER -> INNER -> FEEDBACK) =====
+11:50:04 [image/cifar10] vote=0.684 uniform=0.659 best1=0.680 n_val=15238 vram=0.48GB 22s | grade=0.862 inner_auc=0.825 vs conf_auc=0.798
+11:50:08 ===== CYCLE 239 (OUTER -> INNER -> FEEDBACK) =====
+11:50:21 [image/cifar10] vote=0.681 uniform=0.654 best1=0.676 n_val=15060 vram=0.49GB 13s | grade=0.863 inner_auc=0.831 vs conf_auc=0.804
+11:50:28 ===== CYCLE 240 (OUTER -> INNER -> FEEDBACK) =====
+11:50:50 [image/cifar10] vote=0.683 uniform=0.660 best1=0.680 n_val=15062 vram=0.49GB 22s | grade=0.862 inner_auc=0.837 vs conf_auc=0.817
+11:50:54 ===== CYCLE 241 (OUTER -> INNER -> FEEDBACK) =====
+11:51:43 [image/cifar10] vote=0.682 uniform=0.653 best1=0.681 n_val=15111 vram=0.49GB 49s | grade=0.866 inner_auc=0.832 vs conf_auc=0.802
+11:52:00 ===== CYCLE 242 (OUTER -> INNER -> FEEDBACK) =====
+11:52:35 [image/cifar10] vote=0.680 uniform=0.652 best1=0.677 n_val=15105 vram=0.49GB 36s | grade=0.862 inner_auc=0.823 vs conf_auc=0.799
+11:52:47 ===== CYCLE 243 (OUTER -> INNER -> FEEDBACK) =====
+11:53:05 [image/cifar10] vote=0.680 uniform=0.654 best1=0.677 n_val=15029 vram=0.49GB 18s | grade=0.863 inner_auc=0.821 vs conf_auc=0.790
+11:53:09 ===== CYCLE 244 (OUTER -> INNER -> FEEDBACK) =====
+11:53:32 [image/cifar10] vote=0.688 uniform=0.660 best1=0.685 n_val=15105 vram=0.49GB 22s | grade=0.862 inner_auc=0.840 vs conf_auc=0.814
+11:53:37 ===== CYCLE 245 (OUTER -> INNER -> FEEDBACK) =====
+11:53:51 [image/cifar10] vote=0.687 uniform=0.659 best1=0.683 n_val=15023 vram=0.49GB 14s | grade=0.864 inner_auc=0.821 vs conf_auc=0.788
+11:53:59 ===== CYCLE 246 (OUTER -> INNER -> FEEDBACK) =====
+11:54:17 [image/cifar10] vote=0.679 uniform=0.656 best1=0.676 n_val=15162 vram=0.48GB 18s | grade=0.861 inner_auc=0.839 vs conf_auc=0.812
+11:54:21 ===== CYCLE 247 (OUTER -> INNER -> FEEDBACK) =====
+11:54:44 [image/cifar10] vote=0.682 uniform=0.653 best1=0.679 n_val=15051 vram=0.49GB 23s | grade=0.862 inner_auc=0.833 vs conf_auc=0.807
+11:54:48 ===== CYCLE 248 (OUTER -> INNER -> FEEDBACK) =====
+11:55:04 [image/cifar10] vote=0.684 uniform=0.656 best1=0.682 n_val=14959 vram=0.49GB 15s | grade=0.863 inner_auc=0.839 vs conf_auc=0.807
+11:55:14 ===== CYCLE 249 (OUTER -> INNER -> FEEDBACK) =====
+11:55:48 [image/cifar10] vote=0.687 uniform=0.665 best1=0.685 n_val=15001 vram=0.49GB 34s | grade=0.864 inner_auc=0.857 vs conf_auc=0.827
+11:55:59 ===== CYCLE 250 (OUTER -> INNER -> FEEDBACK) =====
+11:56:35 [image/cifar10] vote=0.682 uniform=0.661 best1=0.680 n_val=15009 vram=0.49GB 36s | grade=0.860 inner_auc=0.843 vs conf_auc=0.819
+11:56:46 ===== CYCLE 251 (OUTER -> INNER -> FEEDBACK) =====
+11:57:33 [image/cifar10] vote=0.681 uniform=0.655 best1=0.677 n_val=14906 vram=0.49GB 47s | grade=0.865 inner_auc=0.833 vs conf_auc=0.801
+11:57:46 ===== CYCLE 252 (OUTER -> INNER -> FEEDBACK) =====
+11:58:18 [image/cifar10] vote=0.680 uniform=0.657 best1=0.676 n_val=15083 vram=0.49GB 33s | grade=0.863 inner_auc=0.827 vs conf_auc=0.801
+11:58:27 ===== CYCLE 253 (OUTER -> INNER -> FEEDBACK) =====
+11:59:04 [image/cifar10] vote=0.678 uniform=0.658 best1=0.676 n_val=14880 vram=0.49GB 37s | grade=0.863 inner_auc=0.840 vs conf_auc=0.811
+11:59:14 ===== CYCLE 254 (OUTER -> INNER -> FEEDBACK) =====
+11:59:47 [image/cifar10] vote=0.686 uniform=0.658 best1=0.683 n_val=14888 vram=0.49GB 32s | grade=0.861 inner_auc=0.828 vs conf_auc=0.802
+11:59:55 ===== CYCLE 255 (OUTER -> INNER -> FEEDBACK) =====
+12:00:33 [image/cifar10] vote=0.681 uniform=0.654 best1=0.678 n_val=14998 vram=0.49GB 38s | grade=0.861 inner_auc=0.827 vs conf_auc=0.792
+12:00:45 ===== CYCLE 256 (OUTER -> INNER -> FEEDBACK) =====
+12:01:18 [image/cifar10] vote=0.682 uniform=0.655 best1=0.680 n_val=15074 vram=0.49GB 33s | grade=0.862 inner_auc=0.836 vs conf_auc=0.810
+12:01:29 ===== CYCLE 257 (OUTER -> INNER -> FEEDBACK) =====
+12:02:02 [image/cifar10] vote=0.681 uniform=0.655 best1=0.678 n_val=15116 vram=0.49GB 33s | grade=0.865 inner_auc=0.835 vs conf_auc=0.810
+12:02:12 ===== CYCLE 258 (OUTER -> INNER -> FEEDBACK) =====
+12:02:49 [image/cifar10] vote=0.682 uniform=0.653 best1=0.678 n_val=14886 vram=0.49GB 36s | grade=0.864 inner_auc=0.831 vs conf_auc=0.807
+12:02:59 ===== CYCLE 259 (OUTER -> INNER -> FEEDBACK) =====
+12:03:33 [image/cifar10] vote=0.681 uniform=0.658 best1=0.678 n_val=14930 vram=0.49GB 34s | grade=0.864 inner_auc=0.833 vs conf_auc=0.806
+12:03:45 ===== CYCLE 260 (OUTER -> INNER -> FEEDBACK) =====
+12:04:23 [image/cifar10] vote=0.684 uniform=0.656 best1=0.679 n_val=15146 vram=0.49GB 39s | grade=0.864 inner_auc=0.835 vs conf_auc=0.811
+12:04:35 ===== CYCLE 261 (OUTER -> INNER -> FEEDBACK) =====
+12:05:12 [image/cifar10] vote=0.683 uniform=0.659 best1=0.681 n_val=15017 vram=0.49GB 37s | grade=0.864 inner_auc=0.829 vs conf_auc=0.803
+12:05:22 ===== CYCLE 262 (OUTER -> INNER -> FEEDBACK) =====
+12:05:56 [image/cifar10] vote=0.686 uniform=0.662 best1=0.685 n_val=15038 vram=0.49GB 34s | grade=0.862 inner_auc=0.839 vs conf_auc=0.818
+12:06:07 ===== CYCLE 263 (OUTER -> INNER -> FEEDBACK) =====
+12:06:45 [image/cifar10] vote=0.678 uniform=0.649 best1=0.675 n_val=15030 vram=0.49GB 38s | grade=0.858 inner_auc=0.840 vs conf_auc=0.812
+12:06:56 ===== CYCLE 264 (OUTER -> INNER -> FEEDBACK) =====
+12:07:34 [image/cifar10] vote=0.680 uniform=0.659 best1=0.676 n_val=15252 vram=0.48GB 39s | grade=0.862 inner_auc=0.837 vs conf_auc=0.815
+12:07:45 ===== CYCLE 265 (OUTER -> INNER -> FEEDBACK) =====
+12:08:17 [image/cifar10] vote=0.678 uniform=0.651 best1=0.675 n_val=15198 vram=0.48GB 32s | grade=0.862 inner_auc=0.833 vs conf_auc=0.809
+12:08:29 ===== CYCLE 266 (OUTER -> INNER -> FEEDBACK) =====
+12:09:08 [image/cifar10] vote=0.679 uniform=0.656 best1=0.677 n_val=14986 vram=0.49GB 39s | grade=0.866 inner_auc=0.818 vs conf_auc=0.791
+12:09:19 ===== CYCLE 267 (OUTER -> INNER -> FEEDBACK) =====
+12:09:53 [image/cifar10] vote=0.680 uniform=0.653 best1=0.677 n_val=14910 vram=0.49GB 33s | grade=0.863 inner_auc=0.840 vs conf_auc=0.810
+12:10:04 ===== CYCLE 268 (OUTER -> INNER -> FEEDBACK) =====
+12:10:41 [image/cifar10] vote=0.690 uniform=0.659 best1=0.684 n_val=15027 vram=0.49GB 37s | grade=0.858 inner_auc=0.827 vs conf_auc=0.804
+12:10:51 ===== CYCLE 269 (OUTER -> INNER -> FEEDBACK) =====
+12:11:26 [image/cifar10] vote=0.684 uniform=0.660 best1=0.679 n_val=15075 vram=0.49GB 35s | grade=0.861 inner_auc=0.838 vs conf_auc=0.807
+12:11:37 ===== CYCLE 270 (OUTER -> INNER -> FEEDBACK) =====
+12:12:26 [image/cifar10] vote=0.677 uniform=0.660 best1=0.675 n_val=14991 vram=0.49GB 49s | grade=0.861 inner_auc=0.825 vs conf_auc=0.797
+12:12:38 ===== CYCLE 271 (OUTER -> INNER -> FEEDBACK) =====
+12:13:18 [image/cifar10] vote=0.685 uniform=0.662 best1=0.682 n_val=14985 vram=0.49GB 40s | grade=0.861 inner_auc=0.843 vs conf_auc=0.815
+12:13:23 ===== CYCLE 272 (OUTER -> INNER -> FEEDBACK) =====
+12:13:51 [image/cifar10] vote=0.688 uniform=0.662 best1=0.686 n_val=15025 vram=0.49GB 28s | grade=0.864 inner_auc=0.838 vs conf_auc=0.814
+12:13:59 ===== CYCLE 273 (OUTER -> INNER -> FEEDBACK) =====
+12:14:31 [image/cifar10] vote=0.681 uniform=0.661 best1=0.678 n_val=15029 vram=0.49GB 31s | grade=0.861 inner_auc=0.837 vs conf_auc=0.816
+12:14:41 ===== CYCLE 274 (OUTER -> INNER -> FEEDBACK) =====
+12:15:15 [image/cifar10] vote=0.679 uniform=0.657 best1=0.675 n_val=15128 vram=0.49GB 34s | grade=0.864 inner_auc=0.836 vs conf_auc=0.802
+12:15:25 ===== CYCLE 275 (OUTER -> INNER -> FEEDBACK) =====
+12:15:59 [image/cifar10] vote=0.678 uniform=0.655 best1=0.675 n_val=15032 vram=0.49GB 35s | grade=0.863 inner_auc=0.824 vs conf_auc=0.799
+12:16:12 ===== CYCLE 276 (OUTER -> INNER -> FEEDBACK) =====
+12:16:53 [image/cifar10] vote=0.685 uniform=0.659 best1=0.682 n_val=14847 vram=0.49GB 42s | grade=0.861 inner_auc=0.828 vs conf_auc=0.797
+12:17:02 ===== CYCLE 277 (OUTER -> INNER -> FEEDBACK) =====
+12:17:52 [image/cifar10] vote=0.681 uniform=0.658 best1=0.679 n_val=15046 vram=0.49GB 50s | grade=0.862 inner_auc=0.830 vs conf_auc=0.801
+12:18:10 ===== CYCLE 278 (OUTER -> INNER -> FEEDBACK) =====
+12:19:09 [image/cifar10] vote=0.681 uniform=0.654 best1=0.679 n_val=15004 vram=0.49GB 59s | grade=0.864 inner_auc=0.840 vs conf_auc=0.809
+12:19:28 ===== CYCLE 279 (OUTER -> INNER -> FEEDBACK) =====
+12:20:32 [image/cifar10] vote=0.688 uniform=0.661 best1=0.685 n_val=15176 vram=0.49GB 64s | grade=0.860 inner_auc=0.829 vs conf_auc=0.801
+12:20:50 ===== CYCLE 280 (OUTER -> INNER -> FEEDBACK) =====
+12:21:46 [image/cifar10] vote=0.684 uniform=0.658 best1=0.683 n_val=14867 vram=0.49GB 56s | grade=0.863 inner_auc=0.837 vs conf_auc=0.813
+12:22:04 ===== CYCLE 281 (OUTER -> INNER -> FEEDBACK) =====
+12:23:00 [image/cifar10] vote=0.688 uniform=0.657 best1=0.684 n_val=15085 vram=0.49GB 56s | grade=0.861 inner_auc=0.828 vs conf_auc=0.805
+12:23:20 ===== CYCLE 282 (OUTER -> INNER -> FEEDBACK) =====
+12:24:32 [image/cifar10] vote=0.680 uniform=0.656 best1=0.678 n_val=15049 vram=0.49GB 72s | grade=0.859 inner_auc=0.833 vs conf_auc=0.810
+12:24:51 ===== CYCLE 283 (OUTER -> INNER -> FEEDBACK) =====
+12:25:30 [image/cifar10] vote=0.681 uniform=0.653 best1=0.677 n_val=14950 vram=0.49GB 39s | grade=0.863 inner_auc=0.843 vs conf_auc=0.821
+12:25:40 ===== CYCLE 284 (OUTER -> INNER -> FEEDBACK) =====
+12:26:03 [image/cifar10] vote=0.683 uniform=0.653 best1=0.679 n_val=14904 vram=0.49GB 23s | grade=0.864 inner_auc=0.842 vs conf_auc=0.816
+12:26:20 ===== CYCLE 285 (OUTER -> INNER -> FEEDBACK) =====
+12:27:20 [image/cifar10] vote=0.685 uniform=0.656 best1=0.682 n_val=14888 vram=0.49GB 60s | grade=0.862 inner_auc=0.823 vs conf_auc=0.793
+12:27:38 ===== CYCLE 286 (OUTER -> INNER -> FEEDBACK) =====
+12:28:37 [image/cifar10] vote=0.682 uniform=0.658 best1=0.678 n_val=15040 vram=0.49GB 60s | grade=0.864 inner_auc=0.830 vs conf_auc=0.799
+12:28:56 ===== CYCLE 287 (OUTER -> INNER -> FEEDBACK) =====
+12:30:00 [image/cifar10] vote=0.688 uniform=0.658 best1=0.685 n_val=14928 vram=0.49GB 63s | grade=0.860 inner_auc=0.834 vs conf_auc=0.811
+12:30:17 ===== CYCLE 288 (OUTER -> INNER -> FEEDBACK) =====
+12:31:25 [image/cifar10] vote=0.682 uniform=0.655 best1=0.682 n_val=15116 vram=0.49GB 68s | grade=0.861 inner_auc=0.835 vs conf_auc=0.807
+12:31:44 ===== CYCLE 289 (OUTER -> INNER -> FEEDBACK) =====
+12:32:41 [image/cifar10] vote=0.684 uniform=0.658 best1=0.681 n_val=14977 vram=0.49GB 58s | grade=0.862 inner_auc=0.828 vs conf_auc=0.799
+12:33:00 ===== CYCLE 290 (OUTER -> INNER -> FEEDBACK) =====
+12:33:59 [image/cifar10] vote=0.681 uniform=0.659 best1=0.678 n_val=15006 vram=0.49GB 59s | grade=0.863 inner_auc=0.817 vs conf_auc=0.792
+12:34:15 ===== CYCLE 291 (OUTER -> INNER -> FEEDBACK) =====
+12:35:15 [image/cifar10] vote=0.680 uniform=0.655 best1=0.675 n_val=15032 vram=0.49GB 60s | grade=0.863 inner_auc=0.834 vs conf_auc=0.804
+12:35:33 ===== CYCLE 292 (OUTER -> INNER -> FEEDBACK) =====
+12:36:59 [image/cifar10] vote=0.687 uniform=0.659 best1=0.683 n_val=15061 vram=0.49GB 86s | grade=0.859 inner_auc=0.827 vs conf_auc=0.803
+12:37:21 ===== CYCLE 293 (OUTER -> INNER -> FEEDBACK) =====
+12:38:58 [image/cifar10] vote=0.681 uniform=0.653 best1=0.677 n_val=15126 vram=0.49GB 97s | grade=0.861 inner_auc=0.829 vs conf_auc=0.804
+12:39:05 ===== CYCLE 294 (OUTER -> INNER -> FEEDBACK) =====
+12:40:30 [image/cifar10] vote=0.685 uniform=0.662 best1=0.681 n_val=15139 vram=0.48GB 85s | grade=0.862 inner_auc=0.843 vs conf_auc=0.816
+12:40:48 ===== CYCLE 295 (OUTER -> INNER -> FEEDBACK) =====
+12:41:39 [image/cifar10] vote=0.682 uniform=0.652 best1=0.680 n_val=15201 vram=0.48GB 51s | grade=0.860 inner_auc=0.835 vs conf_auc=0.813
+12:41:45 ===== CYCLE 296 (OUTER -> INNER -> FEEDBACK) =====
+12:42:06 [image/cifar10] vote=0.678 uniform=0.655 best1=0.673 n_val=14917 vram=0.49GB 21s | grade=0.863 inner_auc=0.832 vs conf_auc=0.807
+12:42:16 ===== CYCLE 297 (OUTER -> INNER -> FEEDBACK) =====
+12:42:49 [image/cifar10] vote=0.690 uniform=0.660 best1=0.687 n_val=14810 vram=0.49GB 32s | grade=0.858 inner_auc=0.838 vs conf_auc=0.818
+12:42:55 ===== CYCLE 298 (OUTER -> INNER -> FEEDBACK) =====
+12:43:20 [image/cifar10] vote=0.688 uniform=0.660 best1=0.686 n_val=14944 vram=0.49GB 24s | grade=0.863 inner_auc=0.838 vs conf_auc=0.808
+12:43:29 ===== CYCLE 299 (OUTER -> INNER -> FEEDBACK) =====
+12:43:52 [image/cifar10] vote=0.680 uniform=0.655 best1=0.676 n_val=14861 vram=0.49GB 23s | grade=0.860 inner_auc=0.838 vs conf_auc=0.816
+12:44:02 ===== CYCLE 300 (OUTER -> INNER -> FEEDBACK) =====
+12:44:37 [image/cifar10] vote=0.686 uniform=0.660 best1=0.682 n_val=14772 vram=0.49GB 35s | grade=0.861 inner_auc=0.830 vs conf_auc=0.801
+12:44:48 ===== CYCLE 301 (OUTER -> INNER -> FEEDBACK) =====
+12:45:23 [image/cifar10] vote=0.681 uniform=0.659 best1=0.677 n_val=14951 vram=0.49GB 35s | grade=0.861 inner_auc=0.832 vs conf_auc=0.810
+12:45:39 ===== CYCLE 302 (OUTER -> INNER -> FEEDBACK) =====
+12:46:24 [image/cifar10] vote=0.684 uniform=0.658 best1=0.681 n_val=14986 vram=0.49GB 46s | grade=0.862 inner_auc=0.829 vs conf_auc=0.803
+12:46:37 ===== CYCLE 303 (OUTER -> INNER -> FEEDBACK) =====
+12:47:18 [image/cifar10] vote=0.680 uniform=0.656 best1=0.676 n_val=15076 vram=0.49GB 41s | grade=0.862 inner_auc=0.841 vs conf_auc=0.813
+12:47:29 ===== CYCLE 304 (OUTER -> INNER -> FEEDBACK) =====
+12:48:06 [image/cifar10] vote=0.684 uniform=0.661 best1=0.681 n_val=15071 vram=0.49GB 37s | grade=0.863 inner_auc=0.835 vs conf_auc=0.810
+12:48:18 ===== CYCLE 305 (OUTER -> INNER -> FEEDBACK) =====
+12:48:53 [image/cifar10] vote=0.683 uniform=0.655 best1=0.681 n_val=15012 vram=0.49GB 35s | grade=0.864 inner_auc=0.832 vs conf_auc=0.804
+12:49:05 ===== CYCLE 306 (OUTER -> INNER -> FEEDBACK) =====
+12:49:39 [image/cifar10] vote=0.681 uniform=0.661 best1=0.678 n_val=14931 vram=0.49GB 35s | grade=0.865 inner_auc=0.834 vs conf_auc=0.813
+12:49:52 ===== CYCLE 307 (OUTER -> INNER -> FEEDBACK) =====
+12:50:25 [image/cifar10] vote=0.683 uniform=0.656 best1=0.679 n_val=15060 vram=0.49GB 33s | grade=0.862 inner_auc=0.822 vs conf_auc=0.788
+12:50:38 ===== CYCLE 308 (OUTER -> INNER -> FEEDBACK) =====
+12:51:28 [image/cifar10] vote=0.680 uniform=0.653 best1=0.676 n_val=15122 vram=0.49GB 51s | grade=0.864 inner_auc=0.837 vs conf_auc=0.809
+12:51:44 ===== CYCLE 309 (OUTER -> INNER -> FEEDBACK) =====
+12:53:00 [image/cifar10] vote=0.682 uniform=0.657 best1=0.680 n_val=14874 vram=0.49GB 76s | grade=0.864 inner_auc=0.838 vs conf_auc=0.806
+12:53:25 ===== CYCLE 310 (OUTER -> INNER -> FEEDBACK) =====
+12:54:10 [image/cifar10] vote=0.682 uniform=0.665 best1=0.679 n_val=14923 vram=0.49GB 45s | grade=0.865 inner_auc=0.842 vs conf_auc=0.813
+12:54:21 ===== CYCLE 311 (OUTER -> INNER -> FEEDBACK) =====
+12:55:02 [image/cifar10] vote=0.683 uniform=0.662 best1=0.681 n_val=15130 vram=0.48GB 40s | grade=0.864 inner_auc=0.833 vs conf_auc=0.811
+12:55:15 ===== CYCLE 312 (OUTER -> INNER -> FEEDBACK) =====
+12:55:55 [image/cifar10] vote=0.678 uniform=0.651 best1=0.675 n_val=14956 vram=0.49GB 40s | grade=0.861 inner_auc=0.836 vs conf_auc=0.811
+12:56:07 ===== CYCLE 313 (OUTER -> INNER -> FEEDBACK) =====
+12:56:49 [image/cifar10] vote=0.684 uniform=0.657 best1=0.682 n_val=15044 vram=0.49GB 42s | grade=0.862 inner_auc=0.834 vs conf_auc=0.811
+12:57:00 ===== CYCLE 314 (OUTER -> INNER -> FEEDBACK) =====
+12:57:42 [image/cifar10] vote=0.683 uniform=0.657 best1=0.681 n_val=14860 vram=0.49GB 42s | grade=0.864 inner_auc=0.833 vs conf_auc=0.806
+12:57:54 ===== CYCLE 315 (OUTER -> INNER -> FEEDBACK) =====
+12:58:33 [image/cifar10] vote=0.680 uniform=0.653 best1=0.677 n_val=15001 vram=0.49GB 39s | grade=0.864 inner_auc=0.836 vs conf_auc=0.806
+12:58:45 ===== CYCLE 316 (OUTER -> INNER -> FEEDBACK) =====
+12:59:27 [image/cifar10] vote=0.688 uniform=0.663 best1=0.686 n_val=14958 vram=0.49GB 41s | grade=0.860 inner_auc=0.828 vs conf_auc=0.798
+12:59:39 ===== CYCLE 317 (OUTER -> INNER -> FEEDBACK) =====
+13:00:17 [image/cifar10] vote=0.676 uniform=0.649 best1=0.675 n_val=14992 vram=0.49GB 38s | grade=0.859 inner_auc=0.829 vs conf_auc=0.802
+13:00:29 ===== CYCLE 318 (OUTER -> INNER -> FEEDBACK) =====
+13:01:07 [image/cifar10] vote=0.680 uniform=0.657 best1=0.676 n_val=14977 vram=0.49GB 38s | grade=0.861 inner_auc=0.828 vs conf_auc=0.800
+13:01:19 ===== CYCLE 319 (OUTER -> INNER -> FEEDBACK) =====
+13:02:01 [image/cifar10] vote=0.681 uniform=0.653 best1=0.677 n_val=15023 vram=0.49GB 42s | grade=0.862 inner_auc=0.832 vs conf_auc=0.806
+13:02:14 ===== CYCLE 320 (OUTER -> INNER -> FEEDBACK) =====
+13:03:10 [image/cifar10] vote=0.684 uniform=0.659 best1=0.681 n_val=15061 vram=0.49GB 56s | grade=0.863 inner_auc=0.837 vs conf_auc=0.813
+13:03:21 ===== CYCLE 321 (OUTER -> INNER -> FEEDBACK) =====
+13:04:03 [image/cifar10] vote=0.680 uniform=0.658 best1=0.677 n_val=15011 vram=0.49GB 42s | grade=0.862 inner_auc=0.842 vs conf_auc=0.817
+13:04:16 ===== CYCLE 322 (OUTER -> INNER -> FEEDBACK) =====
+13:04:59 [image/cifar10] vote=0.687 uniform=0.662 best1=0.684 n_val=15132 vram=0.49GB 43s | grade=0.860 inner_auc=0.824 vs conf_auc=0.796
+13:05:12 ===== CYCLE 323 (OUTER -> INNER -> FEEDBACK) =====
+13:05:53 [image/cifar10] vote=0.684 uniform=0.664 best1=0.682 n_val=14856 vram=0.49GB 41s | grade=0.865 inner_auc=0.837 vs conf_auc=0.808
+13:06:06 ===== CYCLE 324 (OUTER -> INNER -> FEEDBACK) =====
+13:07:16 [image/cifar10] vote=0.683 uniform=0.656 best1=0.682 n_val=14995 vram=0.49GB 70s | grade=0.863 inner_auc=0.827 vs conf_auc=0.802
+13:07:30 ===== CYCLE 325 (OUTER -> INNER -> FEEDBACK) =====
+13:08:17 [image/cifar10] vote=0.682 uniform=0.651 best1=0.678 n_val=14921 vram=0.49GB 48s | grade=0.864 inner_auc=0.832 vs conf_auc=0.806
+13:08:30 ===== CYCLE 326 (OUTER -> INNER -> FEEDBACK) =====
+13:09:32 [image/cifar10] vote=0.684 uniform=0.660 best1=0.682 n_val=14972 vram=0.49GB 62s | grade=0.863 inner_auc=0.830 vs conf_auc=0.801
+13:10:15 ===== CYCLE 327 (OUTER -> INNER -> FEEDBACK) =====
+13:12:44 [image/cifar10] vote=0.685 uniform=0.660 best1=0.681 n_val=15118 vram=0.49GB 149s | grade=0.866 inner_auc=0.837 vs conf_auc=0.810
+13:18:06 ===== CYCLE 328 (OUTER -> INNER -> FEEDBACK) =====
+13:18:45 [image/cifar10] vote=0.684 uniform=0.658 best1=0.680 n_val=14908 vram=0.49GB 40s | grade=0.864 inner_auc=0.837 vs conf_auc=0.814
+13:18:55 ===== CYCLE 329 (OUTER -> INNER -> FEEDBACK) =====
+13:19:30 [image/cifar10] vote=0.683 uniform=0.656 best1=0.680 n_val=15080 vram=0.49GB 34s | grade=0.864 inner_auc=0.841 vs conf_auc=0.815
+13:19:36 ===== CYCLE 330 (OUTER -> INNER -> FEEDBACK) =====
+13:20:34 [image/cifar10] vote=0.685 uniform=0.662 best1=0.682 n_val=15176 vram=0.48GB 58s | grade=0.863 inner_auc=0.836 vs conf_auc=0.813
+13:20:48 ===== CYCLE 331 (OUTER -> INNER -> FEEDBACK) =====

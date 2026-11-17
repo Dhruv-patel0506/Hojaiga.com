@@ -1,0 +1,370 @@
+{
+   "app_metadata": {
+      "app_name": "NS-USBloader",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure and use NS-USBloader to install applications and manage files",
+   "prerequisite_state": "NS-USBloader application is open and the main window is visible",
+   "total_steps": 12,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click on the 'Gear' icon",
+         "ui_target": {
+            "element_name": "Gear icon",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Gear icon",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'Gear' icon menu opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click on 'Download and install drivers'",
+         "ui_target": {
+            "element_name": "Download and install drivers",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Gear icon > Download and install drivers",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The drivers are downloaded and installed"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click on 'Select NSP files'",
+         "ui_target": {
+            "element_name": "Select NSP files",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Gamepad tab > Select NSP files",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A file dialog opens to select NSP files"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Drag and drop files into the application",
+         "ui_target": {
+            "element_name": "Drop area",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Gamepad tab > Drop area",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Files are added to the table"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Click on 'Explore content' -> 'Remote PC (via USB)'",
+         "ui_target": {
+            "element_name": "Explore content",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Gamepad tab > Explore content",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The content of the remote PC is displayed"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Click on 'Stop execution'",
+         "ui_target": {
+            "element_name": "Stop execution",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Gamepad tab > Stop execution",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The execution is stopped"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Click on 'Hekate' or 'LockPick_RCM' in the 'RCM' tab",
+         "ui_target": {
+            "element_name": "Hekate or LockPick_RCM",
+            "automation_id": null,
+            "hierarchical_path": "Main window > RCM tab > Hekate or LockPick_RCM",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected payload is added to the table"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Click on 'Split' or 'Merge' in the 'Folder with arrows and zeroes' tab",
+         "ui_target": {
+            "element_name": "Split or Merge",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Folder with arrows and zeroes tab > Split or Merge",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected operation is performed"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Click on 'Auto-check for updates'",
+         "ui_target": {
+            "element_name": "Auto-check for updates",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Gears tab > Auto-check for updates",
+            "element_type": "CheckBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The application checks for updates"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Click on 'Show only *.nsp in Goldleaf'",
+         "ui_target": {
+            "element_name": "Show only *.nsp in Goldleaf",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Gears tab > Show only *.nsp in Goldleaf",
+            "element_type": "CheckBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The filter is applied to the file list"
+      },
+      {
+         "step_id": 11,
+         "low_level_instruction": "Click on 'Logs'",
+         "ui_target": {
+            "element_name": "Logs",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Dialog with three dots tab > Logs",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The logs are displayed"
+      },
+      {
+         "step_id": 12,
+         "low_level_instruction": "Click on 'Help' in the command line interface",
+         "ui_target": {
+            "element_name": "Help",
+            "automation_id": null,
+            "hierarchical_path": "Main window > CLI tab > Help",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Help information is displayed"
+      }
+   ],
+   "_meta": {
+      "source_app": "NS-USBloader",
+      "app_key": "ns_usbloader",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "Let's stay in touch:",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:32:23Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

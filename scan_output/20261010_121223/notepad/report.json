@@ -1,0 +1,807 @@
+{
+ "app": "notepad",
+ "name": "notepad",
+ "tier": 1,
+ "mode": "full",
+ "scenario": "",
+ "started": "2026-10-10 12:16:27",
+ "phases": {
+  "target": {
+   "display": "Notepad",
+   "id": "Microsoft.WindowsNotepad_8wekyb3d8bbwe!App",
+   "exe": "C:\\windows\\system32\\notepad.exe",
+   "packaged": true,
+   "chromium": ""
+  },
+  "state": {
+   "packaged": true,
+   "family": "Microsoft.WindowsNotepad_8wekyb3d8bbwe",
+   "backed_up": "C:\\Users\\dhruv\\AppData\\Local\\Packages\\Microsoft.WindowsNotepad_8wekyb3d8bbwe\\LocalState",
+   "session_files_cleared": 11
+  },
+  "launch": {
+   "launched": true,
+   "hwnd": 67056,
+   "notes": [
+    "stable"
+   ],
+   "resolved": "Notepad",
+   "title": "Untitled - Notepad",
+   "launch_s": 4.35
+  },
+  "park": "parked",
+  "tree": {
+   "nodes": 68,
+   "waited_s": 0.0,
+   "frame_only": false
+  },
+  "start_s": 5.5,
+  "deep_scan": {
+   "profile": {
+    "family": "winui",
+    "evidence": [
+     "class Notepad / framework Win32",
+     "XAML controls inside"
+    ],
+    "window_class": "Notepad",
+    "process": "notepad",
+    "framework_id": "Win32",
+    "route_prior": [
+     "control",
+     "shortcut",
+     "value"
+    ],
+    "expected_a11y": "rich",
+    "adapters": [],
+    "note": "XAML: Invoke / Toggle / Select work; posted mouse input is usually ignored (measured on Paint)"
+   },
+   "nodes": 68,
+   "interactive": 48,
+   "named": 52,
+   "depth": 7,
+   "native_menu_items": 0,
+   "state": "rich",
+   "waited_s": 2.02,
+   "settled": true,
+   "notes": [
+    "a tree cannot see closed drop-downs and menus: those come from native menus, the guide, or opening them (owned windows only)"
+   ]
+  },
+  "vision_scan": {
+   "vision_model": false,
+   "seconds": 7.2,
+   "elements": 29,
+   "named": 28,
+   "by_source": {
+    "uia": 22,
+    "cv": 14,
+    "ocr": 13,
+    "knowledge": 6
+   },
+   "regions": 7,
+   "path": "full:quick"
+  },
+  "catalog": {
+   "app": "notepad",
+   "verbs": 22,
+   "with_shortcut": 5,
+   "tooltips": 0,
+   "menus": [
+    "System"
+   ],
+   "sources": {
+    "uia": 22,
+    "menu-expand": 51,
+    "reveal": 20
+   },
+   "conflicts": 0,
+   "safety": {
+    "safe": 19,
+    "commit": 1,
+    "runtime": 0,
+    "sensitive": 0,
+    "unsafe": 2
+   },
+   "archetype": "document_text",
+   "seconds": 0.004
+  },
+  "menus": {
+   "openers": 7,
+   "opened": 6,
+   "items": 51,
+   "dialog_openers": 0,
+   "submenus": 2,
+   "failed": [],
+   "skipped": [
+    {
+     "path": "File > Recent",
+     "why": "lists the person's own files / history - left closed"
+    }
+   ],
+   "seconds": 42.5,
+   "by_opener": {
+    "File": 13,
+    "Edit": 16,
+    "View": 4,
+    "View > Zoom": 3,
+    "View > Markdown": 2,
+    "Headings": 0,
+    "Lists": 4,
+    "Table": 2,
+    "Writing tools": 7
+   }
+  },
+  "catalog_after_menus": {
+   "app": "notepad",
+   "verbs": 73,
+   "with_shortcut": 34,
+   "tooltips": 0,
+   "menus": [
+    "Edit",
+    "File",
+    "Lists",
+    "System",
+    "Table",
+    "View",
+    "Writing tools"
+   ],
+   "sources": {
+    "uia": 22,
+    "menu-expand": 51,
+    "reveal": 20
+   },
+   "conflicts": 1,
+   "safety": {
+    "safe": 57,
+    "commit": 6,
+    "runtime": 0,
+    "sensitive": 3,
+    "unsafe": 7
+   },
+   "archetype": "document_text",
+   "seconds": 0.004
+  },
+  "options": {
+   "candidates": 6,
+   "tried": 6,
+   "opened": 2,
+   "dialogs": 1,
+   "pages": 1,
+   "inline": 0,
+   "nothing": 2,
+   "controls": 20,
+   "left_ok": 6,
+   "skipped": [
+    {
+     "path": "File > Open",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "File > Save",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "File > Save as",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "File > Save all",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "File > Print",
+     "why": "opens a file picker / saves / prints: it would touch the person's files - not opened"
+    },
+    {
+     "path": "Edit > Search with Bing",
+     "why": "leaves the application (web, account, update, help) - not opened"
+    },
+    {
+     "path": "Edit > Define with Bing",
+     "why": "leaves the application (web, account, update, help) - not opened"
+    },
+    {
+     "path": "What's new",
+     "why": "leaves the application (web, account, update, help) - not opened"
+    },
+    {
+     "path": "User avatar",
+     "why": "leaves the application (web, account, update, help) - not opened"
+    }
+   ],
+   "surfaces": [
+    {
+     "path": "Settings",
+     "label": "Settings",
+     "kind": "page",
+     "controls": [
+      "App theme",
+      "Font",
+      "Word wrap",
+      "Formatting",
+      "Opening files",
+      "Back"
+     ],
+     "how": "UIA Invoke",
+     "left_by": "'Back' button",
+     "restored": true,
+     "seconds": 6.6,
+     "effect": "context_change",
+     "added": 6
+    },
+    {
+     "path": "File > Page setup",
+     "label": "Page setup",
+     "kind": "dialog",
+     "controls": [
+      "Size:",
+      "Open",
+      "Source:",
+      "Open",
+      "Portrait",
+      "Landscape",
+      "Left:",
+      "Right:",
+      "Top:",
+      "Bottom:",
+      "Header:",
+      "Footer:",
+      "Input Values",
+      "OK",
+      "Cancel",
+      "Size:",
+      "Open",
+      "Source:",
+      "Open",
+      "Portrait",
+      "Landscape",
+      "Left:",
+      "Right:",
+      "Top:",
+      "Bottom:",
+      "Header:",
+      "Footer:",
+      "Input Values",
+      "OK",
+      "Cancel"
+     ],
+     "how": "UIA Invoke",
+     "left_by": "'Cancel' button",
+     "restored": true,
+     "seconds": 7.6,
+     "effect": "opens_dialog",
+     "added": 14
+    },
+    {
+     "path": "Edit > Find",
+     "label": "Find",
+     "kind": "none",
+     "controls": [],
+     "how": "UIA Invoke",
+     "left_by": "Escape",
+     "restored": true,
+     "seconds": 5.9,
+     "effect": "visual_only"
+    },
+    {
+     "path": "Edit > Replace",
+     "label": "Replace",
+     "kind": "none",
+     "controls": [],
+     "how": "UIA Invoke",
+     "left_by": "Escape",
+     "restored": true,
+     "seconds": 5.7,
+     "effect": "visual_only"
+    },
+    {
+     "path": "Edit > Go to",
+     "label": "Go to",
+     "kind": "unreachable",
+     "controls": [],
+     "how": "the control was not in the live tree after opening its path",
+     "left_by": "",
+     "restored": true,
+     "seconds": 10.4
+    },
+    {
+     "path": "Edit > Font",
+     "label": "Font",
+     "kind": "unreachable",
+     "controls": [],
+     "how": "the control was not in the live tree after opening its path",
+     "left_by": "",
+     "restored": true,
+     "seconds": 10.4
+    }
+   ],
+   "stopped": "",
+   "tainted": false,
+   "seconds": 50.0
+  },
+  "catalog_after_options": {
+   "app": "notepad",
+   "verbs": 93,
+   "with_shortcut": 34,
+   "tooltips": 0,
+   "menus": [
+    "Edit",
+    "File",
+    "Lists",
+    "Settings",
+    "System",
+    "Table",
+    "View",
+    "Writing tools"
+   ],
+   "sources": {
+    "uia": 22,
+    "menu-expand": 51,
+    "reveal": 20
+   },
+   "conflicts": 1,
+   "safety": {
+    "safe": 76,
+    "commit": 7,
+    "runtime": 0,
+    "sensitive": 3,
+    "unsafe": 7
+   },
+   "archetype": "document_text",
+   "seconds": 0.004
+  },
+  "ui_map": [
+   {
+    "path": "Edit",
+    "kind": "menu",
+    "count": 16,
+    "items": [
+     "Clear formatting",
+     "Copy",
+     "Cut",
+     "Define with Bing",
+     "Delete",
+     "Find",
+     "Find next",
+     "Find previous",
+     "Font",
+     "Go to",
+     "Paste",
+     "Replace",
+     "Search with Bing",
+     "Select all",
+     "Time/Date",
+     "Undo"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "File",
+    "kind": "menu",
+    "count": 13,
+    "items": [
+     "Close tab",
+     "Close window",
+     "Exit",
+     "New Markdown tab",
+     "New tab",
+     "New window",
+     "Open",
+     "Page setup",
+     "Print",
+     "Recent",
+     "Save",
+     "Save all",
+     "Save as"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "File > Page setup",
+    "kind": "dialog",
+    "count": 14,
+    "items": [
+     "Bottom:",
+     "Cancel",
+     "Footer:",
+     "Header:",
+     "Input Values",
+     "Landscape",
+     "Left:",
+     "OK",
+     "Open",
+     "Portrait",
+     "Right:",
+     "Size:",
+     "Source:",
+     "Top:"
+    ],
+    "depth": 2
+   },
+   {
+    "path": "Lists",
+    "kind": "menu",
+    "count": 4,
+    "items": [
+     "Bulleted list",
+     "Decrease indent",
+     "Increase indent",
+     "Numbered list"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "Settings",
+    "kind": "page",
+    "count": 6,
+    "items": [
+     "App theme",
+     "Back",
+     "Font",
+     "Formatting",
+     "Opening files",
+     "Word wrap"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "Table",
+    "kind": "menu",
+    "count": 2,
+    "items": [
+     "Edit table",
+     "Insert table"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "View",
+    "kind": "menu",
+    "count": 4,
+    "items": [
+     "Markdown",
+     "Status bar",
+     "Word wrap",
+     "Zoom"
+    ],
+    "depth": 1
+   },
+   {
+    "path": "View > Markdown",
+    "kind": "submenu",
+    "count": 2,
+    "items": [
+     "Formatted",
+     "Syntax"
+    ],
+    "depth": 2
+   },
+   {
+    "path": "View > Zoom",
+    "kind": "submenu",
+    "count": 3,
+    "items": [
+     "Restore default zoom",
+     "Zoom in",
+     "Zoom out"
+    ],
+    "depth": 2
+   },
+   {
+    "path": "Writing tools",
+    "kind": "menu",
+    "count": 7,
+    "items": [
+     "Change format",
+     "Change tone",
+     "Make longer",
+     "Make shorter",
+     "Rewrite",
+     "Summarise",
+     "Write"
+    ],
+    "depth": 1
+   }
+  ],
+  "tree_picture": {
+   "nodes": 68,
+   "levels": 8,
+   "by_depth": {
+    "0": 1,
+    "1": 5,
+    "2": 8,
+    "3": 25,
+    "4": 17,
+    "5": 6,
+    "6": 5,
+    "7": 1
+   },
+   "top_roles": {
+    "text": 24,
+    "button": 20,
+    "pane": 9,
+    "menuitem": 4,
+    "window": 2,
+    "menubar": 2,
+    "document": 1,
+    "tab": 1
+   }
+  },
+  "perceive_s": 104.2,
+  "guide": {
+   "docs": 3,
+   "runnable_procedures": 2
+  },
+  "close": {
+   "how": "close"
+  },
+  "state_after": {
+   "restored": "C:\\Users\\dhruv\\AppData\\Local\\Packages\\Microsoft.WindowsNotepad_8wekyb3d8bbwe\\LocalState"
+  }
+ },
+ "checkpoints": [
+  {
+   "n": 1,
+   "tag": "launched",
+   "file": "checkpoints/cp_01_launched.png",
+   "at_s": 5.6
+  },
+  {
+   "n": 2,
+   "tag": "after_scan_home",
+   "file": "checkpoints/cp_02_after_scan_home.png",
+   "at_s": 116.3
+  },
+  {
+   "n": 3,
+   "tag": "task01_ok_How do I change header and footer in Notepad?",
+   "file": "checkpoints/cp_03_task01_ok_How_do_I_change_header_and_footer_in_Not.png",
+   "at_s": 131.4
+  },
+  {
+   "n": 4,
+   "tag": "task02_blocked_How do I use Notepad to create a log file?",
+   "file": "checkpoints/cp_04_task02_blocked_How_do_I_use_Notepad_to_create_a_lo.png",
+   "at_s": 139.7
+  },
+  {
+   "n": 5,
+   "tag": "end_of_run",
+   "file": "checkpoints/cp_05_end_of_run.png",
+   "at_s": 139.8
+  }
+ ],
+ "seconds": 139.8,
+ "ledger": [
+  {
+   "goal": "Enhance Your Writing with AI in Notepad",
+   "cite": "Enhance Your Writing with AI in Notepad",
+   "source": "https://support.microsoft.com/en-us/windows/ai/ai-apps/enhance-your-writing-with-ai-in-notepad",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control)"
+  },
+  {
+   "goal": "Configure policies",
+   "cite": "Manage AI features in Notepad > Configure policies",
+   "source": "https://learn.microsoft.com/en-us/windows/client-management/manage-notepad",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the step names no control)"
+  },
+  {
+   "goal": "Configure policies",
+   "cite": "Manage AI features in Notepad > Configure policies",
+   "source": "https://learn.microsoft.com/en-us/windows/client-management/manage-notepad",
+   "steps": 1,
+   "grounded": 0.0,
+   "disposition": "skipped",
+   "reason": "no step names a control that exists in this application's interface (the manual says 'HKLM:\\SOFTWARE\\Policies\\WindowsNotepad'; no)"
+  },
+  {
+   "goal": "How do I change header and footer in Notepad?",
+   "cite": "Help in Notepad > How do I change header and footer in Notepad?",
+   "source": "https://support.microsoft.com/en-us/windows/apps/help-in-notepad",
+   "steps": 3,
+   "grounded": 1.0,
+   "disposition": "ok",
+   "reason": ""
+  },
+  {
+   "goal": "How do I use Notepad to create a log file?",
+   "cite": "Help in Notepad > How do I use Notepad to create a log file?",
+   "source": "https://support.microsoft.com/en-us/windows/apps/help-in-notepad",
+   "steps": 5,
+   "grounded": 0.6,
+   "disposition": "blocked",
+   "reason": "'Save as' is commit; waiting for a human yes"
+  }
+ ],
+ "ledger_counts": {
+  "blocked": 1,
+  "ok": 1,
+  "skipped": 3
+ },
+ "tasks": [
+  {
+   "goal": "How do I change header and footer in Notepad?",
+   "cite": "Help in Notepad > How do I change header and footer in Notepad?",
+   "source": "https://support.microsoft.com/en-us/windows/apps/help-in-notepad",
+   "steps_in_guide": 3,
+   "grounded": 1.0,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "ok",
+     "why": "",
+     "remedy": "",
+     "steps": 3,
+     "done": 3,
+     "seconds": 13.0,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": "Page setup",
+       "status": "done",
+       "route": "control:Page setup",
+       "effect": "opens_dialog",
+       "summary": "1 new window(s); added Page setup, Paper, Size:, Open, Source:; context changed in Untitled - Notepad, Page setup, (window)",
+       "vision_ok": null,
+       "ms": 4438
+      },
+      {
+       "step": 2,
+       "verb": "Header:",
+       "status": "done",
+       "route": "value:set value of 'Header:'",
+       "effect": "state_change",
+       "summary": "text 'Header:=[0]' -> 'Header:=Hojaiga test[12]'",
+       "vision_ok": null,
+       "ms": 3569
+      },
+      {
+       "step": 3,
+       "verb": "Footer:",
+       "status": "done",
+       "route": "value:set value of 'Footer:'",
+       "effect": "state_change",
+       "summary": "text 'Footer:=[0]' -> 'Footer:=Hojaiga test[12]'",
+       "vision_ok": null,
+       "ms": 4596
+      }
+     ]
+    }
+   ],
+   "final": "ok"
+  },
+  {
+   "goal": "How do I use Notepad to create a log file?",
+   "cite": "Help in Notepad > How do I use Notepad to create a log file?",
+   "source": "https://support.microsoft.com/en-us/windows/apps/help-in-notepad",
+   "steps_in_guide": 5,
+   "grounded": 0.6,
+   "attempts": [
+    {
+     "n": 1,
+     "status": "blocked",
+     "why": "'Save as' is commit; waiting for a human yes",
+     "remedy": "",
+     "steps": 5,
+     "done": 2,
+     "seconds": 7.1,
+     "by": "guide",
+     "results": [
+      {
+       "step": 1,
+       "verb": ".LOG",
+       "status": "done",
+       "route": "text:uia",
+       "effect": "context_change",
+       "summary": "UIA SetValue (append 4 chars to 'Text editor'); text 'Text editor=[0]' -> 'Text editor=.LOG[4]'; text 'Untitled' -> '.LOG'; text '' -> ''; added *.LOG - Notep",
+       "vision_ok": null,
+       "ms": 3719
+      },
+      {
+       "step": 2,
+       "verb": "enter",
+       "status": "done",
+       "route": "text:uia",
+       "effect": "state_change",
+       "summary": "UIA SetValue (append 2 chars to 'Text editor'); text 'Text editor=.LOG[4]' -> 'Text editor=.LOG\r[5]'; context changed in *.LOG - Notepad",
+       "vision_ok": null,
+       "ms": 3134
+      },
+      {
+       "step": 3,
+       "verb": "Save as",
+       "status": "needs_human",
+       "route": "",
+       "effect": "",
+       "summary": "'Save as' is commit; waiting for a human yes",
+       "vision_ok": null,
+       "ms": 0
+      },
+      {
+       "unknown_in_guide": [
+        "the manual says 'File name'; no such control is in the application's catalog (it may sit in a menu or dialog that is not open)",
+        "the step names no control"
+       ]
+      }
+     ]
+    }
+   ],
+   "final": "blocked"
+  }
+ ],
+ "counts": {
+  "ok": 1,
+  "blocked": 1,
+  "failed": 0
+ },
+ "ml": {
+  "outcome": {
+   "seen": 1495,
+   "updates": 4874,
+   "prequential_n": 1494,
+   "ok_accuracy": 0.8594,
+   "ok_baseline": 0.749,
+   "effect_accuracy": 0.7456,
+   "effect_baseline": 0.4746,
+   "ok_brier": 0.1193,
+   "beats_baseline": true,
+   "parameters": 98646
+  },
+  "candidates": {
+   "seen": 28517,
+   "positives": 18295,
+   "updates": 5786,
+   "prequential_auc": 0.9998,
+   "parameters": 24625,
+   "sources": 3,
+   "ready_to_filter": false
+  },
+  "motor": {
+   "a": 0.1,
+   "b": 0.12,
+   "prior": {
+    "a": 0.1,
+    "b": 0.12
+   },
+   "learned_from_people": false,
+   "n": 0,
+   "r2": null,
+   "rmse": null
+  },
+  "events": {
+   "transitions": 18,
+   "scans": 2,
+   "replay_rounds": 12,
+   "checkpoints": 2
+  },
+  "training_now": false
+ },
+ "history": {
+  "transitions": 376,
+  "with_effect": 326,
+  "targets": 19,
+  "apps": 1,
+  "by_source": {
+   "guide": 106,
+   "menu-expand": 245,
+   "probe": 1,
+   "recovery": 1,
+   "reveal": 22,
+   "sleep": 1
+  }
+ },
+ "pointer": {
+  "traces": 29,
+  "avg_planned_s": 0.735,
+  "avg_actual_s": 0.735,
+  "virtual": 0
+ },
+ "focus_returns": 4
+}

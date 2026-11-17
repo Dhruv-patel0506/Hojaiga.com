@@ -1,0 +1,307 @@
+{
+   "app_metadata": {
+      "app_name": "Sussurro IA",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install Sussurro IA and configure it for use",
+   "prerequisite_state": "Windows 10 or 11 64-bit, internet connection",
+   "total_steps": 10,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download Sussurro.IA_1.0.1_x64-setup.exe from the Releases page",
+         "ui_target": {
+            "element_name": "Releases page",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Downloaded file is saved to the Downloads folder"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Right-click on Sussurro.IA_1.0.1_x64-setup.exe and select 'Properties'",
+         "ui_target": {
+            "element_name": "Properties",
+            "automation_id": null,
+            "hierarchical_path": "File Explorer > Sussurro.IA_1.0.1_x64-setup.exe > Properties",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Properties window opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Uncheck 'Unblock file'",
+         "ui_target": {
+            "element_name": "Unblock file",
+            "automation_id": null,
+            "hierarchical_path": "Properties window > Unblock file",
+            "element_type": "CheckBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "File is unblocked"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click 'OK' to close the Properties window",
+         "ui_target": {
+            "element_name": "OK",
+            "automation_id": null,
+            "hierarchical_path": "Properties window > OK",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Properties window closes"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Run the installer by double-clicking Sussurro.IA_1.0.1_x64-setup.exe",
+         "ui_target": {
+            "element_name": "Sussurro.IA_1.0.1_x64-setup.exe",
+            "automation_id": null,
+            "hierarchical_path": "Downloads folder > Sussurro.IA_1.0.1_x64-setup.exe",
+            "element_type": "File",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DOUBLE_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Installer window opens"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Click 'Install' to start the installation",
+         "ui_target": {
+            "element_name": "Install",
+            "automation_id": null,
+            "hierarchical_path": "Installer window > Install",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Installation process starts"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Wait for the installation to complete",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Installation completes"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Open the Sussurro IA icon in the system tray",
+         "ui_target": {
+            "element_name": "Sussurro IA icon",
+            "automation_id": null,
+            "hierarchical_path": "System tray > Sussurro IA icon",
+            "element_type": "Icon",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Cruscotto window opens"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Click on the 'chiave API' panel",
+         "ui_target": {
+            "element_name": "chiave API",
+            "automation_id": null,
+            "hierarchical_path": "Cruscotto window > chiave API",
+            "element_type": "Panel",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "API key input field is focused"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Enter the API key and click 'Save'",
+         "ui_target": {
+            "element_name": "Save",
+            "automation_id": null,
+            "hierarchical_path": "Cruscotto window > chiave API > Save",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "API key is saved and the panel turns green"
+      }
+   ],
+   "_meta": {
+      "source_app": "Sussurro IA",
+      "app_key": "sussurro_ia",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Sussurro IA",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:51:20Z",
+      "schema_warnings": [
+         "step7_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

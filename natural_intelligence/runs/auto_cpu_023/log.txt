@@ -1,0 +1,282 @@
+18:27:46 NI run auto_cpu_023 on CPU; hours=2.0 smoke=False
+18:27:46 explicit task list: ['enc/image/cats_vs_dogs']
+18:27:46 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+18:27:46 [data] enc/image/cats_vs_dogs: n=23410 C=2 D=768 shards=1
+18:28:39 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.994 n_val=7085 vram=0.00GB 53s
+18:29:03 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 7085, "n_val": 1397, "base_rate": 0.9914101362228394, "inner": {"auc": 0.9491275571600482, "ece": 0.006072279335177619, "brier": 0.006536003667861223, "acc80": 0.9991047382354736}, "outer_conf": {"auc": 0.9469314079422383, "ece": 0.020588472858871318, "brier": 0.007430852856487036, "acc80": 0.9991047382354736}}
+18:29:03 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+18:30:06 [enc/image/cats_vs_dogs] vote=0.992 uniform=0.992 best1=0.992 n_val=7080 vram=0.00GB 63s | grade=0.964 inner_auc=0.973 vs conf_auc=0.973
+18:30:17 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+18:31:26 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.992 n_val=7026 vram=0.00GB 68s | grade=0.969 inner_auc=0.977 vs conf_auc=0.987
+18:31:42 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+18:32:53 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7093 vram=0.00GB 71s | grade=0.970 inner_auc=0.988 vs conf_auc=0.984
+18:33:07 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+18:34:19 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7037 vram=0.00GB 71s | grade=0.969 inner_auc=0.973 vs conf_auc=0.961
+18:34:34 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+18:35:45 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.993 n_val=6919 vram=0.00GB 71s | grade=0.966 inner_auc=0.990 vs conf_auc=0.988
+18:35:59 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+18:37:11 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7029 vram=0.00GB 73s | grade=0.964 inner_auc=0.991 vs conf_auc=0.991
+18:37:26 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+18:38:37 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.994 n_val=7036 vram=0.00GB 71s | grade=0.968 inner_auc=0.987 vs conf_auc=0.984
+18:38:51 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+18:40:01 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.994 n_val=7107 vram=0.00GB 70s | grade=0.964 inner_auc=0.981 vs conf_auc=0.978
+18:40:17 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+18:41:29 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7110 vram=0.00GB 72s | grade=0.963 inner_auc=0.966 vs conf_auc=0.964
+18:41:43 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+18:42:55 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.994 n_val=7049 vram=0.00GB 71s | grade=0.967 inner_auc=0.989 vs conf_auc=0.987
+18:43:11 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+18:44:21 [enc/image/cats_vs_dogs] vote=0.992 uniform=0.992 best1=0.992 n_val=6948 vram=0.00GB 71s | grade=0.968 inner_auc=0.990 vs conf_auc=0.989
+18:44:36 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+18:45:47 [enc/image/cats_vs_dogs] vote=0.992 uniform=0.992 best1=0.993 n_val=6970 vram=0.00GB 71s | grade=0.952 inner_auc=0.988 vs conf_auc=0.987
+18:46:02 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+18:47:13 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.994 n_val=6926 vram=0.00GB 72s | grade=0.963 inner_auc=0.957 vs conf_auc=0.966
+18:47:29 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+18:48:38 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.992 best1=0.993 n_val=7086 vram=0.00GB 69s | grade=0.967 inner_auc=0.990 vs conf_auc=0.983
+18:48:52 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+18:50:04 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=7062 vram=0.00GB 71s | grade=0.962 inner_auc=0.995 vs conf_auc=0.987
+18:50:19 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+18:51:31 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.993 best1=0.994 n_val=7075 vram=0.00GB 71s | grade=0.958 inner_auc=0.982 vs conf_auc=0.980
+18:51:44 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+18:52:56 [enc/image/cats_vs_dogs] vote=0.995 uniform=0.994 best1=0.995 n_val=6981 vram=0.00GB 72s | grade=0.974 inner_auc=0.978 vs conf_auc=0.968
+18:53:10 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+18:54:25 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=6952 vram=0.00GB 75s | grade=0.967 inner_auc=0.996 vs conf_auc=0.994
+07:11:35 NI run auto_cpu_023 on CPU; hours=2.0 smoke=False
+07:11:35 explicit task list: ['enc/image/cats_vs_dogs']
+07:11:41 [resume] from checkpoint: next cycle 18, rounds 18, 19 metric rows, inner net restored
+07:11:41 ===== CYCLE 18 (OUTER-ONLY BOOTSTRAP) =====
+07:11:41 [data] enc/image/cats_vs_dogs: n=23410 C=2 D=768 shards=1
+07:13:42 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=6952 vram=0.00GB 121s
+07:13:56 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 18, "n_records": 6952, "n_val": 1404, "base_rate": 0.9950142502784729, "inner": {"auc": 0.9947847428162389, "ece": 0.00350403668958577, "brier": 0.0032394081354141235, "acc80": 1.0}, "outer_conf": {"auc": 0.9935576234788833, "ece": 0.008444850388755146, "brier": 0.003903362201526761, "acc80": 1.0}}
+07:13:56 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+07:16:29 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.993 best1=0.994 n_val=7056 vram=0.00GB 153s | grade=0.968 inner_auc=0.992 vs conf_auc=0.987
+07:16:41 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+07:19:12 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7112 vram=0.00GB 151s | grade=0.974 inner_auc=0.981 vs conf_auc=0.980
+07:19:26 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+07:22:04 [enc/image/cats_vs_dogs] vote=0.992 uniform=0.992 best1=0.993 n_val=7054 vram=0.00GB 158s | grade=0.971 inner_auc=0.980 vs conf_auc=0.979
+07:22:16 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+07:25:16 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.994 n_val=7074 vram=0.00GB 180s | grade=0.968 inner_auc=0.871 vs conf_auc=0.956
+07:25:34 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+07:29:22 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.992 best1=0.993 n_val=7044 vram=0.00GB 229s | grade=0.976 inner_auc=0.986 vs conf_auc=0.986
+07:29:42 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+07:32:30 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.995 best1=0.994 n_val=7090 vram=0.00GB 168s | grade=0.975 inner_auc=0.976 vs conf_auc=0.981
+07:32:44 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+20:22:44 NI run auto_cpu_023 on CPU; hours=2.0 smoke=False
+20:22:44 explicit task list: ['enc/image/cats_vs_dogs']
+20:22:49 [resume] from checkpoint: next cycle 25, rounds 25, 26 metric rows, inner net restored
+20:22:49 ===== CYCLE 25 (OUTER-ONLY BOOTSTRAP) =====
+20:22:49 [data] enc/image/cats_vs_dogs: n=23410 C=2 D=768 shards=1
+20:27:53 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=7110 vram=0.00GB 304s
+20:28:36 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 25, "n_records": 7110, "n_val": 1469, "base_rate": 0.9959155917167664, "inner": {"auc": 0.969127363864206, "ece": 0.002361112626090676, "brier": 0.0036073713563382626, "acc80": 1.0}, "outer_conf": {"auc": 0.9707222601959444, "ece": 0.006674461639844454, "brier": 0.003958863206207752, "acc80": 1.0}}
+20:28:36 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+20:34:37 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=6992 vram=0.00GB 360s | grade=0.975 inner_auc=0.992 vs conf_auc=0.994
+20:34:58 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+20:40:19 [enc/image/cats_vs_dogs] vote=0.992 uniform=0.992 best1=0.992 n_val=7024 vram=0.00GB 321s | grade=0.974 inner_auc=0.956 vs conf_auc=0.957
+20:40:40 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+20:45:46 [enc/image/cats_vs_dogs] vote=0.992 uniform=0.992 best1=0.992 n_val=7025 vram=0.00GB 306s | grade=0.972 inner_auc=0.974 vs conf_auc=0.980
+20:46:08 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+20:51:10 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.994 n_val=7030 vram=0.00GB 302s | grade=0.975 inner_auc=0.955 vs conf_auc=0.965
+20:51:31 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+20:56:33 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=6924 vram=0.00GB 303s | grade=0.975 inner_auc=0.994 vs conf_auc=0.995
+20:56:54 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+21:02:43 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.993 n_val=7018 vram=0.00GB 349s | grade=0.970 inner_auc=0.982 vs conf_auc=0.982
+21:03:08 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+21:08:43 [enc/image/cats_vs_dogs] vote=0.995 uniform=0.994 best1=0.995 n_val=7020 vram=0.00GB 336s | grade=0.978 inner_auc=0.960 vs conf_auc=0.963
+21:09:12 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+21:14:56 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.994 n_val=7016 vram=0.00GB 344s | grade=0.977 inner_auc=0.943 vs conf_auc=0.971
+21:15:17 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+21:20:18 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7104 vram=0.00GB 301s | grade=0.970 inner_auc=0.989 vs conf_auc=0.987
+21:20:41 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+21:25:37 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7017 vram=0.00GB 296s | grade=0.971 inner_auc=0.987 vs conf_auc=0.984
+21:25:58 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+21:30:41 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=6976 vram=0.00GB 283s | grade=0.972 inner_auc=0.996 vs conf_auc=0.999
+21:31:05 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+21:35:33 [enc/image/cats_vs_dogs] vote=0.992 uniform=0.992 best1=0.992 n_val=7074 vram=0.00GB 268s | grade=0.965 inner_auc=0.989 vs conf_auc=0.985
+21:35:54 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+21:40:25 [enc/image/cats_vs_dogs] vote=0.995 uniform=0.994 best1=0.994 n_val=7168 vram=0.00GB 271s | grade=0.975 inner_auc=0.980 vs conf_auc=0.977
+21:40:45 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+21:45:28 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.993 best1=0.994 n_val=6971 vram=0.00GB 283s | grade=0.974 inner_auc=0.995 vs conf_auc=0.996
+21:45:52 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+21:51:18 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.994 best1=0.993 n_val=7105 vram=0.00GB 326s | grade=0.973 inner_auc=0.948 vs conf_auc=0.958
+21:51:40 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+21:56:33 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=7060 vram=0.00GB 293s | grade=0.975 inner_auc=0.973 vs conf_auc=0.974
+21:56:55 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+22:02:06 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.992 best1=0.993 n_val=7123 vram=0.00GB 311s | grade=0.970 inner_auc=0.992 vs conf_auc=0.991
+22:02:27 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+22:07:21 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.992 best1=0.993 n_val=7087 vram=0.00GB 294s | grade=0.972 inner_auc=0.990 vs conf_auc=0.987
+22:07:45 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+22:13:37 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7050 vram=0.00GB 352s | grade=0.969 inner_auc=0.984 vs conf_auc=0.979
+22:14:05 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+22:19:54 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=7124 vram=0.00GB 350s | grade=0.976 inner_auc=0.970 vs conf_auc=0.973
+22:20:20 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+22:25:38 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.995 n_val=7033 vram=0.00GB 318s | grade=0.972 inner_auc=0.950 vs conf_auc=0.961
+22:25:55 RUN COMPLETE
+12:57:52 NI run auto_cpu_023 on CPU; hours=2.0 smoke=False
+12:57:52 explicit task list: ['enc/image/cats_vs_dogs']
+12:58:03 [resume] from checkpoint: next cycle 47, rounds 47, 48 metric rows, inner net restored
+12:58:03 ===== CYCLE 47 (OUTER-ONLY BOOTSTRAP) =====
+12:58:04 [data] enc/image/cats_vs_dogs: n=23410 C=2 D=768 shards=1
+13:03:08 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=7217 vram=0.00GB 304s
+13:03:54 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 47, "n_records": 7217, "n_val": 1460, "base_rate": 0.9952054619789124, "inner": {"auc": 0.9799429751253564, "ece": 0.0033466519150015424, "brier": 0.0031727503519505262, "acc80": 1.0}, "outer_conf": {"auc": 0.9799429751253564, "ece": 0.005996662133360562, "brier": 0.003218134166672826, "acc80": 1.0}}
+13:03:54 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+13:09:44 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=6987 vram=0.00GB 351s | grade=0.971 inner_auc=0.870 vs conf_auc=0.948
+13:10:11 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+13:16:21 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.994 best1=0.993 n_val=6984 vram=0.00GB 370s | grade=0.978 inner_auc=0.945 vs conf_auc=0.958
+13:16:45 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+13:21:55 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.993 best1=0.993 n_val=7040 vram=0.00GB 310s | grade=0.980 inner_auc=0.984 vs conf_auc=0.983
+13:22:17 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+13:27:33 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=7074 vram=0.00GB 316s | grade=0.972 inner_auc=0.987 vs conf_auc=0.988
+13:27:57 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+13:33:35 [enc/image/cats_vs_dogs] vote=0.995 uniform=0.995 best1=0.995 n_val=7008 vram=0.00GB 338s | grade=0.974 inner_auc=0.988 vs conf_auc=0.987
+13:34:02 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+13:39:58 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.992 best1=0.993 n_val=7022 vram=0.00GB 356s | grade=0.973 inner_auc=0.979 vs conf_auc=0.976
+13:40:25 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+13:46:21 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.995 n_val=7072 vram=0.00GB 356s | grade=0.972 inner_auc=0.976 vs conf_auc=0.987
+13:46:48 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+13:52:48 [enc/image/cats_vs_dogs] vote=0.995 uniform=0.994 best1=0.995 n_val=7051 vram=0.00GB 361s | grade=0.979 inner_auc=0.982 vs conf_auc=0.980
+13:53:16 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+13:59:40 [enc/image/cats_vs_dogs] vote=0.995 uniform=0.994 best1=0.994 n_val=6957 vram=0.00GB 384s | grade=0.976 inner_auc=0.982 vs conf_auc=0.983
+14:00:13 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+14:05:57 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=7086 vram=0.00GB 344s | grade=0.978 inner_auc=0.978 vs conf_auc=0.981
+14:06:14 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+15:44:22 NI run auto_cpu_023 on CPU; hours=2.0 smoke=False
+15:44:22 explicit task list: ['enc/image/cats_vs_dogs']
+15:44:35 [resume] from checkpoint: next cycle 58, rounds 58, 59 metric rows, inner net restored
+15:44:35 ===== CYCLE 58 (OUTER-ONLY BOOTSTRAP) =====
+15:44:36 [data] enc/image/cats_vs_dogs: n=23410 C=2 D=768 shards=1
+15:50:44 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=7017 vram=0.00GB 368s
+15:51:24 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 58, "n_records": 7017, "n_val": 1492, "base_rate": 0.9953083395957947, "inner": {"auc": 0.9895141895141896, "ece": 0.004100654264237862, "brier": 0.004106973297894001, "acc80": 1.0}, "outer_conf": {"auc": 0.9857623857623857, "ece": 0.0019135408443036732, "brier": 0.00389478518627584, "acc80": 1.0}}
+15:51:24 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+15:57:32 [enc/image/cats_vs_dogs] vote=0.995 uniform=0.995 best1=0.994 n_val=7096 vram=0.00GB 368s | grade=0.967 inner_auc=0.989 vs conf_auc=0.988
+15:58:02 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+16:03:53 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=7109 vram=0.00GB 352s | grade=0.969 inner_auc=0.989 vs conf_auc=0.985
+16:04:20 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+16:10:58 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.992 n_val=7101 vram=0.00GB 398s | grade=0.972 inner_auc=0.980 vs conf_auc=0.978
+16:11:23 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+16:16:55 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=6906 vram=0.00GB 333s | grade=0.974 inner_auc=0.915 vs conf_auc=0.970
+16:17:21 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+16:22:58 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.992 n_val=6980 vram=0.00GB 337s | grade=0.974 inner_auc=0.984 vs conf_auc=0.977
+16:23:31 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+16:30:09 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7000 vram=0.00GB 397s | grade=0.977 inner_auc=0.945 vs conf_auc=0.962
+16:30:42 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+16:37:08 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.995 n_val=7102 vram=0.00GB 386s | grade=0.977 inner_auc=0.963 vs conf_auc=0.962
+16:37:37 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+16:43:57 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7032 vram=0.00GB 380s | grade=0.974 inner_auc=0.994 vs conf_auc=0.996
+16:44:23 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+16:50:46 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.994 best1=0.993 n_val=7081 vram=0.00GB 383s | grade=0.980 inner_auc=0.995 vs conf_auc=0.993
+16:51:13 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+16:57:36 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.994 best1=0.992 n_val=7013 vram=0.00GB 383s | grade=0.966 inner_auc=0.974 vs conf_auc=0.977
+16:58:06 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+17:05:01 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.994 best1=0.993 n_val=7117 vram=0.00GB 415s | grade=0.971 inner_auc=0.982 vs conf_auc=0.984
+17:05:28 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+17:12:37 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7055 vram=0.00GB 430s | grade=0.977 inner_auc=0.961 vs conf_auc=0.970
+17:13:06 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+17:19:41 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.994 n_val=7135 vram=0.00GB 396s | grade=0.973 inner_auc=0.983 vs conf_auc=0.981
+17:20:10 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+17:26:39 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=6950 vram=0.00GB 389s | grade=0.971 inner_auc=0.963 vs conf_auc=0.976
+17:27:04 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+17:33:14 [enc/image/cats_vs_dogs] vote=0.991 uniform=0.992 best1=0.992 n_val=7114 vram=0.00GB 370s | grade=0.975 inner_auc=0.990 vs conf_auc=0.987
+17:33:42 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+17:39:31 [enc/image/cats_vs_dogs] vote=0.992 uniform=0.992 best1=0.992 n_val=6889 vram=0.00GB 350s | grade=0.972 inner_auc=0.989 vs conf_auc=0.985
+17:39:58 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+17:46:57 [enc/image/cats_vs_dogs] vote=0.992 uniform=0.993 best1=0.992 n_val=6957 vram=0.00GB 419s | grade=0.966 inner_auc=0.987 vs conf_auc=0.988
+17:47:24 RUN COMPLETE
+12:37:52 NI run auto_cpu_023 on CPU; hours=2.0 smoke=False
+12:37:52 explicit task list: ['enc/image/cats_vs_dogs']
+12:38:05 [resume] from checkpoint: next cycle 76, rounds 76, 77 metric rows, inner net restored
+12:38:05 ===== CYCLE 76 (OUTER-ONLY BOOTSTRAP) =====
+12:38:06 [data] enc/image/cats_vs_dogs: n=23410 C=2 D=768 shards=1
+12:44:23 [enc/image/cats_vs_dogs] vote=0.992 uniform=0.992 best1=0.992 n_val=7038 vram=0.00GB 377s
+12:45:08 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 76, "n_records": 7038, "n_val": 1447, "base_rate": 0.9923980832099915, "inner": {"auc": 0.9751835907824766, "ece": 0.005025751461386269, "brier": 0.006372010335326195, "acc80": 1.0}, "outer_conf": {"auc": 0.9764497341099012, "ece": 0.004476749246171531, "brier": 0.0064664073288440704, "acc80": 1.0}}
+12:45:08 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+12:50:36 [enc/image/cats_vs_dogs] vote=0.992 uniform=0.992 best1=0.992 n_val=7056 vram=0.00GB 328s | grade=0.973 inner_auc=0.975 vs conf_auc=0.976
+12:50:59 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+12:56:20 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=7016 vram=0.00GB 321s | grade=0.977 inner_auc=0.991 vs conf_auc=0.992
+12:56:43 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+13:02:24 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7086 vram=0.00GB 341s | grade=0.977 inner_auc=0.997 vs conf_auc=0.997
+13:02:48 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+13:08:09 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7171 vram=0.00GB 321s | grade=0.972 inner_auc=0.940 vs conf_auc=0.979
+13:08:35 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+13:14:14 [enc/image/cats_vs_dogs] vote=0.992 uniform=0.993 best1=0.992 n_val=7024 vram=0.00GB 339s | grade=0.975 inner_auc=0.975 vs conf_auc=0.981
+13:14:39 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+13:19:58 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.993 best1=0.994 n_val=6909 vram=0.00GB 319s | grade=0.973 inner_auc=0.996 vs conf_auc=0.997
+13:20:22 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+13:25:48 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=7033 vram=0.00GB 325s | grade=0.974 inner_auc=0.912 vs conf_auc=0.968
+13:26:13 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+13:31:37 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7077 vram=0.00GB 324s | grade=0.973 inner_auc=0.987 vs conf_auc=0.991
+13:32:03 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+13:37:37 [enc/image/cats_vs_dogs] vote=0.995 uniform=0.994 best1=0.995 n_val=7030 vram=0.00GB 334s | grade=0.969 inner_auc=0.954 vs conf_auc=0.968
+13:38:01 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+13:42:37 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=6985 vram=0.00GB 276s | grade=0.975 inner_auc=0.961 vs conf_auc=0.969
+13:42:57 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+13:47:58 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=7049 vram=0.00GB 302s | grade=0.968 inner_auc=0.964 vs conf_auc=0.972
+13:48:22 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+13:53:29 [enc/image/cats_vs_dogs] vote=0.995 uniform=0.994 best1=0.994 n_val=7054 vram=0.00GB 306s | grade=0.968 inner_auc=0.988 vs conf_auc=0.991
+13:53:52 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+13:58:54 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7226 vram=0.00GB 302s | grade=0.975 inner_auc=0.989 vs conf_auc=0.985
+13:59:19 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+14:05:16 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7004 vram=0.00GB 357s | grade=0.971 inner_auc=0.980 vs conf_auc=0.980
+14:05:41 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+14:10:53 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=7006 vram=0.00GB 312s | grade=0.971 inner_auc=0.988 vs conf_auc=0.986
+14:11:18 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+14:16:43 [enc/image/cats_vs_dogs] vote=0.992 uniform=0.992 best1=0.992 n_val=6981 vram=0.00GB 325s | grade=0.975 inner_auc=0.995 vs conf_auc=0.996
+14:17:08 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+12:20:26 NI run auto_cpu_023 on CPU; hours=2.0 smoke=False
+12:20:26 explicit task list: ['enc/image/cats_vs_dogs']
+12:20:41 [resume] from checkpoint: next cycle 93, rounds 93, 94 metric rows, inner net restored
+12:20:41 ===== CYCLE 93 (OUTER-ONLY BOOTSTRAP) =====
+12:20:42 [data] enc/image/cats_vs_dogs: n=23410 C=2 D=768 shards=1
+12:25:14 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7069 vram=0.00GB 272s
+12:25:51 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 93, "n_records": 7069, "n_val": 1432, "base_rate": 0.9916201233863831, "inner": {"auc": 0.9851525821596244, "ece": 0.004350444437238757, "brier": 0.006426061503589153, "acc80": 1.0}, "outer_conf": {"auc": 0.9839788732394367, "ece": 0.005419241587043475, "brier": 0.00602679280564189, "acc80": 1.0}}
+12:25:51 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+12:30:16 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.992 n_val=6974 vram=0.00GB 265s | grade=0.972 inner_auc=0.983 vs conf_auc=0.984
+12:30:37 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+12:34:55 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=7061 vram=0.00GB 258s | grade=0.969 inner_auc=0.992 vs conf_auc=0.993
+12:35:14 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+12:39:20 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=6946 vram=0.00GB 246s | grade=0.974 inner_auc=0.979 vs conf_auc=0.983
+12:39:38 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+12:44:11 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=7046 vram=0.00GB 273s | grade=0.972 inner_auc=0.994 vs conf_auc=0.993
+12:44:31 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+12:48:43 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.993 n_val=6978 vram=0.00GB 253s | grade=0.970 inner_auc=0.881 vs conf_auc=0.982
+12:49:03 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+12:53:16 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=6944 vram=0.00GB 253s | grade=0.968 inner_auc=0.992 vs conf_auc=0.990
+12:53:34 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+12:57:35 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7053 vram=0.00GB 241s | grade=0.962 inner_auc=0.965 vs conf_auc=0.964
+12:57:54 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+13:01:58 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7060 vram=0.00GB 243s | grade=0.971 inner_auc=0.995 vs conf_auc=0.995
+13:02:16 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+13:06:25 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.993 n_val=7014 vram=0.00GB 248s | grade=0.962 inner_auc=0.973 vs conf_auc=0.984
+13:06:42 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+13:10:40 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.993 best1=0.993 n_val=6983 vram=0.00GB 238s | grade=0.974 inner_auc=0.995 vs conf_auc=0.995
+13:10:58 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+13:14:57 [enc/image/cats_vs_dogs] vote=0.995 uniform=0.995 best1=0.995 n_val=7087 vram=0.00GB 239s | grade=0.977 inner_auc=0.982 vs conf_auc=0.979
+13:15:15 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+13:19:18 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7021 vram=0.00GB 243s | grade=0.983 inner_auc=0.975 vs conf_auc=0.974
+13:19:37 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+13:23:58 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=6982 vram=0.00GB 262s | grade=0.977 inner_auc=0.990 vs conf_auc=0.990
+13:24:18 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+13:28:19 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.993 best1=0.994 n_val=6923 vram=0.00GB 241s | grade=0.973 inner_auc=0.978 vs conf_auc=0.979
+13:28:38 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+13:33:16 [enc/image/cats_vs_dogs] vote=0.992 uniform=0.992 best1=0.992 n_val=7008 vram=0.00GB 278s | grade=0.976 inner_auc=0.971 vs conf_auc=0.981
+13:33:34 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+13:37:41 [enc/image/cats_vs_dogs] vote=0.995 uniform=0.994 best1=0.994 n_val=7083 vram=0.00GB 247s | grade=0.977 inner_auc=0.960 vs conf_auc=0.969
+13:37:59 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+13:41:56 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.992 n_val=6985 vram=0.00GB 237s | grade=0.972 inner_auc=0.997 vs conf_auc=0.995
+13:42:15 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+13:46:40 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.994 best1=0.993 n_val=6955 vram=0.00GB 265s | grade=0.979 inner_auc=0.984 vs conf_auc=0.983
+13:46:57 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+13:51:15 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7009 vram=0.00GB 258s | grade=0.977 inner_auc=0.978 vs conf_auc=0.976
+13:51:33 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+13:55:37 [enc/image/cats_vs_dogs] vote=0.995 uniform=0.995 best1=0.995 n_val=7128 vram=0.00GB 244s | grade=0.972 inner_auc=0.983 vs conf_auc=0.981
+13:55:55 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+13:59:55 [enc/image/cats_vs_dogs] vote=0.992 uniform=0.992 best1=0.992 n_val=6876 vram=0.00GB 240s | grade=0.975 inner_auc=0.912 vs conf_auc=0.980
+14:00:13 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+14:04:08 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7006 vram=0.00GB 235s | grade=0.971 inner_auc=0.965 vs conf_auc=0.974
+14:04:29 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+14:08:29 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=6920 vram=0.00GB 240s | grade=0.971 inner_auc=0.995 vs conf_auc=0.996
+14:08:50 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+14:13:06 [enc/image/cats_vs_dogs] vote=0.993 uniform=0.993 best1=0.993 n_val=7003 vram=0.00GB 256s | grade=0.974 inner_auc=0.983 vs conf_auc=0.985
+14:13:26 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+14:17:08 [enc/image/cats_vs_dogs] vote=0.994 uniform=0.994 best1=0.994 n_val=7027 vram=0.00GB 223s | grade=0.975 inner_auc=0.991 vs conf_auc=0.989
+14:17:25 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+14:21:05 [enc/image/cats_vs_dogs] vote=0.992 uniform=0.992 best1=0.992 n_val=7063 vram=0.00GB 220s | grade=0.973 inner_auc=0.973 vs conf_auc=0.976
+14:21:22 RUN COMPLETE

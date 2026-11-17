@@ -1,0 +1,33 @@
+13:44:00 NI run auto_gpu_073 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+13:44:00 explicit task list: ['enc2/image/imagenet_100']
+13:44:00 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+13:44:04 [data] enc2/image/imagenet_100: n=59928 C=100 D=1536 shards=1
+13:46:07 [enc2/image/imagenet_100] vote=0.933 uniform=0.930 best1=0.931 n_val=17874 vram=1.38GB 123s
+13:46:51 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 17874, "n_val": 3614, "base_rate": 0.9335916042327881, "inner": {"auc": 0.9355920272673385, "ece": 0.011417495219761584, "brier": 0.042580101639032364, "acc80": 0.9923901557922363}, "outer_conf": {"auc": 0.9388176743726536, "ece": 0.01887614970617553, "brier": 0.04252709820866585, "acc80": 0.9910065531730652}}
+13:46:51 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+13:48:50 [enc2/image/imagenet_100] vote=0.932 uniform=0.929 best1=0.930 n_val=17866 vram=1.74GB 119s | grade=0.929 inner_auc=0.908 vs conf_auc=0.910
+13:49:08 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+13:50:59 [enc2/image/imagenet_100] vote=0.939 uniform=0.935 best1=0.936 n_val=18083 vram=1.73GB 111s | grade=0.923 inner_auc=0.930 vs conf_auc=0.929
+13:51:21 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+13:53:32 [enc2/image/imagenet_100] vote=0.935 uniform=0.931 best1=0.933 n_val=17965 vram=1.74GB 132s | grade=0.924 inner_auc=0.933 vs conf_auc=0.926
+13:53:52 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+13:55:45 [enc2/image/imagenet_100] vote=0.934 uniform=0.932 best1=0.932 n_val=18200 vram=1.73GB 114s | grade=0.925 inner_auc=0.933 vs conf_auc=0.926
+13:56:06 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+13:58:07 [enc2/image/imagenet_100] vote=0.937 uniform=0.934 best1=0.935 n_val=17762 vram=1.74GB 121s | grade=0.929 inner_auc=0.934 vs conf_auc=0.924
+13:58:28 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+14:00:30 [enc2/image/imagenet_100] vote=0.937 uniform=0.934 best1=0.935 n_val=17945 vram=1.74GB 122s | grade=0.930 inner_auc=0.936 vs conf_auc=0.932
+14:00:51 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+14:02:48 [enc2/image/imagenet_100] vote=0.935 uniform=0.933 best1=0.932 n_val=18097 vram=1.73GB 117s | grade=0.925 inner_auc=0.943 vs conf_auc=0.943
+14:03:12 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+14:05:19 [enc2/image/imagenet_100] vote=0.938 uniform=0.936 best1=0.936 n_val=17996 vram=1.74GB 127s | grade=0.924 inner_auc=0.941 vs conf_auc=0.938
+14:05:40 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+14:07:41 [enc2/image/imagenet_100] vote=0.935 uniform=0.932 best1=0.933 n_val=18046 vram=1.73GB 121s | grade=0.923 inner_auc=0.935 vs conf_auc=0.930
+14:07:59 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+14:09:58 [enc2/image/imagenet_100] vote=0.935 uniform=0.932 best1=0.933 n_val=18024 vram=1.73GB 120s | grade=0.927 inner_auc=0.930 vs conf_auc=0.923
+14:10:24 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+14:12:20 [enc2/image/imagenet_100] vote=0.934 uniform=0.930 best1=0.932 n_val=18203 vram=1.73GB 117s | grade=0.928 inner_auc=0.927 vs conf_auc=0.921
+14:12:39 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+14:14:38 [enc2/image/imagenet_100] vote=0.934 uniform=0.932 best1=0.932 n_val=17902 vram=1.74GB 118s | grade=0.928 inner_auc=0.943 vs conf_auc=0.937
+14:15:01 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+14:17:08 [enc2/image/imagenet_100] vote=0.935 uniform=0.931 best1=0.933 n_val=18096 vram=1.73GB 127s | grade=0.928 inner_auc=0.937 vs conf_auc=0.930
+14:17:29 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====

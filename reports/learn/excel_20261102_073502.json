@@ -1,0 +1,137 @@
+{
+ "app": "excel",
+ "started": "2026-11-02 07:35:08",
+ "phases": {
+  "read": {
+   "seconds": 9.5,
+   "level": "explored"
+  },
+  "map": {
+   "ran": true,
+   "seconds": 237.1,
+   "level": "explored",
+   "commands": 3587,
+   "with_shortcut": 24,
+   "dialogs": 6,
+   "layout_controls": 1861,
+   "state_variables": 41,
+   "frontier": {
+    "total": 228,
+    "by_status": {
+     "explored": 61,
+     "no_effect": 13,
+     "open": 132,
+     "unsafe": 22
+    },
+    "explorable": 206,
+    "explored_n": 74,
+    "explored_fraction": 0.359
+   }
+  },
+  "ask": {
+   "asked": 4,
+   "answered": 3,
+   "items": [
+    {
+     "q": "In excel, how do I use Align Left?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about excel (5000 documents, 13 procedures, 2 shortcuts). how to use Align Left in excel Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In excel, how do I use Data?",
+     "status": "ANSWERED",
+     "answer": "To use Data in Excel, you can work with Data Tables [7]. For example, you can add a data table with an outline border to an embedded chart using VBA as shown:\n\n```vb\nWith myChart\n    .HasDataTable = True\n    .DataTable.HasBorderOutline = Tr"
+    },
+    {
+     "q": "In excel, how do I use Italic?",
+     "status": "ANSWERED",
+     "answer": "To use Italic in Excel, you can use the following VBA code snippet:\n\n```vb\nWith Worksheets(\"Sheet1\").Range(\"B2:D6\")\n    .Font.Italic = True\nEnd With\n```\n\nThis code sets the font style for cells B2:D6 on Sheet1 of the active workbook to ital"
+    },
+    {
+     "q": "In excel, how do I use Sort...?",
+     "status": "ANSWERED",
+     "answer": "To use the Sort... feature in Excel, you can use the `.Sort` method. For example, to sort a range A1:A5 by using Pin Yin, you can use the following VBA code:\n\n```vb\nSub SpecialSort()\n    Application.Range(\"A1:A5\").SortSpecial SortMethod:=xl"
+    }
+   ],
+   "seconds": 29.5
+  },
+  "practice": {
+   "written": 6,
+   "levels": [
+    {
+     "level": 1,
+     "proven": 0,
+     "of": 2
+    },
+    {
+     "level": 1,
+     "proven": 0,
+     "of": 2
+    },
+    {
+     "level": 1,
+     "proven": 0,
+     "of": 2
+    }
+   ],
+   "highest_level_proven": 0,
+   "tried": 6,
+   "proven_done": 0,
+   "kept_training_rows": 0,
+   "results": [
+    {
+     "task": "open excel, type 'Sales Report 2023' in the center, use Arial Nova Light, 14pt, Bold, and save as D:\\new_automation\\data\\practice\\excel\\sales_report_2023.xlsx",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 72.2,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'excel': BLOCKED (window hwnd=6162764), 7 verified-loop steps in 57.1s\n    - 'create a new blank document' -> DONE (PASS) [WEAK evidence: the UI"
+    },
+    {
+     "task": "open excel, type 'Monthly Expenses' in the center, use Cambria Math, 16pt, Italic, and add a 100% Stacked Line with Markers chart with data: January - 40%, February - 30%, March - 30%, then save as D:\\new_automation\\data\\practice\\excel\\monthly_expenses.xlsx",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 68.1,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'excel': BLOCKED (window hwnd=3082974), 6 verified-loop steps in 46.9s\n    - 'create a new blank document' -> DONE (PASS) [WEAK evidence: the UI"
+    },
+    {
+     "task": "open excel, type 'Quarterly Revenue Analysis' in the center, use Bodoni MT Black, 18pt, Align Left, insert 100% Stacked Line with Markers chart with data: Q1 - 120, Q2 - 150, Q3 - 130, Q4 - 160, save as D:\\new_automation\\data\\practice\\excel\\quarterly_revenue_analysis.xlsm",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 225.6,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'excel': BLOCKED (window hwnd=6620946), 11 verified-loop steps in 223.7s\n    - 'type 'Quarterly Revenue Analysis' in the center, use Bodoni MT B"
+    },
+    {
+     "task": "open excel, type 'Project Timeline' in the center, use Franklin Gothic Demi, 20pt, Italic, insert Clustered Column - Line chart with data: Task A - 10, Task B - 15, Task C - 20, Task D - 25, save as D:\\new_automation\\data\\practice\\excel\\project_timeline.xlsm",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 112.3,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'excel': READY (window hwnd=3214046)\n    note: clause names several apps ('open excel, type 'Project Timeline' in the center,'): launched in ord"
+    },
+    {
+     "task": "open excel, type 'Annual Budget Summary' in the center, use Arial Nova Light, 14pt, add a 100% Stacked Line with Markers chart with data: Q1 - 30%, Q2 - 25%, Q3 - 20%, Q4 - 25%, save as D:\\new_automation\\data\\practice\\excel\\annual_budget_summary.xlsx",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 169.6,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'excel': BLOCKED (window hwnd=11077560), 10 verified-loop steps in 167.8s\n    - 'type 'Annual Budget Summary' in the center, use Arial Nova Ligh"
+    },
+    {
+     "task": "open excel, type 'Employee Performance Review' in the center, use Gill Sans Ultra Bold Condensed, 18pt, apply All Borders, add a Clustered Column - Line chart with data: Q1 - 75, Q2 - 80, Q3 - 85, Q4 - 90, save as D:\\new_automation\\data\\practice\\excel\\employee_performance_review.xlsx",
+     "level": 1,
+     "status": "FAILED",
+     "seconds": 172.5,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'excel': BLOCKED (window hwnd=2689466), 10 verified-loop steps in 170.3s\n    - 'type 'Employee Performance Review' in the center, use Gill Sans "
+    }
+   ],
+   "seconds": 844.2
+  }
+ },
+ "app_key": "excel",
+ "exe": "C:\\Program Files\\Microsoft Office\\Root\\Office16\\EXCEL.EXE",
+ "readiness": {
+  "knows_commands": true,
+  "answers_questions": "3/4",
+  "proven_tasks": "0/6",
+  "verdict": "not ready: nothing proven yet"
+ },
+ "seconds": 1126.9
+}

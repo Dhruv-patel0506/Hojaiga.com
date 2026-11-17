@@ -1,0 +1,137 @@
+{
+   "app_metadata": {
+      "app_name": "ScreenTuner",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure ScreenTuner",
+   "prerequisite_state": "No application is running",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download and install ScreenTuner using the installer",
+         "ui_target": {
+            "element_name": "ScreenTuner-x.y.z-setup.exe",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "ScreenTuner installer window opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click 'Install' in the installer",
+         "ui_target": {
+            "element_name": "Install",
+            "automation_id": null,
+            "hierarchical_path": "Installer window > Install",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "ScreenTuner is installed and the installer window closes"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Run ScreenTuner from the Start Menu",
+         "ui_target": {
+            "element_name": "ScreenTuner",
+            "automation_id": null,
+            "hierarchical_path": "Start Menu > ScreenTuner",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "ScreenTuner settings window opens"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Close the settings window",
+         "ui_target": {
+            "element_name": "Close",
+            "automation_id": null,
+            "hierarchical_path": "Settings window > Close",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Settings window closes"
+      }
+   ],
+   "_meta": {
+      "source_app": "ScreenTuner",
+      "app_key": "screentuner",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "ScreenTuner",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:56:33Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

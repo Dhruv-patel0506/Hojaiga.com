@@ -1,0 +1,71 @@
+{
+   "app_metadata": {
+      "app_name": "RackStack",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "cli",
+   "high_level_task": "Install RackStack via a package manager",
+   "prerequisite_state": "No application is open, and the user is on a Windows machine with internet access.",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install RackStack using winget",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install TheAbider.RackStack"
+         },
+         "expected_state_change": "RackStack is installed via winget"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Install RackStack using Scoop",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "scoop bucket add rackstack https://github.com/TheAbider/scoop-bucket && scoop install rackstack"
+         },
+         "expected_state_change": "RackStack is installed via Scoop"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Install RackStack using Chocolatey",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "choco install rackstack"
+         },
+         "expected_state_change": "RackStack is installed via Chocolatey"
+      }
+   ],
+   "_meta": {
+      "source_app": "RackStack",
+      "app_key": "rackstack",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "Features",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:39:01Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,1251 @@
+02:43:51 NI run overnight_audio_1107_0243 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=9.0 smoke=False
+02:43:51 waiting for the first fill stage (seed shards for every modality)...
+02:48:14 [fill] audio/urbansound8k shard 2/3 ok 262s
+02:48:16 [fill] stage 0 complete
+02:48:16 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+02:48:16 [data] audio/urbansound8k: n=3000 C=10 D=134 shards=3
+02:48:21 [audio/urbansound8k] vote=0.584 uniform=0.584 best1=0.596 n_val=993 vram=0.04GB 5s
+02:48:25 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 993, "n_val": 161, "base_rate": 0.5776397585868835, "inner": {"auc": 0.7077798861480076, "ece": 0.12485225970700663, "brier": 0.21347472071647644, "acc80": 0.6484375}, "outer_conf": {"auc": 0.7077798861480076, "ece": 0.11564472391738655, "brier": 0.2113983929157257, "acc80": 0.6484375}}
+02:48:25 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+02:48:29 [audio/urbansound8k] vote=0.519 uniform=0.519 best1=0.606 n_val=767 vram=0.04GB 4s | grade=0.790 inner_auc=0.741 vs conf_auc=0.741
+02:48:31 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+02:48:35 [audio/urbansound8k] vote=0.563 uniform=0.541 best1=0.592 n_val=1028 vram=0.04GB 4s | grade=0.820 inner_auc=0.614 vs conf_auc=0.788
+02:48:37 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+02:48:41 [audio/urbansound8k] vote=0.476 uniform=0.475 best1=0.487 n_val=1021 vram=0.04GB 4s | grade=0.745 inner_auc=0.585 vs conf_auc=0.596
+02:48:42 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+02:48:46 [audio/urbansound8k] vote=0.555 uniform=0.521 best1=0.607 n_val=849 vram=0.04GB 4s | grade=0.793 inner_auc=0.472 vs conf_auc=0.614
+02:48:48 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+02:48:52 [audio/urbansound8k] vote=0.505 uniform=0.496 best1=0.538 n_val=943 vram=0.04GB 4s | grade=0.791 inner_auc=0.697 vs conf_auc=0.744
+02:48:54 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+02:48:57 [audio/urbansound8k] vote=0.632 uniform=0.640 best1=0.645 n_val=684 vram=0.04GB 4s | grade=0.799 inner_auc=0.787 vs conf_auc=0.776
+02:48:59 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+02:49:03 [audio/urbansound8k] vote=0.489 uniform=0.457 best1=0.509 n_val=975 vram=0.04GB 4s | grade=0.727 inner_auc=0.845 vs conf_auc=0.889
+02:49:05 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+02:49:09 [audio/urbansound8k] vote=0.584 uniform=0.568 best1=0.585 n_val=968 vram=0.04GB 4s | grade=0.798 inner_auc=0.832 vs conf_auc=0.849
+02:49:11 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+02:49:15 [audio/urbansound8k] vote=0.612 uniform=0.583 best1=0.605 n_val=859 vram=0.04GB 4s | grade=0.837 inner_auc=0.688 vs conf_auc=0.778
+02:49:17 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+02:49:20 [audio/urbansound8k] vote=0.490 uniform=0.469 best1=0.514 n_val=755 vram=0.04GB 4s | grade=0.732 inner_auc=n/a vs conf_auc=n/a
+02:49:23 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+02:49:26 [audio/urbansound8k] vote=0.596 uniform=0.612 best1=0.617 n_val=926 vram=0.04GB 4s | grade=0.790 inner_auc=0.520 vs conf_auc=0.606
+02:49:28 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+02:49:32 [audio/urbansound8k] vote=0.550 uniform=0.493 best1=0.566 n_val=927 vram=0.04GB 4s | grade=0.801 inner_auc=0.917 vs conf_auc=0.939
+02:49:34 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+02:49:38 [audio/urbansound8k] vote=0.447 uniform=0.469 best1=0.456 n_val=1035 vram=0.04GB 4s | grade=0.716 inner_auc=0.663 vs conf_auc=0.692
+02:49:40 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+02:49:44 [audio/urbansound8k] vote=0.607 uniform=0.531 best1=0.608 n_val=765 vram=0.04GB 4s | grade=0.760 inner_auc=n/a vs conf_auc=n/a
+02:49:46 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+02:49:50 [audio/urbansound8k] vote=0.489 uniform=0.444 best1=0.497 n_val=1146 vram=0.04GB 4s | grade=0.730 inner_auc=0.770 vs conf_auc=0.870
+02:49:52 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+02:49:56 [audio/urbansound8k] vote=0.637 uniform=0.589 best1=0.638 n_val=1033 vram=0.04GB 4s | grade=0.765 inner_auc=0.360 vs conf_auc=0.541
+02:49:58 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+02:50:02 [audio/urbansound8k] vote=0.528 uniform=0.459 best1=0.543 n_val=999 vram=0.04GB 4s | grade=0.747 inner_auc=0.349 vs conf_auc=0.473
+02:50:04 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+02:50:08 [audio/urbansound8k] vote=0.548 uniform=0.546 best1=0.542 n_val=764 vram=0.04GB 4s | grade=0.808 inner_auc=0.761 vs conf_auc=0.799
+02:50:10 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+02:50:13 [audio/urbansound8k] vote=0.479 uniform=0.455 best1=0.483 n_val=913 vram=0.04GB 4s | grade=0.740 inner_auc=0.621 vs conf_auc=0.666
+02:50:16 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+02:50:20 [audio/urbansound8k] vote=0.529 uniform=0.475 best1=0.537 n_val=748 vram=0.04GB 4s | grade=0.774 inner_auc=0.756 vs conf_auc=0.827
+02:50:22 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+02:50:26 [audio/urbansound8k] vote=0.609 uniform=0.620 best1=0.604 n_val=919 vram=0.04GB 4s | grade=0.798 inner_auc=0.586 vs conf_auc=0.618
+02:50:28 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+02:50:31 [audio/urbansound8k] vote=0.623 uniform=0.592 best1=0.621 n_val=823 vram=0.04GB 4s | grade=0.842 inner_auc=0.613 vs conf_auc=0.615
+02:50:34 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+02:50:37 [audio/urbansound8k] vote=0.588 uniform=0.515 best1=0.598 n_val=806 vram=0.04GB 4s | grade=0.818 inner_auc=0.773 vs conf_auc=0.710
+02:50:39 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+02:50:43 [audio/urbansound8k] vote=0.636 uniform=0.588 best1=0.632 n_val=900 vram=0.04GB 4s | grade=0.833 inner_auc=0.692 vs conf_auc=0.760
+02:50:45 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+02:50:49 [audio/urbansound8k] vote=0.606 uniform=0.611 best1=0.592 n_val=863 vram=0.04GB 4s | grade=0.827 inner_auc=0.684 vs conf_auc=0.693
+02:50:51 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+02:50:55 [audio/urbansound8k] vote=0.570 uniform=0.535 best1=0.576 n_val=731 vram=0.04GB 4s | grade=0.792 inner_auc=n/a vs conf_auc=n/a
+02:50:57 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+02:51:01 [audio/urbansound8k] vote=0.497 uniform=0.484 best1=0.496 n_val=1009 vram=0.04GB 4s | grade=0.750 inner_auc=0.657 vs conf_auc=0.649
+02:51:03 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+02:51:06 [audio/urbansound8k] vote=0.600 uniform=0.543 best1=0.610 n_val=951 vram=0.04GB 4s | grade=0.789 inner_auc=0.887 vs conf_auc=0.817
+02:51:08 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+02:51:13 [audio/urbansound8k] vote=0.609 uniform=0.605 best1=0.607 n_val=861 vram=0.04GB 4s | grade=0.831 inner_auc=0.765 vs conf_auc=0.752
+02:51:15 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+02:51:19 [audio/urbansound8k] vote=0.495 uniform=0.523 best1=0.483 n_val=1037 vram=0.04GB 4s | grade=0.721 inner_auc=0.626 vs conf_auc=0.604
+02:51:22 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+02:51:26 [audio/urbansound8k] vote=0.578 uniform=0.511 best1=0.590 n_val=893 vram=0.04GB 4s | grade=0.785 inner_auc=0.684 vs conf_auc=0.700
+02:51:29 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+02:51:34 [audio/urbansound8k] vote=0.551 uniform=0.534 best1=0.550 n_val=933 vram=0.04GB 5s | grade=0.797 inner_auc=0.852 vs conf_auc=0.868
+02:51:36 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+02:51:41 [audio/urbansound8k] vote=0.613 uniform=0.555 best1=0.617 n_val=857 vram=0.04GB 5s | grade=0.810 inner_auc=0.768 vs conf_auc=0.744
+02:51:43 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+02:51:48 [audio/urbansound8k] vote=0.668 uniform=0.662 best1=0.668 n_val=752 vram=0.04GB 5s | grade=0.834 inner_auc=0.779 vs conf_auc=0.792
+02:51:51 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+02:51:55 [audio/urbansound8k] vote=0.583 uniform=0.555 best1=0.587 n_val=969 vram=0.04GB 4s | grade=0.777 inner_auc=0.836 vs conf_auc=0.733
+02:51:58 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+02:52:02 [audio/urbansound8k] vote=0.523 uniform=0.572 best1=0.537 n_val=795 vram=0.04GB 5s | grade=0.766 inner_auc=0.700 vs conf_auc=0.704
+02:52:05 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+02:52:09 [audio/urbansound8k] vote=0.517 uniform=0.474 best1=0.520 n_val=890 vram=0.04GB 4s | grade=0.794 inner_auc=0.783 vs conf_auc=0.735
+02:52:12 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+02:52:17 [audio/urbansound8k] vote=0.668 uniform=0.584 best1=0.677 n_val=687 vram=0.04GB 4s | grade=0.784 inner_auc=0.618 vs conf_auc=0.591
+02:52:19 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+02:52:24 [audio/urbansound8k] vote=0.569 uniform=0.532 best1=0.565 n_val=977 vram=0.04GB 5s | grade=0.765 inner_auc=0.715 vs conf_auc=0.759
+02:52:27 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+02:52:31 [audio/urbansound8k] vote=0.438 uniform=0.445 best1=0.493 n_val=1086 vram=0.04GB 5s | grade=0.677 inner_auc=0.549 vs conf_auc=0.625
+02:52:34 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+02:52:38 [audio/urbansound8k] vote=0.526 uniform=0.498 best1=0.522 n_val=1075 vram=0.04GB 4s | grade=0.748 inner_auc=0.526 vs conf_auc=0.654
+02:52:41 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+02:52:46 [audio/urbansound8k] vote=0.575 uniform=0.501 best1=0.569 n_val=912 vram=0.04GB 5s | grade=0.809 inner_auc=0.710 vs conf_auc=0.696
+02:52:48 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+02:52:52 [audio/urbansound8k] vote=0.659 uniform=0.618 best1=0.650 n_val=824 vram=0.04GB 4s | grade=0.823 inner_auc=0.748 vs conf_auc=0.787
+02:52:55 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+02:53:00 [audio/urbansound8k] vote=0.479 uniform=0.536 best1=0.492 n_val=1093 vram=0.04GB 5s | grade=0.682 inner_auc=0.801 vs conf_auc=0.796
+02:53:02 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+02:53:07 [audio/urbansound8k] vote=0.520 uniform=0.518 best1=0.519 n_val=908 vram=0.04GB 4s | grade=0.776 inner_auc=0.561 vs conf_auc=0.595
+02:53:10 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+02:53:14 [audio/urbansound8k] vote=0.651 uniform=0.611 best1=0.650 n_val=895 vram=0.04GB 4s | grade=0.797 inner_auc=0.558 vs conf_auc=0.494
+02:53:16 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+02:53:20 [audio/urbansound8k] vote=0.554 uniform=0.531 best1=0.550 n_val=892 vram=0.04GB 4s | grade=0.754 inner_auc=0.925 vs conf_auc=0.929
+02:53:23 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+02:53:28 [audio/urbansound8k] vote=0.488 uniform=0.504 best1=0.497 n_val=764 vram=0.04GB 5s | grade=0.742 inner_auc=n/a vs conf_auc=n/a
+02:53:31 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+02:53:35 [audio/urbansound8k] vote=0.564 uniform=0.524 best1=0.563 n_val=847 vram=0.04GB 4s | grade=0.776 inner_auc=0.727 vs conf_auc=0.764
+02:53:38 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+02:53:42 [audio/urbansound8k] vote=0.596 uniform=0.556 best1=0.603 n_val=882 vram=0.04GB 4s | grade=0.812 inner_auc=0.846 vs conf_auc=0.794
+02:53:45 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+02:53:50 [audio/urbansound8k] vote=0.522 uniform=0.504 best1=0.523 n_val=908 vram=0.04GB 5s | grade=0.747 inner_auc=0.670 vs conf_auc=0.684
+02:53:52 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+02:53:56 [audio/urbansound8k] vote=0.551 uniform=0.557 best1=0.542 n_val=1126 vram=0.04GB 4s | grade=0.792 inner_auc=0.671 vs conf_auc=0.610
+02:53:59 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+02:54:04 [audio/urbansound8k] vote=0.441 uniform=0.485 best1=0.442 n_val=1187 vram=0.04GB 5s | grade=0.699 inner_auc=0.837 vs conf_auc=0.824
+02:54:07 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+02:54:11 [audio/urbansound8k] vote=0.562 uniform=0.531 best1=0.561 n_val=1054 vram=0.04GB 4s | grade=0.755 inner_auc=0.800 vs conf_auc=0.752
+02:54:14 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+02:54:18 [audio/urbansound8k] vote=0.551 uniform=0.583 best1=0.538 n_val=1040 vram=0.04GB 4s | grade=0.802 inner_auc=0.563 vs conf_auc=0.578
+02:54:21 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+02:54:26 [audio/urbansound8k] vote=0.599 uniform=0.558 best1=0.599 n_val=1091 vram=0.04GB 5s | grade=0.803 inner_auc=0.746 vs conf_auc=0.668
+02:54:29 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+02:54:33 [audio/urbansound8k] vote=0.534 uniform=0.507 best1=0.518 n_val=997 vram=0.04GB 4s | grade=0.778 inner_auc=0.590 vs conf_auc=0.643
+02:54:35 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+02:54:40 [audio/urbansound8k] vote=0.565 uniform=0.507 best1=0.562 n_val=933 vram=0.04GB 5s | grade=0.802 inner_auc=0.682 vs conf_auc=0.718
+02:54:43 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+02:54:47 [audio/urbansound8k] vote=0.571 uniform=0.592 best1=0.584 n_val=755 vram=0.04GB 5s | grade=0.809 inner_auc=0.689 vs conf_auc=0.792
+02:54:50 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+02:54:55 [audio/urbansound8k] vote=0.543 uniform=0.504 best1=0.544 n_val=908 vram=0.04GB 5s | grade=0.793 inner_auc=0.565 vs conf_auc=0.593
+02:54:57 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+02:55:02 [audio/urbansound8k] vote=0.530 uniform=0.561 best1=0.533 n_val=941 vram=0.04GB 5s | grade=0.796 inner_auc=0.756 vs conf_auc=0.767
+02:55:05 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+02:55:09 [audio/urbansound8k] vote=0.536 uniform=0.459 best1=0.535 n_val=961 vram=0.04GB 5s | grade=0.800 inner_auc=0.859 vs conf_auc=0.841
+02:55:12 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+02:55:16 [audio/urbansound8k] vote=0.624 uniform=0.557 best1=0.624 n_val=883 vram=0.04GB 4s | grade=0.791 inner_auc=n/a vs conf_auc=n/a
+02:55:19 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+02:55:23 [audio/urbansound8k] vote=0.659 uniform=0.614 best1=0.654 n_val=821 vram=0.04GB 4s | grade=0.836 inner_auc=0.775 vs conf_auc=0.741
+02:55:26 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+02:55:30 [audio/urbansound8k] vote=0.579 uniform=0.513 best1=0.571 n_val=764 vram=0.04GB 4s | grade=0.788 inner_auc=0.780 vs conf_auc=0.833
+02:55:33 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+02:55:38 [audio/urbansound8k] vote=0.594 uniform=0.539 best1=0.594 n_val=774 vram=0.04GB 5s | grade=0.821 inner_auc=0.666 vs conf_auc=0.705
+02:55:40 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+02:55:44 [audio/urbansound8k] vote=0.558 uniform=0.532 best1=0.561 n_val=807 vram=0.04GB 5s | grade=0.794 inner_auc=0.673 vs conf_auc=0.669
+02:55:47 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+02:55:52 [audio/urbansound8k] vote=0.558 uniform=0.525 best1=0.564 n_val=798 vram=0.04GB 5s | grade=0.811 inner_auc=0.527 vs conf_auc=0.564
+02:55:55 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+02:55:59 [audio/urbansound8k] vote=0.521 uniform=0.524 best1=0.525 n_val=1123 vram=0.04GB 4s | grade=0.769 inner_auc=0.668 vs conf_auc=0.746
+02:56:02 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+02:56:07 [audio/urbansound8k] vote=0.531 uniform=0.489 best1=0.534 n_val=816 vram=0.04GB 5s | grade=0.800 inner_auc=0.740 vs conf_auc=0.714
+02:56:09 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+02:56:14 [audio/urbansound8k] vote=0.576 uniform=0.553 best1=0.569 n_val=893 vram=0.04GB 4s | grade=0.789 inner_auc=0.924 vs conf_auc=0.861
+02:56:17 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+02:56:21 [audio/urbansound8k] vote=0.566 uniform=0.512 best1=0.578 n_val=772 vram=0.04GB 4s | grade=0.810 inner_auc=0.694 vs conf_auc=0.697
+02:56:24 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+02:56:28 [audio/urbansound8k] vote=0.514 uniform=0.499 best1=0.516 n_val=867 vram=0.04GB 4s | grade=0.751 inner_auc=0.744 vs conf_auc=0.698
+02:56:31 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+02:56:36 [audio/urbansound8k] vote=0.612 uniform=0.633 best1=0.606 n_val=834 vram=0.04GB 4s | grade=0.788 inner_auc=0.664 vs conf_auc=0.719
+02:56:38 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+02:56:43 [audio/urbansound8k] vote=0.584 uniform=0.530 best1=0.591 n_val=937 vram=0.04GB 4s | grade=0.811 inner_auc=0.736 vs conf_auc=0.662
+02:56:46 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+02:56:50 [audio/urbansound8k] vote=0.490 uniform=0.494 best1=0.490 n_val=884 vram=0.04GB 4s | grade=0.730 inner_auc=0.788 vs conf_auc=0.776
+02:56:53 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+02:56:57 [audio/urbansound8k] vote=0.541 uniform=0.507 best1=0.546 n_val=848 vram=0.04GB 5s | grade=0.785 inner_auc=0.653 vs conf_auc=0.658
+02:57:00 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+02:57:05 [audio/urbansound8k] vote=0.571 uniform=0.522 best1=0.577 n_val=879 vram=0.04GB 4s | grade=0.807 inner_auc=0.761 vs conf_auc=0.779
+02:57:07 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+02:57:13 [audio/urbansound8k] vote=0.612 uniform=0.589 best1=0.616 n_val=801 vram=0.04GB 5s | grade=0.826 inner_auc=0.715 vs conf_auc=0.693
+02:57:15 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+02:57:20 [audio/urbansound8k] vote=0.573 uniform=0.519 best1=0.577 n_val=848 vram=0.04GB 5s | grade=0.801 inner_auc=0.812 vs conf_auc=0.790
+02:57:23 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+02:57:28 [audio/urbansound8k] vote=0.541 uniform=0.498 best1=0.543 n_val=945 vram=0.04GB 5s | grade=0.785 inner_auc=0.597 vs conf_auc=0.611
+02:57:31 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+02:57:35 [audio/urbansound8k] vote=0.489 uniform=0.505 best1=0.483 n_val=1010 vram=0.04GB 5s | grade=0.753 inner_auc=0.680 vs conf_auc=0.677
+02:57:38 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+02:57:43 [audio/urbansound8k] vote=0.464 uniform=0.473 best1=0.467 n_val=914 vram=0.04GB 4s | grade=0.750 inner_auc=0.749 vs conf_auc=0.713
+02:57:46 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+02:57:50 [audio/urbansound8k] vote=0.600 uniform=0.544 best1=0.603 n_val=800 vram=0.04GB 5s | grade=0.771 inner_auc=0.842 vs conf_auc=0.813
+02:57:53 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+02:57:58 [audio/urbansound8k] vote=0.555 uniform=0.525 best1=0.557 n_val=935 vram=0.04GB 5s | grade=0.791 inner_auc=0.705 vs conf_auc=0.712
+02:58:01 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+02:58:06 [audio/urbansound8k] vote=0.539 uniform=0.530 best1=0.553 n_val=837 vram=0.04GB 4s | grade=0.796 inner_auc=0.740 vs conf_auc=0.760
+02:58:09 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+02:58:14 [audio/urbansound8k] vote=0.657 uniform=0.620 best1=0.653 n_val=781 vram=0.04GB 5s | grade=0.798 inner_auc=0.670 vs conf_auc=0.629
+02:58:17 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+02:58:22 [audio/urbansound8k] vote=0.581 uniform=0.504 best1=0.579 n_val=770 vram=0.04GB 5s | grade=0.785 inner_auc=0.658 vs conf_auc=0.704
+02:58:24 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+02:58:29 [audio/urbansound8k] vote=0.546 uniform=0.532 best1=0.537 n_val=995 vram=0.04GB 5s | grade=0.800 inner_auc=0.676 vs conf_auc=0.720
+02:58:32 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+02:58:37 [audio/urbansound8k] vote=0.580 uniform=0.578 best1=0.570 n_val=784 vram=0.04GB 5s | grade=0.805 inner_auc=0.670 vs conf_auc=0.708
+02:58:40 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+02:58:45 [audio/urbansound8k] vote=0.425 uniform=0.398 best1=0.440 n_val=1014 vram=0.04GB 5s | grade=0.672 inner_auc=0.664 vs conf_auc=0.656
+02:58:48 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+02:58:52 [audio/urbansound8k] vote=0.547 uniform=0.499 best1=0.549 n_val=949 vram=0.04GB 5s | grade=0.756 inner_auc=0.706 vs conf_auc=0.741
+02:58:55 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+02:59:00 [audio/urbansound8k] vote=0.599 uniform=0.542 best1=0.600 n_val=873 vram=0.04GB 5s | grade=0.803 inner_auc=n/a vs conf_auc=n/a
+02:59:03 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+02:59:06 [fill] audio/urbansound8k shard 3/9 ok 351s
+02:59:07 [audio/urbansound8k] vote=0.466 uniform=0.466 best1=0.469 n_val=1090 vram=0.04GB 4s | grade=0.701 inner_auc=0.757 vs conf_auc=0.789
+02:59:10 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+02:59:10 [data] audio/urbansound8k: n=4000 C=10 D=134 shards=4
+02:59:15 [audio/urbansound8k] vote=0.605 uniform=0.601 best1=0.601 n_val=1255 vram=0.04GB 5s | grade=0.775 inner_auc=0.807 vs conf_auc=0.820
+02:59:18 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+02:59:22 [audio/urbansound8k] vote=0.563 uniform=0.592 best1=0.554 n_val=1368 vram=0.04GB 4s | grade=0.804 inner_auc=0.577 vs conf_auc=0.604
+02:59:25 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+02:59:30 [audio/urbansound8k] vote=0.580 uniform=0.515 best1=0.584 n_val=1465 vram=0.04GB 5s | grade=0.814 inner_auc=0.596 vs conf_auc=0.552
+02:59:32 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+02:59:38 [audio/urbansound8k] vote=0.705 uniform=0.665 best1=0.705 n_val=1215 vram=0.05GB 6s | grade=0.821 inner_auc=0.670 vs conf_auc=0.685
+02:59:41 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+02:59:46 [audio/urbansound8k] vote=0.685 uniform=0.662 best1=0.690 n_val=1151 vram=0.05GB 5s | grade=0.865 inner_auc=0.696 vs conf_auc=0.727
+02:59:48 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+02:59:54 [audio/urbansound8k] vote=0.675 uniform=0.637 best1=0.678 n_val=1222 vram=0.05GB 6s | grade=0.864 inner_auc=0.791 vs conf_auc=0.802
+02:59:56 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+03:00:01 [audio/urbansound8k] vote=0.632 uniform=0.607 best1=0.634 n_val=1352 vram=0.04GB 5s | grade=0.827 inner_auc=0.646 vs conf_auc=0.694
+03:00:03 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+03:00:09 [audio/urbansound8k] vote=0.584 uniform=0.581 best1=0.586 n_val=1189 vram=0.05GB 6s | grade=0.796 inner_auc=0.863 vs conf_auc=0.889
+03:00:12 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+03:00:16 [audio/urbansound8k] vote=0.617 uniform=0.560 best1=0.619 n_val=1306 vram=0.04GB 5s | grade=0.829 inner_auc=0.743 vs conf_auc=0.836
+03:00:19 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+03:00:24 [audio/urbansound8k] vote=0.632 uniform=0.617 best1=0.637 n_val=1240 vram=0.05GB 6s | grade=0.842 inner_auc=0.703 vs conf_auc=0.757
+03:00:27 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+03:00:32 [audio/urbansound8k] vote=0.606 uniform=0.564 best1=0.613 n_val=991 vram=0.05GB 5s | grade=0.822 inner_auc=0.740 vs conf_auc=0.751
+03:00:34 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+03:00:39 [audio/urbansound8k] vote=0.612 uniform=0.556 best1=0.612 n_val=1210 vram=0.05GB 5s | grade=0.847 inner_auc=0.800 vs conf_auc=0.838
+03:00:42 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+03:00:47 [audio/urbansound8k] vote=0.525 uniform=0.438 best1=0.531 n_val=1287 vram=0.04GB 5s | grade=0.756 inner_auc=0.792 vs conf_auc=0.783
+03:00:49 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+03:00:54 [audio/urbansound8k] vote=0.679 uniform=0.620 best1=0.679 n_val=1190 vram=0.05GB 5s | grade=0.794 inner_auc=0.801 vs conf_auc=0.802
+03:00:58 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+03:01:02 [audio/urbansound8k] vote=0.582 uniform=0.551 best1=0.579 n_val=1305 vram=0.04GB 4s | grade=0.779 inner_auc=0.661 vs conf_auc=0.657
+03:01:05 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+03:01:10 [audio/urbansound8k] vote=0.614 uniform=0.542 best1=0.620 n_val=1215 vram=0.05GB 5s | grade=0.830 inner_auc=0.645 vs conf_auc=0.673
+03:01:13 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+03:01:18 [audio/urbansound8k] vote=0.659 uniform=0.649 best1=0.657 n_val=991 vram=0.05GB 6s | grade=0.845 inner_auc=0.701 vs conf_auc=0.724
+03:01:21 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+03:01:26 [audio/urbansound8k] vote=0.652 uniform=0.613 best1=0.657 n_val=1165 vram=0.05GB 5s | grade=0.855 inner_auc=0.690 vs conf_auc=0.752
+03:01:28 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+03:01:34 [audio/urbansound8k] vote=0.555 uniform=0.524 best1=0.554 n_val=1358 vram=0.04GB 6s | grade=0.766 inner_auc=0.681 vs conf_auc=0.663
+03:01:37 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+03:01:41 [audio/urbansound8k] vote=0.582 uniform=0.559 best1=0.582 n_val=1132 vram=0.05GB 5s | grade=0.819 inner_auc=0.725 vs conf_auc=0.820
+03:01:44 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+03:01:48 [audio/urbansound8k] vote=0.571 uniform=0.588 best1=0.570 n_val=1316 vram=0.04GB 4s | grade=0.818 inner_auc=0.722 vs conf_auc=0.779
+03:01:52 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+03:01:56 [audio/urbansound8k] vote=0.574 uniform=0.541 best1=0.558 n_val=1316 vram=0.04GB 4s | grade=0.826 inner_auc=0.637 vs conf_auc=0.661
+03:01:59 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+03:02:04 [audio/urbansound8k] vote=0.593 uniform=0.549 best1=0.592 n_val=1167 vram=0.05GB 5s | grade=0.829 inner_auc=0.727 vs conf_auc=0.710
+03:02:06 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+03:02:12 [audio/urbansound8k] vote=0.612 uniform=0.542 best1=0.613 n_val=1361 vram=0.04GB 6s | grade=0.836 inner_auc=0.648 vs conf_auc=0.685
+03:02:14 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+03:02:19 [audio/urbansound8k] vote=0.641 uniform=0.588 best1=0.647 n_val=1336 vram=0.04GB 5s | grade=0.836 inner_auc=0.585 vs conf_auc=0.646
+03:02:22 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+03:02:27 [audio/urbansound8k] vote=0.688 uniform=0.657 best1=0.678 n_val=1272 vram=0.04GB 6s | grade=0.852 inner_auc=0.713 vs conf_auc=0.793
+03:02:30 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+03:02:35 [audio/urbansound8k] vote=0.563 uniform=0.535 best1=0.563 n_val=1343 vram=0.04GB 5s | grade=0.755 inner_auc=0.890 vs conf_auc=0.897
+03:02:37 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+03:02:42 [audio/urbansound8k] vote=0.669 uniform=0.629 best1=0.665 n_val=1118 vram=0.05GB 5s | grade=0.816 inner_auc=0.637 vs conf_auc=0.637
+03:02:46 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+03:02:51 [audio/urbansound8k] vote=0.557 uniform=0.489 best1=0.557 n_val=1326 vram=0.04GB 5s | grade=0.762 inner_auc=0.879 vs conf_auc=0.873
+03:02:53 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+03:02:58 [audio/urbansound8k] vote=0.622 uniform=0.592 best1=0.616 n_val=1259 vram=0.04GB 5s | grade=0.818 inner_auc=0.648 vs conf_auc=0.680
+03:03:01 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+03:03:07 [audio/urbansound8k] vote=0.638 uniform=0.632 best1=0.632 n_val=1051 vram=0.05GB 5s | grade=0.847 inner_auc=0.751 vs conf_auc=0.770
+03:03:10 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+03:03:14 [audio/urbansound8k] vote=0.602 uniform=0.576 best1=0.594 n_val=1230 vram=0.05GB 5s | grade=0.825 inner_auc=0.589 vs conf_auc=0.648
+03:03:17 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+03:03:23 [audio/urbansound8k] vote=0.582 uniform=0.557 best1=0.579 n_val=1390 vram=0.04GB 6s | grade=0.811 inner_auc=0.632 vs conf_auc=0.628
+03:03:26 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+03:03:31 [audio/urbansound8k] vote=0.598 uniform=0.558 best1=0.605 n_val=1155 vram=0.05GB 5s | grade=0.831 inner_auc=0.707 vs conf_auc=0.691
+03:03:33 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+03:03:39 [audio/urbansound8k] vote=0.619 uniform=0.617 best1=0.601 n_val=975 vram=0.05GB 6s | grade=0.832 inner_auc=0.620 vs conf_auc=0.653
+03:03:42 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+03:03:47 [audio/urbansound8k] vote=0.567 uniform=0.566 best1=0.569 n_val=1411 vram=0.04GB 5s | grade=0.790 inner_auc=0.671 vs conf_auc=0.719
+03:03:49 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+03:03:54 [audio/urbansound8k] vote=0.576 uniform=0.518 best1=0.576 n_val=1378 vram=0.04GB 5s | grade=0.828 inner_auc=0.561 vs conf_auc=0.596
+03:03:57 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+03:04:02 [audio/urbansound8k] vote=0.536 uniform=0.532 best1=0.531 n_val=1391 vram=0.04GB 5s | grade=0.779 inner_auc=0.613 vs conf_auc=0.693
+03:04:05 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+03:04:10 [audio/urbansound8k] vote=0.695 uniform=0.633 best1=0.688 n_val=1157 vram=0.05GB 5s | grade=0.793 inner_auc=0.658 vs conf_auc=0.772
+03:04:12 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+03:04:18 [audio/urbansound8k] vote=0.600 uniform=0.559 best1=0.603 n_val=1160 vram=0.05GB 6s | grade=0.781 inner_auc=0.670 vs conf_auc=0.700
+03:04:21 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+03:04:26 [audio/urbansound8k] vote=0.538 uniform=0.554 best1=0.528 n_val=992 vram=0.05GB 5s | grade=0.764 inner_auc=0.620 vs conf_auc=0.701
+03:04:29 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+03:04:35 [audio/urbansound8k] vote=0.516 uniform=0.483 best1=0.529 n_val=1206 vram=0.05GB 6s | grade=0.784 inner_auc=0.787 vs conf_auc=0.827
+03:04:38 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+03:04:43 [audio/urbansound8k] vote=0.653 uniform=0.551 best1=0.661 n_val=1052 vram=0.05GB 5s | grade=0.782 inner_auc=0.787 vs conf_auc=0.825
+03:04:46 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+03:04:52 [audio/urbansound8k] vote=0.627 uniform=0.613 best1=0.625 n_val=1337 vram=0.04GB 6s | grade=0.836 inner_auc=0.777 vs conf_auc=0.801
+03:04:54 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+03:04:59 [audio/urbansound8k] vote=0.623 uniform=0.575 best1=0.631 n_val=1406 vram=0.04GB 5s | grade=0.844 inner_auc=0.711 vs conf_auc=0.723
+03:05:02 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+03:05:08 [audio/urbansound8k] vote=0.620 uniform=0.614 best1=0.616 n_val=1118 vram=0.05GB 6s | grade=0.836 inner_auc=0.779 vs conf_auc=0.780
+03:05:10 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+03:05:14 [fill] audio/urbansound8k shard 4/9 ok 368s
+03:05:15 [audio/urbansound8k] vote=0.647 uniform=0.595 best1=0.649 n_val=1110 vram=0.05GB 5s | grade=0.845 inner_auc=0.778 vs conf_auc=0.755
+03:05:18 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+03:05:18 [data] audio/urbansound8k: n=5000 C=10 D=134 shards=5
+03:05:23 [audio/urbansound8k] vote=0.697 uniform=0.668 best1=0.693 n_val=1266 vram=0.05GB 5s | grade=0.853 inner_auc=0.714 vs conf_auc=0.822
+03:05:27 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+03:05:32 [audio/urbansound8k] vote=0.581 uniform=0.566 best1=0.585 n_val=1639 vram=0.05GB 5s | grade=0.773 inner_auc=0.736 vs conf_auc=0.804
+03:05:35 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+03:05:40 [audio/urbansound8k] vote=0.662 uniform=0.628 best1=0.658 n_val=1978 vram=0.05GB 5s | grade=0.832 inner_auc=0.648 vs conf_auc=0.743
+03:05:43 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+03:05:48 [audio/urbansound8k] vote=0.614 uniform=0.592 best1=0.615 n_val=1591 vram=0.05GB 5s | grade=0.817 inner_auc=0.631 vs conf_auc=0.664
+03:05:51 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+03:05:56 [audio/urbansound8k] vote=0.645 uniform=0.609 best1=0.637 n_val=1503 vram=0.05GB 5s | grade=0.838 inner_auc=0.574 vs conf_auc=0.721
+03:05:59 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+03:06:05 [audio/urbansound8k] vote=0.657 uniform=0.649 best1=0.646 n_val=1575 vram=0.05GB 6s | grade=0.855 inner_auc=0.629 vs conf_auc=0.717
+03:06:08 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+03:06:14 [audio/urbansound8k] vote=0.722 uniform=0.686 best1=0.722 n_val=1411 vram=0.05GB 6s | grade=0.846 inner_auc=0.692 vs conf_auc=0.733
+03:06:16 ===== CYCLE 149 (OUTER -> INNER -> FEEDBACK) =====
+03:06:23 [audio/urbansound8k] vote=0.645 uniform=0.628 best1=0.641 n_val=1311 vram=0.05GB 7s | grade=0.819 inner_auc=0.663 vs conf_auc=0.720
+03:06:25 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+03:06:31 [audio/urbansound8k] vote=0.542 uniform=0.521 best1=0.542 n_val=1608 vram=0.05GB 5s | grade=0.761 inner_auc=0.656 vs conf_auc=0.700
+03:06:33 ===== CYCLE 151 (OUTER -> INNER -> FEEDBACK) =====
+03:06:39 [audio/urbansound8k] vote=0.602 uniform=0.573 best1=0.598 n_val=1580 vram=0.05GB 6s | grade=0.809 inner_auc=0.656 vs conf_auc=0.664
+03:06:43 ===== CYCLE 152 (OUTER -> INNER -> FEEDBACK) =====
+03:06:47 [audio/urbansound8k] vote=0.625 uniform=0.574 best1=0.622 n_val=1740 vram=0.05GB 5s | grade=0.838 inner_auc=0.737 vs conf_auc=0.817
+03:06:50 ===== CYCLE 153 (OUTER -> INNER -> FEEDBACK) =====
+03:06:55 [audio/urbansound8k] vote=0.685 uniform=0.604 best1=0.694 n_val=1623 vram=0.05GB 5s | grade=0.847 inner_auc=0.609 vs conf_auc=0.677
+03:06:58 ===== CYCLE 154 (OUTER -> INNER -> FEEDBACK) =====
+03:07:05 [audio/urbansound8k] vote=0.656 uniform=0.622 best1=0.658 n_val=1156 vram=0.06GB 7s | grade=0.847 inner_auc=0.769 vs conf_auc=0.767
+03:07:08 ===== CYCLE 155 (OUTER -> INNER -> FEEDBACK) =====
+03:07:13 [audio/urbansound8k] vote=0.643 uniform=0.620 best1=0.642 n_val=1366 vram=0.05GB 5s | grade=0.850 inner_auc=0.751 vs conf_auc=0.824
+03:07:16 ===== CYCLE 156 (OUTER -> INNER -> FEEDBACK) =====
+03:07:22 [audio/urbansound8k] vote=0.651 uniform=0.572 best1=0.656 n_val=1612 vram=0.05GB 6s | grade=0.851 inner_auc=0.756 vs conf_auc=0.734
+03:07:24 ===== CYCLE 157 (OUTER -> INNER -> FEEDBACK) =====
+03:07:29 [audio/urbansound8k] vote=0.625 uniform=0.656 best1=0.623 n_val=1634 vram=0.05GB 5s | grade=0.828 inner_auc=0.634 vs conf_auc=0.693
+03:07:32 ===== CYCLE 158 (OUTER -> INNER -> FEEDBACK) =====
+03:07:33 [fill] audio/urbansound8k shard 5/9 ok 139s
+03:07:37 [audio/urbansound8k] vote=0.656 uniform=0.620 best1=0.655 n_val=1688 vram=0.05GB 5s | grade=0.851 inner_auc=0.671 vs conf_auc=0.724
+03:07:41 ===== CYCLE 159 (OUTER -> INNER -> FEEDBACK) =====
+03:07:41 [data] audio/urbansound8k: n=6000 C=10 D=134 shards=6
+03:07:46 [audio/urbansound8k] vote=0.593 uniform=0.548 best1=0.596 n_val=1669 vram=0.06GB 5s | grade=0.810 inner_auc=0.780 vs conf_auc=0.802
+03:07:49 ===== CYCLE 160 (OUTER -> INNER -> FEEDBACK) =====
+03:07:54 [audio/urbansound8k] vote=0.659 uniform=0.629 best1=0.653 n_val=1882 vram=0.06GB 5s | grade=0.827 inner_auc=0.712 vs conf_auc=0.768
+03:07:57 ===== CYCLE 161 (OUTER -> INNER -> FEEDBACK) =====
+03:08:04 [audio/urbansound8k] vote=0.612 uniform=0.613 best1=0.608 n_val=1974 vram=0.06GB 7s | grade=0.825 inner_auc=0.775 vs conf_auc=0.787
+03:08:06 ===== CYCLE 162 (OUTER -> INNER -> FEEDBACK) =====
+03:08:12 [audio/urbansound8k] vote=0.618 uniform=0.575 best1=0.621 n_val=1736 vram=0.06GB 5s | grade=0.844 inner_auc=0.764 vs conf_auc=0.791
+03:08:14 ===== CYCLE 163 (OUTER -> INNER -> FEEDBACK) =====
+03:08:21 [audio/urbansound8k] vote=0.595 uniform=0.555 best1=0.603 n_val=1936 vram=0.06GB 7s | grade=0.828 inner_auc=0.736 vs conf_auc=0.755
+03:08:23 ===== CYCLE 164 (OUTER -> INNER -> FEEDBACK) =====
+03:08:29 [audio/urbansound8k] vote=0.674 uniform=0.633 best1=0.675 n_val=2063 vram=0.06GB 5s | grade=0.825 inner_auc=0.715 vs conf_auc=0.803
+03:08:31 ===== CYCLE 165 (OUTER -> INNER -> FEEDBACK) =====
+03:08:37 [audio/urbansound8k] vote=0.626 uniform=0.552 best1=0.633 n_val=1899 vram=0.06GB 5s | grade=0.828 inner_auc=0.831 vs conf_auc=0.901
+03:08:39 ===== CYCLE 166 (OUTER -> INNER -> FEEDBACK) =====
+03:08:46 [audio/urbansound8k] vote=0.675 uniform=0.636 best1=0.673 n_val=1833 vram=0.06GB 7s | grade=0.846 inner_auc=0.731 vs conf_auc=0.760
+03:08:49 ===== CYCLE 167 (OUTER -> INNER -> FEEDBACK) =====
+03:08:54 [audio/urbansound8k] vote=0.626 uniform=0.581 best1=0.627 n_val=1780 vram=0.06GB 5s | grade=0.825 inner_auc=0.739 vs conf_auc=0.784
+03:08:57 ===== CYCLE 168 (OUTER -> INNER -> FEEDBACK) =====
+03:09:04 [audio/urbansound8k] vote=0.634 uniform=0.592 best1=0.638 n_val=1967 vram=0.06GB 7s | grade=0.844 inner_auc=0.796 vs conf_auc=0.804
+03:09:07 ===== CYCLE 169 (OUTER -> INNER -> FEEDBACK) =====
+03:09:12 [audio/urbansound8k] vote=0.614 uniform=0.577 best1=0.605 n_val=1892 vram=0.06GB 5s | grade=0.832 inner_auc=0.608 vs conf_auc=0.608
+03:09:15 ===== CYCLE 170 (OUTER -> INNER -> FEEDBACK) =====
+03:09:21 [audio/urbansound8k] vote=0.559 uniform=0.540 best1=0.556 n_val=2041 vram=0.06GB 6s | grade=0.793 inner_auc=0.754 vs conf_auc=0.739
+03:09:25 ===== CYCLE 171 (OUTER -> INNER -> FEEDBACK) =====
+03:09:30 [audio/urbansound8k] vote=0.638 uniform=0.633 best1=0.630 n_val=1899 vram=0.06GB 5s | grade=0.818 inner_auc=0.682 vs conf_auc=0.735
+03:09:33 ===== CYCLE 172 (OUTER -> INNER -> FEEDBACK) =====
+03:09:38 [audio/urbansound8k] vote=0.593 uniform=0.562 best1=0.593 n_val=1928 vram=0.06GB 6s | grade=0.820 inner_auc=0.720 vs conf_auc=0.755
+03:09:41 ===== CYCLE 173 (OUTER -> INNER -> FEEDBACK) =====
+03:09:48 [audio/urbansound8k] vote=0.685 uniform=0.632 best1=0.686 n_val=1678 vram=0.06GB 7s | grade=0.829 inner_auc=0.722 vs conf_auc=0.728
+03:09:50 ===== CYCLE 174 (OUTER -> INNER -> FEEDBACK) =====
+03:09:56 [audio/urbansound8k] vote=0.632 uniform=0.557 best1=0.632 n_val=1845 vram=0.06GB 5s | grade=0.834 inner_auc=0.805 vs conf_auc=0.823
+03:09:59 ===== CYCLE 175 (OUTER -> INNER -> FEEDBACK) =====
+03:10:04 [audio/urbansound8k] vote=0.663 uniform=0.642 best1=0.658 n_val=1784 vram=0.06GB 6s | grade=0.849 inner_auc=0.691 vs conf_auc=0.733
+03:10:09 ===== CYCLE 176 (OUTER -> INNER -> FEEDBACK) =====
+03:10:15 [audio/urbansound8k] vote=0.709 uniform=0.660 best1=0.709 n_val=1563 vram=0.06GB 6s | grade=0.854 inner_auc=0.833 vs conf_auc=0.845
+03:10:17 ===== CYCLE 177 (OUTER -> INNER -> FEEDBACK) =====
+03:10:23 [audio/urbansound8k] vote=0.605 uniform=0.558 best1=0.608 n_val=1644 vram=0.06GB 6s | grade=0.794 inner_auc=0.737 vs conf_auc=0.792
+03:10:25 [fill] audio/urbansound8k shard 6/9 ok 173s
+03:10:26 ===== CYCLE 178 (OUTER -> INNER -> FEEDBACK) =====
+03:10:26 [data] audio/urbansound8k: n=7000 C=10 D=134 shards=7
+03:10:33 [audio/urbansound8k] vote=0.621 uniform=0.580 best1=0.625 n_val=2083 vram=0.07GB 8s | grade=0.833 inner_auc=0.786 vs conf_auc=0.780
+03:10:36 ===== CYCLE 179 (OUTER -> INNER -> FEEDBACK) =====
+03:10:41 [audio/urbansound8k] vote=0.640 uniform=0.623 best1=0.640 n_val=1921 vram=0.07GB 5s | grade=0.847 inner_auc=0.792 vs conf_auc=0.793
+03:10:44 ===== CYCLE 180 (OUTER -> INNER -> FEEDBACK) =====
+03:10:49 [audio/urbansound8k] vote=0.643 uniform=0.605 best1=0.644 n_val=2443 vram=0.07GB 5s | grade=0.862 inner_auc=0.825 vs conf_auc=0.864
+03:10:54 ===== CYCLE 181 (OUTER -> INNER -> FEEDBACK) =====
+03:10:59 [audio/urbansound8k] vote=0.690 uniform=0.688 best1=0.682 n_val=2155 vram=0.07GB 5s | grade=0.847 inner_auc=0.779 vs conf_auc=0.814
+03:11:01 ===== CYCLE 182 (OUTER -> INNER -> FEEDBACK) =====
+03:11:07 [audio/urbansound8k] vote=0.640 uniform=0.626 best1=0.634 n_val=2378 vram=0.07GB 5s | grade=0.828 inner_auc=0.756 vs conf_auc=0.773
+03:11:09 ===== CYCLE 183 (OUTER -> INNER -> FEEDBACK) =====
+03:11:15 [audio/urbansound8k] vote=0.682 uniform=0.581 best1=0.683 n_val=2159 vram=0.07GB 6s | grade=0.857 inner_auc=0.852 vs conf_auc=0.891
+03:11:20 ===== CYCLE 184 (OUTER -> INNER -> FEEDBACK) =====
+03:11:25 [audio/urbansound8k] vote=0.632 uniform=0.590 best1=0.629 n_val=2220 vram=0.07GB 5s | grade=0.822 inner_auc=0.716 vs conf_auc=0.711
+03:11:28 ===== CYCLE 185 (OUTER -> INNER -> FEEDBACK) =====
+03:11:33 [audio/urbansound8k] vote=0.652 uniform=0.613 best1=0.648 n_val=2001 vram=0.07GB 5s | grade=0.850 inner_auc=0.780 vs conf_auc=0.803
+03:11:36 ===== CYCLE 186 (OUTER -> INNER -> FEEDBACK) =====
+03:11:44 [audio/urbansound8k] vote=0.650 uniform=0.592 best1=0.653 n_val=2245 vram=0.07GB 8s | grade=0.857 inner_auc=0.797 vs conf_auc=0.822
+03:11:47 ===== CYCLE 187 (OUTER -> INNER -> FEEDBACK) =====
+03:11:52 [audio/urbansound8k] vote=0.644 uniform=0.616 best1=0.644 n_val=2161 vram=0.07GB 5s | grade=0.849 inner_auc=0.821 vs conf_auc=0.809
+03:11:54 ===== CYCLE 188 (OUTER -> INNER -> FEEDBACK) =====
+03:12:00 [audio/urbansound8k] vote=0.556 uniform=0.556 best1=0.555 n_val=2161 vram=0.07GB 6s | grade=0.767 inner_auc=0.788 vs conf_auc=0.807
+03:12:05 ===== CYCLE 189 (OUTER -> INNER -> FEEDBACK) =====
+03:12:10 [audio/urbansound8k] vote=0.634 uniform=0.627 best1=0.631 n_val=1936 vram=0.07GB 5s | grade=0.811 inner_auc=0.871 vs conf_auc=0.885
+03:12:13 ===== CYCLE 190 (OUTER -> INNER -> FEEDBACK) =====
+03:12:18 [audio/urbansound8k] vote=0.613 uniform=0.596 best1=0.611 n_val=1995 vram=0.07GB 6s | grade=0.828 inner_auc=0.851 vs conf_auc=0.870
+03:12:21 ===== CYCLE 191 (OUTER -> INNER -> FEEDBACK) =====
+03:12:28 [audio/urbansound8k] vote=0.595 uniform=0.572 best1=0.595 n_val=2397 vram=0.07GB 7s | grade=0.823 inner_auc=0.807 vs conf_auc=0.842
+03:12:31 ===== CYCLE 192 (OUTER -> INNER -> FEEDBACK) =====
+03:12:36 [audio/urbansound8k] vote=0.696 uniform=0.644 best1=0.688 n_val=2047 vram=0.07GB 6s | grade=0.814 inner_auc=0.837 vs conf_auc=0.840
+03:12:39 ===== CYCLE 193 (OUTER -> INNER -> FEEDBACK) =====
+03:12:45 [audio/urbansound8k] vote=0.660 uniform=0.651 best1=0.659 n_val=2019 vram=0.07GB 6s | grade=0.837 inner_auc=0.831 vs conf_auc=0.859
+03:12:48 ===== CYCLE 194 (OUTER -> INNER -> FEEDBACK) =====
+03:12:56 [audio/urbansound8k] vote=0.606 uniform=0.569 best1=0.607 n_val=2259 vram=0.07GB 8s | grade=0.811 inner_auc=0.818 vs conf_auc=0.848
+03:12:59 ===== CYCLE 195 (OUTER -> INNER -> FEEDBACK) =====
+03:13:04 [audio/urbansound8k] vote=0.628 uniform=0.597 best1=0.626 n_val=2077 vram=0.07GB 6s | grade=0.843 inner_auc=0.766 vs conf_auc=0.756
+03:13:07 ===== CYCLE 196 (OUTER -> INNER -> FEEDBACK) =====
+03:13:14 [audio/urbansound8k] vote=0.594 uniform=0.618 best1=0.583 n_val=1976 vram=0.07GB 6s | grade=0.811 inner_auc=0.729 vs conf_auc=0.731
+03:13:18 ===== CYCLE 197 (OUTER -> INNER -> FEEDBACK) =====
+03:13:23 [audio/urbansound8k] vote=0.592 uniform=0.567 best1=0.590 n_val=2156 vram=0.07GB 6s | grade=0.831 inner_auc=0.730 vs conf_auc=0.799
+03:13:26 ===== CYCLE 198 (OUTER -> INNER -> FEEDBACK) =====
+03:13:32 [audio/urbansound8k] vote=0.613 uniform=0.604 best1=0.612 n_val=2299 vram=0.07GB 6s | grade=0.826 inner_auc=0.767 vs conf_auc=0.776
+03:13:35 ===== CYCLE 199 (OUTER -> INNER -> FEEDBACK) =====
+03:13:43 [audio/urbansound8k] vote=0.638 uniform=0.634 best1=0.637 n_val=1952 vram=0.07GB 8s | grade=0.836 inner_auc=0.903 vs conf_auc=0.917
+03:13:46 ===== CYCLE 200 (OUTER -> INNER -> FEEDBACK) =====
+03:13:52 [audio/urbansound8k] vote=0.652 uniform=0.651 best1=0.652 n_val=2127 vram=0.07GB 6s | grade=0.854 inner_auc=0.735 vs conf_auc=0.754
+03:13:54 ===== CYCLE 201 (OUTER -> INNER -> FEEDBACK) =====
+03:14:01 [audio/urbansound8k] vote=0.624 uniform=0.607 best1=0.618 n_val=1892 vram=0.07GB 7s | grade=0.829 inner_auc=0.813 vs conf_auc=0.823
+03:14:05 ===== CYCLE 202 (OUTER -> INNER -> FEEDBACK) =====
+03:14:10 [audio/urbansound8k] vote=0.640 uniform=0.638 best1=0.632 n_val=2222 vram=0.07GB 5s | grade=0.852 inner_auc=0.762 vs conf_auc=0.710
+03:14:13 ===== CYCLE 203 (OUTER -> INNER -> FEEDBACK) =====
+03:14:19 [audio/urbansound8k] vote=0.602 uniform=0.531 best1=0.602 n_val=2299 vram=0.07GB 6s | grade=0.822 inner_auc=0.875 vs conf_auc=0.881
+03:14:21 ===== CYCLE 204 (OUTER -> INNER -> FEEDBACK) =====
+03:14:29 [audio/urbansound8k] vote=0.648 uniform=0.585 best1=0.646 n_val=2264 vram=0.07GB 8s | grade=0.837 inner_auc=0.817 vs conf_auc=0.818
+03:14:30 [fill] audio/urbansound8k shard 7/9 ok 244s
+03:14:32 ===== CYCLE 205 (OUTER -> INNER -> FEEDBACK) =====
+03:14:32 [data] audio/urbansound8k: n=7932 C=10 D=134 shards=8
+03:14:37 [audio/urbansound8k] vote=0.607 uniform=0.547 best1=0.608 n_val=2502 vram=0.07GB 5s | grade=0.814 inner_auc=0.901 vs conf_auc=0.880
+03:14:40 ===== CYCLE 206 (OUTER -> INNER -> FEEDBACK) =====
+03:14:45 [audio/urbansound8k] vote=0.674 uniform=0.629 best1=0.677 n_val=2507 vram=0.07GB 5s | grade=0.835 inner_auc=0.699 vs conf_auc=0.725
+03:14:48 ===== CYCLE 207 (OUTER -> INNER -> FEEDBACK) =====
+03:14:56 [audio/urbansound8k] vote=0.611 uniform=0.573 best1=0.613 n_val=2529 vram=0.07GB 8s | grade=0.808 inner_auc=0.773 vs conf_auc=0.763
+03:14:59 ===== CYCLE 208 (OUTER -> INNER -> FEEDBACK) =====
+03:15:05 [audio/urbansound8k] vote=0.628 uniform=0.576 best1=0.625 n_val=2667 vram=0.07GB 6s | grade=0.841 inner_auc=0.864 vs conf_auc=0.874
+03:15:07 ===== CYCLE 209 (OUTER -> INNER -> FEEDBACK) =====
+03:15:14 [audio/urbansound8k] vote=0.643 uniform=0.639 best1=0.647 n_val=2653 vram=0.07GB 7s | grade=0.845 inner_auc=0.739 vs conf_auc=0.769
+03:15:18 ===== CYCLE 210 (OUTER -> INNER -> FEEDBACK) =====
+03:15:24 [audio/urbansound8k] vote=0.678 uniform=0.629 best1=0.677 n_val=2357 vram=0.07GB 6s | grade=0.848 inner_auc=0.845 vs conf_auc=0.825
+03:15:27 ===== CYCLE 211 (OUTER -> INNER -> FEEDBACK) =====
+03:15:32 [audio/urbansound8k] vote=0.639 uniform=0.618 best1=0.634 n_val=2687 vram=0.07GB 5s | grade=0.829 inner_auc=0.746 vs conf_auc=0.786
+03:15:35 ===== CYCLE 212 (OUTER -> INNER -> FEEDBACK) =====
+03:15:44 [audio/urbansound8k] vote=0.659 uniform=0.628 best1=0.659 n_val=2203 vram=0.07GB 9s | grade=0.849 inner_auc=0.816 vs conf_auc=0.832
+03:15:46 ===== CYCLE 213 (OUTER -> INNER -> FEEDBACK) =====
+03:15:53 [audio/urbansound8k] vote=0.633 uniform=0.607 best1=0.632 n_val=2054 vram=0.08GB 6s | grade=0.837 inner_auc=0.794 vs conf_auc=0.816
+03:15:55 ===== CYCLE 214 (OUTER -> INNER -> FEEDBACK) =====
+03:16:01 [audio/urbansound8k] vote=0.658 uniform=0.592 best1=0.662 n_val=2552 vram=0.08GB 6s | grade=0.850 inner_auc=0.769 vs conf_auc=0.777
+03:16:06 ===== CYCLE 215 (OUTER -> INNER -> FEEDBACK) =====
+03:16:12 [audio/urbansound8k] vote=0.576 uniform=0.537 best1=0.582 n_val=2703 vram=0.07GB 5s | grade=0.774 inner_auc=0.810 vs conf_auc=0.802
+03:16:14 ===== CYCLE 216 (OUTER -> INNER -> FEEDBACK) =====
+03:16:20 [audio/urbansound8k] vote=0.640 uniform=0.606 best1=0.641 n_val=2614 vram=0.07GB 5s | grade=0.827 inner_auc=0.814 vs conf_auc=0.815
+03:16:23 ===== CYCLE 217 (OUTER -> INNER -> FEEDBACK) =====
+03:16:30 [audio/urbansound8k] vote=0.649 uniform=0.614 best1=0.642 n_val=2570 vram=0.07GB 8s | grade=0.848 inner_auc=0.760 vs conf_auc=0.797
+03:16:34 ===== CYCLE 218 (OUTER -> INNER -> FEEDBACK) =====
+03:16:40 [audio/urbansound8k] vote=0.695 uniform=0.624 best1=0.698 n_val=2190 vram=0.07GB 6s | grade=0.850 inner_auc=0.798 vs conf_auc=0.785
+03:16:42 ===== CYCLE 219 (OUTER -> INNER -> FEEDBACK) =====
+03:16:48 [audio/urbansound8k] vote=0.660 uniform=0.593 best1=0.661 n_val=2354 vram=0.07GB 6s | grade=0.841 inner_auc=0.819 vs conf_auc=0.813
+03:16:51 ===== CYCLE 220 (OUTER -> INNER -> FEEDBACK) =====
+03:17:00 [audio/urbansound8k] vote=0.620 uniform=0.617 best1=0.615 n_val=2475 vram=0.07GB 9s | grade=0.827 inner_auc=0.719 vs conf_auc=0.786
+03:17:02 ===== CYCLE 221 (OUTER -> INNER -> FEEDBACK) =====
+03:17:08 [audio/urbansound8k] vote=0.654 uniform=0.577 best1=0.657 n_val=2379 vram=0.07GB 6s | grade=0.845 inner_auc=0.808 vs conf_auc=0.838
+03:17:11 ===== CYCLE 222 (OUTER -> INNER -> FEEDBACK) =====
+03:17:17 [audio/urbansound8k] vote=0.594 uniform=0.571 best1=0.590 n_val=2515 vram=0.07GB 6s | grade=0.803 inner_auc=0.777 vs conf_auc=0.811
+03:17:21 ===== CYCLE 223 (OUTER -> INNER -> FEEDBACK) =====
+03:17:29 [audio/urbansound8k] vote=0.661 uniform=0.606 best1=0.664 n_val=2441 vram=0.07GB 8s | grade=0.831 inner_auc=0.816 vs conf_auc=0.849
+03:17:31 ===== CYCLE 224 (OUTER -> INNER -> FEEDBACK) =====
+03:17:37 [audio/urbansound8k] vote=0.653 uniform=0.596 best1=0.654 n_val=2258 vram=0.07GB 6s | grade=0.858 inner_auc=0.811 vs conf_auc=0.780
+03:17:40 ===== CYCLE 225 (OUTER -> INNER -> FEEDBACK) =====
+03:17:45 [fill] audio/urbansound8k shard 8/9 ok 195s
+03:17:45 [fill] stage 1 complete
+03:17:47 [audio/urbansound8k] vote=0.641 uniform=0.588 best1=0.640 n_val=2211 vram=0.08GB 8s | grade=0.849 inner_auc=0.843 vs conf_auc=0.862
+03:17:51 ===== CYCLE 226 (OUTER -> INNER -> FEEDBACK) =====
+03:17:51 [data] audio/urbansound8k: n=8732 C=10 D=134 shards=9
+03:17:57 [audio/urbansound8k] vote=0.624 uniform=0.561 best1=0.628 n_val=2727 vram=0.08GB 6s | grade=0.837 inner_auc=0.837 vs conf_auc=0.835
+03:17:59 ===== CYCLE 227 (OUTER -> INNER -> FEEDBACK) =====
+03:18:05 [audio/urbansound8k] vote=0.703 uniform=0.676 best1=0.703 n_val=2701 vram=0.08GB 6s | grade=0.836 inner_auc=0.822 vs conf_auc=0.815
+03:18:08 ===== CYCLE 228 (OUTER -> INNER -> FEEDBACK) =====
+03:18:17 [audio/urbansound8k] vote=0.645 uniform=0.623 best1=0.644 n_val=2694 vram=0.08GB 9s | grade=0.825 inner_auc=0.862 vs conf_auc=0.852
+03:18:20 ===== CYCLE 229 (OUTER -> INNER -> FEEDBACK) =====
+03:18:25 [audio/urbansound8k] vote=0.672 uniform=0.628 best1=0.668 n_val=2680 vram=0.08GB 5s | grade=0.850 inner_auc=0.762 vs conf_auc=0.769
+03:18:28 ===== CYCLE 230 (OUTER -> INNER -> FEEDBACK) =====
+03:18:34 [audio/urbansound8k] vote=0.681 uniform=0.633 best1=0.682 n_val=2407 vram=0.08GB 6s | grade=0.865 inner_auc=0.874 vs conf_auc=0.883
+03:18:37 ===== CYCLE 231 (OUTER -> INNER -> FEEDBACK) =====
+03:18:46 [audio/urbansound8k] vote=0.649 uniform=0.602 best1=0.649 n_val=2507 vram=0.08GB 8s | grade=0.844 inner_auc=0.722 vs conf_auc=0.757
+03:18:48 ===== CYCLE 232 (OUTER -> INNER -> FEEDBACK) =====
+03:18:54 [audio/urbansound8k] vote=0.617 uniform=0.603 best1=0.613 n_val=2522 vram=0.08GB 6s | grade=0.827 inner_auc=0.751 vs conf_auc=0.773
+03:18:57 ===== CYCLE 233 (OUTER -> INNER -> FEEDBACK) =====
+03:19:02 [audio/urbansound8k] vote=0.701 uniform=0.663 best1=0.696 n_val=2608 vram=0.08GB 6s | grade=0.831 inner_auc=0.775 vs conf_auc=0.793
+03:19:07 ===== CYCLE 234 (OUTER -> INNER -> FEEDBACK) =====
+03:19:14 [audio/urbansound8k] vote=0.631 uniform=0.605 best1=0.625 n_val=2590 vram=0.08GB 7s | grade=0.815 inner_auc=0.663 vs conf_auc=0.691
+03:19:17 ===== CYCLE 235 (OUTER -> INNER -> FEEDBACK) =====
+03:19:23 [audio/urbansound8k] vote=0.664 uniform=0.619 best1=0.665 n_val=2641 vram=0.08GB 6s | grade=0.834 inner_auc=0.846 vs conf_auc=0.839
+03:19:26 ===== CYCLE 236 (OUTER -> INNER -> FEEDBACK) =====
+03:19:35 [audio/urbansound8k] vote=0.699 uniform=0.693 best1=0.694 n_val=2712 vram=0.08GB 9s | grade=0.855 inner_auc=0.796 vs conf_auc=0.819
+03:19:38 ===== CYCLE 237 (OUTER -> INNER -> FEEDBACK) =====
+03:19:43 [audio/urbansound8k] vote=0.696 uniform=0.665 best1=0.696 n_val=2645 vram=0.08GB 6s | grade=0.869 inner_auc=0.854 vs conf_auc=0.857
+03:19:46 ===== CYCLE 238 (OUTER -> INNER -> FEEDBACK) =====
+03:19:52 [audio/urbansound8k] vote=0.651 uniform=0.607 best1=0.650 n_val=2617 vram=0.08GB 6s | grade=0.833 inner_auc=0.859 vs conf_auc=0.844
+03:19:55 ===== CYCLE 239 (OUTER -> INNER -> FEEDBACK) =====
+03:20:04 [audio/urbansound8k] vote=0.703 uniform=0.634 best1=0.702 n_val=2548 vram=0.08GB 10s | grade=0.850 inner_auc=0.770 vs conf_auc=0.798
+03:20:07 ===== CYCLE 240 (OUTER -> INNER -> FEEDBACK) =====
+03:20:13 [audio/urbansound8k] vote=0.645 uniform=0.612 best1=0.646 n_val=2489 vram=0.08GB 5s | grade=0.830 inner_auc=0.844 vs conf_auc=0.835
+03:20:15 ===== CYCLE 241 (OUTER -> INNER -> FEEDBACK) =====
+03:20:21 [audio/urbansound8k] vote=0.624 uniform=0.566 best1=0.622 n_val=2431 vram=0.08GB 6s | grade=0.838 inner_auc=0.743 vs conf_auc=0.741
+03:20:26 ===== CYCLE 242 (OUTER -> INNER -> FEEDBACK) =====
+03:20:33 [audio/urbansound8k] vote=0.670 uniform=0.625 best1=0.671 n_val=2320 vram=0.08GB 8s | grade=0.840 inner_auc=0.808 vs conf_auc=0.827
+03:20:36 ===== CYCLE 243 (OUTER -> INNER -> FEEDBACK) =====
+03:20:41 [audio/urbansound8k] vote=0.668 uniform=0.633 best1=0.672 n_val=2707 vram=0.08GB 5s | grade=0.854 inner_auc=0.853 vs conf_auc=0.848
+03:20:44 ===== CYCLE 244 (OUTER -> INNER -> FEEDBACK) =====
+03:20:50 [audio/urbansound8k] vote=0.612 uniform=0.573 best1=0.613 n_val=2771 vram=0.08GB 6s | grade=0.812 inner_auc=0.822 vs conf_auc=0.830
+03:20:55 ===== CYCLE 245 (OUTER -> INNER -> FEEDBACK) =====
+03:21:03 [audio/urbansound8k] vote=0.642 uniform=0.632 best1=0.637 n_val=2480 vram=0.08GB 8s | grade=0.827 inner_auc=0.816 vs conf_auc=0.849
+03:21:05 ===== CYCLE 246 (OUTER -> INNER -> FEEDBACK) =====
+03:21:10 [audio/urbansound8k] vote=0.657 uniform=0.627 best1=0.653 n_val=2762 vram=0.08GB 5s | grade=0.852 inner_auc=0.796 vs conf_auc=0.811
+03:21:13 ===== CYCLE 247 (OUTER -> INNER -> FEEDBACK) =====
+03:21:19 [audio/urbansound8k] vote=0.694 uniform=0.641 best1=0.694 n_val=2651 vram=0.08GB 6s | grade=0.859 inner_auc=0.815 vs conf_auc=0.799
+03:21:24 ===== CYCLE 248 (OUTER -> INNER -> FEEDBACK) =====
+03:21:32 [audio/urbansound8k] vote=0.607 uniform=0.555 best1=0.607 n_val=2518 vram=0.08GB 7s | grade=0.790 inner_auc=0.779 vs conf_auc=0.764
+03:21:34 ===== CYCLE 249 (OUTER -> INNER -> FEEDBACK) =====
+03:21:40 [audio/urbansound8k] vote=0.694 uniform=0.647 best1=0.692 n_val=2510 vram=0.08GB 6s | grade=0.833 inner_auc=0.762 vs conf_auc=0.773
+03:21:43 ===== CYCLE 250 (OUTER -> INNER -> FEEDBACK) =====
+03:21:50 [audio/urbansound8k] vote=0.655 uniform=0.568 best1=0.655 n_val=2448 vram=0.08GB 8s | grade=0.836 inner_auc=0.701 vs conf_auc=0.727
+03:21:56 ===== CYCLE 251 (OUTER -> INNER -> FEEDBACK) =====
+03:22:01 [audio/urbansound8k] vote=0.618 uniform=0.573 best1=0.617 n_val=2660 vram=0.08GB 5s | grade=0.828 inner_auc=0.792 vs conf_auc=0.836
+03:22:04 ===== CYCLE 252 (OUTER -> INNER -> FEEDBACK) =====
+03:22:10 [audio/urbansound8k] vote=0.642 uniform=0.598 best1=0.645 n_val=2495 vram=0.08GB 6s | grade=0.838 inner_auc=0.789 vs conf_auc=0.790
+03:22:12 ===== CYCLE 253 (OUTER -> INNER -> FEEDBACK) =====
+03:22:22 [audio/urbansound8k] vote=0.651 uniform=0.609 best1=0.656 n_val=2675 vram=0.08GB 10s | grade=0.852 inner_auc=0.744 vs conf_auc=0.753
+03:22:25 ===== CYCLE 254 (OUTER -> INNER -> FEEDBACK) =====
+03:22:31 [audio/urbansound8k] vote=0.682 uniform=0.664 best1=0.683 n_val=2535 vram=0.08GB 6s | grade=0.853 inner_auc=0.827 vs conf_auc=0.809
+03:22:33 ===== CYCLE 255 (OUTER -> INNER -> FEEDBACK) =====
+03:22:39 [audio/urbansound8k] vote=0.613 uniform=0.583 best1=0.613 n_val=2615 vram=0.08GB 6s | grade=0.804 inner_auc=0.838 vs conf_auc=0.843
+03:22:42 ===== CYCLE 256 (OUTER -> INNER -> FEEDBACK) =====
+03:22:45 [fill] stage 2 complete
+03:22:52 [audio/urbansound8k] vote=0.671 uniform=0.627 best1=0.671 n_val=2685 vram=0.08GB 10s | grade=0.837 inner_auc=0.803 vs conf_auc=0.799
+03:22:55 ===== CYCLE 257 (OUTER -> INNER -> FEEDBACK) =====
+03:23:00 [audio/urbansound8k] vote=0.639 uniform=0.586 best1=0.644 n_val=2518 vram=0.08GB 6s | grade=0.833 inner_auc=0.799 vs conf_auc=0.792
+03:23:03 ===== CYCLE 258 (OUTER -> INNER -> FEEDBACK) =====
+03:23:09 [audio/urbansound8k] vote=0.676 uniform=0.632 best1=0.680 n_val=2325 vram=0.08GB 6s | grade=0.851 inner_auc=0.774 vs conf_auc=0.769
+03:23:12 ===== CYCLE 259 (OUTER -> INNER -> FEEDBACK) =====
+03:23:21 [audio/urbansound8k] vote=0.688 uniform=0.625 best1=0.689 n_val=2717 vram=0.08GB 9s | grade=0.866 inner_auc=0.837 vs conf_auc=0.850
+03:23:25 ===== CYCLE 260 (OUTER -> INNER -> FEEDBACK) =====
+03:23:30 [audio/urbansound8k] vote=0.622 uniform=0.588 best1=0.621 n_val=2636 vram=0.08GB 5s | grade=0.805 inner_auc=0.758 vs conf_auc=0.769
+03:23:33 ===== CYCLE 261 (OUTER -> INNER -> FEEDBACK) =====
+03:23:39 [audio/urbansound8k] vote=0.686 uniform=0.648 best1=0.684 n_val=2333 vram=0.08GB 6s | grade=0.837 inner_auc=0.819 vs conf_auc=0.829
+03:23:42 ===== CYCLE 262 (OUTER -> INNER -> FEEDBACK) =====
+03:23:52 [audio/urbansound8k] vote=0.644 uniform=0.620 best1=0.647 n_val=2857 vram=0.08GB 10s | grade=0.829 inner_auc=0.807 vs conf_auc=0.800
+03:23:54 ===== CYCLE 263 (OUTER -> INNER -> FEEDBACK) =====
+03:24:00 [audio/urbansound8k] vote=0.674 uniform=0.637 best1=0.666 n_val=2444 vram=0.08GB 6s | grade=0.847 inner_auc=0.748 vs conf_auc=0.770
+03:24:03 ===== CYCLE 264 (OUTER -> INNER -> FEEDBACK) =====
+03:24:09 [audio/urbansound8k] vote=0.651 uniform=0.619 best1=0.646 n_val=2506 vram=0.08GB 6s | grade=0.847 inner_auc=0.847 vs conf_auc=0.867
+03:24:13 ===== CYCLE 265 (OUTER -> INNER -> FEEDBACK) =====
+03:24:22 [audio/urbansound8k] vote=0.650 uniform=0.607 best1=0.652 n_val=2317 vram=0.08GB 9s | grade=0.852 inner_auc=0.795 vs conf_auc=0.785
+03:24:25 ===== CYCLE 266 (OUTER -> INNER -> FEEDBACK) =====
+03:24:30 [audio/urbansound8k] vote=0.688 uniform=0.654 best1=0.689 n_val=2736 vram=0.08GB 5s | grade=0.850 inner_auc=0.857 vs conf_auc=0.873
+03:24:33 ===== CYCLE 267 (OUTER -> INNER -> FEEDBACK) =====
+03:24:39 [audio/urbansound8k] vote=0.630 uniform=0.564 best1=0.629 n_val=2547 vram=0.08GB 6s | grade=0.816 inner_auc=0.859 vs conf_auc=0.865
+03:24:42 ===== CYCLE 268 (OUTER -> INNER -> FEEDBACK) =====
+03:24:52 [audio/urbansound8k] vote=0.635 uniform=0.601 best1=0.636 n_val=2537 vram=0.08GB 11s | grade=0.842 inner_auc=0.876 vs conf_auc=0.847
+03:24:55 ===== CYCLE 269 (OUTER -> INNER -> FEEDBACK) =====
+03:25:01 [audio/urbansound8k] vote=0.663 uniform=0.656 best1=0.659 n_val=2488 vram=0.08GB 6s | grade=0.847 inner_auc=0.834 vs conf_auc=0.840
+03:25:03 ===== CYCLE 270 (OUTER -> INNER -> FEEDBACK) =====
+03:25:09 [audio/urbansound8k] vote=0.666 uniform=0.618 best1=0.665 n_val=2959 vram=0.08GB 6s | grade=0.861 inner_auc=0.756 vs conf_auc=0.750
+03:25:15 ===== CYCLE 271 (OUTER -> INNER -> FEEDBACK) =====
+03:25:22 [audio/urbansound8k] vote=0.689 uniform=0.659 best1=0.688 n_val=2396 vram=0.08GB 8s | grade=0.858 inner_auc=0.856 vs conf_auc=0.886
+03:25:25 ===== CYCLE 272 (OUTER -> INNER -> FEEDBACK) =====
+03:25:31 [audio/urbansound8k] vote=0.627 uniform=0.590 best1=0.623 n_val=2528 vram=0.08GB 6s | grade=0.814 inner_auc=0.830 vs conf_auc=0.880
+03:25:34 ===== CYCLE 273 (OUTER -> INNER -> FEEDBACK) =====
+03:25:41 [audio/urbansound8k] vote=0.646 uniform=0.616 best1=0.645 n_val=2590 vram=0.08GB 8s | grade=0.845 inner_auc=0.777 vs conf_auc=0.822
+03:25:47 ===== CYCLE 274 (OUTER -> INNER -> FEEDBACK) =====
+03:25:53 [audio/urbansound8k] vote=0.656 uniform=0.594 best1=0.659 n_val=2668 vram=0.08GB 6s | grade=0.855 inner_auc=0.826 vs conf_auc=0.852
+03:25:56 ===== CYCLE 275 (OUTER -> INNER -> FEEDBACK) =====
+03:26:01 [audio/urbansound8k] vote=0.617 uniform=0.583 best1=0.616 n_val=2784 vram=0.08GB 6s | grade=0.822 inner_auc=0.821 vs conf_auc=0.806
+03:26:04 ===== CYCLE 276 (OUTER -> INNER -> FEEDBACK) =====
+03:26:14 [audio/urbansound8k] vote=0.693 uniform=0.628 best1=0.693 n_val=2386 vram=0.08GB 10s | grade=0.836 inner_auc=0.885 vs conf_auc=0.893
+03:26:17 ===== CYCLE 277 (OUTER -> INNER -> FEEDBACK) =====
+03:26:23 [audio/urbansound8k] vote=0.662 uniform=0.624 best1=0.663 n_val=2214 vram=0.08GB 5s | grade=0.845 inner_auc=0.807 vs conf_auc=0.788
+03:26:25 ===== CYCLE 278 (OUTER -> INNER -> FEEDBACK) =====
+03:26:31 [audio/urbansound8k] vote=0.667 uniform=0.606 best1=0.666 n_val=2725 vram=0.08GB 6s | grade=0.858 inner_auc=0.762 vs conf_auc=0.800
+03:26:34 ===== CYCLE 279 (OUTER -> INNER -> FEEDBACK) =====
+03:26:45 [audio/urbansound8k] vote=0.599 uniform=0.599 best1=0.599 n_val=2764 vram=0.08GB 11s | grade=0.800 inner_auc=0.752 vs conf_auc=0.748
+03:26:47 ===== CYCLE 280 (OUTER -> INNER -> FEEDBACK) =====
+03:26:53 [audio/urbansound8k] vote=0.654 uniform=0.603 best1=0.659 n_val=2319 vram=0.08GB 6s | grade=0.832 inner_auc=0.790 vs conf_auc=0.775
+03:26:56 ===== CYCLE 281 (OUTER -> INNER -> FEEDBACK) =====
+03:27:02 [audio/urbansound8k] vote=0.680 uniform=0.649 best1=0.674 n_val=2672 vram=0.08GB 6s | grade=0.858 inner_auc=0.798 vs conf_auc=0.805
+03:27:06 ===== CYCLE 282 (OUTER -> INNER -> FEEDBACK) =====
+03:27:16 [audio/urbansound8k] vote=0.637 uniform=0.589 best1=0.638 n_val=2710 vram=0.08GB 10s | grade=0.830 inner_auc=0.808 vs conf_auc=0.823
+03:27:18 ===== CYCLE 283 (OUTER -> INNER -> FEEDBACK) =====
+03:27:24 [audio/urbansound8k] vote=0.645 uniform=0.647 best1=0.643 n_val=2720 vram=0.08GB 6s | grade=0.852 inner_auc=0.869 vs conf_auc=0.857
+03:27:27 ===== CYCLE 284 (OUTER -> INNER -> FEEDBACK) =====
+03:27:33 [audio/urbansound8k] vote=0.644 uniform=0.586 best1=0.648 n_val=2837 vram=0.08GB 6s | grade=0.854 inner_auc=0.848 vs conf_auc=0.844
+03:27:39 ===== CYCLE 285 (OUTER -> INNER -> FEEDBACK) =====
+03:27:45 [fill] stage 3 complete
+03:27:46 [audio/urbansound8k] vote=0.609 uniform=0.586 best1=0.607 n_val=2725 vram=0.08GB 7s | grade=0.815 inner_auc=0.834 vs conf_auc=0.840
+03:27:49 ===== CYCLE 286 (OUTER -> INNER -> FEEDBACK) =====
+03:27:55 [audio/urbansound8k] vote=0.676 uniform=0.661 best1=0.674 n_val=2336 vram=0.08GB 6s | grade=0.835 inner_auc=0.888 vs conf_auc=0.907
+03:27:58 ===== CYCLE 287 (OUTER -> INNER -> FEEDBACK) =====
+03:28:06 [audio/urbansound8k] vote=0.681 uniform=0.613 best1=0.679 n_val=2567 vram=0.08GB 9s | grade=0.865 inner_auc=0.849 vs conf_auc=0.855
+03:28:11 ===== CYCLE 288 (OUTER -> INNER -> FEEDBACK) =====
+03:28:16 [audio/urbansound8k] vote=0.666 uniform=0.628 best1=0.662 n_val=2554 vram=0.08GB 5s | grade=0.857 inner_auc=0.851 vs conf_auc=0.845
+03:28:19 ===== CYCLE 289 (OUTER -> INNER -> FEEDBACK) =====
+03:28:25 [audio/urbansound8k] vote=0.714 uniform=0.672 best1=0.712 n_val=2402 vram=0.08GB 6s | grade=0.853 inner_auc=0.783 vs conf_auc=0.801
+03:28:28 ===== CYCLE 290 (OUTER -> INNER -> FEEDBACK) =====
+03:28:37 [audio/urbansound8k] vote=0.626 uniform=0.588 best1=0.622 n_val=2582 vram=0.08GB 9s | grade=0.805 inner_auc=0.855 vs conf_auc=0.843
+03:28:41 ===== CYCLE 291 (OUTER -> INNER -> FEEDBACK) =====
+03:28:47 [audio/urbansound8k] vote=0.685 uniform=0.643 best1=0.685 n_val=2493 vram=0.08GB 6s | grade=0.842 inner_auc=0.909 vs conf_auc=0.920
+03:28:50 ===== CYCLE 292 (OUTER -> INNER -> FEEDBACK) =====
+03:28:55 [audio/urbansound8k] vote=0.667 uniform=0.595 best1=0.666 n_val=2504 vram=0.08GB 6s | grade=0.860 inner_auc=0.822 vs conf_auc=0.798
+03:28:58 ===== CYCLE 293 (OUTER -> INNER -> FEEDBACK) =====
+03:29:09 [audio/urbansound8k] vote=0.698 uniform=0.655 best1=0.695 n_val=2590 vram=0.08GB 10s | grade=0.858 inner_auc=0.823 vs conf_auc=0.812
+03:29:11 ===== CYCLE 294 (OUTER -> INNER -> FEEDBACK) =====
+03:29:17 [audio/urbansound8k] vote=0.654 uniform=0.594 best1=0.657 n_val=2722 vram=0.08GB 5s | grade=0.840 inner_auc=0.832 vs conf_auc=0.860
+03:29:20 ===== CYCLE 295 (OUTER -> INNER -> FEEDBACK) =====
+03:29:26 [audio/urbansound8k] vote=0.644 uniform=0.583 best1=0.647 n_val=2552 vram=0.08GB 6s | grade=0.844 inner_auc=0.816 vs conf_auc=0.825
+03:29:29 ===== CYCLE 296 (OUTER -> INNER -> FEEDBACK) =====
+03:29:39 [audio/urbansound8k] vote=0.694 uniform=0.646 best1=0.695 n_val=2513 vram=0.08GB 10s | grade=0.846 inner_auc=0.773 vs conf_auc=0.823
+03:29:42 ===== CYCLE 297 (OUTER -> INNER -> FEEDBACK) =====
+03:29:47 [audio/urbansound8k] vote=0.690 uniform=0.619 best1=0.686 n_val=2528 vram=0.08GB 6s | grade=0.871 inner_auc=0.770 vs conf_auc=0.759
+03:29:50 ===== CYCLE 298 (OUTER -> INNER -> FEEDBACK) =====
+03:29:57 [audio/urbansound8k] vote=0.685 uniform=0.653 best1=0.685 n_val=2585 vram=0.08GB 6s | grade=0.867 inner_auc=0.795 vs conf_auc=0.790
+03:29:59 ===== CYCLE 299 (OUTER -> INNER -> FEEDBACK) =====
+03:30:10 [audio/urbansound8k] vote=0.715 uniform=0.647 best1=0.719 n_val=2364 vram=0.08GB 11s | grade=0.857 inner_auc=0.848 vs conf_auc=0.861
+03:30:13 ===== CYCLE 300 (OUTER -> INNER -> FEEDBACK) =====
+03:30:19 [audio/urbansound8k] vote=0.651 uniform=0.645 best1=0.648 n_val=2375 vram=0.08GB 6s | grade=0.823 inner_auc=0.771 vs conf_auc=0.764
+03:30:22 ===== CYCLE 301 (OUTER -> INNER -> FEEDBACK) =====
+03:30:28 [audio/urbansound8k] vote=0.651 uniform=0.653 best1=0.651 n_val=2161 vram=0.08GB 6s | grade=0.853 inner_auc=0.838 vs conf_auc=0.845
+03:30:32 ===== CYCLE 302 (OUTER -> INNER -> FEEDBACK) =====
+03:30:42 [audio/urbansound8k] vote=0.643 uniform=0.610 best1=0.642 n_val=2605 vram=0.08GB 10s | grade=0.846 inner_auc=0.816 vs conf_auc=0.816
+03:30:45 ===== CYCLE 303 (OUTER -> INNER -> FEEDBACK) =====
+03:30:51 [audio/urbansound8k] vote=0.646 uniform=0.615 best1=0.644 n_val=2858 vram=0.08GB 6s | grade=0.851 inner_auc=0.760 vs conf_auc=0.791
+03:30:53 ===== CYCLE 304 (OUTER -> INNER -> FEEDBACK) =====
+03:31:00 [audio/urbansound8k] vote=0.675 uniform=0.652 best1=0.669 n_val=2603 vram=0.08GB 6s | grade=0.856 inner_auc=0.767 vs conf_auc=0.782
+03:31:05 ===== CYCLE 305 (OUTER -> INNER -> FEEDBACK) =====
+03:31:13 [audio/urbansound8k] vote=0.692 uniform=0.639 best1=0.692 n_val=2615 vram=0.08GB 8s | grade=0.860 inner_auc=0.826 vs conf_auc=0.826
+03:31:16 ===== CYCLE 306 (OUTER -> INNER -> FEEDBACK) =====
+03:31:22 [audio/urbansound8k] vote=0.652 uniform=0.619 best1=0.654 n_val=2468 vram=0.08GB 6s | grade=0.842 inner_auc=0.797 vs conf_auc=0.807
+03:31:25 ===== CYCLE 307 (OUTER -> INNER -> FEEDBACK) =====
+03:31:33 [audio/urbansound8k] vote=0.655 uniform=0.616 best1=0.656 n_val=2586 vram=0.08GB 8s | grade=0.858 inner_auc=0.708 vs conf_auc=0.697
+03:31:39 ===== CYCLE 308 (OUTER -> INNER -> FEEDBACK) =====
+03:31:45 [audio/urbansound8k] vote=0.708 uniform=0.646 best1=0.707 n_val=2476 vram=0.08GB 6s | grade=0.848 inner_auc=0.757 vs conf_auc=0.770
+03:31:47 ===== CYCLE 309 (OUTER -> INNER -> FEEDBACK) =====
+03:31:53 [audio/urbansound8k] vote=0.627 uniform=0.585 best1=0.628 n_val=2828 vram=0.08GB 5s | grade=0.803 inner_auc=0.692 vs conf_auc=0.673
+03:31:56 ===== CYCLE 310 (OUTER -> INNER -> FEEDBACK) =====
+03:32:02 [audio/urbansound8k] vote=0.648 uniform=0.627 best1=0.645 n_val=2611 vram=0.08GB 6s | grade=0.843 inner_auc=0.866 vs conf_auc=0.873
+03:32:07 ===== CYCLE 311 (OUTER -> INNER -> FEEDBACK) =====
+03:32:17 [audio/urbansound8k] vote=0.663 uniform=0.601 best1=0.663 n_val=2742 vram=0.08GB 10s | grade=0.852 inner_auc=0.844 vs conf_auc=0.866
+03:32:20 ===== CYCLE 312 (OUTER -> INNER -> FEEDBACK) =====
+03:32:25 [audio/urbansound8k] vote=0.648 uniform=0.600 best1=0.646 n_val=3009 vram=0.08GB 5s | grade=0.846 inner_auc=0.742 vs conf_auc=0.762
+03:32:28 ===== CYCLE 313 (OUTER -> INNER -> FEEDBACK) =====
+03:32:34 [audio/urbansound8k] vote=0.672 uniform=0.638 best1=0.659 n_val=2467 vram=0.08GB 7s | grade=0.858 inner_auc=0.786 vs conf_auc=0.790
+03:32:40 ===== CYCLE 314 (OUTER -> INNER -> FEEDBACK) =====
+03:32:49 [audio/urbansound8k] vote=0.617 uniform=0.592 best1=0.615 n_val=2499 vram=0.08GB 9s | grade=0.809 inner_auc=0.725 vs conf_auc=0.736
+03:32:52 ===== CYCLE 315 (OUTER -> INNER -> FEEDBACK) =====
+03:32:58 [audio/urbansound8k] vote=0.618 uniform=0.580 best1=0.621 n_val=2734 vram=0.08GB 6s | grade=0.843 inner_auc=0.804 vs conf_auc=0.803
+03:33:01 ===== CYCLE 316 (OUTER -> INNER -> FEEDBACK) =====
+03:33:07 [audio/urbansound8k] vote=0.707 uniform=0.675 best1=0.706 n_val=2339 vram=0.08GB 6s | grade=0.830 inner_auc=0.845 vs conf_auc=0.855
+03:33:13 ===== CYCLE 317 (OUTER -> INNER -> FEEDBACK) =====
+03:33:21 [audio/urbansound8k] vote=0.623 uniform=0.594 best1=0.620 n_val=2734 vram=0.08GB 9s | grade=0.801 inner_auc=0.840 vs conf_auc=0.885
+03:33:25 ===== CYCLE 318 (OUTER -> INNER -> FEEDBACK) =====
+03:33:30 [audio/urbansound8k] vote=0.668 uniform=0.614 best1=0.666 n_val=2373 vram=0.08GB 5s | grade=0.843 inner_auc=0.836 vs conf_auc=0.850
+03:33:32 ===== CYCLE 319 (OUTER -> INNER -> FEEDBACK) =====
+03:33:39 [audio/urbansound8k] vote=0.629 uniform=0.609 best1=0.630 n_val=2817 vram=0.08GB 6s | grade=0.823 inner_auc=0.788 vs conf_auc=0.764
+03:33:41 ===== CYCLE 320 (OUTER -> INNER -> FEEDBACK) =====
+03:33:53 [audio/urbansound8k] vote=0.647 uniform=0.614 best1=0.647 n_val=2940 vram=0.08GB 12s | grade=0.848 inner_auc=0.693 vs conf_auc=0.728
+03:33:56 ===== CYCLE 321 (OUTER -> INNER -> FEEDBACK) =====
+03:34:02 [audio/urbansound8k] vote=0.643 uniform=0.598 best1=0.647 n_val=2225 vram=0.08GB 6s | grade=0.847 inner_auc=0.747 vs conf_auc=0.755
+03:34:04 ===== CYCLE 322 (OUTER -> INNER -> FEEDBACK) =====
+03:34:11 [audio/urbansound8k] vote=0.741 uniform=0.702 best1=0.742 n_val=2569 vram=0.08GB 6s | grade=0.833 inner_auc=0.853 vs conf_auc=0.850
+03:34:14 ===== CYCLE 323 (OUTER -> INNER -> FEEDBACK) =====
+03:34:23 [audio/urbansound8k] vote=0.636 uniform=0.626 best1=0.634 n_val=2522 vram=0.08GB 10s | grade=0.804 inner_auc=0.748 vs conf_auc=0.751
+03:34:29 ===== CYCLE 324 (OUTER -> INNER -> FEEDBACK) =====
+03:34:35 [audio/urbansound8k] vote=0.678 uniform=0.654 best1=0.673 n_val=2565 vram=0.08GB 5s | grade=0.846 inner_auc=0.827 vs conf_auc=0.815
+03:34:37 ===== CYCLE 325 (OUTER -> INNER -> FEEDBACK) =====
+03:34:43 [audio/urbansound8k] vote=0.618 uniform=0.581 best1=0.620 n_val=2875 vram=0.08GB 6s | grade=0.813 inner_auc=0.750 vs conf_auc=0.774
+03:34:46 ===== CYCLE 326 (OUTER -> INNER -> FEEDBACK) =====
+03:34:55 [audio/urbansound8k] vote=0.658 uniform=0.616 best1=0.667 n_val=2404 vram=0.08GB 9s | grade=0.841 inner_auc=0.805 vs conf_auc=0.799
+03:35:01 ===== CYCLE 327 (OUTER -> INNER -> FEEDBACK) =====
+03:35:07 [audio/urbansound8k] vote=0.675 uniform=0.629 best1=0.675 n_val=2089 vram=0.08GB 6s | grade=0.858 inner_auc=0.812 vs conf_auc=0.842
+03:35:10 ===== CYCLE 328 (OUTER -> INNER -> FEEDBACK) =====
+03:35:16 [audio/urbansound8k] vote=0.666 uniform=0.619 best1=0.666 n_val=2359 vram=0.08GB 6s | grade=0.860 inner_auc=0.788 vs conf_auc=0.799
+03:35:19 ===== CYCLE 329 (OUTER -> INNER -> FEEDBACK) =====
+03:35:27 [audio/urbansound8k] vote=0.631 uniform=0.609 best1=0.627 n_val=2746 vram=0.08GB 8s | grade=0.830 inner_auc=0.769 vs conf_auc=0.772
+03:35:32 ===== CYCLE 330 (OUTER -> INNER -> FEEDBACK) =====
+03:35:39 [audio/urbansound8k] vote=0.695 uniform=0.654 best1=0.689 n_val=2659 vram=0.08GB 7s | grade=0.840 inner_auc=0.820 vs conf_auc=0.838
+03:35:42 ===== CYCLE 331 (OUTER -> INNER -> FEEDBACK) =====
+03:35:48 [audio/urbansound8k] vote=0.679 uniform=0.659 best1=0.677 n_val=2489 vram=0.08GB 6s | grade=0.857 inner_auc=0.767 vs conf_auc=0.760
+03:35:51 ===== CYCLE 332 (OUTER -> INNER -> FEEDBACK) =====
+03:35:57 [audio/urbansound8k] vote=0.683 uniform=0.633 best1=0.684 n_val=2358 vram=0.08GB 6s | grade=0.869 inner_auc=0.754 vs conf_auc=0.768
+03:36:02 ===== CYCLE 333 (OUTER -> INNER -> FEEDBACK) =====
+03:36:13 [audio/urbansound8k] vote=0.665 uniform=0.609 best1=0.663 n_val=2557 vram=0.08GB 10s | grade=0.858 inner_auc=0.778 vs conf_auc=0.787
+03:36:15 ===== CYCLE 334 (OUTER -> INNER -> FEEDBACK) =====
+03:36:21 [audio/urbansound8k] vote=0.585 uniform=0.555 best1=0.583 n_val=2412 vram=0.08GB 6s | grade=0.783 inner_auc=0.704 vs conf_auc=0.716
+03:36:24 ===== CYCLE 335 (OUTER -> INNER -> FEEDBACK) =====
+03:36:30 [audio/urbansound8k] vote=0.643 uniform=0.596 best1=0.646 n_val=2843 vram=0.08GB 6s | grade=0.819 inner_auc=0.841 vs conf_auc=0.869
+03:36:33 ===== CYCLE 336 (OUTER -> INNER -> FEEDBACK) =====
+03:36:46 [audio/urbansound8k] vote=0.634 uniform=0.579 best1=0.636 n_val=2613 vram=0.08GB 13s | grade=0.846 inner_auc=0.826 vs conf_auc=0.833
+03:36:49 ===== CYCLE 337 (OUTER -> INNER -> FEEDBACK) =====
+03:36:54 [audio/urbansound8k] vote=0.622 uniform=0.564 best1=0.626 n_val=2590 vram=0.08GB 6s | grade=0.839 inner_auc=0.819 vs conf_auc=0.821
+03:36:58 ===== CYCLE 338 (OUTER -> INNER -> FEEDBACK) =====
+03:37:04 [audio/urbansound8k] vote=0.622 uniform=0.571 best1=0.621 n_val=2625 vram=0.08GB 6s | grade=0.849 inner_auc=0.770 vs conf_auc=0.788
+03:37:06 ===== CYCLE 339 (OUTER -> INNER -> FEEDBACK) =====
+03:37:18 [audio/urbansound8k] vote=0.637 uniform=0.606 best1=0.639 n_val=2908 vram=0.08GB 12s | grade=0.842 inner_auc=0.910 vs conf_auc=0.920
+03:37:22 ===== CYCLE 340 (OUTER -> INNER -> FEEDBACK) =====
+03:37:27 [audio/urbansound8k] vote=0.645 uniform=0.599 best1=0.643 n_val=2780 vram=0.08GB 5s | grade=0.843 inner_auc=0.802 vs conf_auc=0.807
+03:37:30 ===== CYCLE 341 (OUTER -> INNER -> FEEDBACK) =====
+03:37:36 [audio/urbansound8k] vote=0.660 uniform=0.622 best1=0.660 n_val=2465 vram=0.08GB 6s | grade=0.851 inner_auc=0.790 vs conf_auc=0.816
+03:37:39 ===== CYCLE 342 (OUTER -> INNER -> FEEDBACK) =====
+03:37:49 [audio/urbansound8k] vote=0.651 uniform=0.575 best1=0.655 n_val=3135 vram=0.07GB 10s | grade=0.853 inner_auc=0.769 vs conf_auc=0.796
+03:37:55 ===== CYCLE 343 (OUTER -> INNER -> FEEDBACK) =====
+03:38:01 [audio/urbansound8k] vote=0.660 uniform=0.616 best1=0.663 n_val=2511 vram=0.08GB 6s | grade=0.862 inner_auc=0.760 vs conf_auc=0.763
+03:38:04 ===== CYCLE 344 (OUTER -> INNER -> FEEDBACK) =====
+03:38:09 [audio/urbansound8k] vote=0.662 uniform=0.628 best1=0.663 n_val=2669 vram=0.08GB 5s | grade=0.854 inner_auc=0.858 vs conf_auc=0.872
+03:38:12 ===== CYCLE 345 (OUTER -> INNER -> FEEDBACK) =====
+03:38:18 [audio/urbansound8k] vote=0.647 uniform=0.582 best1=0.646 n_val=2868 vram=0.08GB 6s | grade=0.851 inner_auc=0.912 vs conf_auc=0.907
+03:38:21 ===== CYCLE 346 (OUTER -> INNER -> FEEDBACK) =====
+03:38:33 [audio/urbansound8k] vote=0.608 uniform=0.565 best1=0.608 n_val=2771 vram=0.08GB 12s | grade=0.814 inner_auc=0.799 vs conf_auc=0.811
+03:38:36 ===== CYCLE 347 (OUTER -> INNER -> FEEDBACK) =====
+03:38:42 [audio/urbansound8k] vote=0.615 uniform=0.570 best1=0.615 n_val=2627 vram=0.08GB 6s | grade=0.835 inner_auc=0.808 vs conf_auc=0.807
+03:38:45 ===== CYCLE 348 (OUTER -> INNER -> FEEDBACK) =====
+03:38:51 [audio/urbansound8k] vote=0.636 uniform=0.594 best1=0.632 n_val=2526 vram=0.08GB 6s | grade=0.838 inner_auc=0.877 vs conf_auc=0.869
+03:38:54 ===== CYCLE 349 (OUTER -> INNER -> FEEDBACK) =====
+03:39:05 [audio/urbansound8k] vote=0.682 uniform=0.637 best1=0.687 n_val=2420 vram=0.08GB 11s | grade=0.842 inner_auc=0.843 vs conf_auc=0.849
+03:39:10 ===== CYCLE 350 (OUTER -> INNER -> FEEDBACK) =====
+03:39:16 [audio/urbansound8k] vote=0.604 uniform=0.562 best1=0.605 n_val=2744 vram=0.08GB 6s | grade=0.793 inner_auc=0.855 vs conf_auc=0.861
+03:39:19 ===== CYCLE 351 (OUTER -> INNER -> FEEDBACK) =====
+03:39:25 [audio/urbansound8k] vote=0.666 uniform=0.634 best1=0.664 n_val=2197 vram=0.08GB 6s | grade=0.834 inner_auc=0.863 vs conf_auc=0.866
+03:39:28 ===== CYCLE 352 (OUTER -> INNER -> FEEDBACK) =====
+03:39:38 [audio/urbansound8k] vote=0.684 uniform=0.607 best1=0.685 n_val=2550 vram=0.08GB 9s | grade=0.855 inner_auc=0.764 vs conf_auc=0.782
+03:39:44 ===== CYCLE 353 (OUTER -> INNER -> FEEDBACK) =====
+03:39:50 [audio/urbansound8k] vote=0.659 uniform=0.614 best1=0.658 n_val=2543 vram=0.08GB 6s | grade=0.842 inner_auc=0.795 vs conf_auc=0.810
+03:39:53 ===== CYCLE 354 (OUTER -> INNER -> FEEDBACK) =====
+03:39:58 [audio/urbansound8k] vote=0.688 uniform=0.640 best1=0.686 n_val=2584 vram=0.08GB 5s | grade=0.858 inner_auc=0.799 vs conf_auc=0.816
+03:40:01 ===== CYCLE 355 (OUTER -> INNER -> FEEDBACK) =====
+03:40:08 [audio/urbansound8k] vote=0.676 uniform=0.623 best1=0.674 n_val=2513 vram=0.08GB 7s | grade=0.861 inner_auc=0.677 vs conf_auc=0.708
+03:40:13 ===== CYCLE 356 (OUTER -> INNER -> FEEDBACK) =====
+03:40:24 [audio/urbansound8k] vote=0.641 uniform=0.599 best1=0.641 n_val=2678 vram=0.08GB 11s | grade=0.835 inner_auc=0.809 vs conf_auc=0.824
+03:40:27 ===== CYCLE 357 (OUTER -> INNER -> FEEDBACK) =====
+03:40:33 [audio/urbansound8k] vote=0.635 uniform=0.596 best1=0.633 n_val=2525 vram=0.08GB 6s | grade=0.846 inner_auc=0.816 vs conf_auc=0.824
+03:40:36 ===== CYCLE 358 (OUTER -> INNER -> FEEDBACK) =====
+03:40:42 [audio/urbansound8k] vote=0.639 uniform=0.605 best1=0.634 n_val=2643 vram=0.08GB 6s | grade=0.850 inner_auc=0.854 vs conf_auc=0.844
+03:40:45 ===== CYCLE 359 (OUTER -> INNER -> FEEDBACK) =====
+03:40:58 [audio/urbansound8k] vote=0.625 uniform=0.568 best1=0.626 n_val=2871 vram=0.08GB 12s | grade=0.840 inner_auc=0.783 vs conf_auc=0.819
+03:41:01 ===== CYCLE 360 (OUTER -> INNER -> FEEDBACK) =====
+03:41:06 [audio/urbansound8k] vote=0.655 uniform=0.630 best1=0.654 n_val=2872 vram=0.08GB 6s | grade=0.836 inner_auc=0.756 vs conf_auc=0.754
+03:41:09 ===== CYCLE 361 (OUTER -> INNER -> FEEDBACK) =====
+03:41:16 [audio/urbansound8k] vote=0.688 uniform=0.597 best1=0.688 n_val=2563 vram=0.08GB 6s | grade=0.851 inner_auc=0.813 vs conf_auc=0.834
+03:41:19 ===== CYCLE 362 (OUTER -> INNER -> FEEDBACK) =====
+03:41:30 [audio/urbansound8k] vote=0.642 uniform=0.600 best1=0.641 n_val=2611 vram=0.08GB 11s | grade=0.827 inner_auc=0.792 vs conf_auc=0.814
+03:41:35 ===== CYCLE 363 (OUTER -> INNER -> FEEDBACK) =====
+03:41:41 [audio/urbansound8k] vote=0.638 uniform=0.601 best1=0.640 n_val=2631 vram=0.08GB 6s | grade=0.847 inner_auc=0.784 vs conf_auc=0.798
+03:41:44 ===== CYCLE 364 (OUTER -> INNER -> FEEDBACK) =====
+03:41:49 [audio/urbansound8k] vote=0.679 uniform=0.630 best1=0.676 n_val=2762 vram=0.08GB 6s | grade=0.850 inner_auc=0.794 vs conf_auc=0.795
+03:41:52 ===== CYCLE 365 (OUTER -> INNER -> FEEDBACK) =====
+03:41:59 [audio/urbansound8k] vote=0.716 uniform=0.702 best1=0.718 n_val=2423 vram=0.08GB 6s | grade=0.863 inner_auc=0.848 vs conf_auc=0.853
+03:42:03 ===== CYCLE 366 (OUTER -> INNER -> FEEDBACK) =====
+03:42:15 [audio/urbansound8k] vote=0.694 uniform=0.660 best1=0.688 n_val=2662 vram=0.08GB 12s | grade=0.859 inner_auc=0.763 vs conf_auc=0.751
+03:42:18 ===== CYCLE 367 (OUTER -> INNER -> FEEDBACK) =====
+03:42:24 [audio/urbansound8k] vote=0.652 uniform=0.599 best1=0.653 n_val=2676 vram=0.08GB 5s | grade=0.833 inner_auc=0.778 vs conf_auc=0.762
+03:42:26 ===== CYCLE 368 (OUTER -> INNER -> FEEDBACK) =====
+03:42:33 [audio/urbansound8k] vote=0.682 uniform=0.614 best1=0.683 n_val=2373 vram=0.08GB 6s | grade=0.848 inner_auc=0.815 vs conf_auc=0.833
+03:42:36 ===== CYCLE 369 (OUTER -> INNER -> FEEDBACK) =====
+03:42:44 [audio/urbansound8k] vote=0.690 uniform=0.666 best1=0.685 n_val=2506 vram=0.08GB 8s | grade=0.869 inner_auc=0.785 vs conf_auc=0.809
+03:42:50 ===== CYCLE 370 (OUTER -> INNER -> FEEDBACK) =====
+03:42:59 [audio/urbansound8k] vote=0.678 uniform=0.642 best1=0.677 n_val=2579 vram=0.08GB 9s | grade=0.860 inner_auc=0.804 vs conf_auc=0.816
+03:43:02 ===== CYCLE 371 (OUTER -> INNER -> FEEDBACK) =====
+03:43:07 [audio/urbansound8k] vote=0.681 uniform=0.648 best1=0.676 n_val=2595 vram=0.08GB 6s | grade=0.864 inner_auc=0.906 vs conf_auc=0.907
+03:43:11 ===== CYCLE 372 (OUTER -> INNER -> FEEDBACK) =====
+03:43:17 [audio/urbansound8k] vote=0.665 uniform=0.623 best1=0.662 n_val=2494 vram=0.08GB 6s | grade=0.855 inner_auc=0.768 vs conf_auc=0.785
+03:43:22 ===== CYCLE 373 (OUTER -> INNER -> FEEDBACK) =====
+03:43:34 [audio/urbansound8k] vote=0.711 uniform=0.682 best1=0.713 n_val=2175 vram=0.08GB 12s | grade=0.856 inner_auc=0.816 vs conf_auc=0.819
+03:43:37 ===== CYCLE 374 (OUTER -> INNER -> FEEDBACK) =====
+03:43:43 [audio/urbansound8k] vote=0.699 uniform=0.658 best1=0.699 n_val=2551 vram=0.08GB 5s | grade=0.865 inner_auc=0.772 vs conf_auc=0.798
+03:43:45 ===== CYCLE 375 (OUTER -> INNER -> FEEDBACK) =====
+03:43:51 [audio/urbansound8k] vote=0.626 uniform=0.590 best1=0.623 n_val=2679 vram=0.08GB 6s | grade=0.806 inner_auc=0.834 vs conf_auc=0.853
+03:43:54 ===== CYCLE 376 (OUTER -> INNER -> FEEDBACK) =====
+03:44:02 [audio/urbansound8k] vote=0.674 uniform=0.617 best1=0.671 n_val=2631 vram=0.08GB 8s | grade=0.842 inner_auc=0.799 vs conf_auc=0.792
+03:44:09 ===== CYCLE 377 (OUTER -> INNER -> FEEDBACK) =====
+03:44:19 [audio/urbansound8k] vote=0.585 uniform=0.572 best1=0.584 n_val=2484 vram=0.08GB 10s | grade=0.778 inner_auc=0.781 vs conf_auc=0.798
+03:44:21 ===== CYCLE 378 (OUTER -> INNER -> FEEDBACK) =====
+03:44:27 [audio/urbansound8k] vote=0.663 uniform=0.589 best1=0.669 n_val=2260 vram=0.08GB 6s | grade=0.823 inner_auc=0.899 vs conf_auc=0.904
+03:44:30 ===== CYCLE 379 (OUTER -> INNER -> FEEDBACK) =====
+03:44:36 [audio/urbansound8k] vote=0.612 uniform=0.569 best1=0.613 n_val=2752 vram=0.08GB 6s | grade=0.810 inner_auc=0.830 vs conf_auc=0.837
+03:44:40 ===== CYCLE 380 (OUTER -> INNER -> FEEDBACK) =====
+03:44:53 [audio/urbansound8k] vote=0.634 uniform=0.622 best1=0.637 n_val=2496 vram=0.08GB 13s | grade=0.838 inner_auc=0.778 vs conf_auc=0.787
+03:44:58 ===== CYCLE 381 (OUTER -> INNER -> FEEDBACK) =====
+03:45:04 [audio/urbansound8k] vote=0.678 uniform=0.658 best1=0.677 n_val=2524 vram=0.08GB 6s | grade=0.834 inner_auc=0.850 vs conf_auc=0.858
+03:45:06 ===== CYCLE 382 (OUTER -> INNER -> FEEDBACK) =====
+03:45:12 [audio/urbansound8k] vote=0.672 uniform=0.600 best1=0.677 n_val=2493 vram=0.08GB 6s | grade=0.858 inner_auc=0.768 vs conf_auc=0.801
+03:45:15 ===== CYCLE 383 (OUTER -> INNER -> FEEDBACK) =====
+03:45:25 [audio/urbansound8k] vote=0.672 uniform=0.654 best1=0.672 n_val=2409 vram=0.08GB 10s | grade=0.862 inner_auc=0.835 vs conf_auc=0.849
+03:45:31 ===== CYCLE 384 (OUTER -> INNER -> FEEDBACK) =====
+03:45:40 [audio/urbansound8k] vote=0.655 uniform=0.594 best1=0.655 n_val=2617 vram=0.08GB 9s | grade=0.849 inner_auc=0.802 vs conf_auc=0.816
+03:45:43 ===== CYCLE 385 (OUTER -> INNER -> FEEDBACK) =====
+03:45:48 [audio/urbansound8k] vote=0.631 uniform=0.607 best1=0.632 n_val=2731 vram=0.08GB 5s | grade=0.831 inner_auc=0.838 vs conf_auc=0.850
+03:45:51 ===== CYCLE 386 (OUTER -> INNER -> FEEDBACK) =====
+03:45:57 [audio/urbansound8k] vote=0.676 uniform=0.623 best1=0.681 n_val=2366 vram=0.08GB 6s | grade=0.847 inner_auc=0.744 vs conf_auc=0.744
+03:46:00 ===== CYCLE 387 (OUTER -> INNER -> FEEDBACK) =====
+03:46:11 [audio/urbansound8k] vote=0.682 uniform=0.645 best1=0.681 n_val=2685 vram=0.08GB 11s | grade=0.865 inner_auc=0.764 vs conf_auc=0.769
+03:46:17 ===== CYCLE 388 (OUTER -> INNER -> FEEDBACK) =====
+03:46:25 [audio/urbansound8k] vote=0.604 uniform=0.588 best1=0.599 n_val=2429 vram=0.08GB 8s | grade=0.793 inner_auc=0.824 vs conf_auc=0.823
+03:46:28 ===== CYCLE 389 (OUTER -> INNER -> FEEDBACK) =====
+03:46:33 [audio/urbansound8k] vote=0.642 uniform=0.594 best1=0.642 n_val=2753 vram=0.08GB 5s | grade=0.831 inner_auc=0.761 vs conf_auc=0.741
+03:46:36 ===== CYCLE 390 (OUTER -> INNER -> FEEDBACK) =====
+03:46:42 [audio/urbansound8k] vote=0.654 uniform=0.616 best1=0.655 n_val=2764 vram=0.08GB 7s | grade=0.853 inner_auc=0.817 vs conf_auc=0.824
+03:46:45 ===== CYCLE 391 (OUTER -> INNER -> FEEDBACK) =====
+03:46:58 [audio/urbansound8k] vote=0.651 uniform=0.624 best1=0.644 n_val=2626 vram=0.08GB 12s | grade=0.856 inner_auc=0.874 vs conf_auc=0.873
+03:47:04 ===== CYCLE 392 (OUTER -> INNER -> FEEDBACK) =====
+03:47:10 [audio/urbansound8k] vote=0.680 uniform=0.641 best1=0.680 n_val=2337 vram=0.08GB 6s | grade=0.852 inner_auc=0.831 vs conf_auc=0.834
+03:47:13 ===== CYCLE 393 (OUTER -> INNER -> FEEDBACK) =====
+03:47:19 [audio/urbansound8k] vote=0.677 uniform=0.633 best1=0.678 n_val=2691 vram=0.08GB 6s | grade=0.866 inner_auc=0.853 vs conf_auc=0.867
+03:47:22 ===== CYCLE 394 (OUTER -> INNER -> FEEDBACK) =====
+03:47:29 [audio/urbansound8k] vote=0.641 uniform=0.605 best1=0.636 n_val=2666 vram=0.08GB 7s | grade=0.834 inner_auc=0.736 vs conf_auc=0.735
+03:47:35 ===== CYCLE 395 (OUTER -> INNER -> FEEDBACK) =====
+03:47:47 [audio/urbansound8k] vote=0.617 uniform=0.589 best1=0.613 n_val=2864 vram=0.08GB 12s | grade=0.831 inner_auc=0.816 vs conf_auc=0.839
+03:47:50 ===== CYCLE 396 (OUTER -> INNER -> FEEDBACK) =====
+03:47:55 [audio/urbansound8k] vote=0.645 uniform=0.618 best1=0.645 n_val=2642 vram=0.08GB 5s | grade=0.840 inner_auc=0.803 vs conf_auc=0.808
+03:47:58 ===== CYCLE 397 (OUTER -> INNER -> FEEDBACK) =====
+03:48:05 [audio/urbansound8k] vote=0.696 uniform=0.662 best1=0.692 n_val=2553 vram=0.08GB 7s | grade=0.841 inner_auc=0.794 vs conf_auc=0.806
+03:48:07 ===== CYCLE 398 (OUTER -> INNER -> FEEDBACK) =====
+03:48:15 [audio/urbansound8k] vote=0.676 uniform=0.632 best1=0.678 n_val=2519 vram=0.08GB 8s | grade=0.860 inner_auc=0.851 vs conf_auc=0.868
+03:48:22 ===== CYCLE 399 (OUTER -> INNER -> FEEDBACK) =====
+03:48:33 [audio/urbansound8k] vote=0.659 uniform=0.624 best1=0.658 n_val=2641 vram=0.08GB 11s | grade=0.852 inner_auc=0.847 vs conf_auc=0.866
+03:48:36 ===== CYCLE 400 (OUTER -> INNER -> FEEDBACK) =====
+03:48:42 [audio/urbansound8k] vote=0.631 uniform=0.593 best1=0.632 n_val=2824 vram=0.08GB 6s | grade=0.827 inner_auc=0.815 vs conf_auc=0.814
+03:48:45 ===== CYCLE 401 (OUTER -> INNER -> FEEDBACK) =====
+03:48:51 [audio/urbansound8k] vote=0.688 uniform=0.646 best1=0.688 n_val=2404 vram=0.08GB 6s | grade=0.836 inner_auc=0.774 vs conf_auc=0.787
+03:48:55 ===== CYCLE 402 (OUTER -> INNER -> FEEDBACK) =====
+03:49:08 [audio/urbansound8k] vote=0.640 uniform=0.599 best1=0.641 n_val=2996 vram=0.08GB 13s | grade=0.826 inner_auc=0.821 vs conf_auc=0.827
+03:49:14 ===== CYCLE 403 (OUTER -> INNER -> FEEDBACK) =====
+03:49:20 [audio/urbansound8k] vote=0.681 uniform=0.641 best1=0.679 n_val=2485 vram=0.08GB 6s | grade=0.844 inner_auc=0.798 vs conf_auc=0.812
+03:49:23 ===== CYCLE 404 (OUTER -> INNER -> FEEDBACK) =====
+03:49:29 [audio/urbansound8k] vote=0.656 uniform=0.619 best1=0.653 n_val=2938 vram=0.08GB 6s | grade=0.849 inner_auc=0.895 vs conf_auc=0.884
+03:49:32 ===== CYCLE 405 (OUTER -> INNER -> FEEDBACK) =====
+03:49:40 [audio/urbansound8k] vote=0.665 uniform=0.631 best1=0.664 n_val=2648 vram=0.08GB 9s | grade=0.856 inner_auc=0.873 vs conf_auc=0.871
+03:49:46 ===== CYCLE 406 (OUTER -> INNER -> FEEDBACK) =====
+03:49:57 [audio/urbansound8k] vote=0.683 uniform=0.658 best1=0.686 n_val=2578 vram=0.08GB 11s | grade=0.854 inner_auc=0.812 vs conf_auc=0.826
+03:50:00 ===== CYCLE 407 (OUTER -> INNER -> FEEDBACK) =====
+03:50:06 [audio/urbansound8k] vote=0.660 uniform=0.626 best1=0.658 n_val=2709 vram=0.08GB 6s | grade=0.845 inner_auc=0.800 vs conf_auc=0.822
+03:50:10 ===== CYCLE 408 (OUTER -> INNER -> FEEDBACK) =====
+03:50:16 [audio/urbansound8k] vote=0.652 uniform=0.642 best1=0.645 n_val=2834 vram=0.08GB 6s | grade=0.859 inner_auc=0.830 vs conf_auc=0.825
+03:50:22 ===== CYCLE 409 (OUTER -> INNER -> FEEDBACK) =====
+03:50:34 [audio/urbansound8k] vote=0.681 uniform=0.651 best1=0.678 n_val=2940 vram=0.08GB 13s | grade=0.856 inner_auc=0.824 vs conf_auc=0.834
+03:50:38 ===== CYCLE 410 (OUTER -> INNER -> FEEDBACK) =====
+03:50:44 [audio/urbansound8k] vote=0.630 uniform=0.606 best1=0.627 n_val=2689 vram=0.08GB 6s | grade=0.824 inner_auc=0.730 vs conf_auc=0.733
+03:50:47 ===== CYCLE 411 (OUTER -> INNER -> FEEDBACK) =====
+03:50:53 [audio/urbansound8k] vote=0.664 uniform=0.642 best1=0.662 n_val=2590 vram=0.08GB 6s | grade=0.837 inner_auc=0.823 vs conf_auc=0.820
+03:50:56 ===== CYCLE 412 (OUTER -> INNER -> FEEDBACK) =====
+03:51:07 [audio/urbansound8k] vote=0.645 uniform=0.621 best1=0.641 n_val=2432 vram=0.08GB 11s | grade=0.844 inner_auc=0.856 vs conf_auc=0.875
+03:51:13 ===== CYCLE 413 (OUTER -> INNER -> FEEDBACK) =====
+03:51:22 [audio/urbansound8k] vote=0.648 uniform=0.615 best1=0.645 n_val=2664 vram=0.08GB 9s | grade=0.853 inner_auc=0.801 vs conf_auc=0.810
+03:51:25 ===== CYCLE 414 (OUTER -> INNER -> FEEDBACK) =====
+03:51:31 [audio/urbansound8k] vote=0.620 uniform=0.579 best1=0.615 n_val=2827 vram=0.08GB 7s | grade=0.832 inner_auc=0.819 vs conf_auc=0.822
+03:51:34 ===== CYCLE 415 (OUTER -> INNER -> FEEDBACK) =====
+03:51:41 [audio/urbansound8k] vote=0.663 uniform=0.633 best1=0.658 n_val=2428 vram=0.08GB 6s | grade=0.838 inner_auc=0.810 vs conf_auc=0.796
+03:51:47 ===== CYCLE 416 (OUTER -> INNER -> FEEDBACK) =====
+03:52:00 [audio/urbansound8k] vote=0.613 uniform=0.547 best1=0.612 n_val=2637 vram=0.08GB 13s | grade=0.816 inner_auc=0.795 vs conf_auc=0.809
+03:52:03 ===== CYCLE 417 (OUTER -> INNER -> FEEDBACK) =====
+03:52:09 [audio/urbansound8k] vote=0.626 uniform=0.591 best1=0.622 n_val=2621 vram=0.08GB 5s | grade=0.841 inner_auc=0.801 vs conf_auc=0.801
+03:52:12 ===== CYCLE 418 (OUTER -> INNER -> FEEDBACK) =====
+03:52:18 [audio/urbansound8k] vote=0.661 uniform=0.626 best1=0.663 n_val=2377 vram=0.08GB 6s | grade=0.840 inner_auc=0.774 vs conf_auc=0.778
+03:52:21 ===== CYCLE 419 (OUTER -> INNER -> FEEDBACK) =====
+03:52:33 [audio/urbansound8k] vote=0.671 uniform=0.609 best1=0.673 n_val=2184 vram=0.08GB 12s | grade=0.851 inner_auc=0.847 vs conf_auc=0.832
+03:52:39 ===== CYCLE 420 (OUTER -> INNER -> FEEDBACK) =====
+03:52:47 [audio/urbansound8k] vote=0.706 uniform=0.696 best1=0.701 n_val=2695 vram=0.08GB 8s | grade=0.859 inner_auc=0.781 vs conf_auc=0.774
+03:52:50 ===== CYCLE 421 (OUTER -> INNER -> FEEDBACK) =====
+03:52:56 [audio/urbansound8k] vote=0.706 uniform=0.655 best1=0.704 n_val=2641 vram=0.08GB 6s | grade=0.875 inner_auc=0.844 vs conf_auc=0.842
+03:52:59 ===== CYCLE 422 (OUTER -> INNER -> FEEDBACK) =====
+03:53:05 [audio/urbansound8k] vote=0.584 uniform=0.580 best1=0.578 n_val=2793 vram=0.08GB 6s | grade=0.764 inner_auc=0.828 vs conf_auc=0.837
+03:53:11 ===== CYCLE 423 (OUTER -> INNER -> FEEDBACK) =====
+03:53:24 [audio/urbansound8k] vote=0.624 uniform=0.603 best1=0.627 n_val=2906 vram=0.08GB 13s | grade=0.822 inner_auc=0.886 vs conf_auc=0.893
+03:53:27 ===== CYCLE 424 (OUTER -> INNER -> FEEDBACK) =====
+03:53:33 [audio/urbansound8k] vote=0.692 uniform=0.680 best1=0.693 n_val=2608 vram=0.08GB 6s | grade=0.840 inner_auc=0.878 vs conf_auc=0.864
+03:53:36 ===== CYCLE 425 (OUTER -> INNER -> FEEDBACK) =====
+03:53:43 [audio/urbansound8k] vote=0.601 uniform=0.590 best1=0.598 n_val=2431 vram=0.08GB 7s | grade=0.790 inner_auc=0.780 vs conf_auc=0.807
+03:53:46 ===== CYCLE 426 (OUTER -> INNER -> FEEDBACK) =====
+03:53:56 [audio/urbansound8k] vote=0.626 uniform=0.581 best1=0.625 n_val=2649 vram=0.08GB 11s | grade=0.827 inner_auc=0.838 vs conf_auc=0.836
+03:54:03 ===== CYCLE 427 (OUTER -> INNER -> FEEDBACK) =====
+03:54:12 [audio/urbansound8k] vote=0.654 uniform=0.600 best1=0.653 n_val=2742 vram=0.08GB 9s | grade=0.842 inner_auc=0.788 vs conf_auc=0.785
+03:54:15 ===== CYCLE 428 (OUTER -> INNER -> FEEDBACK) =====
+03:54:21 [audio/urbansound8k] vote=0.687 uniform=0.639 best1=0.689 n_val=2595 vram=0.08GB 6s | grade=0.852 inner_auc=0.783 vs conf_auc=0.773
+03:54:24 ===== CYCLE 429 (OUTER -> INNER -> FEEDBACK) =====
+03:54:31 [audio/urbansound8k] vote=0.670 uniform=0.653 best1=0.660 n_val=2815 vram=0.08GB 7s | grade=0.858 inner_auc=0.755 vs conf_auc=0.772
+03:54:37 ===== CYCLE 430 (OUTER -> INNER -> FEEDBACK) =====
+03:54:50 [audio/urbansound8k] vote=0.686 uniform=0.639 best1=0.692 n_val=2163 vram=0.08GB 13s | grade=0.859 inner_auc=0.862 vs conf_auc=0.803
+03:54:53 ===== CYCLE 431 (OUTER -> INNER -> FEEDBACK) =====
+03:55:00 [audio/urbansound8k] vote=0.682 uniform=0.621 best1=0.683 n_val=2552 vram=0.08GB 7s | grade=0.870 inner_auc=0.835 vs conf_auc=0.839
+03:55:03 ===== CYCLE 432 (OUTER -> INNER -> FEEDBACK) =====
+03:55:09 [audio/urbansound8k] vote=0.620 uniform=0.587 best1=0.620 n_val=2344 vram=0.08GB 6s | grade=0.813 inner_auc=0.877 vs conf_auc=0.865
+03:55:14 ===== CYCLE 433 (OUTER -> INNER -> FEEDBACK) =====
+03:55:28 [audio/urbansound8k] vote=0.683 uniform=0.633 best1=0.684 n_val=2202 vram=0.08GB 13s | grade=0.822 inner_auc=0.882 vs conf_auc=0.873
+03:55:33 ===== CYCLE 434 (OUTER -> INNER -> FEEDBACK) =====
+03:55:38 [audio/urbansound8k] vote=0.616 uniform=0.598 best1=0.615 n_val=2691 vram=0.08GB 6s | grade=0.803 inner_auc=0.821 vs conf_auc=0.822
+03:55:42 ===== CYCLE 435 (OUTER -> INNER -> FEEDBACK) =====
+03:55:48 [audio/urbansound8k] vote=0.693 uniform=0.644 best1=0.694 n_val=2646 vram=0.08GB 6s | grade=0.833 inner_auc=0.802 vs conf_auc=0.817
+03:55:51 ===== CYCLE 436 (OUTER -> INNER -> FEEDBACK) =====
+03:56:01 [audio/urbansound8k] vote=0.632 uniform=0.597 best1=0.632 n_val=2916 vram=0.08GB 10s | grade=0.816 inner_auc=0.831 vs conf_auc=0.790
+03:56:08 ===== CYCLE 437 (OUTER -> INNER -> FEEDBACK) =====
+03:56:17 [audio/urbansound8k] vote=0.679 uniform=0.643 best1=0.682 n_val=2644 vram=0.08GB 9s | grade=0.840 inner_auc=0.757 vs conf_auc=0.778
+03:56:20 ===== CYCLE 438 (OUTER -> INNER -> FEEDBACK) =====
+03:56:26 [audio/urbansound8k] vote=0.645 uniform=0.630 best1=0.644 n_val=2712 vram=0.08GB 6s | grade=0.835 inner_auc=0.769 vs conf_auc=0.782
+03:56:29 ===== CYCLE 439 (OUTER -> INNER -> FEEDBACK) =====
+03:56:35 [audio/urbansound8k] vote=0.688 uniform=0.634 best1=0.687 n_val=2488 vram=0.08GB 6s | grade=0.845 inner_auc=0.787 vs conf_auc=0.783
+03:56:41 ===== CYCLE 440 (OUTER -> INNER -> FEEDBACK) =====
+03:56:54 [audio/urbansound8k] vote=0.642 uniform=0.601 best1=0.645 n_val=2684 vram=0.08GB 13s | grade=0.827 inner_auc=0.807 vs conf_auc=0.834
+03:56:58 ===== CYCLE 441 (OUTER -> INNER -> FEEDBACK) =====
+03:57:03 [audio/urbansound8k] vote=0.698 uniform=0.655 best1=0.699 n_val=2603 vram=0.08GB 6s | grade=0.844 inner_auc=0.851 vs conf_auc=0.861
+03:57:06 ===== CYCLE 442 (OUTER -> INNER -> FEEDBACK) =====
+03:57:12 [audio/urbansound8k] vote=0.685 uniform=0.632 best1=0.690 n_val=2424 vram=0.08GB 6s | grade=0.865 inner_auc=0.817 vs conf_auc=0.804
+03:57:15 ===== CYCLE 443 (OUTER -> INNER -> FEEDBACK) =====
+03:57:25 [audio/urbansound8k] vote=0.670 uniform=0.621 best1=0.669 n_val=3010 vram=0.08GB 10s | grade=0.858 inner_auc=0.779 vs conf_auc=0.774
+03:57:31 ===== CYCLE 444 (OUTER -> INNER -> FEEDBACK) =====
+03:57:41 [audio/urbansound8k] vote=0.663 uniform=0.621 best1=0.659 n_val=2767 vram=0.08GB 10s | grade=0.863 inner_auc=0.789 vs conf_auc=0.784
+03:57:45 ===== CYCLE 445 (OUTER -> INNER -> FEEDBACK) =====
+03:57:50 [audio/urbansound8k] vote=0.653 uniform=0.606 best1=0.653 n_val=2820 vram=0.08GB 5s | grade=0.849 inner_auc=0.721 vs conf_auc=0.716
+03:57:53 ===== CYCLE 446 (OUTER -> INNER -> FEEDBACK) =====
+03:57:59 [audio/urbansound8k] vote=0.656 uniform=0.605 best1=0.653 n_val=2362 vram=0.08GB 6s | grade=0.857 inner_auc=0.849 vs conf_auc=0.885
+03:58:05 ===== CYCLE 447 (OUTER -> INNER -> FEEDBACK) =====
+03:58:18 [audio/urbansound8k] vote=0.693 uniform=0.658 best1=0.687 n_val=2380 vram=0.08GB 13s | grade=0.854 inner_auc=0.787 vs conf_auc=0.813
+03:58:22 ===== CYCLE 448 (OUTER -> INNER -> FEEDBACK) =====
+03:58:28 [audio/urbansound8k] vote=0.669 uniform=0.652 best1=0.668 n_val=2335 vram=0.08GB 6s | grade=0.849 inner_auc=0.870 vs conf_auc=0.869
+03:58:31 ===== CYCLE 449 (OUTER -> INNER -> FEEDBACK) =====
+03:58:37 [audio/urbansound8k] vote=0.614 uniform=0.596 best1=0.614 n_val=2523 vram=0.08GB 6s | grade=0.806 inner_auc=0.757 vs conf_auc=0.764
+03:58:41 ===== CYCLE 450 (OUTER -> INNER -> FEEDBACK) =====
+03:58:51 [audio/urbansound8k] vote=0.659 uniform=0.608 best1=0.656 n_val=2688 vram=0.08GB 10s | grade=0.836 inner_auc=0.835 vs conf_auc=0.853
+03:58:57 ===== CYCLE 451 (OUTER -> INNER -> FEEDBACK) =====
+03:59:07 [audio/urbansound8k] vote=0.627 uniform=0.580 best1=0.627 n_val=2787 vram=0.08GB 10s | grade=0.826 inner_auc=0.796 vs conf_auc=0.785
+03:59:10 ===== CYCLE 452 (OUTER -> INNER -> FEEDBACK) =====
+03:59:16 [audio/urbansound8k] vote=0.678 uniform=0.633 best1=0.678 n_val=2466 vram=0.08GB 6s | grade=0.838 inner_auc=0.826 vs conf_auc=0.823
+03:59:19 ===== CYCLE 453 (OUTER -> INNER -> FEEDBACK) =====
+03:59:25 [audio/urbansound8k] vote=0.607 uniform=0.574 best1=0.606 n_val=2899 vram=0.08GB 6s | grade=0.799 inner_auc=0.832 vs conf_auc=0.839
+03:59:31 ===== CYCLE 454 (OUTER -> INNER -> FEEDBACK) =====
+03:59:44 [audio/urbansound8k] vote=0.657 uniform=0.623 best1=0.651 n_val=2486 vram=0.08GB 13s | grade=0.838 inner_auc=0.751 vs conf_auc=0.766
+03:59:47 ===== CYCLE 455 (OUTER -> INNER -> FEEDBACK) =====
+03:59:54 [audio/urbansound8k] vote=0.613 uniform=0.582 best1=0.612 n_val=2861 vram=0.08GB 6s | grade=0.816 inner_auc=0.667 vs conf_auc=0.681
+03:59:57 ===== CYCLE 456 (OUTER -> INNER -> FEEDBACK) =====
+04:00:03 [audio/urbansound8k] vote=0.677 uniform=0.611 best1=0.678 n_val=2479 vram=0.08GB 6s | grade=0.832 inner_auc=0.765 vs conf_auc=0.796
+04:00:06 ===== CYCLE 457 (OUTER -> INNER -> FEEDBACK) =====
+04:00:19 [audio/urbansound8k] vote=0.704 uniform=0.643 best1=0.706 n_val=2391 vram=0.08GB 13s | grade=0.860 inner_auc=0.862 vs conf_auc=0.844
+04:00:25 ===== CYCLE 458 (OUTER -> INNER -> FEEDBACK) =====
+04:00:32 [audio/urbansound8k] vote=0.671 uniform=0.639 best1=0.668 n_val=2488 vram=0.08GB 7s | grade=0.844 inner_auc=0.796 vs conf_auc=0.795
+04:00:35 ===== CYCLE 459 (OUTER -> INNER -> FEEDBACK) =====
+04:00:42 [audio/urbansound8k] vote=0.654 uniform=0.638 best1=0.651 n_val=2764 vram=0.08GB 6s | grade=0.850 inner_auc=0.863 vs conf_auc=0.865
+04:00:45 ===== CYCLE 460 (OUTER -> INNER -> FEEDBACK) =====
+04:00:53 [audio/urbansound8k] vote=0.635 uniform=0.620 best1=0.634 n_val=2324 vram=0.08GB 8s | grade=0.845 inner_auc=0.870 vs conf_auc=0.867
+04:00:59 ===== CYCLE 461 (OUTER -> INNER -> FEEDBACK) =====
+04:01:11 [audio/urbansound8k] vote=0.625 uniform=0.560 best1=0.626 n_val=2602 vram=0.08GB 12s | grade=0.834 inner_auc=0.803 vs conf_auc=0.833
+04:01:14 ===== CYCLE 462 (OUTER -> INNER -> FEEDBACK) =====
+04:01:20 [audio/urbansound8k] vote=0.685 uniform=0.639 best1=0.686 n_val=2374 vram=0.08GB 6s | grade=0.840 inner_auc=0.772 vs conf_auc=0.784
+04:01:23 ===== CYCLE 463 (OUTER -> INNER -> FEEDBACK) =====
+04:01:33 [audio/urbansound8k] vote=0.629 uniform=0.626 best1=0.624 n_val=2908 vram=0.08GB 9s | grade=0.820 inner_auc=0.793 vs conf_auc=0.801
+05:06:47 ===== CYCLE 464 (OUTER -> INNER -> FEEDBACK) =====
+05:06:58 [audio/urbansound8k] vote=0.671 uniform=0.635 best1=0.674 n_val=2638 vram=0.08GB 12s | grade=0.839 inner_auc=0.808 vs conf_auc=0.832
+05:07:01 ===== CYCLE 465 (OUTER -> INNER -> FEEDBACK) =====
+05:07:07 [audio/urbansound8k] vote=0.643 uniform=0.619 best1=0.641 n_val=2568 vram=0.08GB 5s | grade=0.833 inner_auc=0.921 vs conf_auc=0.908
+05:07:10 ===== CYCLE 466 (OUTER -> INNER -> FEEDBACK) =====
+05:07:15 [audio/urbansound8k] vote=0.663 uniform=0.611 best1=0.659 n_val=2522 vram=0.08GB 5s | grade=0.849 inner_auc=0.854 vs conf_auc=0.848
+05:07:18 ===== CYCLE 467 (OUTER -> INNER -> FEEDBACK) =====
+05:07:27 [audio/urbansound8k] vote=0.628 uniform=0.580 best1=0.626 n_val=2890 vram=0.08GB 9s | grade=0.826 inner_auc=0.813 vs conf_auc=0.799
+05:07:33 ===== CYCLE 468 (OUTER -> INNER -> FEEDBACK) =====
+05:07:41 [audio/urbansound8k] vote=0.616 uniform=0.589 best1=0.617 n_val=3176 vram=0.07GB 8s | grade=0.834 inner_auc=0.873 vs conf_auc=0.874
+05:07:44 ===== CYCLE 469 (OUTER -> INNER -> FEEDBACK) =====
+05:07:49 [audio/urbansound8k] vote=0.634 uniform=0.599 best1=0.633 n_val=2688 vram=0.08GB 5s | grade=0.844 inner_auc=0.753 vs conf_auc=0.760
+05:07:52 ===== CYCLE 470 (OUTER -> INNER -> FEEDBACK) =====
+05:07:57 [audio/urbansound8k] vote=0.628 uniform=0.581 best1=0.625 n_val=3007 vram=0.08GB 5s | grade=0.842 inner_auc=0.771 vs conf_auc=0.777
+05:08:02 ===== CYCLE 471 (OUTER -> INNER -> FEEDBACK) =====
+05:08:14 [audio/urbansound8k] vote=0.648 uniform=0.603 best1=0.648 n_val=2935 vram=0.08GB 11s | grade=0.848 inner_auc=0.831 vs conf_auc=0.835
+05:08:17 ===== CYCLE 472 (OUTER -> INNER -> FEEDBACK) =====
+05:08:22 [audio/urbansound8k] vote=0.674 uniform=0.656 best1=0.669 n_val=2485 vram=0.08GB 6s | grade=0.855 inner_auc=0.844 vs conf_auc=0.845
+05:08:25 ===== CYCLE 473 (OUTER -> INNER -> FEEDBACK) =====
+05:08:30 [audio/urbansound8k] vote=0.695 uniform=0.622 best1=0.696 n_val=2587 vram=0.08GB 5s | grade=0.862 inner_auc=0.818 vs conf_auc=0.821
+05:08:33 ===== CYCLE 474 (OUTER -> INNER -> FEEDBACK) =====
+05:08:44 [audio/urbansound8k] vote=0.673 uniform=0.635 best1=0.677 n_val=2354 vram=0.08GB 11s | grade=0.854 inner_auc=0.863 vs conf_auc=0.876
+05:08:49 ===== CYCLE 475 (OUTER -> INNER -> FEEDBACK) =====
+05:08:56 [audio/urbansound8k] vote=0.688 uniform=0.641 best1=0.681 n_val=2574 vram=0.08GB 7s | grade=0.861 inner_auc=0.849 vs conf_auc=0.853
+05:08:59 ===== CYCLE 476 (OUTER -> INNER -> FEEDBACK) =====
+05:09:04 [audio/urbansound8k] vote=0.649 uniform=0.572 best1=0.646 n_val=2834 vram=0.08GB 6s | grade=0.836 inner_auc=0.758 vs conf_auc=0.774
+05:09:07 ===== CYCLE 477 (OUTER -> INNER -> FEEDBACK) =====
+05:09:13 [audio/urbansound8k] vote=0.677 uniform=0.638 best1=0.676 n_val=2671 vram=0.08GB 5s | grade=0.852 inner_auc=0.784 vs conf_auc=0.804
+05:09:18 ===== CYCLE 478 (OUTER -> INNER -> FEEDBACK) =====
+05:09:30 [audio/urbansound8k] vote=0.701 uniform=0.660 best1=0.697 n_val=2468 vram=0.08GB 12s | grade=0.864 inner_auc=0.847 vs conf_auc=0.851
+05:09:33 ===== CYCLE 479 (OUTER -> INNER -> FEEDBACK) =====
+05:09:38 [audio/urbansound8k] vote=0.577 uniform=0.560 best1=0.575 n_val=2731 vram=0.08GB 5s | grade=0.760 inner_auc=0.828 vs conf_auc=0.831
+05:09:41 ===== CYCLE 480 (OUTER -> INNER -> FEEDBACK) =====
+05:09:46 [audio/urbansound8k] vote=0.672 uniform=0.625 best1=0.674 n_val=2318 vram=0.08GB 5s | grade=0.821 inner_auc=0.840 vs conf_auc=0.837
+05:09:49 ===== CYCLE 481 (OUTER -> INNER -> FEEDBACK) =====
+05:10:05 [audio/urbansound8k] vote=0.651 uniform=0.631 best1=0.649 n_val=2848 vram=0.08GB 16s | grade=0.848 inner_auc=0.784 vs conf_auc=0.801
+06:52:26 ===== CYCLE 482 (OUTER -> INNER -> FEEDBACK) =====
+06:52:37 [audio/urbansound8k] vote=0.665 uniform=0.616 best1=0.668 n_val=2551 vram=0.08GB 10s | grade=0.851 inner_auc=0.819 vs conf_auc=0.805
+06:52:41 ===== CYCLE 483 (OUTER -> INNER -> FEEDBACK) =====
+06:52:48 [audio/urbansound8k] vote=0.641 uniform=0.601 best1=0.638 n_val=2711 vram=0.08GB 8s | grade=0.843 inner_auc=0.874 vs conf_auc=0.880
+06:52:53 ===== CYCLE 484 (OUTER -> INNER -> FEEDBACK) =====
+06:53:13 [audio/urbansound8k] vote=0.691 uniform=0.637 best1=0.689 n_val=2350 vram=0.08GB 20s | grade=0.847 inner_auc=0.828 vs conf_auc=0.819
+06:53:17 ===== CYCLE 485 (OUTER -> INNER -> FEEDBACK) =====
+06:53:22 [audio/urbansound8k] vote=0.639 uniform=0.603 best1=0.643 n_val=2669 vram=0.08GB 5s | grade=0.819 inner_auc=0.860 vs conf_auc=0.849
+06:53:25 ===== CYCLE 486 (OUTER -> INNER -> FEEDBACK) =====
+06:53:31 [audio/urbansound8k] vote=0.605 uniform=0.596 best1=0.605 n_val=2754 vram=0.08GB 6s | grade=0.820 inner_auc=0.886 vs conf_auc=0.897
+06:53:34 ===== CYCLE 487 (OUTER -> INNER -> FEEDBACK) =====
+06:53:41 [audio/urbansound8k] vote=0.645 uniform=0.591 best1=0.648 n_val=2425 vram=0.08GB 7s | grade=0.829 inner_auc=0.802 vs conf_auc=0.785
+06:53:45 ===== CYCLE 488 (OUTER -> INNER -> FEEDBACK) =====
+06:53:54 [audio/urbansound8k] vote=0.693 uniform=0.657 best1=0.691 n_val=2631 vram=0.08GB 9s | grade=0.844 inner_auc=0.834 vs conf_auc=0.852
+06:53:58 ===== CYCLE 489 (OUTER -> INNER -> FEEDBACK) =====
+06:54:05 [audio/urbansound8k] vote=0.678 uniform=0.634 best1=0.680 n_val=2453 vram=0.08GB 7s | grade=0.862 inner_auc=0.875 vs conf_auc=0.879
+06:54:09 ===== CYCLE 490 (OUTER -> INNER -> FEEDBACK) =====
+06:54:17 [audio/urbansound8k] vote=0.623 uniform=0.571 best1=0.621 n_val=2937 vram=0.08GB 8s | grade=0.816 inner_auc=0.804 vs conf_auc=0.777
+06:54:20 ===== CYCLE 491 (OUTER -> INNER -> FEEDBACK) =====
+06:54:25 [audio/urbansound8k] vote=0.656 uniform=0.595 best1=0.659 n_val=2998 vram=0.08GB 6s | grade=0.840 inner_auc=0.732 vs conf_auc=0.750
+06:54:28 ===== CYCLE 492 (OUTER -> INNER -> FEEDBACK) =====
+06:54:34 [audio/urbansound8k] vote=0.669 uniform=0.634 best1=0.669 n_val=2560 vram=0.08GB 6s | grade=0.864 inner_auc=0.773 vs conf_auc=0.777
+06:54:38 ===== CYCLE 493 (OUTER -> INNER -> FEEDBACK) =====
+06:54:46 [audio/urbansound8k] vote=0.688 uniform=0.628 best1=0.686 n_val=2333 vram=0.08GB 8s | grade=0.857 inner_auc=0.839 vs conf_auc=0.865
+06:54:50 ===== CYCLE 494 (OUTER -> INNER -> FEEDBACK) =====
+06:54:58 [audio/urbansound8k] vote=0.671 uniform=0.628 best1=0.671 n_val=2465 vram=0.08GB 8s | grade=0.860 inner_auc=0.761 vs conf_auc=0.766
+06:55:02 ===== CYCLE 495 (OUTER -> INNER -> FEEDBACK) =====
+06:55:09 [audio/urbansound8k] vote=0.630 uniform=0.571 best1=0.636 n_val=2730 vram=0.08GB 7s | grade=0.823 inner_auc=0.881 vs conf_auc=0.878
+06:55:12 ===== CYCLE 496 (OUTER -> INNER -> FEEDBACK) =====
+06:55:18 [audio/urbansound8k] vote=0.638 uniform=0.618 best1=0.634 n_val=2458 vram=0.08GB 6s | grade=0.845 inner_auc=0.831 vs conf_auc=0.838
+06:55:21 ===== CYCLE 497 (OUTER -> INNER -> FEEDBACK) =====
+06:55:27 [audio/urbansound8k] vote=0.631 uniform=0.633 best1=0.626 n_val=2491 vram=0.08GB 6s | grade=0.840 inner_auc=0.799 vs conf_auc=0.817
+06:55:31 ===== CYCLE 498 (OUTER -> INNER -> FEEDBACK) =====
+06:55:39 [audio/urbansound8k] vote=0.628 uniform=0.583 best1=0.632 n_val=2400 vram=0.08GB 8s | grade=0.842 inner_auc=0.832 vs conf_auc=0.825
+06:55:43 ===== CYCLE 499 (OUTER -> INNER -> FEEDBACK) =====
+06:55:51 [audio/urbansound8k] vote=0.615 uniform=0.570 best1=0.617 n_val=2677 vram=0.08GB 8s | grade=0.832 inner_auc=0.862 vs conf_auc=0.870
+06:55:55 ===== CYCLE 500 (OUTER -> INNER -> FEEDBACK) =====
+06:56:01 [audio/urbansound8k] vote=0.658 uniform=0.619 best1=0.655 n_val=2380 vram=0.08GB 6s | grade=0.830 inner_auc=0.809 vs conf_auc=0.811
+06:56:04 ===== CYCLE 501 (OUTER -> INNER -> FEEDBACK) =====
+06:56:10 [audio/urbansound8k] vote=0.654 uniform=0.628 best1=0.654 n_val=2679 vram=0.08GB 6s | grade=0.854 inner_auc=0.840 vs conf_auc=0.864
+06:56:13 ===== CYCLE 502 (OUTER -> INNER -> FEEDBACK) =====
+06:56:19 [audio/urbansound8k] vote=0.627 uniform=0.585 best1=0.625 n_val=2605 vram=0.08GB 6s | grade=0.833 inner_auc=0.750 vs conf_auc=0.760
+06:56:22 ===== CYCLE 503 (OUTER -> INNER -> FEEDBACK) =====
+06:56:30 [audio/urbansound8k] vote=0.653 uniform=0.648 best1=0.654 n_val=2751 vram=0.08GB 8s | grade=0.843 inner_auc=0.844 vs conf_auc=0.861
+06:56:34 ===== CYCLE 504 (OUTER -> INNER -> FEEDBACK) =====
+06:56:43 [audio/urbansound8k] vote=0.585 uniform=0.587 best1=0.579 n_val=2854 vram=0.08GB 8s | grade=0.791 inner_auc=0.860 vs conf_auc=0.869
+06:56:46 ===== CYCLE 505 (OUTER -> INNER -> FEEDBACK) =====
+06:56:53 [audio/urbansound8k] vote=0.667 uniform=0.610 best1=0.672 n_val=2858 vram=0.08GB 6s | grade=0.823 inner_auc=0.800 vs conf_auc=0.793
+06:56:55 ===== CYCLE 506 (OUTER -> INNER -> FEEDBACK) =====
+06:57:03 [audio/urbansound8k] vote=0.639 uniform=0.610 best1=0.638 n_val=2262 vram=0.08GB 7s | grade=0.837 inner_auc=0.842 vs conf_auc=0.846
+06:57:06 ===== CYCLE 507 (OUTER -> INNER -> FEEDBACK) =====
+06:57:12 [audio/urbansound8k] vote=0.648 uniform=0.616 best1=0.645 n_val=2442 vram=0.08GB 6s | grade=0.849 inner_auc=0.868 vs conf_auc=0.861
+06:57:16 ===== CYCLE 508 (OUTER -> INNER -> FEEDBACK) =====
+06:57:24 [audio/urbansound8k] vote=0.694 uniform=0.655 best1=0.693 n_val=2689 vram=0.08GB 8s | grade=0.849 inner_auc=0.822 vs conf_auc=0.825
+06:57:28 ===== CYCLE 509 (OUTER -> INNER -> FEEDBACK) =====
+06:57:36 [audio/urbansound8k] vote=0.679 uniform=0.657 best1=0.679 n_val=2399 vram=0.08GB 8s | grade=0.861 inner_auc=0.822 vs conf_auc=0.817
+06:57:40 ===== CYCLE 510 (OUTER -> INNER -> FEEDBACK) =====
+06:57:47 [audio/urbansound8k] vote=0.684 uniform=0.658 best1=0.680 n_val=2430 vram=0.08GB 7s | grade=0.871 inner_auc=0.808 vs conf_auc=0.832
+06:57:50 ===== CYCLE 511 (OUTER -> INNER -> FEEDBACK) =====
+06:57:56 [audio/urbansound8k] vote=0.596 uniform=0.584 best1=0.593 n_val=3169 vram=0.07GB 6s | grade=0.791 inner_auc=0.786 vs conf_auc=0.795
+06:57:59 ===== CYCLE 512 (OUTER -> INNER -> FEEDBACK) =====
+06:58:05 [audio/urbansound8k] vote=0.598 uniform=0.586 best1=0.596 n_val=2826 vram=0.08GB 6s | grade=0.837 inner_auc=0.852 vs conf_auc=0.873
+06:58:09 ===== CYCLE 513 (OUTER -> INNER -> FEEDBACK) =====
+06:58:18 [audio/urbansound8k] vote=0.662 uniform=0.597 best1=0.664 n_val=2526 vram=0.08GB 9s | grade=0.829 inner_auc=0.825 vs conf_auc=0.828
+06:58:22 ===== CYCLE 514 (OUTER -> INNER -> FEEDBACK) =====
+06:58:30 [audio/urbansound8k] vote=0.669 uniform=0.634 best1=0.666 n_val=2495 vram=0.08GB 8s | grade=0.857 inner_auc=0.842 vs conf_auc=0.828
+06:58:34 ===== CYCLE 515 (OUTER -> INNER -> FEEDBACK) =====
+06:58:43 [audio/urbansound8k] vote=0.626 uniform=0.558 best1=0.630 n_val=2498 vram=0.08GB 9s | grade=0.823 inner_auc=0.775 vs conf_auc=0.775
+06:58:47 ===== CYCLE 516 (OUTER -> INNER -> FEEDBACK) =====
+06:58:56 [audio/urbansound8k] vote=0.723 uniform=0.681 best1=0.718 n_val=2301 vram=0.08GB 8s | grade=0.827 inner_auc=0.832 vs conf_auc=0.837
+06:59:00 ===== CYCLE 517 (OUTER -> INNER -> FEEDBACK) =====
+06:59:07 [audio/urbansound8k] vote=0.643 uniform=0.611 best1=0.644 n_val=2793 vram=0.08GB 8s | grade=0.813 inner_auc=0.879 vs conf_auc=0.869
+06:59:12 ===== CYCLE 518 (OUTER -> INNER -> FEEDBACK) =====
+06:59:19 [audio/urbansound8k] vote=0.670 uniform=0.658 best1=0.666 n_val=2461 vram=0.08GB 7s | grade=0.850 inner_auc=0.881 vs conf_auc=0.888
+06:59:22 ===== CYCLE 519 (OUTER -> INNER -> FEEDBACK) =====
+06:59:28 [audio/urbansound8k] vote=0.654 uniform=0.618 best1=0.648 n_val=2330 vram=0.08GB 6s | grade=0.851 inner_auc=0.786 vs conf_auc=0.784
+06:59:32 ===== CYCLE 520 (OUTER -> INNER -> FEEDBACK) =====
+06:59:38 [audio/urbansound8k] vote=0.642 uniform=0.570 best1=0.643 n_val=2507 vram=0.08GB 6s | grade=0.846 inner_auc=0.833 vs conf_auc=0.857
+06:59:42 ===== CYCLE 521 (OUTER -> INNER -> FEEDBACK) =====
+06:59:49 [audio/urbansound8k] vote=0.646 uniform=0.594 best1=0.646 n_val=2912 vram=0.08GB 8s | grade=0.851 inner_auc=0.756 vs conf_auc=0.770
+06:59:54 ===== CYCLE 522 (OUTER -> INNER -> FEEDBACK) =====
+07:00:02 [audio/urbansound8k] vote=0.625 uniform=0.587 best1=0.619 n_val=2751 vram=0.08GB 8s | grade=0.835 inner_auc=0.810 vs conf_auc=0.810
+07:00:06 ===== CYCLE 523 (OUTER -> INNER -> FEEDBACK) =====
+07:00:12 [audio/urbansound8k] vote=0.618 uniform=0.581 best1=0.620 n_val=2824 vram=0.08GB 6s | grade=0.839 inner_auc=0.809 vs conf_auc=0.820
+07:00:16 ===== CYCLE 524 (OUTER -> INNER -> FEEDBACK) =====
+07:00:22 [audio/urbansound8k] vote=0.652 uniform=0.622 best1=0.650 n_val=2299 vram=0.08GB 6s | grade=0.836 inner_auc=0.821 vs conf_auc=0.832
+07:00:25 ===== CYCLE 525 (OUTER -> INNER -> FEEDBACK) =====
+07:00:31 [audio/urbansound8k] vote=0.703 uniform=0.666 best1=0.703 n_val=2365 vram=0.08GB 6s | grade=0.854 inner_auc=0.800 vs conf_auc=0.811
+07:00:35 ===== CYCLE 526 (OUTER -> INNER -> FEEDBACK) =====
+07:00:42 [audio/urbansound8k] vote=0.654 uniform=0.616 best1=0.652 n_val=2770 vram=0.08GB 8s | grade=0.837 inner_auc=0.851 vs conf_auc=0.852
+07:00:47 ===== CYCLE 527 (OUTER -> INNER -> FEEDBACK) =====
+07:00:55 [audio/urbansound8k] vote=0.644 uniform=0.595 best1=0.648 n_val=2656 vram=0.08GB 8s | grade=0.847 inner_auc=0.783 vs conf_auc=0.757
+07:00:59 ===== CYCLE 528 (OUTER -> INNER -> FEEDBACK) =====
+07:01:05 [audio/urbansound8k] vote=0.638 uniform=0.618 best1=0.636 n_val=2585 vram=0.08GB 6s | grade=0.852 inner_auc=0.778 vs conf_auc=0.816
+07:01:09 ===== CYCLE 529 (OUTER -> INNER -> FEEDBACK) =====
+07:01:25 [audio/urbansound8k] vote=0.633 uniform=0.567 best1=0.635 n_val=2732 vram=0.08GB 17s | grade=0.846 inner_auc=0.870 vs conf_auc=0.866
+07:01:28 ===== CYCLE 530 (OUTER -> INNER -> FEEDBACK) =====
+07:01:34 [audio/urbansound8k] vote=0.664 uniform=0.623 best1=0.666 n_val=2802 vram=0.08GB 5s | grade=0.849 inner_auc=0.786 vs conf_auc=0.799
+07:01:37 ===== CYCLE 531 (OUTER -> INNER -> FEEDBACK) =====
+07:01:48 [audio/urbansound8k] vote=0.656 uniform=0.632 best1=0.659 n_val=2525 vram=0.08GB 10s | grade=0.853 inner_auc=0.761 vs conf_auc=0.753
+07:01:54 ===== CYCLE 532 (OUTER -> INNER -> FEEDBACK) =====
+07:02:08 [audio/urbansound8k] vote=0.651 uniform=0.619 best1=0.652 n_val=2625 vram=0.08GB 14s | grade=0.848 inner_auc=0.801 vs conf_auc=0.820
+07:02:19 ===== CYCLE 533 (OUTER -> INNER -> FEEDBACK) =====
+07:02:28 [audio/urbansound8k] vote=0.607 uniform=0.566 best1=0.604 n_val=2981 vram=0.08GB 9s | grade=0.812 inner_auc=0.745 vs conf_auc=0.747
+07:02:32 ===== CYCLE 534 (OUTER -> INNER -> FEEDBACK) =====
+07:02:53 [audio/urbansound8k] vote=0.700 uniform=0.690 best1=0.694 n_val=2774 vram=0.08GB 20s | grade=0.827 inner_auc=0.751 vs conf_auc=0.767
+07:03:01 ===== CYCLE 535 (OUTER -> INNER -> FEEDBACK) =====
+07:03:10 [audio/urbansound8k] vote=0.654 uniform=0.638 best1=0.652 n_val=2682 vram=0.08GB 10s | grade=0.837 inner_auc=0.800 vs conf_auc=0.793
+07:03:18 ===== CYCLE 536 (OUTER -> INNER -> FEEDBACK) =====
+07:03:38 [audio/urbansound8k] vote=0.674 uniform=0.618 best1=0.680 n_val=2625 vram=0.08GB 20s | grade=0.862 inner_auc=0.757 vs conf_auc=0.790
+07:03:50 ===== CYCLE 537 (OUTER -> INNER -> FEEDBACK) =====
+07:04:00 [audio/urbansound8k] vote=0.638 uniform=0.630 best1=0.637 n_val=2538 vram=0.08GB 10s | grade=0.833 inner_auc=0.775 vs conf_auc=0.796
+07:04:04 ===== CYCLE 538 (OUTER -> INNER -> FEEDBACK) =====
+07:04:12 [audio/urbansound8k] vote=0.668 uniform=0.613 best1=0.670 n_val=2598 vram=0.08GB 8s | grade=0.844 inner_auc=0.831 vs conf_auc=0.843
+07:04:16 ===== CYCLE 539 (OUTER -> INNER -> FEEDBACK) =====
+07:04:26 [audio/urbansound8k] vote=0.665 uniform=0.625 best1=0.665 n_val=2380 vram=0.08GB 10s | grade=0.859 inner_auc=0.865 vs conf_auc=0.858
+07:04:34 ===== CYCLE 540 (OUTER -> INNER -> FEEDBACK) =====
+07:04:48 [audio/urbansound8k] vote=0.677 uniform=0.633 best1=0.673 n_val=2643 vram=0.08GB 13s | grade=0.860 inner_auc=0.808 vs conf_auc=0.816
+07:04:55 ===== CYCLE 541 (OUTER -> INNER -> FEEDBACK) =====
+07:05:10 [audio/urbansound8k] vote=0.649 uniform=0.606 best1=0.645 n_val=2831 vram=0.08GB 15s | grade=0.846 inner_auc=0.769 vs conf_auc=0.764
+07:05:13 ===== CYCLE 542 (OUTER -> INNER -> FEEDBACK) =====
+07:05:19 [audio/urbansound8k] vote=0.645 uniform=0.607 best1=0.646 n_val=2733 vram=0.08GB 6s | grade=0.846 inner_auc=0.853 vs conf_auc=0.867
+07:05:22 ===== CYCLE 543 (OUTER -> INNER -> FEEDBACK) =====
+07:05:28 [audio/urbansound8k] vote=0.620 uniform=0.579 best1=0.622 n_val=2789 vram=0.08GB 6s | grade=0.840 inner_auc=0.790 vs conf_auc=0.802
+07:05:32 ===== CYCLE 544 (OUTER -> INNER -> FEEDBACK) =====
+07:05:40 [audio/urbansound8k] vote=0.645 uniform=0.613 best1=0.642 n_val=2883 vram=0.08GB 8s | grade=0.839 inner_auc=0.833 vs conf_auc=0.833
+07:05:44 ===== CYCLE 545 (OUTER -> INNER -> FEEDBACK) =====
+07:05:53 [audio/urbansound8k] vote=0.629 uniform=0.587 best1=0.633 n_val=2816 vram=0.08GB 8s | grade=0.840 inner_auc=0.826 vs conf_auc=0.797
+07:05:57 ===== CYCLE 546 (OUTER -> INNER -> FEEDBACK) =====
+07:06:06 [audio/urbansound8k] vote=0.694 uniform=0.666 best1=0.690 n_val=2484 vram=0.08GB 9s | grade=0.838 inner_auc=0.820 vs conf_auc=0.833
+07:06:11 ===== CYCLE 547 (OUTER -> INNER -> FEEDBACK) =====
+07:06:19 [audio/urbansound8k] vote=0.666 uniform=0.640 best1=0.669 n_val=2304 vram=0.08GB 8s | grade=0.847 inner_auc=0.845 vs conf_auc=0.861
+07:06:23 ===== CYCLE 548 (OUTER -> INNER -> FEEDBACK) =====
+07:06:31 [audio/urbansound8k] vote=0.646 uniform=0.577 best1=0.648 n_val=2742 vram=0.08GB 9s | grade=0.846 inner_auc=0.863 vs conf_auc=0.866
+07:06:35 ===== CYCLE 549 (OUTER -> INNER -> FEEDBACK) =====
+07:06:41 [audio/urbansound8k] vote=0.608 uniform=0.568 best1=0.607 n_val=2565 vram=0.08GB 6s | grade=0.814 inner_auc=0.748 vs conf_auc=0.727
+07:06:44 ===== CYCLE 550 (OUTER -> INNER -> FEEDBACK) =====
+07:06:49 [audio/urbansound8k] vote=0.642 uniform=0.591 best1=0.638 n_val=2685 vram=0.08GB 6s | grade=0.836 inner_auc=0.833 vs conf_auc=0.862
+07:06:53 ===== CYCLE 551 (OUTER -> INNER -> FEEDBACK) =====
+07:06:59 [audio/urbansound8k] vote=0.660 uniform=0.626 best1=0.655 n_val=2721 vram=0.08GB 6s | grade=0.847 inner_auc=0.854 vs conf_auc=0.856
+07:07:03 ===== CYCLE 552 (OUTER -> INNER -> FEEDBACK) =====
+07:07:11 [audio/urbansound8k] vote=0.600 uniform=0.552 best1=0.605 n_val=2377 vram=0.08GB 8s | grade=0.797 inner_auc=0.741 vs conf_auc=0.746
+07:07:15 ===== CYCLE 553 (OUTER -> INNER -> FEEDBACK) =====
+07:07:24 [audio/urbansound8k] vote=0.711 uniform=0.682 best1=0.711 n_val=2619 vram=0.08GB 8s | grade=0.816 inner_auc=0.773 vs conf_auc=0.806
+07:07:28 ===== CYCLE 554 (OUTER -> INNER -> FEEDBACK) =====
+07:07:34 [audio/urbansound8k] vote=0.674 uniform=0.669 best1=0.670 n_val=2484 vram=0.08GB 6s | grade=0.843 inner_auc=0.774 vs conf_auc=0.768
+07:07:37 ===== CYCLE 555 (OUTER -> INNER -> FEEDBACK) =====
+07:07:43 [audio/urbansound8k] vote=0.693 uniform=0.675 best1=0.691 n_val=2352 vram=0.08GB 6s | grade=0.855 inner_auc=0.855 vs conf_auc=0.864
+07:07:47 ===== CYCLE 556 (OUTER -> INNER -> FEEDBACK) =====
+07:07:54 [audio/urbansound8k] vote=0.679 uniform=0.615 best1=0.677 n_val=2270 vram=0.08GB 8s | grade=0.864 inner_auc=0.805 vs conf_auc=0.826
+07:07:58 ===== CYCLE 557 (OUTER -> INNER -> FEEDBACK) =====
+07:08:07 [audio/urbansound8k] vote=0.570 uniform=0.541 best1=0.571 n_val=3070 vram=0.08GB 8s | grade=0.766 inner_auc=0.814 vs conf_auc=0.815
+07:08:11 ===== CYCLE 558 (OUTER -> INNER -> FEEDBACK) =====
+07:08:19 [audio/urbansound8k] vote=0.629 uniform=0.597 best1=0.627 n_val=2738 vram=0.08GB 8s | grade=0.818 inner_auc=0.823 vs conf_auc=0.840
+07:08:22 ===== CYCLE 559 (OUTER -> INNER -> FEEDBACK) =====
+07:08:28 [audio/urbansound8k] vote=0.615 uniform=0.569 best1=0.614 n_val=2408 vram=0.08GB 6s | grade=0.836 inner_auc=0.754 vs conf_auc=0.760
+07:08:32 ===== CYCLE 560 (OUTER -> INNER -> FEEDBACK) =====
+07:08:38 [audio/urbansound8k] vote=0.642 uniform=0.581 best1=0.639 n_val=2821 vram=0.08GB 6s | grade=0.840 inner_auc=0.824 vs conf_auc=0.822
+07:08:41 ===== CYCLE 561 (OUTER -> INNER -> FEEDBACK) =====
+07:08:49 [audio/urbansound8k] vote=0.669 uniform=0.644 best1=0.668 n_val=2486 vram=0.08GB 8s | grade=0.843 inner_auc=0.738 vs conf_auc=0.735
+07:08:54 ===== CYCLE 562 (OUTER -> INNER -> FEEDBACK) =====
+07:09:02 [audio/urbansound8k] vote=0.668 uniform=0.611 best1=0.671 n_val=2814 vram=0.08GB 8s | grade=0.861 inner_auc=0.813 vs conf_auc=0.809
+07:09:07 ===== CYCLE 563 (OUTER -> INNER -> FEEDBACK) =====
+07:09:16 [audio/urbansound8k] vote=0.665 uniform=0.618 best1=0.664 n_val=2641 vram=0.08GB 9s | grade=0.862 inner_auc=0.794 vs conf_auc=0.792
+07:09:20 ===== CYCLE 564 (OUTER -> INNER -> FEEDBACK) =====
+07:09:26 [audio/urbansound8k] vote=0.679 uniform=0.630 best1=0.680 n_val=2727 vram=0.08GB 6s | grade=0.858 inner_auc=0.788 vs conf_auc=0.795
+07:09:29 ===== CYCLE 565 (OUTER -> INNER -> FEEDBACK) =====
+07:09:36 [audio/urbansound8k] vote=0.692 uniform=0.655 best1=0.691 n_val=2052 vram=0.08GB 6s | grade=0.866 inner_auc=0.838 vs conf_auc=0.836
+07:09:40 ===== CYCLE 566 (OUTER -> INNER -> FEEDBACK) =====
+07:09:48 [audio/urbansound8k] vote=0.666 uniform=0.630 best1=0.666 n_val=2513 vram=0.08GB 9s | grade=0.846 inner_auc=0.785 vs conf_auc=0.794
+07:09:53 ===== CYCLE 567 (OUTER -> INNER -> FEEDBACK) =====
+07:10:01 [audio/urbansound8k] vote=0.633 uniform=0.609 best1=0.634 n_val=2971 vram=0.08GB 8s | grade=0.834 inner_auc=0.830 vs conf_auc=0.831
+07:10:06 ===== CYCLE 568 (OUTER -> INNER -> FEEDBACK) =====
+07:10:15 [audio/urbansound8k] vote=0.661 uniform=0.631 best1=0.660 n_val=2622 vram=0.08GB 9s | grade=0.849 inner_auc=0.835 vs conf_auc=0.851
+07:10:19 ===== CYCLE 569 (OUTER -> INNER -> FEEDBACK) =====
+07:10:28 [audio/urbansound8k] vote=0.626 uniform=0.580 best1=0.629 n_val=2796 vram=0.08GB 9s | grade=0.831 inner_auc=0.814 vs conf_auc=0.860
+07:10:32 ===== CYCLE 570 (OUTER -> INNER -> FEEDBACK) =====
+07:10:40 [audio/urbansound8k] vote=0.612 uniform=0.585 best1=0.610 n_val=2704 vram=0.08GB 8s | grade=0.834 inner_auc=0.800 vs conf_auc=0.814
+07:10:45 ===== CYCLE 571 (OUTER -> INNER -> FEEDBACK) =====
+07:10:53 [audio/urbansound8k] vote=0.602 uniform=0.594 best1=0.596 n_val=2599 vram=0.08GB 8s | grade=0.821 inner_auc=0.818 vs conf_auc=0.832
+07:10:58 ===== CYCLE 572 (OUTER -> INNER -> FEEDBACK) =====
+07:11:05 [audio/urbansound8k] vote=0.647 uniform=0.617 best1=0.641 n_val=2927 vram=0.08GB 8s | grade=0.830 inner_auc=0.795 vs conf_auc=0.766
+07:11:08 ===== CYCLE 573 (OUTER -> INNER -> FEEDBACK) =====
+07:11:15 [audio/urbansound8k] vote=0.631 uniform=0.575 best1=0.634 n_val=2569 vram=0.08GB 7s | grade=0.835 inner_auc=0.773 vs conf_auc=0.796
+07:11:18 ===== CYCLE 574 (OUTER -> INNER -> FEEDBACK) =====
+07:11:24 [audio/urbansound8k] vote=0.617 uniform=0.599 best1=0.616 n_val=2438 vram=0.08GB 6s | grade=0.832 inner_auc=0.738 vs conf_auc=0.770
+07:11:28 ===== CYCLE 575 (OUTER -> INNER -> FEEDBACK) =====
+07:11:37 [audio/urbansound8k] vote=0.628 uniform=0.592 best1=0.626 n_val=2671 vram=0.08GB 9s | grade=0.842 inner_auc=0.825 vs conf_auc=0.814
+07:11:41 ===== CYCLE 576 (OUTER -> INNER -> FEEDBACK) =====
+07:11:49 [audio/urbansound8k] vote=0.627 uniform=0.586 best1=0.627 n_val=2437 vram=0.08GB 8s | grade=0.837 inner_auc=0.829 vs conf_auc=0.847
+07:11:53 ===== CYCLE 577 (OUTER -> INNER -> FEEDBACK) =====
+07:12:02 [audio/urbansound8k] vote=0.594 uniform=0.559 best1=0.594 n_val=2940 vram=0.08GB 8s | grade=0.808 inner_auc=0.796 vs conf_auc=0.803
+07:12:05 ===== CYCLE 578 (OUTER -> INNER -> FEEDBACK) =====
+07:12:11 [audio/urbansound8k] vote=0.651 uniform=0.615 best1=0.645 n_val=2633 vram=0.08GB 6s | grade=0.824 inner_auc=0.800 vs conf_auc=0.802
+07:12:14 ===== CYCLE 579 (OUTER -> INNER -> FEEDBACK) =====
+07:12:19 [audio/urbansound8k] vote=0.630 uniform=0.577 best1=0.625 n_val=2254 vram=0.08GB 6s | grade=0.839 inner_auc=0.770 vs conf_auc=0.748
+07:12:23 ===== CYCLE 580 (OUTER -> INNER -> FEEDBACK) =====
+07:12:31 [audio/urbansound8k] vote=0.654 uniform=0.618 best1=0.654 n_val=2883 vram=0.08GB 7s | grade=0.846 inner_auc=0.868 vs conf_auc=0.874
+07:12:35 ===== CYCLE 581 (OUTER -> INNER -> FEEDBACK) =====
+07:12:43 [audio/urbansound8k] vote=0.632 uniform=0.577 best1=0.630 n_val=2266 vram=0.08GB 8s | grade=0.841 inner_auc=0.779 vs conf_auc=0.807
+07:12:47 ===== CYCLE 582 (OUTER -> INNER -> FEEDBACK) =====
+07:12:55 [audio/urbansound8k] vote=0.642 uniform=0.592 best1=0.645 n_val=2730 vram=0.08GB 8s | grade=0.846 inner_auc=0.802 vs conf_auc=0.806
+07:12:59 ===== CYCLE 583 (OUTER -> INNER -> FEEDBACK) =====
+07:13:05 [audio/urbansound8k] vote=0.734 uniform=0.704 best1=0.734 n_val=2538 vram=0.08GB 6s | grade=0.829 inner_auc=0.880 vs conf_auc=0.877
+07:13:09 ===== CYCLE 584 (OUTER -> INNER -> FEEDBACK) =====
+07:13:17 [audio/urbansound8k] vote=0.634 uniform=0.571 best1=0.637 n_val=2488 vram=0.08GB 8s | grade=0.799 inner_auc=0.741 vs conf_auc=0.739
+07:13:21 ===== CYCLE 585 (OUTER -> INNER -> FEEDBACK) =====
+07:13:29 [audio/urbansound8k] vote=0.664 uniform=0.618 best1=0.663 n_val=2767 vram=0.08GB 8s | grade=0.847 inner_auc=0.931 vs conf_auc=0.914
+07:13:35 ===== CYCLE 586 (OUTER -> INNER -> FEEDBACK) =====
+07:13:43 [audio/urbansound8k] vote=0.695 uniform=0.653 best1=0.692 n_val=2515 vram=0.08GB 9s | grade=0.853 inner_auc=0.831 vs conf_auc=0.860
+07:13:48 ===== CYCLE 587 (OUTER -> INNER -> FEEDBACK) =====
+07:13:55 [audio/urbansound8k] vote=0.728 uniform=0.667 best1=0.726 n_val=2606 vram=0.08GB 7s | grade=0.856 inner_auc=0.753 vs conf_auc=0.765
+07:13:58 ===== CYCLE 588 (OUTER -> INNER -> FEEDBACK) =====
+07:14:04 [audio/urbansound8k] vote=0.699 uniform=0.636 best1=0.699 n_val=2529 vram=0.08GB 6s | grade=0.859 inner_auc=0.820 vs conf_auc=0.804
+07:14:07 ===== CYCLE 589 (OUTER -> INNER -> FEEDBACK) =====
+07:14:13 [audio/urbansound8k] vote=0.619 uniform=0.584 best1=0.621 n_val=2685 vram=0.08GB 6s | grade=0.799 inner_auc=0.870 vs conf_auc=0.862
+07:14:18 ===== CYCLE 590 (OUTER -> INNER -> FEEDBACK) =====
+07:14:26 [audio/urbansound8k] vote=0.689 uniform=0.637 best1=0.689 n_val=2642 vram=0.08GB 8s | grade=0.839 inner_auc=0.811 vs conf_auc=0.808
+07:14:31 ===== CYCLE 591 (OUTER -> INNER -> FEEDBACK) =====
+07:14:39 [audio/urbansound8k] vote=0.648 uniform=0.596 best1=0.652 n_val=3021 vram=0.08GB 9s | grade=0.837 inner_auc=0.807 vs conf_auc=0.810
+07:14:44 ===== CYCLE 592 (OUTER -> INNER -> FEEDBACK) =====
+07:14:52 [audio/urbansound8k] vote=0.627 uniform=0.589 best1=0.627 n_val=2424 vram=0.08GB 8s | grade=0.834 inner_auc=0.837 vs conf_auc=0.841
+07:14:56 ===== CYCLE 593 (OUTER -> INNER -> FEEDBACK) =====
+07:15:05 [audio/urbansound8k] vote=0.671 uniform=0.621 best1=0.671 n_val=2516 vram=0.08GB 9s | grade=0.842 inner_auc=0.825 vs conf_auc=0.822
+07:15:08 ===== CYCLE 594 (OUTER -> INNER -> FEEDBACK) =====
+07:15:15 [audio/urbansound8k] vote=0.654 uniform=0.599 best1=0.654 n_val=2640 vram=0.08GB 6s | grade=0.851 inner_auc=0.838 vs conf_auc=0.831
+07:15:18 ===== CYCLE 595 (OUTER -> INNER -> FEEDBACK) =====
+07:15:24 [audio/urbansound8k] vote=0.637 uniform=0.622 best1=0.632 n_val=2789 vram=0.08GB 6s | grade=0.840 inner_auc=0.857 vs conf_auc=0.874
+07:15:27 ===== CYCLE 596 (OUTER -> INNER -> FEEDBACK) =====
+07:15:34 [audio/urbansound8k] vote=0.662 uniform=0.626 best1=0.660 n_val=2577 vram=0.08GB 7s | grade=0.847 inner_auc=0.754 vs conf_auc=0.741
+07:15:39 ===== CYCLE 597 (OUTER -> INNER -> FEEDBACK) =====
+07:15:47 [audio/urbansound8k] vote=0.678 uniform=0.601 best1=0.680 n_val=2677 vram=0.08GB 8s | grade=0.859 inner_auc=0.808 vs conf_auc=0.829
+07:15:52 ===== CYCLE 598 (OUTER -> INNER -> FEEDBACK) =====
+07:16:00 [audio/urbansound8k] vote=0.683 uniform=0.624 best1=0.684 n_val=2590 vram=0.08GB 8s | grade=0.866 inner_auc=0.843 vs conf_auc=0.833
+07:16:03 ===== CYCLE 599 (OUTER -> INNER -> FEEDBACK) =====
+07:16:08 [audio/urbansound8k] vote=0.701 uniform=0.656 best1=0.699 n_val=2479 vram=0.08GB 5s | grade=0.864 inner_auc=0.827 vs conf_auc=0.821
+07:16:12 ===== CYCLE 600 (OUTER -> INNER -> FEEDBACK) =====
+07:16:18 [audio/urbansound8k] vote=0.652 uniform=0.603 best1=0.657 n_val=2283 vram=0.08GB 6s | grade=0.830 inner_auc=0.820 vs conf_auc=0.854
+07:16:22 ===== CYCLE 601 (OUTER -> INNER -> FEEDBACK) =====
+07:16:30 [audio/urbansound8k] vote=0.657 uniform=0.630 best1=0.656 n_val=2489 vram=0.08GB 8s | grade=0.856 inner_auc=0.797 vs conf_auc=0.810
+07:16:34 ===== CYCLE 602 (OUTER -> INNER -> FEEDBACK) =====
+07:16:43 [audio/urbansound8k] vote=0.634 uniform=0.592 best1=0.637 n_val=2404 vram=0.08GB 9s | grade=0.834 inner_auc=0.819 vs conf_auc=0.822
+07:16:47 ===== CYCLE 603 (OUTER -> INNER -> FEEDBACK) =====
+07:16:55 [audio/urbansound8k] vote=0.717 uniform=0.662 best1=0.723 n_val=2355 vram=0.08GB 8s | grade=0.839 inner_auc=0.805 vs conf_auc=0.818
+07:16:58 ===== CYCLE 604 (OUTER -> INNER -> FEEDBACK) =====
+07:17:08 [audio/urbansound8k] vote=0.628 uniform=0.582 best1=0.629 n_val=3000 vram=0.08GB 10s | grade=0.806 inner_auc=0.848 vs conf_auc=0.843
+07:17:11 ===== CYCLE 605 (OUTER -> INNER -> FEEDBACK) =====
+07:17:17 [audio/urbansound8k] vote=0.620 uniform=0.579 best1=0.618 n_val=2712 vram=0.08GB 6s | grade=0.846 inner_auc=0.834 vs conf_auc=0.826
+07:17:28 ===== CYCLE 606 (OUTER -> INNER -> FEEDBACK) =====
+07:17:48 [audio/urbansound8k] vote=0.626 uniform=0.602 best1=0.626 n_val=2694 vram=0.08GB 21s | grade=0.837 inner_auc=0.760 vs conf_auc=0.773
+07:17:53 ===== CYCLE 607 (OUTER -> INNER -> FEEDBACK) =====
+07:18:02 [audio/urbansound8k] vote=0.691 uniform=0.652 best1=0.695 n_val=2423 vram=0.08GB 8s | grade=0.840 inner_auc=0.777 vs conf_auc=0.796
+07:18:06 ===== CYCLE 608 (OUTER -> INNER -> FEEDBACK) =====
+07:18:16 [audio/urbansound8k] vote=0.624 uniform=0.580 best1=0.622 n_val=2747 vram=0.08GB 10s | grade=0.817 inner_auc=0.838 vs conf_auc=0.864
+07:18:21 ===== CYCLE 609 (OUTER -> INNER -> FEEDBACK) =====
+07:18:31 [audio/urbansound8k] vote=0.667 uniform=0.648 best1=0.665 n_val=2870 vram=0.08GB 10s | grade=0.837 inner_auc=0.838 vs conf_auc=0.847
+07:18:37 ===== CYCLE 610 (OUTER -> INNER -> FEEDBACK) =====
+07:18:57 [audio/urbansound8k] vote=0.668 uniform=0.621 best1=0.666 n_val=2758 vram=0.08GB 20s | grade=0.863 inner_auc=0.841 vs conf_auc=0.825
+07:19:14 ===== CYCLE 611 (OUTER -> INNER -> FEEDBACK) =====
+07:19:29 [audio/urbansound8k] vote=0.692 uniform=0.657 best1=0.691 n_val=2436 vram=0.08GB 15s | grade=0.863 inner_auc=0.796 vs conf_auc=0.754
+07:19:34 ===== CYCLE 612 (OUTER -> INNER -> FEEDBACK) =====
+07:19:51 [audio/urbansound8k] vote=0.650 uniform=0.616 best1=0.644 n_val=2692 vram=0.08GB 17s | grade=0.832 inner_auc=0.895 vs conf_auc=0.895
+07:20:03 ===== CYCLE 613 (OUTER -> INNER -> FEEDBACK) =====
+07:20:17 [audio/urbansound8k] vote=0.657 uniform=0.616 best1=0.650 n_val=2982 vram=0.08GB 13s | grade=0.855 inner_auc=0.882 vs conf_auc=0.871
+07:20:29 ===== CYCLE 614 (OUTER -> INNER -> FEEDBACK) =====
+07:20:47 [audio/urbansound8k] vote=0.688 uniform=0.667 best1=0.688 n_val=2418 vram=0.08GB 18s | grade=0.853 inner_auc=0.744 vs conf_auc=0.781

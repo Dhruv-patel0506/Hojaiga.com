@@ -1,0 +1,168 @@
+{
+   "app_metadata": {
+      "app_name": "simple-dap-gui",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Set up and start debugging a PHP project using simple-dap-gui",
+   "prerequisite_state": "simple-dap-gui is installed and the project folder is ready",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Create a launch.json in your project's .vscode folder",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "{\"version\": \"0.2.0\", \"configurations\": [{\"name\": \"Listen for XDebug\", \"type\": \"php\", \"request\": \"launch\", \"port\": 9003, \"pathMappings\": [{\"localRoot\": \"/var/www/html\", \"remoteRoot\": \"/\"}]}]}"
+         },
+         "expected_state_change": "launch.json file is created in the .vscode folder with the specified content"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Start the application",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "npm run dev"
+         },
+         "expected_state_change": "simple-dap-gui application starts running"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Select a configuration from the dropdown in the toolbar",
+         "ui_target": {
+            "element_name": "Configuration",
+            "automation_id": null,
+            "hierarchical_path": "Toolbar > Configuration",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The dropdown menu opens, showing the configurations"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click Debug (or press F5) to start debugging",
+         "ui_target": {
+            "element_name": "Debug",
+            "automation_id": null,
+            "hierarchical_path": "Toolbar > Debug",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The debugger starts and begins listening for XDebug connections"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Set breakpoints by clicking in the gutter area",
+         "ui_target": {
+            "element_name": "Gutter",
+            "automation_id": null,
+            "hierarchical_path": "Editor > Gutter",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Breakpoints are set in the specified lines of code"
+      }
+   ],
+   "_meta": {
+      "source_app": "simple-dap-gui",
+      "app_key": "simple_dap_gui",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "simple-dap-gui - Xdebug Debugger GUI",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:14:58Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

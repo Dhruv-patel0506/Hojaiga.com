@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hojaiga Professor Command & Control</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card-bg: #161b22;
+    --border: #30363d;
+    --fg: #c9d1d9;
+    --fg-muted: #8b949e;
+    --accent: #58a6ff;
+    --accent-glow: rgba(88, 166, 255, 0.15);
+    --success: #3fb950;
+    --warning: #d29922;
+    --danger: #f85149;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #f6f8fa;
+      --card-bg: #ffffff;
+      --border: #d0d7de;
+      --fg: #24292f;
+      --fg-muted: #57606a;
+      --accent: #0969da;
+      --accent-glow: rgba(9, 105, 218, 0.1);
+      --success: #1a7f37;
+      --warning: #9a6700;
+      --danger: #cf222e;
+      color-scheme: light;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #f6f8fa;
+    --card-bg: #ffffff;
+    --border: #d0d7de;
+    --fg: #24292f;
+    --fg-muted: #57606a;
+    --accent: #0969da;
+    --accent-glow: rgba(9, 105, 218, 0.1);
+    --success: #1a7f37;
+    --warning: #9a6700;
+    --danger: #cf222e;
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1117;
+    --card-bg: #161b22;
+    --border: #30363d;
+    --fg: #c9d1d9;
+    --fg-muted: #8b949e;
+    --accent: #58a6ff;
+    --accent-glow: rgba(88, 166, 255, 0.15);
+    --success: #3fb950;
+    --warning: #d29922;
+    --danger: #f85149;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    padding: 16px;
+    padding-block: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-bottom, 0px));
+    line-height: 1.5;
+  }
+
+  header {
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  h1 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px; }
+  .badge { background: var(--accent-glow); color: var(--accent); border: 1px solid var(--accent); padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 500; font-family: var(--font-mono); }
+  p.subtitle { color: var(--fg-muted); font-size: 0.9rem; margin-top: 4px; }
+
+  .actions-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  button, .btn {
+    background: var(--card-bg);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  button:hover, .btn:hover { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
+  button.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+  button.primary:hover { opacity: 0.9; color: var(--bg); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .card h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .stats-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+  }
+  .stats-row span:last-child { font-family: var(--font-mono); font-weight: 600; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 8px; }
+  th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border); }
+  th { color: var(--fg-muted); font-weight: 500; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; }
+  tr:last-child td { border-bottom: none; }
+
+  .status-pill {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    font-weight: 500;
+  }
+  .status-ok { background: rgba(63, 185, 80, 0.15); color: var(--success); }
+  .status-fail { background: rgba(248, 81, 73, 0.15); color: var(--danger); }
+  .status-blocked { background: rgba(210, 153, 34, 0.15); color: var(--warning); }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+  }
+  .tab {
+    background: none;
+    border: none;
+    color: var(--fg-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 6px;
+  }
+  .tab.active { background: var(--accent-glow); color: var(--accent); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .roadmap-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .roadmap-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--bg);
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+  .roadmap-num {
+    background: var(--accent-glow);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+    font-size: 0.8rem;
+  }
+  .roadmap-body h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
+  .roadmap-body p { font-size: 0.85rem; color: var(--fg-muted); }
+
+  .terminal-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    overflow-x: auto;
+    color: var(--fg);
+    margin-top: 8px;
+    white-space: pre-wrap;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Hojaiga Professor Dashboard <span class="badge">v8.1 Live & Offline</span></h1>
+    <p class="subtitle">Vision-first Clicky-style autonomous teacher and app execution engine for Windows apps.</p>
+  </div>
+  <div class="actions-bar">
+    <button class="primary" onclick="alert('To run test suite: python run_system_intelligence_tests.py')">Run Tests</button>
+    <button onclick="toggleTheme()">Theme</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('overview')">Overview & Scores</button>
+  <button class="tab" onclick="switchTab('apps')">App Run Results</button>
+  <button class="tab" onclick="switchTab('roadmap')">90% Automation Roadmap</button>
+  <button class="tab" onclick="switchTab('architecture')">Architecture & Entrypoints</button>
+</div>
+
+<div id="overview" class="tab-content active">
+  <div class="grid">
+    <div class="card">
+      <h3>System Health Summary</h3>
+      <div class="stats-row"><span>Offline Test Suite</span><span style="color: var(--success);">87 / 87 PASS</span></div>
+      <div class="stats-row"><span>Brain & Popup Tests</span><span style="color: var(--success);">5 / 5 PASS</span></div>
+      <div class="stats-row"><span>Latest Live Task Success</span><span>53% (35 OK / 31 Fail / 10 Blocked)</span></div>
+      <div class="stats-row"><span>Verification Accuracy</span><span style="color: var(--success);">73 Confirmed / 2 Contradicted</span></div>
+      <div class="stats-row"><span>Autonomous Grade</span><span>7 / 10</span></div>
+    </div>
+
+    <div class="card">
+      <h3>Safety & Trustworthiness</h3>
+      <p style="font-size: 0.85rem; color: var(--fg-muted); margin-bottom: 12px;">The safety gate held 100% across all runs. Sandbox isolation ensures user files and physical cursors remain untouched.</p>
+      <div class="stats-row"><span>Physical Mouse Used</span><span style="color: var(--success);">Never (Virtual Only)</span></div>
+      <div class="stats-row"><span>App Isolation</span><span style="color: var(--success);">Parked Off-Screen</span></div>
+      <div class="stats-row"><span>Safety Gate Blocks</span><span>10 sensitive/online tasks</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="apps" class="tab-content">
+  <div class="card">
+<h3>Latest App Run Performance Audit</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Application</th>
+          <th>Latest Run</th>
+          <th>OK / Blocked / Failed</th>
+          <th>Readable Tree Nodes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>PowerPoint</strong></td>
+          <td>10 Oct</td>
+          <td><span class="status-pill status-ok">8 OK</span> / <span class="status-pill status-blocked">2 Blocked</span> / <span class="status-pill status-ok">0 Fail</span></td>
+          <td>150 nodes</td>
+        </tr>
+        <tr>
+          <td><strong>Paint</strong></td>
+          <td>Today</td>
+          <td><span class="status-pill status-ok">7 OK</span> / <span class="status-pill status-blocked">0 Blocked</span> / <span class="status-pill status-fail">3 Fail</span></td>
+          <td>64 nodes</td>
+        </tr>
+        <tr>
+          <td><strong>Notepad</strong></td>
+          <td>Today</td>
+          <td><span class="status-pill status-ok">2 OK</span> / <span class="status-pill status-blocked">0 Blocked</span> / <span class="status-pill status-ok">0 Fail</span></td>
+          <td>68 nodes</td>
+        </tr>
+        <tr>
+          <td><strong>Word</strong></td>
+          <td>Today</td>
+          <td><span class="status-pill status-ok">4 OK</span> / <span class="status-pill status-blocked">3 Blocked</span> / <span class="status-pill status-fail">3 Fail</span></td>
+          <td>4,760 nodes</td>
+        </tr>
+        <tr>
+          <td><strong>Blender</strong></td>
+          <td>Today</td>
+          <td><span class="status-pill status-ok">4 OK</span> / <span class="status-pill status-blocked">1 Blocked</span> / <span class="status-pill status-fail">5 Fail</span></td>
+          <td>Scripting Engine</td>
+        </tr>
+        <tr>
+          <td><strong>Settings</strong></td>
+          <td>Today</td>
+          <td><span class="status-pill status-ok">1 OK</span> / <span class="status-pill status-blocked">0 Blocked</span> / <span class="status-pill status-fail">9 Fail</span></td>
+          <td>224 nodes</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div id="roadmap" class="tab-content">
+  <div class="card">
+    <h3>Roadmap to 90%+ Automation Accuracy</h3>
+    <ul class="roadmap-list" style="margin-top: 12px;">
+      <li class="roadmap-item">
+        <div class="roadmap-num">1</div>
+        <div class="roadmap-body">
+          <h4>Precondition & Object Chaining</h4>
+          <p>Automatically execute prerequisite commands (e.g., adding a mesh or entering header edit mode) before running guide steps that require them.</p>
+        </div>
+      </li>
+      <li class="roadmap-item">
+        <div class="roadmap-num">2</div>
+        <div class="roadmap-body">
+          <h4>UWP Settings Zero-Size Fallback</h4>
+          <p>Build the command catalog directly from the control tree when UWP parked windows report zero-size bounding boxes on off-screen elements.</p>
+        </div>
+      </li>
+      <li class="roadmap-item">
+        <div class="roadmap-num">3</div>
+        <div class="roadmap-body">
+          <h4>Sandbox Format Dialog Relaxation</h4>
+          <p>Permit harmless "Format..." and layout dialog interactions when running inside designated throw-away scratch documents.</p>
+        </div>
+      </li>
+      <li class="roadmap-item">
+        <div class="roadmap-num">4</div>
+        <div class="roadmap-body">
+          <h4>Official Tutorial Corpuses</h4>
+          <p>Ingest official step-by-step tutorials (Blender & Notepad) to replace raw reference manuals with actionable procedures.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div id="architecture" class="tab-content">
+  <div class="grid">
+    <div class="card">
+      <h3>Key Entrypoints & Scripts</h3>
+      <p style="font-size: 0.85rem; color: var(--fg-muted); margin-bottom: 8px;">Main command line tool:</p>
+      <div class="terminal-box">python hojaiga_professor.py &lt;subcommand&gt;</div>
+      <p style="font-size: 0.85rem; color: var(--fg-muted); margin-top: 12px; margin-bottom: 8px;">Run guide against real app:</p>
+      <div class="terminal-box">python professor/apprun.py</div>
+    </div>
+    <div class="card">
+      <h3>Core Directories</h3>
+      <ul style="font-size: 0.85rem; padding-left: 16px; color: var(--fg); display: flex; flex-direction: column; gap: 4px;">
+        <li><code>All codes/core_organs/professor/</code> — Perception, execution, pointers, teacher</li>
+        <li><code>All codes/core_organs/professor/knowledge/</code> — RAG, guide corpus, version fit</li>
+        <li><code>data/professor/apprun/</code> — Live run reports and screenshots</li>
+        <li><code>data/professor/manuals.db</code> — Indexed guide corpus (309 MB)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    document.getElementById(tabId).classList.add('active');
+  }
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+{
+   "app_metadata": {
+      "app_name": "QuickLook",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure QuickLook to enable file previews",
+   "prerequisite_state": "Desktop is open, user is at the desktop or file explorer",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install QuickLook from the Microsoft Store",
+         "ui_target": {
+            "element_name": "Microsoft Store",
+            "automation_id": null,
+            "hierarchical_path": "Start Menu > Microsoft Store",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Microsoft Store window opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Search for QuickLook in the Microsoft Store",
+         "ui_target": {
+            "element_name": "Search box",
+            "automation_id": null,
+            "hierarchical_path": "Microsoft Store > Search box",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "QuickLook"
+         },
+         "expected_state_change": "QuickLook search results appear"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Select QuickLook from the search results",
+         "ui_target": {
+            "element_name": "QuickLook",
+            "automation_id": null,
+            "hierarchical_path": "Microsoft Store > Search results > QuickLook",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "QuickLook details page opens"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click the 'Get it from Microsoft Store' button",
+         "ui_target": {
+            "element_name": "Get it from Microsoft Store",
+            "automation_id": null,
+            "hierarchical_path": "Microsoft Store > QuickLook details page > Get it from Microsoft Store",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "QuickLook installation starts"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Wait for the installation to complete",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "QuickLook is installed and ready to use"
+      }
+   ],
+   "_meta": {
+      "source_app": "QuickLook",
+      "app_key": "quicklook",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "QuickLook",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:38:38Z",
+      "schema_warnings": [
+         "step5_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

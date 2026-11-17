@@ -1,0 +1,81 @@
+{
+   "app_metadata": {
+      "app_name": "Actions Monitor",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure Actions Monitor on Windows",
+   "prerequisite_state": "User is on a Windows 10/11 system",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Run the Actions Monitor executable",
+         "ui_target": {
+            "element_name": "ActionsMonitor.exe",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Actions Monitor application window opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Create `config.yaml` from the template",
+         "ui_target": {
+            "element_name": "config.yaml",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "config.yaml"
+         },
+         "expected_state_change": "The `config.yaml` file is created from the template"
+      }
+   ],
+   "_meta": {
+      "source_app": "Actions Monitor",
+      "app_key": "actions_monitor",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Actions Monitor",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:29:15Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

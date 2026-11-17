@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "Deezer",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Navigate to the Support section of the Deezer application",
+   "prerequisite_state": "The user is on the Deezer application's main screen",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Go to the Support section",
+         "ui_target": {
+            "element_name": "Support",
+            "automation_id": null,
+            "hierarchical_path": "Main menu > Support",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user is navigated to the Support section of the Deezer application"
+      }
+   ],
+   "_meta": {
+      "source_app": "Deezer",
+      "app_key": "deezer",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Support",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:28:16Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

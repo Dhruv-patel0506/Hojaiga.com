@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "WMI Explorer",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Connect to a WMI namespace and explore WMI objects",
+   "prerequisite_state": "WMI Explorer application is open and the user is at the start screen",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Enter the Computer Name in the Options panel",
+         "ui_target": {
+            "element_name": "Computer Name",
+            "automation_id": null,
+            "hierarchical_path": "Options panel > Computer Name field",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "localhost"
+         },
+         "expected_state_change": "The Computer Name field is populated with 'localhost'"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Enter the Namespace Path in the Options panel",
+         "ui_target": {
+            "element_name": "Namespace Path",
+            "automation_id": null,
+            "hierarchical_path": "Options panel > Namespace Path field",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "root\\cimv2"
+         },
+         "expected_state_change": "The Namespace Path field is populated with 'root\\cimv2'"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click the Connect button to establish the connection",
+         "ui_target": {
+            "element_name": "Connect",
+            "automation_id": null,
+            "hierarchical_path": "Options panel > Connect button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The namespace tree populates with the selected namespace, and the status indicator changes to green"
+      }
+   ],
+   "_meta": {
+      "source_app": "WMI Explorer",
+      "app_key": "wmi_explorer",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "WMI Explorer",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:00:06Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

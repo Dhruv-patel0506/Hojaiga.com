@@ -1,0 +1,174 @@
+{
+   "app_metadata": {
+      "app_name": "Audacity",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Access and configure the Amplify effect in Audacity",
+   "prerequisite_state": "Audacity is open and a track or selection is selected",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Go to Effect > Volume and Compression > Amplify",
+         "ui_target": {
+            "element_name": "Effect",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Effect",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Effect menu opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select Amplify from the menu",
+         "ui_target": {
+            "element_name": "Amplify",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Effect > Volume and Compression > Amplify",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Amplify dialog appears"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Type a value in the Amplification (dB) box",
+         "ui_target": {
+            "element_name": "Amplification (dB)",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "2"
+         },
+         "expected_state_change": "The New Peak Amplitude (dB) box updates with the new value"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Drag the slider to the right to increase the amplification",
+         "ui_target": {
+            "element_name": "Amplification (dB) Slider",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Slider",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  100,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The value in the Amplification (dB) box updates with the new position of the slider"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Click the Apply button",
+         "ui_target": {
+            "element_name": "Apply",
+            "automation_id": null,
+            "hierarchical_path": "Amplify dialog > Apply",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected track(s) are amplified according to the settings"
+      }
+   ],
+   "_meta": {
+      "source_app": "Audacity",
+      "app_key": "audacity",
+      "dataset_split": "TRAIN",
+      "category": "Audio Editor",
+      "guide_title": "Amplify - Audacity Manual",
+      "source_status": "extracted_weak",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:03:26Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "Darshan Player",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install Darshan Player using the installer option.",
+   "prerequisite_state": "User is on a Windows 10/11 system with internet access.",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download `DarshanPlayer-win-Setup.exe` from the Releases page.",
+         "ui_target": {
+            "element_name": "Download link",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user navigates to the Releases page and downloads the installer."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run the downloaded `DarshanPlayer-win-Setup.exe`.",
+         "ui_target": {
+            "element_name": "DarshanPlayer-win-Setup.exe",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The installer window opens."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Follow the on-screen instructions to complete the installation.",
+         "ui_target": {
+            "element_name": "Next, Install, and Finish buttons",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Darshan Player is installed and launched."
+      }
+   ],
+   "_meta": {
+      "source_app": "Darshan Player",
+      "app_key": "darshan_player",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Darshan Player — Free Open-Source Media Player for Windows",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:52:55Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

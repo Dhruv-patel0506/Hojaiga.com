@@ -1,0 +1,140 @@
+{
+   "project": "Sales Analysis and Summary",
+   "file": "SalesData",
+   "sheets": [
+      {
+         "name": "Sales",
+         "purpose": "Sales data and summary",
+         "tab_color": "none",
+         "title_banner": "Sales Data",
+         "headers": [
+            "Product",
+            "Quantity",
+            "Price",
+            "Total",
+            "Date",
+            "Region"
+         ],
+         "rows": [
+            [
+               "Product A",
+               10,
+               25,
+               "=B2*C2",
+               "2026-01-15",
+               "North"
+            ],
+            [
+               "Product B",
+               5,
+               50,
+               "=B3*C3",
+               "2026-01-16",
+               "South"
+            ],
+            [
+               "Product C",
+               7,
+               30,
+               "=B4*C4",
+               "2026-01-17",
+               "East"
+            ],
+            [
+               "Product D",
+               12,
+               40,
+               "=B5*C5",
+               "2026-01-18",
+               "West"
+            ]
+         ],
+         "formulas": [
+            {
+               "cell": "D2",
+               "formula": "=B2*C2",
+               "why": "total sales"
+            },
+            {
+               "cell": "D3",
+               "formula": "=B3*C3",
+               "why": "total sales"
+            }
+         ],
+         "features": [
+            {
+               "cap": "bold",
+               "range": "A1:G1"
+            },
+            {
+               "cap": "currency",
+               "range": "D2:D5"
+            },
+            {
+               "cap": "bar_chart",
+               "range": "B2:B5"
+            },
+            {
+               "cap": "new_sheet",
+               "value": "Summary"
+            }
+         ]
+      },
+      {
+         "name": "Summary",
+         "purpose": "Summary of sales data",
+         "tab_color": "none",
+         "title_banner": "Sales Summary",
+         "headers": [
+            "Total Sales",
+            "Max Sales",
+            "Min Sales",
+            "Average Sales"
+         ],
+         "rows": [
+            [
+               "=SUM(D2:D5)",
+               "=MAX(D2:D5)",
+               "=MIN(D2:D5)",
+               "=AVERAGE(D2:D5)"
+            ]
+         ],
+         "formulas": [
+            {
+               "cell": "A1",
+               "formula": "=SUM(D2:D5)",
+               "why": "total sales"
+            },
+            {
+               "cell": "B1",
+               "formula": "=MAX(D2:D5)",
+               "why": "maximum sales"
+            },
+            {
+               "cell": "C1",
+               "formula": "=MIN(D2:D5)",
+               "why": "minimum sales"
+            },
+            {
+               "cell": "D1",
+               "formula": "=AVERAGE(D2:D5)",
+               "why": "average sales"
+            }
+         ],
+         "features": [
+            {
+               "cap": "bold",
+               "range": "A1:D1"
+            },
+            {
+               "cap": "all_borders",
+               "range": "A1:D2"
+            },
+            {
+               "cap": "freeze_first_row"
+            }
+         ]
+      }
+   ],
+   "_engine": "qwen2.5:7b"
+}

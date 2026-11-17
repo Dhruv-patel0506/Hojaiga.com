@@ -1,0 +1,113 @@
+{
+   "app_metadata": {
+      "app_name": "cc-panes",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure CC-Panes for the first launch",
+   "prerequisite_state": "User has downloaded the latest release of CC-Panes and is ready to install it",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install at least one supported CLI and make sure it is available on your PATH",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Install at least one supported CLI and make sure it is available on your PATH"
+         },
+         "expected_state_change": "CLI is installed and added to PATH"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Open CC-Panes",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Open CC-Panes"
+         },
+         "expected_state_change": "CC-Panes application window opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Create or import a workspace, add a project, and launch a session",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Create or import a workspace, add a project, and launch a session"
+         },
+         "expected_state_change": "Workspace is created or imported, project is added, and a session is launched"
+      }
+   ],
+   "_meta": {
+      "source_app": "cc-panes",
+      "app_key": "cc_panes",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Features",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:14:44Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

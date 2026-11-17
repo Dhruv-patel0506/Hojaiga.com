@@ -1,0 +1,102 @@
+{
+   "app_metadata": {
+      "app_name": "Calculator",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "15/3=5",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "ui_target": {
+            "element_name": "One",
+            "element_type": "Button",
+            "bounding_box": [
+               114,
+               887,
+               329,
+               989
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 1",
+         "low_level_instruction": "CLICK One"
+      },
+      {
+         "step_id": 2,
+         "ui_target": {
+            "element_name": "Five",
+            "element_type": "Button",
+            "bounding_box": [
+               332,
+               781,
+               548,
+               884
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 15",
+         "low_level_instruction": "CLICK Five"
+      },
+      {
+         "step_id": 3,
+         "ui_target": {
+            "element_name": "Divide by",
+            "element_type": "Button",
+            "bounding_box": [
+               769,
+               569,
+               984,
+               673
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 15",
+         "low_level_instruction": "CLICK Divide by"
+      },
+      {
+         "step_id": 4,
+         "ui_target": {
+            "element_name": "Three",
+            "element_type": "Button",
+            "bounding_box": [
+               551,
+               887,
+               766,
+               989
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 3",
+         "low_level_instruction": "CLICK Three"
+      },
+      {
+         "step_id": 5,
+         "ui_target": {
+            "element_name": "Equals",
+            "element_type": "Button",
+            "bounding_box": [
+               769,
+               993,
+               984,
+               1096
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 5",
+         "low_level_instruction": "CLICK Equals"
+      }
+   ]
+}

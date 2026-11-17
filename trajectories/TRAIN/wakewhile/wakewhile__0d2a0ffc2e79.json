@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "WakeWhile",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure WakeWhile to keep the Windows PC awake while a selected application is working.",
+   "prerequisite_state": "No specific application is open or running.",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the Microsoft Store.",
+         "ui_target": {
+            "element_name": "Microsoft Store",
+            "automation_id": null,
+            "hierarchical_path": "Start menu > Microsoft Store",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Microsoft Store window opens."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Search for 'WakeWhile'.",
+         "ui_target": {
+            "element_name": "Search bar",
+            "automation_id": null,
+            "hierarchical_path": "Microsoft Store window > Search bar",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "WakeWhile"
+         },
+         "expected_state_change": "Search results for 'WakeWhile' appear."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Install 'WakeWhile'.",
+         "ui_target": {
+            "element_name": "Install",
+            "automation_id": null,
+            "hierarchical_path": "Microsoft Store search results > WakeWhile > Install button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The installation process begins, and the application is installed."
+      }
+   ],
+   "_meta": {
+      "source_app": "WakeWhile",
+      "app_key": "wakewhile",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "WakeWhile",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:26:26Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

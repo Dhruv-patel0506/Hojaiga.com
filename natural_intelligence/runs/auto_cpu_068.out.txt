@@ -1,0 +1,78 @@
+08:23:09 NI run auto_cpu_068 on CPU; hours=2.0 smoke=False
+08:23:09 explicit task list: ['enc2/image/beans']
+08:23:09 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+08:23:09 [data] enc2/image/beans: n=1295 C=3 D=1536 shards=1
+08:25:31 [enc2/image/beans] vote=0.948 uniform=0.950 best1=0.953 n_val=383 vram=0.00GB 142s
+08:25:43 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 383, "n_val": 84, "base_rate": 0.9523809552192688, "inner": {"auc": 0.2625, "ece": 0.03527271108967917, "brier": 0.045412372797727585, "acc80": 0.9552238583564758}, "outer_conf": {"auc": 0.975, "ece": 0.06140109328996567, "brier": 0.027898592874407768, "acc80": 1.0}}
+08:25:43 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+06:20:52 NI run auto_cpu_068 on CPU; hours=2.0 smoke=False
+06:20:52 explicit task list: ['enc2/image/beans']
+06:21:00 [resume] from checkpoint: next cycle 1, rounds 1, 1 metric rows, inner net restored
+06:21:00 ===== CYCLE 1 (OUTER-ONLY BOOTSTRAP) =====
+06:21:00 [data] enc2/image/beans: n=1295 C=3 D=1536 shards=1
+06:23:36 [enc2/image/beans] vote=0.957 uniform=0.960 best1=0.960 n_val=398 vram=0.00GB 156s
+06:23:59 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 1, "n_records": 398, "n_val": 82, "base_rate": 1.0, "inner": {"auc": NaN, "ece": 0.03290353751764065, "brier": 0.00911950133740902, "acc80": 1.0}, "outer_conf": {"auc": NaN, "ece": 0.06208428013615492, "brier": 0.009824290871620178, "acc80": 1.0}}
+06:23:59 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+06:26:47 [enc2/image/beans] vote=0.965 uniform=0.958 best1=0.973 n_val=404 vram=0.00GB 169s | grade=0.946 inner_auc=n/a vs conf_auc=n/a
+06:27:00 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+06:29:43 [enc2/image/beans] vote=0.957 uniform=0.954 best1=0.962 n_val=391 vram=0.00GB 163s | grade=0.954 inner_auc=n/a vs conf_auc=n/a
+06:29:59 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+06:33:10 [enc2/image/beans] vote=0.952 uniform=0.946 best1=0.954 n_val=392 vram=0.00GB 191s | grade=0.954 inner_auc=n/a vs conf_auc=n/a
+06:33:31 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+06:36:11 [enc2/image/beans] vote=0.954 uniform=0.947 best1=0.962 n_val=395 vram=0.00GB 159s | grade=0.954 inner_auc=n/a vs conf_auc=n/a
+06:36:31 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+06:40:03 [enc2/image/beans] vote=0.967 uniform=0.965 best1=0.970 n_val=367 vram=0.00GB 212s | grade=0.951 inner_auc=n/a vs conf_auc=n/a
+06:40:23 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+06:43:35 [enc2/image/beans] vote=0.957 uniform=0.955 best1=0.960 n_val=396 vram=0.00GB 192s | grade=0.957 inner_auc=n/a vs conf_auc=n/a
+06:43:56 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+06:46:50 [enc2/image/beans] vote=0.954 uniform=0.966 best1=0.971 n_val=414 vram=0.00GB 174s | grade=0.970 inner_auc=n/a vs conf_auc=n/a
+06:47:11 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+06:50:08 [enc2/image/beans] vote=0.951 uniform=0.943 best1=0.946 n_val=388 vram=0.00GB 177s | grade=0.948 inner_auc=n/a vs conf_auc=n/a
+06:50:28 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+06:53:17 [enc2/image/beans] vote=0.968 uniform=0.963 best1=0.965 n_val=402 vram=0.00GB 169s | grade=0.954 inner_auc=n/a vs conf_auc=n/a
+06:53:39 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+06:56:47 [enc2/image/beans] vote=0.956 uniform=0.956 best1=0.956 n_val=388 vram=0.00GB 189s | grade=0.958 inner_auc=n/a vs conf_auc=n/a
+06:57:09 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+07:00:30 [enc2/image/beans] vote=0.974 uniform=0.961 best1=0.974 n_val=385 vram=0.00GB 200s | grade=0.958 inner_auc=n/a vs conf_auc=n/a
+07:00:52 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+07:04:30 [enc2/image/beans] vote=0.956 uniform=0.948 best1=0.948 n_val=387 vram=0.00GB 218s | grade=0.934 inner_auc=n/a vs conf_auc=n/a
+07:04:51 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+07:09:13 [enc2/image/beans] vote=0.970 uniform=0.970 best1=0.972 n_val=395 vram=0.00GB 262s | grade=0.969 inner_auc=n/a vs conf_auc=n/a
+07:09:35 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+07:13:06 [enc2/image/beans] vote=0.949 uniform=0.944 best1=0.947 n_val=394 vram=0.00GB 211s | grade=0.945 inner_auc=n/a vs conf_auc=n/a
+07:13:27 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+07:16:15 [enc2/image/beans] vote=0.971 uniform=0.974 best1=0.969 n_val=382 vram=0.00GB 168s | grade=0.948 inner_auc=n/a vs conf_auc=n/a
+07:16:37 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+07:20:01 [enc2/image/beans] vote=0.943 uniform=0.946 best1=0.946 n_val=370 vram=0.00GB 204s | grade=0.918 inner_auc=n/a vs conf_auc=n/a
+07:20:19 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+07:23:12 [enc2/image/beans] vote=0.961 uniform=0.961 best1=0.966 n_val=413 vram=0.00GB 173s | grade=0.954 inner_auc=n/a vs conf_auc=n/a
+07:23:30 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+07:26:42 [enc2/image/beans] vote=0.943 uniform=0.963 best1=0.953 n_val=402 vram=0.00GB 192s | grade=0.939 inner_auc=n/a vs conf_auc=n/a
+07:27:00 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+07:29:58 [enc2/image/beans] vote=0.972 uniform=0.969 best1=0.974 n_val=386 vram=0.00GB 177s | grade=0.922 inner_auc=n/a vs conf_auc=n/a
+07:30:17 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+07:33:17 [enc2/image/beans] vote=0.944 uniform=0.952 best1=0.952 n_val=377 vram=0.00GB 180s | grade=0.948 inner_auc=n/a vs conf_auc=n/a
+07:33:35 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+07:36:40 [enc2/image/beans] vote=0.965 uniform=0.959 best1=0.957 n_val=368 vram=0.00GB 185s | grade=0.924 inner_auc=n/a vs conf_auc=n/a
+07:36:59 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+07:40:10 [enc2/image/beans] vote=0.939 uniform=0.939 best1=0.949 n_val=395 vram=0.00GB 191s | grade=0.939 inner_auc=n/a vs conf_auc=n/a
+07:40:29 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+07:43:43 [enc2/image/beans] vote=0.958 uniform=0.958 best1=0.960 n_val=403 vram=0.00GB 194s | grade=0.950 inner_auc=n/a vs conf_auc=n/a
+07:44:03 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+07:47:09 [enc2/image/beans] vote=0.958 uniform=0.950 best1=0.965 n_val=403 vram=0.00GB 186s | grade=0.954 inner_auc=n/a vs conf_auc=n/a
+07:47:27 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+07:50:59 [enc2/image/beans] vote=0.962 uniform=0.951 best1=0.957 n_val=368 vram=0.00GB 212s | grade=0.967 inner_auc=n/a vs conf_auc=n/a
+07:51:19 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+07:54:40 [enc2/image/beans] vote=0.960 uniform=0.950 best1=0.960 n_val=397 vram=0.00GB 201s | grade=0.957 inner_auc=n/a vs conf_auc=n/a
+07:55:02 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+07:58:11 [enc2/image/beans] vote=0.961 uniform=0.958 best1=0.966 n_val=385 vram=0.00GB 189s | grade=0.957 inner_auc=n/a vs conf_auc=n/a
+07:58:31 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+08:01:41 [enc2/image/beans] vote=0.956 uniform=0.951 best1=0.956 n_val=411 vram=0.00GB 190s | grade=0.963 inner_auc=n/a vs conf_auc=n/a
+08:02:02 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+08:05:24 [enc2/image/beans] vote=0.951 uniform=0.941 best1=0.956 n_val=388 vram=0.00GB 202s | grade=0.948 inner_auc=n/a vs conf_auc=n/a
+08:05:36 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+00:02:47 NI run auto_cpu_068 on CPU; hours=2.0 smoke=False
+00:02:47 explicit task list: ['enc2/image/beans']
+00:02:59 [resume] from checkpoint: next cycle 31, rounds 31, 31 metric rows, inner net restored
+00:02:59 ===== CYCLE 31 (OUTER-ONLY BOOTSTRAP) =====
+00:02:59 [data] enc2/image/beans: n=1295 C=3 D=1536 shards=1

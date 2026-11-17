@@ -1,0 +1,214 @@
+{
+   "app": "Trello",
+   "steps_extracted": 10,
+   "steps_verified": 3,
+   "acc": 0.3,
+   "guide": {
+      "app": "Trello",
+      "goal": "Create a new project with a list, card, and assignee",
+      "steps": [
+         {
+            "intent": "Start a new project",
+            "action": "click",
+            "target": "Create Board button",
+            "value": "",
+            "verify": {
+               "selector": ".t-boards-header__create-board-button",
+               "prop": "class",
+               "expected": "is-active"
+            }
+         },
+         {
+            "intent": "Add a list to the board",
+            "action": "click",
+            "target": "Add List button",
+            "value": "",
+            "verify": {
+               "selector": ".t-boards-header__add-list-button",
+               "prop": "class",
+               "expected": "is-active"
+            }
+         },
+         {
+            "intent": "Name the list To Do",
+            "action": "fill",
+            "target": "New List Name input field",
+            "value": "To Do",
+            "verify": {
+               "selector": ".t-boards-header__new-list-name-input",
+               "prop": "value",
+               "expected": "To Do"
+            }
+         },
+         {
+            "intent": "Save the list",
+            "action": "click",
+            "target": "Save List button",
+            "value": "",
+            "verify": {
+               "selector": ".t-boards-header__save-list-button",
+               "prop": "class",
+               "expected": "is-active"
+            }
+         },
+         {
+            "intent": "Add a card to the To Do list",
+            "action": "click",
+            "target": "Add Card button",
+            "value": "",
+            "verify": {
+               "selector": ".t-boards-header__add-card-button",
+               "prop": "class",
+               "expected": "is-active"
+            }
+         },
+         {
+            "intent": "Name the card Buy groceries",
+            "action": "fill",
+            "target": "New Card Name input field",
+            "value": "Buy groceries",
+            "verify": {
+               "selector": ".t-boards-header__new-card-name-input",
+               "prop": "value",
+               "expected": "Buy groceries"
+            }
+         },
+         {
+            "intent": "Add Alice as the assignee",
+            "action": "click",
+            "target": "Assign Member button",
+            "value": "",
+            "verify": {
+               "selector": ".t-boards-header__assign-member-button",
+               "prop": "class",
+               "expected": "is-active"
+            }
+         },
+         {
+            "intent": "Select Alice from the assignee dropdown",
+            "action": "fill",
+            "target": "Assignee input field",
+            "value": "Alice",
+            "verify": {
+               "selector": ".t-boards-header__assignee-input",
+               "prop": "value",
+               "expected": "Alice"
+            }
+         },
+         {
+            "intent": "Confirm the assignee selection",
+            "action": "click",
+            "target": "Confirm Assignee button",
+            "value": "",
+            "verify": {
+               "selector": ".t-boards-header__confirm-assignee-button",
+               "prop": "class",
+               "expected": "is-active"
+            }
+         },
+         {
+            "intent": "Verify the card is assigned to Alice and the list has one card",
+            "action": "verify",
+            "target": "Card with 'Buy groceries' and 'Alice' assigned",
+            "value": "",
+            "verify": {
+               "selector": ".t-boards-list__card",
+               "prop": "text",
+               "expected": "Buy groceries (Alice)"
+            }
+         }
+      ]
+   },
+   "trail": [
+      {
+         "step": 0,
+         "intent": "Start a new project",
+         "action": "click",
+         "target": "Create Board button",
+         "acted": true,
+         "verified": true,
+         "observed": "oracle_ok=False dom-diff=True"
+      },
+      {
+         "step": 1,
+         "intent": "Add a list to the board",
+         "action": "click",
+         "target": "Add List button",
+         "acted": true,
+         "verified": false,
+         "observed": "oracle_ok=False dom-diff=False"
+      },
+      {
+         "step": 2,
+         "intent": "Name the list To Do",
+         "action": "fill",
+         "target": "New List Name input field",
+         "acted": true,
+         "verified": false,
+         "observed": "oracle_ok=False dom-diff=False"
+      },
+      {
+         "step": 3,
+         "intent": "Save the list",
+         "action": "click",
+         "target": "Save List button",
+         "acted": true,
+         "verified": true,
+         "observed": "oracle_ok=False dom-diff=True"
+      },
+      {
+         "step": 4,
+         "intent": "Add a card to the To Do list",
+         "action": "click",
+         "target": "Add Card button",
+         "acted": true,
+         "verified": false,
+         "observed": "oracle_ok=False dom-diff=False"
+      },
+      {
+         "step": 5,
+         "intent": "Name the card Buy groceries",
+         "action": "fill",
+         "target": "New Card Name input field",
+         "acted": false,
+         "verified": false,
+         "observed": "oracle_ok=False dom-diff=False"
+      },
+      {
+         "step": 6,
+         "intent": "Add Alice as the assignee",
+         "action": "click",
+         "target": "Assign Member button",
+         "acted": true,
+         "verified": true,
+         "observed": "oracle_ok=False dom-diff=True"
+      },
+      {
+         "step": 7,
+         "intent": "Select Alice from the assignee dropdown",
+         "action": "fill",
+         "target": "Assignee input field",
+         "acted": false,
+         "verified": false,
+         "observed": "oracle_ok=False dom-diff=False"
+      },
+      {
+         "step": 8,
+         "intent": "Confirm the assignee selection",
+         "action": "click",
+         "target": "Confirm Assignee button",
+         "acted": false,
+         "verified": false,
+         "observed": "oracle_ok=False dom-diff=False"
+      },
+      {
+         "step": 9,
+         "intent": "Verify the card is assigned to Alice and the list has one card",
+         "action": "verify",
+         "target": "Card with 'Buy groceries' and 'Alice' assigned",
+         "acted": false,
+         "verified": false,
+         "observed": "oracle_ok=False dom-diff=False"
+      }
+   ]
+}

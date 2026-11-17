@@ -1,0 +1,25 @@
+14:02:23 NI run pair2_enc_1107_1402 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=3.0 smoke=False
+14:02:23 explicit task list: ['enc/text/dbpedia_14', 'enc/image/cifar100', 'enc/image/tiny_imagenet', 'enc/audio/gtzan']
+14:02:23 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+14:02:24 [data] enc/text/dbpedia_14: n=100000 C=14 D=384 shards=1
+14:02:47 [enc/text/dbpedia_14] vote=0.974 uniform=0.974 best1=0.979 n_val=29917 vram=0.81GB 22s
+14:02:48 [data] enc/image/cifar100: n=60000 C=100 D=768 shards=1
+14:03:06 [enc/image/cifar100] vote=0.839 uniform=0.839 best1=0.841 n_val=17832 vram=1.64GB 18s
+14:03:07 [data] enc/image/tiny_imagenet: n=100000 C=200 D=768 shards=1
+14:04:19 [enc/image/tiny_imagenet] vote=0.817 uniform=0.817 best1=0.816 n_val=29989 vram=3.07GB 71s
+14:04:19 [data] enc/audio/gtzan: n=999 C=10 D=768 shards=1
+14:04:25 [enc/audio/gtzan] vote=0.895 uniform=0.895 best1=0.888 n_val=313 vram=0.35GB 5s
+14:04:35 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 78051, "n_val": 15836, "base_rate": 0.879578173160553, "inner": {"auc": 0.9404659814401473, "ece": 0.0068559103588220534, "brier": 0.0574980229139328, "acc80": 0.9773445129394531}, "outer_conf": {"auc": 0.910968288762965, "ece": 0.20917833992497667, "brier": 0.1193641945719719, "acc80": 0.9670034646987915}}
+14:04:35 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+14:05:08 [enc/text/dbpedia_14] vote=0.975 uniform=0.975 best1=0.978 n_val=30119 vram=0.81GB 32s | grade=0.881 inner_auc=0.963 vs conf_auc=0.923
+14:05:39 [enc/image/cifar100] vote=0.837 uniform=0.837 best1=0.835 n_val=18038 vram=1.64GB 31s | grade=0.841 inner_auc=0.917 vs conf_auc=0.873
+14:06:24 [enc/image/tiny_imagenet] vote=0.814 uniform=0.814 best1=0.812 n_val=30024 vram=3.07GB 45s | grade=0.807 inner_auc=0.918 vs conf_auc=0.887
+14:06:31 [enc/audio/gtzan] vote=0.866 uniform=0.866 best1=0.854 n_val=329 vram=0.35GB 7s | grade=0.905 inner_auc=n/a vs conf_auc=n/a
+14:06:35 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+14:06:58 [enc/text/dbpedia_14] vote=0.978 uniform=0.977 best1=0.979 n_val=30034 vram=0.81GB 23s | grade=0.878 inner_auc=0.954 vs conf_auc=0.934
+14:07:41 [enc/image/cifar100] vote=0.841 uniform=0.839 best1=0.838 n_val=18037 vram=1.64GB 43s | grade=0.842 inner_auc=0.921 vs conf_auc=0.885
+14:09:15 [enc/image/tiny_imagenet] vote=0.819 uniform=0.817 best1=0.815 n_val=30077 vram=3.06GB 90s | grade=0.807 inner_auc=0.917 vs conf_auc=0.888
+14:09:24 [enc/audio/gtzan] vote=0.844 uniform=0.844 best1=0.848 n_val=282 vram=0.34GB 8s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+14:09:28 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+14:09:53 [enc/text/dbpedia_14] vote=0.976 uniform=0.975 best1=0.979 n_val=29800 vram=0.81GB 25s | grade=0.877 inner_auc=0.955 vs conf_auc=0.929
+14:10:34 [enc/image/cifar100] vote=0.840 uniform=0.836 best1=0.838 n_val=18067 vram=1.64GB 40s | grade=0.844 inner_auc=0.906 vs conf_auc=0.874

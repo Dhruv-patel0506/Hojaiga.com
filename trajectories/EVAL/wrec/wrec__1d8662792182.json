@@ -1,0 +1,41 @@
+{
+   "app_metadata": {
+      "app_name": "Wrec",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "cli",
+   "high_level_task": "Install Wrec from Scoop",
+   "prerequisite_state": "Scoop is installed and configured",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Add the Mew bucket and install Wrec",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "scoop bucket add mew https://github.com/mewisme/scoop-mew"
+         },
+         "expected_state_change": "The Mew bucket is added"
+      }
+   ],
+   "_meta": {
+      "source_app": "Wrec",
+      "app_key": "wrec",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "wrec",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:40:30Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

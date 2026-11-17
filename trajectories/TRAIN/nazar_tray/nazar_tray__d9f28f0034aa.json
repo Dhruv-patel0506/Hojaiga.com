@@ -1,0 +1,81 @@
+{
+   "app_metadata": {
+      "app_name": "nazar-tray",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure nazar-tray on a Windows system",
+   "prerequisite_state": "No application is open, and the user is on a Windows 10 system with internet access",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Run the installer from the GitHub releases page",
+         "ui_target": {
+            "element_name": "Download button",
+            "automation_id": null,
+            "hierarchical_path": "Download section > Download button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The installer file is downloaded and saved to the local machine"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run the downloaded installer file",
+         "ui_target": {
+            "element_name": "Installer file",
+            "automation_id": null,
+            "hierarchical_path": "File Explorer > Downloaded file",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "nazar-tray is installed, and the tray icon appears"
+      }
+   ],
+   "_meta": {
+      "source_app": "nazar-tray",
+      "app_key": "nazar_tray",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "🧿 nazar-tray",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:17:29Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

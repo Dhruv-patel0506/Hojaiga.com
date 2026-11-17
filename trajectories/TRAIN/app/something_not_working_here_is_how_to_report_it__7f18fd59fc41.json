@@ -1,0 +1,165 @@
+{
+   "app_metadata": {
+      "app_name": "Трансляції",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide on how to report issues with the application",
+   "prerequisite_state": "The application is open and the user is on the main screen",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open an issue on GitHub",
+         "ui_target": {
+            "element_name": "GitHub",
+            "automation_id": null,
+            "hierarchical_path": "Header > GitHub",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user is directed to the GitHub issue page"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Open Settings from the gear button in the header",
+         "ui_target": {
+            "element_name": "gear button",
+            "automation_id": null,
+            "hierarchical_path": "Header > gear button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Settings window opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Press Send logs to the author on the About page",
+         "ui_target": {
+            "element_name": "Send logs",
+            "automation_id": null,
+            "hierarchical_path": "Settings > About > Send logs",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The app packs the diagnostic logs and opens the mail program with a ready message"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Open Settings from the Library settings entry of the Operations menu",
+         "ui_target": {
+            "element_name": "Library settings",
+            "automation_id": null,
+            "hierarchical_path": "Operations menu > Library settings",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Settings window opens with the Library settings"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Press Send logs to the author on the About page",
+         "ui_target": {
+            "element_name": "Send logs",
+            "automation_id": null,
+            "hierarchical_path": "Settings > About > Send logs",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The app packs the diagnostic logs and opens the mail program with a ready message"
+      }
+   ],
+   "_meta": {
+      "source_app": "Трансляції",
+      "app_key": "app",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Something not working? Here is how to report it.",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:05:04Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

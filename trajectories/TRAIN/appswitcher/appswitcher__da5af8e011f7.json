@@ -1,0 +1,137 @@
+{
+   "app_metadata": {
+      "app_name": "AppSwitcher",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Set up and configure AppSwitcher hotkeys",
+   "prerequisite_state": "AppSwitcher is installed and running in the system tray",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Right-click the tray icon and open Settings",
+         "ui_target": {
+            "element_name": "Tray icon",
+            "automation_id": null,
+            "hierarchical_path": "System tray > AppSwitcher icon",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The context menu appears with an option to open Settings"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click on Settings in the context menu",
+         "ui_target": {
+            "element_name": "Settings",
+            "automation_id": null,
+            "hierarchical_path": "System tray > AppSwitcher icon > Context menu > Settings",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Settings window opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Add a hotkey and choose the target app",
+         "ui_target": {
+            "element_name": "Add hotkey",
+            "automation_id": null,
+            "hierarchical_path": "Settings window > Add hotkey button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A new hotkey entry is added to the list"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Pick a modifier and a letter key",
+         "ui_target": {
+            "element_name": "Modifier key",
+            "automation_id": null,
+            "hierarchical_path": "Settings window > Modifier key dropdown",
+            "element_type": "ComboBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The modifier key dropdown opens"
+      }
+   ],
+   "_meta": {
+      "source_app": "AppSwitcher",
+      "app_key": "appswitcher",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "AppSwitcher",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:32:51Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

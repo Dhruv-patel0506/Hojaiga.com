@@ -1,0 +1,176 @@
+{
+   "app_metadata": {
+      "app_name": "SIC!",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide the user through the GUI usage of SIC! to batch-convert images.",
+   "prerequisite_state": "SIC! application is open and the user is at the main window.",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Add images using File > Add Image",
+         "ui_target": {
+            "element_name": "File",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The File dropdown opens showing Add Image, Open, Save"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Choose Add Image",
+         "ui_target": {
+            "element_name": "Add Image",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File > Add Image",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Add Image dialog opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Select images to add",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Selected images are added to the queue"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Select a target format from the dropdown",
+         "ui_target": {
+            "element_name": "Format dropdown",
+            "automation_id": null,
+            "hierarchical_path": "MainWindow > Format dropdown",
+            "element_type": "ComboBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The dropdown is open showing available formats"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Click Convert Selected",
+         "ui_target": {
+            "element_name": "Convert Selected",
+            "automation_id": null,
+            "hierarchical_path": "MainWindow > Convert Selected",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected images are converted to the chosen format and saved to the default output folder"
+      }
+   ],
+   "_meta": {
+      "source_app": "SIC!",
+      "app_key": "sic",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "SIC! — Simple Image Converter",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T19:08:48Z",
+      "schema_warnings": [
+         "step3_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

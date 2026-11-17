@@ -1,0 +1,239 @@
+{
+   "app_metadata": {
+      "app_name": "QuickSwitch",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure QuickSwitch to manage file paths and shortcuts",
+   "prerequisite_state": "No specific application state required, just a Windows environment",
+   "total_steps": 7,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the latest x64 or x32 archive of QuickSwitch depending on your system architecture",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user has downloaded the QuickSwitch archive"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Create a directory named 'QuickSwitch'",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A directory named 'QuickSwitch' has been created"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Copy the downloaded QuickSwitch archive to the 'QuickSwitch' directory and extract it",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The QuickSwitch archive has been extracted into the 'QuickSwitch' directory"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Run QuickSwitch.exe",
+         "ui_target": {
+            "element_name": "QuickSwitch",
+            "automation_id": null,
+            "hierarchical_path": "Desktop > QuickSwitch",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "QuickSwitch application opens"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Open some tabs in a supported file manager or create .lnk files in .\\Favorites",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Tabs or .lnk files have been created in the Favorites directory"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Open any application and try to open/save a file using it",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A file dialog appears with QuickSwitch paths"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Press Ctrl+Q and look at the paths in the Menu that opens",
+         "ui_target": {
+            "element_name": "Menu",
+            "automation_id": null,
+            "hierarchical_path": "QuickSwitch > Menu",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Q"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The QuickSwitch Menu opens with paths from the supported file managers"
+      }
+   ],
+   "_meta": {
+      "source_app": "QuickSwitch",
+      "app_key": "quickswitch",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Installation",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:48:51Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target",
+         "step5_ungrounded_target",
+         "step6_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

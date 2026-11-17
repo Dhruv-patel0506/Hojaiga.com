@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "SyncthingTray",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Pause Syncthing from the tray",
+   "prerequisite_state": "SyncthingTray is running and the tray icon is visible",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Right-click the SyncthingTray icon in the system tray",
+         "ui_target": {
+            "element_name": "SyncthingTray icon",
+            "automation_id": null,
+            "hierarchical_path": "System tray > SyncthingTray icon",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The context menu opens with options to pause, resume, and other settings"
+      }
+   ],
+   "_meta": {
+      "source_app": "SyncthingTray",
+      "app_key": "syncthingtray",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "SyncthingPause",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:36:42Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

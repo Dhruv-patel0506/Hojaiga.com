@@ -1,0 +1,398 @@
+{
+  "model_version": "backend-0.2",
+  "group": "workbench",
+  "seed": 42,
+  "alpha": 0.2,
+  "features": [
+    "growth_mom",
+    "log_return",
+    "growth_yoy",
+    "drawdown",
+    "growth_mom_mean3",
+    "growth_mom_mean6",
+    "growth_mom_mean12",
+    "log_level_slope12",
+    "growth_mom_z",
+    "shares_outstanding_m_growth",
+    "shares_outstanding_m_growth_lag1",
+    "cost_of_revenue_usd_m_growth",
+    "cost_of_revenue_usd_m_growth_lag1",
+    "volume_growth",
+    "volume_growth_lag1",
+    "policy_rate_pct_growth",
+    "policy_rate_pct_growth_lag1",
+    "operating_income_usd_m_growth",
+    "operating_income_usd_m_growth_lag1",
+    "fx_rate_per_usd_growth",
+    "fx_rate_per_usd_growth_lag1"
+  ],
+  "split_mode": "time",
+  "companies": [
+    "COMP_ADBE_001"
+  ],
+  "skipped": {},
+  "rows": 202,
+  "data_date": "2026-10-01",
+  "horizons": {
+    "h1": {
+      "selected": "ols_residual",
+      "validation_pinball": {
+        "last_growth": 0.039147823194364044,
+        "mean12_growth": 0.02419512188179909,
+        "constant_median": 0.024147052573442938,
+        "ols_residual": 0.014533889042271939,
+        "lightgbm_quantile": 0.016860602778926776,
+        "mlp_neural": 0.23322845284704088
+      },
+      "conformal_halfwidth": 0.0927158597808517,
+      "test_selected": {
+        "pinball_mean": 0.006582738308006527,
+        "mae_median": 0.020454895242068432,
+        "coverage_raw_80": 0.7692307692307693,
+        "coverage_conformal_80": 1.0
+      },
+      "test_all": {
+        "last_growth": {
+          "pinball_mean": 0.03752563610892072,
+          "mae_median": 0.12391832998950227,
+          "coverage_raw_80": 0.7692307692307693
+        },
+        "mean12_growth": {
+          "pinball_mean": 0.021218438337189834,
+          "mae_median": 0.0712350314254541,
+          "coverage_raw_80": 0.7692307692307693
+        },
+        "constant_median": {
+          "pinball_mean": 0.021152234921839996,
+          "mae_median": 0.07117599988332093,
+          "coverage_raw_80": 0.7692307692307693
+        },
+        "ols_residual": {
+          "pinball_mean": 0.006582738308006527,
+          "mae_median": 0.020454895242068432,
+          "coverage_raw_80": 0.7692307692307693,
+          "coverage_conformal_80": 1.0
+        },
+        "lightgbm_quantile": {
+          "pinball_mean": 0.009725958336320983,
+          "mae_median": 0.02873902368764594,
+          "coverage_raw_80": 0.6923076923076923
+        },
+        "mlp_neural": {
+          "pinball_mean": 0.15920760900209782,
+          "mae_median": 0.33250629691713374,
+          "coverage_raw_80": 0.0
+        }
+      },
+      "test_selected_by_company": {
+        "COMP_ADBE_001": {
+          "mae_median": 0.020454895242068432,
+          "coverage_conformal_80": 1.0,
+          "n": 26
+        }
+      },
+      "train_rows": 84,
+      "test_rows": 26
+    },
+    "h2": {
+      "selected": "mean12_growth",
+      "validation_pinball": {
+        "last_growth": 0.03440495038731923,
+        "mean12_growth": 0.02322568179694379,
+        "constant_median": 0.023839072973551978,
+        "ols_residual": 0.04085796465056308,
+        "lightgbm_quantile": 0.027323647267422202,
+        "mlp_neural": 0.17693326803725673
+      },
+      "conformal_halfwidth": 0.122834347457795,
+      "test_selected": {
+        "pinball_mean": 0.021421749902502216,
+        "mae_median": 0.07232166674966625,
+        "coverage_raw_80": 0.8076923076923077,
+        "coverage_conformal_80": 0.8461538461538461
+      },
+      "test_all": {
+        "last_growth": {
+          "pinball_mean": 0.02837957016375497,
+          "mae_median": 0.09873619033708146,
+          "coverage_raw_80": 0.7307692307692307
+        },
+        "mean12_growth": {
+          "pinball_mean": 0.021421749902502216,
+          "mae_median": 0.07232166674966625,
+          "coverage_raw_80": 0.8076923076923077,
+          "coverage_conformal_80": 0.8461538461538461
+        },
+        "constant_median": {
+          "pinball_mean": 0.021649263103185813,
+          "mae_median": 0.07391694245570325,
+          "coverage_raw_80": 0.7307692307692307
+        },
+        "ols_residual": {
+          "pinball_mean": 0.017207408059497626,
+          "mae_median": 0.05015895047968789,
+          "coverage_raw_80": 0.6538461538461539
+        },
+        "lightgbm_quantile": {
+          "pinball_mean": 0.016287780703896037,
+          "mae_median": 0.05271309462648061,
+          "coverage_raw_80": 0.5
+        },
+        "mlp_neural": {
+          "pinball_mean": 0.16396404204221257,
+          "mae_median": 0.35698459954773526,
+          "coverage_raw_80": 0.23076923076923078
+        }
+      },
+      "test_selected_by_company": {
+        "COMP_ADBE_001": {
+          "mae_median": 0.07232166674966625,
+          "coverage_conformal_80": 0.8461538461538461,
+          "n": 26
+        }
+      },
+      "train_rows": 84,
+      "test_rows": 26
+    },
+    "h3": {
+      "selected": "constant_median",
+      "validation_pinball": {
+        "last_growth": 0.025820912853789443,
+        "mean12_growth": 0.02270658634507027,
+        "constant_median": 0.022018974250985233,
+        "ols_residual": 0.04404113936968857,
+        "lightgbm_quantile": 0.024070284073113485,
+        "mlp_neural": 0.23358436492057985
+      },
+      "conformal_halfwidth": 0.13140931286351476,
+      "test_selected": {
+        "pinball_mean": 0.024605064244140207,
+        "mae_median": 0.08113724415077052,
+        "coverage_raw_80": 0.6923076923076923,
+        "coverage_conformal_80": 0.8076923076923077
+      },
+      "test_all": {
+        "last_growth": {
+          "pinball_mean": 0.028142580503680154,
+          "mae_median": 0.08759082977140246,
+          "coverage_raw_80": 0.7307692307692307
+        },
+        "mean12_growth": {
+          "pinball_mean": 0.024616041782504094,
+          "mae_median": 0.08094949349576597,
+          "coverage_raw_80": 0.6923076923076923
+        },
+        "constant_median": {
+          "pinball_mean": 0.024605064244140207,
+          "mae_median": 0.08113724415077052,
+          "coverage_raw_80": 0.6923076923076923,
+          "coverage_conformal_80": 0.8076923076923077
+        },
+        "ols_residual": {
+          "pinball_mean": 0.021871830213513518,
+          "mae_median": 0.05845199083824699,
+          "coverage_raw_80": 0.6923076923076923
+        },
+        "lightgbm_quantile": {
+          "pinball_mean": 0.02167959672618658,
+          "mae_median": 0.06067086453902083,
+          "coverage_raw_80": 0.6153846153846154
+        },
+        "mlp_neural": {
+          "pinball_mean": 0.1774436829551589,
+          "mae_median": 0.36339188027513675,
+          "coverage_raw_80": 0.038461538461538464
+        }
+      },
+      "test_selected_by_company": {
+        "COMP_ADBE_001": {
+          "mae_median": 0.08113724415077052,
+          "coverage_conformal_80": 0.8076923076923077,
+          "n": 26
+        }
+      },
+      "train_rows": 84,
+      "test_rows": 26
+    },
+    "h4": {
+      "selected": "constant_median",
+      "validation_pinball": {
+        "last_growth": 0.032143089446846955,
+        "mean12_growth": 0.019761711500057066,
+        "constant_median": 0.019499026222463,
+        "ols_residual": 0.04686324989950391,
+        "lightgbm_quantile": 0.01993894566586091,
+        "mlp_neural": 0.1604215525775909
+      },
+      "conformal_halfwidth": 0.13102202085335868,
+      "test_selected": {
+        "pinball_mean": 0.023601138956710833,
+        "mae_median": 0.0770627533432178,
+        "coverage_raw_80": 0.76,
+        "coverage_conformal_80": 0.8
+      },
+      "test_all": {
+        "last_growth": {
+          "pinball_mean": 0.03823278117658288,
+          "mae_median": 0.13145605626579454,
+          "coverage_raw_80": 0.72
+        },
+        "mean12_growth": {
+          "pinball_mean": 0.02369438737366637,
+          "mae_median": 0.07709909037247316,
+          "coverage_raw_80": 0.72
+        },
+        "constant_median": {
+          "pinball_mean": 0.023601138956710833,
+          "mae_median": 0.0770627533432178,
+          "coverage_raw_80": 0.76,
+          "coverage_conformal_80": 0.8
+        },
+        "ols_residual": {
+          "pinball_mean": 0.014792577196861383,
+          "mae_median": 0.04223767739772879,
+          "coverage_raw_80": 0.84
+        },
+        "lightgbm_quantile": {
+          "pinball_mean": 0.01987893522239275,
+          "mae_median": 0.05648548759705302,
+          "coverage_raw_80": 0.72
+        },
+        "mlp_neural": {
+          "pinball_mean": 0.16507729561338136,
+          "mae_median": 0.3719212108692183,
+          "coverage_raw_80": 0.16
+        }
+      },
+      "test_selected_by_company": {
+        "COMP_ADBE_001": {
+          "mae_median": 0.0770627533432178,
+          "coverage_conformal_80": 0.8,
+          "n": 25
+        }
+      },
+      "train_rows": 84,
+      "test_rows": 25
+    },
+    "h5": {
+      "selected": "mean12_growth",
+      "validation_pinball": {
+        "last_growth": 0.03871335928757163,
+        "mean12_growth": 0.02046427252543963,
+        "constant_median": 0.020586427991819905,
+        "ols_residual": 0.03775545714396465,
+        "lightgbm_quantile": 0.022123866224887354,
+        "mlp_neural": 0.19099093904349038
+      },
+      "conformal_halfwidth": 0.12312946253237658,
+      "test_selected": {
+        "pinball_mean": 0.02100801094581003,
+        "mae_median": 0.06897717662356352,
+        "coverage_raw_80": 0.7916666666666666,
+        "coverage_conformal_80": 0.875
+      },
+      "test_all": {
+        "last_growth": {
+          "pinball_mean": 0.027941915920194276,
+          "mae_median": 0.08576366641968587,
+          "coverage_raw_80": 0.6666666666666666
+        },
+        "mean12_growth": {
+          "pinball_mean": 0.02100801094581003,
+          "mae_median": 0.06897717662356352,
+          "coverage_raw_80": 0.7916666666666666,
+          "coverage_conformal_80": 0.875
+        },
+        "constant_median": {
+          "pinball_mean": 0.021146100022985084,
+          "mae_median": 0.06959576631489141,
+          "coverage_raw_80": 0.8333333333333334
+        },
+        "ols_residual": {
+          "pinball_mean": 0.017858650900434585,
+          "mae_median": 0.053299872334438114,
+          "coverage_raw_80": 0.75
+        },
+        "lightgbm_quantile": {
+          "pinball_mean": 0.017231871272680055,
+          "mae_median": 0.05088687815158146,
+          "coverage_raw_80": 0.7916666666666666
+        },
+        "mlp_neural": {
+          "pinball_mean": 0.17779115060926068,
+          "mae_median": 0.38887967892857805,
+          "coverage_raw_80": 0.375
+        }
+      },
+      "test_selected_by_company": {
+        "COMP_ADBE_001": {
+          "mae_median": 0.06897717662356352,
+          "coverage_conformal_80": 0.875,
+          "n": 24
+        }
+      },
+      "train_rows": 84,
+      "test_rows": 24
+    },
+    "h6": {
+      "selected": "lightgbm_quantile",
+      "validation_pinball": {
+        "last_growth": 0.023478004243627833,
+        "mean12_growth": 0.021196296035985284,
+        "constant_median": 0.020696105608290927,
+        "ols_residual": 0.020524064050086607,
+        "lightgbm_quantile": 0.019603823354986123,
+        "mlp_neural": 0.16826950560495282
+      },
+      "conformal_halfwidth": 0.10766029131660305,
+      "test_selected": {
+        "pinball_mean": 0.01807963726495987,
+        "mae_median": 0.05358379653289447,
+        "coverage_raw_80": 0.782608695652174,
+        "coverage_conformal_80": 0.8260869565217391
+      },
+      "test_all": {
+        "last_growth": {
+          "pinball_mean": 0.029709454543451932,
+          "mae_median": 0.09363280314604765,
+          "coverage_raw_80": 0.7391304347826086
+        },
+        "mean12_growth": {
+          "pinball_mean": 0.021571964948118763,
+          "mae_median": 0.07083691613644293,
+          "coverage_raw_80": 0.8260869565217391
+        },
+        "constant_median": {
+          "pinball_mean": 0.021496074234025456,
+          "mae_median": 0.07113909864704118,
+          "coverage_raw_80": 0.8260869565217391
+        },
+        "ols_residual": {
+          "pinball_mean": 0.020331034429226492,
+          "mae_median": 0.05918097152435211,
+          "coverage_raw_80": 0.5217391304347826
+        },
+        "lightgbm_quantile": {
+          "pinball_mean": 0.01807963726495987,
+          "mae_median": 0.05358379653289447,
+          "coverage_raw_80": 0.782608695652174,
+          "coverage_conformal_80": 0.8260869565217391
+        },
+        "mlp_neural": {
+          "pinball_mean": 0.16851464421593643,
+          "mae_median": 0.3459328387203859,
+          "coverage_raw_80": 0.13043478260869565
+        }
+      },
+      "test_selected_by_company": {
+        "COMP_ADBE_001": {
+          "mae_median": 0.05358379653289447,
+          "coverage_conformal_80": 0.8260869565217391,
+          "n": 23
+        }
+      },
+      "train_rows": 84,
+      "test_rows": 23
+    }
+  }
+}

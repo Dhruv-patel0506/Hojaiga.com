@@ -1,0 +1,81 @@
+{
+   "app_metadata": {
+      "app_name": "Skyvex Webcam Uploader",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install Skyvex as an app on a smartphone",
+   "prerequisite_state": "Open skyvex.org in a web browser on a smartphone",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open skyvex.org in Google Chrome",
+         "ui_target": {
+            "element_name": "skyvex.org",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Skyvex website is loaded in the browser"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Tap the three-dot menu (⋮) in the top right",
+         "ui_target": {
+            "element_name": "three-dot menu",
+            "automation_id": null,
+            "hierarchical_path": "Browser UI > Top right corner > Menu",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The menu options appear"
+      }
+   ],
+   "_meta": {
+      "source_app": "Skyvex Webcam Uploader",
+      "app_key": "skyvex_webcam_uploader",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Live weather data",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:17:34Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "Mastodon Extension for the Command Palette",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Set the Home instance for the Mastodon extension",
+   "prerequisite_state": "Mastodon extension is installed and Command Palette is open",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the Mastodon extension's settings in Command Palette",
+         "ui_target": {
+            "element_name": "Mastodon settings",
+            "automation_id": null,
+            "hierarchical_path": "Command Palette > Mastodon settings",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Mastodon settings window opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Set the Home instance to your server's hostname or HTTPS URL",
+         "ui_target": {
+            "element_name": "Home instance",
+            "automation_id": null,
+            "hierarchical_path": "Mastodon settings > Home instance",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "https://fosstodon.org"
+         },
+         "expected_state_change": "The entered URL is displayed in the Home instance field"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Save the settings",
+         "ui_target": {
+            "element_name": "Save",
+            "automation_id": null,
+            "hierarchical_path": "Mastodon settings > Save",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Settings are saved and the Mastodon settings window closes"
+      }
+   ],
+   "_meta": {
+      "source_app": "Mastodon Extension for the Command Palette",
+      "app_key": "mastodon_extension_for_the_command_palette",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Mike's Command Palette Extensions",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:30:36Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,247 @@
+15:57:38 NI run auto_cpu_011 on CPU; hours=2.0 smoke=False
+15:57:38 explicit task list: ['enc/graph/reddit_threads']
+15:57:38 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+15:57:39 [data] enc/graph/reddit_threads: n=203088 C=2 D=534 shards=1
+16:00:38 [enc/graph/reddit_threads] vote=0.770 uniform=0.770 best1=0.771 n_val=61520 vram=0.00GB 179s
+16:00:56 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 61520, "n_val": 12279, "base_rate": 0.7701767086982727, "inner": {"auc": 0.705475929056934, "ece": 0.007189334751932694, "brier": 0.16002807021141052, "acc80": 0.8214395046234131}, "outer_conf": {"auc": 0.6825254104388494, "ece": 0.025829602490711, "brier": 0.16450375318527222, "acc80": 0.8171638250350952}}
+16:00:56 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+16:04:23 [enc/graph/reddit_threads] vote=0.769 uniform=0.769 best1=0.771 n_val=60865 vram=0.00GB 206s | grade=0.922 inner_auc=0.708 vs conf_auc=0.678
+16:04:31 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+16:08:31 [enc/graph/reddit_threads] vote=0.769 uniform=0.768 best1=0.772 n_val=60929 vram=0.00GB 240s | grade=0.921 inner_auc=0.706 vs conf_auc=0.678
+16:08:43 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+16:12:29 [enc/graph/reddit_threads] vote=0.768 uniform=0.767 best1=0.770 n_val=61182 vram=0.00GB 226s | grade=0.921 inner_auc=0.700 vs conf_auc=0.677
+16:12:41 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+16:16:51 [enc/graph/reddit_threads] vote=0.771 uniform=0.770 best1=0.772 n_val=60879 vram=0.00GB 249s | grade=0.920 inner_auc=0.710 vs conf_auc=0.686
+16:17:00 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+16:20:31 [enc/graph/reddit_threads] vote=0.771 uniform=0.770 best1=0.773 n_val=61102 vram=0.00GB 211s | grade=0.921 inner_auc=0.701 vs conf_auc=0.678
+16:20:41 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+16:24:30 [enc/graph/reddit_threads] vote=0.769 uniform=0.766 best1=0.771 n_val=60539 vram=0.00GB 229s | grade=0.922 inner_auc=0.713 vs conf_auc=0.692
+16:24:42 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+16:28:32 [enc/graph/reddit_threads] vote=0.774 uniform=0.771 best1=0.774 n_val=60760 vram=0.00GB 230s | grade=0.921 inner_auc=0.702 vs conf_auc=0.684
+16:28:44 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+16:32:39 [enc/graph/reddit_threads] vote=0.772 uniform=0.768 best1=0.771 n_val=60909 vram=0.00GB 234s | grade=0.920 inner_auc=0.692 vs conf_auc=0.677
+16:32:50 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+16:36:37 [enc/graph/reddit_threads] vote=0.770 uniform=0.767 best1=0.770 n_val=61430 vram=0.00GB 226s | grade=0.921 inner_auc=0.701 vs conf_auc=0.683
+16:36:47 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+16:40:36 [enc/graph/reddit_threads] vote=0.775 uniform=0.772 best1=0.775 n_val=60689 vram=0.00GB 228s | grade=0.920 inner_auc=0.706 vs conf_auc=0.688
+16:40:46 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+16:44:58 [enc/graph/reddit_threads] vote=0.771 uniform=0.767 best1=0.771 n_val=60956 vram=0.00GB 252s | grade=0.920 inner_auc=0.698 vs conf_auc=0.685
+16:45:11 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+16:48:57 [enc/graph/reddit_threads] vote=0.773 uniform=0.768 best1=0.771 n_val=60959 vram=0.00GB 226s | grade=0.921 inner_auc=0.709 vs conf_auc=0.696
+16:49:10 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+16:53:20 [enc/graph/reddit_threads] vote=0.771 uniform=0.768 best1=0.771 n_val=61023 vram=0.00GB 250s | grade=0.921 inner_auc=0.698 vs conf_auc=0.683
+16:53:31 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+16:57:12 [enc/graph/reddit_threads] vote=0.769 uniform=0.765 best1=0.770 n_val=60754 vram=0.00GB 221s | grade=0.921 inner_auc=0.701 vs conf_auc=0.689
+16:57:22 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+17:01:38 [enc/graph/reddit_threads] vote=0.773 uniform=0.769 best1=0.773 n_val=61051 vram=0.00GB 256s | grade=0.919 inner_auc=0.695 vs conf_auc=0.683
+17:01:51 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+17:04:59 [enc/graph/reddit_threads] vote=0.776 uniform=0.771 best1=0.774 n_val=61065 vram=0.00GB 188s | grade=0.919 inner_auc=0.705 vs conf_auc=0.694
+17:05:08 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+17:08:33 [enc/graph/reddit_threads] vote=0.773 uniform=0.769 best1=0.772 n_val=61448 vram=0.00GB 205s | grade=0.920 inner_auc=0.691 vs conf_auc=0.683
+17:08:44 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+17:11:48 [enc/graph/reddit_threads] vote=0.772 uniform=0.767 best1=0.770 n_val=61030 vram=0.00GB 184s | grade=0.921 inner_auc=0.699 vs conf_auc=0.693
+17:11:58 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+17:15:29 [enc/graph/reddit_threads] vote=0.771 uniform=0.767 best1=0.770 n_val=61345 vram=0.00GB 211s | grade=0.923 inner_auc=0.699 vs conf_auc=0.689
+17:15:45 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+17:20:36 [enc/graph/reddit_threads] vote=0.771 uniform=0.768 best1=0.771 n_val=61239 vram=0.00GB 291s | grade=0.920 inner_auc=0.702 vs conf_auc=0.695
+17:21:03 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+21:00:04 NI run auto_cpu_011 on CPU; hours=2.0 smoke=False
+21:00:04 explicit task list: ['enc/graph/reddit_threads']
+21:00:09 [resume] from checkpoint: next cycle 21, rounds 21, 21 metric rows, inner net restored
+21:00:09 ===== CYCLE 21 (OUTER-ONLY BOOTSTRAP) =====
+21:00:11 [data] enc/graph/reddit_threads: n=203088 C=2 D=534 shards=1
+21:02:31 [enc/graph/reddit_threads] vote=0.775 uniform=0.773 best1=0.773 n_val=60757 vram=0.00GB 140s
+21:02:43 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 21, "n_records": 60757, "n_val": 12126, "base_rate": 0.7720600366592407, "inner": {"auc": 0.699590011318348, "ece": 0.0072931034394307795, "brier": 0.1606234759092331, "acc80": 0.8203092813491821}, "outer_conf": {"auc": 0.6946113758207811, "ece": 0.007365659412605503, "brier": 0.16117806732654572, "acc80": 0.8197938203811646}}
+21:02:43 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+21:04:57 [enc/graph/reddit_threads] vote=0.775 uniform=0.773 best1=0.772 n_val=60904 vram=0.00GB 133s | grade=0.924 inner_auc=0.701 vs conf_auc=0.698
+21:05:01 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+21:07:14 [enc/graph/reddit_threads] vote=0.773 uniform=0.772 best1=0.773 n_val=61192 vram=0.00GB 133s | grade=0.917 inner_auc=0.696 vs conf_auc=0.695
+21:07:19 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+21:09:29 [enc/graph/reddit_threads] vote=0.771 uniform=0.769 best1=0.770 n_val=61081 vram=0.00GB 130s | grade=0.920 inner_auc=0.692 vs conf_auc=0.688
+21:09:35 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+21:11:40 [enc/graph/reddit_threads] vote=0.771 uniform=0.770 best1=0.770 n_val=60714 vram=0.00GB 125s | grade=0.923 inner_auc=0.696 vs conf_auc=0.692
+21:11:45 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+21:13:49 [enc/graph/reddit_threads] vote=0.773 uniform=0.772 best1=0.771 n_val=60817 vram=0.00GB 124s | grade=0.922 inner_auc=0.702 vs conf_auc=0.701
+21:13:53 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+21:16:03 [enc/graph/reddit_threads] vote=0.775 uniform=0.774 best1=0.773 n_val=60786 vram=0.00GB 129s | grade=0.922 inner_auc=0.692 vs conf_auc=0.688
+21:16:08 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+21:18:17 [enc/graph/reddit_threads] vote=0.774 uniform=0.772 best1=0.773 n_val=61179 vram=0.00GB 128s | grade=0.923 inner_auc=0.685 vs conf_auc=0.683
+21:18:23 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+21:20:32 [enc/graph/reddit_threads] vote=0.771 uniform=0.769 best1=0.770 n_val=61204 vram=0.00GB 129s | grade=0.921 inner_auc=0.705 vs conf_auc=0.702
+21:20:37 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+21:22:47 [enc/graph/reddit_threads] vote=0.774 uniform=0.772 best1=0.773 n_val=60664 vram=0.00GB 130s | grade=0.922 inner_auc=0.695 vs conf_auc=0.693
+21:22:54 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+21:25:05 [enc/graph/reddit_threads] vote=0.773 uniform=0.771 best1=0.771 n_val=60841 vram=0.00GB 131s | grade=0.923 inner_auc=0.705 vs conf_auc=0.700
+21:25:11 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+21:27:21 [enc/graph/reddit_threads] vote=0.771 uniform=0.769 best1=0.770 n_val=61097 vram=0.00GB 130s | grade=0.921 inner_auc=0.699 vs conf_auc=0.695
+21:27:27 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+21:29:35 [enc/graph/reddit_threads] vote=0.775 uniform=0.773 best1=0.773 n_val=61270 vram=0.00GB 128s | grade=0.922 inner_auc=0.694 vs conf_auc=0.692
+21:29:42 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+21:31:51 [enc/graph/reddit_threads] vote=0.775 uniform=0.774 best1=0.774 n_val=61019 vram=0.00GB 129s | grade=0.923 inner_auc=0.699 vs conf_auc=0.694
+21:31:58 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+21:34:11 [enc/graph/reddit_threads] vote=0.773 uniform=0.771 best1=0.772 n_val=60646 vram=0.00GB 133s | grade=0.922 inner_auc=0.704 vs conf_auc=0.700
+21:34:17 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+21:36:27 [enc/graph/reddit_threads] vote=0.774 uniform=0.772 best1=0.773 n_val=61131 vram=0.00GB 130s | grade=0.924 inner_auc=0.699 vs conf_auc=0.695
+21:36:34 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+21:38:44 [enc/graph/reddit_threads] vote=0.771 uniform=0.769 best1=0.771 n_val=61112 vram=0.00GB 129s | grade=0.921 inner_auc=0.698 vs conf_auc=0.697
+21:38:51 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+21:41:01 [enc/graph/reddit_threads] vote=0.774 uniform=0.772 best1=0.772 n_val=60556 vram=0.00GB 130s | grade=0.922 inner_auc=0.702 vs conf_auc=0.696
+21:41:07 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+21:43:20 [enc/graph/reddit_threads] vote=0.775 uniform=0.774 best1=0.773 n_val=61012 vram=0.00GB 133s | grade=0.923 inner_auc=0.700 vs conf_auc=0.697
+21:43:27 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+21:45:38 [enc/graph/reddit_threads] vote=0.773 uniform=0.771 best1=0.772 n_val=61030 vram=0.00GB 131s | grade=0.919 inner_auc=0.700 vs conf_auc=0.696
+21:45:45 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+21:47:58 [enc/graph/reddit_threads] vote=0.772 uniform=0.770 best1=0.771 n_val=60775 vram=0.00GB 133s | grade=0.919 inner_auc=0.698 vs conf_auc=0.693
+21:48:05 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+21:50:16 [enc/graph/reddit_threads] vote=0.773 uniform=0.772 best1=0.773 n_val=61380 vram=0.00GB 131s | grade=0.923 inner_auc=0.694 vs conf_auc=0.692
+21:50:23 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+21:52:36 [enc/graph/reddit_threads] vote=0.775 uniform=0.773 best1=0.774 n_val=61059 vram=0.00GB 132s | grade=0.919 inner_auc=0.703 vs conf_auc=0.700
+21:52:44 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+21:54:54 [enc/graph/reddit_threads] vote=0.775 uniform=0.773 best1=0.774 n_val=60817 vram=0.00GB 131s | grade=0.924 inner_auc=0.697 vs conf_auc=0.694
+21:55:02 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+21:57:14 [enc/graph/reddit_threads] vote=0.774 uniform=0.773 best1=0.773 n_val=60846 vram=0.00GB 133s | grade=0.922 inner_auc=0.699 vs conf_auc=0.696
+21:57:21 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+21:59:31 [enc/graph/reddit_threads] vote=0.774 uniform=0.772 best1=0.772 n_val=60976 vram=0.00GB 130s | grade=0.919 inner_auc=0.690 vs conf_auc=0.686
+21:59:39 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+22:01:50 [enc/graph/reddit_threads] vote=0.773 uniform=0.771 best1=0.772 n_val=61041 vram=0.00GB 131s | grade=0.918 inner_auc=0.698 vs conf_auc=0.695
+22:01:58 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+22:04:09 [enc/graph/reddit_threads] vote=0.776 uniform=0.775 best1=0.774 n_val=61173 vram=0.00GB 131s | grade=0.921 inner_auc=0.696 vs conf_auc=0.691
+22:04:16 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+22:06:27 [enc/graph/reddit_threads] vote=0.774 uniform=0.771 best1=0.772 n_val=60720 vram=0.00GB 132s | grade=0.920 inner_auc=0.690 vs conf_auc=0.688
+22:06:36 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+22:08:47 [enc/graph/reddit_threads] vote=0.771 uniform=0.769 best1=0.771 n_val=60966 vram=0.00GB 131s | grade=0.919 inner_auc=0.699 vs conf_auc=0.695
+22:08:56 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+22:11:06 [enc/graph/reddit_threads] vote=0.773 uniform=0.772 best1=0.773 n_val=61096 vram=0.00GB 130s | grade=0.921 inner_auc=0.696 vs conf_auc=0.694
+22:11:14 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+22:13:25 [enc/graph/reddit_threads] vote=0.775 uniform=0.773 best1=0.773 n_val=60831 vram=0.00GB 132s | grade=0.922 inner_auc=0.694 vs conf_auc=0.691
+22:13:34 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+22:15:41 [enc/graph/reddit_threads] vote=0.774 uniform=0.771 best1=0.773 n_val=60941 vram=0.00GB 127s | grade=0.922 inner_auc=0.697 vs conf_auc=0.693
+22:15:49 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+22:17:46 [enc/graph/reddit_threads] vote=0.772 uniform=0.771 best1=0.770 n_val=61069 vram=0.00GB 118s | grade=0.921 inner_auc=0.703 vs conf_auc=0.699
+22:17:54 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+22:19:47 [enc/graph/reddit_threads] vote=0.773 uniform=0.772 best1=0.771 n_val=61135 vram=0.00GB 112s | grade=0.920 inner_auc=0.703 vs conf_auc=0.700
+22:19:55 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+22:21:55 [enc/graph/reddit_threads] vote=0.773 uniform=0.771 best1=0.772 n_val=60736 vram=0.00GB 121s | grade=0.922 inner_auc=0.698 vs conf_auc=0.696
+22:22:04 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+22:24:09 [enc/graph/reddit_threads] vote=0.774 uniform=0.773 best1=0.772 n_val=60959 vram=0.00GB 125s | grade=0.921 inner_auc=0.701 vs conf_auc=0.699
+22:24:19 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+22:26:23 [enc/graph/reddit_threads] vote=0.772 uniform=0.770 best1=0.771 n_val=60698 vram=0.00GB 124s | grade=0.919 inner_auc=0.697 vs conf_auc=0.693
+22:26:32 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+22:28:38 [enc/graph/reddit_threads] vote=0.771 uniform=0.770 best1=0.770 n_val=60800 vram=0.00GB 126s | grade=0.920 inner_auc=0.699 vs conf_auc=0.697
+22:28:47 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+22:30:52 [enc/graph/reddit_threads] vote=0.775 uniform=0.772 best1=0.773 n_val=60862 vram=0.00GB 125s | grade=0.921 inner_auc=0.689 vs conf_auc=0.687
+22:31:02 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+22:33:06 [enc/graph/reddit_threads] vote=0.773 uniform=0.772 best1=0.771 n_val=60807 vram=0.00GB 125s | grade=0.921 inner_auc=0.709 vs conf_auc=0.706
+22:33:16 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+22:35:21 [enc/graph/reddit_threads] vote=0.772 uniform=0.771 best1=0.770 n_val=60958 vram=0.00GB 125s | grade=0.921 inner_auc=0.697 vs conf_auc=0.693
+22:35:30 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+22:37:41 [enc/graph/reddit_threads] vote=0.772 uniform=0.770 best1=0.771 n_val=60974 vram=0.00GB 131s | grade=0.919 inner_auc=0.702 vs conf_auc=0.699
+22:37:52 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+22:41:06 [enc/graph/reddit_threads] vote=0.773 uniform=0.771 best1=0.771 n_val=61268 vram=0.00GB 194s | grade=0.921 inner_auc=0.697 vs conf_auc=0.694
+22:41:18 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+22:43:48 [enc/graph/reddit_threads] vote=0.773 uniform=0.772 best1=0.770 n_val=60858 vram=0.00GB 150s | grade=0.922 inner_auc=0.704 vs conf_auc=0.700
+22:44:00 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+22:46:46 [enc/graph/reddit_threads] vote=0.774 uniform=0.772 best1=0.772 n_val=60564 vram=0.00GB 166s | grade=0.922 inner_auc=0.700 vs conf_auc=0.695
+22:46:58 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+22:50:07 [enc/graph/reddit_threads] vote=0.772 uniform=0.772 best1=0.773 n_val=60673 vram=0.00GB 190s | grade=0.918 inner_auc=0.703 vs conf_auc=0.701
+22:50:21 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+22:53:10 [enc/graph/reddit_threads] vote=0.774 uniform=0.773 best1=0.773 n_val=61150 vram=0.00GB 169s | grade=0.921 inner_auc=0.692 vs conf_auc=0.690
+22:53:22 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+22:59:06 [enc/graph/reddit_threads] vote=0.776 uniform=0.775 best1=0.774 n_val=61130 vram=0.00GB 344s | grade=0.922 inner_auc=0.699 vs conf_auc=0.696
+22:59:44 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+23:03:58 [enc/graph/reddit_threads] vote=0.776 uniform=0.773 best1=0.773 n_val=60757 vram=0.00GB 254s | grade=0.922 inner_auc=0.696 vs conf_auc=0.692
+23:04:35 RUN COMPLETE
+14:28:53 NI run auto_cpu_011 on CPU; hours=2.0 smoke=False
+14:28:53 explicit task list: ['enc/graph/reddit_threads']
+14:29:01 [resume] from checkpoint: next cycle 71, rounds 71, 71 metric rows, inner net restored
+14:29:01 ===== CYCLE 71 (OUTER-ONLY BOOTSTRAP) =====
+14:29:05 [data] enc/graph/reddit_threads: n=203088 C=2 D=534 shards=1
+14:41:17 [enc/graph/reddit_threads] vote=0.770 uniform=0.769 best1=0.770 n_val=61005 vram=0.00GB 732s
+14:42:31 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 71, "n_records": 61005, "n_val": 12135, "base_rate": 0.774042010307312, "inner": {"auc": 0.6992795277268956, "ece": 0.013253969862768568, "brier": 0.1593773066997528, "acc80": 0.8244746327400208}, "outer_conf": {"auc": 0.695767321491096, "ece": 0.02736703174125033, "brier": 0.16071054339408875, "acc80": 0.8231355547904968}}
+14:42:31 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+02:24:27 NI run auto_cpu_011 on CPU; hours=2.0 smoke=False
+02:24:27 explicit task list: ['enc/graph/reddit_threads']
+02:24:44 [resume] from checkpoint: next cycle 72, rounds 72, 72 metric rows, inner net restored
+02:24:44 ===== CYCLE 72 (OUTER-ONLY BOOTSTRAP) =====
+02:24:49 [data] enc/graph/reddit_threads: n=203088 C=2 D=534 shards=1
+02:36:45 [enc/graph/reddit_threads] vote=0.773 uniform=0.771 best1=0.771 n_val=60643 vram=0.00GB 715s
+02:37:35 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 72, "n_records": 60643, "n_val": 12050, "base_rate": 0.7749377489089966, "inner": {"auc": 0.6994111193455106, "ece": 0.007532523365930898, "brier": 0.1595081388950348, "acc80": 0.8224066495895386}, "outer_conf": {"auc": 0.6975550625445811, "ece": 0.005515959060043716, "brier": 0.1596701294183731, "acc80": 0.8228215575218201}}
+02:37:35 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+02:51:42 [enc/graph/reddit_threads] vote=0.771 uniform=0.770 best1=0.769 n_val=60918 vram=0.00GB 847s | grade=0.904 inner_auc=0.702 vs conf_auc=0.699
+02:52:08 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+03:07:22 [enc/graph/reddit_threads] vote=0.774 uniform=0.773 best1=0.773 n_val=60841 vram=0.00GB 914s | grade=0.901 inner_auc=0.688 vs conf_auc=0.684
+03:08:02 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+18:20:17 NI run auto_cpu_011 on CPU; hours=2.0 smoke=False
+18:20:17 explicit task list: ['enc/graph/reddit_threads']
+18:20:30 [resume] from checkpoint: next cycle 75, rounds 75, 75 metric rows, inner net restored
+18:20:30 ===== CYCLE 75 (OUTER-ONLY BOOTSTRAP) =====
+18:20:36 [data] enc/graph/reddit_threads: n=203088 C=2 D=534 shards=1
+18:30:14 [enc/graph/reddit_threads] vote=0.775 uniform=0.773 best1=0.773 n_val=60725 vram=0.00GB 578s
+18:31:04 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 75, "n_records": 60725, "n_val": 12240, "base_rate": 0.7785947918891907, "inner": {"auc": 0.6977555244072903, "ece": 0.006610130002490835, "brier": 0.15786394476890564, "acc80": 0.826797366142273}, "outer_conf": {"auc": 0.6960592883998095, "ece": 0.010322367229492835, "brier": 0.15806345641613007, "acc80": 0.8254697918891907}}
+18:31:04 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+18:45:08 [enc/graph/reddit_threads] vote=0.773 uniform=0.771 best1=0.772 n_val=60766 vram=0.00GB 844s | grade=0.907 inner_auc=0.699 vs conf_auc=0.693
+18:45:40 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+21:53:04 NI run auto_cpu_011 on CPU; hours=2.0 smoke=False
+21:53:04 explicit task list: ['enc/graph/reddit_threads']
+21:53:18 [resume] from checkpoint: next cycle 77, rounds 77, 77 metric rows, inner net restored
+21:53:18 ===== CYCLE 77 (OUTER-ONLY BOOTSTRAP) =====
+21:53:24 [data] enc/graph/reddit_threads: n=203088 C=2 D=534 shards=1
+22:04:22 [enc/graph/reddit_threads] vote=0.773 uniform=0.771 best1=0.772 n_val=60770 vram=0.00GB 658s
+22:05:14 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 77, "n_records": 60770, "n_val": 12167, "base_rate": 0.7710199952125549, "inner": {"auc": 0.6937250324903332, "ece": 0.005582174509604505, "brier": 0.16186070442199707, "acc80": 0.819891095161438}, "outer_conf": {"auc": 0.6915993386151982, "ece": 0.027465466040362565, "brier": 0.16292613744735718, "acc80": 0.8179389834403992}}
+22:05:14 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+22:20:23 [enc/graph/reddit_threads] vote=0.774 uniform=0.772 best1=0.773 n_val=60795 vram=0.00GB 909s | grade=0.898 inner_auc=0.695 vs conf_auc=0.693
+22:20:51 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+22:36:10 [enc/graph/reddit_threads] vote=0.773 uniform=0.771 best1=0.772 n_val=61124 vram=0.00GB 919s | grade=0.897 inner_auc=0.693 vs conf_auc=0.692
+22:36:42 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+18:58:04 NI run auto_cpu_011 on CPU; hours=2.0 smoke=False
+18:58:04 explicit task list: ['enc/graph/reddit_threads']
+18:58:10 [resume] from checkpoint: next cycle 80, rounds 80, 80 metric rows, inner net restored
+18:58:10 ===== CYCLE 80 (OUTER-ONLY BOOTSTRAP) =====
+18:58:14 [data] enc/graph/reddit_threads: n=203088 C=2 D=534 shards=1
+19:08:02 [enc/graph/reddit_threads] vote=0.775 uniform=0.772 best1=0.773 n_val=60926 vram=0.00GB 589s
+19:08:50 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 80, "n_records": 60926, "n_val": 12199, "base_rate": 0.7757193446159363, "inner": {"auc": 0.7013503037067113, "ece": 0.00790295631477643, "brier": 0.15846478939056396, "acc80": 0.8252894878387451}, "outer_conf": {"auc": 0.6987135337198186, "ece": 0.008875643999833184, "brier": 0.15890948474407196, "acc80": 0.8242647647857666}}
+19:08:50 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+19:21:49 [enc/graph/reddit_threads] vote=0.775 uniform=0.773 best1=0.774 n_val=61025 vram=0.00GB 778s | grade=0.912 inner_auc=0.699 vs conf_auc=0.696
+19:22:09 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+19:34:42 [enc/graph/reddit_threads] vote=0.772 uniform=0.770 best1=0.771 n_val=61150 vram=0.00GB 753s | grade=0.914 inner_auc=0.701 vs conf_auc=0.699
+19:35:06 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+19:47:34 [enc/graph/reddit_threads] vote=0.775 uniform=0.772 best1=0.773 n_val=60580 vram=0.00GB 748s | grade=0.917 inner_auc=0.705 vs conf_auc=0.702
+19:48:00 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+20:00:47 [enc/graph/reddit_threads] vote=0.775 uniform=0.772 best1=0.773 n_val=61128 vram=0.00GB 767s | grade=0.914 inner_auc=0.693 vs conf_auc=0.691
+20:01:12 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+20:12:15 [enc/graph/reddit_threads] vote=0.771 uniform=0.770 best1=0.770 n_val=60955 vram=0.00GB 663s | grade=0.919 inner_auc=0.692 vs conf_auc=0.689
+20:12:36 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+20:24:01 [enc/graph/reddit_threads] vote=0.772 uniform=0.768 best1=0.771 n_val=60807 vram=0.00GB 685s | grade=0.917 inner_auc=0.696 vs conf_auc=0.693
+20:24:22 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+20:35:36 [enc/graph/reddit_threads] vote=0.772 uniform=0.770 best1=0.771 n_val=61102 vram=0.00GB 673s | grade=0.919 inner_auc=0.705 vs conf_auc=0.701
+20:35:56 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+20:47:03 [enc/graph/reddit_threads] vote=0.773 uniform=0.772 best1=0.771 n_val=61355 vram=0.00GB 667s | grade=0.922 inner_auc=0.695 vs conf_auc=0.693
+20:47:30 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+20:58:43 [enc/graph/reddit_threads] vote=0.773 uniform=0.772 best1=0.772 n_val=60887 vram=0.00GB 673s | grade=0.920 inner_auc=0.700 vs conf_auc=0.698
+20:59:07 RUN COMPLETE
+17:45:29 NI run auto_cpu_011 on CPU; hours=2.0 smoke=False
+17:45:29 explicit task list: ['enc/graph/reddit_threads']
+17:45:36 [resume] from checkpoint: next cycle 90, rounds 90, 90 metric rows, inner net restored
+17:45:36 ===== CYCLE 90 (OUTER-ONLY BOOTSTRAP) =====
+17:45:39 [data] enc/graph/reddit_threads: n=203088 C=2 D=534 shards=1
+17:53:45 [enc/graph/reddit_threads] vote=0.773 uniform=0.771 best1=0.771 n_val=60961 vram=0.00GB 486s
+17:54:30 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 90, "n_records": 60961, "n_val": 12099, "base_rate": 0.7668402194976807, "inner": {"auc": 0.6915046392043659, "ece": 0.009341291833863848, "brier": 0.1641014814376831, "acc80": 0.8145469427108765}, "outer_conf": {"auc": 0.6913326696528721, "ece": 0.008927944864416056, "brier": 0.1641083061695099, "acc80": 0.814960241317749}}
+17:54:30 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+18:07:10 [enc/graph/reddit_threads] vote=0.771 uniform=0.770 best1=0.770 n_val=60916 vram=0.00GB 760s | grade=0.911 inner_auc=0.697 vs conf_auc=0.691
+18:07:31 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+18:20:05 [enc/graph/reddit_threads] vote=0.772 uniform=0.771 best1=0.772 n_val=60944 vram=0.00GB 754s | grade=0.914 inner_auc=0.699 vs conf_auc=0.698
+18:20:34 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+18:33:06 [enc/graph/reddit_threads] vote=0.775 uniform=0.774 best1=0.774 n_val=61028 vram=0.00GB 752s | grade=0.914 inner_auc=0.694 vs conf_auc=0.690
+18:33:38 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+18:46:18 [enc/graph/reddit_threads] vote=0.774 uniform=0.771 best1=0.772 n_val=60855 vram=0.00GB 760s | grade=0.915 inner_auc=0.696 vs conf_auc=0.692
+18:46:45 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+18:59:10 [enc/graph/reddit_threads] vote=0.774 uniform=0.772 best1=0.772 n_val=60948 vram=0.00GB 745s | grade=0.916 inner_auc=0.706 vs conf_auc=0.702
+18:59:34 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+19:11:45 [enc/graph/reddit_threads] vote=0.771 uniform=0.769 best1=0.772 n_val=60849 vram=0.00GB 731s | grade=0.915 inner_auc=0.693 vs conf_auc=0.690
+19:12:15 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+19:24:35 [enc/graph/reddit_threads] vote=0.775 uniform=0.774 best1=0.773 n_val=61170 vram=0.00GB 740s | grade=0.914 inner_auc=0.695 vs conf_auc=0.693
+19:24:58 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+19:37:09 [enc/graph/reddit_threads] vote=0.775 uniform=0.771 best1=0.773 n_val=60826 vram=0.00GB 731s | grade=0.918 inner_auc=0.702 vs conf_auc=0.698
+19:37:33 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+19:49:17 [enc/graph/reddit_threads] vote=0.774 uniform=0.773 best1=0.772 n_val=60987 vram=0.00GB 704s | grade=0.922 inner_auc=0.697 vs conf_auc=0.694
+19:49:39 RUN COMPLETE

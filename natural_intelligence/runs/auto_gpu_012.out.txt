@@ -1,0 +1,269 @@
+18:25:24 NI run auto_gpu_012 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+18:25:24 explicit task list: ['enc/text/yelp_polarity']
+18:25:24 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+18:25:25 [data] enc/text/yelp_polarity: n=100413 C=2 D=384 shards=1
+18:25:56 [enc/text/yelp_polarity] vote=0.869 uniform=0.869 best1=0.874 n_val=30214 vram=0.80GB 31s
+18:26:05 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 30214, "n_val": 6140, "base_rate": 0.8666123747825623, "inner": {"auc": 0.8451750488021865, "ece": 0.009540392475427168, "brier": 0.09178604185581207, "acc80": 0.9322068691253662}, "outer_conf": {"auc": 0.8124635288702193, "ece": 0.047997092754134135, "brier": 0.10026979446411133, "acc80": 0.9220277070999146}}
+18:26:05 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+18:26:41 [enc/text/yelp_polarity] vote=0.869 uniform=0.869 best1=0.873 n_val=30153 vram=0.95GB 36s | grade=0.913 inner_auc=0.841 vs conf_auc=0.813
+18:26:48 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+18:27:27 [enc/text/yelp_polarity] vote=0.871 uniform=0.870 best1=0.875 n_val=30002 vram=0.96GB 39s | grade=0.911 inner_auc=0.842 vs conf_auc=0.818
+18:27:34 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+18:28:15 [enc/text/yelp_polarity] vote=0.872 uniform=0.870 best1=0.876 n_val=30029 vram=0.96GB 42s | grade=0.912 inner_auc=0.844 vs conf_auc=0.819
+18:28:23 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+18:29:10 [enc/text/yelp_polarity] vote=0.872 uniform=0.870 best1=0.876 n_val=29893 vram=0.96GB 48s | grade=0.912 inner_auc=0.851 vs conf_auc=0.827
+18:29:18 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+18:30:14 [enc/text/yelp_polarity] vote=0.872 uniform=0.870 best1=0.873 n_val=30359 vram=0.95GB 56s | grade=0.912 inner_auc=0.852 vs conf_auc=0.831
+18:30:24 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+18:31:19 [enc/text/yelp_polarity] vote=0.873 uniform=0.869 best1=0.874 n_val=29985 vram=0.96GB 56s | grade=0.912 inner_auc=0.848 vs conf_auc=0.828
+18:31:28 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+18:32:22 [enc/text/yelp_polarity] vote=0.870 uniform=0.866 best1=0.872 n_val=29934 vram=0.96GB 54s | grade=0.913 inner_auc=0.848 vs conf_auc=0.829
+18:32:32 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+18:33:27 [enc/text/yelp_polarity] vote=0.875 uniform=0.871 best1=0.876 n_val=30078 vram=0.96GB 55s | grade=0.912 inner_auc=0.849 vs conf_auc=0.831
+18:33:38 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+18:34:31 [enc/text/yelp_polarity] vote=0.871 uniform=0.867 best1=0.874 n_val=30341 vram=0.95GB 53s | grade=0.913 inner_auc=0.854 vs conf_auc=0.845
+18:34:40 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+18:35:33 [enc/text/yelp_polarity] vote=0.873 uniform=0.869 best1=0.874 n_val=30115 vram=0.95GB 53s | grade=0.915 inner_auc=0.850 vs conf_auc=0.841
+18:35:43 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+18:36:37 [enc/text/yelp_polarity] vote=0.872 uniform=0.867 best1=0.872 n_val=30227 vram=0.95GB 54s | grade=0.916 inner_auc=0.847 vs conf_auc=0.838
+18:36:47 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+18:37:43 [enc/text/yelp_polarity] vote=0.871 uniform=0.866 best1=0.872 n_val=30239 vram=0.95GB 56s | grade=0.916 inner_auc=0.841 vs conf_auc=0.833
+18:37:52 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+18:38:47 [enc/text/yelp_polarity] vote=0.876 uniform=0.869 best1=0.876 n_val=30109 vram=0.95GB 55s | grade=0.914 inner_auc=0.847 vs conf_auc=0.837
+18:38:56 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+18:39:50 [enc/text/yelp_polarity] vote=0.874 uniform=0.869 best1=0.875 n_val=30017 vram=0.96GB 54s | grade=0.916 inner_auc=0.835 vs conf_auc=0.829
+18:39:59 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+18:40:54 [enc/text/yelp_polarity] vote=0.874 uniform=0.869 best1=0.874 n_val=30026 vram=0.96GB 55s | grade=0.916 inner_auc=0.848 vs conf_auc=0.843
+18:41:04 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+18:41:59 [enc/text/yelp_polarity] vote=0.871 uniform=0.865 best1=0.871 n_val=30026 vram=0.96GB 55s | grade=0.915 inner_auc=0.846 vs conf_auc=0.838
+18:42:10 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+18:43:05 [enc/text/yelp_polarity] vote=0.876 uniform=0.869 best1=0.872 n_val=29985 vram=0.96GB 55s | grade=0.915 inner_auc=0.834 vs conf_auc=0.830
+18:43:16 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+18:44:09 [enc/text/yelp_polarity] vote=0.874 uniform=0.868 best1=0.873 n_val=30103 vram=0.95GB 53s | grade=0.916 inner_auc=0.836 vs conf_auc=0.833
+18:44:20 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+18:45:12 [enc/text/yelp_polarity] vote=0.877 uniform=0.872 best1=0.876 n_val=30098 vram=0.95GB 52s | grade=0.918 inner_auc=0.841 vs conf_auc=0.837
+18:45:23 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+18:46:18 [enc/text/yelp_polarity] vote=0.876 uniform=0.870 best1=0.877 n_val=30226 vram=0.95GB 56s | grade=0.918 inner_auc=0.840 vs conf_auc=0.836
+18:46:29 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+18:47:24 [enc/text/yelp_polarity] vote=0.875 uniform=0.868 best1=0.875 n_val=30001 vram=0.96GB 55s | grade=0.917 inner_auc=0.845 vs conf_auc=0.841
+18:47:35 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+18:48:28 [enc/text/yelp_polarity] vote=0.873 uniform=0.866 best1=0.872 n_val=30039 vram=0.96GB 53s | grade=0.916 inner_auc=0.836 vs conf_auc=0.832
+18:48:38 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+18:49:33 [enc/text/yelp_polarity] vote=0.876 uniform=0.870 best1=0.875 n_val=30243 vram=0.95GB 55s | grade=0.916 inner_auc=0.842 vs conf_auc=0.837
+18:49:44 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+18:50:38 [enc/text/yelp_polarity] vote=0.877 uniform=0.872 best1=0.876 n_val=30368 vram=0.95GB 55s | grade=0.918 inner_auc=0.842 vs conf_auc=0.842
+18:50:48 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+18:51:43 [enc/text/yelp_polarity] vote=0.880 uniform=0.872 best1=0.879 n_val=30122 vram=0.95GB 55s | grade=0.918 inner_auc=0.841 vs conf_auc=0.838
+18:51:54 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+18:52:50 [enc/text/yelp_polarity] vote=0.876 uniform=0.868 best1=0.875 n_val=30163 vram=0.95GB 56s | grade=0.917 inner_auc=0.834 vs conf_auc=0.831
+18:53:00 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+18:53:55 [enc/text/yelp_polarity] vote=0.877 uniform=0.871 best1=0.875 n_val=30063 vram=0.95GB 56s | grade=0.919 inner_auc=0.839 vs conf_auc=0.838
+18:54:06 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+07:23:45 NI run auto_gpu_012 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+07:23:45 explicit task list: ['enc/text/yelp_polarity']
+07:23:54 [resume] from checkpoint: next cycle 28, rounds 28, 28 metric rows, inner net restored
+07:23:54 ===== CYCLE 28 (OUTER-ONLY BOOTSTRAP) =====
+07:23:55 [data] enc/text/yelp_polarity: n=100413 C=2 D=384 shards=1
+07:24:56 [enc/text/yelp_polarity] vote=0.879 uniform=0.872 best1=0.876 n_val=30009 vram=0.84GB 60s
+07:25:15 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 28, "n_records": 30009, "n_val": 6006, "base_rate": 0.8786213994026184, "inner": {"auc": 0.8439812962690019, "ece": 0.01486091708247756, "brier": 0.08650269359350204, "acc80": 0.9433805346488953}, "outer_conf": {"auc": 0.8403127894351162, "ece": 0.02131205862695044, "brier": 0.08716189861297607, "acc80": 0.944005012512207}}
+07:25:15 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+07:26:21 [enc/text/yelp_polarity] vote=0.877 uniform=0.870 best1=0.876 n_val=29844 vram=0.98GB 66s | grade=0.915 inner_auc=0.840 vs conf_auc=0.837
+07:26:32 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+07:27:47 [enc/text/yelp_polarity] vote=0.874 uniform=0.868 best1=0.871 n_val=30177 vram=0.97GB 75s | grade=0.915 inner_auc=0.839 vs conf_auc=0.834
+07:27:56 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+07:29:03 [enc/text/yelp_polarity] vote=0.878 uniform=0.871 best1=0.877 n_val=29954 vram=0.98GB 67s | grade=0.916 inner_auc=0.836 vs conf_auc=0.832
+07:29:16 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+07:30:25 [enc/text/yelp_polarity] vote=0.876 uniform=0.867 best1=0.875 n_val=30213 vram=0.97GB 69s | grade=0.916 inner_auc=0.836 vs conf_auc=0.832
+07:30:33 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+07:31:31 [enc/text/yelp_polarity] vote=0.874 uniform=0.867 best1=0.874 n_val=29929 vram=0.98GB 59s | grade=0.914 inner_auc=0.832 vs conf_auc=0.829
+07:31:39 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+07:32:28 [enc/text/yelp_polarity] vote=0.876 uniform=0.870 best1=0.874 n_val=30129 vram=0.97GB 49s | grade=0.915 inner_auc=0.839 vs conf_auc=0.835
+07:32:39 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+07:33:28 [enc/text/yelp_polarity] vote=0.873 uniform=0.869 best1=0.872 n_val=30104 vram=0.98GB 48s | grade=0.914 inner_auc=0.838 vs conf_auc=0.830
+07:33:36 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+07:34:35 [enc/text/yelp_polarity] vote=0.878 uniform=0.873 best1=0.877 n_val=29981 vram=0.98GB 59s | grade=0.915 inner_auc=0.842 vs conf_auc=0.835
+18:57:33 NI run auto_gpu_012 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+18:57:33 explicit task list: ['enc/text/yelp_polarity']
+18:57:49 [resume] from checkpoint: next cycle 36, rounds 36, 37 metric rows, inner net restored
+18:57:49 ===== CYCLE 36 (OUTER-ONLY BOOTSTRAP) =====
+18:57:51 [data] enc/text/yelp_polarity: n=100413 C=2 D=384 shards=1
+18:59:18 [enc/text/yelp_polarity] vote=0.878 uniform=0.873 best1=0.877 n_val=29981 vram=0.84GB 87s
+18:59:48 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 36, "n_records": 29981, "n_val": 6071, "base_rate": 0.8794267773628235, "inner": {"auc": 0.8421999371569346, "ece": 0.005120099425374764, "brier": 0.08609727025032043, "acc80": 0.9408978819847107}, "outer_conf": {"auc": 0.8347792867619138, "ece": 0.017080608034345978, "brier": 0.08732688426971436, "acc80": 0.938838541507721}}
+18:59:48 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+19:01:25 [enc/text/yelp_polarity] vote=0.875 uniform=0.867 best1=0.873 n_val=30337 vram=0.97GB 97s | grade=0.914 inner_auc=0.827 vs conf_auc=0.824
+19:01:43 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+19:03:24 [enc/text/yelp_polarity] vote=0.876 uniform=0.870 best1=0.875 n_val=29961 vram=0.98GB 101s | grade=0.915 inner_auc=0.851 vs conf_auc=0.846
+19:03:40 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+19:05:16 [enc/text/yelp_polarity] vote=0.875 uniform=0.869 best1=0.874 n_val=30052 vram=0.98GB 96s | grade=0.915 inner_auc=0.836 vs conf_auc=0.828
+19:05:39 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+19:07:45 [enc/text/yelp_polarity] vote=0.875 uniform=0.866 best1=0.875 n_val=30096 vram=0.98GB 126s | grade=0.916 inner_auc=0.843 vs conf_auc=0.837
+19:08:04 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+19:09:51 [enc/text/yelp_polarity] vote=0.878 uniform=0.870 best1=0.876 n_val=30140 vram=0.97GB 108s | grade=0.916 inner_auc=0.846 vs conf_auc=0.844
+19:10:10 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+19:12:09 [enc/text/yelp_polarity] vote=0.876 uniform=0.869 best1=0.874 n_val=29787 vram=0.98GB 119s | grade=0.915 inner_auc=0.837 vs conf_auc=0.831
+19:12:24 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+19:14:16 [enc/text/yelp_polarity] vote=0.873 uniform=0.868 best1=0.871 n_val=30224 vram=0.98GB 111s | grade=0.912 inner_auc=0.837 vs conf_auc=0.830
+19:14:36 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+19:16:42 [enc/text/yelp_polarity] vote=0.875 uniform=0.869 best1=0.874 n_val=30063 vram=0.98GB 126s | grade=0.914 inner_auc=0.839 vs conf_auc=0.835
+19:17:05 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+19:18:57 [enc/text/yelp_polarity] vote=0.875 uniform=0.866 best1=0.873 n_val=30298 vram=0.97GB 112s | grade=0.917 inner_auc=0.827 vs conf_auc=0.823
+19:19:17 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+19:21:40 [enc/text/yelp_polarity] vote=0.878 uniform=0.870 best1=0.877 n_val=30291 vram=0.97GB 142s | grade=0.915 inner_auc=0.832 vs conf_auc=0.827
+19:22:05 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+19:24:23 [enc/text/yelp_polarity] vote=0.874 uniform=0.867 best1=0.874 n_val=30337 vram=0.97GB 137s | grade=0.913 inner_auc=0.849 vs conf_auc=0.843
+19:24:47 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+19:26:55 [enc/text/yelp_polarity] vote=0.875 uniform=0.868 best1=0.873 n_val=30041 vram=0.98GB 128s | grade=0.914 inner_auc=0.841 vs conf_auc=0.835
+19:27:21 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+19:29:09 [enc/text/yelp_polarity] vote=0.875 uniform=0.871 best1=0.873 n_val=29907 vram=0.98GB 108s | grade=0.915 inner_auc=0.839 vs conf_auc=0.830
+19:29:26 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+19:31:06 [enc/text/yelp_polarity] vote=0.874 uniform=0.868 best1=0.873 n_val=30105 vram=0.98GB 101s | grade=0.914 inner_auc=0.835 vs conf_auc=0.828
+19:31:25 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+19:33:02 [enc/text/yelp_polarity] vote=0.876 uniform=0.870 best1=0.874 n_val=30265 vram=0.97GB 97s | grade=0.915 inner_auc=0.840 vs conf_auc=0.834
+19:33:21 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+19:35:05 [enc/text/yelp_polarity] vote=0.874 uniform=0.871 best1=0.873 n_val=30201 vram=0.97GB 104s | grade=0.913 inner_auc=0.841 vs conf_auc=0.833
+19:35:23 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+19:37:02 [enc/text/yelp_polarity] vote=0.876 uniform=0.869 best1=0.876 n_val=30150 vram=0.97GB 99s | grade=0.915 inner_auc=0.843 vs conf_auc=0.837
+19:37:20 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+19:39:01 [enc/text/yelp_polarity] vote=0.875 uniform=0.869 best1=0.874 n_val=30131 vram=0.97GB 102s | grade=0.914 inner_auc=0.839 vs conf_auc=0.834
+19:39:20 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+19:40:53 [enc/text/yelp_polarity] vote=0.875 uniform=0.870 best1=0.875 n_val=30499 vram=0.97GB 93s | grade=0.915 inner_auc=0.839 vs conf_auc=0.829
+19:41:15 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+19:42:50 [enc/text/yelp_polarity] vote=0.875 uniform=0.869 best1=0.875 n_val=30232 vram=0.97GB 95s | grade=0.915 inner_auc=0.845 vs conf_auc=0.837
+19:43:08 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+19:44:45 [enc/text/yelp_polarity] vote=0.874 uniform=0.871 best1=0.874 n_val=30298 vram=0.97GB 97s | grade=0.915 inner_auc=0.843 vs conf_auc=0.837
+19:45:02 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+19:46:27 [enc/text/yelp_polarity] vote=0.878 uniform=0.872 best1=0.877 n_val=29989 vram=0.98GB 86s | grade=0.915 inner_auc=0.843 vs conf_auc=0.836
+19:46:47 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+19:48:22 [enc/text/yelp_polarity] vote=0.873 uniform=0.867 best1=0.872 n_val=30083 vram=0.98GB 95s | grade=0.913 inner_auc=0.823 vs conf_auc=0.814
+19:48:41 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+19:50:12 [enc/text/yelp_polarity] vote=0.876 uniform=0.871 best1=0.875 n_val=30033 vram=0.98GB 91s | grade=0.916 inner_auc=0.826 vs conf_auc=0.820
+19:50:35 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+19:52:28 [enc/text/yelp_polarity] vote=0.875 uniform=0.869 best1=0.873 n_val=30338 vram=0.97GB 113s | grade=0.915 inner_auc=0.841 vs conf_auc=0.831
+19:52:45 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+19:54:09 [enc/text/yelp_polarity] vote=0.875 uniform=0.871 best1=0.874 n_val=30004 vram=0.98GB 84s | grade=0.916 inner_auc=0.840 vs conf_auc=0.830
+19:54:21 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+19:55:36 [enc/text/yelp_polarity] vote=0.873 uniform=0.867 best1=0.872 n_val=30270 vram=0.97GB 75s | grade=0.914 inner_auc=0.833 vs conf_auc=0.826
+19:55:57 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+08:46:44 NI run auto_gpu_012 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+08:46:44 explicit task list: ['enc/text/yelp_polarity']
+08:47:03 [resume] from checkpoint: next cycle 64, rounds 64, 65 metric rows, inner net restored
+08:47:03 ===== CYCLE 64 (OUTER-ONLY BOOTSTRAP) =====
+08:47:05 [data] enc/text/yelp_polarity: n=100413 C=2 D=384 shards=1
+18:40:42 NI run auto_gpu_012 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+18:40:42 explicit task list: ['enc/text/yelp_polarity']
+18:40:59 [resume] from checkpoint: next cycle 64, rounds 64, 65 metric rows, inner net restored
+18:40:59 ===== CYCLE 64 (OUTER-ONLY BOOTSTRAP) =====
+18:41:01 [data] enc/text/yelp_polarity: n=100413 C=2 D=384 shards=1
+18:42:44 [enc/text/yelp_polarity] vote=0.876 uniform=0.872 best1=0.876 n_val=30159 vram=0.83GB 103s
+18:43:24 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 64, "n_records": 30159, "n_val": 6041, "base_rate": 0.8713788986206055, "inner": {"auc": 0.8454011708191039, "ece": 0.008352866775250321, "brier": 0.0896550863981247, "acc80": 0.9375}, "outer_conf": {"auc": 0.835813695806097, "ece": 0.01347759285621978, "brier": 0.09094992280006409, "acc80": 0.9352235198020935}}
+18:43:24 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+18:45:35 [enc/text/yelp_polarity] vote=0.877 uniform=0.872 best1=0.876 n_val=30126 vram=0.98GB 131s | grade=0.915 inner_auc=0.822 vs conf_auc=0.816
+18:45:56 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+18:48:02 [enc/text/yelp_polarity] vote=0.876 uniform=0.869 best1=0.875 n_val=30005 vram=0.98GB 126s | grade=0.914 inner_auc=0.843 vs conf_auc=0.832
+18:48:24 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+18:50:16 [enc/text/yelp_polarity] vote=0.876 uniform=0.870 best1=0.875 n_val=29966 vram=0.98GB 112s | grade=0.916 inner_auc=0.839 vs conf_auc=0.832
+18:50:35 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+18:52:48 [enc/text/yelp_polarity] vote=0.874 uniform=0.870 best1=0.873 n_val=30187 vram=0.97GB 133s | grade=0.914 inner_auc=0.840 vs conf_auc=0.828
+18:53:08 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+18:55:19 [enc/text/yelp_polarity] vote=0.875 uniform=0.870 best1=0.874 n_val=30169 vram=0.97GB 131s | grade=0.914 inner_auc=0.843 vs conf_auc=0.830
+18:55:42 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+18:57:29 [enc/text/yelp_polarity] vote=0.876 uniform=0.871 best1=0.875 n_val=30032 vram=0.98GB 107s | grade=0.915 inner_auc=0.843 vs conf_auc=0.831
+18:57:51 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+19:00:16 [enc/text/yelp_polarity] vote=0.876 uniform=0.868 best1=0.875 n_val=29958 vram=0.98GB 144s | grade=0.916 inner_auc=0.835 vs conf_auc=0.827
+19:00:45 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+19:03:09 [enc/text/yelp_polarity] vote=0.874 uniform=0.869 best1=0.873 n_val=29939 vram=0.98GB 144s | grade=0.913 inner_auc=0.844 vs conf_auc=0.834
+19:03:34 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+19:06:00 [enc/text/yelp_polarity] vote=0.876 uniform=0.872 best1=0.875 n_val=30145 vram=0.97GB 146s | grade=0.915 inner_auc=0.844 vs conf_auc=0.834
+19:06:24 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+19:08:37 [enc/text/yelp_polarity] vote=0.877 uniform=0.870 best1=0.876 n_val=29910 vram=0.98GB 133s | grade=0.916 inner_auc=0.839 vs conf_auc=0.834
+19:09:02 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+19:11:35 [enc/text/yelp_polarity] vote=0.874 uniform=0.868 best1=0.874 n_val=30112 vram=0.97GB 153s | grade=0.913 inner_auc=0.847 vs conf_auc=0.840
+19:12:03 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+19:14:18 [enc/text/yelp_polarity] vote=0.874 uniform=0.870 best1=0.873 n_val=29874 vram=0.98GB 135s | grade=0.915 inner_auc=0.838 vs conf_auc=0.826
+19:14:42 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+19:17:04 [enc/text/yelp_polarity] vote=0.874 uniform=0.870 best1=0.874 n_val=30206 vram=0.97GB 143s | grade=0.916 inner_auc=0.842 vs conf_auc=0.830
+19:17:30 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+19:19:43 [enc/text/yelp_polarity] vote=0.873 uniform=0.866 best1=0.872 n_val=30263 vram=0.97GB 134s | grade=0.915 inner_auc=0.827 vs conf_auc=0.820
+19:20:09 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+19:22:27 [enc/text/yelp_polarity] vote=0.872 uniform=0.865 best1=0.871 n_val=30082 vram=0.98GB 137s | grade=0.914 inner_auc=0.829 vs conf_auc=0.818
+19:22:49 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+19:25:04 [enc/text/yelp_polarity] vote=0.876 uniform=0.871 best1=0.875 n_val=30429 vram=0.97GB 135s | grade=0.914 inner_auc=0.835 vs conf_auc=0.824
+19:25:30 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+19:27:45 [enc/text/yelp_polarity] vote=0.874 uniform=0.865 best1=0.873 n_val=30215 vram=0.97GB 135s | grade=0.912 inner_auc=0.835 vs conf_auc=0.826
+19:28:05 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+19:30:26 [enc/text/yelp_polarity] vote=0.879 uniform=0.873 best1=0.877 n_val=29919 vram=0.98GB 140s | grade=0.914 inner_auc=0.843 vs conf_auc=0.830
+19:30:52 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+19:33:09 [enc/text/yelp_polarity] vote=0.875 uniform=0.869 best1=0.874 n_val=30091 vram=0.98GB 137s | grade=0.913 inner_auc=0.836 vs conf_auc=0.825
+19:33:33 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+19:35:51 [enc/text/yelp_polarity] vote=0.875 uniform=0.868 best1=0.874 n_val=30116 vram=0.97GB 139s | grade=0.914 inner_auc=0.834 vs conf_auc=0.820
+19:36:18 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+19:38:30 [enc/text/yelp_polarity] vote=0.873 uniform=0.866 best1=0.872 n_val=29709 vram=0.98GB 132s | grade=0.915 inner_auc=0.834 vs conf_auc=0.823
+19:38:56 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+19:41:10 [enc/text/yelp_polarity] vote=0.875 uniform=0.870 best1=0.875 n_val=30308 vram=0.97GB 134s | grade=0.915 inner_auc=0.834 vs conf_auc=0.820
+19:41:37 RUN COMPLETE
+18:30:12 NI run auto_gpu_012 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+18:30:12 explicit task list: ['enc/text/yelp_polarity']
+18:30:29 [resume] from checkpoint: next cycle 87, rounds 87, 88 metric rows, inner net restored
+18:30:29 ===== CYCLE 87 (OUTER-ONLY BOOTSTRAP) =====
+18:30:31 [data] enc/text/yelp_polarity: n=100413 C=2 D=384 shards=1
+18:32:05 [enc/text/yelp_polarity] vote=0.875 uniform=0.868 best1=0.874 n_val=30181 vram=0.83GB 94s
+18:32:33 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 87, "n_records": 30181, "n_val": 6025, "base_rate": 0.8712033033370972, "inner": {"auc": 0.8391841450408816, "ece": 0.01144793823052244, "brier": 0.09108710289001465, "acc80": 0.9354771971702576}, "outer_conf": {"auc": 0.8282072137451807, "ece": 0.015358273616964886, "brier": 0.09270291030406952, "acc80": 0.9340248703956604}}
+18:32:33 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+18:34:07 [enc/text/yelp_polarity] vote=0.877 uniform=0.870 best1=0.875 n_val=30361 vram=0.97GB 95s | grade=0.915 inner_auc=0.832 vs conf_auc=0.817
+18:34:22 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+18:36:02 [enc/text/yelp_polarity] vote=0.874 uniform=0.869 best1=0.874 n_val=30018 vram=0.98GB 100s | grade=0.913 inner_auc=0.840 vs conf_auc=0.832
+18:36:22 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+18:37:57 [enc/text/yelp_polarity] vote=0.874 uniform=0.869 best1=0.874 n_val=30294 vram=0.97GB 96s | grade=0.916 inner_auc=0.841 vs conf_auc=0.827
+18:38:13 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+18:39:45 [enc/text/yelp_polarity] vote=0.873 uniform=0.868 best1=0.872 n_val=30157 vram=0.97GB 92s | grade=0.914 inner_auc=0.842 vs conf_auc=0.832
+18:40:03 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+18:41:39 [enc/text/yelp_polarity] vote=0.874 uniform=0.869 best1=0.874 n_val=30183 vram=0.97GB 96s | grade=0.914 inner_auc=0.839 vs conf_auc=0.826
+18:41:56 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+18:43:46 [enc/text/yelp_polarity] vote=0.874 uniform=0.870 best1=0.873 n_val=29796 vram=0.98GB 110s | grade=0.914 inner_auc=0.829 vs conf_auc=0.816
+18:44:06 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+18:45:55 [enc/text/yelp_polarity] vote=0.873 uniform=0.868 best1=0.872 n_val=30316 vram=0.97GB 109s | grade=0.913 inner_auc=0.835 vs conf_auc=0.822
+18:46:14 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+18:47:52 [enc/text/yelp_polarity] vote=0.872 uniform=0.867 best1=0.871 n_val=30088 vram=0.98GB 98s | grade=0.913 inner_auc=0.838 vs conf_auc=0.826
+18:48:09 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+18:49:45 [enc/text/yelp_polarity] vote=0.872 uniform=0.866 best1=0.870 n_val=30503 vram=0.97GB 96s | grade=0.914 inner_auc=0.841 vs conf_auc=0.828
+18:50:03 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+18:51:49 [enc/text/yelp_polarity] vote=0.872 uniform=0.867 best1=0.871 n_val=30013 vram=0.98GB 105s | grade=0.914 inner_auc=0.839 vs conf_auc=0.827
+18:52:08 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+18:53:49 [enc/text/yelp_polarity] vote=0.876 uniform=0.870 best1=0.874 n_val=30135 vram=0.98GB 100s | grade=0.914 inner_auc=0.838 vs conf_auc=0.825
+18:54:05 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+18:55:41 [enc/text/yelp_polarity] vote=0.873 uniform=0.868 best1=0.872 n_val=30065 vram=0.98GB 96s | grade=0.913 inner_auc=0.842 vs conf_auc=0.833
+18:55:59 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+18:57:35 [enc/text/yelp_polarity] vote=0.875 uniform=0.869 best1=0.874 n_val=29843 vram=0.98GB 96s | grade=0.915 inner_auc=0.833 vs conf_auc=0.818
+18:57:51 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+18:59:28 [enc/text/yelp_polarity] vote=0.872 uniform=0.867 best1=0.872 n_val=30263 vram=0.97GB 97s | grade=0.914 inner_auc=0.837 vs conf_auc=0.825
+18:59:48 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+19:01:26 [enc/text/yelp_polarity] vote=0.876 uniform=0.870 best1=0.875 n_val=30234 vram=0.98GB 97s | grade=0.914 inner_auc=0.832 vs conf_auc=0.818
+19:01:44 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+19:03:18 [enc/text/yelp_polarity] vote=0.874 uniform=0.868 best1=0.874 n_val=30085 vram=0.98GB 95s | grade=0.914 inner_auc=0.837 vs conf_auc=0.823
+19:03:37 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+19:05:22 [enc/text/yelp_polarity] vote=0.873 uniform=0.868 best1=0.872 n_val=30006 vram=0.98GB 105s | grade=0.914 inner_auc=0.843 vs conf_auc=0.831
+19:05:41 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+19:07:34 [enc/text/yelp_polarity] vote=0.874 uniform=0.868 best1=0.873 n_val=30125 vram=0.98GB 113s | grade=0.915 inner_auc=0.834 vs conf_auc=0.824
+19:07:54 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+19:09:37 [enc/text/yelp_polarity] vote=0.875 uniform=0.869 best1=0.874 n_val=30168 vram=0.97GB 103s | grade=0.915 inner_auc=0.843 vs conf_auc=0.831
+19:09:55 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+19:11:32 [enc/text/yelp_polarity] vote=0.871 uniform=0.869 best1=0.871 n_val=30023 vram=0.98GB 97s | grade=0.911 inner_auc=0.841 vs conf_auc=0.828
+19:11:50 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+19:13:30 [enc/text/yelp_polarity] vote=0.874 uniform=0.869 best1=0.872 n_val=30198 vram=0.98GB 100s | grade=0.914 inner_auc=0.842 vs conf_auc=0.829
+19:13:53 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+19:15:32 [enc/text/yelp_polarity] vote=0.878 uniform=0.872 best1=0.877 n_val=30222 vram=0.97GB 99s | grade=0.915 inner_auc=0.850 vs conf_auc=0.837
+19:15:50 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+19:17:29 [enc/text/yelp_polarity] vote=0.876 uniform=0.869 best1=0.874 n_val=30109 vram=0.98GB 100s | grade=0.916 inner_auc=0.836 vs conf_auc=0.821
+19:17:49 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+19:19:32 [enc/text/yelp_polarity] vote=0.872 uniform=0.865 best1=0.871 n_val=30096 vram=0.98GB 103s | grade=0.912 inner_auc=0.837 vs conf_auc=0.824
+19:19:51 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+19:21:28 [enc/text/yelp_polarity] vote=0.872 uniform=0.867 best1=0.872 n_val=29967 vram=0.98GB 97s | grade=0.914 inner_auc=0.830 vs conf_auc=0.815
+19:21:46 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+19:23:23 [enc/text/yelp_polarity] vote=0.876 uniform=0.871 best1=0.875 n_val=30149 vram=0.98GB 96s | grade=0.913 inner_auc=0.841 vs conf_auc=0.828
+19:23:44 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+19:25:25 [enc/text/yelp_polarity] vote=0.874 uniform=0.867 best1=0.874 n_val=30252 vram=0.98GB 102s | grade=0.913 inner_auc=0.844 vs conf_auc=0.832
+19:25:44 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+19:27:35 [enc/text/yelp_polarity] vote=0.873 uniform=0.868 best1=0.873 n_val=30048 vram=0.98GB 110s | grade=0.914 inner_auc=0.844 vs conf_auc=0.829
+19:27:59 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+19:29:57 [enc/text/yelp_polarity] vote=0.871 uniform=0.865 best1=0.870 n_val=29788 vram=0.98GB 118s | grade=0.912 inner_auc=0.829 vs conf_auc=0.812
+19:30:17 RUN COMPLETE

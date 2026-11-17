@@ -1,0 +1,118 @@
+<svg class="dark " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 854 380" width="854" height="380">
+  <style>:root, .light {
+    --_lm: ;
+    --_dm: initial;
+    --bg: #ffffff;
+    --fg: #1f1f1f;
+    --line: #545454;
+    --accent: #1a73e8;
+    --surface: #f8f9fa;
+    --border: #747775;
+  }
+
+  .dark {
+    --_lm: initial;
+    --_dm: ;
+    --bg: #1f1f1f;
+    --fg: #e3e3e3;
+    --line: #bfbfbf;
+    --accent: #8ab4f8;
+    --surface: #2d2e30;
+    --border: #8e918f;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Google+Sans+Mono:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Google Sans Mono', sans-serif; }
+  svg {
+    --_text:          var(--primaryTextColor, var(--fg));
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--lineColor, var(--defaultLinkColor, var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)))));
+    --_arrow:         var(--_line);
+    --_node-fill:     var(--primaryColor, var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg))));
+    --_node-stroke:   var(--primaryBorderColor, var(--nodeBorder, var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)))));
+    --_group-fill:    var(--surface, var(--bg));
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  var(--_node-stroke);
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }</style>
+  <defs>
+    <style>          text { font-family: "Google Sans Mono", monospace; font-size: 13px; dominant-baseline: central; white-space: pre; }
+          .outer-box { fill: color-mix(in srgb, var(--fg) 6%, transparent); stroke: var(--primaryBorderColor, var(--nodeBorder, var(--border, var(--_node-stroke)))); stroke-width: 1.75px; }
+          .rect-pill { fill: var(--bg); stroke: var(--primaryBorderColor, var(--nodeBorder, var(--border, var(--_node-stroke)))); stroke-width: 1.5px; }
+          .stadium-pill { fill: var(--bg); stroke: var(--primaryBorderColor, var(--nodeBorder, var(--border, var(--_node-stroke)))); stroke-width: 1.5px; }
+          .hex-pill { fill: var(--bg); stroke: var(--primaryBorderColor, var(--nodeBorder, var(--border, var(--_node-stroke)))); stroke-width: 1.5px; stroke-linejoin: round; stroke-linecap: round; }
+          .diamond-box { fill: color-mix(in srgb, var(--fg) 9%, transparent); stroke: var(--primaryBorderColor, var(--nodeBorder, var(--border, var(--_node-stroke)))); stroke-width: 1.5px; stroke-linejoin: round; stroke-linecap: round; }
+          .header-text { font-size: 14px; font-weight: 600; fill: var(--_text); }
+          .label-text { font-size: 13px; font-weight: 500; fill: var(--_text); }
+          .annotation-text { font-size: 12px; font-weight: 500; fill: var(--_text); }
+          .arrow-line, .bus-line { stroke: var(--_line); stroke-width: 1.5px; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+          .divider-line { stroke: var(--primaryBorderColor, var(--nodeBorder, var(--border, var(--_node-stroke)))); stroke-width: 1.0px; stroke-opacity: 0.75; }
+.junction-dot { fill: var(--_line); }
+.junction-pin { fill: var(--bg); stroke: var(--_line); stroke-width: 1.5px; }</style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 Z" fill="var(--_arrow)"/>
+    </marker>
+    <marker id="arrow-left" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 Z" fill="var(--_arrow)"/>
+    </marker>
+  </defs>
+  <g class="shape inner">
+    <rect x="15" y="15" width="149" height="20" rx="3" ry="3" class="rect-pill"/>
+    <text x="89.5" y="25" class="label-text" text-anchor="middle" dominant-baseline="central">Raw Video Stream</text>
+  </g>
+  <g class="shape inner">
+    <rect x="117" y="59" width="132" height="20" rx="3" ry="3" class="rect-pill"/>
+    <text x="183" y="69" class="label-text" text-anchor="middle" dominant-baseline="central">Acoustic Stage</text>
+  </g>
+  <g class="shape inner">
+    <rect x="117" y="81" width="132" height="20" rx="3" ry="3" class="rect-pill"/>
+    <text x="183" y="91" class="label-text" text-anchor="middle" dominant-baseline="central">Motion Slicing</text>
+  </g>
+  <g class="shape inner">
+    <rect x="91.5" y="147" width="157.5" height="20" rx="3" ry="3" class="rect-pill"/>
+    <text x="170.25" y="157" class="label-text" text-anchor="middle" dominant-baseline="central">Action Triggered?</text>
+  </g>
+  <g class="shape inner">
+    <rect x="271.9" y="147" width="145.2" height="20" rx="10" ry="10" class="stadium-pill"/>
+    <text x="344.5" y="157" class="label-text" text-anchor="middle" dominant-baseline="central">No: Skip Frame</text>
+  </g>
+  <g class="shape inner">
+    <rect x="448.5" y="147" width="200" height="20" rx="3" ry="3" class="rect-pill"/>
+    <text x="548.5" y="157" class="label-text" text-anchor="middle" dominant-baseline="central">Next Timestamp Cluster</text>
+  </g>
+  <g class="shape inner">
+    <rect x="57.5" y="213" width="208.5" height="20" rx="3" ry="3" class="rect-pill"/>
+    <text x="161.75" y="223" class="label-text" text-anchor="middle" dominant-baseline="central">Visual Grounding Engine</text>
+  </g>
+  <g class="shape inner">
+    <rect x="505.2" y="279" width="35.6" height="20" rx="3" ry="3" class="rect-pill"/>
+    <text x="523" y="289" class="label-text" text-anchor="middle" dominant-baseline="central">id</text>
+  </g>
+  <g class="shape inner">
+    <rect x="40.5" y="345" width="276.5" height="20" rx="3" ry="3" class="rect-pill"/>
+    <text x="178.75" y="355" class="label-text" text-anchor="middle" dominant-baseline="central">Generate Canonical JSON Payload</text>
+  </g>
+  <line x1="76.75" y1="69" x2="115" y2="69" class="arrow-line" marker-end="url(#arrow)"/>
+  <line x1="76.75" y1="91" x2="115" y2="91" class="arrow-line" marker-end="url(#arrow)"/>
+  <line x1="249" y1="157" x2="271.9" y2="157" class="bus-line"/>
+  <line x1="417.1" y1="157" x2="446.5" y2="157" class="arrow-line" marker-end="url(#arrow)"/>
+  <line x1="76.75" y1="245" x2="104.5" y2="245" class="arrow-line" marker-end="url(#arrow)"/>
+  <line x1="76.75" y1="267" x2="104.5" y2="267" class="arrow-line" marker-end="url(#arrow)"/>
+  <line x1="76.75" y1="289" x2="104.5" y2="289" class="arrow-line" marker-end="url(#arrow)"/>
+  <line x1="317" y1="355" x2="351" y2="355" class="arrow-line" marker-end="url(#arrow)"/>
+  <line x1="76.75" y1="35" x2="76.75" y2="91" class="bus-line"/>
+  <line x1="76.75" y1="233" x2="76.75" y2="289" class="bus-line"/>
+  <line x1="161.75" y1="101" x2="161.75" y2="145" class="arrow-line" marker-end="url(#arrow)"/>
+  <line x1="161.75" y1="167" x2="161.75" y2="211" class="arrow-line" marker-end="url(#arrow)"/>
+  <line x1="161.75" y1="289" x2="161.75" y2="343" class="arrow-line" marker-end="url(#arrow)"/>
+  <circle cx="493.25" cy="289" r="3.5" class="junction-pin"/>
+  <text x="254" y="69" class="annotation-text" text-anchor="start" dominant-baseline="central">: WhisperX flags time-windows containing app-specific keywords.</text>
+  <text x="254" y="91" class="annotation-text" text-anchor="start" dominant-baseline="central">: OpenCV calculates Frame Delta Δ(T0, T1) using absolute pixel differences.</text>
+  <text x="174.5" y="179" class="annotation-text" text-anchor="start" dominant-baseline="central">(Yes: Motion Spike + Verbal Keyword overlap)</text>
+  <text x="115" y="245" class="annotation-text" text-anchor="start" dominant-baseline="central">Grounding DINO identifies matching UI elements (Bbox arrays).</text>
+  <text x="115" y="267" class="annotation-text" text-anchor="start" dominant-baseline="central">SAM 2 locks a persistent tracking mask over the UI component.</text>
+  <text x="115" y="289" class="annotation-text" text-anchor="start" dominant-baseline="central">Core engine draws Set-of-Marks visual dots (</text>
+  <text x="543" y="289" class="annotation-text" text-anchor="start" dominant-baseline="central">) directly onto the frame bytes.</text>
+  <text x="361.5" y="355" class="annotation-text" text-anchor="start" dominant-baseline="central">Inject to Qwen3-VL Fine-tuning &amp; Qdrant RAG Vault</text>
+</svg>

@@ -1,0 +1,169 @@
+{
+   "app_metadata": {
+      "app_name": "Currency Converter for Command Palette",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide the user through the installation and basic usage of the Currency Converter for Command Palette extension",
+   "prerequisite_state": "User is at the Microsoft Store or terminal or GitHub releases page",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click the Microsoft Store badge to open the store page",
+         "ui_target": {
+            "element_name": "Microsoft",
+            "automation_id": null,
+            "hierarchical_path": "Badge > Microsoft",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user is redirected to the Microsoft Store page for the Currency Converter for Command Palette"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run the Winget command to install the extension",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install advaith.CurrencyConverterCommandPalette"
+         },
+         "expected_state_change": "The Winget command is executed and the installation process begins"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click the MSIX package download link on the GitHub Releases page",
+         "ui_target": {
+            "element_name": "MSIX package",
+            "automation_id": null,
+            "hierarchical_path": "Releases page > MSIX package",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user downloads the MSIX package and can install it manually"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Open Command Palette and type a conversion on the home list (for example `300 cny` or `10*30`)",
+         "ui_target": {
+            "element_name": "Command Palette",
+            "automation_id": null,
+            "hierarchical_path": "Home list",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "300 cny"
+         },
+         "expected_state_change": "The converted amount appears immediately"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Press Enter to copy the converted amount",
+         "ui_target": {
+            "element_name": "Enter key",
+            "automation_id": null,
+            "hierarchical_path": "Keyboard",
+            "element_type": "Key",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Enter"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The converted amount is copied to the clipboard"
+      }
+   ],
+   "_meta": {
+      "source_app": "Currency Converter for Command Palette",
+      "app_key": "currency_converter_for_command_palette",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Currency Converter",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:30:59Z",
+      "schema_warnings": [
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

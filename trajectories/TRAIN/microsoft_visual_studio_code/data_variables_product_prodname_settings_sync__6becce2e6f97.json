@@ -1,0 +1,140 @@
+{
+   "app_metadata": {
+      "app_name": "Microsoft Visual Studio Code",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure and manage settings synchronization in Microsoft Visual Studio Code",
+   "prerequisite_state": "Microsoft Visual Studio Code is open and the user is logged in",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Select 'Backup and Sync Settings...' from the 'Manage' gear menu or the 'Accounts' menu at the bottom of the Activity Bar.",
+         "ui_target": {
+            "element_name": "Backup and Sync Settings...",
+            "automation_id": null,
+            "hierarchical_path": "Manage menu > Backup and Sync Settings... or Accounts menu > Backup and Sync Settings...",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Settings Sync configuration picker opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select the data categories to synchronize.",
+         "ui_target": {
+            "element_name": "Settings Sync configuration picker",
+            "automation_id": null,
+            "hierarchical_path": "Settings Sync configuration picker",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected data categories are highlighted"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Select 'Sign in', and then select a Microsoft or GitHub account.",
+         "ui_target": {
+            "element_name": "Sign in",
+            "automation_id": null,
+            "hierarchical_path": "Settings Sync configuration picker > Sign in",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The authentication flow opens in the browser"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Complete the authentication flow in the browser.",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Shift",
+               "T"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The browser navigates to the authentication page"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "After signing in, {% data variables.product.prodname_settings_sync %} automatically merges your local and cloud data and continues to synchronize changes in the background.",
+         "ui_target": null,
+         "virtual_mouse_action": null,
+         "expected_state_change": "The synchronization process starts and the user can continue using VS Code"
+      }
+   ],
+   "_meta": {
+      "source_app": "Microsoft Visual Studio Code",
+      "app_key": "microsoft_visual_studio_code",
+      "dataset_split": "TRAIN",
+      "category": "Code Editor",
+      "guide_title": "{% data variables.product.prodname_settings_sync %}",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:18:22Z",
+      "schema_warnings": [
+         "step4_ungrounded_target",
+         "step5_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

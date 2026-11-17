@@ -1,0 +1,81 @@
+{
+   "app_metadata": {
+      "app_name": "No Bloat PDF",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and set No Bloat PDF as the default PDF viewer",
+   "prerequisite_state": "User is on a computer with internet access",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download and install No Bloat PDF",
+         "ui_target": {
+            "element_name": "Download for Windows",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A download starts for the No Bloat PDF installer"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Set No Bloat PDF as the default PDF viewer",
+         "ui_target": {
+            "element_name": "Open with",
+            "automation_id": null,
+            "hierarchical_path": "Context menu > Open with",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A dialog appears with a list of applications to choose from, No Bloat PDF is selected and 'Always use this app' is checked"
+      }
+   ],
+   "_meta": {
+      "source_app": "No Bloat PDF",
+      "app_key": "no_bloat_pdf",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "The most common file on your computer deserves a viewer that is small, instant, and quiet , not a launcher with ads.",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:08:56Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

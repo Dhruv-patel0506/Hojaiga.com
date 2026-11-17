@@ -1,0 +1,118 @@
+{
+   "app_metadata": {
+      "app_name": "AvUpload",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Zip and upload a file to the Avast® whitelisting server using AvUpload",
+   "prerequisite_state": "AvUpload application is open and the file explorer is ready for file selection",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Choose file(s) via filechooser or drag&drop",
+         "ui_target": {
+            "element_name": "File Chooser",
+            "automation_id": null,
+            "hierarchical_path": "Main window > File Chooser",
+            "element_type": "Dialog",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected file(s) are highlighted in the file explorer"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click on the Zip button to create the archive",
+         "ui_target": {
+            "element_name": "Zip",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Toolbar > Zip",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The archive is created and the file explorer updates to show the new archive file"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click on the Upload button to upload the archive",
+         "ui_target": {
+            "element_name": "Upload",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Toolbar > Upload",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The archive is uploaded to the Avast® whitelisting server"
+      }
+   ],
+   "_meta": {
+      "source_app": "AvUpload",
+      "app_key": "avupload",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "manfred-mueller-avupload-head-readme-md",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:58:58Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

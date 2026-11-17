@@ -1,0 +1,128 @@
+{
+   "app": "Trello",
+   "goal": "",
+   "steps": [
+      {
+         "id": 1,
+         "tut_time": "0:23",
+         "intent": "Create a new Trello board",
+         "action": "click",
+         "target": "Create new board",
+         "value": null,
+         "verify": {
+            "selector": ".trello-create-board-button",
+            "prop": "text",
+            "expected": "Create a board"
+         }
+      },
+      {
+         "id": 2,
+         "tut_time": "0:35",
+         "intent": "Add a list to the board",
+         "action": "fill",
+         "target": "Add list",
+         "value": "To Do",
+         "verify": {
+            "selector": ".trello-list-name input",
+            "prop": "value",
+            "expected": "To Do"
+         }
+      },
+      {
+         "id": 3,
+         "tut_time": "0:45",
+         "intent": "Save the list",
+         "action": "click",
+         "target": "Save list",
+         "value": null,
+         "verify": {
+            "selector": ".trello-save-list-button",
+            "prop": "text",
+            "expected": "Save"
+         }
+      },
+      {
+         "id": 4,
+         "tut_time": "0:55",
+         "intent": "Add a card to the To Do list",
+         "action": "fill",
+         "target": "Add a card",
+         "value": "Buy groceries",
+         "verify": {
+            "selector": ".trello-card-title input",
+            "prop": "value",
+            "expected": "Buy groceries"
+         }
+      },
+      {
+         "id": 5,
+         "tut_time": "1:05",
+         "intent": "Assign a member to the card",
+         "action": "click",
+         "target": "Members",
+         "value": null,
+         "verify": {
+            "selector": ".trello-member-assign input",
+            "prop": "value",
+            "expected": "Assign members"
+         }
+      },
+      {
+         "id": 6,
+         "tut_time": "1:15",
+         "intent": "Apply a label to the card",
+         "action": "click",
+         "target": "Labels",
+         "value": null,
+         "verify": {
+            "selector": ".trello-label-select input",
+            "prop": "value",
+            "expected": "Select a label"
+         }
+      },
+      {
+         "id": 7,
+         "tut_time": "1:25",
+         "intent": "Add a checklist to the card",
+         "action": "click",
+         "target": "Checklist",
+         "value": null,
+         "verify": {
+            "selector": ".trello-checklist-add",
+            "prop": "visible",
+            "expected": "true"
+         }
+      },
+      {
+         "id": 8,
+         "tut_time": "1:35",
+         "intent": "Set a due date for the card",
+         "action": "fill",
+         "target": "Due date",
+         "value": "2023-10-01",
+         "verify": {
+            "selector": ".trello-due-date input",
+            "prop": "value",
+            "expected": "2023-10-01"
+         }
+      },
+      {
+         "id": 9,
+         "tut_time": "1:45",
+         "intent": "Add an attachment to the card",
+         "action": "fill",
+         "target": "Attachment",
+         "value": "path/to/file.jpg",
+         "verify": {
+            "selector": ".trello-attachment-preview",
+            "prop": "text",
+            "expected": "file.jpg"
+         }
+      }
+   ],
+   "app_kind": "web",
+   "source": {
+      "kind": "youtube",
+      "url": ""
+   }
+}

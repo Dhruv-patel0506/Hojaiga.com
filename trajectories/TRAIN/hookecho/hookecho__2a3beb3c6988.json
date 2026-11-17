@@ -1,0 +1,41 @@
+{
+   "app_metadata": {
+      "app_name": "HookEcho",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "web",
+   "high_level_task": "Open the live radar in a browser",
+   "prerequisite_state": "No application is open; user is on the internet",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the live radar in your browser",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "https://app.hookecho.io/"
+         },
+         "expected_state_change": "The browser navigates to the live radar page"
+      }
+   ],
+   "_meta": {
+      "source_app": "hookecho",
+      "app_key": "hookecho",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "HookEcho",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:23:55Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

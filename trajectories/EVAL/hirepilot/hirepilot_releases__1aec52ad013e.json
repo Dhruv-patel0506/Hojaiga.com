@@ -1,0 +1,41 @@
+{
+   "app_metadata": {
+      "app_name": "HirePilot",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "non_gui",
+   "high_level_task": "Verify the integrity of the HirePilot Windows companion installer",
+   "prerequisite_state": "The user has downloaded the HirePilot Windows companion installer and the corresponding SHA256 checksum file",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Run the command to verify the installer's SHA256 checksum",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "$version = \"2.2.2\"\nGet-FileHash \".\\HirePilot-Setup-v$version.exe\" -Algorithm SHA256\nGet-Content \".\\HirePilot-Setup-v$version.exe.sha256\""
+         },
+         "expected_state_change": "The PowerShell command is executed, and the SHA256 values are compared"
+      }
+   ],
+   "_meta": {
+      "source_app": "HirePilot",
+      "app_key": "hirepilot",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "HirePilot Releases",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:50:40Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

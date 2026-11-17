@@ -1,0 +1,117 @@
+{
+ "app": "Windows Media Player",
+ "started": "2026-11-02 04:05:16",
+ "phases": {
+  "read": {
+   "program": {
+    "exe": "C:\\Program Files (x86)\\Windows Media Player\\wmplayer.exe",
+    "mb": 0.2,
+    "filed": {
+     "document_chunks": 1,
+     "commands": 0,
+     "hotkeys": 0
+    },
+    "how_to_drive": "plain Win32: tree reflects the standard controls it uses"
+   },
+   "seconds": 6.1,
+   "level": "none"
+  },
+  "map": {
+   "ran": true,
+   "seconds": 103.2,
+   "level": "explored",
+   "commands": 80,
+   "with_shortcut": 2,
+   "dialogs": 0,
+   "layout_controls": 112,
+   "state_variables": 2,
+   "frontier": {
+    "total": 28,
+    "by_status": {
+     "explored": 1,
+     "no_effect": 10,
+     "open": 15,
+     "unsafe": 2
+    },
+    "explorable": 26,
+    "explored_n": 11,
+    "explored_fraction": 0.423
+   }
+  },
+  "ask": {
+   "asked": 4,
+   "answered": 0,
+   "items": [
+    {
+     "q": "In Windows Media Player, how do I use #?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about mediaplayer (1 documents, 0 procedures, 0 shortcuts). how to use # in Windows Media Player Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In Windows Media Player, how do I use &Help?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about mediaplayer (1 documents, 0 procedures, 0 shortcuts). how to use &Help in Windows Media Player Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In Windows Media Player, how do I use Album?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about mediaplayer (1 documents, 0 procedures, 0 shortcuts). how to use Album feature in Windows Media Player. Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In Windows Media Player, how do I use Album?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about mediaplayer (1 documents, 0 procedures, 0 shortcuts). how to use Album feature in Windows Media Player. Reverse engineering or scanning it more would fill this in."
+    }
+   ],
+   "seconds": 8.2
+  },
+  "practice": {
+   "written": 5,
+   "tried": 5,
+   "proven_done": 0,
+   "kept_training_rows": 0,
+   "results": [
+    {
+     "task": "open Windows Media Player, Library Navigation Pane > Music, Library Navigation Pane > All music, Command Toolbar > Create playlist, titlebar > Maximize, svMarquee > MetadataIconArt, Details, Header Control > Album, Column right, File name: MyFirstPlaylist, Files of type: .aac, Filter dropdown > Artist, Forward (Alt + Right Arrow), New Volume > Music, titlebar > Minimize, Save as: D:\\new_automation\\data\\practice\\windows media player\\MyFirstPlaylist.m3u",
+     "status": "NEEDS_CONFIRM",
+     "seconds": 2.8,
+     "proof": ""
+    },
+    {
+     "task": "open Windows Media Player, Library Navigation Pane > Genre, Library Navigation Pane > All locations, Back (Alt + Left Arrow), Library Navigation Pane > Artist, Column left, File name: MySecondPlaylist, Files of type: .mp3, Filter dropdown > Album, Line down, New Volume > Music, titlebar > Minimize, Save as: D:\\new_automation\\data\\practice\\windows media player\\MySecondPlaylist.m3u",
+     "status": "FAILED",
+     "seconds": 91.4,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'media player': BLOCKED (window hwnd=396384), 8 verified-loop steps in 76.5s\n    - 'open the file C:\\Users\\Public\\Music\\Windows Media Player\\MyS"
+    },
+    {
+     "task": "open Windows Media Player, Library Navigation Pane > Music, Library Navigation Pane > Dhruv Patel, Command Toolbar > Create playlist, titlebar > Maximize, svMarquee > MetadataIconArt, Details, Header Control > Composer, Column right, File name: MyThirdPlaylist, Files of type: .wma, Filter dropdown > Contributing artist, Line up, New Volume > Music, titlebar > Minimize, Save as: D:\\new_automation\\data\\practice\\windows media player\\MyThirdPlaylist.m3u",
+     "status": "FAILED",
+     "seconds": 225.8,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'media player': BLOCKED (window hwnd=396384), 14 verified-loop steps in 197.5s\n    - 'open the file C:\\Program Files\\Windows Media Player\\wmplay"
+    },
+    {
+     "task": "open Windows Media Player, Library Navigation Pane > Album, Library Navigation Pane > All locations, Back (Alt + Left Arrow), Library Navigation Pane > Artist, Column left, File name: MyFourthPlaylist, Files of type: .wav, Filter dropdown > Genre, Line down, New Volume > Music, titlebar > Minimize, Save as: D:\\new_automation\\data\\practice\\windows media player\\MyFourthPlaylist.m3u",
+     "status": "FAILED",
+     "seconds": 62.0,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'media player': BLOCKED (window hwnd=396384), 8 verified-loop steps in 44.8s\n    - 'open the file C:\\Users\\Public\\Music\\Windows Media Player\\MyF"
+    },
+    {
+     "task": "open Windows Media Player, Library Navigation Pane > Music, Library Navigation Pane > All music, Command Toolbar > Create playlist, titlebar > Maximize, svMarquee > MetadataIconArt, Details, Header Control > Length, Column right, File name: MyFifthPlaylist, Files of type: .mp3, Filter dropdown > Album, Line up, New Volume > Music, titlebar > Minimize, Save as: D:\\new_automation\\data\\practice\\windows media player\\MyFifthPlaylist.m3u",
+     "status": "FAILED",
+     "seconds": 161.1,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'media player': BLOCKED (window hwnd=396384), 13 verified-loop steps in 130.7s\n    - 'open the file C:\\Program Files\\Windows Media Player\\wmplay"
+    }
+   ],
+   "seconds": 566.4
+  }
+ },
+ "app_key": "windows media player",
+ "exe": "C:\\Program Files (x86)\\Windows Media Player\\wmplayer.exe",
+ "readiness": {
+  "knows_commands": true,
+  "answers_questions": "0/4",
+  "proven_tasks": "0/5",
+  "verdict": "not ready: nothing proven yet"
+ },
+ "seconds": 688.1
+}

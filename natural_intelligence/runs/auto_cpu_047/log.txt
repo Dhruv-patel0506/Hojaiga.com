@@ -1,0 +1,169 @@
+05:06:40 NI run auto_cpu_047 on CPU; hours=2.0 smoke=False
+05:06:40 explicit task list: ['enc2/graph/twitch_egos']
+05:06:40 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+05:06:43 [data] enc2/graph/twitch_egos: n=127094 C=2 D=1387 shards=1
+05:08:49 [enc2/graph/twitch_egos] vote=0.687 uniform=0.686 best1=0.683 n_val=38087 vram=0.00GB 126s
+05:09:00 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 38087, "n_val": 7761, "base_rate": 0.6747841835021973, "inner": {"auc": 0.5739897178039834, "ece": 0.012685391847934631, "brier": 0.21552738547325134, "acc80": 0.6963595151901245}, "outer_conf": {"auc": 0.5679775094740671, "ece": 0.04887535972641909, "brier": 0.21899954974651337, "acc80": 0.6978092789649963}}
+05:09:00 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+05:12:37 [enc2/graph/twitch_egos] vote=0.688 uniform=0.686 best1=0.688 n_val=38069 vram=0.00GB 217s | grade=0.894 inner_auc=0.584 vs conf_auc=0.582
+05:12:45 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+05:16:29 [enc2/graph/twitch_egos] vote=0.688 uniform=0.685 best1=0.683 n_val=38096 vram=0.00GB 224s | grade=0.892 inner_auc=0.573 vs conf_auc=0.572
+05:16:37 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+05:20:09 [enc2/graph/twitch_egos] vote=0.684 uniform=0.682 best1=0.683 n_val=37973 vram=0.00GB 213s | grade=0.887 inner_auc=0.590 vs conf_auc=0.584
+05:20:16 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+05:24:02 [enc2/graph/twitch_egos] vote=0.689 uniform=0.686 best1=0.683 n_val=38226 vram=0.00GB 226s | grade=0.892 inner_auc=0.578 vs conf_auc=0.574
+05:24:11 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+05:27:48 [enc2/graph/twitch_egos] vote=0.688 uniform=0.686 best1=0.684 n_val=38361 vram=0.00GB 217s | grade=0.896 inner_auc=0.580 vs conf_auc=0.578
+05:27:56 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+05:31:37 [enc2/graph/twitch_egos] vote=0.692 uniform=0.689 best1=0.687 n_val=37773 vram=0.00GB 221s | grade=0.897 inner_auc=0.574 vs conf_auc=0.579
+05:31:44 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+05:35:23 [enc2/graph/twitch_egos] vote=0.687 uniform=0.685 best1=0.681 n_val=38381 vram=0.00GB 218s | grade=0.892 inner_auc=0.573 vs conf_auc=0.572
+05:35:32 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+05:39:02 [enc2/graph/twitch_egos] vote=0.688 uniform=0.685 best1=0.681 n_val=38075 vram=0.00GB 211s | grade=0.895 inner_auc=0.578 vs conf_auc=0.577
+05:39:10 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+05:42:38 [enc2/graph/twitch_egos] vote=0.687 uniform=0.685 best1=0.680 n_val=37960 vram=0.00GB 208s | grade=0.892 inner_auc=0.583 vs conf_auc=0.581
+05:42:47 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+05:46:26 [enc2/graph/twitch_egos] vote=0.688 uniform=0.685 best1=0.681 n_val=38072 vram=0.00GB 219s | grade=0.896 inner_auc=0.572 vs conf_auc=0.569
+05:46:34 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+05:50:15 [enc2/graph/twitch_egos] vote=0.686 uniform=0.684 best1=0.680 n_val=38090 vram=0.00GB 221s | grade=0.896 inner_auc=0.564 vs conf_auc=0.565
+05:50:24 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+05:53:53 [enc2/graph/twitch_egos] vote=0.689 uniform=0.686 best1=0.684 n_val=38313 vram=0.00GB 210s | grade=0.893 inner_auc=0.572 vs conf_auc=0.571
+05:54:03 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+05:57:43 [enc2/graph/twitch_egos] vote=0.686 uniform=0.684 best1=0.681 n_val=38270 vram=0.00GB 220s | grade=0.895 inner_auc=0.571 vs conf_auc=0.571
+05:57:52 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+06:01:21 [enc2/graph/twitch_egos] vote=0.690 uniform=0.688 best1=0.685 n_val=38288 vram=0.00GB 209s | grade=0.896 inner_auc=0.572 vs conf_auc=0.572
+06:01:31 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+06:05:11 [enc2/graph/twitch_egos] vote=0.690 uniform=0.687 best1=0.684 n_val=38209 vram=0.00GB 220s | grade=0.897 inner_auc=0.588 vs conf_auc=0.588
+06:05:19 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+06:08:51 [enc2/graph/twitch_egos] vote=0.690 uniform=0.685 best1=0.688 n_val=38131 vram=0.00GB 212s | grade=0.893 inner_auc=0.571 vs conf_auc=0.570
+06:09:01 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+06:12:35 [enc2/graph/twitch_egos] vote=0.691 uniform=0.685 best1=0.687 n_val=38429 vram=0.00GB 214s | grade=0.892 inner_auc=0.565 vs conf_auc=0.564
+06:12:45 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+06:16:09 [enc2/graph/twitch_egos] vote=0.690 uniform=0.688 best1=0.686 n_val=38195 vram=0.00GB 205s | grade=0.898 inner_auc=0.575 vs conf_auc=0.574
+06:16:18 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+06:19:49 [enc2/graph/twitch_egos] vote=0.691 uniform=0.689 best1=0.686 n_val=38045 vram=0.00GB 211s | grade=0.897 inner_auc=0.589 vs conf_auc=0.584
+06:19:57 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+06:23:39 [enc2/graph/twitch_egos] vote=0.687 uniform=0.685 best1=0.682 n_val=38230 vram=0.00GB 223s | grade=0.896 inner_auc=0.585 vs conf_auc=0.585
+06:23:48 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+06:27:19 [enc2/graph/twitch_egos] vote=0.688 uniform=0.685 best1=0.686 n_val=38302 vram=0.00GB 210s | grade=0.894 inner_auc=0.575 vs conf_auc=0.572
+06:27:30 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+06:31:10 [enc2/graph/twitch_egos] vote=0.690 uniform=0.688 best1=0.685 n_val=38059 vram=0.00GB 221s | grade=0.898 inner_auc=0.569 vs conf_auc=0.568
+06:31:20 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+06:34:51 [enc2/graph/twitch_egos] vote=0.692 uniform=0.689 best1=0.685 n_val=38192 vram=0.00GB 211s | grade=0.896 inner_auc=0.574 vs conf_auc=0.574
+06:35:01 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+06:38:42 [enc2/graph/twitch_egos] vote=0.689 uniform=0.685 best1=0.688 n_val=38255 vram=0.00GB 221s | grade=0.895 inner_auc=0.572 vs conf_auc=0.570
+06:38:51 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+06:42:24 [enc2/graph/twitch_egos] vote=0.692 uniform=0.690 best1=0.685 n_val=38171 vram=0.00GB 214s | grade=0.896 inner_auc=0.572 vs conf_auc=0.571
+06:42:34 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+06:45:54 [enc2/graph/twitch_egos] vote=0.685 uniform=0.683 best1=0.680 n_val=38155 vram=0.00GB 200s | grade=0.893 inner_auc=0.583 vs conf_auc=0.582
+06:46:03 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+06:49:39 [enc2/graph/twitch_egos] vote=0.688 uniform=0.685 best1=0.685 n_val=38392 vram=0.00GB 215s | grade=0.897 inner_auc=0.572 vs conf_auc=0.571
+06:49:49 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+06:53:20 [enc2/graph/twitch_egos] vote=0.686 uniform=0.684 best1=0.686 n_val=37829 vram=0.00GB 211s | grade=0.897 inner_auc=0.571 vs conf_auc=0.568
+06:53:31 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+06:57:14 [enc2/graph/twitch_egos] vote=0.687 uniform=0.683 best1=0.682 n_val=37960 vram=0.00GB 223s | grade=0.897 inner_auc=0.580 vs conf_auc=0.577
+06:57:25 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+07:00:56 [enc2/graph/twitch_egos] vote=0.686 uniform=0.682 best1=0.686 n_val=38286 vram=0.00GB 211s | grade=0.900 inner_auc=0.578 vs conf_auc=0.581
+07:01:08 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+07:05:03 [enc2/graph/twitch_egos] vote=0.692 uniform=0.686 best1=0.688 n_val=38149 vram=0.00GB 236s | grade=0.891 inner_auc=0.574 vs conf_auc=0.573
+07:05:14 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+07:09:53 [enc2/graph/twitch_egos] vote=0.689 uniform=0.687 best1=0.685 n_val=38112 vram=0.00GB 279s | grade=0.898 inner_auc=0.568 vs conf_auc=0.570
+07:10:07 RUN COMPLETE
+19:12:42 NI run auto_cpu_047 on CPU; hours=2.0 smoke=False
+19:12:42 explicit task list: ['enc2/graph/twitch_egos']
+19:12:58 [resume] from checkpoint: next cycle 33, rounds 33, 33 metric rows, inner net restored
+19:12:58 ===== CYCLE 33 (OUTER-ONLY BOOTSTRAP) =====
+19:13:07 [data] enc2/graph/twitch_egos: n=127094 C=2 D=1387 shards=1
+19:25:13 [enc2/graph/twitch_egos] vote=0.690 uniform=0.686 best1=0.685 n_val=38350 vram=0.00GB 726s
+19:26:18 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 33, "n_records": 38350, "n_val": 7661, "base_rate": 0.6890745162963867, "inner": {"auc": 0.5739218445342659, "ece": 0.011397113825412506, "brier": 0.21051636338233948, "acc80": 0.7150783538818359}, "outer_conf": {"auc": 0.5740244324700201, "ece": 0.06805802042810122, "brier": 0.21591366827487946, "acc80": 0.7127937078475952}}
+19:26:18 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+19:40:33 [enc2/graph/twitch_egos] vote=0.689 uniform=0.687 best1=0.684 n_val=38107 vram=0.00GB 855s | grade=0.867 inner_auc=0.572 vs conf_auc=0.573
+19:40:56 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+19:53:49 [enc2/graph/twitch_egos] vote=0.690 uniform=0.687 best1=0.685 n_val=38076 vram=0.00GB 773s | grade=0.871 inner_auc=0.576 vs conf_auc=0.577
+19:54:15 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+10:54:45 NI run auto_cpu_047 on CPU; hours=2.0 smoke=False
+10:54:45 explicit task list: ['enc2/graph/twitch_egos']
+10:54:58 [resume] from checkpoint: next cycle 36, rounds 36, 36 metric rows, inner net restored
+10:54:58 ===== CYCLE 36 (OUTER-ONLY BOOTSTRAP) =====
+10:55:06 [data] enc2/graph/twitch_egos: n=127094 C=2 D=1387 shards=1
+11:04:49 [enc2/graph/twitch_egos] vote=0.690 uniform=0.687 best1=0.686 n_val=38295 vram=0.00GB 583s
+11:05:37 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 36, "n_records": 38295, "n_val": 7810, "base_rate": 0.683610737323761, "inner": {"auc": 0.570394739684593, "ece": 0.020007362698470737, "brier": 0.21316736936569214, "acc80": 0.7043853998184204}, "outer_conf": {"auc": 0.5726188536982167, "ece": 0.043087396762129894, "brier": 0.21545720100402832, "acc80": 0.7053456902503967}}
+11:05:37 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+11:19:30 [enc2/graph/twitch_egos] vote=0.686 uniform=0.683 best1=0.683 n_val=38275 vram=0.00GB 833s | grade=0.861 inner_auc=0.579 vs conf_auc=0.580
+11:19:54 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+11:33:18 [enc2/graph/twitch_egos] vote=0.689 uniform=0.685 best1=0.686 n_val=37999 vram=0.00GB 804s | grade=0.861 inner_auc=0.579 vs conf_auc=0.579
+11:33:42 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+11:47:20 [enc2/graph/twitch_egos] vote=0.689 uniform=0.686 best1=0.683 n_val=38241 vram=0.00GB 818s | grade=0.865 inner_auc=0.580 vs conf_auc=0.580
+11:47:44 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+12:01:42 [enc2/graph/twitch_egos] vote=0.687 uniform=0.684 best1=0.680 n_val=38359 vram=0.00GB 838s | grade=0.864 inner_auc=0.571 vs conf_auc=0.570
+12:02:01 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+12:14:43 [enc2/graph/twitch_egos] vote=0.687 uniform=0.685 best1=0.682 n_val=38104 vram=0.00GB 762s | grade=0.870 inner_auc=0.578 vs conf_auc=0.577
+12:15:04 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+12:27:56 [enc2/graph/twitch_egos] vote=0.689 uniform=0.684 best1=0.685 n_val=38273 vram=0.00GB 773s | grade=0.865 inner_auc=0.579 vs conf_auc=0.581
+12:28:24 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+12:41:45 [enc2/graph/twitch_egos] vote=0.691 uniform=0.686 best1=0.685 n_val=38402 vram=0.00GB 801s | grade=0.867 inner_auc=0.571 vs conf_auc=0.571
+12:42:08 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+12:55:47 [enc2/graph/twitch_egos] vote=0.687 uniform=0.682 best1=0.682 n_val=37873 vram=0.00GB 819s | grade=0.864 inner_auc=0.579 vs conf_auc=0.578
+12:56:15 RUN COMPLETE
+13:43:30 NI run auto_cpu_047 on CPU; hours=2.0 smoke=False
+13:43:30 explicit task list: ['enc2/graph/twitch_egos']
+13:43:45 [resume] from checkpoint: next cycle 45, rounds 45, 45 metric rows, inner net restored
+13:43:45 ===== CYCLE 45 (OUTER-ONLY BOOTSTRAP) =====
+13:43:54 [data] enc2/graph/twitch_egos: n=127094 C=2 D=1387 shards=1
+13:57:14 [enc2/graph/twitch_egos] vote=0.687 uniform=0.685 best1=0.683 n_val=38238 vram=0.00GB 800s
+13:58:13 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 45, "n_records": 38238, "n_val": 7698, "base_rate": 0.6764094829559326, "inner": {"auc": 0.5767789585045052, "ece": 0.02299445637962235, "brier": 0.2151409536600113, "acc80": 0.7041246891021729}, "outer_conf": {"auc": 0.5778874237248333, "ece": 0.039503053724998065, "brier": 0.2168288379907608, "acc80": 0.7026631832122803}}
+13:58:13 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+10:33:28 NI run auto_cpu_047 on CPU; hours=2.0 smoke=False
+10:33:28 explicit task list: ['enc2/graph/twitch_egos']
+10:33:40 [resume] from checkpoint: next cycle 46, rounds 46, 46 metric rows, inner net restored
+10:33:40 ===== CYCLE 46 (OUTER-ONLY BOOTSTRAP) =====
+10:33:46 [data] enc2/graph/twitch_egos: n=127094 C=2 D=1387 shards=1
+10:42:04 [enc2/graph/twitch_egos] vote=0.687 uniform=0.686 best1=0.680 n_val=38165 vram=0.00GB 498s
+10:42:47 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 46, "n_records": 38165, "n_val": 7649, "base_rate": 0.686756432056427, "inner": {"auc": 0.581340434450844, "ece": 0.009535624226926588, "brier": 0.2109348624944687, "acc80": 0.7153129577636719}, "outer_conf": {"auc": 0.5811725917330967, "ece": 0.042740581276869055, "brier": 0.21316403150558472, "acc80": 0.7136787176132202}}
+10:42:47 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+10:55:13 [enc2/graph/twitch_egos] vote=0.690 uniform=0.687 best1=0.686 n_val=38002 vram=0.00GB 746s | grade=0.868 inner_auc=0.584 vs conf_auc=0.582
+10:55:31 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+11:06:50 [enc2/graph/twitch_egos] vote=0.687 uniform=0.683 best1=0.681 n_val=38140 vram=0.00GB 680s | grade=0.881 inner_auc=0.578 vs conf_auc=0.579
+11:07:10 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+11:18:36 [enc2/graph/twitch_egos] vote=0.693 uniform=0.685 best1=0.688 n_val=38343 vram=0.00GB 686s | grade=0.875 inner_auc=0.575 vs conf_auc=0.573
+11:18:57 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+11:30:19 [enc2/graph/twitch_egos] vote=0.686 uniform=0.684 best1=0.686 n_val=37944 vram=0.00GB 682s | grade=0.875 inner_auc=0.577 vs conf_auc=0.578
+11:30:38 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+11:41:54 [enc2/graph/twitch_egos] vote=0.687 uniform=0.684 best1=0.681 n_val=38389 vram=0.00GB 676s | grade=0.879 inner_auc=0.586 vs conf_auc=0.586
+11:42:15 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+11:53:27 [enc2/graph/twitch_egos] vote=0.688 uniform=0.686 best1=0.685 n_val=38307 vram=0.00GB 673s | grade=0.879 inner_auc=0.580 vs conf_auc=0.578
+11:53:51 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+12:05:26 [enc2/graph/twitch_egos] vote=0.686 uniform=0.683 best1=0.682 n_val=38235 vram=0.00GB 695s | grade=0.879 inner_auc=0.569 vs conf_auc=0.568
+12:05:46 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+12:17:07 [enc2/graph/twitch_egos] vote=0.688 uniform=0.685 best1=0.684 n_val=38240 vram=0.00GB 681s | grade=0.882 inner_auc=0.591 vs conf_auc=0.587
+12:17:30 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+12:28:54 [enc2/graph/twitch_egos] vote=0.690 uniform=0.689 best1=0.685 n_val=38429 vram=0.00GB 685s | grade=0.879 inner_auc=0.588 vs conf_auc=0.585
+12:29:14 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+12:42:34 [enc2/graph/twitch_egos] vote=0.688 uniform=0.685 best1=0.685 n_val=38042 vram=0.00GB 799s | grade=0.863 inner_auc=0.585 vs conf_auc=0.585
+12:43:00 RUN COMPLETE
+10:14:31 NI run auto_cpu_047 on CPU; hours=2.0 smoke=False
+10:14:31 explicit task list: ['enc2/graph/twitch_egos']
+10:14:46 [resume] from checkpoint: next cycle 57, rounds 57, 57 metric rows, inner net restored
+10:14:46 ===== CYCLE 57 (OUTER-ONLY BOOTSTRAP) =====
+10:14:54 [data] enc2/graph/twitch_egos: n=127094 C=2 D=1387 shards=1
+10:23:45 [enc2/graph/twitch_egos] vote=0.688 uniform=0.685 best1=0.683 n_val=37869 vram=0.00GB 531s
+10:24:34 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 57, "n_records": 37869, "n_val": 7518, "base_rate": 0.6870177984237671, "inner": {"auc": 0.5722275408748857, "ece": 0.009528286646071442, "brier": 0.21166835725307465, "acc80": 0.7106751203536987}, "outer_conf": {"auc": 0.5726568912253477, "ece": 0.05748051593645547, "brier": 0.2159266471862793, "acc80": 0.7105088233947754}}
+10:24:34 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+10:38:10 [enc2/graph/twitch_egos] vote=0.688 uniform=0.685 best1=0.682 n_val=38270 vram=0.00GB 815s | grade=0.870 inner_auc=0.592 vs conf_auc=0.592
+10:38:33 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+10:51:05 [enc2/graph/twitch_egos] vote=0.687 uniform=0.686 best1=0.681 n_val=37978 vram=0.00GB 753s | grade=0.870 inner_auc=0.587 vs conf_auc=0.586
+10:51:29 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+11:03:53 [enc2/graph/twitch_egos] vote=0.692 uniform=0.687 best1=0.689 n_val=38186 vram=0.00GB 745s | grade=0.865 inner_auc=0.579 vs conf_auc=0.580
+11:04:15 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+11:16:33 [enc2/graph/twitch_egos] vote=0.692 uniform=0.689 best1=0.685 n_val=37924 vram=0.00GB 738s | grade=0.876 inner_auc=0.582 vs conf_auc=0.581
+11:16:53 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+11:29:06 [enc2/graph/twitch_egos] vote=0.686 uniform=0.684 best1=0.680 n_val=38235 vram=0.00GB 733s | grade=0.871 inner_auc=0.578 vs conf_auc=0.579
+11:29:32 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+11:41:56 [enc2/graph/twitch_egos] vote=0.688 uniform=0.685 best1=0.683 n_val=38350 vram=0.00GB 744s | grade=0.874 inner_auc=0.576 vs conf_auc=0.575
+11:42:18 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+11:54:40 [enc2/graph/twitch_egos] vote=0.687 uniform=0.685 best1=0.681 n_val=38294 vram=0.00GB 742s | grade=0.875 inner_auc=0.580 vs conf_auc=0.578
+11:55:05 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+12:07:15 [enc2/graph/twitch_egos] vote=0.686 uniform=0.684 best1=0.680 n_val=38486 vram=0.00GB 731s | grade=0.873 inner_auc=0.579 vs conf_auc=0.580
+12:07:39 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+12:19:17 [enc2/graph/twitch_egos] vote=0.688 uniform=0.687 best1=0.685 n_val=38025 vram=0.00GB 698s | grade=0.879 inner_auc=0.583 vs conf_auc=0.582
+12:19:37 RUN COMPLETE

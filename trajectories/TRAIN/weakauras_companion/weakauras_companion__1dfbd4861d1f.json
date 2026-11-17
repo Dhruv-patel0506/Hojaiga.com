@@ -1,0 +1,252 @@
+{
+   "app_metadata": {
+      "app_name": "WeakAuras Companion",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure and use WeakAuras Companion to fetch and update auras and profiles",
+   "prerequisite_state": "WeakAuras Companion is installed and launched",
+   "total_steps": 8,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Start the WeakAuras Companion",
+         "ui_target": {
+            "element_name": "Start button",
+            "automation_id": null,
+            "hierarchical_path": "Application > Start",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The WeakAuras Companion window opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click on 'Fetch Updates'",
+         "ui_target": {
+            "element_name": "Fetch Updates button",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Fetch Updates",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'Fetching updates...' message appears and the process starts"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Restart World of Warcraft or reload the UI",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The WeakAuras panel in-game shows the 'update-available' icon next to the auras"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click on the 'update-available' icon",
+         "ui_target": {
+            "element_name": "Update-available icon",
+            "automation_id": null,
+            "hierarchical_path": "WeakAuras panel > Update-available icon",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user is prompted to upgrade or import the aura"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Follow the instructions inside the app",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The app guides the user through the process of updating auras"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Open the Plater options panel in-game",
+         "ui_target": {
+            "element_name": "Plater options panel",
+            "automation_id": null,
+            "hierarchical_path": "In-game > Plater options panel",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Plater options panel opens"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Check for available updates in the Profiles tab",
+         "ui_target": {
+            "element_name": "Profiles tab",
+            "automation_id": null,
+            "hierarchical_path": "Plater options panel > Profiles tab",
+            "element_type": "Tab",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Profiles tab is selected and the update indicators are visible"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Click on 'Update Profile'",
+         "ui_target": {
+            "element_name": "Update Profile button",
+            "automation_id": null,
+            "hierarchical_path": "Plater options panel > Profiles tab > Update Profile",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The profile is updated from Wago.io"
+      }
+   ],
+   "_meta": {
+      "source_app": "WeakAuras Companion",
+      "app_key": "weakauras_companion",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "WeakAuras Companion",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:07:17Z",
+      "schema_warnings": [
+         "step3_ungrounded_target",
+         "step5_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

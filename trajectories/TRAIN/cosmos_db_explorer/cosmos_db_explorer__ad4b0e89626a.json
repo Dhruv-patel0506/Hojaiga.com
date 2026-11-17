@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "Cosmos DB Explorer",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Start Cosmos DB Explorer and add an account",
+   "prerequisite_state": "Cosmos DB Explorer is installed and the application is open",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Add your account from File>Add Account",
+         "ui_target": {
+            "element_name": "Add Account",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File > Add Account",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Add Account dialog opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Enter the Label: The display name of your account",
+         "ui_target": {
+            "element_name": "Label",
+            "automation_id": null,
+            "hierarchical_path": "Add Account Dialog > Label",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "DEV"
+         },
+         "expected_state_change": "The Label field is populated with the entered text"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Enter the Account Endpoint: Copy from the URI property from the Keys menu on the Azure Portal",
+         "ui_target": {
+            "element_name": "Account Endpoint",
+            "automation_id": null,
+            "hierarchical_path": "Add Account Dialog > Account Endpoint",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "https://your-account.documents.azure.com:443/"
+         },
+         "expected_state_change": "The Account Endpoint field is populated with the entered text"
+      }
+   ],
+   "_meta": {
+      "source_app": "Cosmos DB Explorer",
+      "app_key": "cosmos_db_explorer",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Cosmos DB Explorer",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:55:04Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

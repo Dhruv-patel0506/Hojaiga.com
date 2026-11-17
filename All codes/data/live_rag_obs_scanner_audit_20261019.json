@@ -1,0 +1,247 @@
+{
+  "audit_kind": "read_only_production_rag_and_archetype_routing",
+  "execution": "NO_UI_ACTIONS_WERE_ATTEMPTED",
+  "warning": "A structural match is not proof of live app autonomy.  A real autonomy claim requires a fresh scan, grounded controls, verified state transitions, and task-specific postconditions.",
+  "store": {
+    "ok": true,
+    "root": "D:\\new_automation\\data\\ai_root",
+    "degraded": [],
+    "tables": {
+      "knowledge_chunks": 223,
+      "procedures": 1427,
+      "fast_paths": 242,
+      "error_playbooks": 51,
+      "ui_states": 302
+    },
+    "embedder": "nomic-embed-text@ollama-cpu",
+    "schema_version": 1
+  },
+  "real_scanned_control_holdout_evaluation": {
+    "matrix": {
+      "archetypes": 25,
+      "train_apps": 175,
+      "test_apps": 75,
+      "name_only_zero_shot": {
+        "n": 75,
+        "accuracy": 0.133
+      }
+    },
+    "real_apps": 22,
+    "splits": 20,
+    "held_out_predictions": 140,
+    "signals_only_top1": 0.564,
+    "signals_plus_fitted_top1": 0.564,
+    "signals_plus_fitted_top3": 0.729,
+    "caveat": "labels for the scanned apps were assigned by me; classes with one scanned app cannot be learned when it is held out, so the fitted number is a floor"
+  },
+  "manual_demo_token_only_accuracy": {
+    "correct": 0,
+    "labelled_cases": 0,
+    "note": "Small hand-labelled smoke test only; not a benchmark or a training score."
+  },
+  "cases": [
+    {
+      "app": "obs",
+      "rag_app_key": "obs_studio",
+      "goal": "Explain the visible controls safely.",
+      "observed_control_count": 48,
+      "observed_controls": [
+        "ButtonControl: Minimize",
+        "ButtonControl: Maximize",
+        "TitleBarControl: TitleBarControl",
+        "MenuBarControl: MenuBarControl",
+        "MenuItemControl: File",
+        "MenuItemControl: Edit",
+        "MenuItemControl: View",
+        "MenuItemControl: Docks",
+        "MenuItemControl: Profile",
+        "MenuItemControl: Scene Collection",
+        "MenuItemControl: Tools",
+        "MenuItemControl: Help",
+        "PaneControl: Scenes",
+        "GroupControl: GroupControl",
+        "GroupControl: GroupControl",
+        "GroupControl: GroupControl",
+        "ButtonControl: Float",
+        "GroupControl: GroupControl",
+        "CustomControl: CustomControl",
+        "PaneControl: Sources",
+        "ButtonControl: Float",
+        "CustomControl: CustomControl",
+        "CustomControl: CustomControl",
+        "CustomControl: CustomControl",
+        "GroupControl: GroupControl",
+        "CustomControl: CustomControl",
+        "PaneControl: Audio Mixer",
+        "PaneControl: Scene Transitions",
+        "PaneControl: Controls",
+        "ButtonControl: Float",
+        "ButtonControl: Float",
+        "ButtonControl: Float",
+        "GroupControl: GroupControl",
+        "CustomControl: CustomControl",
+        "CustomControl: CustomControl",
+        "CustomControl: CustomControl",
+        "CustomControl: CustomControl",
+        "PaneControl: PaneControl",
+        "ToolBarControl: ToolBarControl",
+        "StatusBarControl: StatusBarControl",
+        "GroupControl: GroupControl",
+        "CustomControl: CustomControl",
+        "CustomControl: CustomControl",
+        "CustomControl: CustomControl",
+        "CustomControl: CustomControl",
+        "CustomControl: CustomControl",
+        "CustomControl: CustomControl",
+        "ThumbControl: ThumbControl"
+      ],
+      "expected_archetype_for_manual_audit": null,
+      "token_only": {
+        "candidates": [
+          {
+            "archetype_id": "screen_capture_stream",
+            "archetype_name": "Screen capture / recording / streaming",
+            "relative_score": 1.0
+          },
+          {
+            "archetype_id": "text_editor",
+            "archetype_name": "Plain text editor",
+            "relative_score": 0.7438
+          },
+          {
+            "archetype_id": "presentation",
+            "archetype_name": "Slide presentation",
+            "relative_score": 0.4074
+          }
+        ],
+        "supporting_signal_words": [
+          "mixer",
+          "scenes",
+          "sources"
+        ],
+        "routing_assessment": {
+          "status": "candidate",
+          "margin": 0.2562,
+          "note": "Margin and relative scores rank candidates; neither is a calibrated probability."
+        },
+        "match_is_correct_against_manual_label": null
+      },
+      "production_candidate": {
+        "archetype_id": "screen_capture_stream",
+        "archetype_name": "Screen capture / recording / streaming",
+        "relative_score": 1.0
+      },
+      "direct_app_evidence": {
+        "counts": {
+          "chunks": 4,
+          "commands": 24,
+          "fast_paths": 0,
+          "matching_chunks": 3,
+          "matching_procedures": 3
+        },
+        "chunks": [
+          {
+            "kind": "chunk",
+            "trust": "official_doc",
+            "confidence": 0.63,
+            "citation": "https://obsproject.com/kb/quick-start-guide#(untitled)",
+            "source_kind": "manual",
+            "heading": "(untitled)",
+            "excerpt": "If they aren't moving, or you suspect the wrong device is being captured, click on Settings → Audio and select the devices manually. 4. Test your Settings Double check that all your settings are how you want them in Settings → Output . Then, click Start Recording or Start Streami"
+          },
+          {
+            "kind": "chunk",
+            "trust": "official_doc",
+            "confidence": 0.9,
+            "citation": "https://obsproject.com/kb/quick-start-guide#(untitled)",
+            "source_kind": "manual",
+            "heading": "(untitled)",
+            "excerpt": "Quick Start Guide | OBS OBS Open Broadcaster Software ®️ Discord Twitter Mastodon GitHub Contribute Knowledge Base > Getting Started > Quick Start Guide Quick Start Guide 2021-08-25 Table of Contents Get Started in 5 Easy Steps Further Reading Help and Support Get Started in 5 Ea"
+          },
+          {
+            "kind": "chunk",
+            "trust": "official_doc",
+            "confidence": 0.72,
+            "citation": "https://obsproject.com/kb/quick-start-guide#(untitled)",
+            "source_kind": "manual",
+            "heading": "(untitled)",
+            "excerpt": "You can add all kinds of Sources — to show images, text, video, your webcam, game play, desktop, etc. At the bottom of the main window is the Sources Dock. Click on the + symbol to add a source of your choice. Here are a few basic Sources to get you started: Display Capture Sourc"
+          }
+        ],
+        "procedures": [
+          {
+            "kind": "procedure",
+            "trust": "learned",
+            "confidence": 0.5,
+            "citation": "local_recorder:child_window",
+            "source_kind": "",
+            "heading": "",
+            "excerpt": "Open the 'Scenes' window from 'Float' (deep section)"
+          },
+          {
+            "kind": "procedure",
+            "trust": "verified",
+            "confidence": 0.5,
+            "citation": "local_recorder:crash",
+            "source_kind": "",
+            "heading": "",
+            "excerpt": "Do not operate 'Mic/Aux' through UI Automation: it ends the application"
+          },
+          {
+            "kind": "procedure",
+            "trust": "learned",
+            "confidence": 0.5,
+            "citation": "local_recorder:child_window",
+            "source_kind": "",
+            "heading": "",
+            "excerpt": "Open the 'Advanced Audio Properties' window from 'Advanced Audio Properties' (deep section)"
+          }
+        ],
+        "router_evidence": [
+          {
+            "kind": "chunk",
+            "trust": "official_doc",
+            "confidence": 0.63,
+            "citation": "https://obsproject.com/kb/quick-start-guide#(untitled)",
+            "source_kind": "manual",
+            "heading": "(untitled)",
+            "excerpt": "If they aren't moving, or you suspect the wrong device is being captured, click on Settings → Audio and select the devices manually. 4. Test your Settings Double check that all your settings are how you want them in Settings → Output . Then, click Start Recording or Start Streami"
+          }
+        ],
+        "router_gaps": [],
+        "router_plan_count_not_executed": 0
+      },
+      "archetype_context": {
+        "action_grammar": [
+          "pick source",
+          "set output",
+          "start",
+          "stop",
+          "save"
+        ],
+        "trap_guards": [
+          "buy",
+          "delete",
+          "empty",
+          "format",
+          "go live",
+          "log out",
+          "pay",
+          "post",
+          "publish",
+          "purchase",
+          "remove all",
+          "send",
+          "sign out",
+          "start streaming",
+          "submit",
+          "uninstall",
+          "upload"
+        ],
+        "visible_trap_hits": [],
+        "fallback_skeleton": null
+      },
+      "automation_verdict": "DIRECT_GOAL_EVIDENCE_PRESENT__STILL_REQUIRES_LIVE_STATE_GROUNDING_AND_POSTCONDITION_CHECKS"
+    }
+  ]
+}

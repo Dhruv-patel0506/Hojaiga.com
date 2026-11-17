@@ -1,0 +1,81 @@
+{
+   "app_metadata": {
+      "app_name": "File Search Manager",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Start File Search Manager and perform a basic search operation",
+   "prerequisite_state": "File Search Manager is not running",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Start File Search Manager",
+         "ui_target": {
+            "element_name": "File Search Manager",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Application",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "File Search Manager application window opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Type in Filter to narrow the result list",
+         "ui_target": {
+            "element_name": "Filter",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Filter TextBox",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Filter"
+         },
+         "expected_state_change": "The result list narrows based on the filter text"
+      }
+   ],
+   "_meta": {
+      "source_app": "File Search Manager",
+      "app_key": "file_search_manager",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "File Search Manager",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:08:23Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

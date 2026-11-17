@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "Subloader",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Open Subloader and use its GUI to search for subtitles",
+   "prerequisite_state": "Subloader application is installed and open on its main window",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the 'File' button to start a search",
+         "ui_target": {
+            "element_name": "File",
+            "automation_id": null,
+            "hierarchical_path": "Main window > File button",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The main window's search functionality is activated, allowing the user to select a video file"
+      }
+   ],
+   "_meta": {
+      "source_app": "Subloader",
+      "app_key": "subloader",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Subloader",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:57:34Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,141 @@
+{
+   "app_metadata": {
+      "app_name": "AVD Health Monitor",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure and launch AVD Health Monitor for real-time Azure Virtual Desktop endpoint health monitoring",
+   "prerequisite_state": "The application is not running and the user is on the Windows desktop",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the latest MSI installer from the Releases page",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user is directed to the Releases page"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run the downloaded MSI installer",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The installation wizard opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Follow the installation wizard to install the application",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CONTINUOUS_DRAG",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The application is installed and added to the Start Menu"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Launch the application from the Start Menu",
+         "ui_target": {
+            "element_name": "AVD Health Monitor",
+            "automation_id": null,
+            "hierarchical_path": "Start Menu > AVD Health Monitor",
+            "element_type": "Application",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The application starts and the main dashboard is displayed"
+      }
+   ],
+   "_meta": {
+      "source_app": "AVD Health Monitor",
+      "app_key": "avd_health_monitor",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "AVD Health Monitor",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:02:18Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

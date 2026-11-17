@@ -1,0 +1,133 @@
+{
+   "app_metadata": {
+      "app_name": "RIGStats",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and run RIGStats on Windows",
+   "prerequisite_state": "Windows 10/11 x64 is installed",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install RIGStats using winget",
+         "ui_target": {
+            "element_name": "winget",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Shift",
+               "w"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "RIGStats is installed and the sensor sidecar is registered as a Windows Service"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Build and run the debug binary",
+         "ui_target": {
+            "element_name": "rigstats.exe",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": ".\\target\\debug\\rigstats.exe"
+         },
+         "expected_state_change": "The RIGStats dashboard appears on a secondary monitor"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Restart the workflow if the process is locked",
+         "ui_target": {
+            "element_name": "rigstats.exe",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Shift",
+               "r"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The RIGStats debug binary is rebuilt and launched"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Build the production installer",
+         "ui_target": {
+            "element_name": "rigstats.exe",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "cargo xtask build"
+         },
+         "expected_state_change": "The RIGStats installer is built and the sensor sidecar is bundled"
+      }
+   ],
+   "_meta": {
+      "source_app": "RIGStats",
+      "app_key": "rigstats",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "RIGStats (rig-dashboard)",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:16:45Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

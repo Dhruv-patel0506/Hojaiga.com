@@ -1,0 +1,137 @@
+{
+   "app_metadata": {
+      "app_name": "Onion Board",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install Onion Board and configure sound settings",
+   "prerequisite_state": "No application is open",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download OnionBoardSetup.exe and double-click it",
+         "ui_target": {
+            "element_name": "Download link",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Hyperlink",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "OnionBoardSetup.exe opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Follow the on-screen instructions to install Onion Board",
+         "ui_target": {
+            "element_name": "Install button",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Installation completes and Onion Board opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Follow Bun the bunny's four steps: your mic, your headphones, where your sounds go, and what to set in Discord or your game",
+         "ui_target": {
+            "element_name": "Bun the bunny's guide",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Text",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Settings for sound output are configured"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Drag sounds onto the window and double-click a pad to play it. Right-click a pad for a hotkey, or Edit for its picture and effects",
+         "ui_target": {
+            "element_name": "Pad",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Sound plays and pad settings can be edited"
+      }
+   ],
+   "_meta": {
+      "source_app": "Onion Board",
+      "app_key": "onion_board",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "⬇️ [Download Onion Board for Windows](../../releases/latest/download/OnionBoardSetup.exe)",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T19:14:39Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

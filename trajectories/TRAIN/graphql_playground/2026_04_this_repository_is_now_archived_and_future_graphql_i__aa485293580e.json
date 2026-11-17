@@ -1,0 +1,62 @@
+{
+   "app_metadata": {
+      "app_name": "GraphQL Playground",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure GraphQL Playground",
+   "prerequisite_state": "No application is open",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the Terminal or Command Prompt",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Terminal or Command Prompt window is open and ready for input"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run the command to install GraphQL Playground",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "brew install --cask graphql-playground"
+         },
+         "expected_state_change": "The installation process of GraphQL Playground starts in the Terminal or Command Prompt"
+      }
+   ],
+   "_meta": {
+      "source_app": "GraphQL Playground",
+      "app_key": "graphql_playground",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "2026-04: This repository is now archived and future GraphQL IDE developments will happen in [GraphiQL](https://github.com/graphql/graphiql/).",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:13:09Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

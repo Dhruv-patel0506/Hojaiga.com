@@ -1,0 +1,112 @@
+{
+   "app_metadata": {
+      "app_name": "explobar",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure explobar to provide a toolbar for quick access to productivity tools and commands.",
+   "prerequisite_state": "Windows 10/11 system with .NET Framework 4.8.1+ installed.",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install explobar using winget",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install explobar"
+         },
+         "expected_state_change": "explobar is installed and available in the system."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Start explobar by typing 'explobar' in the Run dialog and pressing Enter",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "explobar"
+         },
+         "expected_state_change": "explobar application starts and appears in the system tray."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Configure explobar by right-clicking the tray menu and selecting 'Start with Windows'",
+         "ui_target": {
+            "element_name": "Start with Windows",
+            "automation_id": null,
+            "hierarchical_path": "System Tray Menu > Start with Windows",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "explobar starts automatically with Windows."
+      }
+   ],
+   "_meta": {
+      "source_app": "explobar",
+      "app_key": "explobar",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "The Problem",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T19:10:14Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

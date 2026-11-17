@@ -1,0 +1,342 @@
+{
+   "app_metadata": {
+      "app_name": "Celestia",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Provide an overview of how to use Celestia and its basic controls",
+   "prerequisite_state": "Celestia is open and running",
+   "total_steps": 10,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click on the Earth icon to start Celestia",
+         "ui_target": {
+            "element_name": "Earth",
+            "automation_id": null,
+            "hierarchical_path": "Window > Earth",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Celestia window opens with Earth in front of a field of stars"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Right drag the mouse to orbit Earth",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Camera orbits Earth"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Left drag the mouse to change orientation",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Camera rotates about its center"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Roll the mouse wheel to change distance to Earth",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Camera moves closer or farther from Earth"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Press G to zoom to the selected object",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "G"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "Camera zooms to the selected object"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Click on a star to select it",
+         "ui_target": {
+            "element_name": "Star",
+            "automation_id": null,
+            "hierarchical_path": "Canvas > Star",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Information about the selected star is displayed"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Press G to travel to the selected star",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "G"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "Camera travels to the selected star"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Right click on the Sun to bring up a menu",
+         "ui_target": {
+            "element_name": "Sun",
+            "automation_id": null,
+            "hierarchical_path": "Canvas > Sun",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Menu of planets and other objects in the solar system appears"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Select a planet from the menu and press G to travel to it",
+         "ui_target": {
+            "element_name": "Planet",
+            "automation_id": null,
+            "hierarchical_path": "Menu > Planet",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Camera travels to the selected planet"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Right click on the planet to orbit it",
+         "ui_target": {
+            "element_name": "Planet",
+            "automation_id": null,
+            "hierarchical_path": "Canvas > Planet",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Camera orbits the selected planet"
+      }
+   ],
+   "_meta": {
+      "source_app": "Celestia",
+      "app_key": "celestia",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Celestia",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:11:39Z",
+      "schema_warnings": [
+         "step2_ungrounded_target",
+         "step3_ungrounded_target",
+         "step4_ungrounded_target",
+         "step5_ungrounded_target",
+         "step7_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

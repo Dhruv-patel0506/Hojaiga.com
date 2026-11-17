@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "IdleHarbor",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Launch IdleHarbor and confirm the visible state is Stopped.",
+   "prerequisite_state": "No application is open.",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Launch IdleHarbor and confirm the visible state is Stopped.",
+         "ui_target": {
+            "element_name": "IdleHarbor window",
+            "automation_id": null,
+            "hierarchical_path": "Window > IdleHarbor",
+            "element_type": "Window",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "IdleHarbor window opens and the title bar displays 'IdleHarbor v0.2.0' with the window title bar showing 'IdleHarbor' and the window body showing 'Stopped' in the center."
+      }
+   ],
+   "_meta": {
+      "source_app": "IdleHarbor",
+      "app_key": "idleharbor",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "IdleHarbor — Lightweight Windows Mouse Jiggler and Keep-Awake Utility",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:13:17Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

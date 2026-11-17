@@ -1,0 +1,146 @@
+{
+   "app_metadata": {
+      "app_name": "tosu",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "non_gui",
+   "high_level_task": "Provide instructions for installing and using tosu",
+   "prerequisite_state": "No specific application state required",
+   "total_steps": 8,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download tosu",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "https://github.com/tosuapp/tosu/releases/latest"
+         },
+         "expected_state_change": "User navigates to the tosu download page"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Extract tosu.exe to a Folder",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Extract tosu.exe to a Folder"
+         },
+         "expected_state_change": "tosu.exe is extracted to a folder"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Run tosu.exe",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Run tosu.exe"
+         },
+         "expected_state_change": "tosu application is launched"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Go to http://127.0.0.1:24050",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "http://127.0.0.1:24050"
+         },
+         "expected_state_change": "User navigates to the tosu dashboard"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Now you in overlays dashboard, in here you can download counters, or tweak settings of tosu",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Now you in overlays dashboard, in here you can download counters, or tweak settings of tosu"
+         },
+         "expected_state_change": "User is in the tosu dashboard with options to download counters or tweak settings"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Watch showcase of dashboard: [link](https://youtu.be/3eW4TD_zwhM)",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Watch showcase of dashboard: [link](https://youtu.be/3eW4TD_zwhM)"
+         },
+         "expected_state_change": "User watches the showcase of the tosu dashboard"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Have fun!",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Have fun!"
+         },
+         "expected_state_change": "User is ready to use tosu"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Enable in-game overlay by editing tosu.env and setting ENABLE_INGAME_OVERLAY=true",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Enable in-game overlay by editing tosu.env and setting ENABLE_INGAME_OVERLAY=true"
+         },
+         "expected_state_change": "In-game overlay is enabled in tosu"
+      }
+   ],
+   "_meta": {
+      "source_app": "tosu",
+      "app_key": "tosu",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "Maintainers",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:47:38Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target",
+         "step4_ungrounded_target",
+         "step5_ungrounded_target",
+         "step6_ungrounded_target",
+         "step7_ungrounded_target",
+         "step8_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

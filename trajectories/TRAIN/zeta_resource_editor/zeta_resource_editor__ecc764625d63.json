@@ -1,0 +1,139 @@
+{
+   "app_metadata": {
+      "app_name": "Zeta Resource Editor",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide on how to use Zeta Resource Editor to edit and manage .NET resource files",
+   "prerequisite_state": "Zeta Resource Editor is installed and open",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Create your resource files in Visual Studio .NET 2005 as you usually do",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": null,
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Resource files are created in the Properties folder of the project"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Start Zeta Resource Editor and open the resource files",
+         "ui_target": {
+            "element_name": "File",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The File dropdown opens showing Open, Save, etc."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Choose Open",
+         "ui_target": {
+            "element_name": "Open",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File > Open",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Resource files are loaded into Zeta Resource Editor"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Edit the resources and save them",
+         "ui_target": {
+            "element_name": "Save",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File > Save",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Resource files are saved and the changes are applied"
+      }
+   ],
+   "_meta": {
+      "source_app": "Zeta Resource Editor",
+      "app_key": "zeta_resource_editor",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Zeta Resource Editor",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:35:49Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

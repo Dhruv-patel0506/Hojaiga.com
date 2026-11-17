@@ -1,0 +1,169 @@
+{
+   "app_metadata": {
+      "app_name": "WFInfo",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Set up WFInfo for use in Warframe",
+   "prerequisite_state": "User has downloaded and installed WFInfo and required dependencies",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the latest release of WFInfo",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User navigates to the download page and downloads the latest release"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Download Microsoft Visual C++ Redistributable 2019 for x64 and x86",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User navigates to the download page and downloads the x64 and x86 versions of the Visual C++ Redistributable 2019"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Run WFInfo.exe and wait for initial load",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "WFInfo application opens and completes initial load"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Set the display mode to Borderless Fullscreen in Warframe",
+         "ui_target": {
+            "element_name": "Display Settings",
+            "automation_id": null,
+            "hierarchical_path": "Settings > Display",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Warframe display settings open"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Enable Item Labels in Warframe",
+         "ui_target": {
+            "element_name": "Item Labels",
+            "automation_id": null,
+            "hierarchical_path": "Settings > Display > Item Labels",
+            "element_type": "CheckBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Item labels are enabled in Warframe"
+      }
+   ],
+   "_meta": {
+      "source_app": "WFInfo",
+      "app_key": "wfinfo",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Description",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:10:33Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

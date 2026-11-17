@@ -1,0 +1,165 @@
+{
+   "app_metadata": {
+      "app_name": "APRSNET Desktop",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide the user through the first run setup of the APRSNET Desktop client",
+   "prerequisite_state": "The APRSNET Desktop client is installed and launched for the first time",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Enter callsign and APRS-IS passcode",
+         "ui_target": {
+            "element_name": "Callsign and Passcode input fields",
+            "automation_id": null,
+            "hierarchical_path": "Connect screen > Callsign and Passcode input fields",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Enter your callsign and APRS-IS passcode here"
+         },
+         "expected_state_change": "The input fields for callsign and passcode are populated with the user's credentials"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Enter your aprsnet.uk member account credentials",
+         "ui_target": {
+            "element_name": "Username and Password input fields",
+            "automation_id": null,
+            "hierarchical_path": "Connect screen > Username and Password input fields",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Enter your aprsnet.uk username and password here"
+         },
+         "expected_state_change": "The input fields for username and password are populated with the user's credentials"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Tick Remember me and connect automatically",
+         "ui_target": {
+            "element_name": "Remember me and connect automatically checkbox",
+            "automation_id": null,
+            "hierarchical_path": "Connect screen > Remember me and connect automatically checkbox",
+            "element_type": "CheckBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The checkbox is checked, indicating the user wants to remember their credentials and connect automatically"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click Connect to APRS Net",
+         "ui_target": {
+            "element_name": "Connect to APRS Net button",
+            "automation_id": null,
+            "hierarchical_path": "Connect screen > Connect to APRS Net button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Connect to APRS Net button is clicked, initiating the connection process"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "The full web dashboard loads inside the app with the client toolbar at the top",
+         "ui_target": {
+            "element_name": "Full web dashboard",
+            "automation_id": null,
+            "hierarchical_path": "Desktop window > Full web dashboard",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The full web dashboard is displayed with the client toolbar at the top of the window"
+      }
+   ],
+   "_meta": {
+      "source_app": "APRSNET Desktop",
+      "app_key": "aprsnet_desktop",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "APRS Client",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:26:47Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

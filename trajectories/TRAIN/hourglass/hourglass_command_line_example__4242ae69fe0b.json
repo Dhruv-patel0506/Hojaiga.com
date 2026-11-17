@@ -1,0 +1,41 @@
+{
+   "app_metadata": {
+      "app_name": "Hourglass",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "cli",
+   "high_level_task": "Install Hourglass using WinGet",
+   "prerequisite_state": "Windows system with internet access",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Run the command `winget source update` in a command prompt with administrator privileges",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget source update"
+         },
+         "expected_state_change": "The command prompt outputs the message 'Source 'Microsoft' has been updated'"
+      }
+   ],
+   "_meta": {
+      "source_app": "Hourglass",
+      "app_key": "hourglass",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Hourglass Command-line Example",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:27:57Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

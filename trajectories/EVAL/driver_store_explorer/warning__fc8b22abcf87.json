@@ -1,0 +1,137 @@
+{
+   "app_metadata": {
+      "app_name": "Driver Store Explorer",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install Driver Store Explorer via pre-built binary",
+   "prerequisite_state": "User is on the latest release page of Driver Store Explorer",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Go to the latest release page",
+         "ui_target": {
+            "element_name": "latest release page",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User is navigated to the latest release page"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Download the latest ZIP archive",
+         "ui_target": {
+            "element_name": "Download button",
+            "automation_id": null,
+            "hierarchical_path": "Download section > Download button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The ZIP archive starts downloading"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Extract the files to a folder of your choice",
+         "ui_target": {
+            "element_name": "Extract button",
+            "automation_id": null,
+            "hierarchical_path": "Downloaded ZIP > Extract button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The files are extracted to the chosen folder"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Run Rapr.exe",
+         "ui_target": {
+            "element_name": "Rapr.exe",
+            "automation_id": null,
+            "hierarchical_path": "Extracted folder > Rapr.exe",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Driver Store Explorer opens"
+      }
+   ],
+   "_meta": {
+      "source_app": "Driver Store Explorer",
+      "app_key": "driver_store_explorer",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "⚠️ Warning",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:19:27Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

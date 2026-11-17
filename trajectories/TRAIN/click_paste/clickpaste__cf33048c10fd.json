@@ -1,0 +1,165 @@
+{
+   "app_metadata": {
+      "app_name": "Click Paste",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure and use Click Paste to paste clipboard contents as keystrokes to a selected location",
+   "prerequisite_state": "Click Paste is installed and running, with the notification icon visible in the Windows 10/11 notification area",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click the target notification icon to begin",
+         "ui_target": {
+            "element_name": "Target notification icon",
+            "automation_id": null,
+            "hierarchical_path": "Windows taskbar > Notification area > Click Paste icon",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Click Paste menu opens showing options to choose a location to paste"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click to choose a location you want to paste the text",
+         "ui_target": {
+            "element_name": "Location to paste",
+            "automation_id": null,
+            "hierarchical_path": "Click Paste menu > Select location to paste",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The clipboard contents are typed as keystrokes onto the selected window"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Right-click the notification icon and select Settings",
+         "ui_target": {
+            "element_name": "Settings",
+            "automation_id": null,
+            "hierarchical_path": "Windows taskbar > Notification area > Click Paste icon > Right-click menu > Settings",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Settings dialog opens"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Configure settings as needed",
+         "ui_target": {
+            "element_name": "Settings dialog",
+            "automation_id": null,
+            "hierarchical_path": "Settings dialog",
+            "element_type": "Dialog",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "Change between key typing modes, set delay, trigger confirmation, configure hot key, configure hot key behavior"
+         },
+         "expected_state_change": "Settings are updated according to user input"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Right-click the notification icon and select Exit",
+         "ui_target": {
+            "element_name": "Exit",
+            "automation_id": null,
+            "hierarchical_path": "Windows taskbar > Notification area > Click Paste icon > Right-click menu > Exit",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Click Paste is exited"
+      }
+   ],
+   "_meta": {
+      "source_app": "Click Paste",
+      "app_key": "click_paste",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "ClickPaste",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:19:18Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

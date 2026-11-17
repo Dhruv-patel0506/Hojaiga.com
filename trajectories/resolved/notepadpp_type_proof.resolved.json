@@ -1,0 +1,34 @@
+{
+   "app_metadata": {
+      "app_name": "Notepad++",
+      "winget_id": "Notepad++.Notepad++",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "high_level_task": "Type a proof string into a new Notepad++ document",
+   "prerequisite_state": "A fresh 'new 1' Notepad++ document is open with the editor focused",
+   "total_steps": 1,
+   "grounding_note": "ui_target is the real 'new 1' tab node (role=tabitem, only a select pattern) so the step is not mis-routed to the invokable Edit menu or Minimize button; the editor is Scintilla (no ValuePattern), so text is delivered to the focused editor via EM_REPLACESEL/WM_CHAR and verified by the status-bar 'length' readout.",
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Type the proof text into the focused editor",
+         "ui_target": {
+            "element_name": "new 1",
+            "element_type": "tab",
+            "automation_id": "",
+            "bounding_box": [
+               11,
+               94,
+               130,
+               122
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "text_payload": "HOJAIGA NPP PROOF 42"
+         },
+         "expected_state_change": "length: 20"
+      }
+   ]
+}

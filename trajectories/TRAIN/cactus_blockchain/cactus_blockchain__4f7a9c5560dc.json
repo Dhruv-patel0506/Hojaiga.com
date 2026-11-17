@@ -1,0 +1,360 @@
+{
+   "app_metadata": {
+      "app_name": "Cactus Blockchain",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "high_level_task": "Install and set up Cactus Blockchain on Ubuntu/Debian",
+   "prerequisite_state": "Ubuntu/Debian system with internet access",
+   "total_steps": 12,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Update the package list",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "sudo apt-get update"
+         },
+         "expected_state_change": "Package list is updated"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Upgrade all packages",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "sudo apt-get upgrade -y"
+         },
+         "expected_state_change": "All packages are upgraded"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Install Git",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "sudo apt install git -y"
+         },
+         "expected_state_change": "Git is installed"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Clone the Cactus Blockchain repository",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "git clone https://github.com/Cactus-Network/cactus-blockchain.git --recurse-submodules"
+         },
+         "expected_state_change": "Repository is cloned"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Change directory to the cloned repository",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "cd cactus-blockchain"
+         },
+         "expected_state_change": "Changed to the cloned repository directory"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Run the installation script",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "sh install.sh"
+         },
+         "expected_state_change": "Installation script is executed"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Activate the environment",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": ". ./activate"
+         },
+         "expected_state_change": "Environment is activated"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Initialize Cactus Blockchain",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "cactus init"
+         },
+         "expected_state_change": "Cactus Blockchain is initialized"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Start the farmer",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "cactus start farmer"
+         },
+         "expected_state_change": "Farmer is started"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Update to version 1.3.4",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "cactus stop -d all"
+         },
+         "expected_state_change": "All Cactus processes are stopped"
+      },
+      {
+         "step_id": 11,
+         "low_level_instruction": "Delete the 'cactus-blockchain' folder",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "rm -rf cactus-blockchain"
+         },
+         "expected_state_change": "'cactus-blockchain' folder is deleted"
+      },
+      {
+         "step_id": 12,
+         "low_level_instruction": "Clone the updated Cactus Blockchain repository",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "git clone https://github.com/Cactus-Network/cactus-blockchain.git --recurse-submodules"
+         },
+         "expected_state_change": "Updated repository is cloned"
+      }
+   ],
+   "_meta": {
+      "source_app": "Cactus Blockchain",
+      "app_key": "cactus_blockchain",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Cactus-Blockchain",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T13:05:50Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

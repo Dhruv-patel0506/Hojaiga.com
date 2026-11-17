@@ -1,0 +1,84 @@
+{
+   "app_metadata": {
+      "app_name": "Sticker",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure the Sticker application via winget and provide instructions for using the application.",
+   "prerequisite_state": "No application is installed and the user is on a Windows 11 system with .NET 10 SDK installed and Developer Mode turned on.",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install the app via winget",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install Zophie.Sticker"
+         },
+         "expected_state_change": "The installation process starts for the Sticker application."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Install the app from the latest release",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "https://github.com/Zophie-Sticker/Sticker/releases/latest"
+         },
+         "expected_state_change": "The user navigates to the latest release page of the Sticker application."
+      }
+   ],
+   "_meta": {
+      "source_app": "Sticker",
+      "app_key": "sticker",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Sticker",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:38:30Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

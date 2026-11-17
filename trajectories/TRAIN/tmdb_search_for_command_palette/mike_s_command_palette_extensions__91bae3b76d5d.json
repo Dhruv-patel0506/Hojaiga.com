@@ -1,0 +1,81 @@
+{
+   "app_metadata": {
+      "app_name": "TMDB Search for Command Palette",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Set up TMDB Search extension for Command Palette",
+   "prerequisite_state": "Command Palette is open and TMDB Search extension is installed",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the TMDB Search extension's settings",
+         "ui_target": {
+            "element_name": "Settings",
+            "automation_id": null,
+            "hierarchical_path": "Command Palette > TMDB Search > Settings",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The settings window for TMDB Search opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Enter the API Read Access Token",
+         "ui_target": {
+            "element_name": "API Read Access Token",
+            "automation_id": null,
+            "hierarchical_path": "Settings > API Read Access Token",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Your API Read Access Token"
+         },
+         "expected_state_change": "The API Read Access Token is entered and stored"
+      }
+   ],
+   "_meta": {
+      "source_app": "TMDB Search for Command Palette",
+      "app_key": "tmdb_search_for_command_palette",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Mike's Command Palette Extensions",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:31:27Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

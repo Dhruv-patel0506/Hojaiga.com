@@ -1,0 +1,41 @@
+{
+   "app_metadata": {
+      "app_name": "HRRR-Render",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "cli",
+   "high_level_task": "Build and run HRRR-Render to render weather maps",
+   "prerequisite_state": "The user has the HRRR-Render application installed and the necessary dependencies are met",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Build the HRRR-Render application in release mode",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "cargo build --release"
+         },
+         "expected_state_change": "The HRRR-Render application is compiled in release mode"
+      }
+   ],
+   "_meta": {
+      "source_app": "HRRR-Render",
+      "app_key": "hrrr_render",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "hrrr-render",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:51:41Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

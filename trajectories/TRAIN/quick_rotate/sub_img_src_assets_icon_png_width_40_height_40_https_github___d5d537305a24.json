@@ -1,0 +1,165 @@
+{
+   "app_metadata": {
+      "app_name": "Quick Rotate",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure and use Quick Rotate to manage display orientations",
+   "prerequisite_state": "Quick Rotate application is open on its main interface",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click the 'Settings ⚙️' button",
+         "ui_target": {
+            "element_name": "Settings ⚙️",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Settings ⚙️",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The settings panel opens with various configuration options"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click the 'Minimize to Tray on Close' checkbox",
+         "ui_target": {
+            "element_name": "Minimize to Tray on Close",
+            "automation_id": null,
+            "hierarchical_path": "Settings panel > Minimize to Tray on Close",
+            "element_type": "CheckBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The checkbox toggles its state"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click the 'Start with Windows' checkbox",
+         "ui_target": {
+            "element_name": "Start with Windows",
+            "automation_id": null,
+            "hierarchical_path": "Settings panel > Start with Windows",
+            "element_type": "CheckBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The checkbox toggles its state"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click the 'Theme Control' dropdown",
+         "ui_target": {
+            "element_name": "Theme Control",
+            "automation_id": null,
+            "hierarchical_path": "Settings panel > Theme Control",
+            "element_type": "DropDown",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The dropdown menu opens with options: Light, Dark, System Default"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Select 'Dark' from the 'Theme Control' dropdown",
+         "ui_target": {
+            "element_name": "Dark",
+            "automation_id": null,
+            "hierarchical_path": "Settings panel > Theme Control > Dark",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The application's theme changes to Dark mode"
+      }
+   ],
+   "_meta": {
+      "source_app": "Quick Rotate",
+      "app_key": "quick_rotate",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "<sub>[<img src=\"./assets/icon.png\" width=\"40\" height=\"40\">](https://github.com/ArKT-7/QuickRotate/releases/latest)</sub> Quick Rotate",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:50:44Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

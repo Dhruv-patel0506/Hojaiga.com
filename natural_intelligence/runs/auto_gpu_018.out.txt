@@ -1,0 +1,297 @@
+18:30:50 NI run auto_gpu_018 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+18:30:50 explicit task list: ['enc/image/resisc45']
+18:30:50 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+18:30:52 [data] enc/image/resisc45: n=69300 C=45 D=768 shards=1
+18:31:46 [enc/image/resisc45] vote=0.936 uniform=0.936 best1=0.938 n_val=20844 vram=0.75GB 54s
+18:32:02 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 20844, "n_val": 4162, "base_rate": 0.9322441220283508, "inner": {"auc": 0.9695474153688675, "ece": 0.006965864643075041, "brier": 0.03365947678685188, "acc80": 0.9984980225563049}, "outer_conf": {"auc": 0.9387283395481465, "ece": 0.20096949927942043, "brier": 0.09338948130607605, "acc80": 0.9897867441177368}}
+18:32:02 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+18:32:56 [enc/image/resisc45] vote=0.935 uniform=0.935 best1=0.938 n_val=20841 vram=0.96GB 54s | grade=0.864 inner_auc=0.973 vs conf_auc=0.934
+18:33:05 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+18:33:59 [enc/image/resisc45] vote=0.936 uniform=0.934 best1=0.937 n_val=20925 vram=0.95GB 53s | grade=0.868 inner_auc=0.971 vs conf_auc=0.944
+18:34:08 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+18:34:58 [enc/image/resisc45] vote=0.940 uniform=0.937 best1=0.940 n_val=20701 vram=0.96GB 50s | grade=0.871 inner_auc=0.967 vs conf_auc=0.936
+18:35:08 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+18:36:00 [enc/image/resisc45] vote=0.939 uniform=0.935 best1=0.939 n_val=20574 vram=0.96GB 52s | grade=0.874 inner_auc=0.968 vs conf_auc=0.947
+18:36:09 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+18:37:03 [enc/image/resisc45] vote=0.940 uniform=0.935 best1=0.940 n_val=20942 vram=0.95GB 54s | grade=0.882 inner_auc=0.969 vs conf_auc=0.951
+18:37:13 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+18:38:06 [enc/image/resisc45] vote=0.943 uniform=0.936 best1=0.940 n_val=20697 vram=0.96GB 53s | grade=0.885 inner_auc=0.968 vs conf_auc=0.948
+18:38:15 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+18:39:07 [enc/image/resisc45] vote=0.942 uniform=0.935 best1=0.939 n_val=20756 vram=0.96GB 52s | grade=0.889 inner_auc=0.959 vs conf_auc=0.940
+18:39:17 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+18:40:08 [enc/image/resisc45] vote=0.941 uniform=0.935 best1=0.939 n_val=20666 vram=0.96GB 51s | grade=0.892 inner_auc=0.970 vs conf_auc=0.955
+18:40:18 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+18:41:12 [enc/image/resisc45] vote=0.943 uniform=0.937 best1=0.940 n_val=20679 vram=0.96GB 54s | grade=0.894 inner_auc=0.963 vs conf_auc=0.948
+18:41:22 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+18:42:15 [enc/image/resisc45] vote=0.944 uniform=0.938 best1=0.940 n_val=20688 vram=0.96GB 53s | grade=0.897 inner_auc=0.970 vs conf_auc=0.956
+18:42:24 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+18:43:17 [enc/image/resisc45] vote=0.942 uniform=0.935 best1=0.939 n_val=20603 vram=0.96GB 54s | grade=0.896 inner_auc=0.964 vs conf_auc=0.951
+18:43:26 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+18:44:19 [enc/image/resisc45] vote=0.941 uniform=0.937 best1=0.938 n_val=20599 vram=0.96GB 53s | grade=0.899 inner_auc=0.966 vs conf_auc=0.950
+18:44:28 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+18:45:20 [enc/image/resisc45] vote=0.940 uniform=0.935 best1=0.938 n_val=20988 vram=0.95GB 53s | grade=0.899 inner_auc=0.969 vs conf_auc=0.954
+18:45:30 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+18:46:23 [enc/image/resisc45] vote=0.943 uniform=0.936 best1=0.941 n_val=20972 vram=0.95GB 53s | grade=0.898 inner_auc=0.971 vs conf_auc=0.957
+18:46:33 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+18:47:27 [enc/image/resisc45] vote=0.942 uniform=0.936 best1=0.939 n_val=20852 vram=0.96GB 54s | grade=0.902 inner_auc=0.968 vs conf_auc=0.952
+18:47:37 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+18:48:29 [enc/image/resisc45] vote=0.943 uniform=0.937 best1=0.941 n_val=20783 vram=0.96GB 52s | grade=0.901 inner_auc=0.969 vs conf_auc=0.951
+18:48:38 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+18:49:32 [enc/image/resisc45] vote=0.940 uniform=0.934 best1=0.938 n_val=20775 vram=0.96GB 54s | grade=0.901 inner_auc=0.971 vs conf_auc=0.953
+18:49:42 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+18:50:35 [enc/image/resisc45] vote=0.942 uniform=0.936 best1=0.939 n_val=20847 vram=0.96GB 54s | grade=0.900 inner_auc=0.968 vs conf_auc=0.949
+18:50:44 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+18:51:38 [enc/image/resisc45] vote=0.942 uniform=0.935 best1=0.940 n_val=20969 vram=0.95GB 54s | grade=0.902 inner_auc=0.967 vs conf_auc=0.945
+18:51:47 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+18:52:41 [enc/image/resisc45] vote=0.941 uniform=0.934 best1=0.940 n_val=20666 vram=0.96GB 53s | grade=0.901 inner_auc=0.974 vs conf_auc=0.957
+18:52:51 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+18:53:45 [enc/image/resisc45] vote=0.940 uniform=0.935 best1=0.939 n_val=20740 vram=0.96GB 53s | grade=0.900 inner_auc=0.974 vs conf_auc=0.958
+18:53:54 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+14:33:01 NI run auto_gpu_018 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+14:33:01 explicit task list: ['enc/image/resisc45']
+14:33:24 [resume] from checkpoint: next cycle 22, rounds 22, 22 metric rows, inner net restored
+14:33:25 ===== CYCLE 22 (OUTER-ONLY BOOTSTRAP) =====
+14:33:28 [data] enc/image/resisc45: n=69300 C=45 D=768 shards=1
+14:35:10 [enc/image/resisc45] vote=0.929 uniform=0.919 best1=0.928 n_val=20969 vram=0.83GB 102s
+14:35:57 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 22, "n_records": 20969, "n_val": 4141, "base_rate": 0.9290026426315308, "inner": {"auc": 0.9671269599599652, "ece": 0.00928042510371908, "brier": 0.03519165515899658, "acc80": 0.9972826242446899}, "outer_conf": {"auc": 0.942797550525279, "ece": 0.009507042652482256, "brier": 0.04168915003538132, "acc80": 0.9906401038169861}}
+14:35:57 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+14:38:18 [enc/image/resisc45] vote=0.936 uniform=0.930 best1=0.935 n_val=20710 vram=1.03GB 141s | grade=0.921 inner_auc=0.973 vs conf_auc=0.948
+14:38:45 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+14:41:05 [enc/image/resisc45] vote=0.933 uniform=0.930 best1=0.933 n_val=20750 vram=1.03GB 140s | grade=0.924 inner_auc=0.975 vs conf_auc=0.953
+14:41:29 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+14:43:45 [enc/image/resisc45] vote=0.935 uniform=0.927 best1=0.935 n_val=20669 vram=1.03GB 135s | grade=0.923 inner_auc=0.968 vs conf_auc=0.941
+14:44:06 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+14:46:37 [enc/image/resisc45] vote=0.932 uniform=0.927 best1=0.932 n_val=20777 vram=1.03GB 150s | grade=0.922 inner_auc=0.968 vs conf_auc=0.939
+14:46:55 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+14:49:04 [enc/image/resisc45] vote=0.932 uniform=0.925 best1=0.932 n_val=20848 vram=1.03GB 129s | grade=0.922 inner_auc=0.973 vs conf_auc=0.945
+14:49:25 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+14:51:14 [enc/image/resisc45] vote=0.935 uniform=0.923 best1=0.935 n_val=20626 vram=1.03GB 109s | grade=0.922 inner_auc=0.970 vs conf_auc=0.941
+14:51:41 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+01:57:14 NI run auto_gpu_018 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+01:57:14 explicit task list: ['enc/image/resisc45']
+01:57:29 [resume] from checkpoint: next cycle 29, rounds 29, 29 metric rows, inner net restored
+01:57:29 ===== CYCLE 29 (OUTER-ONLY BOOTSTRAP) =====
+01:57:32 [data] enc/image/resisc45: n=69300 C=45 D=768 shards=1
+01:59:23 [enc/image/resisc45] vote=0.938 uniform=0.930 best1=0.938 n_val=20488 vram=0.83GB 110s
+01:59:55 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 29, "n_records": 20488, "n_val": 4027, "base_rate": 0.9371740818023682, "inner": {"auc": 0.9737448445888344, "ece": 0.009570817512822913, "brier": 0.030136771500110626, "acc80": 0.9984477162361145}, "outer_conf": {"auc": 0.9539914245796599, "ece": 0.015068323674526408, "brier": 0.03610997647047043, "acc80": 0.9953430891036987}}
+01:59:55 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+02:01:40 [enc/image/resisc45] vote=0.933 uniform=0.928 best1=0.933 n_val=20678 vram=1.03GB 105s | grade=0.921 inner_auc=0.975 vs conf_auc=0.950
+02:01:57 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+02:03:49 [enc/image/resisc45] vote=0.933 uniform=0.922 best1=0.933 n_val=20870 vram=1.03GB 112s | grade=0.925 inner_auc=0.970 vs conf_auc=0.940
+02:04:06 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+02:06:02 [enc/image/resisc45] vote=0.930 uniform=0.920 best1=0.929 n_val=20921 vram=1.03GB 116s | grade=0.922 inner_auc=0.966 vs conf_auc=0.941
+02:06:29 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+02:08:52 [enc/image/resisc45] vote=0.934 uniform=0.924 best1=0.933 n_val=20804 vram=1.03GB 144s | grade=0.922 inner_auc=0.974 vs conf_auc=0.955
+02:09:17 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+02:11:25 [enc/image/resisc45] vote=0.936 uniform=0.928 best1=0.935 n_val=20935 vram=1.03GB 128s | grade=0.923 inner_auc=0.972 vs conf_auc=0.946
+02:11:44 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+02:14:01 [enc/image/resisc45] vote=0.931 uniform=0.919 best1=0.930 n_val=20980 vram=1.03GB 137s | grade=0.920 inner_auc=0.968 vs conf_auc=0.940
+02:14:24 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+02:16:42 [enc/image/resisc45] vote=0.933 uniform=0.928 best1=0.932 n_val=20729 vram=1.03GB 139s | grade=0.924 inner_auc=0.971 vs conf_auc=0.944
+02:17:06 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+02:19:18 [enc/image/resisc45] vote=0.933 uniform=0.921 best1=0.933 n_val=20704 vram=1.03GB 132s | grade=0.921 inner_auc=0.977 vs conf_auc=0.955
+02:19:41 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+02:21:49 [enc/image/resisc45] vote=0.930 uniform=0.925 best1=0.930 n_val=20754 vram=1.03GB 128s | grade=0.921 inner_auc=0.970 vs conf_auc=0.940
+02:22:14 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+02:24:32 [enc/image/resisc45] vote=0.933 uniform=0.925 best1=0.933 n_val=20901 vram=1.03GB 138s | grade=0.922 inner_auc=0.972 vs conf_auc=0.951
+02:24:53 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+02:27:02 [enc/image/resisc45] vote=0.934 uniform=0.929 best1=0.934 n_val=20739 vram=1.03GB 129s | grade=0.923 inner_auc=0.970 vs conf_auc=0.945
+02:27:28 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+02:29:53 [enc/image/resisc45] vote=0.933 uniform=0.928 best1=0.933 n_val=20967 vram=1.03GB 145s | grade=0.923 inner_auc=0.966 vs conf_auc=0.935
+02:30:20 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+02:32:58 [enc/image/resisc45] vote=0.933 uniform=0.927 best1=0.933 n_val=20769 vram=1.03GB 158s | grade=0.924 inner_auc=0.968 vs conf_auc=0.941
+02:33:27 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+02:36:01 [enc/image/resisc45] vote=0.934 uniform=0.923 best1=0.934 n_val=20747 vram=1.03GB 154s | grade=0.925 inner_auc=0.974 vs conf_auc=0.949
+02:36:28 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+02:38:32 [enc/image/resisc45] vote=0.931 uniform=0.922 best1=0.930 n_val=20749 vram=1.03GB 125s | grade=0.920 inner_auc=0.970 vs conf_auc=0.943
+02:38:53 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+02:41:10 [enc/image/resisc45] vote=0.934 uniform=0.927 best1=0.933 n_val=20665 vram=1.03GB 137s | grade=0.921 inner_auc=0.971 vs conf_auc=0.937
+02:41:31 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+02:43:09 [enc/image/resisc45] vote=0.936 uniform=0.929 best1=0.935 n_val=20864 vram=1.03GB 99s | grade=0.923 inner_auc=0.971 vs conf_auc=0.943
+02:43:29 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+02:45:08 [enc/image/resisc45] vote=0.931 uniform=0.921 best1=0.930 n_val=20810 vram=1.03GB 99s | grade=0.919 inner_auc=0.973 vs conf_auc=0.951
+02:45:28 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+02:47:11 [enc/image/resisc45] vote=0.936 uniform=0.928 best1=0.935 n_val=20665 vram=1.03GB 103s | grade=0.921 inner_auc=0.970 vs conf_auc=0.942
+02:47:28 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+02:49:07 [enc/image/resisc45] vote=0.935 uniform=0.923 best1=0.934 n_val=20616 vram=1.03GB 99s | grade=0.924 inner_auc=0.971 vs conf_auc=0.940
+02:49:24 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+02:51:14 [enc/image/resisc45] vote=0.937 uniform=0.930 best1=0.937 n_val=20838 vram=1.03GB 110s | grade=0.923 inner_auc=0.972 vs conf_auc=0.948
+02:51:33 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+02:53:07 [enc/image/resisc45] vote=0.933 uniform=0.927 best1=0.933 n_val=20781 vram=1.03GB 94s | grade=0.922 inner_auc=0.969 vs conf_auc=0.940
+02:53:27 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+02:55:09 [enc/image/resisc45] vote=0.933 uniform=0.927 best1=0.933 n_val=20674 vram=1.03GB 103s | grade=0.924 inner_auc=0.971 vs conf_auc=0.946
+02:55:33 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+02:57:34 [enc/image/resisc45] vote=0.934 uniform=0.926 best1=0.933 n_val=20663 vram=1.03GB 122s | grade=0.924 inner_auc=0.972 vs conf_auc=0.947
+02:57:59 RUN COMPLETE
+13:22:56 NI run auto_gpu_018 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+13:22:56 explicit task list: ['enc/image/resisc45']
+13:23:07 [resume] from checkpoint: next cycle 54, rounds 54, 54 metric rows, inner net restored
+13:23:07 ===== CYCLE 54 (OUTER-ONLY BOOTSTRAP) =====
+13:23:09 [data] enc/image/resisc45: n=69300 C=45 D=768 shards=1
+13:24:41 [enc/image/resisc45] vote=0.932 uniform=0.923 best1=0.932 n_val=20625 vram=0.83GB 92s
+13:25:10 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 54, "n_records": 20625, "n_val": 4145, "base_rate": 0.9290711879730225, "inner": {"auc": 0.9687915675228803, "ece": 0.012034743953276025, "brier": 0.03661463037133217, "acc80": 0.9984921813011169}, "outer_conf": {"auc": 0.9480769196798429, "ece": 0.013189595589016544, "brier": 0.041814226657152176, "acc80": 0.9924607872962952}}
+13:25:10 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+13:26:47 [enc/image/resisc45] vote=0.933 uniform=0.923 best1=0.932 n_val=20604 vram=1.03GB 98s | grade=0.925 inner_auc=0.975 vs conf_auc=0.953
+13:27:05 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+13:28:37 [enc/image/resisc45] vote=0.932 uniform=0.920 best1=0.932 n_val=20979 vram=1.03GB 91s | grade=0.922 inner_auc=0.969 vs conf_auc=0.941
+13:28:54 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+13:30:32 [enc/image/resisc45] vote=0.932 uniform=0.921 best1=0.932 n_val=20748 vram=1.03GB 98s | grade=0.924 inner_auc=0.972 vs conf_auc=0.947
+13:30:46 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+13:32:24 [enc/image/resisc45] vote=0.933 uniform=0.925 best1=0.933 n_val=20816 vram=1.03GB 98s | grade=0.924 inner_auc=0.975 vs conf_auc=0.951
+13:32:38 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+13:34:21 [enc/image/resisc45] vote=0.934 uniform=0.930 best1=0.934 n_val=20839 vram=1.03GB 102s | grade=0.924 inner_auc=0.969 vs conf_auc=0.943
+13:34:38 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+13:36:21 [enc/image/resisc45] vote=0.935 uniform=0.925 best1=0.935 n_val=20770 vram=1.03GB 103s | grade=0.924 inner_auc=0.974 vs conf_auc=0.951
+13:36:38 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+13:38:13 [enc/image/resisc45] vote=0.937 uniform=0.929 best1=0.937 n_val=20953 vram=1.03GB 95s | grade=0.923 inner_auc=0.974 vs conf_auc=0.951
+13:38:32 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+13:40:18 [enc/image/resisc45] vote=0.933 uniform=0.924 best1=0.933 n_val=20869 vram=1.03GB 105s | grade=0.922 inner_auc=0.973 vs conf_auc=0.952
+13:40:34 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+13:42:13 [enc/image/resisc45] vote=0.934 uniform=0.929 best1=0.934 n_val=20690 vram=1.03GB 98s | grade=0.922 inner_auc=0.975 vs conf_auc=0.951
+13:42:32 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+13:44:14 [enc/image/resisc45] vote=0.937 uniform=0.924 best1=0.936 n_val=20706 vram=1.03GB 102s | grade=0.923 inner_auc=0.972 vs conf_auc=0.945
+13:44:33 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+13:46:28 [enc/image/resisc45] vote=0.935 uniform=0.928 best1=0.935 n_val=20831 vram=1.03GB 115s | grade=0.923 inner_auc=0.973 vs conf_auc=0.947
+13:46:46 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+13:48:33 [enc/image/resisc45] vote=0.937 uniform=0.932 best1=0.936 n_val=20945 vram=1.03GB 107s | grade=0.924 inner_auc=0.969 vs conf_auc=0.941
+13:48:52 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+13:50:36 [enc/image/resisc45] vote=0.935 uniform=0.928 best1=0.935 n_val=20503 vram=1.03GB 103s | grade=0.925 inner_auc=0.972 vs conf_auc=0.949
+13:50:52 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+13:52:40 [enc/image/resisc45] vote=0.930 uniform=0.924 best1=0.930 n_val=20676 vram=1.03GB 108s | grade=0.921 inner_auc=0.970 vs conf_auc=0.945
+13:52:57 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+13:54:49 [enc/image/resisc45] vote=0.934 uniform=0.926 best1=0.934 n_val=20867 vram=1.03GB 112s | grade=0.922 inner_auc=0.971 vs conf_auc=0.939
+13:55:11 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+13:56:57 [enc/image/resisc45] vote=0.933 uniform=0.927 best1=0.932 n_val=20862 vram=1.03GB 106s | grade=0.924 inner_auc=0.974 vs conf_auc=0.954
+13:57:16 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+13:59:06 [enc/image/resisc45] vote=0.936 uniform=0.933 best1=0.936 n_val=20775 vram=1.03GB 109s | grade=0.924 inner_auc=0.970 vs conf_auc=0.939
+13:59:30 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+14:01:19 [enc/image/resisc45] vote=0.934 uniform=0.923 best1=0.933 n_val=20823 vram=1.03GB 109s | grade=0.923 inner_auc=0.969 vs conf_auc=0.943
+14:01:38 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+14:03:26 [enc/image/resisc45] vote=0.932 uniform=0.922 best1=0.932 n_val=20716 vram=1.03GB 108s | grade=0.923 inner_auc=0.972 vs conf_auc=0.948
+14:03:47 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+14:05:18 [enc/image/resisc45] vote=0.933 uniform=0.925 best1=0.933 n_val=20719 vram=1.03GB 92s | grade=0.923 inner_auc=0.973 vs conf_auc=0.946
+14:05:36 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+14:06:59 [enc/image/resisc45] vote=0.934 uniform=0.925 best1=0.933 n_val=20677 vram=1.03GB 83s | grade=0.923 inner_auc=0.973 vs conf_auc=0.948
+14:07:16 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+14:08:18 [enc/image/resisc45] vote=0.935 uniform=0.924 best1=0.935 n_val=20629 vram=1.03GB 62s | grade=0.922 inner_auc=0.972 vs conf_auc=0.947
+14:08:34 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+14:10:01 [enc/image/resisc45] vote=0.932 uniform=0.921 best1=0.932 n_val=20650 vram=1.03GB 86s | grade=0.921 inner_auc=0.969 vs conf_auc=0.941
+14:10:12 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+12:55:33 NI run auto_gpu_018 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+12:55:33 explicit task list: ['enc/image/resisc45']
+12:55:47 [resume] from checkpoint: next cycle 78, rounds 78, 78 metric rows, inner net restored
+12:55:47 ===== CYCLE 78 (OUTER-ONLY BOOTSTRAP) =====
+12:55:53 [data] enc/image/resisc45: n=69300 C=45 D=768 shards=1
+12:57:39 [enc/image/resisc45] vote=0.934 uniform=0.926 best1=0.934 n_val=20815 vram=0.83GB 106s
+12:58:12 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 78, "n_records": 20815, "n_val": 4171, "base_rate": 0.9290338158607483, "inner": {"auc": 0.9742641673931997, "ece": 0.00974700013383262, "brier": 0.032712820917367935, "acc80": 0.9988009333610535}, "outer_conf": {"auc": 0.9494612031386225, "ece": 0.010889515009208768, "brier": 0.04021288454532623, "acc80": 0.9937050342559814}}
+12:58:12 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+13:00:06 [enc/image/resisc45] vote=0.935 uniform=0.928 best1=0.935 n_val=20771 vram=1.03GB 114s | grade=0.924 inner_auc=0.972 vs conf_auc=0.947
+13:00:23 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+13:02:09 [enc/image/resisc45] vote=0.934 uniform=0.927 best1=0.934 n_val=20899 vram=1.03GB 105s | grade=0.925 inner_auc=0.970 vs conf_auc=0.940
+13:02:25 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+13:04:12 [enc/image/resisc45] vote=0.937 uniform=0.931 best1=0.936 n_val=20872 vram=1.03GB 107s | grade=0.923 inner_auc=0.973 vs conf_auc=0.949
+13:04:28 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+13:06:12 [enc/image/resisc45] vote=0.934 uniform=0.928 best1=0.933 n_val=20956 vram=1.03GB 103s | grade=0.922 inner_auc=0.977 vs conf_auc=0.952
+13:06:31 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+13:08:17 [enc/image/resisc45] vote=0.933 uniform=0.930 best1=0.932 n_val=20691 vram=1.03GB 106s | grade=0.922 inner_auc=0.974 vs conf_auc=0.945
+13:08:37 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+13:10:28 [enc/image/resisc45] vote=0.934 uniform=0.928 best1=0.934 n_val=20707 vram=1.03GB 112s | grade=0.924 inner_auc=0.973 vs conf_auc=0.944
+13:10:47 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+13:12:34 [enc/image/resisc45] vote=0.932 uniform=0.924 best1=0.932 n_val=20708 vram=1.03GB 107s | grade=0.921 inner_auc=0.971 vs conf_auc=0.947
+13:12:52 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+13:14:40 [enc/image/resisc45] vote=0.934 uniform=0.925 best1=0.933 n_val=20752 vram=1.03GB 108s | grade=0.924 inner_auc=0.972 vs conf_auc=0.947
+13:14:57 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+13:16:43 [enc/image/resisc45] vote=0.936 uniform=0.928 best1=0.935 n_val=20985 vram=1.03GB 105s | grade=0.923 inner_auc=0.973 vs conf_auc=0.943
+13:17:01 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+13:18:47 [enc/image/resisc45] vote=0.933 uniform=0.923 best1=0.933 n_val=20653 vram=1.03GB 106s | grade=0.922 inner_auc=0.973 vs conf_auc=0.947
+13:19:07 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+13:20:55 [enc/image/resisc45] vote=0.934 uniform=0.926 best1=0.934 n_val=20817 vram=1.03GB 108s | grade=0.924 inner_auc=0.970 vs conf_auc=0.945
+13:21:15 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+13:23:07 [enc/image/resisc45] vote=0.934 uniform=0.928 best1=0.934 n_val=20897 vram=1.03GB 112s | grade=0.923 inner_auc=0.972 vs conf_auc=0.945
+13:23:26 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+13:25:11 [enc/image/resisc45] vote=0.935 uniform=0.924 best1=0.935 n_val=20865 vram=1.03GB 105s | grade=0.924 inner_auc=0.969 vs conf_auc=0.938
+13:25:29 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+13:27:16 [enc/image/resisc45] vote=0.933 uniform=0.923 best1=0.933 n_val=20703 vram=1.03GB 106s | grade=0.923 inner_auc=0.974 vs conf_auc=0.952
+13:27:33 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+13:29:19 [enc/image/resisc45] vote=0.932 uniform=0.927 best1=0.932 n_val=20766 vram=1.03GB 106s | grade=0.923 inner_auc=0.966 vs conf_auc=0.938
+13:29:39 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+13:31:30 [enc/image/resisc45] vote=0.937 uniform=0.928 best1=0.937 n_val=20778 vram=1.03GB 112s | grade=0.923 inner_auc=0.970 vs conf_auc=0.937
+13:31:50 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+13:33:44 [enc/image/resisc45] vote=0.931 uniform=0.926 best1=0.931 n_val=21053 vram=1.03GB 113s | grade=0.922 inner_auc=0.974 vs conf_auc=0.950
+13:34:04 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+13:35:54 [enc/image/resisc45] vote=0.933 uniform=0.926 best1=0.932 n_val=20743 vram=1.03GB 110s | grade=0.923 inner_auc=0.971 vs conf_auc=0.943
+13:36:14 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+13:38:01 [enc/image/resisc45] vote=0.935 uniform=0.928 best1=0.934 n_val=20790 vram=1.03GB 106s | grade=0.924 inner_auc=0.969 vs conf_auc=0.940
+13:38:19 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+13:40:04 [enc/image/resisc45] vote=0.932 uniform=0.920 best1=0.932 n_val=20999 vram=1.03GB 105s | grade=0.923 inner_auc=0.971 vs conf_auc=0.946
+13:40:24 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+13:42:03 [enc/image/resisc45] vote=0.933 uniform=0.924 best1=0.933 n_val=20694 vram=1.03GB 98s | grade=0.923 inner_auc=0.971 vs conf_auc=0.948
+13:42:20 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+13:44:08 [enc/image/resisc45] vote=0.931 uniform=0.923 best1=0.931 n_val=20844 vram=1.03GB 109s | grade=0.923 inner_auc=0.976 vs conf_auc=0.948
+13:44:38 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+13:46:39 [enc/image/resisc45] vote=0.935 uniform=0.928 best1=0.935 n_val=20771 vram=1.03GB 122s | grade=0.924 inner_auc=0.970 vs conf_auc=0.941
+13:47:01 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+13:49:01 [enc/image/resisc45] vote=0.935 uniform=0.923 best1=0.934 n_val=20710 vram=1.03GB 120s | grade=0.924 inner_auc=0.970 vs conf_auc=0.945
+13:49:29 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+13:51:56 [enc/image/resisc45] vote=0.933 uniform=0.922 best1=0.933 n_val=20820 vram=1.03GB 148s | grade=0.924 inner_auc=0.969 vs conf_auc=0.941
+13:52:33 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+13:55:10 [enc/image/resisc45] vote=0.935 uniform=0.924 best1=0.934 n_val=20692 vram=1.03GB 157s | grade=0.924 inner_auc=0.971 vs conf_auc=0.946
+13:55:42 RUN COMPLETE
+01:03:43 NI run auto_gpu_018 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+01:03:43 explicit task list: ['enc/image/resisc45']
+01:03:58 [resume] from checkpoint: next cycle 105, rounds 105, 105 metric rows, inner net restored
+01:03:58 ===== CYCLE 105 (OUTER-ONLY BOOTSTRAP) =====
+01:04:01 [data] enc/image/resisc45: n=69300 C=45 D=768 shards=1
+01:05:44 [enc/image/resisc45] vote=0.930 uniform=0.922 best1=0.930 n_val=20862 vram=0.83GB 103s
+01:06:24 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 105, "n_records": 20862, "n_val": 4156, "base_rate": 0.9280558228492737, "inner": {"auc": 0.972122961075853, "ece": 0.007590302518507083, "brier": 0.033952634781599045, "acc80": 0.9987966418266296}, "outer_conf": {"auc": 0.9465359859110353, "ece": 0.01317019265456998, "brier": 0.04202435910701752, "acc80": 0.9930806159973145}}
+01:06:24 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+01:08:25 [enc/image/resisc45] vote=0.935 uniform=0.928 best1=0.935 n_val=20921 vram=1.03GB 121s | grade=0.922 inner_auc=0.970 vs conf_auc=0.943
+01:08:45 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+01:10:37 [enc/image/resisc45] vote=0.934 uniform=0.921 best1=0.934 n_val=20696 vram=1.03GB 112s | grade=0.923 inner_auc=0.971 vs conf_auc=0.950
+01:10:54 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+01:12:41 [enc/image/resisc45] vote=0.932 uniform=0.925 best1=0.932 n_val=20983 vram=1.03GB 107s | grade=0.923 inner_auc=0.972 vs conf_auc=0.946
+01:12:58 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+01:14:51 [enc/image/resisc45] vote=0.934 uniform=0.926 best1=0.934 n_val=20792 vram=1.03GB 114s | grade=0.923 inner_auc=0.970 vs conf_auc=0.947
+01:15:11 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+01:17:09 [enc/image/resisc45] vote=0.933 uniform=0.925 best1=0.933 n_val=20867 vram=1.03GB 118s | grade=0.923 inner_auc=0.970 vs conf_auc=0.944
+01:17:30 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+01:19:28 [enc/image/resisc45] vote=0.933 uniform=0.925 best1=0.933 n_val=20885 vram=1.03GB 118s | grade=0.924 inner_auc=0.972 vs conf_auc=0.946
+01:19:43 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+01:21:32 [enc/image/resisc45] vote=0.934 uniform=0.929 best1=0.934 n_val=20794 vram=1.03GB 109s | grade=0.922 inner_auc=0.975 vs conf_auc=0.949
+01:21:50 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+01:23:51 [enc/image/resisc45] vote=0.934 uniform=0.928 best1=0.934 n_val=20580 vram=1.03GB 120s | grade=0.923 inner_auc=0.970 vs conf_auc=0.944
+01:24:09 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+01:26:03 [enc/image/resisc45] vote=0.932 uniform=0.923 best1=0.932 n_val=20527 vram=1.03GB 114s | grade=0.921 inner_auc=0.973 vs conf_auc=0.947
+01:26:26 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+01:28:19 [enc/image/resisc45] vote=0.936 uniform=0.929 best1=0.936 n_val=20838 vram=1.03GB 113s | grade=0.921 inner_auc=0.971 vs conf_auc=0.943
+01:28:39 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+01:30:26 [enc/image/resisc45] vote=0.937 uniform=0.929 best1=0.937 n_val=20731 vram=1.03GB 107s | grade=0.924 inner_auc=0.972 vs conf_auc=0.939
+01:30:45 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+01:32:44 [enc/image/resisc45] vote=0.932 uniform=0.927 best1=0.932 n_val=20707 vram=1.03GB 119s | grade=0.921 inner_auc=0.974 vs conf_auc=0.947
+01:33:07 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+01:35:10 [enc/image/resisc45] vote=0.935 uniform=0.925 best1=0.934 n_val=20901 vram=1.03GB 123s | grade=0.924 inner_auc=0.972 vs conf_auc=0.945
+01:35:31 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+01:37:27 [enc/image/resisc45] vote=0.935 uniform=0.927 best1=0.935 n_val=20849 vram=1.03GB 116s | grade=0.925 inner_auc=0.973 vs conf_auc=0.950
+01:37:48 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+01:39:37 [enc/image/resisc45] vote=0.933 uniform=0.924 best1=0.933 n_val=20802 vram=1.03GB 109s | grade=0.924 inner_auc=0.967 vs conf_auc=0.938
+01:39:59 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+01:41:59 [enc/image/resisc45] vote=0.936 uniform=0.929 best1=0.936 n_val=20974 vram=1.03GB 120s | grade=0.924 inner_auc=0.974 vs conf_auc=0.949
+01:42:20 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+01:44:32 [enc/image/resisc45] vote=0.933 uniform=0.927 best1=0.933 n_val=20761 vram=1.03GB 132s | grade=0.923 inner_auc=0.972 vs conf_auc=0.949
+01:44:53 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+01:46:52 [enc/image/resisc45] vote=0.935 uniform=0.927 best1=0.935 n_val=20785 vram=1.03GB 118s | grade=0.923 inner_auc=0.975 vs conf_auc=0.950
+01:47:14 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+01:49:15 [enc/image/resisc45] vote=0.932 uniform=0.927 best1=0.932 n_val=20911 vram=1.03GB 121s | grade=0.923 inner_auc=0.971 vs conf_auc=0.946
+01:49:37 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+01:51:47 [enc/image/resisc45] vote=0.934 uniform=0.929 best1=0.934 n_val=20781 vram=1.03GB 130s | grade=0.924 inner_auc=0.973 vs conf_auc=0.943
+01:52:12 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+01:54:26 [enc/image/resisc45] vote=0.934 uniform=0.925 best1=0.933 n_val=20724 vram=1.03GB 133s | grade=0.923 inner_auc=0.970 vs conf_auc=0.943
+01:54:50 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+01:56:47 [enc/image/resisc45] vote=0.934 uniform=0.928 best1=0.934 n_val=20564 vram=1.03GB 117s | grade=0.924 inner_auc=0.971 vs conf_auc=0.944
+01:57:09 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+01:59:09 [enc/image/resisc45] vote=0.936 uniform=0.928 best1=0.936 n_val=20818 vram=1.03GB 120s | grade=0.924 inner_auc=0.966 vs conf_auc=0.939
+01:59:36 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+02:01:42 [enc/image/resisc45] vote=0.935 uniform=0.929 best1=0.935 n_val=20697 vram=1.03GB 126s | grade=0.923 inner_auc=0.974 vs conf_auc=0.947
+02:02:03 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+02:04:04 [enc/image/resisc45] vote=0.932 uniform=0.924 best1=0.931 n_val=20753 vram=1.03GB 121s | grade=0.920 inner_auc=0.971 vs conf_auc=0.947
+02:04:28 RUN COMPLETE

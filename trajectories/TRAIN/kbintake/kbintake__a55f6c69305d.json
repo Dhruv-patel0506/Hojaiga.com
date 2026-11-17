@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "KBIntake",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure KBIntake",
+   "prerequisite_state": "No specific application state required",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the v2.1.1 release page",
+         "ui_target": {
+            "element_name": "v2.1.1 release page",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The release page is displayed in the browser"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Download KBIntake-Setup.exe",
+         "ui_target": {
+            "element_name": "Download button",
+            "automation_id": null,
+            "hierarchical_path": "Download section > Download button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "KBIntake-Setup.exe starts downloading"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Run the installer",
+         "ui_target": {
+            "element_name": "Install button",
+            "automation_id": null,
+            "hierarchical_path": "Installer window > Install button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "KBIntake is installed and added to the PATH"
+      }
+   ],
+   "_meta": {
+      "source_app": "KBIntake",
+      "app_key": "kbintake",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "KBIntake",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:08:05Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

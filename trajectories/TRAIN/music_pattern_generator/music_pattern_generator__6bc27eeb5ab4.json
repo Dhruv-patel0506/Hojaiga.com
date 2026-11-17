@@ -1,0 +1,493 @@
+{
+   "app_metadata": {
+      "app_name": "Music Pattern Generator",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Explore the features and settings of the Music Pattern Generator application",
+   "prerequisite_state": "Music Pattern Generator application is open and the main window is visible",
+   "total_steps": 16,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the File menu",
+         "ui_target": {
+            "element_name": "File",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The File dropdown opens showing New, Open, Save"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click on New",
+         "ui_target": {
+            "element_name": "New",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File > New",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A blank untitled document appears in the workspace"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click the Connections button in the top Control Bar",
+         "ui_target": {
+            "element_name": "Connections",
+            "automation_id": null,
+            "hierarchical_path": "Control Bar > Connections",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The app enters Connection mode, allowing cables to be dragged between processors"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Drag a cable from the output of the Euclidean processor to the input of the Euclid FX processor",
+         "ui_target": {
+            "element_name": "Euclidean processor output",
+            "automation_id": null,
+            "hierarchical_path": "Main area > Euclidean processor > Output",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A cable connects the Euclidean processor output to the Euclid FX processor input"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Drag a cable from the output of the Euclid FX processor to the input of the MIDI Out processor",
+         "ui_target": {
+            "element_name": "Euclid FX processor output",
+            "automation_id": null,
+            "hierarchical_path": "Main area > Euclid FX processor > Output",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  0
+               ],
+               [
+                  0,
+                  0
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A cable connects the Euclid FX processor output to the MIDI Out processor input"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Click the 'Editor' button in the Control Bar",
+         "ui_target": {
+            "element_name": "Editor",
+            "automation_id": null,
+            "hierarchical_path": "Control Bar > Editor",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The editor panel for the selected processor appears"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Click the 'Euclidean' processor center circle to select it",
+         "ui_target": {
+            "element_name": "Euclidean processor center circle",
+            "automation_id": null,
+            "hierarchical_path": "Main area > Euclidean processor > Center circle",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Euclidean processor shows a double ring to indicate it's selected"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Change the 'steps' setting to 8",
+         "ui_target": {
+            "element_name": "Steps",
+            "automation_id": null,
+            "hierarchical_path": "Editor panel > Euclidean processor > Steps",
+            "element_type": "Slider",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "8"
+         },
+         "expected_state_change": "The number of steps in the Euclidean processor pattern changes to 8"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Change the 'pulses' setting to 3",
+         "ui_target": {
+            "element_name": "Pulses",
+            "automation_id": null,
+            "hierarchical_path": "Editor panel > Euclidean processor > Pulses",
+            "element_type": "Slider",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "3"
+         },
+         "expected_state_change": "The number of pulses in the Euclidean processor pattern changes to 3"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Change the 'rotation' setting to 2",
+         "ui_target": {
+            "element_name": "Rotation",
+            "automation_id": null,
+            "hierarchical_path": "Editor panel > Euclidean processor > Rotation",
+            "element_type": "Slider",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "2"
+         },
+         "expected_state_change": "The rotation of the Euclidean processor pattern changes to 2"
+      },
+      {
+         "step_id": 11,
+         "low_level_instruction": "Click the 'MIDI Out' processor center circle to select it",
+         "ui_target": {
+            "element_name": "MIDI Out processor center circle",
+            "automation_id": null,
+            "hierarchical_path": "Main area > MIDI Out processor > Center circle",
+            "element_type": "Canvas",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The MIDI Out processor shows a double ring to indicate it's selected"
+      },
+      {
+         "step_id": 12,
+         "low_level_instruction": "Click the 'Preferences' button in the Control Bar",
+         "ui_target": {
+            "element_name": "Preferences",
+            "automation_id": null,
+            "hierarchical_path": "Control Bar > Preferences",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Preferences panel opens"
+      },
+      {
+         "step_id": 13,
+         "low_level_instruction": "Enable the 'MIDI Out' port in the Network column",
+         "ui_target": {
+            "element_name": "MIDI Out port",
+            "automation_id": null,
+            "hierarchical_path": "Preferences panel > Network column > MIDI Out port",
+            "element_type": "Checkbox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The MIDI Out port is enabled for sending MIDI data"
+      },
+      {
+         "step_id": 14,
+         "low_level_instruction": "Click the 'MIDI Learn' button in the Control Bar",
+         "ui_target": {
+            "element_name": "MIDI Learn",
+            "automation_id": null,
+            "hierarchical_path": "Control Bar > MIDI Learn",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "MIDI Learn mode is enabled, the Assignments panel appears, and the editor panel shows a dashed border around each setting"
+      },
+      {
+         "step_id": 15,
+         "low_level_instruction": "Click the 'Rate' setting in the Euclidean processor editor to arm it for MIDI Learn",
+         "ui_target": {
+            "element_name": "Rate",
+            "automation_id": null,
+            "hierarchical_path": "Editor panel > Euclidean processor > Rate",
+            "element_type": "Slider",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Rate setting shows a darkened background to indicate it's ready to receive MIDI data"
+      },
+      {
+         "step_id": 16,
+         "low_level_instruction": "Turn a knob on a MIDI controller to set the Rate setting",
+         "ui_target": {
+            "element_name": "Rate",
+            "automation_id": null,
+            "hierarchical_path": "Editor panel > Euclidean processor > Rate",
+            "element_type": "Slider",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [
+               "Ctrl"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The Rate setting follows the incoming MIDI data"
+      }
+   ],
+   "_meta": {
+      "source_app": "Music Pattern Generator",
+      "app_key": "music_pattern_generator",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Music Pattern Generator",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:13:40Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

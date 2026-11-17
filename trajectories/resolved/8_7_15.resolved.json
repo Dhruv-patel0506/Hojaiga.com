@@ -1,0 +1,84 @@
+{
+   "app_metadata": {
+      "app_name": "Calculator",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "8+7=15",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "ui_target": {
+            "element_name": "Eight",
+            "element_type": "Button",
+            "bounding_box": [
+               332,
+               675,
+               548,
+               779
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 8",
+         "low_level_instruction": "CLICK Eight"
+      },
+      {
+         "step_id": 2,
+         "ui_target": {
+            "element_name": "Plus",
+            "element_type": "Button",
+            "bounding_box": [
+               314,
+               397,
+               412,
+               460
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 8",
+         "low_level_instruction": "CLICK Plus"
+      },
+      {
+         "step_id": 3,
+         "ui_target": {
+            "element_name": "Seven",
+            "element_type": "Button",
+            "bounding_box": [
+               114,
+               675,
+               329,
+               779
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 7",
+         "low_level_instruction": "CLICK Seven"
+      },
+      {
+         "step_id": 4,
+         "ui_target": {
+            "element_name": "Equals",
+            "element_type": "Button",
+            "bounding_box": [
+               769,
+               993,
+               984,
+               1096
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "expected_state_change": "Display is 15",
+         "low_level_instruction": "CLICK Equals"
+      }
+   ]
+}

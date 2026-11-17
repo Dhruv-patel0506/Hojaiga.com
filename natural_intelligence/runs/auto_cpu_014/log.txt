@@ -1,0 +1,343 @@
+17:21:15 NI run auto_cpu_014 on CPU; hours=2.0 smoke=False
+17:21:15 explicit task list: ['enc/graph/twitch_egos']
+17:21:15 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+17:21:19 [data] enc/graph/twitch_egos: n=127094 C=2 D=534 shards=1
+17:29:24 [enc/graph/twitch_egos] vote=0.679 uniform=0.679 best1=0.687 n_val=37688 vram=0.00GB 486s
+17:30:54 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 37688, "n_val": 7460, "base_rate": 0.6702412962913513, "inner": {"auc": 0.5956712195121951, "ece": 0.01386122697160327, "brier": 0.21436969935894012, "acc80": 0.7042560577392578}, "outer_conf": {"auc": 0.574169674796748, "ece": 0.03850015997886658, "brier": 0.2188219130039215, "acc80": 0.695040225982666}}
+17:30:54 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+17:40:26 [enc/graph/twitch_egos] vote=0.679 uniform=0.679 best1=0.689 n_val=38142 vram=0.00GB 571s | grade=0.897 inner_auc=0.602 vs conf_auc=0.583
+17:40:56 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+17:48:20 [enc/graph/twitch_egos] vote=0.680 uniform=0.679 best1=0.689 n_val=38338 vram=0.00GB 443s | grade=0.895 inner_auc=0.601 vs conf_auc=0.579
+17:48:47 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+17:56:31 [enc/graph/twitch_egos] vote=0.676 uniform=0.675 best1=0.686 n_val=38237 vram=0.00GB 465s | grade=0.895 inner_auc=0.592 vs conf_auc=0.574
+17:57:01 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+18:04:55 [enc/graph/twitch_egos] vote=0.681 uniform=0.679 best1=0.688 n_val=38222 vram=0.00GB 474s | grade=0.894 inner_auc=0.585 vs conf_auc=0.570
+18:05:17 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+18:11:32 [enc/graph/twitch_egos] vote=0.680 uniform=0.677 best1=0.687 n_val=38185 vram=0.00GB 375s | grade=0.896 inner_auc=0.605 vs conf_auc=0.584
+18:11:47 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+18:16:00 [enc/graph/twitch_egos] vote=0.681 uniform=0.678 best1=0.687 n_val=38215 vram=0.00GB 253s | grade=0.898 inner_auc=0.596 vs conf_auc=0.584
+18:16:15 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+18:20:24 [enc/graph/twitch_egos] vote=0.682 uniform=0.678 best1=0.687 n_val=38177 vram=0.00GB 249s | grade=0.896 inner_auc=0.585 vs conf_auc=0.577
+18:20:38 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+00:59:55 NI run auto_cpu_014 on CPU; hours=2.0 smoke=False
+00:59:55 explicit task list: ['enc/graph/twitch_egos']
+01:00:15 [resume] from checkpoint: next cycle 8, rounds 8, 8 metric rows, inner net restored
+01:00:15 ===== CYCLE 8 (OUTER-ONLY BOOTSTRAP) =====
+01:00:19 [data] enc/graph/twitch_egos: n=127094 C=2 D=534 shards=1
+01:06:04 [enc/graph/twitch_egos] vote=0.693 uniform=0.690 best1=0.690 n_val=38271 vram=0.00GB 345s
+01:06:56 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 8, "n_records": 38271, "n_val": 7705, "base_rate": 0.6895522475242615, "inner": {"auc": 0.5813897035541647, "ece": 0.00972005241416941, "brier": 0.21025341749191284, "acc80": 0.7144711017608643}, "outer_conf": {"auc": 0.5779198353631246, "ece": 0.05652455610551284, "brier": 0.2143760472536087, "acc80": 0.7128487825393677}}
+01:06:56 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+01:10:50 [enc/graph/twitch_egos] vote=0.691 uniform=0.688 best1=0.688 n_val=38281 vram=0.00GB 233s | grade=0.891 inner_auc=0.581 vs conf_auc=0.579
+01:10:58 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+01:12:59 [enc/graph/twitch_egos] vote=0.689 uniform=0.685 best1=0.687 n_val=38202 vram=0.00GB 122s | grade=0.892 inner_auc=0.575 vs conf_auc=0.575
+01:13:08 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+01:15:29 [enc/graph/twitch_egos] vote=0.687 uniform=0.685 best1=0.686 n_val=38072 vram=0.00GB 142s | grade=0.892 inner_auc=0.576 vs conf_auc=0.574
+01:15:36 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+01:16:58 [enc/graph/twitch_egos] vote=0.687 uniform=0.685 best1=0.685 n_val=38168 vram=0.00GB 82s | grade=0.892 inner_auc=0.581 vs conf_auc=0.584
+01:17:04 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+01:18:29 [enc/graph/twitch_egos] vote=0.687 uniform=0.684 best1=0.686 n_val=37940 vram=0.00GB 85s | grade=0.892 inner_auc=0.574 vs conf_auc=0.572
+01:18:36 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+01:20:02 [enc/graph/twitch_egos] vote=0.689 uniform=0.687 best1=0.688 n_val=38118 vram=0.00GB 87s | grade=0.891 inner_auc=0.590 vs conf_auc=0.587
+01:20:09 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+01:21:35 [enc/graph/twitch_egos] vote=0.689 uniform=0.685 best1=0.687 n_val=38080 vram=0.00GB 86s | grade=0.892 inner_auc=0.583 vs conf_auc=0.584
+01:21:42 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+01:23:09 [enc/graph/twitch_egos] vote=0.691 uniform=0.686 best1=0.687 n_val=37971 vram=0.00GB 87s | grade=0.892 inner_auc=0.574 vs conf_auc=0.573
+01:23:16 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+01:24:47 [enc/graph/twitch_egos] vote=0.693 uniform=0.689 best1=0.691 n_val=38114 vram=0.00GB 92s | grade=0.891 inner_auc=0.586 vs conf_auc=0.586
+01:24:56 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+01:26:46 [enc/graph/twitch_egos] vote=0.687 uniform=0.683 best1=0.685 n_val=37905 vram=0.00GB 110s | grade=0.884 inner_auc=0.574 vs conf_auc=0.574
+01:26:54 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+01:28:30 [enc/graph/twitch_egos] vote=0.689 uniform=0.685 best1=0.685 n_val=37916 vram=0.00GB 96s | grade=0.890 inner_auc=0.576 vs conf_auc=0.575
+01:28:40 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+01:30:43 [enc/graph/twitch_egos] vote=0.687 uniform=0.684 best1=0.684 n_val=38231 vram=0.00GB 124s | grade=0.892 inner_auc=0.562 vs conf_auc=0.562
+01:30:53 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+01:32:54 [enc/graph/twitch_egos] vote=0.687 uniform=0.683 best1=0.686 n_val=38312 vram=0.00GB 122s | grade=0.891 inner_auc=0.579 vs conf_auc=0.578
+01:33:03 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+01:34:56 [enc/graph/twitch_egos] vote=0.691 uniform=0.687 best1=0.689 n_val=38059 vram=0.00GB 113s | grade=0.890 inner_auc=0.585 vs conf_auc=0.584
+01:35:05 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+01:37:03 [enc/graph/twitch_egos] vote=0.689 uniform=0.685 best1=0.688 n_val=38050 vram=0.00GB 118s | grade=0.890 inner_auc=0.565 vs conf_auc=0.564
+01:37:13 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+01:39:15 [enc/graph/twitch_egos] vote=0.691 uniform=0.685 best1=0.690 n_val=38266 vram=0.00GB 122s | grade=0.889 inner_auc=0.584 vs conf_auc=0.584
+01:39:25 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+01:41:14 [enc/graph/twitch_egos] vote=0.688 uniform=0.685 best1=0.687 n_val=38061 vram=0.00GB 109s | grade=0.890 inner_auc=0.580 vs conf_auc=0.582
+01:41:23 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+01:43:09 [enc/graph/twitch_egos] vote=0.690 uniform=0.687 best1=0.688 n_val=38212 vram=0.00GB 106s | grade=0.890 inner_auc=0.588 vs conf_auc=0.587
+01:43:19 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+01:45:08 [enc/graph/twitch_egos] vote=0.690 uniform=0.684 best1=0.687 n_val=38350 vram=0.00GB 109s | grade=0.889 inner_auc=0.569 vs conf_auc=0.569
+01:45:17 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+01:47:06 [enc/graph/twitch_egos] vote=0.689 uniform=0.685 best1=0.686 n_val=37868 vram=0.00GB 109s | grade=0.889 inner_auc=0.569 vs conf_auc=0.569
+01:47:16 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+01:48:59 [enc/graph/twitch_egos] vote=0.690 uniform=0.686 best1=0.688 n_val=37965 vram=0.00GB 103s | grade=0.892 inner_auc=0.574 vs conf_auc=0.573
+01:49:07 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+01:50:56 [enc/graph/twitch_egos] vote=0.690 uniform=0.686 best1=0.688 n_val=37813 vram=0.00GB 109s | grade=0.890 inner_auc=0.581 vs conf_auc=0.581
+01:51:28 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+01:54:38 [enc/graph/twitch_egos] vote=0.687 uniform=0.683 best1=0.685 n_val=38075 vram=0.00GB 189s | grade=0.891 inner_auc=0.573 vs conf_auc=0.576
+01:54:46 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+01:56:18 [enc/graph/twitch_egos] vote=0.689 uniform=0.685 best1=0.688 n_val=38077 vram=0.00GB 91s | grade=0.892 inner_auc=0.581 vs conf_auc=0.579
+01:56:26 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+02:00:53 [enc/graph/twitch_egos] vote=0.690 uniform=0.686 best1=0.686 n_val=38148 vram=0.00GB 267s | grade=0.891 inner_auc=0.580 vs conf_auc=0.579
+02:01:07 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+02:03:46 [enc/graph/twitch_egos] vote=0.689 uniform=0.687 best1=0.688 n_val=38369 vram=0.00GB 159s | grade=0.892 inner_auc=0.577 vs conf_auc=0.576
+02:04:17 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+02:07:37 [enc/graph/twitch_egos] vote=0.691 uniform=0.686 best1=0.690 n_val=38155 vram=0.00GB 200s | grade=0.892 inner_auc=0.571 vs conf_auc=0.571
+02:07:47 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+02:10:49 [enc/graph/twitch_egos] vote=0.689 uniform=0.688 best1=0.687 n_val=38085 vram=0.00GB 182s | grade=0.890 inner_auc=0.582 vs conf_auc=0.581
+02:10:58 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+02:12:42 [enc/graph/twitch_egos] vote=0.688 uniform=0.683 best1=0.685 n_val=38304 vram=0.00GB 104s | grade=0.889 inner_auc=0.576 vs conf_auc=0.576
+02:12:52 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+02:14:30 [enc/graph/twitch_egos] vote=0.690 uniform=0.685 best1=0.688 n_val=37856 vram=0.00GB 99s | grade=0.889 inner_auc=0.572 vs conf_auc=0.571
+02:14:40 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+02:16:26 [enc/graph/twitch_egos] vote=0.692 uniform=0.689 best1=0.689 n_val=38361 vram=0.00GB 105s | grade=0.891 inner_auc=0.572 vs conf_auc=0.569
+02:16:37 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+02:18:26 [enc/graph/twitch_egos] vote=0.693 uniform=0.690 best1=0.691 n_val=37984 vram=0.00GB 109s | grade=0.890 inner_auc=0.579 vs conf_auc=0.578
+02:18:35 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+02:20:19 [enc/graph/twitch_egos] vote=0.693 uniform=0.689 best1=0.690 n_val=38269 vram=0.00GB 103s | grade=0.891 inner_auc=0.578 vs conf_auc=0.577
+02:20:28 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+02:22:06 [enc/graph/twitch_egos] vote=0.689 uniform=0.689 best1=0.686 n_val=38127 vram=0.00GB 98s | grade=0.889 inner_auc=0.567 vs conf_auc=0.565
+02:22:15 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+02:23:54 [enc/graph/twitch_egos] vote=0.690 uniform=0.688 best1=0.686 n_val=38356 vram=0.00GB 99s | grade=0.890 inner_auc=0.583 vs conf_auc=0.581
+02:24:04 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+02:25:42 [enc/graph/twitch_egos] vote=0.687 uniform=0.683 best1=0.685 n_val=37964 vram=0.00GB 98s | grade=0.889 inner_auc=0.580 vs conf_auc=0.580
+02:25:51 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+02:27:29 [enc/graph/twitch_egos] vote=0.692 uniform=0.687 best1=0.689 n_val=38142 vram=0.00GB 98s | grade=0.888 inner_auc=0.574 vs conf_auc=0.572
+02:27:38 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+02:29:17 [enc/graph/twitch_egos] vote=0.689 uniform=0.685 best1=0.688 n_val=38194 vram=0.00GB 98s | grade=0.886 inner_auc=0.578 vs conf_auc=0.580
+02:29:26 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+02:31:05 [enc/graph/twitch_egos] vote=0.693 uniform=0.689 best1=0.691 n_val=38000 vram=0.00GB 99s | grade=0.889 inner_auc=0.577 vs conf_auc=0.578
+02:31:15 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+02:32:53 [enc/graph/twitch_egos] vote=0.689 uniform=0.688 best1=0.687 n_val=38369 vram=0.00GB 98s | grade=0.889 inner_auc=0.582 vs conf_auc=0.582
+02:33:03 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+02:34:42 [enc/graph/twitch_egos] vote=0.692 uniform=0.684 best1=0.689 n_val=38124 vram=0.00GB 98s | grade=0.889 inner_auc=0.578 vs conf_auc=0.577
+02:34:51 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+02:36:23 [enc/graph/twitch_egos] vote=0.686 uniform=0.682 best1=0.684 n_val=38038 vram=0.00GB 92s | grade=0.887 inner_auc=0.564 vs conf_auc=0.566
+02:36:33 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+02:38:08 [enc/graph/twitch_egos] vote=0.690 uniform=0.686 best1=0.687 n_val=38356 vram=0.00GB 95s | grade=0.888 inner_auc=0.580 vs conf_auc=0.579
+02:38:18 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+02:39:50 [enc/graph/twitch_egos] vote=0.691 uniform=0.687 best1=0.688 n_val=38126 vram=0.00GB 92s | grade=0.890 inner_auc=0.564 vs conf_auc=0.564
+02:39:58 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+02:41:29 [enc/graph/twitch_egos] vote=0.689 uniform=0.686 best1=0.686 n_val=38006 vram=0.00GB 90s | grade=0.890 inner_auc=0.584 vs conf_auc=0.583
+02:41:39 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+02:43:46 [enc/graph/twitch_egos] vote=0.686 uniform=0.684 best1=0.683 n_val=38399 vram=0.00GB 127s | grade=0.889 inner_auc=0.582 vs conf_auc=0.582
+02:44:01 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+02:46:13 [enc/graph/twitch_egos] vote=0.687 uniform=0.683 best1=0.685 n_val=38417 vram=0.00GB 132s | grade=0.890 inner_auc=0.582 vs conf_auc=0.580
+02:46:29 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+02:48:49 [enc/graph/twitch_egos] vote=0.690 uniform=0.685 best1=0.688 n_val=38104 vram=0.00GB 140s | grade=0.890 inner_auc=0.573 vs conf_auc=0.572
+02:49:04 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+02:51:22 [enc/graph/twitch_egos] vote=0.688 uniform=0.686 best1=0.686 n_val=38037 vram=0.00GB 138s | grade=0.889 inner_auc=0.573 vs conf_auc=0.572
+02:51:31 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+02:53:07 [enc/graph/twitch_egos] vote=0.695 uniform=0.690 best1=0.693 n_val=37954 vram=0.00GB 96s | grade=0.888 inner_auc=0.579 vs conf_auc=0.582
+02:53:17 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+02:54:38 [enc/graph/twitch_egos] vote=0.689 uniform=0.688 best1=0.688 n_val=37896 vram=0.00GB 80s | grade=0.890 inner_auc=0.573 vs conf_auc=0.573
+02:54:46 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+02:56:17 [enc/graph/twitch_egos] vote=0.691 uniform=0.687 best1=0.690 n_val=38471 vram=0.00GB 91s | grade=0.891 inner_auc=0.569 vs conf_auc=0.569
+02:56:26 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+02:57:56 [enc/graph/twitch_egos] vote=0.689 uniform=0.686 best1=0.688 n_val=38305 vram=0.00GB 90s | grade=0.890 inner_auc=0.574 vs conf_auc=0.573
+02:58:06 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+02:59:35 [enc/graph/twitch_egos] vote=0.690 uniform=0.685 best1=0.689 n_val=38055 vram=0.00GB 89s | grade=0.890 inner_auc=0.586 vs conf_auc=0.585
+02:59:46 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+03:01:25 [enc/graph/twitch_egos] vote=0.690 uniform=0.688 best1=0.688 n_val=38330 vram=0.00GB 99s | grade=0.892 inner_auc=0.577 vs conf_auc=0.578
+03:01:35 RUN COMPLETE
+14:58:23 NI run auto_cpu_014 on CPU; hours=2.0 smoke=False
+14:58:23 explicit task list: ['enc/graph/twitch_egos']
+14:58:35 [resume] from checkpoint: next cycle 64, rounds 64, 64 metric rows, inner net restored
+14:58:35 ===== CYCLE 64 (OUTER-ONLY BOOTSTRAP) =====
+14:58:38 [data] enc/graph/twitch_egos: n=127094 C=2 D=534 shards=1
+15:03:58 [enc/graph/twitch_egos] vote=0.686 uniform=0.684 best1=0.685 n_val=38165 vram=0.00GB 320s
+06:27:43 NI run auto_cpu_014 on CPU; hours=2.0 smoke=False
+06:27:43 explicit task list: ['enc/graph/twitch_egos']
+06:27:49 [resume] from checkpoint: next cycle 64, rounds 64, 65 metric rows, inner net restored
+06:27:49 ===== CYCLE 64 (OUTER-ONLY BOOTSTRAP) =====
+06:27:51 [data] enc/graph/twitch_egos: n=127094 C=2 D=534 shards=1
+06:30:22 [enc/graph/twitch_egos] vote=0.686 uniform=0.684 best1=0.685 n_val=38165 vram=0.00GB 151s
+06:30:52 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 64, "n_records": 38165, "n_val": 7660, "base_rate": 0.6864230036735535, "inner": {"auc": 0.5763019136772355, "ece": 0.00842754766150492, "brier": 0.21165995299816132, "acc80": 0.7105091214179993}, "outer_conf": {"auc": 0.5761650143201953, "ece": 0.04494011389680071, "brier": 0.21457085013389587, "acc80": 0.7114882469177246}}
+06:30:52 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+06:37:13 [enc/graph/twitch_egos] vote=0.687 uniform=0.686 best1=0.684 n_val=38063 vram=0.00GB 381s | grade=0.891 inner_auc=0.584 vs conf_auc=0.587
+06:37:45 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+06:45:55 [enc/graph/twitch_egos] vote=0.687 uniform=0.684 best1=0.686 n_val=38278 vram=0.00GB 490s | grade=0.891 inner_auc=0.570 vs conf_auc=0.570
+06:46:25 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+06:53:57 [enc/graph/twitch_egos] vote=0.687 uniform=0.684 best1=0.684 n_val=38061 vram=0.00GB 451s | grade=0.890 inner_auc=0.578 vs conf_auc=0.579
+06:54:23 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+07:01:01 [enc/graph/twitch_egos] vote=0.689 uniform=0.688 best1=0.688 n_val=38141 vram=0.00GB 399s | grade=0.890 inner_auc=0.577 vs conf_auc=0.576
+07:01:25 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+07:08:14 [enc/graph/twitch_egos] vote=0.690 uniform=0.687 best1=0.689 n_val=38232 vram=0.00GB 410s | grade=0.891 inner_auc=0.567 vs conf_auc=0.567
+07:08:38 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+07:15:27 [enc/graph/twitch_egos] vote=0.691 uniform=0.689 best1=0.690 n_val=38387 vram=0.00GB 409s | grade=0.891 inner_auc=0.581 vs conf_auc=0.582
+07:15:50 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+07:22:40 [enc/graph/twitch_egos] vote=0.690 uniform=0.688 best1=0.689 n_val=38406 vram=0.00GB 410s | grade=0.890 inner_auc=0.581 vs conf_auc=0.579
+07:23:05 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+07:29:56 [enc/graph/twitch_egos] vote=0.687 uniform=0.686 best1=0.685 n_val=38119 vram=0.00GB 411s | grade=0.889 inner_auc=0.575 vs conf_auc=0.574
+07:30:19 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+07:37:06 [enc/graph/twitch_egos] vote=0.691 uniform=0.687 best1=0.690 n_val=37868 vram=0.00GB 407s | grade=0.887 inner_auc=0.578 vs conf_auc=0.580
+07:37:31 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+07:44:15 [enc/graph/twitch_egos] vote=0.691 uniform=0.688 best1=0.687 n_val=38078 vram=0.00GB 404s | grade=0.890 inner_auc=0.586 vs conf_auc=0.587
+07:44:42 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+07:51:44 [enc/graph/twitch_egos] vote=0.686 uniform=0.684 best1=0.685 n_val=38099 vram=0.00GB 422s | grade=0.889 inner_auc=0.586 vs conf_auc=0.587
+07:52:15 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+08:01:40 [enc/graph/twitch_egos] vote=0.690 uniform=0.688 best1=0.688 n_val=38120 vram=0.00GB 565s | grade=0.889 inner_auc=0.584 vs conf_auc=0.585
+08:02:14 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+08:11:55 [enc/graph/twitch_egos] vote=0.690 uniform=0.687 best1=0.688 n_val=38171 vram=0.00GB 581s | grade=0.891 inner_auc=0.574 vs conf_auc=0.575
+08:12:33 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+08:21:23 [enc/graph/twitch_egos] vote=0.687 uniform=0.686 best1=0.684 n_val=38101 vram=0.00GB 530s | grade=0.888 inner_auc=0.574 vs conf_auc=0.572
+08:21:52 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+08:29:49 [enc/graph/twitch_egos] vote=0.689 uniform=0.686 best1=0.688 n_val=38219 vram=0.00GB 478s | grade=0.891 inner_auc=0.579 vs conf_auc=0.579
+08:30:16 RUN COMPLETE
+20:49:23 NI run auto_cpu_014 on CPU; hours=2.0 smoke=False
+20:49:23 explicit task list: ['enc/graph/twitch_egos']
+20:49:26 [resume] from checkpoint: next cycle 80, rounds 80, 81 metric rows, inner net restored
+20:49:26 ===== CYCLE 80 (OUTER-ONLY BOOTSTRAP) =====
+20:49:28 [data] enc/graph/twitch_egos: n=127094 C=2 D=534 shards=1
+20:50:33 [enc/graph/twitch_egos] vote=0.685 uniform=0.683 best1=0.684 n_val=38196 vram=0.00GB 66s
+20:50:50 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 80, "n_records": 38196, "n_val": 7670, "base_rate": 0.6775749921798706, "inner": {"auc": 0.5773872932539621, "ece": 0.012867666036861972, "brier": 0.21450746059417725, "acc80": 0.7059974074363708}, "outer_conf": {"auc": 0.5774566589126001, "ece": 0.04175740823130253, "brier": 0.21712514758110046, "acc80": 0.7058344483375549}}
+20:50:50 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+20:56:45 [enc/graph/twitch_egos] vote=0.686 uniform=0.684 best1=0.686 n_val=38214 vram=0.00GB 355s | grade=0.891 inner_auc=0.589 vs conf_auc=0.590
+20:57:07 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+21:03:47 [enc/graph/twitch_egos] vote=0.690 uniform=0.687 best1=0.688 n_val=38060 vram=0.00GB 400s | grade=0.889 inner_auc=0.586 vs conf_auc=0.586
+21:04:10 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+21:12:43 [enc/graph/twitch_egos] vote=0.687 uniform=0.685 best1=0.685 n_val=38172 vram=0.00GB 513s | grade=0.890 inner_auc=0.573 vs conf_auc=0.575
+21:13:13 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+21:22:05 [enc/graph/twitch_egos] vote=0.689 uniform=0.686 best1=0.686 n_val=38184 vram=0.00GB 532s | grade=0.889 inner_auc=0.572 vs conf_auc=0.572
+21:22:33 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+21:31:35 [enc/graph/twitch_egos] vote=0.688 uniform=0.684 best1=0.686 n_val=37968 vram=0.00GB 542s | grade=0.891 inner_auc=0.571 vs conf_auc=0.570
+21:32:03 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+21:40:37 [enc/graph/twitch_egos] vote=0.690 uniform=0.686 best1=0.688 n_val=37975 vram=0.00GB 514s | grade=0.891 inner_auc=0.579 vs conf_auc=0.578
+21:41:10 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+21:49:33 [enc/graph/twitch_egos] vote=0.690 uniform=0.688 best1=0.688 n_val=38212 vram=0.00GB 502s | grade=0.891 inner_auc=0.580 vs conf_auc=0.578
+21:50:01 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+21:58:14 [enc/graph/twitch_egos] vote=0.691 uniform=0.685 best1=0.688 n_val=38400 vram=0.00GB 492s | grade=0.891 inner_auc=0.582 vs conf_auc=0.580
+21:58:41 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+22:06:11 [enc/graph/twitch_egos] vote=0.684 uniform=0.683 best1=0.684 n_val=38035 vram=0.00GB 450s | grade=0.888 inner_auc=0.576 vs conf_auc=0.576
+22:06:40 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+22:14:24 [enc/graph/twitch_egos] vote=0.689 uniform=0.686 best1=0.687 n_val=37980 vram=0.00GB 464s | grade=0.890 inner_auc=0.575 vs conf_auc=0.578
+22:14:49 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+22:21:45 [enc/graph/twitch_egos] vote=0.689 uniform=0.686 best1=0.688 n_val=38307 vram=0.00GB 416s | grade=0.891 inner_auc=0.578 vs conf_auc=0.579
+22:22:09 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+22:29:38 [enc/graph/twitch_egos] vote=0.688 uniform=0.684 best1=0.686 n_val=38108 vram=0.00GB 449s | grade=0.891 inner_auc=0.587 vs conf_auc=0.588
+22:30:09 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+22:38:01 [enc/graph/twitch_egos] vote=0.686 uniform=0.684 best1=0.684 n_val=38143 vram=0.00GB 472s | grade=0.889 inner_auc=0.573 vs conf_auc=0.574
+22:38:30 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+22:46:29 [enc/graph/twitch_egos] vote=0.686 uniform=0.684 best1=0.686 n_val=38521 vram=0.00GB 479s | grade=0.890 inner_auc=0.584 vs conf_auc=0.588
+22:47:01 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+22:54:43 [enc/graph/twitch_egos] vote=0.691 uniform=0.689 best1=0.689 n_val=37990 vram=0.00GB 462s | grade=0.889 inner_auc=0.590 vs conf_auc=0.590
+22:55:23 RUN COMPLETE
+00:06:14 NI run auto_cpu_014 on CPU; hours=2.0 smoke=False
+00:06:14 explicit task list: ['enc/graph/twitch_egos']
+00:06:26 [resume] from checkpoint: next cycle 96, rounds 96, 97 metric rows, inner net restored
+00:06:26 ===== CYCLE 96 (OUTER-ONLY BOOTSTRAP) =====
+00:06:29 [data] enc/graph/twitch_egos: n=127094 C=2 D=534 shards=1
+00:12:36 [enc/graph/twitch_egos] vote=0.690 uniform=0.686 best1=0.688 n_val=38420 vram=0.00GB 367s
+00:13:30 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 96, "n_records": 38420, "n_val": 7656, "base_rate": 0.6841692924499512, "inner": {"auc": 0.5866429976146194, "ece": 0.010722197241917673, "brier": 0.21151195466518402, "acc80": 0.7119529843330383}, "outer_conf": {"auc": 0.585837817173035, "ece": 0.03935575009544566, "brier": 0.21366798877716064, "acc80": 0.711626410484314}}
+00:13:30 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+00:21:25 [enc/graph/twitch_egos] vote=0.689 uniform=0.688 best1=0.686 n_val=38292 vram=0.00GB 475s | grade=0.891 inner_auc=0.573 vs conf_auc=0.572
+00:21:51 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+00:29:04 [enc/graph/twitch_egos] vote=0.687 uniform=0.683 best1=0.684 n_val=38038 vram=0.00GB 433s | grade=0.890 inner_auc=0.588 vs conf_auc=0.588
+00:29:35 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+00:36:44 [enc/graph/twitch_egos] vote=0.690 uniform=0.687 best1=0.689 n_val=38080 vram=0.00GB 430s | grade=0.890 inner_auc=0.579 vs conf_auc=0.577
+00:37:11 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+00:44:57 [enc/graph/twitch_egos] vote=0.688 uniform=0.682 best1=0.685 n_val=38395 vram=0.00GB 465s | grade=0.891 inner_auc=0.577 vs conf_auc=0.577
+00:45:23 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+00:53:57 [enc/graph/twitch_egos] vote=0.688 uniform=0.686 best1=0.688 n_val=38367 vram=0.00GB 514s | grade=0.891 inner_auc=0.570 vs conf_auc=0.571
+00:54:29 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+01:02:28 [enc/graph/twitch_egos] vote=0.687 uniform=0.686 best1=0.685 n_val=38383 vram=0.00GB 479s | grade=0.891 inner_auc=0.581 vs conf_auc=0.581
+01:02:56 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+01:10:54 [enc/graph/twitch_egos] vote=0.688 uniform=0.683 best1=0.686 n_val=38167 vram=0.00GB 478s | grade=0.889 inner_auc=0.575 vs conf_auc=0.578
+01:11:23 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+01:19:36 [enc/graph/twitch_egos] vote=0.691 uniform=0.687 best1=0.690 n_val=38216 vram=0.00GB 493s | grade=0.890 inner_auc=0.577 vs conf_auc=0.575
+01:20:05 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+01:28:12 [enc/graph/twitch_egos] vote=0.686 uniform=0.685 best1=0.683 n_val=38331 vram=0.00GB 487s | grade=0.890 inner_auc=0.586 vs conf_auc=0.587
+01:28:44 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+01:36:58 [enc/graph/twitch_egos] vote=0.687 uniform=0.687 best1=0.686 n_val=38129 vram=0.00GB 494s | grade=0.891 inner_auc=0.570 vs conf_auc=0.569
+01:37:27 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+01:45:51 [enc/graph/twitch_egos] vote=0.690 uniform=0.686 best1=0.689 n_val=38250 vram=0.00GB 503s | grade=0.888 inner_auc=0.578 vs conf_auc=0.577
+01:46:23 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+01:55:07 [enc/graph/twitch_egos] vote=0.689 uniform=0.687 best1=0.687 n_val=38287 vram=0.00GB 525s | grade=0.890 inner_auc=0.574 vs conf_auc=0.576
+01:55:41 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+02:03:52 [enc/graph/twitch_egos] vote=0.689 uniform=0.689 best1=0.688 n_val=38273 vram=0.00GB 491s | grade=0.891 inner_auc=0.584 vs conf_auc=0.584
+02:04:30 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+02:11:39 [enc/graph/twitch_egos] vote=0.693 uniform=0.691 best1=0.692 n_val=38279 vram=0.00GB 429s | grade=0.888 inner_auc=0.573 vs conf_auc=0.574
+02:12:12 RUN COMPLETE
+21:02:30 NI run auto_cpu_014 on CPU; hours=2.0 smoke=False
+21:02:30 explicit task list: ['enc/graph/twitch_egos']
+21:02:38 [resume] from checkpoint: next cycle 111, rounds 111, 112 metric rows, inner net restored
+21:02:38 ===== CYCLE 111 (OUTER-ONLY BOOTSTRAP) =====
+21:02:40 [data] enc/graph/twitch_egos: n=127094 C=2 D=534 shards=1
+21:06:35 [enc/graph/twitch_egos] vote=0.689 uniform=0.685 best1=0.688 n_val=38082 vram=0.00GB 235s
+21:07:12 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 111, "n_records": 38082, "n_val": 7673, "base_rate": 0.6891698241233826, "inner": {"auc": 0.5787174870043166, "ece": 0.008358489196210085, "brier": 0.21043109893798828, "acc80": 0.7147279381752014}, "outer_conf": {"auc": 0.5777140680057216, "ece": 0.04332861063083582, "brier": 0.2134789526462555, "acc80": 0.7165200114250183}}
+21:07:12 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+21:13:16 [enc/graph/twitch_egos] vote=0.690 uniform=0.688 best1=0.687 n_val=38112 vram=0.00GB 364s | grade=0.892 inner_auc=0.591 vs conf_auc=0.591
+21:13:36 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+21:19:52 [enc/graph/twitch_egos] vote=0.690 uniform=0.686 best1=0.687 n_val=38324 vram=0.00GB 376s | grade=0.890 inner_auc=0.578 vs conf_auc=0.578
+21:20:13 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+21:26:44 [enc/graph/twitch_egos] vote=0.690 uniform=0.687 best1=0.688 n_val=38303 vram=0.00GB 391s | grade=0.890 inner_auc=0.577 vs conf_auc=0.576
+21:27:08 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+21:33:32 [enc/graph/twitch_egos] vote=0.689 uniform=0.685 best1=0.690 n_val=38393 vram=0.00GB 384s | grade=0.890 inner_auc=0.587 vs conf_auc=0.586
+21:33:54 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+21:40:12 [enc/graph/twitch_egos] vote=0.686 uniform=0.682 best1=0.685 n_val=37936 vram=0.00GB 378s | grade=0.889 inner_auc=0.573 vs conf_auc=0.574
+21:40:35 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+21:47:01 [enc/graph/twitch_egos] vote=0.690 uniform=0.687 best1=0.688 n_val=38097 vram=0.00GB 385s | grade=0.890 inner_auc=0.570 vs conf_auc=0.575
+21:47:24 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+21:53:47 [enc/graph/twitch_egos] vote=0.690 uniform=0.687 best1=0.688 n_val=38194 vram=0.00GB 383s | grade=0.892 inner_auc=0.580 vs conf_auc=0.579
+21:54:08 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+22:00:42 [enc/graph/twitch_egos] vote=0.688 uniform=0.686 best1=0.687 n_val=38148 vram=0.00GB 394s | grade=0.890 inner_auc=0.572 vs conf_auc=0.573
+22:01:03 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+22:07:22 [enc/graph/twitch_egos] vote=0.687 uniform=0.681 best1=0.684 n_val=38342 vram=0.00GB 379s | grade=0.888 inner_auc=0.585 vs conf_auc=0.585
+22:07:49 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+22:13:57 [enc/graph/twitch_egos] vote=0.686 uniform=0.686 best1=0.685 n_val=37949 vram=0.00GB 369s | grade=0.890 inner_auc=0.575 vs conf_auc=0.576
+22:14:22 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+22:20:50 [enc/graph/twitch_egos] vote=0.689 uniform=0.686 best1=0.688 n_val=38410 vram=0.00GB 388s | grade=0.890 inner_auc=0.581 vs conf_auc=0.580
+22:21:13 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+22:27:33 [enc/graph/twitch_egos] vote=0.683 uniform=0.681 best1=0.682 n_val=38385 vram=0.00GB 380s | grade=0.887 inner_auc=0.583 vs conf_auc=0.582
+22:27:56 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+22:34:19 [enc/graph/twitch_egos] vote=0.689 uniform=0.687 best1=0.687 n_val=37832 vram=0.00GB 383s | grade=0.889 inner_auc=0.576 vs conf_auc=0.576
+22:34:43 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+22:41:01 [enc/graph/twitch_egos] vote=0.689 uniform=0.688 best1=0.688 n_val=38149 vram=0.00GB 378s | grade=0.890 inner_auc=0.592 vs conf_auc=0.591
+22:41:23 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+22:47:50 [enc/graph/twitch_egos] vote=0.687 uniform=0.683 best1=0.687 n_val=38067 vram=0.00GB 387s | grade=0.889 inner_auc=0.576 vs conf_auc=0.576
+22:48:18 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+22:54:44 [enc/graph/twitch_egos] vote=0.692 uniform=0.689 best1=0.690 n_val=38534 vram=0.00GB 386s | grade=0.889 inner_auc=0.580 vs conf_auc=0.577
+22:55:11 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+23:01:32 [enc/graph/twitch_egos] vote=0.694 uniform=0.690 best1=0.693 n_val=37785 vram=0.00GB 381s | grade=0.890 inner_auc=0.571 vs conf_auc=0.571
+23:01:56 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+23:07:40 [enc/graph/twitch_egos] vote=0.691 uniform=0.687 best1=0.689 n_val=38073 vram=0.00GB 344s | grade=0.889 inner_auc=0.566 vs conf_auc=0.566
+23:08:05 RUN COMPLETE
+19:51:11 NI run auto_cpu_014 on CPU; hours=2.0 smoke=False
+19:51:11 explicit task list: ['enc/graph/twitch_egos']
+19:51:21 [resume] from checkpoint: next cycle 130, rounds 130, 131 metric rows, inner net restored
+19:51:21 ===== CYCLE 130 (OUTER-ONLY BOOTSTRAP) =====
+19:51:23 [data] enc/graph/twitch_egos: n=127094 C=2 D=534 shards=1
+19:55:41 [enc/graph/twitch_egos] vote=0.688 uniform=0.687 best1=0.687 n_val=38176 vram=0.00GB 257s
+19:56:22 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 130, "n_records": 38176, "n_val": 7651, "base_rate": 0.6880146265029907, "inner": {"auc": 0.5786254111365642, "ece": 0.012102794840419671, "brier": 0.2107948660850525, "acc80": 0.7106209397315979}, "outer_conf": {"auc": 0.5752883686075666, "ece": 0.04358175424575308, "brier": 0.214157372713089, "acc80": 0.7102941274642944}}
+19:56:22 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+20:02:49 [enc/graph/twitch_egos] vote=0.685 uniform=0.682 best1=0.684 n_val=37932 vram=0.00GB 387s | grade=0.889 inner_auc=0.577 vs conf_auc=0.579
+20:03:15 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+20:09:41 [enc/graph/twitch_egos] vote=0.692 uniform=0.689 best1=0.691 n_val=37953 vram=0.00GB 387s | grade=0.887 inner_auc=0.577 vs conf_auc=0.576
+20:10:00 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+20:16:33 [enc/graph/twitch_egos] vote=0.689 uniform=0.688 best1=0.688 n_val=37599 vram=0.00GB 393s | grade=0.891 inner_auc=0.582 vs conf_auc=0.583
+20:16:56 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+20:23:30 [enc/graph/twitch_egos] vote=0.688 uniform=0.686 best1=0.688 n_val=38206 vram=0.00GB 394s | grade=0.891 inner_auc=0.575 vs conf_auc=0.577
+20:23:52 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+20:30:36 [enc/graph/twitch_egos] vote=0.689 uniform=0.686 best1=0.689 n_val=38113 vram=0.00GB 404s | grade=0.889 inner_auc=0.560 vs conf_auc=0.560
+20:30:59 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+20:37:33 [enc/graph/twitch_egos] vote=0.692 uniform=0.688 best1=0.691 n_val=38099 vram=0.00GB 394s | grade=0.889 inner_auc=0.578 vs conf_auc=0.577
+20:37:54 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+20:44:26 [enc/graph/twitch_egos] vote=0.690 uniform=0.688 best1=0.688 n_val=37950 vram=0.00GB 392s | grade=0.890 inner_auc=0.575 vs conf_auc=0.575
+20:44:49 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+20:51:16 [enc/graph/twitch_egos] vote=0.690 uniform=0.687 best1=0.689 n_val=38137 vram=0.00GB 387s | grade=0.891 inner_auc=0.583 vs conf_auc=0.584
+20:51:36 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+20:58:19 [enc/graph/twitch_egos] vote=0.690 uniform=0.688 best1=0.690 n_val=38138 vram=0.00GB 403s | grade=0.890 inner_auc=0.577 vs conf_auc=0.579
+20:58:45 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+21:05:42 [enc/graph/twitch_egos] vote=0.692 uniform=0.689 best1=0.691 n_val=38279 vram=0.00GB 417s | grade=0.889 inner_auc=0.581 vs conf_auc=0.582
+21:06:05 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+21:12:55 [enc/graph/twitch_egos] vote=0.689 uniform=0.687 best1=0.687 n_val=37966 vram=0.00GB 410s | grade=0.889 inner_auc=0.565 vs conf_auc=0.566
+21:13:21 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+21:20:11 [enc/graph/twitch_egos] vote=0.690 uniform=0.687 best1=0.689 n_val=38231 vram=0.00GB 410s | grade=0.890 inner_auc=0.590 vs conf_auc=0.592
+21:20:35 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+21:27:52 [enc/graph/twitch_egos] vote=0.685 uniform=0.685 best1=0.685 n_val=38068 vram=0.00GB 436s | grade=0.888 inner_auc=0.578 vs conf_auc=0.577
+21:28:27 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+21:35:30 [enc/graph/twitch_egos] vote=0.688 uniform=0.686 best1=0.687 n_val=38106 vram=0.00GB 423s | grade=0.889 inner_auc=0.578 vs conf_auc=0.578
+21:35:57 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+21:43:12 [enc/graph/twitch_egos] vote=0.688 uniform=0.685 best1=0.688 n_val=38304 vram=0.00GB 435s | grade=0.889 inner_auc=0.572 vs conf_auc=0.572
+21:43:38 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+21:50:31 [enc/graph/twitch_egos] vote=0.689 uniform=0.685 best1=0.688 n_val=38250 vram=0.00GB 413s | grade=0.890 inner_auc=0.575 vs conf_auc=0.574
+21:50:55 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+21:57:32 [enc/graph/twitch_egos] vote=0.689 uniform=0.687 best1=0.688 n_val=38357 vram=0.00GB 396s | grade=0.892 inner_auc=0.588 vs conf_auc=0.588
+21:57:58 RUN COMPLETE

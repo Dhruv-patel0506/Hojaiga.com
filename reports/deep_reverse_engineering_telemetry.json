@@ -1,0 +1,71 @@
+{
+  "timestamp": "2026-10-22 20:27:14",
+  "target_input": "File Explorer",
+  "task_intent": "Navigate to D drive and inspect files",
+  "mode": "DESKTOP_UIA",
+  "title": "new_automation - File Explorer",
+  "timings": {
+    "real_scan_ms": 1862.26,
+    "real_rag_ms": 44.85,
+    "real_qwen_gpu_ms": 11529.65,
+    "total_latency_ms": 13436.76
+  },
+  "reverse_engineering": {
+    "inferred_archetype": "ARCH_07_IDE_CODE_EDITOR",
+    "control_breakdown": {
+      "buttons": 12,
+      "inputs": 56,
+      "links": 0,
+      "canvas": 0,
+      "code_editor": 0,
+      "media": 0,
+      "tree_list": 27
+    },
+    "controls_mapped_count": 95,
+    "annotated_screenshot": "D:\\new_automation\\reports\\live_benchmark_captures\\desktop_File_Explorer.png"
+  },
+  "rag_context": {
+    "retrieved_hits": 3,
+    "planned_steps": [
+      {
+        "step": 1,
+        "action": "click",
+        "target": "File menu",
+        "hotkey": "",
+        "expected_delta": "File menu opens"
+      },
+      {
+        "step": 2,
+        "action": "click",
+        "target": "Export As submenu",
+        "hotkey": "",
+        "expected_delta": "Export formats list opens"
+      },
+      {
+        "step": 3,
+        "action": "click",
+        "target": "Export as PDF...",
+        "hotkey": "",
+        "expected_delta": "PDF Options dialog opens"
+      },
+      {
+        "step": 4,
+        "action": "click",
+        "target": "Export button in PDF Options dialog",
+        "hotkey": "",
+        "expected_delta": "Save dialog opens"
+      },
+      {
+        "step": 5,
+        "action": "click",
+        "target": "Save button in file picker",
+        "hotkey": "",
+        "expected_delta": "PDF is written to the selected path"
+      }
+    ]
+  },
+  "neural_vlm": {
+    "adapter_used": "D:\\new_automation\\data\\ai_root\\harvest\\training\\runs\\run_20261022_040604\\adapter",
+    "decision": "{\"mark_id\": 15, \"target\": \"New Volume (D:)\", \"bbox\": [560, 823, 668, 863], \"reason\": \"the user wants to navigate to the D drive and inspect files, so this action will allow them to do so\"}"
+  }
+}

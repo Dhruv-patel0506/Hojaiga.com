@@ -1,0 +1,84 @@
+{
+   "app_metadata": {
+      "app_name": "CopyQ",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Start CopyQ and use its basic features",
+   "prerequisite_state": "Desktop environment is ready",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Start CopyQ by double-clicking the program icon or running `copyq`",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "CopyQ main window appears"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Copy text to the clipboard and create a new item in the list",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "Some Text"
+         },
+         "expected_state_change": "A new item with the text 'Some Text' appears in the clipboard history"
+      }
+   ],
+   "_meta": {
+      "source_app": "CopyQ",
+      "app_key": "copyq",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "CopyQ",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:23:28Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,106 @@
+{
+ "app": "word",
+ "started": "2026-11-02 05:17:07",
+ "phases": {
+  "read": {
+   "seconds": 3.1,
+   "level": "explored"
+  },
+  "map": {
+   "ran": true,
+   "seconds": 253.3,
+   "level": "explored",
+   "commands": 2691,
+   "with_shortcut": 24,
+   "dialogs": 20,
+   "layout_controls": 958,
+   "state_variables": 38,
+   "frontier": {
+    "total": 182,
+    "by_status": {
+     "explored": 53,
+     "no_effect": 5,
+     "open": 115,
+     "unsafe": 9
+    },
+    "explorable": 173,
+    "explored_n": 58,
+    "explored_fraction": 0.335
+   }
+  },
+  "ask": {
+   "asked": 4,
+   "answered": 1,
+   "items": [
+    {
+     "q": "In word, how do I use View?",
+     "status": "ANSWERED",
+     "answer": "To use View in Word, you can follow these steps:\n\n1. Look at the screen [3].\n2. Click on the View tab in the ribbon [3]."
+    },
+    {
+     "q": "In word, how do I use Insert Index...?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about word (1 documents, 4 procedures, 0 shortcuts). how to use Insert Index... [1] [2] Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In word, how do I use Superscript?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about word (1 documents, 4 procedures, 0 shortcuts). how to use Superscript in Word Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In word, how do I use 1x6 Table?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about word (1 documents, 4 procedures, 0 shortcuts). how to create or use a 1x6 table in Word. Reverse engineering or scanning it more would fill this in."
+    }
+   ],
+   "seconds": 23.4
+  },
+  "practice": {
+   "written": 5,
+   "tried": 4,
+   "proven_done": 0,
+   "kept_training_rows": 0,
+   "results": [
+    {
+     "task": "open word, type 'Hello, World!' in Arial Rounded MT Bold font, 24 pt, then insert a 1x6 table with headers 'Name', 'Age', 'City', 'Country', 'Phone', 'Email'. Save as 'example_table.docx' in D:\\new_automation\\data\\practice\\word.",
+     "status": "SKIPPED",
+     "why": "risky words, a menu-click list, or no checkable end (not saved in the practice folder)"
+    },
+    {
+     "task": "open word, type 'Automation Practice' in Cascadia Code Light font, 36 pt, then insert a 5x1 table with headers 'Product', 'Price', 'Quantity', 'Total', 'Discount'. Fill in the table with sample data. Save as 'sales_report.docx' in D:\\new_automation\\data\\practice\\word.",
+     "status": "FAILED",
+     "seconds": 126.2,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'word': BLOCKED (window hwnd=4065190), 5 verified-loop steps in 122.3s\n    - 'type \"'Automation Practice' in Cascadia Code Light font, 36 pt\"' -"
+    },
+    {
+     "task": "open word, type 'Accessibility Test' in Blue Green color, 18 pt, then use the accessibility feature to ensure the document is readable for people with visual impairments. Save as 'accessibility_test.docx' in D:\\new_automation\\data\\practice\\word.",
+     "status": "PARTIAL",
+     "seconds": 138.2,
+     "proof": ""
+    },
+    {
+     "task": "open word, type 'Superscript Example' in Arial Rounded MT Bold font, 20 pt, then use the Superscript feature to add superscript text '2' to the number '100'. Save as 'superscript_example.docx' in D:\\new_automation\\data\\practice\\word.",
+     "status": "PARTIAL",
+     "seconds": 74.5,
+     "proof": ""
+    },
+    {
+     "task": "open word, type 'Complex Table' in Gill Sans Ultra Bold Condensed font, 28 pt, then insert a 3x3 table with headers 'Item', 'Price', 'Quantity'. Fill in the table with sample data. Use the 'Insert Index' feature to create an index for the table. Save as 'complex_table.docx' in D:\\new_automation\\data\\practice\\word.",
+     "status": "FAILED",
+     "seconds": 126.4,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'word': BLOCKED (window hwnd=6949420), 5 verified-loop steps in 124.3s\n    - 'type \"'Complex Table' in Gill Sans Ultra Bold Condensed font, 28 p"
+    }
+   ],
+   "seconds": 481.6
+  }
+ },
+ "app_key": "word",
+ "exe": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
+ "readiness": {
+  "knows_commands": true,
+  "answers_questions": "1/4",
+  "proven_tasks": "0/4",
+  "verdict": "not ready: nothing proven yet"
+ },
+ "seconds": 767.3
+}

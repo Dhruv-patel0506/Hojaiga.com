@@ -1,0 +1,111 @@
+{
+   "app_metadata": {
+      "app_name": "BizHawk",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install BizHawk on Windows",
+   "prerequisite_state": "User is on a Windows machine and has internet access",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click on the BizHawk link to download the latest version",
+         "ui_target": {
+            "element_name": "BizHawk-<version>-win-x64.zip",
+            "automation_id": null,
+            "hierarchical_path": "Download section > BizHawk link",
+            "element_type": "Hyperlink",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A download dialog opens or the file starts downloading"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Extract the downloaded BizHawk-<version>-win-x64.zip file to a desired location",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The BizHawk folder is extracted to the chosen location"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Run EmuHawk.exe from the extracted BizHawk folder",
+         "ui_target": {
+            "element_name": "EmuHawk.exe",
+            "automation_id": null,
+            "hierarchical_path": "BizHawk folder > EmuHawk.exe",
+            "element_type": "Executable",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "BizHawk application opens"
+      }
+   ],
+   "_meta": {
+      "source_app": "BizHawk",
+      "app_key": "bizhawk",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "BizHawk",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:35:09Z",
+      "schema_warnings": [
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

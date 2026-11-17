@@ -1,0 +1,100 @@
+{
+   "app_metadata": {
+      "app_name": "RELYR",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure a single action in RELYR",
+   "prerequisite_state": "RELYR is installed and running",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Temporarily disable AutoHotkey, PowerToys Keyboard Manager, and other remapping tools",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": null,
+            "modifiers": [
+               "Alt",
+               "Tab"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The specified remapping tools are disabled"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "In RELYR, select the Space layer, choose an unused key, assign Launch Notepad, and save",
+         "ui_target": {
+            "element_name": "Space layer",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Layers > Space",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Space layer is selected"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Choose an unused key and assign Launch Notepad",
+         "ui_target": {
+            "element_name": "Key assignment",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Key assignment",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "L"
+         },
+         "expected_state_change": "The key L is selected for assignment"
+      }
+   ],
+   "_meta": {
+      "source_app": "RELYR",
+      "app_key": "relyr",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "RELYR",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T05:38:01Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

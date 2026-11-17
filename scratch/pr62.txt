@@ -1,0 +1,57 @@
+# ====================================================================================================================== PR62 the workflow library
+def run_pr62() -> TestOutcome:
+    """PR62: the guides become a LIBRARY - every procedure is analysed against the application's controls (path / label / chord / typed / file dialog / pointer gesture / human), written as readable
+    markdown and fetchable json (one format for every application), found again by a plain request, given a last-run result, and turned back into a task the executor performs"""
+    import tempfile
+    from core_organs.professor import workflows as WF
+    from core_organs.professor.harvest import Catalog, Verb
+    from core_organs.professor.knowledge import manual_rag as MR
+    guide = ("# Header and footer\n\n1. Select **File** > **Page setup**.\n2. In the **Header** box, type &f.\n3. Select **OK**.\n\n"
+             "# Open a picture\n\n1. Select **File** > **Open**.\n2. Select the picture you want to open.\n3. Click **Open**.\n\n"
+             "# Draw a line\n\n1. Select the **Pencil** tool.\n2. Click and drag on the canvas.\n\n"
+             "# Copy and paste\n\n1. Select **Edit** > **Copy**.\n2. Press Ctrl+V.\n")
+
+    def V(label, path=(), role="menu_item", sc=""):
+        return Verb(label, label, list(path), sc, "", True, False, "", 0, "", role, ["uia"], "measured", "safe")
+    cat = Catalog(app_key="demo", verbs=[V("Page setup", ["File"]), V("Header", ["File", "Page setup"], "field"), V("OK", ["File", "Page setup"], "button"), V("Open", ["File"], sc="Ctrl+O"), V("Pencil", ["Tools"], "button"),
+                                         V("Copy", ["Edit"], sc="Ctrl+C"), V("Paste", ["Edit"], sc="Ctrl+V")])
+    with tempfile.TemporaryDirectory() as tmp:
+        ix = MR.ManualIndex(os.path.join(tmp, "m.db"))
+        ix.ingest_text("demo", "Guide", guide, "https://example.test/guide", "md", embed=False)
+        real = WF.WF_DIR
+        WF.WF_DIR = os.path.join(tmp, "wf")
+        GS = __import__("core_organs.professor.knowledge.guide_steps", fromlist=["x"])
+        GS.SANDBOX_FILES = True
+        try:
+            doc = WF.build("demo", ix=ix, catalog=cat)
+            ws = {w["goal"]: w for w in doc["workflows"]}
+            md = open(WF.path_of("demo", "md"), encoding="utf-8").read()
+            idx = open(os.path.join(WF.WF_DIR, "INDEX.md"), encoding="utf-8").read()
+            again = WF.load("demo")
+            found = WF.fetch("demo", "how do I rotate... open a picture file")
+            by_id = WF.get(next(iter(ws.values()))["id"])
+            hdr, opn, drw, cpy = ws.get("Header and footer"), ws.get("Open a picture"), ws.get("Draw a line"), ws.get("Copy and paste")
+            WF.record_run("demo", {"started": "2026-10-10 12:00:00", "html": "x.html", "ledger": [{"goal": "Header and footer", "cite": hdr["cite"], "disposition": "ok", "reason": ""},
+                                                                                                    {"goal": "Draw a line", "cite": drw["cite"], "disposition": "blocked", "reason": "needs a pointer gesture"}], "tasks": []})
+            rec = WF.load("demo")
+            rw = {w["goal"]: w for w in rec["workflows"]}
+            task = WF.to_task(hdr)
+        finally:
+            WF.WF_DIR = real
+            GS.SANDBOX_FILES = False
+        ix.close()
+    checks = {"every_procedure_is_a_workflow": len(ws) == 4 and doc["summary"]["workflows"] == 4,
+              "ids_are_stable_and_unique": len({w["id"] for w in ws.values()}) == 4 and all(w["id"].startswith("demo.") for w in ws.values()),
+              "path_steps_are_grounded_to_controls": hdr and [s["how"] for s in hdr["steps"]][:1] == ["path"] and hdr["steps"][0]["verb"] == "Page setup" and hdr["grounded_share"] >= 0.66,
+              "file_choosing_needs_the_dialog_handler": opn and opn["status"] == "needs-file-dialog" and "file_dialog" in opn["requires"] and any(s["how"] == "dialog" for s in opn["steps"]),
+              "pointer_gesture_is_named_not_run": drw and drw["status"] == "needs-pointer" and any(s["how"] == "gesture" for s in drw["steps"]),
+              "clipboard_use_is_named": cpy and "clipboard" in cpy["requires"],
+              "markdown_is_readable": "## Header and footer" in md and "| # | what the guide says |" in md and "Page setup" in md and "https://example.test/guide" in md,
+              "index_lists_the_application": "| [demo](demo.md) |" in idx,
+              "json_roundtrips": again and again["app"] == "demo" and len(again["workflows"]) == 4,
+              "a_request_finds_its_workflow": bool(found) and found[0]["goal"] == "Open a picture" and by_id is not None,
+              "last_run_is_recorded": rw["Header and footer"]["last_run"]["result"] == "ok" and rw["Draw a line"]["last_run"]["result"] == "blocked" and rw["Open a picture"]["last_run"]["result"] == "never",
+              "functions_explained_by_the_guide": doc["summary"]["functions_explained_by_a_guide"] >= 3 and any(f["label"] == "Page setup" and f["explained_by"] for f in doc["functions"]),
+              "workflow_becomes_a_task": task["goal"] == "Header and footer" and len(task["steps"]) == 3 and task["source"] == "https://example.test/guide"}
+    return _verdict(checks, f"statuses={ {g: w['status'] for g, w in ws.items()} } requires={ {g: w['requires'] for g, w in ws.items()} } found={[w['goal'] for w in found]}")
+

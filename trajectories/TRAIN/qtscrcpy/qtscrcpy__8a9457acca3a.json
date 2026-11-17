@@ -1,0 +1,249 @@
+{
+   "app_metadata": {
+      "app_name": "QtScrcpy",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Set up and configure QtScrcpy for wireless connection to an Android device",
+   "prerequisite_state": "QtScrcpy application is open and the user is ready to connect to an Android device wirelessly",
+   "total_steps": 8,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click on 'Start config'",
+         "ui_target": {
+            "element_name": "Start config",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Start config",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The configuration window opens with settings for bit rate, resolution, recording format, and video save path"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click on 'Refresh devices'",
+         "ui_target": {
+            "element_name": "Refresh devices",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Refresh devices",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The list of connected Android devices is updated"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click on 'Get device IP'",
+         "ui_target": {
+            "element_name": "Get device IP",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Get device IP",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The IP address of the Android device is displayed and updated in the 'Wireless' area"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Click on 'Start adbd'",
+         "ui_target": {
+            "element_name": "Start adbd",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Start adbd",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The adbd service of the Android device is started"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Click on 'Wireless connect'",
+         "ui_target": {
+            "element_name": "Wireless connect",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Wireless connect",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Android device is connected wirelessly"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Click on 'Start service'",
+         "ui_target": {
+            "element_name": "Start service",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Start service",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The service is started and the Android device is connected"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Click on 'Stop service'",
+         "ui_target": {
+            "element_name": "Stop service",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Stop service",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The service is stopped and the connection is disconnected"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Click on 'Stop all services'",
+         "ui_target": {
+            "element_name": "Stop all services",
+            "automation_id": null,
+            "hierarchical_path": "Main window > Stop all services",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "All services are stopped and all connections are disconnected"
+      }
+   ],
+   "_meta": {
+      "source_app": "QtScrcpy",
+      "app_key": "qtscrcpy",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "QtScrcpy",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:59:17Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

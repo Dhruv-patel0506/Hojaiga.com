@@ -1,0 +1,130 @@
+{
+   "app_metadata": {
+      "app_name": "Microsoft Excel",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": false
+   },
+   "target_kind": "gui",
+   "high_level_task": "Entering formula",
+   "prerequisite_state": "App is open at the state the tutorial video starts from",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "ui_target": {
+            "element_name": "New",
+            "element_type": "MenuItem",
+            "automation_id": "",
+            "hierarchical_path": "",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ],
+            "visual_description": ""
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "low_level_instruction": "And I'm going to click here just to show that there will often also be templates that you can click to open up and use.",
+         "expected_state_change": "New menu items are visible",
+         "provenance": {
+            "engine": "ollama",
+            "confidence": 0.9,
+            "t0": 54.0,
+            "t1": 60.0,
+            "kind": "stride",
+            "frame": "video_dataset/wbJcJCkBcMg/frames_raw/s00010.jpg",
+            "narration": "And I'm going to click here just to show that there will often also be templates that you can click to open up and use.",
+            "executable": true
+         }
+      },
+      {
+         "step_id": 2,
+         "ui_target": {
+            "element_name": "=taxesowed+1",
+            "element_type": "Edit",
+            "automation_id": "",
+            "hierarchical_path": "",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ],
+            "visual_description": ""
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "text_payload": "=taxesowed+1"
+         },
+         "low_level_instruction": "and then continue my formula. So, taxes owed plus one, tap enter, and it's added",
+         "expected_state_change": "Edit box now contains '=taxesowed+1'",
+         "provenance": {
+            "engine": "ollama",
+            "confidence": 0.9,
+            "t0": 1806.0,
+            "t1": 1812.0,
+            "kind": "stride",
+            "frame": "video_dataset/wbJcJCkBcMg/frames_raw/s00302.jpg",
+            "narration": "and then continue my formula. So, taxes owed plus one, tap enter, and it's added",
+            "executable": true
+         }
+      },
+      {
+         "step_id": 3,
+         "ui_target": {
+            "element_name": "Enter",
+            "element_type": "Button",
+            "automation_id": "",
+            "hierarchical_path": "",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ],
+            "visual_description": ""
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK"
+         },
+         "low_level_instruction": "and then continue my formula. So, taxes owed plus one, tap enter, and it's added",
+         "expected_state_change": "New value is calculated and displayed",
+         "provenance": {
+            "engine": "ollama",
+            "confidence": 0.9,
+            "t0": 1806.0,
+            "t1": 1812.0,
+            "kind": "stride",
+            "frame": "video_dataset/wbJcJCkBcMg/frames_raw/s00302.jpg",
+            "narration": "and then continue my formula. So, taxes owed plus one, tap enter, and it's added",
+            "executable": true
+         }
+      }
+   ],
+   "_meta": {
+      "source": "video_harvest",
+      "generator": "ollama+rules+vlm",
+      "produced": "2026-10-16T03:06:04Z",
+      "source_app": "Microsoft Excel",
+      "app_key": "microsoft_excel",
+      "dataset_split": "TRAIN",
+      "video_id": "wbJcJCkBcMg",
+      "video_url": "https://www.youtube.com/watch?v=wbJcJCkBcMg",
+      "video_title": "Excel for Beginners - The Complete Course",
+      "video_duration": 3295.0,
+      "channel": "Technology for Teachers and Students",
+      "transcript_source": "captions",
+      "time_range": [
+         54.0,
+         1812.0
+      ],
+      "task_index": 0,
+      "guide_id": "bb2aa1892e79",
+      "verified": false,
+      "note": "candidate guide from a tutorial video; prove each step with the live executor + UIA oracle before trusting it",
+      "schema_warnings": []
+   }
+}

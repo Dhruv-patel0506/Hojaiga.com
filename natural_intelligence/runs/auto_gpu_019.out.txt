@@ -1,0 +1,421 @@
+19:37:05 NI run auto_gpu_019 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+19:37:05 explicit task list: ['enc/image/kmnist']
+19:37:05 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+19:37:06 [data] enc/image/kmnist: n=70000 C=10 D=768 shards=1
+19:37:32 [enc/image/kmnist] vote=0.970 uniform=0.948 best1=0.971 n_val=20987 vram=0.83GB 26s
+19:37:37 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 20987, "n_val": 4244, "base_rate": 0.9693685173988342, "inner": {"auc": 0.9599052017501215, "ece": 0.007657365292366893, "brier": 0.019991474226117134, "acc80": 0.9979381561279297}, "outer_conf": {"auc": 0.9418477244680453, "ece": 0.04723274587363032, "brier": 0.02537715621292591, "acc80": 0.9970545172691345}}
+19:37:37 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+19:38:03 [enc/image/kmnist] vote=0.971 uniform=0.951 best1=0.971 n_val=21085 vram=1.03GB 26s | grade=0.915 inner_auc=0.951 vs conf_auc=0.948
+19:38:07 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+19:38:32 [enc/image/kmnist] vote=0.970 uniform=0.947 best1=0.971 n_val=21209 vram=1.03GB 25s | grade=0.918 inner_auc=0.959 vs conf_auc=0.946
+19:38:36 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+19:39:03 [enc/image/kmnist] vote=0.972 uniform=0.951 best1=0.972 n_val=21083 vram=1.03GB 26s | grade=0.919 inner_auc=0.966 vs conf_auc=0.957
+19:39:07 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+19:39:35 [enc/image/kmnist] vote=0.972 uniform=0.949 best1=0.972 n_val=21149 vram=1.03GB 27s | grade=0.922 inner_auc=0.959 vs conf_auc=0.946
+19:39:40 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+19:40:06 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.971 n_val=21120 vram=1.03GB 27s | grade=0.920 inner_auc=0.963 vs conf_auc=0.954
+19:40:11 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+19:40:39 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.971 n_val=21060 vram=1.03GB 28s | grade=0.922 inner_auc=0.951 vs conf_auc=0.934
+19:40:43 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+19:41:12 [enc/image/kmnist] vote=0.973 uniform=0.950 best1=0.973 n_val=21028 vram=1.03GB 28s | grade=0.925 inner_auc=0.957 vs conf_auc=0.945
+19:41:16 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+19:41:45 [enc/image/kmnist] vote=0.972 uniform=0.951 best1=0.972 n_val=20986 vram=1.03GB 28s | grade=0.926 inner_auc=0.962 vs conf_auc=0.951
+19:41:49 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+19:42:17 [enc/image/kmnist] vote=0.971 uniform=0.949 best1=0.972 n_val=21086 vram=1.03GB 27s | grade=0.925 inner_auc=0.964 vs conf_auc=0.955
+19:42:22 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+19:42:49 [enc/image/kmnist] vote=0.972 uniform=0.950 best1=0.972 n_val=21155 vram=1.03GB 27s | grade=0.927 inner_auc=0.963 vs conf_auc=0.960
+19:42:54 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+19:43:13 [enc/image/kmnist] vote=0.970 uniform=0.950 best1=0.970 n_val=21011 vram=1.03GB 19s | grade=0.925 inner_auc=0.929 vs conf_auc=0.938
+19:43:16 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+19:43:34 [enc/image/kmnist] vote=0.972 uniform=0.951 best1=0.972 n_val=21192 vram=1.03GB 18s | grade=0.925 inner_auc=0.951 vs conf_auc=0.944
+19:43:37 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+19:43:56 [enc/image/kmnist] vote=0.970 uniform=0.947 best1=0.970 n_val=20973 vram=1.03GB 19s | grade=0.927 inner_auc=0.968 vs conf_auc=0.961
+19:43:59 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+19:44:20 [enc/image/kmnist] vote=0.969 uniform=0.947 best1=0.969 n_val=21061 vram=1.03GB 20s | grade=0.928 inner_auc=0.954 vs conf_auc=0.942
+19:44:22 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+19:44:40 [enc/image/kmnist] vote=0.974 uniform=0.953 best1=0.974 n_val=20959 vram=1.03GB 17s | grade=0.928 inner_auc=0.954 vs conf_auc=0.948
+19:44:42 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+19:45:02 [enc/image/kmnist] vote=0.970 uniform=0.950 best1=0.970 n_val=20887 vram=1.03GB 20s | grade=0.930 inner_auc=0.978 vs conf_auc=0.972
+19:45:06 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+19:45:34 [enc/image/kmnist] vote=0.969 uniform=0.948 best1=0.969 n_val=20852 vram=1.03GB 28s | grade=0.928 inner_auc=0.962 vs conf_auc=0.955
+19:45:39 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+19:46:07 [enc/image/kmnist] vote=0.974 uniform=0.951 best1=0.973 n_val=20841 vram=1.03GB 29s | grade=0.927 inner_auc=0.950 vs conf_auc=0.945
+19:46:12 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+19:46:42 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.971 n_val=20930 vram=1.03GB 29s | grade=0.928 inner_auc=0.967 vs conf_auc=0.964
+19:46:47 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+19:47:16 [enc/image/kmnist] vote=0.972 uniform=0.950 best1=0.972 n_val=20819 vram=1.03GB 30s | grade=0.930 inner_auc=0.953 vs conf_auc=0.946
+19:47:21 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+19:47:49 [enc/image/kmnist] vote=0.969 uniform=0.946 best1=0.969 n_val=20968 vram=1.03GB 28s | grade=0.929 inner_auc=0.973 vs conf_auc=0.970
+19:47:54 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+19:48:18 [enc/image/kmnist] vote=0.971 uniform=0.949 best1=0.971 n_val=20973 vram=1.03GB 23s | grade=0.931 inner_auc=0.966 vs conf_auc=0.965
+19:48:22 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+19:48:40 [enc/image/kmnist] vote=0.971 uniform=0.947 best1=0.971 n_val=21077 vram=1.03GB 18s | grade=0.931 inner_auc=0.955 vs conf_auc=0.952
+19:48:44 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+19:49:02 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.971 n_val=21128 vram=1.03GB 18s | grade=0.929 inner_auc=0.967 vs conf_auc=0.958
+19:49:05 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+19:49:24 [enc/image/kmnist] vote=0.973 uniform=0.951 best1=0.973 n_val=20836 vram=1.03GB 19s | grade=0.928 inner_auc=0.952 vs conf_auc=0.943
+19:49:28 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+19:49:47 [enc/image/kmnist] vote=0.972 uniform=0.951 best1=0.973 n_val=20870 vram=1.03GB 20s | grade=0.929 inner_auc=0.959 vs conf_auc=0.956
+19:49:51 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+19:50:09 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.971 n_val=21024 vram=1.03GB 19s | grade=0.928 inner_auc=0.962 vs conf_auc=0.962
+19:50:12 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+19:50:33 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.971 n_val=20889 vram=1.03GB 21s | grade=0.928 inner_auc=0.972 vs conf_auc=0.961
+19:50:39 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+19:51:07 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.972 n_val=21007 vram=1.03GB 28s | grade=0.929 inner_auc=0.955 vs conf_auc=0.942
+19:51:12 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+19:51:41 [enc/image/kmnist] vote=0.971 uniform=0.952 best1=0.971 n_val=20927 vram=1.03GB 29s | grade=0.925 inner_auc=0.947 vs conf_auc=0.936
+19:51:47 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+19:52:16 [enc/image/kmnist] vote=0.972 uniform=0.951 best1=0.972 n_val=20941 vram=1.03GB 29s | grade=0.929 inner_auc=0.960 vs conf_auc=0.953
+19:52:21 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+19:52:51 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.971 n_val=21132 vram=1.03GB 30s | grade=0.927 inner_auc=0.955 vs conf_auc=0.948
+19:52:56 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+19:53:25 [enc/image/kmnist] vote=0.972 uniform=0.950 best1=0.972 n_val=21007 vram=1.03GB 29s | grade=0.927 inner_auc=0.969 vs conf_auc=0.960
+19:53:31 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+19:54:03 [enc/image/kmnist] vote=0.968 uniform=0.946 best1=0.968 n_val=21094 vram=1.03GB 32s | grade=0.926 inner_auc=0.949 vs conf_auc=0.941
+19:54:10 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+19:54:43 [enc/image/kmnist] vote=0.970 uniform=0.947 best1=0.970 n_val=21172 vram=1.03GB 33s | grade=0.926 inner_auc=0.952 vs conf_auc=0.942
+19:54:49 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+19:55:23 [enc/image/kmnist] vote=0.971 uniform=0.949 best1=0.971 n_val=21080 vram=1.03GB 33s | grade=0.929 inner_auc=0.973 vs conf_auc=0.968
+19:55:28 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+19:55:51 [enc/image/kmnist] vote=0.970 uniform=0.949 best1=0.970 n_val=21022 vram=1.03GB 23s | grade=0.929 inner_auc=0.956 vs conf_auc=0.949
+19:55:55 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+19:56:24 [enc/image/kmnist] vote=0.970 uniform=0.950 best1=0.970 n_val=20845 vram=1.03GB 29s | grade=0.927 inner_auc=0.960 vs conf_auc=0.955
+19:56:37 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+19:57:35 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.971 n_val=21085 vram=1.03GB 58s | grade=0.929 inner_auc=0.969 vs conf_auc=0.960
+19:57:48 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+19:58:48 [enc/image/kmnist] vote=0.970 uniform=0.949 best1=0.970 n_val=21087 vram=1.03GB 61s | grade=0.929 inner_auc=0.975 vs conf_auc=0.968
+19:59:05 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+20:00:15 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.971 n_val=20977 vram=1.03GB 70s | grade=0.929 inner_auc=0.969 vs conf_auc=0.959
+20:00:25 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+20:00:53 [enc/image/kmnist] vote=0.970 uniform=0.950 best1=0.970 n_val=21011 vram=1.03GB 28s | grade=0.924 inner_auc=0.955 vs conf_auc=0.956
+20:00:58 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+20:01:23 [enc/image/kmnist] vote=0.970 uniform=0.948 best1=0.970 n_val=20867 vram=1.03GB 25s | grade=0.927 inner_auc=0.958 vs conf_auc=0.953
+20:01:28 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+20:01:51 [enc/image/kmnist] vote=0.973 uniform=0.954 best1=0.973 n_val=20998 vram=1.03GB 23s | grade=0.929 inner_auc=0.957 vs conf_auc=0.953
+20:01:56 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+20:02:22 [enc/image/kmnist] vote=0.970 uniform=0.949 best1=0.970 n_val=21022 vram=1.03GB 26s | grade=0.927 inner_auc=0.971 vs conf_auc=0.966
+20:02:27 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+20:02:53 [enc/image/kmnist] vote=0.972 uniform=0.947 best1=0.972 n_val=20897 vram=1.03GB 26s | grade=0.927 inner_auc=0.962 vs conf_auc=0.959
+20:02:59 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+20:03:15 [enc/image/kmnist] vote=0.971 uniform=0.951 best1=0.971 n_val=21025 vram=1.03GB 16s | grade=0.927 inner_auc=0.960 vs conf_auc=0.956
+20:03:18 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+20:05:05 [enc/image/kmnist] vote=0.972 uniform=0.950 best1=0.972 n_val=20964 vram=1.03GB 107s | grade=0.926 inner_auc=0.967 vs conf_auc=0.963
+20:05:30 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+20:08:05 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.971 n_val=21141 vram=1.03GB 155s | grade=0.929 inner_auc=0.953 vs conf_auc=0.951
+20:08:41 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+20:09:37 [enc/image/kmnist] vote=0.970 uniform=0.947 best1=0.970 n_val=21169 vram=1.03GB 56s | grade=0.927 inner_auc=0.959 vs conf_auc=0.951
+20:09:43 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+20:10:14 [enc/image/kmnist] vote=0.972 uniform=0.951 best1=0.972 n_val=21236 vram=1.03GB 31s | grade=0.927 inner_auc=0.961 vs conf_auc=0.950
+20:10:20 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+20:10:54 [enc/image/kmnist] vote=0.972 uniform=0.949 best1=0.972 n_val=20724 vram=1.04GB 34s | grade=0.929 inner_auc=0.959 vs conf_auc=0.949
+20:11:01 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+20:11:35 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.971 n_val=21001 vram=1.03GB 35s | grade=0.928 inner_auc=0.974 vs conf_auc=0.968
+20:11:43 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+20:13:44 [enc/image/kmnist] vote=0.970 uniform=0.949 best1=0.970 n_val=20898 vram=1.03GB 121s | grade=0.929 inner_auc=0.962 vs conf_auc=0.954
+20:13:50 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+20:14:21 [enc/image/kmnist] vote=0.972 uniform=0.951 best1=0.971 n_val=21116 vram=1.03GB 31s | grade=0.929 inner_auc=0.968 vs conf_auc=0.968
+20:14:28 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+20:15:02 [enc/image/kmnist] vote=0.970 uniform=0.950 best1=0.970 n_val=21120 vram=1.03GB 34s | grade=0.928 inner_auc=0.965 vs conf_auc=0.959
+20:15:11 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+20:15:47 [enc/image/kmnist] vote=0.972 uniform=0.952 best1=0.972 n_val=21008 vram=1.03GB 36s | grade=0.927 inner_auc=0.965 vs conf_auc=0.959
+20:15:55 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+20:16:31 [enc/image/kmnist] vote=0.972 uniform=0.951 best1=0.972 n_val=20970 vram=1.03GB 36s | grade=0.927 inner_auc=0.941 vs conf_auc=0.935
+20:16:38 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+20:17:15 [enc/image/kmnist] vote=0.972 uniform=0.953 best1=0.972 n_val=20902 vram=1.03GB 37s | grade=0.926 inner_auc=0.966 vs conf_auc=0.954
+20:17:22 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+20:18:02 [enc/image/kmnist] vote=0.968 uniform=0.946 best1=0.968 n_val=21081 vram=1.03GB 39s | grade=0.928 inner_auc=0.956 vs conf_auc=0.951
+20:18:10 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+20:18:48 [enc/image/kmnist] vote=0.971 uniform=0.949 best1=0.971 n_val=21130 vram=1.03GB 38s | grade=0.927 inner_auc=0.967 vs conf_auc=0.961
+20:18:56 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+20:19:34 [enc/image/kmnist] vote=0.972 uniform=0.950 best1=0.972 n_val=21089 vram=1.03GB 38s | grade=0.928 inner_auc=0.971 vs conf_auc=0.965
+20:19:42 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+20:20:20 [enc/image/kmnist] vote=0.973 uniform=0.951 best1=0.973 n_val=20874 vram=1.03GB 37s | grade=0.928 inner_auc=0.956 vs conf_auc=0.951
+20:20:28 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+20:21:06 [enc/image/kmnist] vote=0.970 uniform=0.949 best1=0.970 n_val=21142 vram=1.03GB 38s | grade=0.925 inner_auc=0.955 vs conf_auc=0.948
+20:21:13 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+20:21:53 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.971 n_val=20904 vram=1.03GB 39s | grade=0.930 inner_auc=0.965 vs conf_auc=0.959
+20:22:01 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+20:22:38 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.971 n_val=21163 vram=1.03GB 37s | grade=0.929 inner_auc=0.965 vs conf_auc=0.950
+20:22:47 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+20:23:25 [enc/image/kmnist] vote=0.969 uniform=0.948 best1=0.969 n_val=20927 vram=1.03GB 38s | grade=0.926 inner_auc=0.967 vs conf_auc=0.955
+20:23:34 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+20:24:17 [enc/image/kmnist] vote=0.972 uniform=0.953 best1=0.972 n_val=21171 vram=1.03GB 43s | grade=0.924 inner_auc=0.954 vs conf_auc=0.941
+20:24:26 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+20:25:31 [enc/image/kmnist] vote=0.972 uniform=0.951 best1=0.972 n_val=20925 vram=1.03GB 65s | grade=0.928 inner_auc=0.973 vs conf_auc=0.965
+20:25:47 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+20:27:08 [enc/image/kmnist] vote=0.973 uniform=0.950 best1=0.973 n_val=21084 vram=1.03GB 81s | grade=0.927 inner_auc=0.948 vs conf_auc=0.934
+20:27:27 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+20:28:46 [enc/image/kmnist] vote=0.972 uniform=0.951 best1=0.972 n_val=21009 vram=1.03GB 79s | grade=0.927 inner_auc=0.960 vs conf_auc=0.954
+20:29:04 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+20:30:40 [enc/image/kmnist] vote=0.971 uniform=0.949 best1=0.971 n_val=21100 vram=1.03GB 96s | grade=0.927 inner_auc=0.971 vs conf_auc=0.958
+20:31:00 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+20:32:35 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.971 n_val=21035 vram=1.03GB 95s | grade=0.927 inner_auc=0.961 vs conf_auc=0.953
+20:32:56 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+20:33:26 [enc/image/kmnist] vote=0.972 uniform=0.952 best1=0.972 n_val=21021 vram=1.03GB 30s | grade=0.927 inner_auc=0.964 vs conf_auc=0.956
+20:33:34 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+20:34:02 [enc/image/kmnist] vote=0.971 uniform=0.951 best1=0.972 n_val=20841 vram=1.03GB 28s | grade=0.929 inner_auc=0.956 vs conf_auc=0.948
+20:34:08 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+20:34:35 [enc/image/kmnist] vote=0.969 uniform=0.948 best1=0.969 n_val=20979 vram=1.03GB 27s | grade=0.927 inner_auc=0.965 vs conf_auc=0.957
+20:34:42 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+20:35:10 [enc/image/kmnist] vote=0.971 uniform=0.947 best1=0.971 n_val=21200 vram=1.03GB 28s | grade=0.927 inner_auc=0.949 vs conf_auc=0.945
+20:35:16 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+20:35:45 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.971 n_val=21256 vram=1.03GB 28s | grade=0.929 inner_auc=0.967 vs conf_auc=0.958
+20:35:52 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+20:36:21 [enc/image/kmnist] vote=0.971 uniform=0.951 best1=0.971 n_val=20938 vram=1.03GB 29s | grade=0.924 inner_auc=0.962 vs conf_auc=0.958
+20:36:28 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+20:36:58 [enc/image/kmnist] vote=0.974 uniform=0.951 best1=0.974 n_val=21079 vram=1.03GB 29s | grade=0.926 inner_auc=0.973 vs conf_auc=0.969
+20:37:06 RUN COMPLETE
+14:56:02 NI run auto_gpu_019 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+14:56:02 explicit task list: ['enc/image/kmnist']
+14:56:11 [resume] from checkpoint: next cycle 81, rounds 81, 81 metric rows, inner net restored
+14:56:11 ===== CYCLE 81 (OUTER-ONLY BOOTSTRAP) =====
+14:56:12 [data] enc/image/kmnist: n=70000 C=10 D=768 shards=1
+14:57:07 [enc/image/kmnist] vote=0.971 uniform=0.947 best1=0.971 n_val=21118 vram=0.83GB 54s
+14:57:29 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 81, "n_records": 21118, "n_val": 4157, "base_rate": 0.9711330533027649, "inner": {"auc": 0.9591858640904962, "ece": 0.005820606501595115, "brier": 0.018594814464449883, "acc80": 0.9984962344169617}, "outer_conf": {"auc": 0.9530055321608455, "ece": 0.014181950519169241, "brier": 0.019778836518526077, "acc80": 0.99729323387146}}
+14:57:29 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+14:58:49 [enc/image/kmnist] vote=0.970 uniform=0.946 best1=0.970 n_val=21142 vram=1.03GB 80s | grade=0.928 inner_auc=0.960 vs conf_auc=0.955
+14:59:06 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+15:00:49 [enc/image/kmnist] vote=0.972 uniform=0.948 best1=0.972 n_val=20898 vram=1.03GB 103s | grade=0.927 inner_auc=0.962 vs conf_auc=0.963
+15:01:09 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+15:02:52 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.971 n_val=21025 vram=1.03GB 103s | grade=0.923 inner_auc=0.950 vs conf_auc=0.939
+15:03:15 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+03:04:39 NI run auto_gpu_019 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+03:04:39 explicit task list: ['enc/image/kmnist']
+03:04:59 [resume] from checkpoint: next cycle 85, rounds 85, 85 metric rows, inner net restored
+03:04:59 ===== CYCLE 85 (OUTER-ONLY BOOTSTRAP) =====
+03:05:03 [data] enc/image/kmnist: n=70000 C=10 D=768 shards=1
+03:06:46 [enc/image/kmnist] vote=0.971 uniform=0.949 best1=0.971 n_val=20901 vram=0.83GB 104s
+03:07:20 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 85, "n_records": 20901, "n_val": 4208, "base_rate": 0.9719581604003906, "inner": {"auc": 0.9569267746881605, "ece": 0.006186819985905529, "brier": 0.0179786067456007, "acc80": 0.9985145330429077}, "outer_conf": {"auc": 0.9510940284281629, "ece": 0.01253617867586617, "brier": 0.019536448642611504, "acc80": 0.9979203939437866}}
+03:07:20 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+03:09:07 [enc/image/kmnist] vote=0.973 uniform=0.950 best1=0.972 n_val=20778 vram=1.04GB 107s | grade=0.929 inner_auc=0.970 vs conf_auc=0.962
+03:09:23 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+03:11:09 [enc/image/kmnist] vote=0.972 uniform=0.951 best1=0.972 n_val=21138 vram=1.03GB 106s | grade=0.929 inner_auc=0.953 vs conf_auc=0.943
+03:11:29 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+03:13:30 [enc/image/kmnist] vote=0.971 uniform=0.949 best1=0.971 n_val=21186 vram=1.03GB 121s | grade=0.927 inner_auc=0.968 vs conf_auc=0.960
+03:13:53 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+03:15:41 [enc/image/kmnist] vote=0.973 uniform=0.951 best1=0.973 n_val=20754 vram=1.04GB 108s | grade=0.928 inner_auc=0.963 vs conf_auc=0.951
+03:15:58 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+03:17:50 [enc/image/kmnist] vote=0.970 uniform=0.948 best1=0.970 n_val=21033 vram=1.03GB 112s | grade=0.928 inner_auc=0.950 vs conf_auc=0.945
+03:18:10 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+03:20:18 [enc/image/kmnist] vote=0.972 uniform=0.951 best1=0.972 n_val=20967 vram=1.03GB 129s | grade=0.929 inner_auc=0.961 vs conf_auc=0.950
+03:20:43 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+03:22:36 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.971 n_val=20826 vram=1.03GB 112s | grade=0.928 inner_auc=0.971 vs conf_auc=0.967
+03:22:56 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+03:24:51 [enc/image/kmnist] vote=0.971 uniform=0.949 best1=0.971 n_val=21080 vram=1.03GB 114s | grade=0.927 inner_auc=0.960 vs conf_auc=0.948
+03:25:08 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+03:27:05 [enc/image/kmnist] vote=0.971 uniform=0.946 best1=0.971 n_val=20841 vram=1.03GB 117s | grade=0.929 inner_auc=0.976 vs conf_auc=0.970
+03:27:25 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+03:29:22 [enc/image/kmnist] vote=0.969 uniform=0.947 best1=0.969 n_val=20856 vram=1.03GB 117s | grade=0.927 inner_auc=0.956 vs conf_auc=0.947
+03:29:39 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+03:31:33 [enc/image/kmnist] vote=0.970 uniform=0.950 best1=0.970 n_val=21025 vram=1.03GB 113s | grade=0.929 inner_auc=0.962 vs conf_auc=0.952
+03:31:54 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+03:33:46 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.971 n_val=20994 vram=1.03GB 112s | grade=0.929 inner_auc=0.960 vs conf_auc=0.957
+03:34:06 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+15:21:16 NI run auto_gpu_019 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+15:21:16 explicit task list: ['enc/image/kmnist']
+15:21:29 [resume] from checkpoint: next cycle 98, rounds 98, 98 metric rows, inner net restored
+15:21:29 ===== CYCLE 98 (OUTER-ONLY BOOTSTRAP) =====
+15:21:31 [data] enc/image/kmnist: n=70000 C=10 D=768 shards=1
+15:23:06 [enc/image/kmnist] vote=0.973 uniform=0.951 best1=0.973 n_val=21103 vram=0.83GB 94s
+15:23:38 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 98, "n_records": 21103, "n_val": 4294, "base_rate": 0.974615752696991, "inner": {"auc": 0.9709315708131926, "ece": 0.00604824250903194, "brier": 0.016726024448871613, "acc80": 0.9991266131401062}, "outer_conf": {"auc": 0.963614043164206, "ece": 0.013862908747121795, "brier": 0.018343089148402214, "acc80": 0.9991266131401062}}
+15:23:38 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+15:24:52 [enc/image/kmnist] vote=0.970 uniform=0.948 best1=0.970 n_val=20839 vram=1.03GB 74s | grade=0.929 inner_auc=0.952 vs conf_auc=0.948
+15:25:05 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+15:26:29 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.972 n_val=20877 vram=1.03GB 84s | grade=0.928 inner_auc=0.956 vs conf_auc=0.949
+15:26:47 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+15:28:24 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.971 n_val=21111 vram=1.03GB 97s | grade=0.926 inner_auc=0.965 vs conf_auc=0.959
+15:28:36 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+15:29:44 [enc/image/kmnist] vote=0.969 uniform=0.946 best1=0.969 n_val=20857 vram=1.03GB 68s | grade=0.927 inner_auc=0.960 vs conf_auc=0.950
+15:29:58 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+15:31:23 [enc/image/kmnist] vote=0.972 uniform=0.951 best1=0.972 n_val=20986 vram=1.03GB 85s | grade=0.927 inner_auc=0.967 vs conf_auc=0.956
+15:31:39 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+15:33:10 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.972 n_val=20926 vram=1.03GB 90s | grade=0.928 inner_auc=0.974 vs conf_auc=0.968
+15:33:23 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+15:34:48 [enc/image/kmnist] vote=0.973 uniform=0.951 best1=0.973 n_val=20973 vram=1.03GB 86s | grade=0.927 inner_auc=0.956 vs conf_auc=0.951
+15:35:02 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+15:36:21 [enc/image/kmnist] vote=0.973 uniform=0.952 best1=0.973 n_val=21039 vram=1.03GB 80s | grade=0.929 inner_auc=0.951 vs conf_auc=0.944
+15:36:35 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+15:37:54 [enc/image/kmnist] vote=0.973 uniform=0.952 best1=0.974 n_val=21085 vram=1.03GB 80s | grade=0.929 inner_auc=0.946 vs conf_auc=0.938
+15:38:10 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+15:39:46 [enc/image/kmnist] vote=0.972 uniform=0.950 best1=0.972 n_val=20956 vram=1.03GB 96s | grade=0.928 inner_auc=0.977 vs conf_auc=0.970
+15:39:59 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+15:41:12 [enc/image/kmnist] vote=0.972 uniform=0.950 best1=0.972 n_val=21011 vram=1.03GB 73s | grade=0.929 inner_auc=0.969 vs conf_auc=0.965
+15:41:25 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+15:42:49 [enc/image/kmnist] vote=0.970 uniform=0.947 best1=0.970 n_val=20854 vram=1.03GB 83s | grade=0.930 inner_auc=0.971 vs conf_auc=0.962
+15:43:04 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+15:44:26 [enc/image/kmnist] vote=0.971 uniform=0.949 best1=0.971 n_val=21031 vram=1.03GB 82s | grade=0.926 inner_auc=0.958 vs conf_auc=0.950
+15:44:39 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+15:46:00 [enc/image/kmnist] vote=0.973 uniform=0.952 best1=0.973 n_val=21098 vram=1.03GB 81s | grade=0.928 inner_auc=0.959 vs conf_auc=0.949
+15:46:17 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+15:47:50 [enc/image/kmnist] vote=0.970 uniform=0.949 best1=0.970 n_val=21085 vram=1.03GB 93s | grade=0.927 inner_auc=0.964 vs conf_auc=0.958
+15:48:05 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+15:49:22 [enc/image/kmnist] vote=0.970 uniform=0.948 best1=0.970 n_val=21021 vram=1.03GB 77s | grade=0.927 inner_auc=0.960 vs conf_auc=0.951
+15:49:35 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+15:51:05 [enc/image/kmnist] vote=0.973 uniform=0.951 best1=0.973 n_val=20958 vram=1.03GB 89s | grade=0.927 inner_auc=0.967 vs conf_auc=0.960
+15:51:18 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+15:52:38 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.971 n_val=21035 vram=1.03GB 80s | grade=0.925 inner_auc=0.970 vs conf_auc=0.963
+15:52:52 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+15:54:10 [enc/image/kmnist] vote=0.970 uniform=0.948 best1=0.970 n_val=20955 vram=1.03GB 78s | grade=0.927 inner_auc=0.959 vs conf_auc=0.950
+15:54:28 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+15:56:04 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.972 n_val=20967 vram=1.03GB 96s | grade=0.927 inner_auc=0.960 vs conf_auc=0.952
+15:56:20 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+15:57:38 [enc/image/kmnist] vote=0.970 uniform=0.948 best1=0.971 n_val=21003 vram=1.03GB 78s | grade=0.928 inner_auc=0.973 vs conf_auc=0.964
+15:57:53 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+15:59:04 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.971 n_val=20895 vram=1.03GB 70s | grade=0.928 inner_auc=0.965 vs conf_auc=0.956
+15:59:19 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+16:00:48 [enc/image/kmnist] vote=0.970 uniform=0.951 best1=0.970 n_val=20840 vram=1.03GB 89s | grade=0.923 inner_auc=0.961 vs conf_auc=0.960
+16:01:08 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+16:02:35 [enc/image/kmnist] vote=0.970 uniform=0.949 best1=0.970 n_val=21129 vram=1.03GB 87s | grade=0.927 inner_auc=0.959 vs conf_auc=0.954
+16:02:50 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+16:04:17 [enc/image/kmnist] vote=0.970 uniform=0.948 best1=0.970 n_val=21080 vram=1.03GB 87s | grade=0.928 inner_auc=0.942 vs conf_auc=0.939
+16:04:32 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+16:05:55 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.971 n_val=21165 vram=1.03GB 83s | grade=0.923 inner_auc=0.973 vs conf_auc=0.967
+16:06:11 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+16:07:35 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.971 n_val=20960 vram=1.03GB 84s | grade=0.928 inner_auc=0.971 vs conf_auc=0.962
+16:07:50 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+16:09:23 [enc/image/kmnist] vote=0.969 uniform=0.947 best1=0.970 n_val=20803 vram=1.03GB 93s | grade=0.927 inner_auc=0.960 vs conf_auc=0.954
+16:09:39 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+16:11:09 [enc/image/kmnist] vote=0.971 uniform=0.951 best1=0.971 n_val=20950 vram=1.03GB 90s | grade=0.928 inner_auc=0.963 vs conf_auc=0.957
+16:11:26 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+16:13:12 [enc/image/kmnist] vote=0.972 uniform=0.952 best1=0.972 n_val=21028 vram=1.03GB 106s | grade=0.928 inner_auc=0.961 vs conf_auc=0.951
+16:13:29 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+16:14:54 [enc/image/kmnist] vote=0.973 uniform=0.951 best1=0.973 n_val=21086 vram=1.03GB 84s | grade=0.928 inner_auc=0.971 vs conf_auc=0.970
+16:15:11 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+16:16:28 [enc/image/kmnist] vote=0.972 uniform=0.948 best1=0.972 n_val=21017 vram=1.03GB 77s | grade=0.927 inner_auc=0.955 vs conf_auc=0.947
+16:16:49 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+16:18:18 [enc/image/kmnist] vote=0.971 uniform=0.947 best1=0.971 n_val=20936 vram=1.03GB 89s | grade=0.927 inner_auc=0.964 vs conf_auc=0.958
+16:18:31 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+16:19:44 [enc/image/kmnist] vote=0.970 uniform=0.948 best1=0.970 n_val=21045 vram=1.03GB 72s | grade=0.929 inner_auc=0.961 vs conf_auc=0.954
+16:20:02 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+16:21:34 [enc/image/kmnist] vote=0.973 uniform=0.955 best1=0.973 n_val=20913 vram=1.03GB 92s | grade=0.928 inner_auc=0.971 vs conf_auc=0.965
+16:21:52 RUN COMPLETE
+17:24:01 NI run auto_gpu_019 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+17:24:01 explicit task list: ['enc/image/kmnist']
+17:24:16 [resume] from checkpoint: next cycle 134, rounds 134, 134 metric rows, inner net restored
+17:24:16 ===== CYCLE 134 (OUTER-ONLY BOOTSTRAP) =====
+17:24:18 [data] enc/image/kmnist: n=70000 C=10 D=768 shards=1
+17:25:43 [enc/image/kmnist] vote=0.970 uniform=0.948 best1=0.970 n_val=20913 vram=0.83GB 84s
+17:26:17 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 134, "n_records": 20913, "n_val": 4237, "base_rate": 0.9697899222373962, "inner": {"auc": 0.9671205737405695, "ece": 0.006257176589144269, "brier": 0.020078755915164948, "acc80": 0.9991148114204407}, "outer_conf": {"auc": 0.9585190283523972, "ece": 0.011024206124135339, "brier": 0.021394580602645874, "acc80": 0.9979345202445984}}
+17:26:17 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+17:27:56 [enc/image/kmnist] vote=0.972 uniform=0.949 best1=0.972 n_val=20814 vram=1.03GB 99s | grade=0.928 inner_auc=0.955 vs conf_auc=0.947
+17:28:12 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+17:29:52 [enc/image/kmnist] vote=0.970 uniform=0.949 best1=0.970 n_val=21153 vram=1.03GB 99s | grade=0.927 inner_auc=0.955 vs conf_auc=0.947
+17:30:07 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+17:31:39 [enc/image/kmnist] vote=0.968 uniform=0.948 best1=0.969 n_val=21105 vram=1.03GB 92s | grade=0.927 inner_auc=0.959 vs conf_auc=0.951
+17:31:55 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+17:33:34 [enc/image/kmnist] vote=0.972 uniform=0.950 best1=0.972 n_val=20980 vram=1.03GB 99s | grade=0.928 inner_auc=0.961 vs conf_auc=0.947
+17:33:51 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+17:35:25 [enc/image/kmnist] vote=0.973 uniform=0.949 best1=0.973 n_val=21106 vram=1.03GB 93s | grade=0.926 inner_auc=0.955 vs conf_auc=0.945
+17:35:44 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+17:37:19 [enc/image/kmnist] vote=0.970 uniform=0.947 best1=0.970 n_val=20764 vram=1.04GB 95s | grade=0.928 inner_auc=0.964 vs conf_auc=0.966
+17:37:34 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+17:39:04 [enc/image/kmnist] vote=0.972 uniform=0.948 best1=0.972 n_val=20966 vram=1.03GB 90s | grade=0.928 inner_auc=0.958 vs conf_auc=0.950
+17:39:22 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+17:40:57 [enc/image/kmnist] vote=0.972 uniform=0.950 best1=0.972 n_val=21189 vram=1.03GB 95s | grade=0.926 inner_auc=0.956 vs conf_auc=0.945
+17:41:14 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+17:42:50 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.971 n_val=20936 vram=1.03GB 96s | grade=0.928 inner_auc=0.968 vs conf_auc=0.957
+17:43:09 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+17:44:46 [enc/image/kmnist] vote=0.972 uniform=0.949 best1=0.972 n_val=20918 vram=1.03GB 97s | grade=0.930 inner_auc=0.959 vs conf_auc=0.951
+17:45:01 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+17:46:29 [enc/image/kmnist] vote=0.972 uniform=0.950 best1=0.972 n_val=20936 vram=1.03GB 88s | grade=0.929 inner_auc=0.968 vs conf_auc=0.954
+17:46:48 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+17:48:14 [enc/image/kmnist] vote=0.973 uniform=0.954 best1=0.973 n_val=21110 vram=1.03GB 86s | grade=0.930 inner_auc=0.966 vs conf_auc=0.957
+17:48:32 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+17:50:02 [enc/image/kmnist] vote=0.973 uniform=0.952 best1=0.973 n_val=20938 vram=1.03GB 90s | grade=0.931 inner_auc=0.955 vs conf_auc=0.949
+17:50:17 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+17:51:42 [enc/image/kmnist] vote=0.973 uniform=0.950 best1=0.973 n_val=20970 vram=1.03GB 85s | grade=0.929 inner_auc=0.952 vs conf_auc=0.946
+17:51:58 ===== CYCLE 149 (OUTER -> INNER -> FEEDBACK) =====
+17:53:14 [enc/image/kmnist] vote=0.971 uniform=0.949 best1=0.971 n_val=21078 vram=1.03GB 76s | grade=0.928 inner_auc=0.970 vs conf_auc=0.964
+17:53:28 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+17:54:41 [enc/image/kmnist] vote=0.971 uniform=0.949 best1=0.972 n_val=21199 vram=1.03GB 73s | grade=0.928 inner_auc=0.967 vs conf_auc=0.961
+17:54:55 ===== CYCLE 151 (OUTER -> INNER -> FEEDBACK) =====
+17:56:27 [enc/image/kmnist] vote=0.970 uniform=0.947 best1=0.970 n_val=20809 vram=1.04GB 92s | grade=0.929 inner_auc=0.957 vs conf_auc=0.954
+17:56:44 ===== CYCLE 152 (OUTER -> INNER -> FEEDBACK) =====
+17:58:12 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.971 n_val=20814 vram=1.03GB 88s | grade=0.927 inner_auc=0.964 vs conf_auc=0.964
+17:58:28 ===== CYCLE 153 (OUTER -> INNER -> FEEDBACK) =====
+17:59:59 [enc/image/kmnist] vote=0.972 uniform=0.948 best1=0.972 n_val=21141 vram=1.03GB 90s | grade=0.929 inner_auc=0.960 vs conf_auc=0.957
+18:00:15 ===== CYCLE 154 (OUTER -> INNER -> FEEDBACK) =====
+18:01:49 [enc/image/kmnist] vote=0.970 uniform=0.946 best1=0.970 n_val=21054 vram=1.03GB 94s | grade=0.928 inner_auc=0.968 vs conf_auc=0.955
+18:02:04 ===== CYCLE 155 (OUTER -> INNER -> FEEDBACK) =====
+18:03:39 [enc/image/kmnist] vote=0.972 uniform=0.950 best1=0.972 n_val=20954 vram=1.03GB 95s | grade=0.929 inner_auc=0.964 vs conf_auc=0.959
+18:03:52 ===== CYCLE 156 (OUTER -> INNER -> FEEDBACK) =====
+18:05:21 [enc/image/kmnist] vote=0.971 uniform=0.951 best1=0.971 n_val=21072 vram=1.03GB 89s | grade=0.924 inner_auc=0.965 vs conf_auc=0.962
+18:05:37 ===== CYCLE 157 (OUTER -> INNER -> FEEDBACK) =====
+18:07:10 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.971 n_val=20960 vram=1.03GB 94s | grade=0.929 inner_auc=0.968 vs conf_auc=0.960
+18:07:28 ===== CYCLE 158 (OUTER -> INNER -> FEEDBACK) =====
+18:08:59 [enc/image/kmnist] vote=0.972 uniform=0.952 best1=0.972 n_val=20698 vram=1.04GB 91s | grade=0.925 inner_auc=0.966 vs conf_auc=0.956
+18:09:16 ===== CYCLE 159 (OUTER -> INNER -> FEEDBACK) =====
+18:10:54 [enc/image/kmnist] vote=0.972 uniform=0.950 best1=0.972 n_val=21008 vram=1.03GB 98s | grade=0.931 inner_auc=0.966 vs conf_auc=0.959
+18:11:12 ===== CYCLE 160 (OUTER -> INNER -> FEEDBACK) =====
+18:12:54 [enc/image/kmnist] vote=0.973 uniform=0.950 best1=0.973 n_val=21042 vram=1.03GB 102s | grade=0.929 inner_auc=0.966 vs conf_auc=0.956
+18:13:08 ===== CYCLE 161 (OUTER -> INNER -> FEEDBACK) =====
+18:14:43 [enc/image/kmnist] vote=0.972 uniform=0.950 best1=0.972 n_val=20906 vram=1.03GB 95s | grade=0.928 inner_auc=0.958 vs conf_auc=0.944
+18:14:59 ===== CYCLE 162 (OUTER -> INNER -> FEEDBACK) =====
+18:16:31 [enc/image/kmnist] vote=0.972 uniform=0.952 best1=0.972 n_val=20989 vram=1.03GB 92s | grade=0.930 inner_auc=0.957 vs conf_auc=0.958
+18:16:49 ===== CYCLE 163 (OUTER -> INNER -> FEEDBACK) =====
+18:18:24 [enc/image/kmnist] vote=0.970 uniform=0.947 best1=0.970 n_val=21216 vram=1.03GB 95s | grade=0.929 inner_auc=0.958 vs conf_auc=0.951
+18:18:41 ===== CYCLE 164 (OUTER -> INNER -> FEEDBACK) =====
+18:20:14 [enc/image/kmnist] vote=0.971 uniform=0.949 best1=0.970 n_val=21194 vram=1.03GB 93s | grade=0.929 inner_auc=0.951 vs conf_auc=0.942
+18:20:31 ===== CYCLE 165 (OUTER -> INNER -> FEEDBACK) =====
+18:22:02 [enc/image/kmnist] vote=0.971 uniform=0.947 best1=0.971 n_val=21201 vram=1.03GB 91s | grade=0.928 inner_auc=0.968 vs conf_auc=0.961
+18:22:22 ===== CYCLE 166 (OUTER -> INNER -> FEEDBACK) =====
+18:23:58 [enc/image/kmnist] vote=0.970 uniform=0.949 best1=0.970 n_val=21119 vram=1.03GB 96s | grade=0.928 inner_auc=0.963 vs conf_auc=0.956
+18:24:17 RUN COMPLETE
+01:09:31 NI run auto_gpu_019 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+01:09:31 explicit task list: ['enc/image/kmnist']
+01:09:46 [resume] from checkpoint: next cycle 167, rounds 167, 167 metric rows, inner net restored
+01:09:46 ===== CYCLE 167 (OUTER-ONLY BOOTSTRAP) =====
+01:09:49 [data] enc/image/kmnist: n=70000 C=10 D=768 shards=1
+01:11:33 [enc/image/kmnist] vote=0.970 uniform=0.948 best1=0.970 n_val=21005 vram=0.83GB 104s
+01:12:06 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 167, "n_records": 21005, "n_val": 4181, "base_rate": 0.9689069390296936, "inner": {"auc": 0.9691889941704802, "ece": 0.006133652722769963, "brier": 0.018535982817411423, "acc80": 0.9988038539886475}, "outer_conf": {"auc": 0.9616884719822266, "ece": 0.013211943139672935, "brier": 0.019850919023156166, "acc80": 0.9988038539886475}}
+01:12:06 ===== CYCLE 168 (OUTER -> INNER -> FEEDBACK) =====
+01:13:56 [enc/image/kmnist] vote=0.971 uniform=0.949 best1=0.971 n_val=21030 vram=1.03GB 110s | grade=0.928 inner_auc=0.963 vs conf_auc=0.956
+01:14:15 ===== CYCLE 169 (OUTER -> INNER -> FEEDBACK) =====
+01:16:11 [enc/image/kmnist] vote=0.972 uniform=0.950 best1=0.972 n_val=20800 vram=1.03GB 116s | grade=0.928 inner_auc=0.960 vs conf_auc=0.954
+01:16:33 ===== CYCLE 170 (OUTER -> INNER -> FEEDBACK) =====
+01:18:26 [enc/image/kmnist] vote=0.971 uniform=0.949 best1=0.971 n_val=21148 vram=1.03GB 113s | grade=0.929 inner_auc=0.957 vs conf_auc=0.952
+01:18:47 ===== CYCLE 171 (OUTER -> INNER -> FEEDBACK) =====
+01:20:37 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.971 n_val=20993 vram=1.03GB 110s | grade=0.929 inner_auc=0.947 vs conf_auc=0.934
+01:20:57 ===== CYCLE 172 (OUTER -> INNER -> FEEDBACK) =====
+01:22:47 [enc/image/kmnist] vote=0.971 uniform=0.949 best1=0.971 n_val=21144 vram=1.03GB 110s | grade=0.929 inner_auc=0.944 vs conf_auc=0.950
+01:23:09 ===== CYCLE 173 (OUTER -> INNER -> FEEDBACK) =====
+01:25:04 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.971 n_val=21218 vram=1.03GB 115s | grade=0.930 inner_auc=0.965 vs conf_auc=0.961
+01:25:25 ===== CYCLE 174 (OUTER -> INNER -> FEEDBACK) =====
+01:27:25 [enc/image/kmnist] vote=0.970 uniform=0.947 best1=0.970 n_val=21138 vram=1.03GB 121s | grade=0.928 inner_auc=0.958 vs conf_auc=0.950
+01:27:46 ===== CYCLE 175 (OUTER -> INNER -> FEEDBACK) =====
+01:29:30 [enc/image/kmnist] vote=0.973 uniform=0.952 best1=0.973 n_val=20911 vram=1.03GB 104s | grade=0.927 inner_auc=0.958 vs conf_auc=0.951
+01:29:50 ===== CYCLE 176 (OUTER -> INNER -> FEEDBACK) =====
+01:31:45 [enc/image/kmnist] vote=0.970 uniform=0.947 best1=0.970 n_val=21012 vram=1.03GB 114s | grade=0.927 inner_auc=0.956 vs conf_auc=0.947
+01:32:07 ===== CYCLE 177 (OUTER -> INNER -> FEEDBACK) =====
+01:34:10 [enc/image/kmnist] vote=0.973 uniform=0.951 best1=0.973 n_val=21024 vram=1.03GB 123s | grade=0.925 inner_auc=0.965 vs conf_auc=0.961
+01:34:31 ===== CYCLE 178 (OUTER -> INNER -> FEEDBACK) =====
+01:36:33 [enc/image/kmnist] vote=0.969 uniform=0.947 best1=0.969 n_val=21090 vram=1.03GB 122s | grade=0.927 inner_auc=0.962 vs conf_auc=0.955
+01:36:53 ===== CYCLE 179 (OUTER -> INNER -> FEEDBACK) =====
+01:38:41 [enc/image/kmnist] vote=0.972 uniform=0.947 best1=0.972 n_val=21233 vram=1.03GB 108s | grade=0.927 inner_auc=0.970 vs conf_auc=0.965
+01:39:02 ===== CYCLE 180 (OUTER -> INNER -> FEEDBACK) =====
+01:40:55 [enc/image/kmnist] vote=0.973 uniform=0.950 best1=0.973 n_val=20983 vram=1.03GB 113s | grade=0.929 inner_auc=0.954 vs conf_auc=0.943
+01:41:16 ===== CYCLE 181 (OUTER -> INNER -> FEEDBACK) =====
+01:43:20 [enc/image/kmnist] vote=0.972 uniform=0.951 best1=0.972 n_val=21233 vram=1.03GB 123s | grade=0.929 inner_auc=0.974 vs conf_auc=0.970
+01:43:44 ===== CYCLE 182 (OUTER -> INNER -> FEEDBACK) =====
+01:45:49 [enc/image/kmnist] vote=0.973 uniform=0.952 best1=0.973 n_val=20891 vram=1.03GB 124s | grade=0.928 inner_auc=0.960 vs conf_auc=0.956
+01:46:09 ===== CYCLE 183 (OUTER -> INNER -> FEEDBACK) =====
+01:48:11 [enc/image/kmnist] vote=0.973 uniform=0.950 best1=0.973 n_val=21210 vram=1.03GB 122s | grade=0.926 inner_auc=0.963 vs conf_auc=0.954
+01:48:35 ===== CYCLE 184 (OUTER -> INNER -> FEEDBACK) =====
+01:50:41 [enc/image/kmnist] vote=0.971 uniform=0.950 best1=0.971 n_val=21014 vram=1.03GB 126s | grade=0.928 inner_auc=0.969 vs conf_auc=0.960
+01:51:04 ===== CYCLE 185 (OUTER -> INNER -> FEEDBACK) =====
+01:53:21 [enc/image/kmnist] vote=0.971 uniform=0.948 best1=0.971 n_val=20937 vram=1.03GB 137s | grade=0.929 inner_auc=0.958 vs conf_auc=0.953
+01:53:44 ===== CYCLE 186 (OUTER -> INNER -> FEEDBACK) =====
+01:55:49 [enc/image/kmnist] vote=0.972 uniform=0.951 best1=0.972 n_val=21091 vram=1.03GB 125s | grade=0.926 inner_auc=0.942 vs conf_auc=0.941
+01:56:09 ===== CYCLE 187 (OUTER -> INNER -> FEEDBACK) =====
+01:58:08 [enc/image/kmnist] vote=0.972 uniform=0.948 best1=0.972 n_val=20946 vram=1.03GB 119s | grade=0.928 inner_auc=0.951 vs conf_auc=0.953
+01:58:30 ===== CYCLE 188 (OUTER -> INNER -> FEEDBACK) =====
+02:00:43 [enc/image/kmnist] vote=0.971 uniform=0.953 best1=0.971 n_val=21032 vram=1.03GB 134s | grade=0.928 inner_auc=0.974 vs conf_auc=0.970
+02:01:06 ===== CYCLE 189 (OUTER -> INNER -> FEEDBACK) =====
+02:03:00 [enc/image/kmnist] vote=0.971 uniform=0.951 best1=0.972 n_val=21169 vram=1.03GB 114s | grade=0.924 inner_auc=0.958 vs conf_auc=0.946
+02:03:25 ===== CYCLE 190 (OUTER -> INNER -> FEEDBACK) =====
+02:05:22 [enc/image/kmnist] vote=0.972 uniform=0.951 best1=0.972 n_val=21162 vram=1.03GB 117s | grade=0.926 inner_auc=0.954 vs conf_auc=0.955
+02:05:43 ===== CYCLE 191 (OUTER -> INNER -> FEEDBACK) =====
+02:07:36 [enc/image/kmnist] vote=0.970 uniform=0.949 best1=0.970 n_val=21014 vram=1.03GB 113s | grade=0.928 inner_auc=0.959 vs conf_auc=0.949
+02:08:01 ===== CYCLE 192 (OUTER -> INNER -> FEEDBACK) =====
+02:10:01 [enc/image/kmnist] vote=0.969 uniform=0.946 best1=0.969 n_val=20834 vram=1.03GB 120s | grade=0.928 inner_auc=0.961 vs conf_auc=0.950
+02:10:24 RUN COMPLETE

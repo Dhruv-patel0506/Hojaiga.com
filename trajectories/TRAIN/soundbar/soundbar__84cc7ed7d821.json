@@ -1,0 +1,41 @@
+{
+   "app_metadata": {
+      "app_name": "SoundBar",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "cli",
+   "high_level_task": "Install SoundBar using Winget",
+   "prerequisite_state": "Command prompt or PowerShell open",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Run the command to install SoundBar via Winget",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install levon2805.SoundBar"
+         },
+         "expected_state_change": "SoundBar is installed and ready to use"
+      }
+   ],
+   "_meta": {
+      "source_app": "SoundBar",
+      "app_key": "soundbar",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "SoundBar",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:11:47Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

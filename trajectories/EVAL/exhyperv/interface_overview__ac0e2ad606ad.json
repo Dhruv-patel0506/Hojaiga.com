@@ -1,0 +1,81 @@
+{
+   "app_metadata": {
+      "app_name": "ExHyperV",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Provide a quick start guide for ExHyperV",
+   "prerequisite_state": "ExHyperV is not running and the user is at the start screen or download page",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Go to the Releases page to download the latest version",
+         "ui_target": {
+            "element_name": "Releases page",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user is now on the Releases page"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run ExHyperV.exe directly after extracting the archive",
+         "ui_target": {
+            "element_name": "ExHyperV.exe",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "ExHyperV application opens and the main interface appears"
+      }
+   ],
+   "_meta": {
+      "source_app": "ExHyperV",
+      "app_key": "exhyperv",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "🎨 Interface Overview",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:51:51Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

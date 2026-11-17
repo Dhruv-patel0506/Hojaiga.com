@@ -1,0 +1,283 @@
+{
+ "_comment": "NI governor policy (brief 1 sections 4.1, 6.3; brief 2 section 3.4). READ-ONLY to NI: the governor refuses to act on a policy whose sha256 differs from gov_policy.lock, and only a human may re-approve it (python gov_policy.py approve). Units: the gain of one successful action is 1.0; losses are in the same units.",
+ "version": 2,
+ "gain_success": 1.0,
+ "cost": {
+  "proceed": 0.0,
+  "verify": 0.15,
+  "stop": 0.0
+ },
+ "verify_coverage": 0.6,
+ "human": {
+  "cost_base": 0.6,
+  "soft_cap_asks_per_hour": 6,
+  "stakes_relief": 10.0,
+  "accuracy_prior": [
+   9.0,
+   1.0
+  ]
+ },
+ "epsilon_irreversible": 0.01,
+ "environment": {
+  "production_patterns": [
+   "\\bprod(uction)?\\b",
+   "--prod\\b",
+   "\\bmain\\b.*\\bpush\\b|\\bpush\\b.*\\b(main|master)\\b"
+  ],
+  "production_loss_multiplier": 3.0
+ },
+ "autonomy": {
+  "tau": [
+   0.8,
+   0.9,
+   0.95,
+   0.98
+  ],
+  "n_min": [
+   5,
+   20,
+   50,
+   200
+  ],
+  "lcb_confidence": 0.95,
+  "unit": "validate",
+  "_comment_unit": "'kind' = agent x kind of command (head), 'class' = agent x action class; 'validate' lets gov_eval pick on the validation half and write the choice to self_state.json"
+ },
+ "classes": [
+  {
+   "name": "money",
+   "loss": 100.0,
+   "irreversible": true,
+   "requires_human": true,
+   "hard_value": "consent",
+   "verify": "show the amount and payee to the human",
+   "patterns": [
+    "\\b(stripe|paypal|razorpay|braintree)\\b.*\\b(charges|payment_intents|payouts|transfers|checkout)\\b",
+    "/(checkout|pay|payment)(/|\\b).*\\b(confirm|submit|place[-_ ]?order)\\b"
+   ],
+   "tools": []
+  },
+  {
+   "name": "secret_exposure",
+   "loss": 80.0,
+   "irreversible": true,
+   "requires_human": true,
+   "hard_value": "privacy",
+   "verify": "remove the secret from the command",
+   "patterns": [
+    "(api[_-]?key|secret|password|passwd|token)['\"]?\\s*[=:]\\s*['\"]?(?![$%{<])[^\\s'\"$]{6,}",
+    "\\bsk-[A-Za-z0-9]{16,}",
+    "Authorization:\\s*Bearer\\s+(?![$%{<])[A-Za-z0-9._-]{10,}"
+   ],
+   "tools": []
+  },
+  {
+   "name": "external_publish",
+   "loss": 50.0,
+   "irreversible": true,
+   "requires_human": true,
+   "hard_value": "consent",
+   "verify": "show the human exactly what will be published or sent",
+   "patterns": [
+    "\\bgit\\s+push\\b",
+    "\\bgh\\s+(pr|issue|release)\\s+(create|merge|comment|close|edit)\\b",
+    "\\bnpm\\s+publish\\b",
+    "\\b(vercel|netlify)\\b.*(\\bdeploy\\b|--prod\\b)",
+    "\\bdocker\\s+push\\b",
+    "\\bcurl(\\.exe)?\\b(?=.*-X\\s*(POST|PUT|DELETE|PATCH)\\b)(?=.*https?://(?!127\\.0\\.0\\.1|localhost|\\[::1\\]))",
+    "\\btwine\\s+upload\\b"
+   ],
+   "tools": [
+    "send_message",
+    "reply",
+    "forward"
+   ]
+  },
+  {
+   "name": "destructive_local",
+   "loss": 30.0,
+   "irreversible": true,
+   "requires_human": true,
+   "hard_value": "safety",
+   "verify": "list exactly what would be removed (dry run / -WhatIf) and keep a copy",
+   "patterns": [
+    "\\brm\\s+-[a-zA-Z]*[rf]",
+    "\\bRemove-Item\\b",
+    "\\bdel\\s+/[sq]",
+    "\\brmdir\\b",
+    "\\bshutil\\.rmtree\\b",
+    "\\bgit\\s+(reset\\s+--hard|clean\\s+-[a-z]*f|checkout\\s+--\\s|branch\\s+-D|stash\\s+drop)",
+    "\\bkill\\s+-9\\b",
+    "\\b(DROP|TRUNCATE)\\s+(TABLE|DATABASE)\\b",
+    "\\bformat\\s+[a-zA-Z]:",
+    "Clear-Content\\b",
+    "\\bgov_policy\\.py\\s+approve\\b",
+    "\\btaskkill\\b(?=.*\\s/IM\\s)",
+    "\\bStop-Process\\b(?=.*-Name\\b)",
+    "\\b(pkill|killall)\\b"
+   ],
+   "tools": [
+    "delete_session",
+    "trash_message",
+    "trash_thread",
+    "delete_draft",
+    "delete_label"
+   ]
+  },
+  {
+   "name": "process_control",
+   "loss": 5.0,
+   "irreversible": false,
+   "requires_human": false,
+   "required_level": 2,
+   "verify": "confirm the PID belongs to a process this agent started (kill by PID only)",
+   "patterns": [
+    "\\b(taskkill\\s+/PID|Stop-Process\\s+-Id|kill\\s+-9|kill\\s+\\d+)\\b",
+    "\\bStop-Process\\b"
+   ],
+   "tools": [
+    "TaskStop"
+   ]
+  },
+  {
+   "name": "shell",
+   "loss": 2.0,
+   "irreversible": false,
+   "requires_human": false,
+   "required_level": 2,
+   "verify": "run it in a dry-run form first, or on a copy",
+   "patterns": [],
+   "tools": [
+    "Bash",
+    "PowerShell"
+   ]
+  },
+  {
+   "name": "reversible_write",
+   "loss": 3.0,
+   "irreversible": false,
+   "requires_human": false,
+   "required_level": 2,
+   "verify": "diff the change and run the tests on a copy",
+   "patterns": [],
+   "tools": [
+    "Edit",
+    "Write",
+    "NotebookEdit",
+    "MultiEdit"
+   ]
+  },
+  {
+   "name": "ui_action",
+   "loss": 1.5,
+   "irreversible": false,
+   "requires_human": false,
+   "required_level": 2,
+   "verify": "take a screenshot first and confirm the target",
+   "patterns": [],
+   "tools": [
+    "computer",
+    "form_input",
+    "left_click",
+    "navigate"
+   ]
+  },
+  {
+   "name": "plan_ui",
+   "loss": 0.2,
+   "irreversible": false,
+   "requires_human": false,
+   "required_level": 1,
+   "verify": "none needed",
+   "patterns": [],
+   "tools": [
+    "update_plan",
+    "wrap_up",
+    "mark_chapter",
+    "TodoWrite"
+   ]
+  },
+  {
+   "name": "read",
+   "loss": 0.5,
+   "irreversible": false,
+   "requires_human": false,
+   "required_level": 1,
+   "verify": "none needed",
+   "patterns": [],
+   "tools": [
+    "Read",
+    "Grep",
+    "Glob",
+    "WebSearch",
+    "WebFetch",
+    "ToolSearch",
+    "get_page_text",
+    "read_page",
+    "find",
+    "screenshot",
+    "tabs_context",
+    "read_console_messages",
+    "read_network_requests",
+    "Monitor",
+    "list_",
+    "get_",
+    "search_",
+    "read_"
+   ]
+  },
+  {
+   "name": "other",
+   "loss": 2.0,
+   "irreversible": false,
+   "requires_human": false,
+   "required_level": 2,
+   "verify": "ask what the tool will change before calling it",
+   "patterns": [],
+   "tools": []
+  }
+ ],
+ "failure_reasons": {
+  "_comment": "brief 2 section 6.3: a failure is kept with a reason, not a minus sign. First match wins; matched against outcome class then error text.",
+  "by_outcome": {
+   "blocked": "unsafe_blocked",
+   "rejected": "right_but_unwanted"
+  },
+  "by_error_text": [
+   [
+    "timed? ?out|timeout",
+    "too_slow"
+   ],
+   [
+    "permission|access is denied|not permitted|unauthori[sz]ed",
+    "unsafe_blocked"
+   ],
+   [
+    "no such file|not found|cannot find|does not exist|not recognized|unknown (command|option)|no module named",
+    "wrong_fact"
+   ],
+   [
+    "syntax|parse|unexpected token|invalid (argument|option|syntax)|is not a valid|unterminated",
+    "malformed_action"
+   ],
+   [
+    "old_string|not unique|must read|has not been read|modified since",
+    "wrong_scope"
+   ],
+   [
+    "assert|test(s)? failed|failed:|error:",
+    "task_failed"
+   ]
+  ],
+  "default": "task_failed"
+ },
+ "pattern_tools": [
+  "Bash",
+  "PowerShell",
+  "javascript_tool",
+  "form_input",
+  "computer",
+  "Monitor"
+ ],
+ "_comment_pattern_tools": "content patterns are searched only in actions that EXECUTE their text; a plan, a file read or a file write that merely mentions 'rm -rf' or 'git push' is classed by its tool."
+}

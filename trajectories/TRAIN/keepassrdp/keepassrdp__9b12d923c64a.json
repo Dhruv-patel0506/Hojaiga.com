@@ -1,0 +1,99 @@
+{
+   "app_metadata": {
+      "app_name": "KeePassRDP",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install KeePassRDP plugin for KeePass 2.x",
+   "prerequisite_state": "KeePass 2.x is installed and open",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download KeePassRDP",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": null
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Run the MSI setup",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": null
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Copy KeePassRDP.plgx to KeePass plugins folder",
+         "ui_target": {
+            "element_name": "KeePass plugins folder",
+            "automation_id": null,
+            "hierarchical_path": "File Explorer > KeePass plugins folder",
+            "element_type": "Directory",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  100,
+                  100
+               ],
+               [
+                  200,
+                  200
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "KeePassRDP.plgx appears in the KeePass plugins folder"
+      }
+   ],
+   "_meta": {
+      "source_app": "KeePassRDP",
+      "app_key": "keepassrdp",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "KeePassRDP",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:54:40Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

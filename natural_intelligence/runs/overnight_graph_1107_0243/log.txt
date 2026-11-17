@@ -1,0 +1,1210 @@
+02:43:51 NI run overnight_graph_1107_0243 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=9.0 smoke=False
+02:43:51 waiting for the first fill stage (seed shards for every modality)...
+02:43:54 [fill] stage 0 complete
+02:43:54 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+02:43:54 [data] graph/proteins: n=1113 C=2 D=26 shards=1
+02:43:58 [graph/proteins] vote=0.816 uniform=0.816 best1=0.804 n_val=353 vram=0.02GB 4s
+02:43:58 [data] graph/mutag: n=188 C=2 D=34 shards=1
+02:44:00 [graph/mutag] vote=0.881 uniform=0.881 best1=0.895 n_val=67 vram=0.02GB 2s
+02:44:03 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 420, "n_val": 85, "base_rate": 0.8235294222831726, "inner": {"auc": 0.6409523809523809, "ece": 0.06459274502361521, "brier": 0.14000141620635986, "acc80": 0.8676470518112183}, "outer_conf": {"auc": 0.6685714285714286, "ece": 0.08392462309669046, "brier": 0.1387006938457489, "acc80": 0.8823529481887817}}
+02:44:03 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+02:44:06 [graph/proteins] vote=0.739 uniform=0.739 best1=0.774 n_val=337 vram=0.03GB 3s | grade=0.849 inner_auc=n/a vs conf_auc=n/a
+02:44:09 [graph/mutag] vote=0.885 uniform=0.885 best1=0.904 n_val=52 vram=0.02GB 3s | grade=0.917 inner_auc=n/a vs conf_auc=n/a
+02:44:10 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+02:44:13 [graph/proteins] vote=0.776 uniform=0.776 best1=0.779 n_val=344 vram=0.03GB 3s | grade=0.884 inner_auc=n/a vs conf_auc=n/a
+02:44:16 [graph/mutag] vote=0.843 uniform=0.843 best1=0.843 n_val=51 vram=0.02GB 3s | grade=0.915 inner_auc=n/a vs conf_auc=n/a
+02:44:18 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+02:44:21 [graph/proteins] vote=0.770 uniform=0.770 best1=0.756 n_val=348 vram=0.03GB 3s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+02:44:24 [graph/mutag] vote=0.889 uniform=0.889 best1=0.911 n_val=45 vram=0.02GB 3s | grade=0.917 inner_auc=n/a vs conf_auc=n/a
+02:44:26 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+02:44:28 [graph/proteins] vote=0.773 uniform=0.773 best1=0.794 n_val=326 vram=0.03GB 3s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+02:44:31 [graph/mutag] vote=0.860 uniform=0.877 best1=0.895 n_val=57 vram=0.02GB 3s | grade=0.875 inner_auc=n/a vs conf_auc=n/a
+02:44:33 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+02:44:36 [graph/proteins] vote=0.788 uniform=0.783 best1=0.771 n_val=345 vram=0.03GB 3s | grade=0.905 inner_auc=n/a vs conf_auc=n/a
+02:44:39 [graph/mutag] vote=0.857 uniform=0.875 best1=0.893 n_val=56 vram=0.02GB 3s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+02:44:41 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+02:44:44 [graph/proteins] vote=0.717 uniform=0.717 best1=0.728 n_val=346 vram=0.03GB 3s | grade=0.848 inner_auc=n/a vs conf_auc=n/a
+02:44:47 [graph/mutag] vote=0.770 uniform=0.770 best1=0.836 n_val=61 vram=0.02GB 3s | grade=0.850 inner_auc=n/a vs conf_auc=n/a
+02:44:49 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+02:44:52 [graph/proteins] vote=0.774 uniform=0.770 best1=0.748 n_val=305 vram=0.03GB 3s | grade=0.872 inner_auc=n/a vs conf_auc=n/a
+02:44:55 [graph/mutag] vote=0.823 uniform=0.806 best1=0.839 n_val=62 vram=0.02GB 3s | grade=0.867 inner_auc=n/a vs conf_auc=n/a
+02:44:56 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+02:45:00 [graph/proteins] vote=0.760 uniform=0.766 best1=0.757 n_val=333 vram=0.03GB 3s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+02:45:02 [graph/mutag] vote=0.806 uniform=0.823 best1=0.855 n_val=62 vram=0.02GB 3s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+02:45:04 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+02:45:07 [graph/proteins] vote=0.815 uniform=0.809 best1=0.792 n_val=341 vram=0.03GB 3s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+02:45:10 [graph/mutag] vote=0.885 uniform=0.869 best1=0.902 n_val=61 vram=0.02GB 3s | grade=0.877 inner_auc=n/a vs conf_auc=n/a
+02:45:12 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+02:45:15 [graph/proteins] vote=0.777 uniform=0.777 best1=0.788 n_val=345 vram=0.03GB 3s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+02:45:18 [graph/mutag] vote=0.860 uniform=0.860 best1=0.880 n_val=50 vram=0.02GB 3s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+02:45:20 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+02:45:23 [graph/proteins] vote=0.737 uniform=0.737 best1=0.731 n_val=335 vram=0.03GB 3s | grade=0.864 inner_auc=n/a vs conf_auc=n/a
+02:45:26 [graph/mutag] vote=0.792 uniform=0.811 best1=0.849 n_val=53 vram=0.02GB 3s | grade=0.843 inner_auc=n/a vs conf_auc=n/a
+02:45:27 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+02:45:31 [graph/proteins] vote=0.769 uniform=0.777 best1=0.763 n_val=350 vram=0.03GB 3s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+02:45:34 [graph/mutag] vote=0.857 uniform=0.871 best1=0.871 n_val=70 vram=0.02GB 3s | grade=0.854 inner_auc=n/a vs conf_auc=n/a
+02:45:35 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+02:45:38 [graph/proteins] vote=0.805 uniform=0.802 best1=0.791 n_val=339 vram=0.03GB 3s | grade=0.901 inner_auc=n/a vs conf_auc=n/a
+02:45:41 [graph/mutag] vote=0.863 uniform=0.863 best1=0.863 n_val=73 vram=0.02GB 3s | grade=0.930 inner_auc=n/a vs conf_auc=n/a
+02:45:43 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+02:45:46 [graph/proteins] vote=0.758 uniform=0.746 best1=0.758 n_val=331 vram=0.03GB 3s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+02:45:50 [graph/mutag] vote=0.889 uniform=0.889 best1=0.907 n_val=54 vram=0.02GB 3s | grade=0.901 inner_auc=n/a vs conf_auc=n/a
+02:45:52 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+02:45:54 [graph/proteins] vote=0.779 uniform=0.785 best1=0.767 n_val=331 vram=0.03GB 3s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+02:45:58 [graph/mutag] vote=0.900 uniform=0.900 best1=0.900 n_val=50 vram=0.02GB 3s | grade=0.906 inner_auc=n/a vs conf_auc=n/a
+02:45:59 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+02:46:02 [graph/proteins] vote=0.755 uniform=0.752 best1=0.767 n_val=330 vram=0.03GB 3s | grade=0.879 inner_auc=n/a vs conf_auc=n/a
+02:46:05 [graph/mutag] vote=0.817 uniform=0.817 best1=0.833 n_val=60 vram=0.02GB 3s | grade=0.864 inner_auc=n/a vs conf_auc=n/a
+02:46:07 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+02:46:10 [graph/proteins] vote=0.762 uniform=0.765 best1=0.765 n_val=362 vram=0.03GB 3s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+02:46:13 [graph/mutag] vote=0.857 uniform=0.839 best1=0.875 n_val=56 vram=0.02GB 3s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+02:46:15 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+02:46:18 [graph/proteins] vote=0.755 uniform=0.748 best1=0.761 n_val=314 vram=0.03GB 3s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+02:46:21 [graph/mutag] vote=0.830 uniform=0.849 best1=0.868 n_val=53 vram=0.02GB 3s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+02:46:23 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+02:46:26 [graph/proteins] vote=0.807 uniform=0.816 best1=0.795 n_val=347 vram=0.03GB 3s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+02:46:29 [graph/mutag] vote=0.855 uniform=0.855 best1=0.909 n_val=55 vram=0.02GB 3s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+02:46:30 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+02:46:33 [graph/proteins] vote=0.729 uniform=0.732 best1=0.741 n_val=328 vram=0.03GB 3s | grade=0.847 inner_auc=n/a vs conf_auc=n/a
+02:46:36 [graph/mutag] vote=0.803 uniform=0.848 best1=0.909 n_val=66 vram=0.02GB 3s | grade=0.869 inner_auc=n/a vs conf_auc=n/a
+02:46:38 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+02:46:41 [graph/proteins] vote=0.774 uniform=0.765 best1=0.783 n_val=345 vram=0.03GB 3s | grade=0.880 inner_auc=n/a vs conf_auc=n/a
+02:46:44 [graph/mutag] vote=0.900 uniform=0.880 best1=0.940 n_val=50 vram=0.02GB 3s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+02:46:46 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+02:46:49 [graph/proteins] vote=0.757 uniform=0.754 best1=0.766 n_val=334 vram=0.03GB 3s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+02:46:52 [graph/mutag] vote=0.824 uniform=0.863 best1=0.882 n_val=51 vram=0.02GB 3s | grade=0.839 inner_auc=n/a vs conf_auc=n/a
+02:46:53 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+02:46:56 [graph/proteins] vote=0.763 uniform=0.768 best1=0.771 n_val=354 vram=0.03GB 3s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+02:46:59 [graph/mutag] vote=0.816 uniform=0.837 best1=0.878 n_val=49 vram=0.02GB 3s | grade=0.866 inner_auc=n/a vs conf_auc=n/a
+02:47:01 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+02:47:04 [graph/proteins] vote=0.738 uniform=0.735 best1=0.726 n_val=332 vram=0.03GB 3s | grade=0.875 inner_auc=n/a vs conf_auc=n/a
+02:47:07 [graph/mutag] vote=0.907 uniform=0.889 best1=0.889 n_val=54 vram=0.02GB 3s | grade=0.863 inner_auc=n/a vs conf_auc=n/a
+02:47:09 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+02:47:12 [graph/proteins] vote=0.775 uniform=0.784 best1=0.775 n_val=324 vram=0.03GB 3s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+02:47:15 [graph/mutag] vote=0.914 uniform=0.914 best1=0.914 n_val=58 vram=0.02GB 3s | grade=0.919 inner_auc=n/a vs conf_auc=n/a
+02:47:17 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+02:47:20 [graph/proteins] vote=0.773 uniform=0.779 best1=0.779 n_val=330 vram=0.03GB 3s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+02:47:23 [graph/mutag] vote=0.920 uniform=0.920 best1=0.960 n_val=50 vram=0.02GB 3s | grade=0.935 inner_auc=n/a vs conf_auc=n/a
+02:47:24 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+02:47:27 [graph/proteins] vote=0.744 uniform=0.741 best1=0.744 n_val=332 vram=0.03GB 3s | grade=0.884 inner_auc=n/a vs conf_auc=n/a
+02:47:31 [graph/mutag] vote=0.808 uniform=0.827 best1=0.885 n_val=52 vram=0.02GB 3s | grade=0.823 inner_auc=n/a vs conf_auc=n/a
+02:47:32 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+02:47:36 [graph/proteins] vote=0.775 uniform=0.791 best1=0.772 n_val=325 vram=0.03GB 3s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+02:47:38 [graph/mutag] vote=0.804 uniform=0.804 best1=0.804 n_val=56 vram=0.02GB 3s | grade=0.884 inner_auc=n/a vs conf_auc=n/a
+02:47:40 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+02:47:43 [graph/proteins] vote=0.742 uniform=0.730 best1=0.733 n_val=345 vram=0.03GB 3s | grade=0.866 inner_auc=n/a vs conf_auc=n/a
+02:47:46 [graph/mutag] vote=0.818 uniform=0.818 best1=0.855 n_val=55 vram=0.02GB 3s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+02:47:48 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+02:47:51 [graph/proteins] vote=0.768 uniform=0.746 best1=0.781 n_val=315 vram=0.03GB 3s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+02:47:54 [graph/mutag] vote=0.806 uniform=0.806 best1=0.839 n_val=62 vram=0.02GB 3s | grade=0.872 inner_auc=n/a vs conf_auc=n/a
+02:47:56 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+02:47:59 [graph/proteins] vote=0.746 uniform=0.761 best1=0.740 n_val=335 vram=0.03GB 3s | grade=0.880 inner_auc=n/a vs conf_auc=n/a
+02:48:02 [graph/mutag] vote=0.907 uniform=0.907 best1=0.926 n_val=54 vram=0.02GB 3s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+02:48:03 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+02:48:06 [graph/proteins] vote=0.754 uniform=0.751 best1=0.749 n_val=358 vram=0.03GB 3s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+02:48:09 [graph/mutag] vote=0.857 uniform=0.839 best1=0.857 n_val=56 vram=0.02GB 3s | grade=0.893 inner_auc=n/a vs conf_auc=n/a
+02:48:11 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+02:48:14 [graph/proteins] vote=0.773 uniform=0.794 best1=0.788 n_val=326 vram=0.03GB 3s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+02:48:17 [graph/mutag] vote=0.836 uniform=0.820 best1=0.869 n_val=61 vram=0.02GB 3s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+02:48:19 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+02:48:23 [graph/proteins] vote=0.778 uniform=0.785 best1=0.782 n_val=316 vram=0.03GB 4s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+02:48:27 [graph/mutag] vote=0.854 uniform=0.875 best1=0.896 n_val=48 vram=0.02GB 3s | grade=0.911 inner_auc=n/a vs conf_auc=n/a
+02:48:29 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+02:48:32 [graph/proteins] vote=0.794 uniform=0.791 best1=0.780 n_val=359 vram=0.03GB 4s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+02:48:36 [graph/mutag] vote=0.896 uniform=0.896 best1=0.875 n_val=48 vram=0.02GB 4s | grade=0.882 inner_auc=n/a vs conf_auc=n/a
+02:48:38 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+02:48:42 [graph/proteins] vote=0.761 uniform=0.773 best1=0.767 n_val=326 vram=0.03GB 4s | grade=0.878 inner_auc=n/a vs conf_auc=n/a
+02:48:46 [graph/mutag] vote=0.828 uniform=0.828 best1=0.859 n_val=64 vram=0.02GB 4s | grade=0.872 inner_auc=n/a vs conf_auc=n/a
+02:48:48 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+02:48:52 [graph/proteins] vote=0.758 uniform=0.761 best1=0.764 n_val=327 vram=0.03GB 4s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+02:48:54 [fill] stage 1 complete
+02:48:55 [graph/mutag] vote=0.898 uniform=0.864 best1=0.915 n_val=59 vram=0.02GB 4s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+02:48:57 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+02:49:01 [graph/proteins] vote=0.791 uniform=0.798 best1=0.794 n_val=321 vram=0.03GB 4s | grade=0.893 inner_auc=n/a vs conf_auc=n/a
+02:49:05 [graph/mutag] vote=0.863 uniform=0.863 best1=0.882 n_val=51 vram=0.02GB 4s | grade=0.920 inner_auc=n/a vs conf_auc=n/a
+02:49:07 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+02:49:10 [graph/proteins] vote=0.760 uniform=0.757 best1=0.749 n_val=338 vram=0.03GB 4s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+02:49:14 [graph/mutag] vote=0.873 uniform=0.873 best1=0.909 n_val=55 vram=0.02GB 4s | grade=0.919 inner_auc=n/a vs conf_auc=n/a
+02:49:16 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+02:49:20 [graph/proteins] vote=0.802 uniform=0.802 best1=0.811 n_val=334 vram=0.03GB 4s | grade=0.877 inner_auc=n/a vs conf_auc=n/a
+02:49:24 [graph/mutag] vote=0.949 uniform=0.932 best1=0.949 n_val=59 vram=0.02GB 4s | grade=0.908 inner_auc=n/a vs conf_auc=n/a
+02:49:26 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+02:49:29 [graph/proteins] vote=0.776 uniform=0.782 best1=0.767 n_val=326 vram=0.03GB 4s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+02:49:33 [graph/mutag] vote=0.857 uniform=0.857 best1=0.857 n_val=63 vram=0.02GB 4s | grade=0.855 inner_auc=n/a vs conf_auc=n/a
+02:49:35 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+02:49:39 [graph/proteins] vote=0.788 uniform=0.791 best1=0.790 n_val=358 vram=0.03GB 4s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+02:49:43 [graph/mutag] vote=0.878 uniform=0.837 best1=0.898 n_val=49 vram=0.02GB 4s | grade=0.871 inner_auc=n/a vs conf_auc=n/a
+02:49:45 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+02:49:49 [graph/proteins] vote=0.726 uniform=0.756 best1=0.750 n_val=340 vram=0.03GB 4s | grade=0.842 inner_auc=n/a vs conf_auc=n/a
+02:49:52 [graph/mutag] vote=0.847 uniform=0.847 best1=0.881 n_val=59 vram=0.02GB 4s | grade=0.901 inner_auc=n/a vs conf_auc=n/a
+02:49:55 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+02:49:59 [graph/proteins] vote=0.775 uniform=0.784 best1=0.767 n_val=347 vram=0.03GB 4s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+02:50:02 [graph/mutag] vote=0.825 uniform=0.807 best1=0.877 n_val=57 vram=0.02GB 4s | grade=0.910 inner_auc=n/a vs conf_auc=n/a
+02:50:04 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+02:50:08 [graph/proteins] vote=0.766 uniform=0.781 best1=0.769 n_val=342 vram=0.03GB 4s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+02:50:11 [graph/mutag] vote=0.906 uniform=0.891 best1=0.906 n_val=64 vram=0.02GB 3s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+02:50:14 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+02:50:18 [graph/proteins] vote=0.759 uniform=0.747 best1=0.768 n_val=324 vram=0.03GB 4s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+02:50:22 [graph/mutag] vote=0.855 uniform=0.855 best1=0.839 n_val=62 vram=0.02GB 4s | grade=0.854 inner_auc=n/a vs conf_auc=n/a
+02:50:24 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+02:50:28 [graph/proteins] vote=0.787 uniform=0.775 best1=0.781 n_val=338 vram=0.03GB 4s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+02:50:31 [graph/mutag] vote=0.895 uniform=0.877 best1=0.895 n_val=57 vram=0.02GB 4s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+02:50:33 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+02:50:37 [graph/proteins] vote=0.734 uniform=0.743 best1=0.731 n_val=335 vram=0.03GB 4s | grade=0.869 inner_auc=n/a vs conf_auc=n/a
+02:50:41 [graph/mutag] vote=0.907 uniform=0.907 best1=0.907 n_val=54 vram=0.02GB 4s | grade=0.933 inner_auc=n/a vs conf_auc=n/a
+02:50:43 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+02:50:47 [graph/proteins] vote=0.769 uniform=0.754 best1=0.772 n_val=333 vram=0.03GB 3s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+02:50:51 [graph/mutag] vote=0.864 uniform=0.881 best1=0.881 n_val=59 vram=0.02GB 4s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+02:50:53 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+02:50:57 [graph/proteins] vote=0.734 uniform=0.757 best1=0.743 n_val=350 vram=0.03GB 4s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+02:51:01 [graph/mutag] vote=0.926 uniform=0.926 best1=0.926 n_val=68 vram=0.02GB 4s | grade=0.911 inner_auc=n/a vs conf_auc=n/a
+02:51:03 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+02:51:06 [graph/proteins] vote=0.759 uniform=0.774 best1=0.762 n_val=332 vram=0.03GB 3s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+02:51:10 [graph/mutag] vote=0.852 uniform=0.852 best1=0.836 n_val=61 vram=0.02GB 4s | grade=0.870 inner_auc=n/a vs conf_auc=n/a
+02:51:12 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+02:51:17 [graph/proteins] vote=0.755 uniform=0.758 best1=0.777 n_val=355 vram=0.03GB 4s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+02:51:21 [graph/mutag] vote=0.900 uniform=0.933 best1=0.933 n_val=60 vram=0.02GB 5s | grade=0.882 inner_auc=n/a vs conf_auc=n/a
+02:51:24 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+02:51:28 [graph/proteins] vote=0.777 uniform=0.789 best1=0.777 n_val=332 vram=0.03GB 4s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+02:51:33 [graph/mutag] vote=0.800 uniform=0.800 best1=0.833 n_val=60 vram=0.02GB 5s | grade=0.817 inner_auc=n/a vs conf_auc=n/a
+02:51:36 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+02:51:40 [graph/proteins] vote=0.741 uniform=0.759 best1=0.741 n_val=328 vram=0.03GB 4s | grade=0.877 inner_auc=n/a vs conf_auc=n/a
+02:51:44 [graph/mutag] vote=0.863 uniform=0.843 best1=0.863 n_val=51 vram=0.02GB 4s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+02:51:47 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+02:51:52 [graph/proteins] vote=0.782 uniform=0.773 best1=0.782 n_val=335 vram=0.03GB 4s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+02:51:56 [graph/mutag] vote=0.864 uniform=0.864 best1=0.881 n_val=59 vram=0.02GB 5s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+02:51:59 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+02:52:04 [graph/proteins] vote=0.795 uniform=0.789 best1=0.774 n_val=332 vram=0.03GB 5s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+02:52:08 [graph/mutag] vote=0.825 uniform=0.825 best1=0.841 n_val=63 vram=0.02GB 4s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+02:52:11 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+02:52:16 [graph/proteins] vote=0.781 uniform=0.790 best1=0.790 n_val=347 vram=0.03GB 4s | grade=0.905 inner_auc=n/a vs conf_auc=n/a
+02:52:20 [graph/mutag] vote=0.885 uniform=0.885 best1=0.902 n_val=61 vram=0.02GB 5s | grade=0.875 inner_auc=n/a vs conf_auc=n/a
+02:52:23 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+02:52:27 [graph/proteins] vote=0.746 uniform=0.742 best1=0.752 n_val=299 vram=0.03GB 4s | grade=0.877 inner_auc=n/a vs conf_auc=n/a
+02:52:32 [graph/mutag] vote=0.877 uniform=0.877 best1=0.895 n_val=57 vram=0.02GB 5s | grade=0.922 inner_auc=n/a vs conf_auc=n/a
+02:52:35 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+02:52:39 [graph/proteins] vote=0.774 uniform=0.780 best1=0.774 n_val=341 vram=0.03GB 5s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+02:52:44 [graph/mutag] vote=0.857 uniform=0.839 best1=0.857 n_val=56 vram=0.02GB 5s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+02:52:47 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+02:52:51 [graph/proteins] vote=0.777 uniform=0.788 best1=0.777 n_val=345 vram=0.03GB 4s | grade=0.906 inner_auc=n/a vs conf_auc=n/a
+02:52:56 [graph/mutag] vote=0.866 uniform=0.866 best1=0.851 n_val=67 vram=0.02GB 5s | grade=0.913 inner_auc=n/a vs conf_auc=n/a
+02:52:58 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+02:53:03 [graph/proteins] vote=0.735 uniform=0.732 best1=0.732 n_val=343 vram=0.03GB 4s | grade=0.872 inner_auc=n/a vs conf_auc=n/a
+02:53:07 [graph/mutag] vote=0.877 uniform=0.846 best1=0.862 n_val=65 vram=0.02GB 4s | grade=0.923 inner_auc=n/a vs conf_auc=n/a
+02:53:10 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+02:53:14 [graph/proteins] vote=0.748 uniform=0.759 best1=0.751 n_val=345 vram=0.03GB 4s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+02:53:19 [graph/mutag] vote=0.806 uniform=0.774 best1=0.839 n_val=62 vram=0.02GB 5s | grade=0.842 inner_auc=n/a vs conf_auc=n/a
+02:53:21 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+02:53:26 [graph/proteins] vote=0.774 uniform=0.785 best1=0.781 n_val=297 vram=0.03GB 5s | grade=0.893 inner_auc=n/a vs conf_auc=n/a
+02:53:30 [graph/mutag] vote=0.797 uniform=0.763 best1=0.797 n_val=59 vram=0.02GB 4s | grade=0.861 inner_auc=n/a vs conf_auc=n/a
+02:53:33 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+02:53:38 [graph/proteins] vote=0.760 uniform=0.769 best1=0.753 n_val=312 vram=0.03GB 5s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+02:53:42 [graph/mutag] vote=0.849 uniform=0.887 best1=0.887 n_val=53 vram=0.02GB 4s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+02:53:45 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+02:53:49 [graph/proteins] vote=0.787 uniform=0.775 best1=0.784 n_val=324 vram=0.03GB 5s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+02:53:54 [fill] stage 2 complete
+02:53:54 [graph/mutag] vote=0.859 uniform=0.844 best1=0.875 n_val=64 vram=0.02GB 4s | grade=0.921 inner_auc=n/a vs conf_auc=n/a
+02:53:56 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+02:54:01 [graph/proteins] vote=0.755 uniform=0.770 best1=0.748 n_val=322 vram=0.03GB 5s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+02:54:05 [graph/mutag] vote=0.833 uniform=0.833 best1=0.854 n_val=48 vram=0.02GB 4s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+02:54:08 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+02:54:12 [graph/proteins] vote=0.749 uniform=0.755 best1=0.746 n_val=343 vram=0.03GB 4s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+02:54:18 [graph/mutag] vote=0.910 uniform=0.881 best1=0.895 n_val=67 vram=0.02GB 5s | grade=0.905 inner_auc=n/a vs conf_auc=n/a
+02:54:20 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+02:54:24 [graph/proteins] vote=0.771 uniform=0.777 best1=0.782 n_val=349 vram=0.03GB 4s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+02:54:29 [graph/mutag] vote=0.910 uniform=0.896 best1=0.895 n_val=67 vram=0.02GB 5s | grade=0.936 inner_auc=n/a vs conf_auc=n/a
+02:54:32 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+02:54:36 [graph/proteins] vote=0.767 uniform=0.767 best1=0.767 n_val=331 vram=0.03GB 4s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+02:54:42 [graph/mutag] vote=0.875 uniform=0.875 best1=0.906 n_val=64 vram=0.02GB 5s | grade=0.920 inner_auc=n/a vs conf_auc=n/a
+02:54:44 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+02:54:48 [graph/proteins] vote=0.771 uniform=0.777 best1=0.768 n_val=336 vram=0.03GB 4s | grade=0.910 inner_auc=n/a vs conf_auc=n/a
+02:54:53 [graph/mutag] vote=0.893 uniform=0.893 best1=0.911 n_val=56 vram=0.02GB 5s | grade=0.923 inner_auc=n/a vs conf_auc=n/a
+02:54:56 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+02:55:00 [graph/proteins] vote=0.751 uniform=0.764 best1=0.751 n_val=373 vram=0.03GB 4s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+02:55:05 [graph/mutag] vote=0.880 uniform=0.860 best1=0.900 n_val=50 vram=0.02GB 5s | grade=0.910 inner_auc=n/a vs conf_auc=n/a
+02:55:07 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+02:55:12 [graph/proteins] vote=0.760 uniform=0.780 best1=0.768 n_val=354 vram=0.03GB 4s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+02:55:16 [graph/mutag] vote=0.903 uniform=0.919 best1=0.903 n_val=62 vram=0.02GB 4s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+02:55:19 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+02:55:23 [graph/proteins] vote=0.761 uniform=0.755 best1=0.764 n_val=327 vram=0.03GB 4s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+02:55:27 [graph/mutag] vote=0.897 uniform=0.914 best1=0.948 n_val=58 vram=0.02GB 4s | grade=0.913 inner_auc=n/a vs conf_auc=n/a
+02:55:30 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+02:55:35 [graph/proteins] vote=0.763 uniform=0.777 best1=0.777 n_val=354 vram=0.03GB 5s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+02:55:39 [graph/mutag] vote=0.922 uniform=0.922 best1=0.922 n_val=64 vram=0.02GB 4s | grade=0.915 inner_auc=n/a vs conf_auc=n/a
+02:55:42 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+02:55:46 [graph/proteins] vote=0.750 uniform=0.750 best1=0.744 n_val=336 vram=0.03GB 4s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+02:55:51 [graph/mutag] vote=0.864 uniform=0.864 best1=0.886 n_val=44 vram=0.02GB 5s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+02:55:54 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+02:55:58 [graph/proteins] vote=0.774 uniform=0.783 best1=0.786 n_val=318 vram=0.03GB 4s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+02:56:03 [graph/mutag] vote=0.811 uniform=0.811 best1=0.849 n_val=53 vram=0.02GB 5s | grade=0.893 inner_auc=n/a vs conf_auc=n/a
+02:56:06 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+02:56:10 [graph/proteins] vote=0.765 uniform=0.768 best1=0.771 n_val=306 vram=0.03GB 4s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+02:56:15 [graph/mutag] vote=0.765 uniform=0.784 best1=0.824 n_val=51 vram=0.02GB 5s | grade=0.840 inner_auc=n/a vs conf_auc=n/a
+02:56:18 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+02:56:22 [graph/proteins] vote=0.773 uniform=0.779 best1=0.767 n_val=330 vram=0.03GB 4s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+02:56:27 [graph/mutag] vote=0.841 uniform=0.810 best1=0.841 n_val=63 vram=0.02GB 5s | grade=0.857 inner_auc=n/a vs conf_auc=n/a
+02:56:29 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+02:56:34 [graph/proteins] vote=0.768 uniform=0.756 best1=0.778 n_val=315 vram=0.03GB 5s | grade=0.893 inner_auc=n/a vs conf_auc=n/a
+02:56:38 [graph/mutag] vote=0.849 uniform=0.849 best1=0.887 n_val=53 vram=0.02GB 4s | grade=0.940 inner_auc=n/a vs conf_auc=n/a
+02:56:41 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+02:56:46 [graph/proteins] vote=0.744 uniform=0.778 best1=0.775 n_val=320 vram=0.03GB 5s | grade=0.874 inner_auc=n/a vs conf_auc=n/a
+02:56:50 [graph/mutag] vote=0.845 uniform=0.845 best1=0.897 n_val=58 vram=0.02GB 4s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+02:56:53 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+02:56:57 [graph/proteins] vote=0.777 uniform=0.783 best1=0.774 n_val=345 vram=0.03GB 4s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+02:57:02 [graph/mutag] vote=0.915 uniform=0.915 best1=0.932 n_val=59 vram=0.02GB 5s | grade=0.921 inner_auc=n/a vs conf_auc=n/a
+02:57:05 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+02:57:09 [graph/proteins] vote=0.743 uniform=0.734 best1=0.743 n_val=338 vram=0.03GB 4s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+02:57:15 [graph/mutag] vote=0.864 uniform=0.864 best1=0.881 n_val=59 vram=0.02GB 5s | grade=0.917 inner_auc=n/a vs conf_auc=n/a
+02:57:17 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+02:57:22 [graph/proteins] vote=0.767 uniform=0.770 best1=0.779 n_val=335 vram=0.03GB 4s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+02:57:26 [graph/mutag] vote=0.776 uniform=0.793 best1=0.810 n_val=58 vram=0.02GB 5s | grade=0.833 inner_auc=n/a vs conf_auc=n/a
+02:57:30 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+02:57:34 [graph/proteins] vote=0.751 uniform=0.778 best1=0.772 n_val=342 vram=0.03GB 4s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+02:57:38 [graph/mutag] vote=0.907 uniform=0.870 best1=0.889 n_val=54 vram=0.02GB 4s | grade=0.873 inner_auc=n/a vs conf_auc=n/a
+02:57:40 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+02:57:46 [graph/proteins] vote=0.756 uniform=0.744 best1=0.756 n_val=324 vram=0.03GB 5s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+02:57:50 [graph/mutag] vote=0.782 uniform=0.745 best1=0.818 n_val=55 vram=0.02GB 4s | grade=0.815 inner_auc=n/a vs conf_auc=n/a
+02:57:53 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+02:57:57 [graph/proteins] vote=0.770 uniform=0.779 best1=0.758 n_val=326 vram=0.03GB 4s | grade=0.901 inner_auc=n/a vs conf_auc=n/a
+02:58:02 [graph/mutag] vote=0.793 uniform=0.793 best1=0.793 n_val=58 vram=0.02GB 5s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+02:58:05 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+02:58:09 [graph/proteins] vote=0.760 uniform=0.754 best1=0.767 n_val=313 vram=0.03GB 4s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+02:58:15 [graph/mutag] vote=0.875 uniform=0.891 best1=0.891 n_val=64 vram=0.02GB 5s | grade=0.879 inner_auc=n/a vs conf_auc=n/a
+02:58:17 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+02:58:22 [graph/proteins] vote=0.768 uniform=0.765 best1=0.771 n_val=323 vram=0.03GB 4s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+02:58:26 [graph/mutag] vote=0.841 uniform=0.841 best1=0.841 n_val=63 vram=0.02GB 4s | grade=0.882 inner_auc=n/a vs conf_auc=n/a
+02:58:29 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+02:58:34 [graph/proteins] vote=0.720 uniform=0.734 best1=0.720 n_val=304 vram=0.03GB 5s | grade=0.866 inner_auc=n/a vs conf_auc=n/a
+02:58:39 [graph/mutag] vote=0.828 uniform=0.810 best1=0.845 n_val=58 vram=0.02GB 5s | grade=0.915 inner_auc=n/a vs conf_auc=n/a
+02:58:41 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+02:58:46 [graph/proteins] vote=0.791 uniform=0.794 best1=0.800 n_val=345 vram=0.03GB 5s | grade=0.872 inner_auc=n/a vs conf_auc=n/a
+02:58:51 [graph/mutag] vote=0.852 uniform=0.820 best1=0.853 n_val=61 vram=0.02GB 4s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+02:58:53 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+02:58:54 [fill] stage 3 complete
+02:58:58 [graph/proteins] vote=0.752 uniform=0.748 best1=0.764 n_val=326 vram=0.03GB 5s | grade=0.884 inner_auc=n/a vs conf_auc=n/a
+02:59:03 [graph/mutag] vote=0.877 uniform=0.877 best1=0.908 n_val=65 vram=0.02GB 5s | grade=0.915 inner_auc=n/a vs conf_auc=n/a
+02:59:06 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+02:59:10 [graph/proteins] vote=0.790 uniform=0.796 best1=0.787 n_val=348 vram=0.03GB 4s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+02:59:15 [graph/mutag] vote=0.868 uniform=0.849 best1=0.924 n_val=53 vram=0.02GB 5s | grade=0.942 inner_auc=n/a vs conf_auc=n/a
+02:59:18 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+02:59:22 [graph/proteins] vote=0.763 uniform=0.750 best1=0.766 n_val=316 vram=0.03GB 4s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+02:59:27 [graph/mutag] vote=0.800 uniform=0.840 best1=0.860 n_val=50 vram=0.02GB 5s | grade=0.851 inner_auc=n/a vs conf_auc=n/a
+02:59:30 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+02:59:35 [graph/proteins] vote=0.729 uniform=0.745 best1=0.754 n_val=329 vram=0.03GB 5s | grade=0.869 inner_auc=n/a vs conf_auc=n/a
+02:59:39 [graph/mutag] vote=0.873 uniform=0.873 best1=0.927 n_val=55 vram=0.02GB 4s | grade=0.859 inner_auc=n/a vs conf_auc=n/a
+02:59:42 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+02:59:47 [graph/proteins] vote=0.766 uniform=0.769 best1=0.769 n_val=325 vram=0.03GB 5s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+02:59:52 [graph/mutag] vote=0.845 uniform=0.879 best1=0.862 n_val=58 vram=0.02GB 6s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+02:59:54 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+02:59:58 [graph/proteins] vote=0.768 uniform=0.777 best1=0.777 n_val=328 vram=0.03GB 4s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:00:03 [graph/mutag] vote=0.900 uniform=0.900 best1=0.914 n_val=70 vram=0.02GB 5s | grade=0.908 inner_auc=n/a vs conf_auc=n/a
+03:00:06 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+03:00:11 [graph/proteins] vote=0.753 uniform=0.753 best1=0.768 n_val=328 vram=0.03GB 5s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+03:00:15 [graph/mutag] vote=0.836 uniform=0.836 best1=0.836 n_val=55 vram=0.02GB 4s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+03:00:18 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+03:00:24 [graph/proteins] vote=0.740 uniform=0.756 best1=0.750 n_val=312 vram=0.03GB 6s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+03:00:28 [graph/mutag] vote=0.940 uniform=0.940 best1=0.940 n_val=67 vram=0.02GB 4s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+03:00:31 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+03:00:35 [graph/proteins] vote=0.753 uniform=0.744 best1=0.756 n_val=324 vram=0.03GB 4s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+03:00:41 [graph/mutag] vote=0.818 uniform=0.833 best1=0.849 n_val=66 vram=0.02GB 6s | grade=0.863 inner_auc=n/a vs conf_auc=n/a
+03:00:43 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+03:00:47 [graph/proteins] vote=0.762 uniform=0.780 best1=0.762 n_val=323 vram=0.03GB 4s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:00:52 [graph/mutag] vote=0.922 uniform=0.922 best1=0.922 n_val=51 vram=0.02GB 5s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:00:55 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+03:01:00 [graph/proteins] vote=0.777 uniform=0.786 best1=0.777 n_val=345 vram=0.03GB 5s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+03:01:05 [graph/mutag] vote=0.807 uniform=0.860 best1=0.860 n_val=57 vram=0.02GB 4s | grade=0.831 inner_auc=n/a vs conf_auc=n/a
+03:01:07 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+03:01:12 [graph/proteins] vote=0.787 uniform=0.784 best1=0.784 n_val=343 vram=0.03GB 5s | grade=0.906 inner_auc=n/a vs conf_auc=n/a
+03:01:18 [graph/mutag] vote=0.864 uniform=0.848 best1=0.879 n_val=66 vram=0.02GB 6s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+03:01:20 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+03:01:24 [graph/proteins] vote=0.779 uniform=0.799 best1=0.784 n_val=348 vram=0.03GB 4s | grade=0.907 inner_auc=n/a vs conf_auc=n/a
+03:01:29 [graph/mutag] vote=0.820 uniform=0.840 best1=0.860 n_val=50 vram=0.02GB 4s | grade=0.879 inner_auc=n/a vs conf_auc=n/a
+03:01:32 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+03:01:37 [graph/proteins] vote=0.759 uniform=0.750 best1=0.771 n_val=332 vram=0.03GB 5s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+03:01:42 [graph/mutag] vote=0.846 uniform=0.862 best1=0.862 n_val=65 vram=0.02GB 4s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+03:01:44 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+03:01:48 [graph/proteins] vote=0.779 uniform=0.776 best1=0.789 n_val=317 vram=0.03GB 4s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+03:01:54 [graph/mutag] vote=0.854 uniform=0.812 best1=0.833 n_val=48 vram=0.02GB 6s | grade=0.873 inner_auc=n/a vs conf_auc=n/a
+03:01:56 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+03:02:01 [graph/proteins] vote=0.786 uniform=0.783 best1=0.783 n_val=336 vram=0.03GB 4s | grade=0.907 inner_auc=n/a vs conf_auc=n/a
+03:02:05 [graph/mutag] vote=0.853 uniform=0.838 best1=0.868 n_val=68 vram=0.02GB 5s | grade=0.913 inner_auc=n/a vs conf_auc=n/a
+03:02:09 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+03:02:13 [graph/proteins] vote=0.766 uniform=0.768 best1=0.766 n_val=380 vram=0.03GB 5s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+03:02:18 [graph/mutag] vote=0.881 uniform=0.881 best1=0.898 n_val=59 vram=0.02GB 4s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+03:02:21 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+03:02:26 [graph/proteins] vote=0.773 uniform=0.767 best1=0.770 n_val=326 vram=0.03GB 5s | grade=0.909 inner_auc=n/a vs conf_auc=n/a
+03:02:31 [graph/mutag] vote=0.877 uniform=0.877 best1=0.895 n_val=57 vram=0.02GB 5s | grade=0.948 inner_auc=n/a vs conf_auc=n/a
+03:02:33 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+03:02:37 [graph/proteins] vote=0.735 uniform=0.746 best1=0.755 n_val=339 vram=0.03GB 4s | grade=0.871 inner_auc=n/a vs conf_auc=n/a
+03:02:42 [graph/mutag] vote=0.896 uniform=0.910 best1=0.925 n_val=67 vram=0.02GB 5s | grade=0.932 inner_auc=n/a vs conf_auc=n/a
+03:02:46 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+03:02:50 [graph/proteins] vote=0.782 uniform=0.769 best1=0.776 n_val=321 vram=0.03GB 4s | grade=0.884 inner_auc=n/a vs conf_auc=n/a
+03:02:54 [graph/mutag] vote=0.852 uniform=0.852 best1=0.870 n_val=54 vram=0.02GB 4s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:02:57 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+03:03:03 [graph/proteins] vote=0.744 uniform=0.733 best1=0.750 n_val=360 vram=0.03GB 6s | grade=0.879 inner_auc=n/a vs conf_auc=n/a
+03:03:07 [graph/mutag] vote=0.839 uniform=0.855 best1=0.871 n_val=62 vram=0.02GB 4s | grade=0.908 inner_auc=n/a vs conf_auc=n/a
+03:03:09 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+03:03:14 [graph/proteins] vote=0.780 uniform=0.798 best1=0.786 n_val=336 vram=0.03GB 4s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+03:03:19 [graph/mutag] vote=0.857 uniform=0.857 best1=0.873 n_val=63 vram=0.02GB 5s | grade=0.913 inner_auc=n/a vs conf_auc=n/a
+03:03:22 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+03:03:26 [graph/proteins] vote=0.746 uniform=0.773 best1=0.773 n_val=331 vram=0.03GB 4s | grade=0.882 inner_auc=n/a vs conf_auc=n/a
+03:03:31 [graph/mutag] vote=0.800 uniform=0.800 best1=0.840 n_val=50 vram=0.02GB 5s | grade=0.851 inner_auc=n/a vs conf_auc=n/a
+03:03:33 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+03:03:39 [graph/proteins] vote=0.752 uniform=0.752 best1=0.772 n_val=311 vram=0.03GB 6s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+03:03:43 [graph/mutag] vote=0.895 uniform=0.877 best1=0.895 n_val=57 vram=0.02GB 4s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+03:03:46 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+03:03:51 [graph/proteins] vote=0.736 uniform=0.739 best1=0.742 n_val=329 vram=0.03GB 5s | grade=0.874 inner_auc=n/a vs conf_auc=n/a
+03:03:56 [graph/mutag] vote=0.871 uniform=0.871 best1=0.887 n_val=62 vram=0.02GB 5s | grade=0.918 inner_auc=n/a vs conf_auc=n/a
+03:03:59 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+03:04:03 [graph/proteins] vote=0.796 uniform=0.802 best1=0.793 n_val=338 vram=0.03GB 4s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+03:04:08 [graph/mutag] vote=0.840 uniform=0.820 best1=0.840 n_val=50 vram=0.02GB 5s | grade=0.875 inner_auc=n/a vs conf_auc=n/a
+03:04:10 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+03:04:16 [graph/proteins] vote=0.755 uniform=0.752 best1=0.758 n_val=330 vram=0.03GB 5s | grade=0.884 inner_auc=n/a vs conf_auc=n/a
+03:04:20 [graph/mutag] vote=0.860 uniform=0.860 best1=0.895 n_val=57 vram=0.02GB 5s | grade=0.913 inner_auc=n/a vs conf_auc=n/a
+03:04:23 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+03:04:27 [graph/proteins] vote=0.760 uniform=0.787 best1=0.763 n_val=329 vram=0.03GB 5s | grade=0.907 inner_auc=n/a vs conf_auc=n/a
+03:04:33 [graph/mutag] vote=0.896 uniform=0.896 best1=0.938 n_val=48 vram=0.02GB 6s | grade=0.928 inner_auc=n/a vs conf_auc=n/a
+03:04:35 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+03:04:40 [graph/proteins] vote=0.777 uniform=0.765 best1=0.774 n_val=336 vram=0.03GB 4s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+03:04:44 [graph/mutag] vote=0.836 uniform=0.836 best1=0.863 n_val=73 vram=0.02GB 5s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+03:04:47 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+03:04:53 [graph/proteins] vote=0.742 uniform=0.756 best1=0.740 n_val=357 vram=0.03GB 6s | grade=0.882 inner_auc=n/a vs conf_auc=n/a
+03:04:57 [graph/mutag] vote=0.826 uniform=0.826 best1=0.848 n_val=46 vram=0.02GB 4s | grade=0.910 inner_auc=n/a vs conf_auc=n/a
+03:05:00 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+03:05:04 [graph/proteins] vote=0.756 uniform=0.762 best1=0.748 n_val=353 vram=0.03GB 4s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+03:05:10 [graph/mutag] vote=0.810 uniform=0.793 best1=0.828 n_val=58 vram=0.02GB 6s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+03:05:13 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+03:05:17 [graph/proteins] vote=0.740 uniform=0.743 best1=0.734 n_val=342 vram=0.03GB 4s | grade=0.878 inner_auc=n/a vs conf_auc=n/a
+03:05:22 [graph/mutag] vote=0.845 uniform=0.845 best1=0.845 n_val=58 vram=0.02GB 5s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+03:05:26 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+03:05:30 [graph/proteins] vote=0.749 uniform=0.760 best1=0.754 n_val=346 vram=0.03GB 4s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+03:05:34 [graph/mutag] vote=0.841 uniform=0.857 best1=0.873 n_val=63 vram=0.02GB 4s | grade=0.920 inner_auc=n/a vs conf_auc=n/a
+03:05:37 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+03:05:42 [graph/proteins] vote=0.780 uniform=0.764 best1=0.792 n_val=318 vram=0.03GB 5s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+03:05:47 [graph/mutag] vote=0.914 uniform=0.931 best1=0.931 n_val=58 vram=0.02GB 5s | grade=0.910 inner_auc=n/a vs conf_auc=n/a
+03:05:50 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+03:05:55 [graph/proteins] vote=0.776 uniform=0.770 best1=0.770 n_val=344 vram=0.03GB 5s | grade=0.911 inner_auc=n/a vs conf_auc=n/a
+03:05:59 [graph/mutag] vote=0.897 uniform=0.879 best1=0.914 n_val=58 vram=0.02GB 5s | grade=0.922 inner_auc=n/a vs conf_auc=n/a
+03:06:03 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+03:06:07 [graph/proteins] vote=0.771 uniform=0.789 best1=0.777 n_val=323 vram=0.03GB 4s | grade=0.901 inner_auc=n/a vs conf_auc=n/a
+03:06:12 [graph/mutag] vote=0.857 uniform=0.841 best1=0.873 n_val=63 vram=0.02GB 5s | grade=0.908 inner_auc=n/a vs conf_auc=n/a
+03:06:15 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+03:06:20 [graph/proteins] vote=0.791 uniform=0.822 best1=0.801 n_val=326 vram=0.03GB 6s | grade=0.907 inner_auc=n/a vs conf_auc=n/a
+03:06:25 [graph/mutag] vote=0.873 uniform=0.857 best1=0.889 n_val=63 vram=0.02GB 4s | grade=0.933 inner_auc=n/a vs conf_auc=n/a
+03:06:27 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+03:06:32 [graph/proteins] vote=0.761 uniform=0.764 best1=0.760 n_val=309 vram=0.03GB 5s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+03:06:36 [graph/mutag] vote=0.830 uniform=0.830 best1=0.868 n_val=53 vram=0.02GB 4s | grade=0.872 inner_auc=n/a vs conf_auc=n/a
+03:06:40 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+03:06:44 [graph/proteins] vote=0.779 uniform=0.773 best1=0.767 n_val=330 vram=0.03GB 4s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:06:49 [graph/mutag] vote=0.897 uniform=0.879 best1=0.914 n_val=58 vram=0.02GB 4s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+03:06:51 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+03:06:56 [graph/proteins] vote=0.786 uniform=0.771 best1=0.789 n_val=336 vram=0.03GB 4s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+03:07:02 [graph/mutag] vote=0.789 uniform=0.789 best1=0.842 n_val=57 vram=0.02GB 6s | grade=0.835 inner_auc=n/a vs conf_auc=n/a
+03:07:05 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+03:07:09 [graph/proteins] vote=0.748 uniform=0.765 best1=0.751 n_val=345 vram=0.03GB 4s | grade=0.866 inner_auc=n/a vs conf_auc=n/a
+03:07:14 [graph/mutag] vote=0.839 uniform=0.857 best1=0.857 n_val=56 vram=0.02GB 5s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+03:07:16 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+03:07:22 [graph/proteins] vote=0.740 uniform=0.769 best1=0.757 n_val=350 vram=0.03GB 6s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+03:07:26 [graph/mutag] vote=0.897 uniform=0.879 best1=0.897 n_val=58 vram=0.02GB 4s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+03:07:29 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+03:07:33 [graph/proteins] vote=0.749 uniform=0.755 best1=0.764 n_val=335 vram=0.03GB 4s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+03:07:38 [graph/mutag] vote=0.812 uniform=0.875 best1=0.854 n_val=48 vram=0.02GB 5s | grade=0.853 inner_auc=n/a vs conf_auc=n/a
+03:07:42 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+03:07:46 [graph/proteins] vote=0.793 uniform=0.785 best1=0.793 n_val=362 vram=0.03GB 4s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+03:07:51 [graph/mutag] vote=0.794 uniform=0.825 best1=0.857 n_val=63 vram=0.02GB 5s | grade=0.872 inner_auc=n/a vs conf_auc=n/a
+03:07:54 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+03:07:58 [graph/proteins] vote=0.758 uniform=0.752 best1=0.761 n_val=343 vram=0.03GB 5s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:08:04 [graph/mutag] vote=0.868 uniform=0.906 best1=0.906 n_val=53 vram=0.02GB 6s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:08:06 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+03:08:11 [graph/proteins] vote=0.721 uniform=0.732 best1=0.732 n_val=340 vram=0.03GB 4s | grade=0.868 inner_auc=n/a vs conf_auc=n/a
+03:08:15 [graph/mutag] vote=0.833 uniform=0.815 best1=0.907 n_val=54 vram=0.02GB 5s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+03:08:18 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+03:08:24 [graph/proteins] vote=0.818 uniform=0.808 best1=0.808 n_val=313 vram=0.03GB 6s | grade=0.864 inner_auc=n/a vs conf_auc=n/a
+03:08:28 [graph/mutag] vote=0.839 uniform=0.875 best1=0.857 n_val=56 vram=0.02GB 4s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:08:31 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+03:08:36 [graph/proteins] vote=0.756 uniform=0.775 best1=0.772 n_val=307 vram=0.03GB 5s | grade=0.878 inner_auc=n/a vs conf_auc=n/a
+03:08:41 [graph/mutag] vote=0.911 uniform=0.893 best1=0.911 n_val=56 vram=0.02GB 5s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+03:08:44 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+03:08:48 [graph/proteins] vote=0.739 uniform=0.761 best1=0.776 n_val=352 vram=0.03GB 4s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+03:08:53 [graph/mutag] vote=0.850 uniform=0.900 best1=0.900 n_val=60 vram=0.02GB 4s | grade=0.868 inner_auc=n/a vs conf_auc=n/a
+03:08:55 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+03:09:00 [graph/proteins] vote=0.733 uniform=0.759 best1=0.753 n_val=348 vram=0.03GB 5s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+03:09:07 [graph/mutag] vote=0.909 uniform=0.891 best1=0.946 n_val=55 vram=0.02GB 7s | grade=0.911 inner_auc=n/a vs conf_auc=n/a
+03:09:09 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+03:09:14 [graph/proteins] vote=0.754 uniform=0.763 best1=0.754 n_val=337 vram=0.03GB 4s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+03:09:18 [graph/mutag] vote=0.865 uniform=0.865 best1=0.885 n_val=52 vram=0.02GB 5s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:09:21 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+03:09:27 [graph/proteins] vote=0.764 uniform=0.757 best1=0.767 n_val=309 vram=0.03GB 6s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+03:09:32 [graph/mutag] vote=0.893 uniform=0.839 best1=0.893 n_val=56 vram=0.02GB 5s | grade=0.917 inner_auc=n/a vs conf_auc=n/a
+03:09:34 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+03:09:39 [graph/proteins] vote=0.769 uniform=0.781 best1=0.775 n_val=334 vram=0.03GB 5s | grade=0.910 inner_auc=n/a vs conf_auc=n/a
+03:09:44 [graph/mutag] vote=0.812 uniform=0.812 best1=0.833 n_val=48 vram=0.02GB 5s | grade=0.858 inner_auc=n/a vs conf_auc=n/a
+03:09:48 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+03:09:52 [graph/proteins] vote=0.772 uniform=0.775 best1=0.767 n_val=356 vram=0.03GB 4s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:09:57 [graph/mutag] vote=0.900 uniform=0.917 best1=0.900 n_val=60 vram=0.02GB 5s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:10:00 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+03:10:05 [graph/proteins] vote=0.772 uniform=0.764 best1=0.775 n_val=360 vram=0.03GB 5s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+03:10:11 [graph/mutag] vote=0.902 uniform=0.863 best1=0.902 n_val=51 vram=0.02GB 6s | grade=0.922 inner_auc=n/a vs conf_auc=n/a
+03:10:14 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+03:10:19 [graph/proteins] vote=0.773 uniform=0.773 best1=0.779 n_val=322 vram=0.03GB 5s | grade=0.912 inner_auc=n/a vs conf_auc=n/a
+03:10:23 [graph/mutag] vote=0.906 uniform=0.891 best1=0.906 n_val=64 vram=0.02GB 5s | grade=0.941 inner_auc=n/a vs conf_auc=n/a
+03:10:26 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+03:10:32 [graph/proteins] vote=0.763 uniform=0.769 best1=0.772 n_val=355 vram=0.03GB 6s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+03:10:37 [graph/mutag] vote=0.841 uniform=0.825 best1=0.873 n_val=63 vram=0.02GB 4s | grade=0.882 inner_auc=n/a vs conf_auc=n/a
+03:10:39 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+03:10:43 [graph/proteins] vote=0.798 uniform=0.789 best1=0.789 n_val=327 vram=0.03GB 4s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+03:10:48 [graph/mutag] vote=0.852 uniform=0.815 best1=0.852 n_val=54 vram=0.02GB 5s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+03:10:52 ===== CYCLE 149 (OUTER -> INNER -> FEEDBACK) =====
+03:10:57 [graph/proteins] vote=0.724 uniform=0.735 best1=0.727 n_val=359 vram=0.03GB 5s | grade=0.845 inner_auc=n/a vs conf_auc=n/a
+03:11:01 [graph/mutag] vote=0.849 uniform=0.849 best1=0.887 n_val=53 vram=0.02GB 4s | grade=0.911 inner_auc=n/a vs conf_auc=n/a
+03:11:04 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+03:11:09 [graph/proteins] vote=0.766 uniform=0.763 best1=0.771 n_val=337 vram=0.03GB 5s | grade=0.878 inner_auc=n/a vs conf_auc=n/a
+03:11:13 [graph/mutag] vote=0.881 uniform=0.864 best1=0.898 n_val=59 vram=0.02GB 5s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:11:18 ===== CYCLE 151 (OUTER -> INNER -> FEEDBACK) =====
+03:11:23 [graph/proteins] vote=0.783 uniform=0.780 best1=0.777 n_val=341 vram=0.03GB 5s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+03:11:27 [graph/mutag] vote=0.891 uniform=0.909 best1=0.909 n_val=55 vram=0.02GB 5s | grade=0.917 inner_auc=n/a vs conf_auc=n/a
+03:11:30 ===== CYCLE 152 (OUTER -> INNER -> FEEDBACK) =====
+03:11:34 [graph/proteins] vote=0.785 uniform=0.797 best1=0.794 n_val=335 vram=0.03GB 5s | grade=0.916 inner_auc=n/a vs conf_auc=n/a
+03:11:41 [graph/mutag] vote=0.917 uniform=0.875 best1=0.917 n_val=48 vram=0.02GB 7s | grade=0.923 inner_auc=n/a vs conf_auc=n/a
+03:11:44 ===== CYCLE 153 (OUTER -> INNER -> FEEDBACK) =====
+03:11:48 [graph/proteins] vote=0.764 uniform=0.770 best1=0.770 n_val=343 vram=0.03GB 4s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+03:11:53 [graph/mutag] vote=0.840 uniform=0.820 best1=0.880 n_val=50 vram=0.02GB 5s | grade=0.877 inner_auc=n/a vs conf_auc=n/a
+03:11:55 ===== CYCLE 154 (OUTER -> INNER -> FEEDBACK) =====
+03:12:00 [graph/proteins] vote=0.731 uniform=0.743 best1=0.728 n_val=338 vram=0.03GB 5s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+03:12:06 [graph/mutag] vote=0.850 uniform=0.875 best1=0.900 n_val=40 vram=0.02GB 6s | grade=0.917 inner_auc=n/a vs conf_auc=n/a
+03:12:09 ===== CYCLE 155 (OUTER -> INNER -> FEEDBACK) =====
+03:12:13 [graph/proteins] vote=0.746 uniform=0.761 best1=0.749 n_val=351 vram=0.03GB 4s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+03:12:18 [graph/mutag] vote=0.909 uniform=0.909 best1=0.924 n_val=66 vram=0.02GB 5s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+03:12:20 ===== CYCLE 156 (OUTER -> INNER -> FEEDBACK) =====
+03:12:27 [graph/proteins] vote=0.747 uniform=0.744 best1=0.753 n_val=352 vram=0.03GB 6s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:12:31 [graph/mutag] vote=0.908 uniform=0.892 best1=0.908 n_val=65 vram=0.02GB 4s | grade=0.930 inner_auc=n/a vs conf_auc=n/a
+03:12:33 ===== CYCLE 157 (OUTER -> INNER -> FEEDBACK) =====
+03:12:37 [graph/proteins] vote=0.773 uniform=0.757 best1=0.773 n_val=309 vram=0.03GB 4s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+03:12:42 [graph/mutag] vote=0.815 uniform=0.815 best1=0.852 n_val=54 vram=0.02GB 4s | grade=0.849 inner_auc=n/a vs conf_auc=n/a
+03:12:45 ===== CYCLE 158 (OUTER -> INNER -> FEEDBACK) =====
+03:12:50 [graph/proteins] vote=0.762 uniform=0.750 best1=0.768 n_val=340 vram=0.03GB 6s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+03:12:56 [graph/mutag] vote=0.830 uniform=0.830 best1=0.830 n_val=53 vram=0.02GB 6s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:12:58 ===== CYCLE 159 (OUTER -> INNER -> FEEDBACK) =====
+03:13:03 [graph/proteins] vote=0.792 uniform=0.783 best1=0.783 n_val=336 vram=0.03GB 5s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+03:13:08 [graph/mutag] vote=0.851 uniform=0.894 best1=0.894 n_val=47 vram=0.02GB 5s | grade=0.884 inner_auc=n/a vs conf_auc=n/a
+03:13:10 ===== CYCLE 160 (OUTER -> INNER -> FEEDBACK) =====
+03:13:17 [graph/proteins] vote=0.767 uniform=0.801 best1=0.778 n_val=352 vram=0.03GB 7s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:13:21 [graph/mutag] vote=0.872 uniform=0.872 best1=0.872 n_val=47 vram=0.02GB 4s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+03:13:24 ===== CYCLE 161 (OUTER -> INNER -> FEEDBACK) =====
+03:13:28 [graph/proteins] vote=0.725 uniform=0.722 best1=0.738 n_val=320 vram=0.03GB 5s | grade=0.868 inner_auc=n/a vs conf_auc=n/a
+03:13:33 [graph/mutag] vote=0.797 uniform=0.797 best1=0.831 n_val=59 vram=0.02GB 5s | grade=0.828 inner_auc=n/a vs conf_auc=n/a
+03:13:36 ===== CYCLE 162 (OUTER -> INNER -> FEEDBACK) =====
+03:13:43 [graph/proteins] vote=0.763 uniform=0.760 best1=0.769 n_val=308 vram=0.03GB 6s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:13:47 [graph/mutag] vote=0.898 uniform=0.881 best1=0.898 n_val=59 vram=0.02GB 4s | grade=0.873 inner_auc=n/a vs conf_auc=n/a
+03:13:49 ===== CYCLE 163 (OUTER -> INNER -> FEEDBACK) =====
+03:13:54 [graph/proteins] vote=0.757 uniform=0.757 best1=0.740 n_val=346 vram=0.03GB 5s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+03:13:58 [graph/mutag] vote=0.796 uniform=0.833 best1=0.852 n_val=54 vram=0.02GB 5s | grade=0.817 inner_auc=n/a vs conf_auc=n/a
+03:14:03 ===== CYCLE 164 (OUTER -> INNER -> FEEDBACK) =====
+03:14:07 [graph/proteins] vote=0.767 uniform=0.764 best1=0.770 n_val=331 vram=0.03GB 4s | grade=0.906 inner_auc=n/a vs conf_auc=n/a
+03:14:12 [graph/mutag] vote=0.868 uniform=0.849 best1=0.868 n_val=53 vram=0.02GB 4s | grade=0.870 inner_auc=n/a vs conf_auc=n/a
+03:14:14 ===== CYCLE 165 (OUTER -> INNER -> FEEDBACK) =====
+03:14:19 [graph/proteins] vote=0.764 uniform=0.773 best1=0.757 n_val=309 vram=0.03GB 5s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+03:14:25 [graph/mutag] vote=0.808 uniform=0.788 best1=0.827 n_val=52 vram=0.02GB 6s | grade=0.846 inner_auc=n/a vs conf_auc=n/a
+03:14:29 ===== CYCLE 166 (OUTER -> INNER -> FEEDBACK) =====
+03:14:33 [graph/proteins] vote=0.759 uniform=0.768 best1=0.771 n_val=340 vram=0.03GB 4s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+03:14:37 [graph/mutag] vote=0.859 uniform=0.844 best1=0.859 n_val=64 vram=0.02GB 4s | grade=0.884 inner_auc=n/a vs conf_auc=n/a
+03:14:39 ===== CYCLE 167 (OUTER -> INNER -> FEEDBACK) =====
+03:14:44 [graph/proteins] vote=0.767 uniform=0.778 best1=0.770 n_val=356 vram=0.03GB 4s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:14:48 [graph/mutag] vote=0.803 uniform=0.848 best1=0.879 n_val=66 vram=0.02GB 5s | grade=0.859 inner_auc=n/a vs conf_auc=n/a
+03:14:53 ===== CYCLE 168 (OUTER -> INNER -> FEEDBACK) =====
+03:14:58 [graph/proteins] vote=0.746 uniform=0.749 best1=0.755 n_val=327 vram=0.03GB 4s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+03:15:02 [graph/mutag] vote=0.905 uniform=0.889 best1=0.921 n_val=63 vram=0.02GB 4s | grade=0.866 inner_auc=n/a vs conf_auc=n/a
+03:15:05 ===== CYCLE 169 (OUTER -> INNER -> FEEDBACK) =====
+03:15:09 [graph/proteins] vote=0.746 uniform=0.749 best1=0.758 n_val=327 vram=0.03GB 4s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+03:15:16 [graph/mutag] vote=0.831 uniform=0.846 best1=0.862 n_val=65 vram=0.02GB 7s | grade=0.857 inner_auc=n/a vs conf_auc=n/a
+03:15:19 ===== CYCLE 170 (OUTER -> INNER -> FEEDBACK) =====
+03:15:23 [graph/proteins] vote=0.746 uniform=0.746 best1=0.749 n_val=339 vram=0.03GB 4s | grade=0.901 inner_auc=n/a vs conf_auc=n/a
+03:15:28 [graph/mutag] vote=0.889 uniform=0.889 best1=0.889 n_val=54 vram=0.02GB 5s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+03:15:30 ===== CYCLE 171 (OUTER -> INNER -> FEEDBACK) =====
+03:15:35 [graph/proteins] vote=0.769 uniform=0.789 best1=0.777 n_val=350 vram=0.03GB 5s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:15:43 [graph/mutag] vote=0.865 uniform=0.885 best1=0.865 n_val=52 vram=0.02GB 8s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+03:15:45 ===== CYCLE 172 (OUTER -> INNER -> FEEDBACK) =====
+03:15:49 [graph/proteins] vote=0.761 uniform=0.755 best1=0.763 n_val=351 vram=0.03GB 4s | grade=0.905 inner_auc=n/a vs conf_auc=n/a
+03:15:54 [graph/mutag] vote=0.855 uniform=0.836 best1=0.855 n_val=55 vram=0.02GB 5s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:15:57 ===== CYCLE 173 (OUTER -> INNER -> FEEDBACK) =====
+03:16:02 [graph/proteins] vote=0.755 uniform=0.758 best1=0.767 n_val=331 vram=0.03GB 6s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+03:16:09 [graph/mutag] vote=0.846 uniform=0.831 best1=0.846 n_val=65 vram=0.02GB 7s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+03:16:11 ===== CYCLE 174 (OUTER -> INNER -> FEEDBACK) =====
+03:16:15 [graph/proteins] vote=0.757 uniform=0.751 best1=0.766 n_val=342 vram=0.03GB 4s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:16:20 [graph/mutag] vote=0.893 uniform=0.857 best1=0.893 n_val=56 vram=0.02GB 4s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+03:16:22 ===== CYCLE 175 (OUTER -> INNER -> FEEDBACK) =====
+03:16:28 [graph/proteins] vote=0.739 uniform=0.748 best1=0.754 n_val=337 vram=0.03GB 5s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+03:16:34 [graph/mutag] vote=0.710 uniform=0.694 best1=0.758 n_val=62 vram=0.02GB 6s | grade=0.726 inner_auc=n/a vs conf_auc=n/a
+03:16:37 ===== CYCLE 176 (OUTER -> INNER -> FEEDBACK) =====
+03:16:41 [graph/proteins] vote=0.752 uniform=0.770 best1=0.761 n_val=339 vram=0.03GB 4s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+03:16:45 [graph/mutag] vote=0.823 uniform=0.823 best1=0.855 n_val=62 vram=0.02GB 4s | grade=0.826 inner_auc=n/a vs conf_auc=n/a
+03:16:48 ===== CYCLE 177 (OUTER -> INNER -> FEEDBACK) =====
+03:16:52 [graph/proteins] vote=0.769 uniform=0.787 best1=0.766 n_val=333 vram=0.03GB 4s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+03:17:00 [graph/mutag] vote=0.845 uniform=0.828 best1=0.845 n_val=58 vram=0.02GB 8s | grade=0.871 inner_auc=n/a vs conf_auc=n/a
+03:17:03 ===== CYCLE 178 (OUTER -> INNER -> FEEDBACK) =====
+03:17:07 [graph/proteins] vote=0.710 uniform=0.710 best1=0.710 n_val=324 vram=0.03GB 4s | grade=0.848 inner_auc=n/a vs conf_auc=n/a
+03:17:11 [graph/mutag] vote=0.902 uniform=0.902 best1=0.902 n_val=51 vram=0.02GB 4s | grade=0.812 inner_auc=n/a vs conf_auc=n/a
+03:17:14 ===== CYCLE 179 (OUTER -> INNER -> FEEDBACK) =====
+03:17:19 [graph/proteins] vote=0.760 uniform=0.743 best1=0.766 n_val=334 vram=0.03GB 5s | grade=0.872 inner_auc=n/a vs conf_auc=n/a
+03:17:26 [graph/mutag] vote=0.895 uniform=0.860 best1=0.912 n_val=57 vram=0.02GB 8s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:17:29 ===== CYCLE 180 (OUTER -> INNER -> FEEDBACK) =====
+03:17:33 [graph/proteins] vote=0.737 uniform=0.755 best1=0.746 n_val=335 vram=0.03GB 4s | grade=0.882 inner_auc=n/a vs conf_auc=n/a
+03:17:38 [graph/mutag] vote=0.922 uniform=0.863 best1=0.922 n_val=51 vram=0.02GB 5s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+03:17:40 ===== CYCLE 181 (OUTER -> INNER -> FEEDBACK) =====
+03:17:46 [graph/proteins] vote=0.784 uniform=0.769 best1=0.781 n_val=333 vram=0.03GB 6s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+03:17:52 [graph/mutag] vote=0.918 uniform=0.816 best1=0.918 n_val=49 vram=0.02GB 6s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:17:55 ===== CYCLE 182 (OUTER -> INNER -> FEEDBACK) =====
+03:17:59 [graph/proteins] vote=0.769 uniform=0.774 best1=0.772 n_val=359 vram=0.03GB 4s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+03:18:04 [graph/mutag] vote=0.818 uniform=0.891 best1=0.891 n_val=55 vram=0.02GB 5s | grade=0.825 inner_auc=n/a vs conf_auc=n/a
+03:18:06 ===== CYCLE 183 (OUTER -> INNER -> FEEDBACK) =====
+03:18:12 [graph/proteins] vote=0.766 uniform=0.743 best1=0.772 n_val=342 vram=0.03GB 6s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:18:18 [graph/mutag] vote=0.841 uniform=0.825 best1=0.857 n_val=63 vram=0.02GB 6s | grade=0.893 inner_auc=n/a vs conf_auc=n/a
+03:18:20 ===== CYCLE 184 (OUTER -> INNER -> FEEDBACK) =====
+03:18:24 [graph/proteins] vote=0.788 uniform=0.791 best1=0.800 n_val=345 vram=0.03GB 4s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+03:18:29 [graph/mutag] vote=0.868 uniform=0.906 best1=0.906 n_val=53 vram=0.02GB 5s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:18:31 ===== CYCLE 185 (OUTER -> INNER -> FEEDBACK) =====
+03:18:36 [graph/proteins] vote=0.773 uniform=0.773 best1=0.764 n_val=331 vram=0.03GB 5s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+03:18:44 [graph/mutag] vote=0.855 uniform=0.806 best1=0.855 n_val=62 vram=0.02GB 8s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+03:18:46 ===== CYCLE 186 (OUTER -> INNER -> FEEDBACK) =====
+03:18:50 [graph/proteins] vote=0.743 uniform=0.740 best1=0.749 n_val=315 vram=0.03GB 4s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+03:18:55 [graph/mutag] vote=0.804 uniform=0.821 best1=0.821 n_val=56 vram=0.02GB 5s | grade=0.854 inner_auc=n/a vs conf_auc=n/a
+03:18:57 ===== CYCLE 187 (OUTER -> INNER -> FEEDBACK) =====
+03:19:02 [graph/proteins] vote=0.742 uniform=0.751 best1=0.745 n_val=345 vram=0.03GB 4s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+03:19:10 [graph/mutag] vote=0.881 uniform=0.864 best1=0.881 n_val=59 vram=0.02GB 8s | grade=0.847 inner_auc=n/a vs conf_auc=n/a
+03:19:12 ===== CYCLE 188 (OUTER -> INNER -> FEEDBACK) =====
+03:19:17 [graph/proteins] vote=0.728 uniform=0.737 best1=0.742 n_val=357 vram=0.03GB 5s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+03:19:21 [graph/mutag] vote=0.898 uniform=0.814 best1=0.881 n_val=59 vram=0.02GB 4s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:19:24 ===== CYCLE 189 (OUTER -> INNER -> FEEDBACK) =====
+03:19:28 [graph/proteins] vote=0.781 uniform=0.784 best1=0.784 n_val=320 vram=0.03GB 5s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+03:19:37 [graph/mutag] vote=0.824 uniform=0.843 best1=0.922 n_val=51 vram=0.02GB 8s | grade=0.857 inner_auc=n/a vs conf_auc=n/a
+03:19:39 ===== CYCLE 190 (OUTER -> INNER -> FEEDBACK) =====
+03:19:43 [graph/proteins] vote=0.760 uniform=0.748 best1=0.751 n_val=337 vram=0.03GB 4s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+03:19:47 [graph/mutag] vote=0.800 uniform=0.786 best1=0.857 n_val=70 vram=0.02GB 4s | grade=0.880 inner_auc=n/a vs conf_auc=n/a
+03:19:50 ===== CYCLE 191 (OUTER -> INNER -> FEEDBACK) =====
+03:19:54 [graph/proteins] vote=0.781 uniform=0.793 best1=0.781 n_val=333 vram=0.03GB 4s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:20:02 [graph/mutag] vote=0.857 uniform=0.857 best1=0.857 n_val=49 vram=0.02GB 8s | grade=0.866 inner_auc=n/a vs conf_auc=n/a
+03:20:05 ===== CYCLE 192 (OUTER -> INNER -> FEEDBACK) =====
+03:20:09 [graph/proteins] vote=0.750 uniform=0.761 best1=0.758 n_val=352 vram=0.03GB 4s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+03:20:13 [graph/mutag] vote=0.806 uniform=0.806 best1=0.887 n_val=62 vram=0.02GB 4s | grade=0.848 inner_auc=n/a vs conf_auc=n/a
+03:20:15 ===== CYCLE 193 (OUTER -> INNER -> FEEDBACK) =====
+03:20:20 [graph/proteins] vote=0.769 uniform=0.772 best1=0.766 n_val=333 vram=0.03GB 5s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+03:20:27 [graph/mutag] vote=0.847 uniform=0.814 best1=0.864 n_val=59 vram=0.02GB 7s | grade=0.856 inner_auc=n/a vs conf_auc=n/a
+03:20:30 ===== CYCLE 194 (OUTER -> INNER -> FEEDBACK) =====
+03:20:35 [graph/proteins] vote=0.749 uniform=0.773 best1=0.776 n_val=335 vram=0.03GB 4s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+03:20:38 [graph/mutag] vote=0.887 uniform=0.871 best1=0.887 n_val=62 vram=0.02GB 4s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:20:41 ===== CYCLE 195 (OUTER -> INNER -> FEEDBACK) =====
+03:20:45 [graph/proteins] vote=0.762 uniform=0.768 best1=0.771 n_val=319 vram=0.03GB 4s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+03:20:50 [graph/mutag] vote=0.893 uniform=0.911 best1=0.911 n_val=56 vram=0.02GB 4s | grade=0.939 inner_auc=n/a vs conf_auc=n/a
+03:20:54 ===== CYCLE 196 (OUTER -> INNER -> FEEDBACK) =====
+03:21:01 [graph/proteins] vote=0.741 uniform=0.735 best1=0.738 n_val=347 vram=0.03GB 7s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+03:21:04 [graph/mutag] vote=0.849 uniform=0.849 best1=0.868 n_val=53 vram=0.02GB 4s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:21:07 ===== CYCLE 197 (OUTER -> INNER -> FEEDBACK) =====
+03:21:11 [graph/proteins] vote=0.763 uniform=0.745 best1=0.768 n_val=337 vram=0.03GB 5s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:21:16 [graph/mutag] vote=0.873 uniform=0.855 best1=0.873 n_val=55 vram=0.02GB 4s | grade=0.869 inner_auc=n/a vs conf_auc=n/a
+03:21:18 ===== CYCLE 198 (OUTER -> INNER -> FEEDBACK) =====
+03:21:26 [graph/proteins] vote=0.795 uniform=0.792 best1=0.783 n_val=336 vram=0.03GB 8s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+03:21:31 [graph/mutag] vote=0.811 uniform=0.868 best1=0.849 n_val=53 vram=0.02GB 5s | grade=0.864 inner_auc=n/a vs conf_auc=n/a
+03:21:33 ===== CYCLE 199 (OUTER -> INNER -> FEEDBACK) =====
+03:21:38 [graph/proteins] vote=0.788 uniform=0.791 best1=0.800 n_val=320 vram=0.03GB 4s | grade=0.908 inner_auc=n/a vs conf_auc=n/a
+03:21:42 [graph/mutag] vote=0.845 uniform=0.776 best1=0.862 n_val=58 vram=0.02GB 5s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+03:21:44 ===== CYCLE 200 (OUTER -> INNER -> FEEDBACK) =====
+03:21:51 [graph/proteins] vote=0.782 uniform=0.767 best1=0.773 n_val=344 vram=0.03GB 7s | grade=0.907 inner_auc=n/a vs conf_auc=n/a
+03:21:58 [graph/mutag] vote=0.928 uniform=0.942 best1=0.927 n_val=69 vram=0.02GB 6s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+03:22:00 ===== CYCLE 201 (OUTER -> INNER -> FEEDBACK) =====
+03:22:04 [graph/proteins] vote=0.748 uniform=0.739 best1=0.745 n_val=322 vram=0.03GB 4s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+03:22:09 [graph/mutag] vote=0.845 uniform=0.828 best1=0.879 n_val=58 vram=0.02GB 4s | grade=0.877 inner_auc=n/a vs conf_auc=n/a
+03:22:11 ===== CYCLE 202 (OUTER -> INNER -> FEEDBACK) =====
+03:22:17 [graph/proteins] vote=0.772 uniform=0.766 best1=0.775 n_val=338 vram=0.03GB 6s | grade=0.901 inner_auc=n/a vs conf_auc=n/a
+03:22:24 [graph/mutag] vote=0.877 uniform=0.877 best1=0.877 n_val=57 vram=0.02GB 7s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+03:22:26 ===== CYCLE 203 (OUTER -> INNER -> FEEDBACK) =====
+03:22:31 [graph/proteins] vote=0.799 uniform=0.806 best1=0.812 n_val=309 vram=0.03GB 4s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:22:35 [graph/mutag] vote=0.910 uniform=0.881 best1=0.895 n_val=67 vram=0.02GB 4s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+03:22:38 ===== CYCLE 204 (OUTER -> INNER -> FEEDBACK) =====
+03:22:42 [graph/proteins] vote=0.756 uniform=0.762 best1=0.772 n_val=324 vram=0.03GB 5s | grade=0.878 inner_auc=n/a vs conf_auc=n/a
+03:22:50 [graph/mutag] vote=0.906 uniform=0.906 best1=0.906 n_val=64 vram=0.02GB 7s | grade=0.930 inner_auc=n/a vs conf_auc=n/a
+03:22:53 ===== CYCLE 205 (OUTER -> INNER -> FEEDBACK) =====
+03:22:57 [graph/proteins] vote=0.738 uniform=0.769 best1=0.767 n_val=347 vram=0.03GB 4s | grade=0.874 inner_auc=n/a vs conf_auc=n/a
+03:23:01 [graph/mutag] vote=0.873 uniform=0.857 best1=0.889 n_val=63 vram=0.02GB 4s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+03:23:03 ===== CYCLE 206 (OUTER -> INNER -> FEEDBACK) =====
+03:23:08 [graph/proteins] vote=0.776 uniform=0.767 best1=0.770 n_val=326 vram=0.03GB 5s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+03:23:12 [graph/mutag] vote=0.883 uniform=0.867 best1=0.917 n_val=60 vram=0.02GB 4s | grade=0.926 inner_auc=n/a vs conf_auc=n/a
+03:23:15 ===== CYCLE 207 (OUTER -> INNER -> FEEDBACK) =====
+03:23:24 [graph/proteins] vote=0.765 uniform=0.782 best1=0.779 n_val=340 vram=0.03GB 8s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:23:28 [graph/mutag] vote=0.871 uniform=0.855 best1=0.887 n_val=62 vram=0.02GB 4s | grade=0.922 inner_auc=n/a vs conf_auc=n/a
+03:23:30 ===== CYCLE 208 (OUTER -> INNER -> FEEDBACK) =====
+03:23:35 [graph/proteins] vote=0.822 uniform=0.822 best1=0.816 n_val=342 vram=0.03GB 5s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:23:40 [graph/mutag] vote=0.891 uniform=0.855 best1=0.891 n_val=55 vram=0.02GB 5s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+03:23:42 ===== CYCLE 209 (OUTER -> INNER -> FEEDBACK) =====
+03:23:50 [graph/proteins] vote=0.770 uniform=0.782 best1=0.785 n_val=330 vram=0.03GB 8s | grade=0.867 inner_auc=n/a vs conf_auc=n/a
+03:23:55 [graph/mutag] vote=0.846 uniform=0.831 best1=0.846 n_val=65 vram=0.02GB 5s | grade=0.877 inner_auc=n/a vs conf_auc=n/a
+03:23:57 ===== CYCLE 210 (OUTER -> INNER -> FEEDBACK) =====
+03:24:02 [graph/proteins] vote=0.761 uniform=0.770 best1=0.754 n_val=330 vram=0.03GB 4s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+03:24:06 [graph/mutag] vote=0.855 uniform=0.871 best1=0.935 n_val=62 vram=0.02GB 5s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+03:24:09 ===== CYCLE 211 (OUTER -> INNER -> FEEDBACK) =====
+03:24:17 [graph/proteins] vote=0.757 uniform=0.760 best1=0.763 n_val=325 vram=0.03GB 8s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:24:22 [graph/mutag] vote=0.765 uniform=0.765 best1=0.765 n_val=51 vram=0.02GB 6s | grade=0.805 inner_auc=n/a vs conf_auc=n/a
+03:24:25 ===== CYCLE 212 (OUTER -> INNER -> FEEDBACK) =====
+03:24:28 [graph/proteins] vote=0.781 uniform=0.796 best1=0.769 n_val=334 vram=0.03GB 4s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+03:24:33 [graph/mutag] vote=0.894 uniform=0.957 best1=0.979 n_val=47 vram=0.02GB 5s | grade=0.866 inner_auc=n/a vs conf_auc=n/a
+03:24:35 ===== CYCLE 213 (OUTER -> INNER -> FEEDBACK) =====
+03:24:40 [graph/proteins] vote=0.732 uniform=0.730 best1=0.741 n_val=370 vram=0.03GB 4s | grade=0.866 inner_auc=n/a vs conf_auc=n/a
+03:24:48 [graph/mutag] vote=0.854 uniform=0.829 best1=0.854 n_val=41 vram=0.02GB 8s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+03:24:52 ===== CYCLE 214 (OUTER -> INNER -> FEEDBACK) =====
+03:24:55 [graph/proteins] vote=0.789 uniform=0.801 best1=0.795 n_val=317 vram=0.03GB 4s | grade=0.879 inner_auc=n/a vs conf_auc=n/a
+03:25:00 [graph/mutag] vote=0.852 uniform=0.815 best1=0.889 n_val=54 vram=0.02GB 4s | grade=0.893 inner_auc=n/a vs conf_auc=n/a
+03:25:02 ===== CYCLE 215 (OUTER -> INNER -> FEEDBACK) =====
+03:25:07 [graph/proteins] vote=0.766 uniform=0.769 best1=0.769 n_val=320 vram=0.03GB 4s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+03:25:14 [graph/mutag] vote=0.836 uniform=0.855 best1=0.836 n_val=55 vram=0.02GB 7s | grade=0.852 inner_auc=n/a vs conf_auc=n/a
+03:25:19 ===== CYCLE 216 (OUTER -> INNER -> FEEDBACK) =====
+03:25:23 [graph/proteins] vote=0.767 uniform=0.775 best1=0.775 n_val=356 vram=0.03GB 4s | grade=0.901 inner_auc=n/a vs conf_auc=n/a
+03:25:27 [graph/mutag] vote=0.873 uniform=0.873 best1=0.873 n_val=63 vram=0.02GB 5s | grade=0.941 inner_auc=n/a vs conf_auc=n/a
+03:25:30 ===== CYCLE 217 (OUTER -> INNER -> FEEDBACK) =====
+03:25:34 [graph/proteins] vote=0.748 uniform=0.756 best1=0.767 n_val=357 vram=0.03GB 4s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+03:25:39 [graph/mutag] vote=0.871 uniform=0.871 best1=0.903 n_val=62 vram=0.02GB 5s | grade=0.929 inner_auc=n/a vs conf_auc=n/a
+03:25:45 ===== CYCLE 218 (OUTER -> INNER -> FEEDBACK) =====
+03:25:50 [graph/proteins] vote=0.749 uniform=0.769 best1=0.749 n_val=342 vram=0.03GB 6s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+03:25:55 [graph/mutag] vote=0.760 uniform=0.800 best1=0.820 n_val=50 vram=0.02GB 4s | grade=0.793 inner_auc=n/a vs conf_auc=n/a
+03:25:57 ===== CYCLE 219 (OUTER -> INNER -> FEEDBACK) =====
+03:26:01 [graph/proteins] vote=0.792 uniform=0.795 best1=0.789 n_val=317 vram=0.03GB 4s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+03:26:06 [graph/mutag] vote=0.830 uniform=0.849 best1=0.868 n_val=53 vram=0.02GB 5s | grade=0.878 inner_auc=n/a vs conf_auc=n/a
+03:26:11 ===== CYCLE 220 (OUTER -> INNER -> FEEDBACK) =====
+03:26:18 [graph/proteins] vote=0.785 uniform=0.767 best1=0.791 n_val=330 vram=0.03GB 7s | grade=0.905 inner_auc=n/a vs conf_auc=n/a
+03:26:22 [graph/mutag] vote=0.837 uniform=0.837 best1=0.878 n_val=49 vram=0.02GB 4s | grade=0.919 inner_auc=n/a vs conf_auc=n/a
+03:26:24 ===== CYCLE 221 (OUTER -> INNER -> FEEDBACK) =====
+03:26:28 [graph/proteins] vote=0.765 uniform=0.773 best1=0.770 n_val=344 vram=0.03GB 4s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+03:26:33 [graph/mutag] vote=0.844 uniform=0.844 best1=0.867 n_val=45 vram=0.02GB 5s | grade=0.916 inner_auc=n/a vs conf_auc=n/a
+03:26:37 ===== CYCLE 222 (OUTER -> INNER -> FEEDBACK) =====
+03:26:45 [graph/proteins] vote=0.770 uniform=0.790 best1=0.795 n_val=352 vram=0.03GB 8s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:26:49 [graph/mutag] vote=0.875 uniform=0.857 best1=0.893 n_val=56 vram=0.02GB 4s | grade=0.914 inner_auc=n/a vs conf_auc=n/a
+03:26:52 ===== CYCLE 223 (OUTER -> INNER -> FEEDBACK) =====
+03:26:56 [graph/proteins] vote=0.730 uniform=0.761 best1=0.746 n_val=330 vram=0.03GB 4s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+03:27:00 [graph/mutag] vote=0.964 uniform=0.946 best1=0.946 n_val=56 vram=0.02GB 4s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+03:27:03 ===== CYCLE 224 (OUTER -> INNER -> FEEDBACK) =====
+03:27:11 [graph/proteins] vote=0.782 uniform=0.788 best1=0.788 n_val=325 vram=0.03GB 8s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+03:27:16 [graph/mutag] vote=0.881 uniform=0.881 best1=0.864 n_val=59 vram=0.02GB 5s | grade=0.858 inner_auc=n/a vs conf_auc=n/a
+03:27:19 ===== CYCLE 225 (OUTER -> INNER -> FEEDBACK) =====
+03:27:23 [graph/proteins] vote=0.784 uniform=0.790 best1=0.802 n_val=334 vram=0.03GB 5s | grade=0.909 inner_auc=n/a vs conf_auc=n/a
+03:27:27 [graph/mutag] vote=0.900 uniform=0.900 best1=0.883 n_val=60 vram=0.02GB 4s | grade=0.936 inner_auc=n/a vs conf_auc=n/a
+03:27:30 ===== CYCLE 226 (OUTER -> INNER -> FEEDBACK) =====
+03:27:37 [graph/proteins] vote=0.789 uniform=0.792 best1=0.792 n_val=322 vram=0.03GB 7s | grade=0.910 inner_auc=n/a vs conf_auc=n/a
+03:27:44 [graph/mutag] vote=0.877 uniform=0.860 best1=0.877 n_val=57 vram=0.02GB 7s | grade=0.908 inner_auc=n/a vs conf_auc=n/a
+03:27:46 ===== CYCLE 227 (OUTER -> INNER -> FEEDBACK) =====
+03:27:50 [graph/proteins] vote=0.775 uniform=0.777 best1=0.775 n_val=346 vram=0.03GB 4s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+03:27:55 [graph/mutag] vote=0.900 uniform=0.883 best1=0.900 n_val=60 vram=0.02GB 5s | grade=0.901 inner_auc=n/a vs conf_auc=n/a
+03:27:57 ===== CYCLE 228 (OUTER -> INNER -> FEEDBACK) =====
+03:28:02 [graph/proteins] vote=0.780 uniform=0.776 best1=0.779 n_val=322 vram=0.03GB 4s | grade=0.909 inner_auc=n/a vs conf_auc=n/a
+03:28:11 [graph/mutag] vote=0.873 uniform=0.873 best1=0.927 n_val=55 vram=0.02GB 10s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+03:28:14 ===== CYCLE 229 (OUTER -> INNER -> FEEDBACK) =====
+03:28:18 [graph/proteins] vote=0.737 uniform=0.749 best1=0.734 n_val=323 vram=0.03GB 4s | grade=0.870 inner_auc=n/a vs conf_auc=n/a
+03:28:22 [graph/mutag] vote=0.877 uniform=0.842 best1=0.895 n_val=57 vram=0.02GB 5s | grade=0.924 inner_auc=n/a vs conf_auc=n/a
+03:28:25 ===== CYCLE 230 (OUTER -> INNER -> FEEDBACK) =====
+03:28:29 [graph/proteins] vote=0.743 uniform=0.734 best1=0.746 n_val=335 vram=0.03GB 4s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+03:28:38 [graph/mutag] vote=0.862 uniform=0.831 best1=0.862 n_val=65 vram=0.02GB 9s | grade=0.912 inner_auc=n/a vs conf_auc=n/a
+03:28:41 ===== CYCLE 231 (OUTER -> INNER -> FEEDBACK) =====
+03:28:45 [graph/proteins] vote=0.745 uniform=0.748 best1=0.754 n_val=329 vram=0.03GB 4s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:28:49 [graph/mutag] vote=0.828 uniform=0.862 best1=0.879 n_val=58 vram=0.02GB 4s | grade=0.875 inner_auc=n/a vs conf_auc=n/a
+03:28:52 ===== CYCLE 232 (OUTER -> INNER -> FEEDBACK) =====
+03:28:56 [graph/proteins] vote=0.773 uniform=0.757 best1=0.767 n_val=309 vram=0.03GB 4s | grade=0.879 inner_auc=n/a vs conf_auc=n/a
+03:29:01 [graph/mutag] vote=0.833 uniform=0.833 best1=0.870 n_val=54 vram=0.02GB 5s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:29:07 ===== CYCLE 233 (OUTER -> INNER -> FEEDBACK) =====
+03:29:12 [graph/proteins] vote=0.753 uniform=0.766 best1=0.753 n_val=320 vram=0.03GB 5s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+03:29:17 [graph/mutag] vote=0.818 uniform=0.818 best1=0.818 n_val=55 vram=0.02GB 4s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+03:29:19 ===== CYCLE 234 (OUTER -> INNER -> FEEDBACK) =====
+03:29:23 [graph/proteins] vote=0.770 uniform=0.782 best1=0.770 n_val=331 vram=0.03GB 5s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+03:29:28 [graph/mutag] vote=0.889 uniform=0.905 best1=0.905 n_val=63 vram=0.02GB 4s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+03:29:31 ===== CYCLE 235 (OUTER -> INNER -> FEEDBACK) =====
+03:29:39 [graph/proteins] vote=0.743 uniform=0.763 best1=0.746 n_val=350 vram=0.03GB 8s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:29:43 [graph/mutag] vote=0.907 uniform=0.889 best1=0.907 n_val=54 vram=0.02GB 4s | grade=0.908 inner_auc=n/a vs conf_auc=n/a
+03:29:45 ===== CYCLE 236 (OUTER -> INNER -> FEEDBACK) =====
+03:29:49 [graph/proteins] vote=0.758 uniform=0.752 best1=0.755 n_val=314 vram=0.03GB 4s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+03:29:54 [graph/mutag] vote=0.877 uniform=0.807 best1=0.877 n_val=57 vram=0.02GB 5s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+03:29:56 ===== CYCLE 237 (OUTER -> INNER -> FEEDBACK) =====
+03:30:02 [graph/proteins] vote=0.751 uniform=0.749 best1=0.737 n_val=354 vram=0.03GB 5s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+03:30:10 [graph/mutag] vote=0.881 uniform=0.898 best1=0.915 n_val=59 vram=0.02GB 9s | grade=0.915 inner_auc=n/a vs conf_auc=n/a
+03:30:13 ===== CYCLE 238 (OUTER -> INNER -> FEEDBACK) =====
+03:30:16 [graph/proteins] vote=0.752 uniform=0.749 best1=0.746 n_val=335 vram=0.03GB 4s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+03:30:21 [graph/mutag] vote=0.833 uniform=0.815 best1=0.833 n_val=54 vram=0.02GB 5s | grade=0.867 inner_auc=n/a vs conf_auc=n/a
+03:30:23 ===== CYCLE 239 (OUTER -> INNER -> FEEDBACK) =====
+03:30:28 [graph/proteins] vote=0.761 uniform=0.748 best1=0.764 n_val=301 vram=0.03GB 4s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+03:30:35 [graph/mutag] vote=0.852 uniform=0.869 best1=0.885 n_val=61 vram=0.02GB 7s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+03:30:40 ===== CYCLE 240 (OUTER -> INNER -> FEEDBACK) =====
+03:30:44 [graph/proteins] vote=0.772 uniform=0.759 best1=0.772 n_val=316 vram=0.03GB 4s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+03:30:48 [graph/mutag] vote=0.852 uniform=0.963 best1=0.907 n_val=54 vram=0.02GB 4s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+03:30:51 ===== CYCLE 241 (OUTER -> INNER -> FEEDBACK) =====
+03:30:55 [graph/proteins] vote=0.773 uniform=0.770 best1=0.779 n_val=331 vram=0.03GB 4s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:31:00 [graph/mutag] vote=0.894 uniform=0.894 best1=0.915 n_val=47 vram=0.02GB 5s | grade=0.908 inner_auc=n/a vs conf_auc=n/a
+03:31:06 ===== CYCLE 242 (OUTER -> INNER -> FEEDBACK) =====
+03:31:12 [graph/proteins] vote=0.771 uniform=0.759 best1=0.759 n_val=315 vram=0.03GB 6s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+03:31:16 [graph/mutag] vote=0.826 uniform=0.826 best1=0.870 n_val=46 vram=0.02GB 4s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+03:31:19 ===== CYCLE 243 (OUTER -> INNER -> FEEDBACK) =====
+03:31:23 [graph/proteins] vote=0.751 uniform=0.766 best1=0.766 n_val=325 vram=0.03GB 4s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+03:31:27 [graph/mutag] vote=0.904 uniform=0.904 best1=0.923 n_val=52 vram=0.02GB 4s | grade=0.914 inner_auc=n/a vs conf_auc=n/a
+03:31:31 ===== CYCLE 244 (OUTER -> INNER -> FEEDBACK) =====
+03:31:40 [graph/proteins] vote=0.787 uniform=0.784 best1=0.784 n_val=334 vram=0.03GB 9s | grade=0.893 inner_auc=n/a vs conf_auc=n/a
+03:31:44 [graph/mutag] vote=0.845 uniform=0.862 best1=0.862 n_val=58 vram=0.02GB 4s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+03:31:46 ===== CYCLE 245 (OUTER -> INNER -> FEEDBACK) =====
+03:31:50 [graph/proteins] vote=0.786 uniform=0.773 best1=0.789 n_val=299 vram=0.03GB 4s | grade=0.901 inner_auc=n/a vs conf_auc=n/a
+03:31:55 [graph/mutag] vote=0.884 uniform=0.860 best1=0.907 n_val=43 vram=0.02GB 4s | grade=0.907 inner_auc=n/a vs conf_auc=n/a
+03:31:57 ===== CYCLE 246 (OUTER -> INNER -> FEEDBACK) =====
+03:32:02 [graph/proteins] vote=0.778 uniform=0.791 best1=0.781 n_val=320 vram=0.03GB 5s | grade=0.912 inner_auc=n/a vs conf_auc=n/a
+03:32:11 [graph/mutag] vote=0.891 uniform=0.891 best1=0.891 n_val=64 vram=0.02GB 9s | grade=0.936 inner_auc=n/a vs conf_auc=n/a
+03:32:15 ===== CYCLE 247 (OUTER -> INNER -> FEEDBACK) =====
+03:32:19 [graph/proteins] vote=0.766 uniform=0.763 best1=0.769 n_val=308 vram=0.03GB 4s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+03:32:23 [graph/mutag] vote=0.906 uniform=0.906 best1=0.924 n_val=53 vram=0.02GB 4s | grade=0.906 inner_auc=n/a vs conf_auc=n/a
+03:32:26 ===== CYCLE 248 (OUTER -> INNER -> FEEDBACK) =====
+03:32:30 [graph/proteins] vote=0.748 uniform=0.742 best1=0.751 n_val=330 vram=0.03GB 4s | grade=0.880 inner_auc=n/a vs conf_auc=n/a
+03:32:35 [graph/mutag] vote=0.912 uniform=0.912 best1=0.912 n_val=68 vram=0.02GB 5s | grade=0.944 inner_auc=n/a vs conf_auc=n/a
+03:32:40 ===== CYCLE 249 (OUTER -> INNER -> FEEDBACK) =====
+03:32:48 [graph/proteins] vote=0.753 uniform=0.740 best1=0.747 n_val=288 vram=0.03GB 7s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+03:32:52 [graph/mutag] vote=0.887 uniform=0.887 best1=0.906 n_val=53 vram=0.02GB 4s | grade=0.914 inner_auc=n/a vs conf_auc=n/a
+03:32:54 ===== CYCLE 250 (OUTER -> INNER -> FEEDBACK) =====
+03:32:58 [graph/proteins] vote=0.771 uniform=0.786 best1=0.771 n_val=341 vram=0.03GB 4s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:33:03 [graph/mutag] vote=0.833 uniform=0.833 best1=0.870 n_val=54 vram=0.02GB 4s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:33:06 ===== CYCLE 251 (OUTER -> INNER -> FEEDBACK) =====
+03:33:14 [graph/proteins] vote=0.777 uniform=0.788 best1=0.782 n_val=349 vram=0.03GB 8s | grade=0.905 inner_auc=n/a vs conf_auc=n/a
+03:33:20 [graph/mutag] vote=0.821 uniform=0.806 best1=0.821 n_val=67 vram=0.02GB 7s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+03:33:23 ===== CYCLE 252 (OUTER -> INNER -> FEEDBACK) =====
+03:33:27 [graph/proteins] vote=0.739 uniform=0.745 best1=0.751 n_val=345 vram=0.03GB 4s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+03:33:31 [graph/mutag] vote=0.857 uniform=0.857 best1=0.873 n_val=63 vram=0.02GB 4s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+03:33:33 ===== CYCLE 253 (OUTER -> INNER -> FEEDBACK) =====
+03:33:38 [graph/proteins] vote=0.760 uniform=0.775 best1=0.766 n_val=338 vram=0.03GB 5s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+03:33:42 [graph/mutag] vote=0.893 uniform=0.875 best1=0.893 n_val=56 vram=0.02GB 5s | grade=0.907 inner_auc=n/a vs conf_auc=n/a
+03:33:48 ===== CYCLE 254 (OUTER -> INNER -> FEEDBACK) =====
+03:33:55 [graph/proteins] vote=0.755 uniform=0.761 best1=0.758 n_val=335 vram=0.03GB 8s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:33:59 [graph/mutag] vote=0.780 uniform=0.800 best1=0.880 n_val=50 vram=0.02GB 4s | grade=0.834 inner_auc=n/a vs conf_auc=n/a
+03:34:01 ===== CYCLE 255 (OUTER -> INNER -> FEEDBACK) =====
+03:34:05 [graph/proteins] vote=0.768 uniform=0.774 best1=0.759 n_val=341 vram=0.03GB 4s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+03:34:10 [graph/mutag] vote=0.946 uniform=0.946 best1=0.946 n_val=56 vram=0.02GB 5s | grade=0.828 inner_auc=n/a vs conf_auc=n/a
+03:34:12 ===== CYCLE 256 (OUTER -> INNER -> FEEDBACK) =====
+03:34:17 [graph/proteins] vote=0.732 uniform=0.735 best1=0.738 n_val=340 vram=0.03GB 5s | grade=0.874 inner_auc=n/a vs conf_auc=n/a
+03:34:27 [graph/mutag] vote=0.900 uniform=0.900 best1=0.900 n_val=50 vram=0.02GB 10s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+03:34:30 ===== CYCLE 257 (OUTER -> INNER -> FEEDBACK) =====
+03:34:34 [graph/proteins] vote=0.787 uniform=0.807 best1=0.810 n_val=348 vram=0.03GB 4s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+03:34:38 [graph/mutag] vote=0.902 uniform=0.902 best1=0.918 n_val=61 vram=0.02GB 4s | grade=0.933 inner_auc=n/a vs conf_auc=n/a
+03:34:41 ===== CYCLE 258 (OUTER -> INNER -> FEEDBACK) =====
+03:34:45 [graph/proteins] vote=0.778 uniform=0.766 best1=0.781 n_val=333 vram=0.03GB 5s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+03:34:51 [graph/mutag] vote=0.862 uniform=0.879 best1=0.897 n_val=58 vram=0.02GB 5s | grade=0.910 inner_auc=n/a vs conf_auc=n/a
+03:34:56 ===== CYCLE 259 (OUTER -> INNER -> FEEDBACK) =====
+03:35:04 [graph/proteins] vote=0.757 uniform=0.760 best1=0.751 n_val=325 vram=0.03GB 8s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+03:35:08 [graph/mutag] vote=0.882 uniform=0.863 best1=0.882 n_val=51 vram=0.02GB 4s | grade=0.917 inner_auc=n/a vs conf_auc=n/a
+03:35:10 ===== CYCLE 260 (OUTER -> INNER -> FEEDBACK) =====
+03:35:15 [graph/proteins] vote=0.782 uniform=0.778 best1=0.781 n_val=325 vram=0.03GB 5s | grade=0.901 inner_auc=n/a vs conf_auc=n/a
+03:35:19 [graph/mutag] vote=0.896 uniform=0.896 best1=0.938 n_val=48 vram=0.02GB 4s | grade=0.911 inner_auc=n/a vs conf_auc=n/a
+03:35:21 ===== CYCLE 261 (OUTER -> INNER -> FEEDBACK) =====
+03:35:30 [graph/proteins] vote=0.769 uniform=0.769 best1=0.781 n_val=333 vram=0.03GB 8s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+03:35:37 [graph/mutag] vote=0.880 uniform=0.880 best1=0.900 n_val=50 vram=0.02GB 8s | grade=0.911 inner_auc=n/a vs conf_auc=n/a
+03:35:39 ===== CYCLE 262 (OUTER -> INNER -> FEEDBACK) =====
+03:35:43 [graph/proteins] vote=0.756 uniform=0.767 best1=0.764 n_val=352 vram=0.03GB 4s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+03:35:48 [graph/mutag] vote=0.850 uniform=0.817 best1=0.833 n_val=60 vram=0.02GB 5s | grade=0.901 inner_auc=n/a vs conf_auc=n/a
+03:35:50 ===== CYCLE 263 (OUTER -> INNER -> FEEDBACK) =====
+03:35:55 [graph/proteins] vote=0.759 uniform=0.755 best1=0.746 n_val=323 vram=0.03GB 5s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:36:02 [graph/mutag] vote=0.845 uniform=0.862 best1=0.862 n_val=58 vram=0.02GB 7s | grade=0.916 inner_auc=n/a vs conf_auc=n/a
+03:36:08 ===== CYCLE 264 (OUTER -> INNER -> FEEDBACK) =====
+03:36:13 [graph/proteins] vote=0.752 uniform=0.756 best1=0.752 n_val=315 vram=0.03GB 5s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+03:36:17 [graph/mutag] vote=0.898 uniform=0.878 best1=0.898 n_val=49 vram=0.02GB 4s | grade=0.905 inner_auc=n/a vs conf_auc=n/a
+03:36:19 ===== CYCLE 265 (OUTER -> INNER -> FEEDBACK) =====
+03:36:23 [graph/proteins] vote=0.758 uniform=0.761 best1=0.761 n_val=322 vram=0.03GB 4s | grade=0.905 inner_auc=n/a vs conf_auc=n/a
+03:36:28 [graph/mutag] vote=0.833 uniform=0.833 best1=0.850 n_val=60 vram=0.02GB 4s | grade=0.874 inner_auc=n/a vs conf_auc=n/a
+03:36:30 ===== CYCLE 266 (OUTER -> INNER -> FEEDBACK) =====
+03:36:37 [graph/proteins] vote=0.739 uniform=0.751 best1=0.742 n_val=345 vram=0.03GB 6s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+03:36:46 [graph/mutag] vote=0.847 uniform=0.831 best1=0.848 n_val=59 vram=0.02GB 10s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+03:36:49 ===== CYCLE 267 (OUTER -> INNER -> FEEDBACK) =====
+03:36:53 [graph/proteins] vote=0.762 uniform=0.765 best1=0.765 n_val=319 vram=0.03GB 4s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+03:36:57 [graph/mutag] vote=0.904 uniform=0.904 best1=0.962 n_val=52 vram=0.02GB 5s | grade=0.918 inner_auc=n/a vs conf_auc=n/a
+03:37:00 ===== CYCLE 268 (OUTER -> INNER -> FEEDBACK) =====
+03:37:05 [graph/proteins] vote=0.753 uniform=0.744 best1=0.750 n_val=320 vram=0.03GB 5s | grade=0.882 inner_auc=n/a vs conf_auc=n/a
+03:37:12 [graph/mutag] vote=0.870 uniform=0.870 best1=0.889 n_val=54 vram=0.02GB 7s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:37:17 ===== CYCLE 269 (OUTER -> INNER -> FEEDBACK) =====
+03:37:23 [graph/proteins] vote=0.746 uniform=0.771 best1=0.746 n_val=323 vram=0.03GB 6s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:37:27 [graph/mutag] vote=0.862 uniform=0.862 best1=0.862 n_val=58 vram=0.02GB 4s | grade=0.881 inner_auc=n/a vs conf_auc=n/a
+03:37:30 ===== CYCLE 270 (OUTER -> INNER -> FEEDBACK) =====
+03:37:34 [graph/proteins] vote=0.766 uniform=0.760 best1=0.760 n_val=329 vram=0.03GB 4s | grade=0.893 inner_auc=n/a vs conf_auc=n/a
+03:37:38 [graph/mutag] vote=0.839 uniform=0.855 best1=0.855 n_val=62 vram=0.02GB 5s | grade=0.905 inner_auc=n/a vs conf_auc=n/a
+03:37:41 ===== CYCLE 271 (OUTER -> INNER -> FEEDBACK) =====
+03:37:50 [graph/proteins] vote=0.758 uniform=0.772 best1=0.752 n_val=351 vram=0.03GB 10s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+03:37:57 [graph/mutag] vote=0.925 uniform=0.925 best1=0.962 n_val=53 vram=0.02GB 7s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:37:59 ===== CYCLE 272 (OUTER -> INNER -> FEEDBACK) =====
+03:38:04 [graph/proteins] vote=0.772 uniform=0.769 best1=0.787 n_val=324 vram=0.03GB 4s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+03:38:07 [graph/mutag] vote=0.919 uniform=0.903 best1=0.919 n_val=62 vram=0.02GB 4s | grade=0.923 inner_auc=n/a vs conf_auc=n/a
+03:38:10 ===== CYCLE 273 (OUTER -> INNER -> FEEDBACK) =====
+03:38:14 [graph/proteins] vote=0.754 uniform=0.751 best1=0.748 n_val=357 vram=0.03GB 4s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:38:19 [graph/mutag] vote=0.960 uniform=0.940 best1=0.960 n_val=50 vram=0.02GB 5s | grade=0.936 inner_auc=n/a vs conf_auc=n/a
+03:38:22 ===== CYCLE 274 (OUTER -> INNER -> FEEDBACK) =====
+03:38:31 [graph/proteins] vote=0.790 uniform=0.796 best1=0.787 n_val=328 vram=0.03GB 9s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+03:38:37 [graph/mutag] vote=0.852 uniform=0.836 best1=0.885 n_val=61 vram=0.02GB 6s | grade=0.849 inner_auc=n/a vs conf_auc=n/a
+03:38:40 ===== CYCLE 275 (OUTER -> INNER -> FEEDBACK) =====
+03:38:44 [graph/proteins] vote=0.792 uniform=0.792 best1=0.789 n_val=327 vram=0.03GB 4s | grade=0.914 inner_auc=n/a vs conf_auc=n/a
+03:38:48 [graph/mutag] vote=0.911 uniform=0.929 best1=0.911 n_val=56 vram=0.02GB 5s | grade=0.926 inner_auc=n/a vs conf_auc=n/a
+03:38:51 ===== CYCLE 276 (OUTER -> INNER -> FEEDBACK) =====
+03:38:56 [graph/proteins] vote=0.758 uniform=0.755 best1=0.755 n_val=326 vram=0.03GB 5s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:39:06 [graph/mutag] vote=0.821 uniform=0.839 best1=0.857 n_val=56 vram=0.02GB 10s | grade=0.853 inner_auc=n/a vs conf_auc=n/a
+03:39:10 ===== CYCLE 277 (OUTER -> INNER -> FEEDBACK) =====
+03:39:14 [graph/proteins] vote=0.778 uniform=0.781 best1=0.775 n_val=329 vram=0.03GB 4s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:39:18 [graph/mutag] vote=0.864 uniform=0.864 best1=0.894 n_val=66 vram=0.02GB 4s | grade=0.911 inner_auc=n/a vs conf_auc=n/a
+03:39:21 ===== CYCLE 278 (OUTER -> INNER -> FEEDBACK) =====
+03:39:25 [graph/proteins] vote=0.780 uniform=0.774 best1=0.777 n_val=318 vram=0.03GB 4s | grade=0.912 inner_auc=n/a vs conf_auc=n/a
+03:39:30 [graph/mutag] vote=0.862 uniform=0.877 best1=0.908 n_val=65 vram=0.02GB 5s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:39:36 ===== CYCLE 279 (OUTER -> INNER -> FEEDBACK) =====
+03:39:44 [graph/proteins] vote=0.741 uniform=0.729 best1=0.748 n_val=321 vram=0.03GB 9s | grade=0.879 inner_auc=n/a vs conf_auc=n/a
+03:39:49 [graph/mutag] vote=0.867 uniform=0.867 best1=0.900 n_val=60 vram=0.02GB 4s | grade=0.910 inner_auc=n/a vs conf_auc=n/a
+03:39:51 ===== CYCLE 280 (OUTER -> INNER -> FEEDBACK) =====
+03:39:55 [graph/proteins] vote=0.759 uniform=0.762 best1=0.773 n_val=344 vram=0.03GB 3s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+03:39:59 [graph/mutag] vote=0.839 uniform=0.821 best1=0.857 n_val=56 vram=0.02GB 4s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:40:02 ===== CYCLE 281 (OUTER -> INNER -> FEEDBACK) =====
+03:40:06 [graph/proteins] vote=0.740 uniform=0.752 best1=0.755 n_val=335 vram=0.03GB 5s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+03:40:13 [graph/mutag] vote=0.778 uniform=0.794 best1=0.825 n_val=63 vram=0.02GB 7s | grade=0.862 inner_auc=n/a vs conf_auc=n/a
+03:40:18 ===== CYCLE 282 (OUTER -> INNER -> FEEDBACK) =====
+03:40:25 [graph/proteins] vote=0.756 uniform=0.777 best1=0.768 n_val=328 vram=0.03GB 7s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+03:40:30 [graph/mutag] vote=0.830 uniform=0.830 best1=0.849 n_val=53 vram=0.02GB 4s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+03:40:32 ===== CYCLE 283 (OUTER -> INNER -> FEEDBACK) =====
+03:40:36 [graph/proteins] vote=0.765 uniform=0.765 best1=0.768 n_val=336 vram=0.03GB 4s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:40:41 [graph/mutag] vote=0.820 uniform=0.840 best1=0.820 n_val=50 vram=0.02GB 5s | grade=0.918 inner_auc=n/a vs conf_auc=n/a
+03:40:44 ===== CYCLE 284 (OUTER -> INNER -> FEEDBACK) =====
+03:40:53 [graph/proteins] vote=0.750 uniform=0.768 best1=0.780 n_val=328 vram=0.03GB 9s | grade=0.893 inner_auc=n/a vs conf_auc=n/a
+03:41:00 [graph/mutag] vote=0.865 uniform=0.865 best1=0.885 n_val=52 vram=0.02GB 8s | grade=0.884 inner_auc=n/a vs conf_auc=n/a
+03:41:02 ===== CYCLE 285 (OUTER -> INNER -> FEEDBACK) =====
+03:41:07 [graph/proteins] vote=0.777 uniform=0.777 best1=0.776 n_val=349 vram=0.03GB 4s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+03:41:11 [graph/mutag] vote=0.839 uniform=0.839 best1=0.871 n_val=62 vram=0.02GB 4s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+03:41:14 ===== CYCLE 286 (OUTER -> INNER -> FEEDBACK) =====
+03:41:18 [graph/proteins] vote=0.755 uniform=0.752 best1=0.752 n_val=339 vram=0.03GB 4s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+03:41:26 [graph/mutag] vote=0.812 uniform=0.812 best1=0.833 n_val=48 vram=0.02GB 8s | grade=0.867 inner_auc=n/a vs conf_auc=n/a
+03:41:31 ===== CYCLE 287 (OUTER -> INNER -> FEEDBACK) =====
+03:41:37 [graph/proteins] vote=0.736 uniform=0.736 best1=0.742 n_val=326 vram=0.03GB 6s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+03:41:42 [graph/mutag] vote=0.878 uniform=0.857 best1=0.878 n_val=49 vram=0.02GB 4s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+03:41:44 ===== CYCLE 288 (OUTER -> INNER -> FEEDBACK) =====
+03:41:47 [graph/proteins] vote=0.718 uniform=0.734 best1=0.732 n_val=354 vram=0.03GB 4s | grade=0.874 inner_auc=n/a vs conf_auc=n/a
+03:41:52 [graph/mutag] vote=0.850 uniform=0.850 best1=0.883 n_val=60 vram=0.02GB 4s | grade=0.917 inner_auc=n/a vs conf_auc=n/a
+03:41:54 ===== CYCLE 289 (OUTER -> INNER -> FEEDBACK) =====
+03:41:59 [graph/proteins] vote=0.757 uniform=0.766 best1=0.763 n_val=342 vram=0.03GB 4s | grade=0.884 inner_auc=n/a vs conf_auc=n/a
+03:42:08 [graph/mutag] vote=0.863 uniform=0.863 best1=0.882 n_val=51 vram=0.02GB 9s | grade=0.870 inner_auc=n/a vs conf_auc=n/a
+03:42:13 ===== CYCLE 290 (OUTER -> INNER -> FEEDBACK) =====
+03:42:18 [graph/proteins] vote=0.759 uniform=0.786 best1=0.753 n_val=332 vram=0.03GB 5s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+03:42:22 [graph/mutag] vote=0.877 uniform=0.842 best1=0.860 n_val=57 vram=0.02GB 4s | grade=0.919 inner_auc=n/a vs conf_auc=n/a
+03:42:24 ===== CYCLE 291 (OUTER -> INNER -> FEEDBACK) =====
+03:42:28 [graph/proteins] vote=0.755 uniform=0.761 best1=0.777 n_val=327 vram=0.03GB 4s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+03:42:33 [graph/mutag] vote=0.820 uniform=0.820 best1=0.820 n_val=50 vram=0.02GB 5s | grade=0.870 inner_auc=n/a vs conf_auc=n/a
+03:42:35 ===== CYCLE 292 (OUTER -> INNER -> FEEDBACK) =====
+03:42:40 [graph/proteins] vote=0.741 uniform=0.749 best1=0.741 n_val=343 vram=0.03GB 5s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+03:42:50 [graph/mutag] vote=0.836 uniform=0.852 best1=0.885 n_val=61 vram=0.02GB 10s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+03:42:56 ===== CYCLE 293 (OUTER -> INNER -> FEEDBACK) =====
+03:42:59 [graph/proteins] vote=0.742 uniform=0.748 best1=0.761 n_val=322 vram=0.03GB 4s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+03:43:03 [graph/mutag] vote=0.904 uniform=0.923 best1=0.923 n_val=52 vram=0.02GB 4s | grade=0.873 inner_auc=n/a vs conf_auc=n/a
+03:43:06 ===== CYCLE 294 (OUTER -> INNER -> FEEDBACK) =====
+03:43:11 [graph/proteins] vote=0.747 uniform=0.756 best1=0.758 n_val=360 vram=0.03GB 5s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+03:43:15 [graph/mutag] vote=0.885 uniform=0.885 best1=0.923 n_val=52 vram=0.02GB 4s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+03:43:19 ===== CYCLE 295 (OUTER -> INNER -> FEEDBACK) =====
+03:43:28 [graph/proteins] vote=0.782 uniform=0.771 best1=0.785 n_val=340 vram=0.03GB 9s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+03:43:36 [graph/mutag] vote=0.803 uniform=0.788 best1=0.818 n_val=66 vram=0.02GB 8s | grade=0.850 inner_auc=n/a vs conf_auc=n/a
+03:43:38 ===== CYCLE 296 (OUTER -> INNER -> FEEDBACK) =====
+03:43:42 [graph/proteins] vote=0.775 uniform=0.753 best1=0.778 n_val=356 vram=0.03GB 4s | grade=0.913 inner_auc=n/a vs conf_auc=n/a
+03:43:46 [graph/mutag] vote=0.854 uniform=0.875 best1=0.854 n_val=48 vram=0.02GB 4s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+03:43:48 ===== CYCLE 297 (OUTER -> INNER -> FEEDBACK) =====
+03:43:53 [graph/proteins] vote=0.757 uniform=0.769 best1=0.769 n_val=329 vram=0.03GB 4s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+03:43:57 [graph/mutag] vote=0.772 uniform=0.737 best1=0.789 n_val=57 vram=0.02GB 4s | grade=0.842 inner_auc=n/a vs conf_auc=n/a
+03:44:02 ===== CYCLE 298 (OUTER -> INNER -> FEEDBACK) =====
+03:44:12 [graph/proteins] vote=0.792 uniform=0.785 best1=0.795 n_val=331 vram=0.03GB 10s | grade=0.905 inner_auc=n/a vs conf_auc=n/a
+03:44:18 [graph/mutag] vote=0.794 uniform=0.810 best1=0.825 n_val=63 vram=0.02GB 6s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:44:20 ===== CYCLE 299 (OUTER -> INNER -> FEEDBACK) =====
+03:44:24 [graph/proteins] vote=0.780 uniform=0.783 best1=0.775 n_val=355 vram=0.03GB 4s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+03:44:28 [graph/mutag] vote=0.875 uniform=0.875 best1=0.893 n_val=56 vram=0.02GB 4s | grade=0.873 inner_auc=n/a vs conf_auc=n/a
+03:44:30 ===== CYCLE 300 (OUTER -> INNER -> FEEDBACK) =====
+03:44:35 [graph/proteins] vote=0.775 uniform=0.788 best1=0.784 n_val=306 vram=0.03GB 5s | grade=0.907 inner_auc=n/a vs conf_auc=n/a
+03:44:41 [graph/mutag] vote=0.873 uniform=0.855 best1=0.891 n_val=55 vram=0.02GB 6s | grade=0.919 inner_auc=n/a vs conf_auc=n/a
+03:44:46 ===== CYCLE 301 (OUTER -> INNER -> FEEDBACK) =====
+03:44:55 [graph/proteins] vote=0.760 uniform=0.769 best1=0.775 n_val=333 vram=0.03GB 9s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+03:45:00 [graph/mutag] vote=0.881 uniform=0.851 best1=0.851 n_val=67 vram=0.02GB 5s | grade=0.909 inner_auc=n/a vs conf_auc=n/a
+03:45:03 ===== CYCLE 302 (OUTER -> INNER -> FEEDBACK) =====
+03:45:07 [graph/proteins] vote=0.795 uniform=0.792 best1=0.776 n_val=331 vram=0.03GB 4s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:45:12 [graph/mutag] vote=0.854 uniform=0.829 best1=0.854 n_val=41 vram=0.02GB 5s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:45:14 ===== CYCLE 303 (OUTER -> INNER -> FEEDBACK) =====
+03:45:19 [graph/proteins] vote=0.780 uniform=0.794 best1=0.788 n_val=345 vram=0.03GB 5s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+03:45:28 [graph/mutag] vote=0.897 uniform=0.897 best1=0.882 n_val=68 vram=0.02GB 10s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+03:45:34 ===== CYCLE 304 (OUTER -> INNER -> FEEDBACK) =====
+03:45:39 [graph/proteins] vote=0.763 uniform=0.766 best1=0.760 n_val=329 vram=0.03GB 6s | grade=0.901 inner_auc=n/a vs conf_auc=n/a
+03:45:44 [graph/mutag] vote=0.881 uniform=0.898 best1=0.932 n_val=59 vram=0.02GB 4s | grade=0.906 inner_auc=n/a vs conf_auc=n/a
+03:45:46 ===== CYCLE 305 (OUTER -> INNER -> FEEDBACK) =====
+03:45:49 [graph/proteins] vote=0.771 uniform=0.777 best1=0.777 n_val=332 vram=0.03GB 4s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+03:45:54 [graph/mutag] vote=0.925 uniform=0.906 best1=0.943 n_val=53 vram=0.02GB 4s | grade=0.919 inner_auc=n/a vs conf_auc=n/a
+03:45:57 ===== CYCLE 306 (OUTER -> INNER -> FEEDBACK) =====
+03:46:01 [graph/proteins] vote=0.752 uniform=0.762 best1=0.749 n_val=311 vram=0.03GB 4s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:46:10 [graph/mutag] vote=0.923 uniform=0.892 best1=0.923 n_val=65 vram=0.02GB 9s | grade=0.943 inner_auc=n/a vs conf_auc=n/a
+03:46:15 ===== CYCLE 307 (OUTER -> INNER -> FEEDBACK) =====
+03:46:23 [graph/proteins] vote=0.706 uniform=0.718 best1=0.712 n_val=333 vram=0.03GB 7s | grade=0.856 inner_auc=n/a vs conf_auc=n/a
+03:46:26 [graph/mutag] vote=0.833 uniform=0.870 best1=0.852 n_val=54 vram=0.02GB 4s | grade=0.867 inner_auc=n/a vs conf_auc=n/a
+03:46:28 ===== CYCLE 308 (OUTER -> INNER -> FEEDBACK) =====
+03:46:32 [graph/proteins] vote=0.749 uniform=0.767 best1=0.761 n_val=339 vram=0.03GB 3s | grade=0.882 inner_auc=n/a vs conf_auc=n/a
+03:46:36 [graph/mutag] vote=0.852 uniform=0.852 best1=0.853 n_val=61 vram=0.02GB 4s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+03:46:39 ===== CYCLE 309 (OUTER -> INNER -> FEEDBACK) =====
+03:46:43 [graph/proteins] vote=0.756 uniform=0.772 best1=0.756 n_val=311 vram=0.03GB 4s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:46:50 [graph/mutag] vote=0.846 uniform=0.877 best1=0.862 n_val=65 vram=0.02GB 7s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+03:46:56 ===== CYCLE 310 (OUTER -> INNER -> FEEDBACK) =====
+03:47:05 [graph/proteins] vote=0.786 uniform=0.798 best1=0.795 n_val=322 vram=0.03GB 10s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+03:47:09 [graph/mutag] vote=0.887 uniform=0.868 best1=0.887 n_val=53 vram=0.02GB 4s | grade=0.909 inner_auc=n/a vs conf_auc=n/a
+03:47:11 ===== CYCLE 311 (OUTER -> INNER -> FEEDBACK) =====
+03:47:15 [graph/proteins] vote=0.744 uniform=0.764 best1=0.744 n_val=352 vram=0.03GB 4s | grade=0.878 inner_auc=n/a vs conf_auc=n/a
+03:47:20 [graph/mutag] vote=0.881 uniform=0.864 best1=0.881 n_val=59 vram=0.02GB 5s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:47:23 ===== CYCLE 312 (OUTER -> INNER -> FEEDBACK) =====
+03:47:27 [graph/proteins] vote=0.722 uniform=0.722 best1=0.722 n_val=360 vram=0.03GB 5s | grade=0.873 inner_auc=n/a vs conf_auc=n/a
+03:47:37 [graph/mutag] vote=0.788 uniform=0.848 best1=0.818 n_val=66 vram=0.02GB 10s | grade=0.847 inner_auc=n/a vs conf_auc=n/a
+03:47:43 ===== CYCLE 313 (OUTER -> INNER -> FEEDBACK) =====
+03:47:49 [graph/proteins] vote=0.784 uniform=0.761 best1=0.764 n_val=347 vram=0.03GB 6s | grade=0.863 inner_auc=n/a vs conf_auc=n/a
+03:47:53 [graph/mutag] vote=0.897 uniform=0.879 best1=0.914 n_val=58 vram=0.02GB 4s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+03:47:55 ===== CYCLE 314 (OUTER -> INNER -> FEEDBACK) =====
+03:47:59 [graph/proteins] vote=0.806 uniform=0.801 best1=0.806 n_val=341 vram=0.03GB 4s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:48:04 [graph/mutag] vote=0.844 uniform=0.875 best1=0.875 n_val=64 vram=0.02GB 4s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+03:48:06 ===== CYCLE 315 (OUTER -> INNER -> FEEDBACK) =====
+03:48:10 [graph/proteins] vote=0.732 uniform=0.752 best1=0.736 n_val=314 vram=0.03GB 4s | grade=0.852 inner_auc=n/a vs conf_auc=n/a
+03:48:20 [graph/mutag] vote=0.932 uniform=0.932 best1=0.915 n_val=59 vram=0.02GB 9s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:48:26 ===== CYCLE 316 (OUTER -> INNER -> FEEDBACK) =====
+03:48:33 [graph/proteins] vote=0.785 uniform=0.791 best1=0.785 n_val=330 vram=0.03GB 7s | grade=0.884 inner_auc=n/a vs conf_auc=n/a
+03:48:37 [graph/mutag] vote=0.906 uniform=0.887 best1=0.887 n_val=53 vram=0.02GB 4s | grade=0.901 inner_auc=n/a vs conf_auc=n/a
+03:48:39 ===== CYCLE 317 (OUTER -> INNER -> FEEDBACK) =====
+03:48:44 [graph/proteins] vote=0.763 uniform=0.749 best1=0.772 n_val=346 vram=0.03GB 5s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+03:48:49 [graph/mutag] vote=0.776 uniform=0.793 best1=0.810 n_val=58 vram=0.02GB 5s | grade=0.813 inner_auc=n/a vs conf_auc=n/a
+03:48:51 ===== CYCLE 318 (OUTER -> INNER -> FEEDBACK) =====
+03:48:58 [graph/proteins] vote=0.723 uniform=0.745 best1=0.757 n_val=325 vram=0.03GB 7s | grade=0.874 inner_auc=n/a vs conf_auc=n/a
+03:49:09 [graph/mutag] vote=0.841 uniform=0.794 best1=0.857 n_val=63 vram=0.02GB 11s | grade=0.884 inner_auc=n/a vs conf_auc=n/a
+03:49:14 ===== CYCLE 319 (OUTER -> INNER -> FEEDBACK) =====
+03:49:17 [graph/proteins] vote=0.772 uniform=0.785 best1=0.782 n_val=307 vram=0.03GB 4s | grade=0.880 inner_auc=n/a vs conf_auc=n/a
+03:49:21 [graph/mutag] vote=0.865 uniform=0.846 best1=0.885 n_val=52 vram=0.02GB 4s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+03:49:24 ===== CYCLE 320 (OUTER -> INNER -> FEEDBACK) =====
+03:49:28 [graph/proteins] vote=0.780 uniform=0.786 best1=0.783 n_val=332 vram=0.03GB 4s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+03:49:32 [graph/mutag] vote=0.848 uniform=0.870 best1=0.848 n_val=46 vram=0.02GB 4s | grade=0.872 inner_auc=n/a vs conf_auc=n/a
+03:49:35 ===== CYCLE 321 (OUTER -> INNER -> FEEDBACK) =====
+03:49:46 [graph/proteins] vote=0.775 uniform=0.769 best1=0.787 n_val=329 vram=0.03GB 10s | grade=0.906 inner_auc=n/a vs conf_auc=n/a
+03:49:55 [graph/mutag] vote=0.881 uniform=0.881 best1=0.881 n_val=59 vram=0.02GB 9s | grade=0.927 inner_auc=n/a vs conf_auc=n/a
+03:49:57 ===== CYCLE 322 (OUTER -> INNER -> FEEDBACK) =====
+03:50:01 [graph/proteins] vote=0.794 uniform=0.794 best1=0.785 n_val=330 vram=0.03GB 4s | grade=0.912 inner_auc=n/a vs conf_auc=n/a
+03:50:06 [graph/mutag] vote=0.868 uniform=0.838 best1=0.868 n_val=68 vram=0.02GB 5s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+03:50:09 ===== CYCLE 323 (OUTER -> INNER -> FEEDBACK) =====
+03:50:13 [graph/proteins] vote=0.766 uniform=0.766 best1=0.771 n_val=372 vram=0.03GB 4s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:50:18 [graph/mutag] vote=0.864 uniform=0.881 best1=0.898 n_val=59 vram=0.02GB 6s | grade=0.913 inner_auc=n/a vs conf_auc=n/a
+03:50:24 ===== CYCLE 324 (OUTER -> INNER -> FEEDBACK) =====
+03:50:34 [graph/proteins] vote=0.766 uniform=0.779 best1=0.760 n_val=312 vram=0.03GB 9s | grade=0.906 inner_auc=n/a vs conf_auc=n/a
+03:50:40 [graph/mutag] vote=0.905 uniform=0.873 best1=0.905 n_val=63 vram=0.02GB 6s | grade=0.919 inner_auc=n/a vs conf_auc=n/a
+03:50:42 ===== CYCLE 325 (OUTER -> INNER -> FEEDBACK) =====
+03:50:46 [graph/proteins] vote=0.781 uniform=0.784 best1=0.793 n_val=343 vram=0.03GB 5s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+03:50:50 [graph/mutag] vote=0.873 uniform=0.855 best1=0.909 n_val=55 vram=0.02GB 4s | grade=0.923 inner_auc=n/a vs conf_auc=n/a
+03:50:53 ===== CYCLE 326 (OUTER -> INNER -> FEEDBACK) =====
+03:50:57 [graph/proteins] vote=0.743 uniform=0.743 best1=0.749 n_val=342 vram=0.03GB 4s | grade=0.867 inner_auc=n/a vs conf_auc=n/a
+03:51:07 [graph/mutag] vote=0.852 uniform=0.852 best1=0.889 n_val=54 vram=0.02GB 9s | grade=0.906 inner_auc=n/a vs conf_auc=n/a
+03:51:12 ===== CYCLE 327 (OUTER -> INNER -> FEEDBACK) =====
+03:51:20 [graph/proteins] vote=0.781 uniform=0.784 best1=0.784 n_val=324 vram=0.03GB 8s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+03:51:24 [graph/mutag] vote=0.842 uniform=0.825 best1=0.842 n_val=57 vram=0.02GB 4s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:51:27 ===== CYCLE 328 (OUTER -> INNER -> FEEDBACK) =====
+03:51:31 [graph/proteins] vote=0.759 uniform=0.759 best1=0.765 n_val=315 vram=0.03GB 4s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+03:51:35 [graph/mutag] vote=0.857 uniform=0.857 best1=0.875 n_val=56 vram=0.02GB 4s | grade=0.910 inner_auc=n/a vs conf_auc=n/a
+03:51:38 ===== CYCLE 329 (OUTER -> INNER -> FEEDBACK) =====
+03:51:44 [graph/proteins] vote=0.756 uniform=0.759 best1=0.753 n_val=336 vram=0.03GB 6s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+03:51:55 [graph/mutag] vote=0.859 uniform=0.859 best1=0.875 n_val=64 vram=0.02GB 10s | grade=0.920 inner_auc=n/a vs conf_auc=n/a
+03:52:00 ===== CYCLE 330 (OUTER -> INNER -> FEEDBACK) =====
+03:52:05 [graph/proteins] vote=0.794 uniform=0.805 best1=0.785 n_val=339 vram=0.03GB 4s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+03:52:09 [graph/mutag] vote=0.900 uniform=0.900 best1=0.900 n_val=50 vram=0.02GB 4s | grade=0.907 inner_auc=n/a vs conf_auc=n/a
+03:52:11 ===== CYCLE 331 (OUTER -> INNER -> FEEDBACK) =====
+03:52:15 [graph/proteins] vote=0.730 uniform=0.736 best1=0.730 n_val=322 vram=0.03GB 4s | grade=0.860 inner_auc=n/a vs conf_auc=n/a
+03:52:20 [graph/mutag] vote=0.851 uniform=0.866 best1=0.895 n_val=67 vram=0.02GB 4s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+03:52:22 ===== CYCLE 332 (OUTER -> INNER -> FEEDBACK) =====
+03:52:32 [graph/proteins] vote=0.763 uniform=0.766 best1=0.763 n_val=308 vram=0.03GB 9s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+03:52:42 [graph/mutag] vote=0.900 uniform=0.883 best1=0.900 n_val=60 vram=0.02GB 10s | grade=0.884 inner_auc=n/a vs conf_auc=n/a
+03:52:45 ===== CYCLE 333 (OUTER -> INNER -> FEEDBACK) =====
+03:52:49 [graph/proteins] vote=0.798 uniform=0.786 best1=0.789 n_val=341 vram=0.03GB 4s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:52:53 [graph/mutag] vote=0.827 uniform=0.827 best1=0.865 n_val=52 vram=0.02GB 5s | grade=0.852 inner_auc=n/a vs conf_auc=n/a
+03:52:56 ===== CYCLE 334 (OUTER -> INNER -> FEEDBACK) =====
+03:53:00 [graph/proteins] vote=0.739 uniform=0.742 best1=0.736 n_val=337 vram=0.03GB 4s | grade=0.870 inner_auc=n/a vs conf_auc=n/a
+03:53:05 [graph/mutag] vote=0.885 uniform=0.869 best1=0.885 n_val=61 vram=0.02GB 5s | grade=0.898 inner_auc=n/a vs conf_auc=n/a
+03:53:09 ===== CYCLE 335 (OUTER -> INNER -> FEEDBACK) =====
+03:53:19 [graph/proteins] vote=0.752 uniform=0.742 best1=0.752 n_val=322 vram=0.03GB 10s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+03:53:27 [graph/mutag] vote=0.918 uniform=0.902 best1=0.918 n_val=61 vram=0.02GB 8s | grade=0.920 inner_auc=n/a vs conf_auc=n/a
+03:53:29 ===== CYCLE 336 (OUTER -> INNER -> FEEDBACK) =====
+03:53:33 [graph/proteins] vote=0.755 uniform=0.770 best1=0.770 n_val=331 vram=0.03GB 4s | grade=0.905 inner_auc=n/a vs conf_auc=n/a
+03:53:37 [graph/mutag] vote=0.881 uniform=0.847 best1=0.881 n_val=59 vram=0.02GB 4s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+03:53:40 ===== CYCLE 337 (OUTER -> INNER -> FEEDBACK) =====
+03:53:45 [graph/proteins] vote=0.766 uniform=0.753 best1=0.766 n_val=316 vram=0.03GB 4s | grade=0.893 inner_auc=n/a vs conf_auc=n/a
+03:53:50 [graph/mutag] vote=0.915 uniform=0.915 best1=0.957 n_val=47 vram=0.02GB 5s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+03:53:56 ===== CYCLE 338 (OUTER -> INNER -> FEEDBACK) =====
+03:54:05 [graph/proteins] vote=0.767 uniform=0.782 best1=0.773 n_val=335 vram=0.03GB 9s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+03:54:11 [graph/mutag] vote=0.868 uniform=0.868 best1=0.897 n_val=68 vram=0.02GB 6s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:54:13 ===== CYCLE 339 (OUTER -> INNER -> FEEDBACK) =====
+03:54:17 [graph/proteins] vote=0.806 uniform=0.806 best1=0.800 n_val=340 vram=0.03GB 4s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+03:54:22 [graph/mutag] vote=0.867 uniform=0.867 best1=0.900 n_val=60 vram=0.02GB 5s | grade=0.945 inner_auc=n/a vs conf_auc=n/a
+03:54:25 ===== CYCLE 340 (OUTER -> INNER -> FEEDBACK) =====
+03:54:29 [graph/proteins] vote=0.795 uniform=0.783 best1=0.786 n_val=336 vram=0.03GB 5s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:54:38 [graph/mutag] vote=0.859 uniform=0.828 best1=0.859 n_val=64 vram=0.02GB 9s | grade=0.913 inner_auc=n/a vs conf_auc=n/a
+03:54:44 ===== CYCLE 341 (OUTER -> INNER -> FEEDBACK) =====
+03:54:51 [graph/proteins] vote=0.772 uniform=0.764 best1=0.775 n_val=351 vram=0.03GB 8s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+03:54:56 [graph/mutag] vote=0.845 uniform=0.845 best1=0.897 n_val=58 vram=0.02GB 4s | grade=0.913 inner_auc=n/a vs conf_auc=n/a
+03:54:58 ===== CYCLE 342 (OUTER -> INNER -> FEEDBACK) =====
+03:55:02 [graph/proteins] vote=0.799 uniform=0.821 best1=0.802 n_val=329 vram=0.03GB 4s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+03:55:06 [graph/mutag] vote=0.879 uniform=0.862 best1=0.862 n_val=58 vram=0.02GB 4s | grade=0.910 inner_auc=n/a vs conf_auc=n/a
+03:55:09 ===== CYCLE 343 (OUTER -> INNER -> FEEDBACK) =====
+03:55:15 [graph/proteins] vote=0.759 uniform=0.781 best1=0.768 n_val=319 vram=0.03GB 6s | grade=0.875 inner_auc=n/a vs conf_auc=n/a
+03:55:25 [graph/mutag] vote=0.943 uniform=0.962 best1=0.943 n_val=53 vram=0.02GB 10s | grade=0.917 inner_auc=n/a vs conf_auc=n/a
+03:55:31 ===== CYCLE 344 (OUTER -> INNER -> FEEDBACK) =====
+03:55:35 [graph/proteins] vote=0.759 uniform=0.774 best1=0.762 n_val=323 vram=0.03GB 4s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:55:39 [graph/mutag] vote=0.831 uniform=0.814 best1=0.864 n_val=59 vram=0.02GB 4s | grade=0.860 inner_auc=n/a vs conf_auc=n/a
+03:55:42 ===== CYCLE 345 (OUTER -> INNER -> FEEDBACK) =====
+03:55:46 [graph/proteins] vote=0.777 uniform=0.794 best1=0.780 n_val=354 vram=0.03GB 4s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+03:55:51 [graph/mutag] vote=0.823 uniform=0.790 best1=0.839 n_val=62 vram=0.02GB 4s | grade=0.879 inner_auc=n/a vs conf_auc=n/a
+03:55:53 ===== CYCLE 346 (OUTER -> INNER -> FEEDBACK) =====
+03:56:03 [graph/proteins] vote=0.763 uniform=0.779 best1=0.779 n_val=312 vram=0.03GB 10s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+03:56:13 [graph/mutag] vote=0.855 uniform=0.836 best1=0.873 n_val=55 vram=0.02GB 10s | grade=0.925 inner_auc=n/a vs conf_auc=n/a
+03:56:15 ===== CYCLE 347 (OUTER -> INNER -> FEEDBACK) =====
+03:56:19 [graph/proteins] vote=0.795 uniform=0.813 best1=0.783 n_val=332 vram=0.03GB 4s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+03:56:23 [graph/mutag] vote=0.929 uniform=0.911 best1=0.929 n_val=56 vram=0.02GB 4s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:56:26 ===== CYCLE 348 (OUTER -> INNER -> FEEDBACK) =====
+03:56:31 [graph/proteins] vote=0.763 uniform=0.769 best1=0.766 n_val=325 vram=0.03GB 4s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+03:56:35 [graph/mutag] vote=0.895 uniform=0.895 best1=0.912 n_val=57 vram=0.02GB 5s | grade=0.910 inner_auc=n/a vs conf_auc=n/a
+03:56:41 ===== CYCLE 349 (OUTER -> INNER -> FEEDBACK) =====
+03:56:50 [graph/proteins] vote=0.773 uniform=0.789 best1=0.786 n_val=322 vram=0.03GB 9s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:56:57 [graph/mutag] vote=0.863 uniform=0.863 best1=0.882 n_val=51 vram=0.02GB 8s | grade=0.914 inner_auc=n/a vs conf_auc=n/a
+03:57:00 ===== CYCLE 350 (OUTER -> INNER -> FEEDBACK) =====
+03:57:04 [graph/proteins] vote=0.745 uniform=0.748 best1=0.751 n_val=330 vram=0.03GB 4s | grade=0.879 inner_auc=n/a vs conf_auc=n/a
+03:57:08 [graph/mutag] vote=0.851 uniform=0.866 best1=0.866 n_val=67 vram=0.02GB 4s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+03:57:11 ===== CYCLE 351 (OUTER -> INNER -> FEEDBACK) =====
+03:57:16 [graph/proteins] vote=0.757 uniform=0.777 best1=0.766 n_val=337 vram=0.03GB 5s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:57:23 [graph/mutag] vote=0.881 uniform=0.831 best1=0.898 n_val=59 vram=0.02GB 8s | grade=0.905 inner_auc=n/a vs conf_auc=n/a
+03:57:29 ===== CYCLE 352 (OUTER -> INNER -> FEEDBACK) =====
+03:57:38 [graph/proteins] vote=0.792 uniform=0.811 best1=0.789 n_val=317 vram=0.03GB 9s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+03:57:41 [graph/mutag] vote=0.889 uniform=0.833 best1=0.889 n_val=54 vram=0.02GB 4s | grade=0.916 inner_auc=n/a vs conf_auc=n/a
+03:57:44 ===== CYCLE 353 (OUTER -> INNER -> FEEDBACK) =====
+03:57:48 [graph/proteins] vote=0.776 uniform=0.773 best1=0.770 n_val=335 vram=0.03GB 4s | grade=0.895 inner_auc=n/a vs conf_auc=n/a
+03:57:53 [graph/mutag] vote=0.852 uniform=0.852 best1=0.869 n_val=61 vram=0.02GB 4s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+03:57:55 ===== CYCLE 354 (OUTER -> INNER -> FEEDBACK) =====
+03:58:00 [graph/proteins] vote=0.756 uniform=0.775 best1=0.768 n_val=315 vram=0.03GB 5s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+03:58:10 [graph/mutag] vote=0.815 uniform=0.833 best1=0.870 n_val=54 vram=0.02GB 10s | grade=0.861 inner_auc=n/a vs conf_auc=n/a
+03:58:15 ===== CYCLE 355 (OUTER -> INNER -> FEEDBACK) =====
+03:58:23 [graph/proteins] vote=0.757 uniform=0.757 best1=0.769 n_val=350 vram=0.03GB 7s | grade=0.908 inner_auc=n/a vs conf_auc=n/a
+03:58:27 [graph/mutag] vote=0.909 uniform=0.873 best1=0.927 n_val=55 vram=0.02GB 4s | grade=0.875 inner_auc=n/a vs conf_auc=n/a
+03:58:29 ===== CYCLE 356 (OUTER -> INNER -> FEEDBACK) =====
+03:58:33 [graph/proteins] vote=0.757 uniform=0.740 best1=0.760 n_val=350 vram=0.03GB 4s | grade=0.894 inner_auc=n/a vs conf_auc=n/a
+03:58:38 [graph/mutag] vote=0.877 uniform=0.877 best1=0.918 n_val=73 vram=0.02GB 4s | grade=0.911 inner_auc=n/a vs conf_auc=n/a
+03:58:40 ===== CYCLE 357 (OUTER -> INNER -> FEEDBACK) =====
+03:58:46 [graph/proteins] vote=0.741 uniform=0.731 best1=0.741 n_val=301 vram=0.03GB 6s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+03:58:57 [graph/mutag] vote=0.893 uniform=0.875 best1=0.893 n_val=56 vram=0.02GB 10s | grade=0.914 inner_auc=n/a vs conf_auc=n/a
+03:59:03 ===== CYCLE 358 (OUTER -> INNER -> FEEDBACK) =====
+03:59:07 [graph/proteins] vote=0.788 uniform=0.782 best1=0.782 n_val=335 vram=0.03GB 4s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+03:59:11 [graph/mutag] vote=0.881 uniform=0.881 best1=0.881 n_val=59 vram=0.02GB 4s | grade=0.943 inner_auc=n/a vs conf_auc=n/a
+03:59:13 ===== CYCLE 359 (OUTER -> INNER -> FEEDBACK) =====
+03:59:18 [graph/proteins] vote=0.760 uniform=0.766 best1=0.763 n_val=321 vram=0.03GB 5s | grade=0.878 inner_auc=n/a vs conf_auc=n/a
+03:59:22 [graph/mutag] vote=0.878 uniform=0.878 best1=0.898 n_val=49 vram=0.02GB 4s | grade=0.920 inner_auc=n/a vs conf_auc=n/a
+03:59:25 ===== CYCLE 360 (OUTER -> INNER -> FEEDBACK) =====
+03:59:33 [graph/proteins] vote=0.766 uniform=0.763 best1=0.769 n_val=333 vram=0.03GB 8s | grade=0.906 inner_auc=n/a vs conf_auc=n/a
+03:59:43 [graph/mutag] vote=0.837 uniform=0.837 best1=0.857 n_val=49 vram=0.02GB 10s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+03:59:47 ===== CYCLE 361 (OUTER -> INNER -> FEEDBACK) =====
+03:59:51 [graph/proteins] vote=0.769 uniform=0.778 best1=0.772 n_val=342 vram=0.03GB 5s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+03:59:55 [graph/mutag] vote=0.940 uniform=0.880 best1=0.920 n_val=50 vram=0.02GB 4s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+03:59:58 ===== CYCLE 362 (OUTER -> INNER -> FEEDBACK) =====
+04:00:02 [graph/proteins] vote=0.746 uniform=0.752 best1=0.749 n_val=315 vram=0.03GB 4s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+04:00:06 [graph/mutag] vote=0.878 uniform=0.857 best1=0.878 n_val=49 vram=0.02GB 4s | grade=0.910 inner_auc=n/a vs conf_auc=n/a
+04:00:12 ===== CYCLE 363 (OUTER -> INNER -> FEEDBACK) =====
+04:00:21 [graph/proteins] vote=0.777 uniform=0.798 best1=0.777 n_val=332 vram=0.03GB 9s | grade=0.880 inner_auc=n/a vs conf_auc=n/a
+04:00:29 [graph/mutag] vote=0.839 uniform=0.839 best1=0.855 n_val=62 vram=0.02GB 8s | grade=0.911 inner_auc=n/a vs conf_auc=n/a
+04:00:31 ===== CYCLE 364 (OUTER -> INNER -> FEEDBACK) =====
+04:00:35 [graph/proteins] vote=0.789 uniform=0.795 best1=0.783 n_val=322 vram=0.03GB 4s | grade=0.905 inner_auc=n/a vs conf_auc=n/a
+04:00:40 [graph/mutag] vote=0.816 uniform=0.796 best1=0.857 n_val=49 vram=0.02GB 5s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+04:00:42 ===== CYCLE 365 (OUTER -> INNER -> FEEDBACK) =====
+04:00:46 [graph/proteins] vote=0.738 uniform=0.754 best1=0.741 n_val=321 vram=0.03GB 4s | grade=0.871 inner_auc=n/a vs conf_auc=n/a
+04:00:53 [graph/mutag] vote=0.836 uniform=0.745 best1=0.855 n_val=55 vram=0.02GB 6s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+04:00:58 ===== CYCLE 366 (OUTER -> INNER -> FEEDBACK) =====
+04:01:07 [graph/proteins] vote=0.756 uniform=0.775 best1=0.766 n_val=316 vram=0.03GB 9s | grade=0.901 inner_auc=n/a vs conf_auc=n/a
+04:01:13 [graph/mutag] vote=0.879 uniform=0.845 best1=0.914 n_val=58 vram=0.02GB 6s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+04:01:16 ===== CYCLE 367 (OUTER -> INNER -> FEEDBACK) =====
+04:01:20 [graph/proteins] vote=0.735 uniform=0.745 best1=0.742 n_val=325 vram=0.03GB 4s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+04:01:24 [graph/mutag] vote=0.889 uniform=0.852 best1=0.889 n_val=54 vram=0.02GB 4s | grade=0.923 inner_auc=n/a vs conf_auc=n/a
+04:01:26 ===== CYCLE 368 (OUTER -> INNER -> FEEDBACK) =====
+04:01:34 [graph/proteins] vote=0.753 uniform=0.747 best1=0.747 n_val=328 vram=0.03GB 8s | grade=0.893 inner_auc=n/a vs conf_auc=n/a
+04:02:12 [graph/mutag] vote=0.887 uniform=0.887 best1=0.903 n_val=62 vram=0.02GB 38s | grade=0.937 inner_auc=n/a vs conf_auc=n/a
+04:02:40 ===== CYCLE 369 (OUTER -> INNER -> FEEDBACK) =====
+04:03:30 [graph/proteins] vote=0.763 uniform=0.766 best1=0.766 n_val=316 vram=0.03GB 49s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+04:04:22 [graph/mutag] vote=0.836 uniform=0.836 best1=0.853 n_val=61 vram=0.02GB 52s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+04:04:50 ===== CYCLE 370 (OUTER -> INNER -> FEEDBACK) =====
+04:05:39 [graph/proteins] vote=0.735 uniform=0.723 best1=0.744 n_val=347 vram=0.03GB 49s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+04:06:31 [graph/mutag] vote=0.857 uniform=0.857 best1=0.873 n_val=63 vram=0.02GB 52s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+04:06:59 ===== CYCLE 371 (OUTER -> INNER -> FEEDBACK) =====
+04:07:47 [graph/proteins] vote=0.778 uniform=0.799 best1=0.781 n_val=333 vram=0.03GB 49s | grade=0.884 inner_auc=n/a vs conf_auc=n/a
+04:08:37 [graph/mutag] vote=0.815 uniform=0.800 best1=0.846 n_val=65 vram=0.02GB 49s | grade=0.882 inner_auc=n/a vs conf_auc=n/a
+04:09:04 ===== CYCLE 372 (OUTER -> INNER -> FEEDBACK) =====
+04:09:48 [graph/proteins] vote=0.771 uniform=0.777 best1=0.768 n_val=310 vram=0.03GB 45s | grade=0.905 inner_auc=n/a vs conf_auc=n/a
+04:10:38 [graph/mutag] vote=0.883 uniform=0.883 best1=0.900 n_val=60 vram=0.02GB 49s | grade=0.904 inner_auc=n/a vs conf_auc=n/a
+04:11:04 ===== CYCLE 373 (OUTER -> INNER -> FEEDBACK) =====
+04:11:51 [graph/proteins] vote=0.750 uniform=0.741 best1=0.747 n_val=352 vram=0.03GB 46s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+04:12:40 [graph/mutag] vote=0.821 uniform=0.821 best1=0.851 n_val=67 vram=0.02GB 49s | grade=0.861 inner_auc=n/a vs conf_auc=n/a
+04:13:07 ===== CYCLE 374 (OUTER -> INNER -> FEEDBACK) =====
+04:13:52 [graph/proteins] vote=0.793 uniform=0.793 best1=0.787 n_val=329 vram=0.03GB 45s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+04:14:41 [graph/mutag] vote=0.839 uniform=0.839 best1=0.871 n_val=62 vram=0.02GB 49s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+04:15:08 ===== CYCLE 375 (OUTER -> INNER -> FEEDBACK) =====
+04:15:54 [graph/proteins] vote=0.734 uniform=0.750 best1=0.753 n_val=308 vram=0.03GB 46s | grade=0.853 inner_auc=n/a vs conf_auc=n/a
+04:16:43 [graph/mutag] vote=0.855 uniform=0.806 best1=0.855 n_val=62 vram=0.02GB 49s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+04:17:10 ===== CYCLE 376 (OUTER -> INNER -> FEEDBACK) =====
+04:17:55 [graph/proteins] vote=0.769 uniform=0.777 best1=0.769 n_val=359 vram=0.03GB 45s | grade=0.889 inner_auc=n/a vs conf_auc=n/a
+04:18:45 [graph/mutag] vote=0.837 uniform=0.837 best1=0.857 n_val=49 vram=0.02GB 49s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+04:19:11 ===== CYCLE 377 (OUTER -> INNER -> FEEDBACK) =====
+04:19:58 [graph/proteins] vote=0.759 uniform=0.770 best1=0.742 n_val=357 vram=0.03GB 47s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+04:20:48 [graph/mutag] vote=0.902 uniform=0.882 best1=0.902 n_val=51 vram=0.02GB 50s | grade=0.909 inner_auc=n/a vs conf_auc=n/a
+04:21:15 ===== CYCLE 378 (OUTER -> INNER -> FEEDBACK) =====
+04:22:00 [graph/proteins] vote=0.771 uniform=0.780 best1=0.780 n_val=350 vram=0.03GB 46s | grade=0.897 inner_auc=n/a vs conf_auc=n/a
+04:22:50 [graph/mutag] vote=0.864 uniform=0.864 best1=0.864 n_val=59 vram=0.02GB 49s | grade=0.910 inner_auc=n/a vs conf_auc=n/a
+04:23:17 ===== CYCLE 379 (OUTER -> INNER -> FEEDBACK) =====
+04:24:03 [graph/proteins] vote=0.765 uniform=0.770 best1=0.765 n_val=357 vram=0.03GB 47s | grade=0.907 inner_auc=n/a vs conf_auc=n/a
+04:24:53 [graph/mutag] vote=0.914 uniform=0.914 best1=0.931 n_val=58 vram=0.02GB 50s | grade=0.915 inner_auc=n/a vs conf_auc=n/a
+04:25:20 ===== CYCLE 380 (OUTER -> INNER -> FEEDBACK) =====
+04:26:05 [graph/proteins] vote=0.765 uniform=0.796 best1=0.765 n_val=362 vram=0.03GB 45s | grade=0.906 inner_auc=n/a vs conf_auc=n/a
+04:26:55 [graph/mutag] vote=0.873 uniform=0.825 best1=0.873 n_val=63 vram=0.02GB 50s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+04:27:21 ===== CYCLE 381 (OUTER -> INNER -> FEEDBACK) =====
+04:28:08 [graph/proteins] vote=0.758 uniform=0.779 best1=0.767 n_val=335 vram=0.03GB 47s | grade=0.891 inner_auc=n/a vs conf_auc=n/a
+04:28:58 [graph/mutag] vote=0.825 uniform=0.825 best1=0.825 n_val=57 vram=0.02GB 50s | grade=0.874 inner_auc=n/a vs conf_auc=n/a
+04:29:25 ===== CYCLE 382 (OUTER -> INNER -> FEEDBACK) =====
+04:30:11 [graph/proteins] vote=0.789 uniform=0.789 best1=0.786 n_val=327 vram=0.03GB 46s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+04:31:00 [graph/mutag] vote=0.854 uniform=0.854 best1=0.854 n_val=48 vram=0.02GB 49s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+04:31:27 ===== CYCLE 383 (OUTER -> INNER -> FEEDBACK) =====
+04:32:14 [graph/proteins] vote=0.791 uniform=0.794 best1=0.791 n_val=344 vram=0.03GB 47s | grade=0.909 inner_auc=n/a vs conf_auc=n/a
+04:33:04 [graph/mutag] vote=0.855 uniform=0.855 best1=0.873 n_val=55 vram=0.02GB 50s | grade=0.927 inner_auc=n/a vs conf_auc=n/a
+04:33:31 ===== CYCLE 384 (OUTER -> INNER -> FEEDBACK) =====
+04:34:18 [graph/proteins] vote=0.744 uniform=0.736 best1=0.739 n_val=352 vram=0.03GB 47s | grade=0.875 inner_auc=n/a vs conf_auc=n/a
+04:35:07 [graph/mutag] vote=0.898 uniform=0.898 best1=0.915 n_val=59 vram=0.02GB 49s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+04:35:34 ===== CYCLE 385 (OUTER -> INNER -> FEEDBACK) =====
+04:36:21 [graph/proteins] vote=0.777 uniform=0.766 best1=0.766 n_val=337 vram=0.03GB 47s | grade=0.878 inner_auc=n/a vs conf_auc=n/a
+04:37:10 [graph/mutag] vote=0.807 uniform=0.807 best1=0.860 n_val=57 vram=0.02GB 50s | grade=0.859 inner_auc=n/a vs conf_auc=n/a
+04:37:37 ===== CYCLE 386 (OUTER -> INNER -> FEEDBACK) =====
+04:38:23 [graph/proteins] vote=0.761 uniform=0.767 best1=0.752 n_val=339 vram=0.03GB 46s | grade=0.893 inner_auc=n/a vs conf_auc=n/a
+04:39:12 [graph/mutag] vote=0.944 uniform=0.944 best1=0.944 n_val=54 vram=0.02GB 50s | grade=0.863 inner_auc=n/a vs conf_auc=n/a
+04:39:39 ===== CYCLE 387 (OUTER -> INNER -> FEEDBACK) =====
+04:40:25 [graph/proteins] vote=0.726 uniform=0.739 best1=0.736 n_val=303 vram=0.03GB 45s | grade=0.860 inner_auc=n/a vs conf_auc=n/a
+04:41:14 [graph/mutag] vote=0.900 uniform=0.880 best1=0.920 n_val=50 vram=0.02GB 50s | grade=0.901 inner_auc=n/a vs conf_auc=n/a
+04:41:41 ===== CYCLE 388 (OUTER -> INNER -> FEEDBACK) =====
+04:42:28 [graph/proteins] vote=0.722 uniform=0.734 best1=0.725 n_val=334 vram=0.03GB 47s | grade=0.886 inner_auc=n/a vs conf_auc=n/a
+04:43:17 [graph/mutag] vote=0.894 uniform=0.879 best1=0.909 n_val=66 vram=0.02GB 49s | grade=0.920 inner_auc=n/a vs conf_auc=n/a
+04:43:44 ===== CYCLE 389 (OUTER -> INNER -> FEEDBACK) =====
+04:44:30 [graph/proteins] vote=0.730 uniform=0.742 best1=0.739 n_val=318 vram=0.03GB 46s | grade=0.883 inner_auc=n/a vs conf_auc=n/a
+04:45:20 [graph/mutag] vote=0.934 uniform=0.918 best1=0.934 n_val=61 vram=0.02GB 50s | grade=0.925 inner_auc=n/a vs conf_auc=n/a
+04:45:47 ===== CYCLE 390 (OUTER -> INNER -> FEEDBACK) =====
+04:46:34 [graph/proteins] vote=0.742 uniform=0.752 best1=0.746 n_val=330 vram=0.03GB 47s | grade=0.890 inner_auc=n/a vs conf_auc=n/a
+04:47:23 [graph/mutag] vote=0.792 uniform=0.792 best1=0.830 n_val=53 vram=0.02GB 49s | grade=0.819 inner_auc=n/a vs conf_auc=n/a
+04:47:50 ===== CYCLE 391 (OUTER -> INNER -> FEEDBACK) =====
+04:48:37 [graph/proteins] vote=0.777 uniform=0.780 best1=0.771 n_val=327 vram=0.03GB 47s | grade=0.896 inner_auc=n/a vs conf_auc=n/a
+04:49:26 [graph/mutag] vote=0.838 uniform=0.868 best1=0.868 n_val=68 vram=0.02GB 49s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+04:49:53 ===== CYCLE 392 (OUTER -> INNER -> FEEDBACK) =====
+04:50:40 [graph/proteins] vote=0.772 uniform=0.778 best1=0.765 n_val=311 vram=0.03GB 47s | grade=0.899 inner_auc=n/a vs conf_auc=n/a
+04:51:30 [graph/mutag] vote=0.922 uniform=0.922 best1=0.941 n_val=51 vram=0.02GB 50s | grade=0.876 inner_auc=n/a vs conf_auc=n/a
+04:51:57 ===== CYCLE 393 (OUTER -> INNER -> FEEDBACK) =====
+04:52:44 [graph/proteins] vote=0.774 uniform=0.771 best1=0.774 n_val=332 vram=0.03GB 47s | grade=0.902 inner_auc=n/a vs conf_auc=n/a
+04:53:33 [graph/mutag] vote=0.877 uniform=0.877 best1=0.895 n_val=57 vram=0.02GB 49s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+04:54:00 ===== CYCLE 394 (OUTER -> INNER -> FEEDBACK) =====
+04:54:46 [graph/proteins] vote=0.803 uniform=0.806 best1=0.803 n_val=335 vram=0.03GB 47s | grade=0.903 inner_auc=n/a vs conf_auc=n/a
+04:55:36 [graph/mutag] vote=0.875 uniform=0.833 best1=0.896 n_val=48 vram=0.02GB 50s | grade=0.909 inner_auc=n/a vs conf_auc=n/a
+04:56:03 ===== CYCLE 395 (OUTER -> INNER -> FEEDBACK) =====
+04:56:50 [graph/proteins] vote=0.770 uniform=0.790 best1=0.793 n_val=348 vram=0.03GB 48s | grade=0.885 inner_auc=n/a vs conf_auc=n/a
+04:57:40 [graph/mutag] vote=0.896 uniform=0.896 best1=0.938 n_val=48 vram=0.02GB 49s | grade=0.910 inner_auc=n/a vs conf_auc=n/a
+04:58:07 ===== CYCLE 396 (OUTER -> INNER -> FEEDBACK) =====
+04:58:53 [graph/proteins] vote=0.740 uniform=0.758 best1=0.743 n_val=327 vram=0.03GB 47s | grade=0.887 inner_auc=n/a vs conf_auc=n/a
+04:59:43 [graph/mutag] vote=0.836 uniform=0.800 best1=0.891 n_val=55 vram=0.02GB 50s | grade=0.863 inner_auc=n/a vs conf_auc=n/a
+05:00:10 ===== CYCLE 397 (OUTER -> INNER -> FEEDBACK) =====
+05:00:57 [graph/proteins] vote=0.763 uniform=0.763 best1=0.760 n_val=334 vram=0.03GB 47s | grade=0.888 inner_auc=n/a vs conf_auc=n/a
+05:01:46 [graph/mutag] vote=0.804 uniform=0.839 best1=0.875 n_val=56 vram=0.02GB 49s | grade=0.893 inner_auc=n/a vs conf_auc=n/a
+05:02:13 ===== CYCLE 398 (OUTER -> INNER -> FEEDBACK) =====
+05:03:00 [graph/proteins] vote=0.784 uniform=0.794 best1=0.781 n_val=379 vram=0.03GB 47s | grade=0.900 inner_auc=n/a vs conf_auc=n/a
+05:03:50 [graph/mutag] vote=0.833 uniform=0.833 best1=0.850 n_val=60 vram=0.02GB 50s | grade=0.892 inner_auc=n/a vs conf_auc=n/a
+05:04:17 ===== CYCLE 399 (OUTER -> INNER -> FEEDBACK) =====
+05:05:04 [graph/proteins] vote=0.781 uniform=0.781 best1=0.781 n_val=374 vram=0.03GB 48s | grade=0.906 inner_auc=n/a vs conf_auc=n/a
+05:05:54 [graph/mutag] vote=0.911 uniform=0.893 best1=0.911 n_val=56 vram=0.02GB 49s | grade=0.893 inner_auc=n/a vs conf_auc=n/a
+05:06:20 RUN COMPLETE

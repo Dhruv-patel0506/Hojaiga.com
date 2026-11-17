@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "Everything Next",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install Everything Next from the official WinGet community source",
+   "prerequisite_state": "Windows 11 x64 system with internet access",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Run the WinGet command to install Everything Next",
+         "ui_target": {
+            "element_name": "Command Prompt or PowerShell",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install --id StephanOrgiazzi.EverythingNext --exact"
+         },
+         "expected_state_change": "The command prompt or PowerShell window executes the WinGet command and installs Everything Next"
+      }
+   ],
+   "_meta": {
+      "source_app": "Everything Next",
+      "app_key": "everything_next",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "Why Everything Next",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:27:13Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

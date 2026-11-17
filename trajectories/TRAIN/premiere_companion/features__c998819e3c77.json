@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "Premiere Companion",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure and connect Premiere Companion to Adobe Premiere Pro",
+   "prerequisite_state": "Premiere Companion application is open and ready for configuration",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Go to Settings -> Configure -> Install Plugin",
+         "ui_target": {
+            "element_name": "Settings",
+            "automation_id": null,
+            "hierarchical_path": "Main Menu > Settings",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Settings menu opens, revealing various configuration options"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Open the Install Plugin option",
+         "ui_target": {
+            "element_name": "Install Plugin",
+            "automation_id": null,
+            "hierarchical_path": "Settings > Install Plugin",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The plugin installation process begins, allowing the user to select the plugin file"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Open Premiere Pro and load the Premiere Companion plugin",
+         "ui_target": {
+            "element_name": "Window > UXP Plugins > Premiere Companion (Listener)",
+            "automation_id": null,
+            "hierarchical_path": "Main Menu > Window > UXP Plugins > Premiere Companion (Listener)",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Premiere Companion plugin panel opens, indicating that the plugin is successfully loaded and connected"
+      }
+   ],
+   "_meta": {
+      "source_app": "Premiere Companion",
+      "app_key": "premiere_companion",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "✨ Features",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:42:49Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

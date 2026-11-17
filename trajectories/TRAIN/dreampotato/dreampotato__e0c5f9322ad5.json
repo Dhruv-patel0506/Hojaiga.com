@@ -1,0 +1,111 @@
+{
+   "app_metadata": {
+      "app_name": "DreamPotato",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "non_gui",
+   "high_level_task": "Provide instructions for integrating DreamPotato with Flycast",
+   "prerequisite_state": "DreamPotato and Flycast are both installed and running",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the Flycast controller settings",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Flycast controller settings menu opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Enable 'Use Physical VMU Memory'",
+         "ui_target": {
+            "element_name": "Use Physical VMU Memory",
+            "automation_id": null,
+            "hierarchical_path": "Flycast controller settings > Use Physical VMU Memory",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'Use Physical VMU Memory' option is toggled on"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Enable 'Use Network Expansion Devices' for the desired controller port",
+         "ui_target": {
+            "element_name": "Use Network Expansion Devices",
+            "automation_id": null,
+            "hierarchical_path": "Flycast controller settings > Use Network Expansion Devices",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The 'Use Network Expansion Devices' option is toggled on for the selected controller port"
+      }
+   ],
+   "_meta": {
+      "source_app": "DreamPotato",
+      "app_key": "dreampotato",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "DreamPotato",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:48:17Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,236 @@
+{
+   "app_metadata": {
+      "app_name": "Slick Cmd",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and verify Slick Cmd on a Windows system",
+   "prerequisite_state": "Windows 10 or above, 64-bit, with classic Command Prompt or PowerShell installed",
+   "total_steps": 7,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the latest version of Slick Cmd from the Releases page",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User navigates to the Releases page"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Extract the release zip to a preferred installation folder",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The release zip is extracted to the chosen folder"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Double-click `slickcmd.exe` to launch Slick Cmd",
+         "ui_target": {
+            "element_name": "slickcmd.exe",
+            "automation_id": null,
+            "hierarchical_path": "File Explorer > Installation folder > slickcmd.exe",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DOUBLE_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Slick Cmd icon appears in the system tray"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Press `Alt + Up` to navigate to the parent directory",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Alt"
+            ],
+            "text_payload": "Up"
+         },
+         "expected_state_change": "The parent directory is selected"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Press `Alt + F7` to open the command history dialog",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Alt"
+            ],
+            "text_payload": "F7"
+         },
+         "expected_state_change": "The command history dialog is displayed"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Press `Ctrl + L` to clear the screen",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl"
+            ],
+            "text_payload": "L"
+         },
+         "expected_state_change": "The screen is cleared"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Verify Slick Cmd by pressing `Alt + Up` in a command prompt window",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Alt"
+            ],
+            "text_payload": "Up"
+         },
+         "expected_state_change": "The parent directory is selected in the command prompt window"
+      }
+   ],
+   "_meta": {
+      "source_app": "Slick Cmd",
+      "app_key": "slick_cmd",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "Screenshots",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:46:44Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step4_ungrounded_target",
+         "step5_ungrounded_target",
+         "step6_ungrounded_target",
+         "step7_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

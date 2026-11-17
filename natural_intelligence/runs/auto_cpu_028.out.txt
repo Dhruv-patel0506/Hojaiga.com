@@ -1,0 +1,645 @@
+20:56:57 NI run auto_cpu_028 on CPU; hours=2.0 smoke=False
+20:56:57 explicit task list: ['enc2/text/rotten_tomatoes']
+20:56:57 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+20:56:57 [data] enc2/text/rotten_tomatoes: n=10662 C=2 D=768 shards=1
+20:57:40 [enc2/text/rotten_tomatoes] vote=0.858 uniform=0.859 best1=0.857 n_val=3220 vram=0.00GB 43s
+20:57:52 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 3220, "n_val": 654, "base_rate": 0.8654434084892273, "inner": {"auc": 0.8257910375843238, "ece": 0.037541685939199695, "brier": 0.09882109612226486, "acc80": 0.9196940660476685}, "outer_conf": {"auc": 0.8361106649534211, "ece": 0.0509381079163391, "brier": 0.09629567712545395, "acc80": 0.9254302382469177}}
+20:57:52 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+20:58:34 [enc2/text/rotten_tomatoes] vote=0.864 uniform=0.864 best1=0.861 n_val=3242 vram=0.00GB 42s | grade=0.939 inner_auc=0.802 vs conf_auc=0.813
+20:58:40 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+20:59:22 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.860 best1=0.859 n_val=3151 vram=0.00GB 42s | grade=0.939 inner_auc=0.815 vs conf_auc=0.813
+20:59:28 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+21:00:12 [enc2/text/rotten_tomatoes] vote=0.858 uniform=0.858 best1=0.859 n_val=3205 vram=0.00GB 44s | grade=0.944 inner_auc=0.859 vs conf_auc=0.855
+21:00:19 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+21:01:08 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.862 best1=0.859 n_val=3151 vram=0.00GB 49s | grade=0.943 inner_auc=0.847 vs conf_auc=0.849
+21:01:15 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+21:02:03 [enc2/text/rotten_tomatoes] vote=0.869 uniform=0.868 best1=0.870 n_val=3159 vram=0.00GB 48s | grade=0.943 inner_auc=0.843 vs conf_auc=0.846
+21:02:11 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+21:02:55 [enc2/text/rotten_tomatoes] vote=0.872 uniform=0.872 best1=0.865 n_val=3223 vram=0.00GB 44s | grade=0.940 inner_auc=0.844 vs conf_auc=0.848
+21:03:01 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+21:03:43 [enc2/text/rotten_tomatoes] vote=0.871 uniform=0.871 best1=0.867 n_val=3221 vram=0.00GB 42s | grade=0.944 inner_auc=0.815 vs conf_auc=0.818
+21:03:49 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+21:04:25 [enc2/text/rotten_tomatoes] vote=0.855 uniform=0.855 best1=0.854 n_val=3178 vram=0.00GB 35s | grade=0.932 inner_auc=0.815 vs conf_auc=0.815
+21:04:30 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+21:05:02 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.861 best1=0.862 n_val=3216 vram=0.00GB 33s | grade=0.942 inner_auc=0.849 vs conf_auc=0.852
+21:05:07 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+21:05:41 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.864 best1=0.859 n_val=3213 vram=0.00GB 34s | grade=0.944 inner_auc=0.814 vs conf_auc=0.810
+21:05:46 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+21:06:26 [enc2/text/rotten_tomatoes] vote=0.858 uniform=0.860 best1=0.860 n_val=3244 vram=0.00GB 39s | grade=0.933 inner_auc=0.825 vs conf_auc=0.821
+21:06:32 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+21:07:10 [enc2/text/rotten_tomatoes] vote=0.864 uniform=0.862 best1=0.861 n_val=3261 vram=0.00GB 39s | grade=0.943 inner_auc=0.849 vs conf_auc=0.855
+21:07:16 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+21:07:50 [enc2/text/rotten_tomatoes] vote=0.865 uniform=0.865 best1=0.866 n_val=3178 vram=0.00GB 34s | grade=0.944 inner_auc=0.810 vs conf_auc=0.804
+21:07:56 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+21:08:33 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.861 best1=0.856 n_val=3212 vram=0.00GB 37s | grade=0.941 inner_auc=0.802 vs conf_auc=0.799
+21:08:39 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+21:09:15 [enc2/text/rotten_tomatoes] vote=0.856 uniform=0.857 best1=0.855 n_val=3194 vram=0.00GB 36s | grade=0.939 inner_auc=0.819 vs conf_auc=0.815
+21:09:21 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+21:09:51 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.860 best1=0.857 n_val=3176 vram=0.00GB 30s | grade=0.939 inner_auc=0.819 vs conf_auc=0.814
+21:09:56 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+21:10:32 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.861 best1=0.856 n_val=3250 vram=0.00GB 36s | grade=0.940 inner_auc=0.823 vs conf_auc=0.823
+21:10:38 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+21:11:14 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.861 best1=0.863 n_val=3118 vram=0.00GB 36s | grade=0.937 inner_auc=0.824 vs conf_auc=0.825
+21:11:20 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+21:11:54 [enc2/text/rotten_tomatoes] vote=0.859 uniform=0.858 best1=0.855 n_val=3298 vram=0.00GB 33s | grade=0.939 inner_auc=0.834 vs conf_auc=0.837
+21:11:58 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+21:12:32 [enc2/text/rotten_tomatoes] vote=0.858 uniform=0.858 best1=0.854 n_val=3189 vram=0.00GB 34s | grade=0.943 inner_auc=0.819 vs conf_auc=0.827
+21:12:37 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+21:13:14 [enc2/text/rotten_tomatoes] vote=0.857 uniform=0.856 best1=0.854 n_val=3254 vram=0.00GB 37s | grade=0.943 inner_auc=0.835 vs conf_auc=0.833
+21:13:19 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+21:13:52 [enc2/text/rotten_tomatoes] vote=0.870 uniform=0.869 best1=0.864 n_val=3176 vram=0.00GB 33s | grade=0.940 inner_auc=0.776 vs conf_auc=0.775
+21:13:56 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+21:14:28 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.861 best1=0.860 n_val=3171 vram=0.00GB 32s | grade=0.942 inner_auc=0.822 vs conf_auc=0.817
+21:14:34 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+21:15:13 [enc2/text/rotten_tomatoes] vote=0.855 uniform=0.855 best1=0.855 n_val=3241 vram=0.00GB 39s | grade=0.940 inner_auc=0.811 vs conf_auc=0.810
+21:15:19 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+21:15:57 [enc2/text/rotten_tomatoes] vote=0.859 uniform=0.859 best1=0.858 n_val=3235 vram=0.00GB 38s | grade=0.940 inner_auc=0.840 vs conf_auc=0.836
+21:16:03 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+21:16:36 [enc2/text/rotten_tomatoes] vote=0.858 uniform=0.857 best1=0.855 n_val=3188 vram=0.00GB 33s | grade=0.944 inner_auc=0.783 vs conf_auc=0.779
+21:16:41 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+21:17:18 [enc2/text/rotten_tomatoes] vote=0.860 uniform=0.858 best1=0.857 n_val=3142 vram=0.00GB 38s | grade=0.944 inner_auc=0.798 vs conf_auc=0.793
+21:17:25 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+21:18:03 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.861 best1=0.859 n_val=3162 vram=0.00GB 38s | grade=0.944 inner_auc=0.803 vs conf_auc=0.802
+21:18:09 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+21:18:42 [enc2/text/rotten_tomatoes] vote=0.857 uniform=0.856 best1=0.859 n_val=3231 vram=0.00GB 33s | grade=0.940 inner_auc=0.859 vs conf_auc=0.857
+21:18:48 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+21:19:25 [enc2/text/rotten_tomatoes] vote=0.867 uniform=0.866 best1=0.862 n_val=3179 vram=0.00GB 38s | grade=0.938 inner_auc=0.787 vs conf_auc=0.780
+21:19:31 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+21:20:09 [enc2/text/rotten_tomatoes] vote=0.869 uniform=0.870 best1=0.868 n_val=3118 vram=0.00GB 38s | grade=0.944 inner_auc=0.778 vs conf_auc=0.778
+21:20:15 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+21:20:50 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.862 best1=0.857 n_val=3209 vram=0.00GB 35s | grade=0.944 inner_auc=0.814 vs conf_auc=0.814
+21:20:55 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+21:21:32 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.860 best1=0.859 n_val=3167 vram=0.00GB 37s | grade=0.941 inner_auc=0.816 vs conf_auc=0.810
+21:21:38 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+21:22:16 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.863 best1=0.857 n_val=3246 vram=0.00GB 38s | grade=0.942 inner_auc=0.799 vs conf_auc=0.795
+21:22:22 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+21:22:59 [enc2/text/rotten_tomatoes] vote=0.854 uniform=0.855 best1=0.853 n_val=3186 vram=0.00GB 37s | grade=0.939 inner_auc=0.801 vs conf_auc=0.805
+21:23:04 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+21:23:40 [enc2/text/rotten_tomatoes] vote=0.868 uniform=0.869 best1=0.866 n_val=3188 vram=0.00GB 36s | grade=0.936 inner_auc=0.836 vs conf_auc=0.832
+21:23:46 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+21:24:24 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.864 best1=0.857 n_val=3153 vram=0.00GB 38s | grade=0.938 inner_auc=0.799 vs conf_auc=0.805
+21:24:31 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+21:25:07 [enc2/text/rotten_tomatoes] vote=0.869 uniform=0.869 best1=0.862 n_val=3158 vram=0.00GB 36s | grade=0.942 inner_auc=0.821 vs conf_auc=0.819
+21:25:12 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+21:25:48 [enc2/text/rotten_tomatoes] vote=0.857 uniform=0.856 best1=0.854 n_val=3166 vram=0.00GB 35s | grade=0.938 inner_auc=0.813 vs conf_auc=0.802
+21:25:54 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+21:26:32 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.863 best1=0.854 n_val=3147 vram=0.00GB 38s | grade=0.941 inner_auc=0.837 vs conf_auc=0.842
+21:26:38 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+21:27:17 [enc2/text/rotten_tomatoes] vote=0.870 uniform=0.869 best1=0.866 n_val=3095 vram=0.00GB 39s | grade=0.934 inner_auc=0.840 vs conf_auc=0.834
+21:27:22 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+21:27:56 [enc2/text/rotten_tomatoes] vote=0.867 uniform=0.868 best1=0.862 n_val=3184 vram=0.00GB 34s | grade=0.946 inner_auc=0.813 vs conf_auc=0.821
+21:28:02 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+21:28:40 [enc2/text/rotten_tomatoes] vote=0.858 uniform=0.857 best1=0.857 n_val=3174 vram=0.00GB 39s | grade=0.936 inner_auc=0.839 vs conf_auc=0.838
+21:28:46 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+21:29:24 [enc2/text/rotten_tomatoes] vote=0.871 uniform=0.870 best1=0.862 n_val=3272 vram=0.00GB 38s | grade=0.940 inner_auc=0.818 vs conf_auc=0.822
+21:29:30 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+21:30:03 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.861 best1=0.857 n_val=3226 vram=0.00GB 33s | grade=0.944 inner_auc=0.790 vs conf_auc=0.795
+21:30:09 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+21:30:47 [enc2/text/rotten_tomatoes] vote=0.856 uniform=0.856 best1=0.856 n_val=3295 vram=0.00GB 38s | grade=0.939 inner_auc=0.827 vs conf_auc=0.825
+21:30:53 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+21:31:32 [enc2/text/rotten_tomatoes] vote=0.875 uniform=0.874 best1=0.871 n_val=3226 vram=0.00GB 38s | grade=0.937 inner_auc=0.790 vs conf_auc=0.789
+21:31:38 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+21:32:12 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.864 best1=0.859 n_val=3159 vram=0.00GB 34s | grade=0.938 inner_auc=0.803 vs conf_auc=0.801
+21:32:17 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+21:32:55 [enc2/text/rotten_tomatoes] vote=0.874 uniform=0.876 best1=0.872 n_val=3115 vram=0.00GB 38s | grade=0.939 inner_auc=0.845 vs conf_auc=0.845
+21:33:01 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+21:33:39 [enc2/text/rotten_tomatoes] vote=0.866 uniform=0.865 best1=0.863 n_val=3247 vram=0.00GB 38s | grade=0.942 inner_auc=0.790 vs conf_auc=0.787
+21:33:46 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+21:34:22 [enc2/text/rotten_tomatoes] vote=0.869 uniform=0.867 best1=0.865 n_val=3179 vram=0.00GB 36s | grade=0.943 inner_auc=0.824 vs conf_auc=0.824
+21:34:27 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+21:35:03 [enc2/text/rotten_tomatoes] vote=0.860 uniform=0.861 best1=0.852 n_val=3211 vram=0.00GB 36s | grade=0.940 inner_auc=0.835 vs conf_auc=0.835
+21:35:09 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+21:35:48 [enc2/text/rotten_tomatoes] vote=0.874 uniform=0.873 best1=0.867 n_val=3139 vram=0.00GB 38s | grade=0.939 inner_auc=0.785 vs conf_auc=0.787
+21:35:53 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+21:36:31 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.863 best1=0.857 n_val=3245 vram=0.00GB 38s | grade=0.943 inner_auc=0.813 vs conf_auc=0.821
+21:36:36 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+21:37:11 [enc2/text/rotten_tomatoes] vote=0.865 uniform=0.865 best1=0.867 n_val=3220 vram=0.00GB 35s | grade=0.944 inner_auc=0.825 vs conf_auc=0.826
+21:37:17 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+21:37:55 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.861 best1=0.860 n_val=3234 vram=0.00GB 38s | grade=0.944 inner_auc=0.822 vs conf_auc=0.824
+21:38:02 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+21:38:40 [enc2/text/rotten_tomatoes] vote=0.851 uniform=0.850 best1=0.849 n_val=3175 vram=0.00GB 38s | grade=0.934 inner_auc=0.830 vs conf_auc=0.833
+21:38:45 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+21:39:19 [enc2/text/rotten_tomatoes] vote=0.868 uniform=0.868 best1=0.865 n_val=3231 vram=0.00GB 33s | grade=0.935 inner_auc=0.791 vs conf_auc=0.786
+21:39:25 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+21:40:03 [enc2/text/rotten_tomatoes] vote=0.859 uniform=0.861 best1=0.854 n_val=3205 vram=0.00GB 38s | grade=0.939 inner_auc=0.839 vs conf_auc=0.838
+21:40:10 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+21:40:48 [enc2/text/rotten_tomatoes] vote=0.860 uniform=0.857 best1=0.859 n_val=3234 vram=0.00GB 38s | grade=0.940 inner_auc=0.861 vs conf_auc=0.860
+21:40:54 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+21:41:28 [enc2/text/rotten_tomatoes] vote=0.874 uniform=0.871 best1=0.866 n_val=3221 vram=0.00GB 34s | grade=0.936 inner_auc=0.802 vs conf_auc=0.797
+21:41:34 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+21:42:12 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.864 best1=0.860 n_val=3153 vram=0.00GB 39s | grade=0.938 inner_auc=0.839 vs conf_auc=0.843
+21:42:19 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+21:42:57 [enc2/text/rotten_tomatoes] vote=0.859 uniform=0.861 best1=0.858 n_val=3209 vram=0.00GB 38s | grade=0.943 inner_auc=0.805 vs conf_auc=0.810
+21:43:03 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+21:43:38 [enc2/text/rotten_tomatoes] vote=0.865 uniform=0.864 best1=0.860 n_val=3225 vram=0.00GB 35s | grade=0.938 inner_auc=0.788 vs conf_auc=0.787
+21:43:43 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+21:44:21 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.862 best1=0.858 n_val=3292 vram=0.00GB 38s | grade=0.942 inner_auc=0.809 vs conf_auc=0.806
+21:44:28 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+21:45:05 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.860 best1=0.858 n_val=3166 vram=0.00GB 38s | grade=0.947 inner_auc=0.837 vs conf_auc=0.829
+21:45:11 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+21:45:47 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.862 best1=0.860 n_val=3164 vram=0.00GB 36s | grade=0.941 inner_auc=0.835 vs conf_auc=0.836
+21:45:53 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+21:46:28 [enc2/text/rotten_tomatoes] vote=0.855 uniform=0.854 best1=0.850 n_val=3208 vram=0.00GB 35s | grade=0.943 inner_auc=0.825 vs conf_auc=0.816
+21:46:35 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+21:47:13 [enc2/text/rotten_tomatoes] vote=0.875 uniform=0.873 best1=0.874 n_val=3187 vram=0.00GB 38s | grade=0.935 inner_auc=0.824 vs conf_auc=0.821
+21:47:20 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+21:47:57 [enc2/text/rotten_tomatoes] vote=0.856 uniform=0.857 best1=0.853 n_val=3113 vram=0.00GB 38s | grade=0.931 inner_auc=0.826 vs conf_auc=0.822
+21:48:03 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+21:48:37 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.860 best1=0.861 n_val=3260 vram=0.00GB 34s | grade=0.944 inner_auc=0.800 vs conf_auc=0.803
+21:48:44 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+21:49:22 [enc2/text/rotten_tomatoes] vote=0.867 uniform=0.865 best1=0.861 n_val=3225 vram=0.00GB 38s | grade=0.944 inner_auc=0.837 vs conf_auc=0.831
+21:49:29 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+21:50:06 [enc2/text/rotten_tomatoes] vote=0.866 uniform=0.864 best1=0.861 n_val=3188 vram=0.00GB 37s | grade=0.947 inner_auc=0.805 vs conf_auc=0.812
+21:50:13 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+21:50:46 [enc2/text/rotten_tomatoes] vote=0.868 uniform=0.868 best1=0.865 n_val=3153 vram=0.00GB 34s | grade=0.944 inner_auc=0.855 vs conf_auc=0.856
+21:50:53 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+21:51:31 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.863 best1=0.861 n_val=3254 vram=0.00GB 38s | grade=0.940 inner_auc=0.850 vs conf_auc=0.845
+21:51:37 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+21:52:17 [enc2/text/rotten_tomatoes] vote=0.859 uniform=0.859 best1=0.858 n_val=3250 vram=0.00GB 40s | grade=0.946 inner_auc=0.775 vs conf_auc=0.780
+21:52:23 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+21:52:57 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.862 best1=0.863 n_val=3258 vram=0.00GB 34s | grade=0.943 inner_auc=0.850 vs conf_auc=0.860
+21:53:03 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+21:53:40 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.864 best1=0.860 n_val=3223 vram=0.00GB 37s | grade=0.943 inner_auc=0.810 vs conf_auc=0.813
+21:53:47 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+21:54:25 [enc2/text/rotten_tomatoes] vote=0.856 uniform=0.856 best1=0.856 n_val=3197 vram=0.00GB 38s | grade=0.943 inner_auc=0.828 vs conf_auc=0.830
+21:54:32 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+21:55:07 [enc2/text/rotten_tomatoes] vote=0.870 uniform=0.869 best1=0.864 n_val=3332 vram=0.00GB 35s | grade=0.938 inner_auc=0.833 vs conf_auc=0.830
+21:55:14 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+21:55:49 [enc2/text/rotten_tomatoes] vote=0.864 uniform=0.864 best1=0.862 n_val=3176 vram=0.00GB 35s | grade=0.944 inner_auc=0.814 vs conf_auc=0.823
+21:55:56 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+21:56:34 [enc2/text/rotten_tomatoes] vote=0.855 uniform=0.853 best1=0.852 n_val=3225 vram=0.00GB 38s | grade=0.939 inner_auc=0.820 vs conf_auc=0.817
+21:56:40 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+21:57:17 [enc2/text/rotten_tomatoes] vote=0.857 uniform=0.859 best1=0.861 n_val=3238 vram=0.00GB 37s | grade=0.941 inner_auc=0.856 vs conf_auc=0.850
+21:57:23 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+21:57:58 [enc2/text/rotten_tomatoes] vote=0.853 uniform=0.854 best1=0.858 n_val=3104 vram=0.00GB 35s | grade=0.939 inner_auc=0.794 vs conf_auc=0.786
+21:58:04 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+21:58:42 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.860 best1=0.859 n_val=3259 vram=0.00GB 38s | grade=0.939 inner_auc=0.828 vs conf_auc=0.833
+21:58:49 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+21:59:27 [enc2/text/rotten_tomatoes] vote=0.859 uniform=0.859 best1=0.856 n_val=3137 vram=0.00GB 38s | grade=0.944 inner_auc=0.827 vs conf_auc=0.822
+21:59:32 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+22:00:06 [enc2/text/rotten_tomatoes] vote=0.867 uniform=0.867 best1=0.862 n_val=3147 vram=0.00GB 34s | grade=0.942 inner_auc=0.830 vs conf_auc=0.829
+22:00:12 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+22:00:50 [enc2/text/rotten_tomatoes] vote=0.869 uniform=0.867 best1=0.864 n_val=3187 vram=0.00GB 38s | grade=0.944 inner_auc=0.855 vs conf_auc=0.856
+22:00:57 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+22:01:35 [enc2/text/rotten_tomatoes] vote=0.872 uniform=0.872 best1=0.867 n_val=3266 vram=0.00GB 38s | grade=0.940 inner_auc=0.799 vs conf_auc=0.800
+22:01:41 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+22:02:15 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.863 best1=0.855 n_val=3305 vram=0.00GB 33s | grade=0.938 inner_auc=0.824 vs conf_auc=0.822
+22:02:19 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+22:02:58 [enc2/text/rotten_tomatoes] vote=0.867 uniform=0.867 best1=0.861 n_val=3234 vram=0.00GB 38s | grade=0.943 inner_auc=0.784 vs conf_auc=0.781
+22:03:04 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+22:03:42 [enc2/text/rotten_tomatoes] vote=0.873 uniform=0.874 best1=0.872 n_val=3183 vram=0.00GB 38s | grade=0.941 inner_auc=0.804 vs conf_auc=0.806
+22:03:49 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+22:04:24 [enc2/text/rotten_tomatoes] vote=0.868 uniform=0.868 best1=0.866 n_val=3195 vram=0.00GB 36s | grade=0.944 inner_auc=0.839 vs conf_auc=0.840
+22:04:30 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+22:05:06 [enc2/text/rotten_tomatoes] vote=0.871 uniform=0.869 best1=0.866 n_val=3243 vram=0.00GB 36s | grade=0.944 inner_auc=0.846 vs conf_auc=0.843
+22:05:12 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+22:05:50 [enc2/text/rotten_tomatoes] vote=0.873 uniform=0.872 best1=0.868 n_val=3224 vram=0.00GB 38s | grade=0.942 inner_auc=0.794 vs conf_auc=0.789
+22:05:57 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+22:06:34 [enc2/text/rotten_tomatoes] vote=0.864 uniform=0.868 best1=0.860 n_val=3277 vram=0.00GB 37s | grade=0.941 inner_auc=0.818 vs conf_auc=0.817
+22:06:40 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+22:07:15 [enc2/text/rotten_tomatoes] vote=0.868 uniform=0.866 best1=0.859 n_val=3108 vram=0.00GB 35s | grade=0.944 inner_auc=0.784 vs conf_auc=0.778
+22:07:21 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+22:08:00 [enc2/text/rotten_tomatoes] vote=0.871 uniform=0.870 best1=0.865 n_val=3142 vram=0.00GB 39s | grade=0.941 inner_auc=0.837 vs conf_auc=0.829
+22:08:06 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+22:08:44 [enc2/text/rotten_tomatoes] vote=0.867 uniform=0.868 best1=0.862 n_val=3174 vram=0.00GB 38s | grade=0.947 inner_auc=0.799 vs conf_auc=0.796
+22:08:50 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+22:09:23 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.860 best1=0.860 n_val=3289 vram=0.00GB 33s | grade=0.944 inner_auc=0.813 vs conf_auc=0.809
+22:09:30 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+22:10:08 [enc2/text/rotten_tomatoes] vote=0.868 uniform=0.862 best1=0.861 n_val=3093 vram=0.00GB 37s | grade=0.940 inner_auc=0.804 vs conf_auc=0.800
+22:10:14 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+22:10:53 [enc2/text/rotten_tomatoes] vote=0.864 uniform=0.864 best1=0.862 n_val=3169 vram=0.00GB 38s | grade=0.944 inner_auc=0.809 vs conf_auc=0.812
+22:11:00 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+22:11:33 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.863 best1=0.857 n_val=3282 vram=0.00GB 33s | grade=0.942 inner_auc=0.810 vs conf_auc=0.808
+22:11:38 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+22:12:16 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.863 best1=0.858 n_val=3142 vram=0.00GB 38s | grade=0.945 inner_auc=0.812 vs conf_auc=0.808
+22:12:23 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+22:13:02 [enc2/text/rotten_tomatoes] vote=0.857 uniform=0.856 best1=0.848 n_val=3195 vram=0.00GB 39s | grade=0.939 inner_auc=0.801 vs conf_auc=0.796
+22:13:09 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+22:13:44 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.860 best1=0.858 n_val=3192 vram=0.00GB 35s | grade=0.942 inner_auc=0.799 vs conf_auc=0.800
+22:13:50 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+22:14:26 [enc2/text/rotten_tomatoes] vote=0.869 uniform=0.870 best1=0.864 n_val=3138 vram=0.00GB 36s | grade=0.943 inner_auc=0.792 vs conf_auc=0.790
+22:14:33 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+22:15:08 [enc2/text/rotten_tomatoes] vote=0.859 uniform=0.859 best1=0.854 n_val=3124 vram=0.00GB 36s | grade=0.936 inner_auc=0.832 vs conf_auc=0.837
+22:15:14 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+22:15:47 [enc2/text/rotten_tomatoes] vote=0.860 uniform=0.860 best1=0.860 n_val=3222 vram=0.00GB 33s | grade=0.943 inner_auc=0.817 vs conf_auc=0.812
+22:15:52 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+22:16:23 [enc2/text/rotten_tomatoes] vote=0.865 uniform=0.862 best1=0.861 n_val=3140 vram=0.00GB 31s | grade=0.942 inner_auc=0.802 vs conf_auc=0.795
+22:16:29 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+22:17:04 [enc2/text/rotten_tomatoes] vote=0.865 uniform=0.863 best1=0.859 n_val=3143 vram=0.00GB 35s | grade=0.944 inner_auc=0.812 vs conf_auc=0.810
+22:17:09 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+22:17:44 [enc2/text/rotten_tomatoes] vote=0.868 uniform=0.867 best1=0.861 n_val=3282 vram=0.00GB 35s | grade=0.941 inner_auc=0.826 vs conf_auc=0.830
+22:17:49 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+22:18:19 [enc2/text/rotten_tomatoes] vote=0.864 uniform=0.866 best1=0.861 n_val=3176 vram=0.00GB 30s | grade=0.940 inner_auc=0.821 vs conf_auc=0.817
+22:18:25 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+22:18:57 [enc2/text/rotten_tomatoes] vote=0.869 uniform=0.869 best1=0.862 n_val=3249 vram=0.00GB 33s | grade=0.940 inner_auc=0.798 vs conf_auc=0.789
+22:19:03 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+22:19:37 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.863 best1=0.862 n_val=3165 vram=0.00GB 34s | grade=0.938 inner_auc=0.818 vs conf_auc=0.824
+22:19:43 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+22:20:12 [enc2/text/rotten_tomatoes] vote=0.865 uniform=0.865 best1=0.862 n_val=3232 vram=0.00GB 29s | grade=0.944 inner_auc=0.798 vs conf_auc=0.799
+22:20:16 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+22:20:52 [enc2/text/rotten_tomatoes] vote=0.866 uniform=0.866 best1=0.867 n_val=3113 vram=0.00GB 35s | grade=0.944 inner_auc=0.839 vs conf_auc=0.840
+22:20:58 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+22:21:36 [enc2/text/rotten_tomatoes] vote=0.860 uniform=0.859 best1=0.855 n_val=3209 vram=0.00GB 38s | grade=0.941 inner_auc=0.876 vs conf_auc=0.876
+22:21:42 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+22:22:17 [enc2/text/rotten_tomatoes] vote=0.860 uniform=0.860 best1=0.858 n_val=3105 vram=0.00GB 34s | grade=0.943 inner_auc=0.782 vs conf_auc=0.772
+22:22:22 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+22:22:58 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.862 best1=0.858 n_val=3257 vram=0.00GB 36s | grade=0.946 inner_auc=0.812 vs conf_auc=0.814
+22:23:04 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+22:23:41 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.863 best1=0.861 n_val=3303 vram=0.00GB 37s | grade=0.944 inner_auc=0.801 vs conf_auc=0.803
+22:23:48 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+22:24:23 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.866 best1=0.858 n_val=3156 vram=0.00GB 35s | grade=0.942 inner_auc=0.846 vs conf_auc=0.834
+22:24:28 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+22:25:03 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.857 best1=0.858 n_val=3199 vram=0.00GB 35s | grade=0.946 inner_auc=0.818 vs conf_auc=0.822
+22:25:10 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+22:25:47 [enc2/text/rotten_tomatoes] vote=0.857 uniform=0.855 best1=0.849 n_val=3182 vram=0.00GB 37s | grade=0.940 inner_auc=0.819 vs conf_auc=0.815
+22:25:54 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+22:26:29 [enc2/text/rotten_tomatoes] vote=0.857 uniform=0.857 best1=0.856 n_val=3196 vram=0.00GB 36s | grade=0.943 inner_auc=0.847 vs conf_auc=0.844
+22:26:36 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+22:27:10 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.862 best1=0.858 n_val=3312 vram=0.00GB 34s | grade=0.938 inner_auc=0.841 vs conf_auc=0.846
+22:27:16 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+22:27:53 [enc2/text/rotten_tomatoes] vote=0.877 uniform=0.875 best1=0.874 n_val=3118 vram=0.00GB 37s | grade=0.936 inner_auc=0.849 vs conf_auc=0.845
+22:27:59 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+22:28:37 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.864 best1=0.867 n_val=3189 vram=0.00GB 38s | grade=0.936 inner_auc=0.814 vs conf_auc=0.815
+22:28:42 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+22:29:15 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.862 best1=0.853 n_val=3238 vram=0.00GB 33s | grade=0.945 inner_auc=0.821 vs conf_auc=0.824
+22:29:21 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+22:29:58 [enc2/text/rotten_tomatoes] vote=0.856 uniform=0.854 best1=0.853 n_val=3270 vram=0.00GB 37s | grade=0.939 inner_auc=0.837 vs conf_auc=0.830
+22:30:05 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+22:30:43 [enc2/text/rotten_tomatoes] vote=0.864 uniform=0.864 best1=0.862 n_val=3229 vram=0.00GB 38s | grade=0.939 inner_auc=0.813 vs conf_auc=0.810
+22:30:49 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+22:31:22 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.860 best1=0.859 n_val=3215 vram=0.00GB 33s | grade=0.942 inner_auc=0.825 vs conf_auc=0.822
+22:31:28 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+22:32:05 [enc2/text/rotten_tomatoes] vote=0.866 uniform=0.866 best1=0.864 n_val=3248 vram=0.00GB 37s | grade=0.943 inner_auc=0.830 vs conf_auc=0.837
+22:32:11 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+22:32:48 [enc2/text/rotten_tomatoes] vote=0.873 uniform=0.874 best1=0.864 n_val=3158 vram=0.00GB 37s | grade=0.940 inner_auc=0.836 vs conf_auc=0.844
+22:32:55 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+22:33:29 [enc2/text/rotten_tomatoes] vote=0.869 uniform=0.870 best1=0.863 n_val=3226 vram=0.00GB 34s | grade=0.945 inner_auc=0.805 vs conf_auc=0.795
+22:33:34 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+22:34:10 [enc2/text/rotten_tomatoes] vote=0.856 uniform=0.856 best1=0.853 n_val=3260 vram=0.00GB 36s | grade=0.935 inner_auc=0.847 vs conf_auc=0.846
+22:34:17 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+22:34:55 [enc2/text/rotten_tomatoes] vote=0.860 uniform=0.863 best1=0.859 n_val=3209 vram=0.00GB 38s | grade=0.939 inner_auc=0.786 vs conf_auc=0.781
+22:35:01 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+22:35:37 [enc2/text/rotten_tomatoes] vote=0.864 uniform=0.866 best1=0.859 n_val=3222 vram=0.00GB 35s | grade=0.938 inner_auc=0.791 vs conf_auc=0.795
+22:35:42 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+22:36:19 [enc2/text/rotten_tomatoes] vote=0.868 uniform=0.868 best1=0.861 n_val=3226 vram=0.00GB 37s | grade=0.941 inner_auc=0.853 vs conf_auc=0.853
+22:36:25 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+22:37:06 [enc2/text/rotten_tomatoes] vote=0.874 uniform=0.875 best1=0.871 n_val=3177 vram=0.00GB 41s | grade=0.939 inner_auc=0.797 vs conf_auc=0.800
+22:37:13 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+22:37:50 [enc2/text/rotten_tomatoes] vote=0.877 uniform=0.881 best1=0.873 n_val=3198 vram=0.00GB 37s | grade=0.943 inner_auc=0.780 vs conf_auc=0.776
+22:37:57 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+22:38:34 [enc2/text/rotten_tomatoes] vote=0.857 uniform=0.859 best1=0.856 n_val=3247 vram=0.00GB 37s | grade=0.933 inner_auc=0.837 vs conf_auc=0.840
+22:38:42 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+22:39:26 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.860 best1=0.857 n_val=3231 vram=0.00GB 45s | grade=0.945 inner_auc=0.819 vs conf_auc=0.817
+22:39:34 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+22:41:02 [enc2/text/rotten_tomatoes] vote=0.872 uniform=0.871 best1=0.867 n_val=3222 vram=0.00GB 88s | grade=0.942 inner_auc=0.790 vs conf_auc=0.781
+22:41:10 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+22:41:45 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.864 best1=0.857 n_val=3157 vram=0.00GB 36s | grade=0.940 inner_auc=0.780 vs conf_auc=0.779
+22:41:53 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+22:42:33 [enc2/text/rotten_tomatoes] vote=0.865 uniform=0.864 best1=0.864 n_val=3202 vram=0.00GB 40s | grade=0.941 inner_auc=0.800 vs conf_auc=0.797
+22:42:40 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+22:43:34 [enc2/text/rotten_tomatoes] vote=0.866 uniform=0.863 best1=0.862 n_val=3163 vram=0.00GB 54s | grade=0.943 inner_auc=0.818 vs conf_auc=0.818
+22:43:42 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+22:44:24 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.860 best1=0.858 n_val=3221 vram=0.00GB 42s | grade=0.944 inner_auc=0.792 vs conf_auc=0.792
+22:44:31 ===== CYCLE 149 (OUTER -> INNER -> FEEDBACK) =====
+22:45:20 [enc2/text/rotten_tomatoes] vote=0.858 uniform=0.857 best1=0.854 n_val=3256 vram=0.00GB 49s | grade=0.941 inner_auc=0.817 vs conf_auc=0.821
+22:45:29 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+22:46:18 [enc2/text/rotten_tomatoes] vote=0.864 uniform=0.863 best1=0.857 n_val=3162 vram=0.00GB 49s | grade=0.946 inner_auc=0.795 vs conf_auc=0.777
+22:46:27 ===== CYCLE 151 (OUTER -> INNER -> FEEDBACK) =====
+22:47:10 [enc2/text/rotten_tomatoes] vote=0.866 uniform=0.870 best1=0.863 n_val=3228 vram=0.00GB 43s | grade=0.942 inner_auc=0.813 vs conf_auc=0.810
+22:47:17 ===== CYCLE 152 (OUTER -> INNER -> FEEDBACK) =====
+22:48:19 [enc2/text/rotten_tomatoes] vote=0.866 uniform=0.867 best1=0.860 n_val=3093 vram=0.00GB 61s | grade=0.944 inner_auc=0.818 vs conf_auc=0.821
+22:48:27 ===== CYCLE 153 (OUTER -> INNER -> FEEDBACK) =====
+22:49:22 [enc2/text/rotten_tomatoes] vote=0.867 uniform=0.864 best1=0.862 n_val=3113 vram=0.00GB 55s | grade=0.942 inner_auc=0.790 vs conf_auc=0.785
+22:49:31 ===== CYCLE 154 (OUTER -> INNER -> FEEDBACK) =====
+22:50:20 [enc2/text/rotten_tomatoes] vote=0.866 uniform=0.863 best1=0.863 n_val=3242 vram=0.00GB 49s | grade=0.941 inner_auc=0.815 vs conf_auc=0.812
+22:50:29 ===== CYCLE 155 (OUTER -> INNER -> FEEDBACK) =====
+22:51:14 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.862 best1=0.859 n_val=3101 vram=0.00GB 46s | grade=0.941 inner_auc=0.822 vs conf_auc=0.826
+22:51:23 ===== CYCLE 156 (OUTER -> INNER -> FEEDBACK) =====
+22:52:14 [enc2/text/rotten_tomatoes] vote=0.864 uniform=0.865 best1=0.864 n_val=3171 vram=0.00GB 51s | grade=0.940 inner_auc=0.835 vs conf_auc=0.831
+22:52:23 ===== CYCLE 157 (OUTER -> INNER -> FEEDBACK) =====
+22:53:11 [enc2/text/rotten_tomatoes] vote=0.870 uniform=0.872 best1=0.868 n_val=3168 vram=0.00GB 48s | grade=0.937 inner_auc=0.838 vs conf_auc=0.830
+22:53:19 ===== CYCLE 158 (OUTER -> INNER -> FEEDBACK) =====
+22:54:04 [enc2/text/rotten_tomatoes] vote=0.871 uniform=0.870 best1=0.864 n_val=3129 vram=0.00GB 45s | grade=0.942 inner_auc=0.825 vs conf_auc=0.817
+22:54:13 ===== CYCLE 159 (OUTER -> INNER -> FEEDBACK) =====
+22:55:34 [enc2/text/rotten_tomatoes] vote=0.864 uniform=0.865 best1=0.864 n_val=3246 vram=0.00GB 81s | grade=0.940 inner_auc=0.834 vs conf_auc=0.822
+22:56:11 ===== CYCLE 160 (OUTER -> INNER -> FEEDBACK) =====
+22:58:26 [enc2/text/rotten_tomatoes] vote=0.871 uniform=0.869 best1=0.865 n_val=3179 vram=0.00GB 135s | grade=0.940 inner_auc=0.825 vs conf_auc=0.817
+22:58:34 RUN COMPLETE
+00:28:02 NI run auto_cpu_028 on CPU; hours=2.0 smoke=False
+00:28:02 explicit task list: ['enc2/text/rotten_tomatoes']
+00:28:06 [resume] from checkpoint: next cycle 161, rounds 161, 161 metric rows, inner net restored
+00:28:06 ===== CYCLE 161 (OUTER-ONLY BOOTSTRAP) =====
+00:28:06 [data] enc2/text/rotten_tomatoes: n=10662 C=2 D=768 shards=1
+00:29:10 [enc2/text/rotten_tomatoes] vote=0.866 uniform=0.868 best1=0.864 n_val=3235 vram=0.00GB 64s
+00:29:27 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 161, "n_records": 3235, "n_val": 610, "base_rate": 0.8590164184570312, "inner": {"auc": 0.8041452156932363, "ece": 0.04664512989950962, "brier": 0.10256274789571762, "acc80": 0.9159836173057556}, "outer_conf": {"auc": 0.7989747914077756, "ece": 0.03718683709863757, "brier": 0.10256495326757431, "acc80": 0.9180327653884888}}
+00:29:27 ===== CYCLE 162 (OUTER -> INNER -> FEEDBACK) =====
+00:31:12 [enc2/text/rotten_tomatoes] vote=0.857 uniform=0.858 best1=0.857 n_val=3179 vram=0.00GB 105s | grade=0.934 inner_auc=0.860 vs conf_auc=0.856
+00:31:28 ===== CYCLE 163 (OUTER -> INNER -> FEEDBACK) =====
+00:33:29 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.865 best1=0.863 n_val=3208 vram=0.00GB 121s | grade=0.940 inner_auc=0.800 vs conf_auc=0.807
+00:33:44 ===== CYCLE 164 (OUTER -> INNER -> FEEDBACK) =====
+00:35:08 [enc2/text/rotten_tomatoes] vote=0.864 uniform=0.863 best1=0.859 n_val=3053 vram=0.00GB 84s | grade=0.941 inner_auc=0.877 vs conf_auc=0.878
+00:35:16 ===== CYCLE 165 (OUTER -> INNER -> FEEDBACK) =====
+00:37:01 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.864 best1=0.863 n_val=3230 vram=0.00GB 105s | grade=0.943 inner_auc=0.808 vs conf_auc=0.809
+00:37:31 ===== CYCLE 166 (OUTER -> INNER -> FEEDBACK) =====
+00:40:23 [enc2/text/rotten_tomatoes] vote=0.865 uniform=0.866 best1=0.864 n_val=3199 vram=0.00GB 172s | grade=0.942 inner_auc=0.858 vs conf_auc=0.850
+00:40:49 ===== CYCLE 167 (OUTER -> INNER -> FEEDBACK) =====
+00:43:57 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.863 best1=0.858 n_val=3245 vram=0.00GB 188s | grade=0.942 inner_auc=0.828 vs conf_auc=0.822
+00:44:14 ===== CYCLE 168 (OUTER -> INNER -> FEEDBACK) =====
+00:46:06 [enc2/text/rotten_tomatoes] vote=0.854 uniform=0.855 best1=0.852 n_val=3220 vram=0.00GB 111s | grade=0.940 inner_auc=0.818 vs conf_auc=0.818
+00:46:12 ===== CYCLE 169 (OUTER -> INNER -> FEEDBACK) =====
+00:46:57 [enc2/text/rotten_tomatoes] vote=0.872 uniform=0.870 best1=0.870 n_val=3233 vram=0.00GB 45s | grade=0.936 inner_auc=0.798 vs conf_auc=0.798
+00:47:03 ===== CYCLE 170 (OUTER -> INNER -> FEEDBACK) =====
+00:47:48 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.862 best1=0.862 n_val=3247 vram=0.00GB 45s | grade=0.939 inner_auc=0.807 vs conf_auc=0.797
+00:47:54 ===== CYCLE 171 (OUTER -> INNER -> FEEDBACK) =====
+00:48:38 [enc2/text/rotten_tomatoes] vote=0.855 uniform=0.856 best1=0.852 n_val=3182 vram=0.00GB 45s | grade=0.937 inner_auc=0.856 vs conf_auc=0.848
+00:48:44 ===== CYCLE 172 (OUTER -> INNER -> FEEDBACK) =====
+00:49:28 [enc2/text/rotten_tomatoes] vote=0.857 uniform=0.859 best1=0.857 n_val=3214 vram=0.00GB 45s | grade=0.942 inner_auc=0.817 vs conf_auc=0.814
+00:49:34 ===== CYCLE 173 (OUTER -> INNER -> FEEDBACK) =====
+00:50:17 [enc2/text/rotten_tomatoes] vote=0.855 uniform=0.855 best1=0.857 n_val=3148 vram=0.00GB 43s | grade=0.941 inner_auc=0.824 vs conf_auc=0.823
+00:50:23 ===== CYCLE 174 (OUTER -> INNER -> FEEDBACK) =====
+00:51:07 [enc2/text/rotten_tomatoes] vote=0.855 uniform=0.856 best1=0.855 n_val=3160 vram=0.00GB 44s | grade=0.939 inner_auc=0.814 vs conf_auc=0.805
+00:51:13 ===== CYCLE 175 (OUTER -> INNER -> FEEDBACK) =====
+00:52:03 [enc2/text/rotten_tomatoes] vote=0.855 uniform=0.858 best1=0.858 n_val=3168 vram=0.00GB 50s | grade=0.940 inner_auc=0.814 vs conf_auc=0.811
+00:52:08 ===== CYCLE 176 (OUTER -> INNER -> FEEDBACK) =====
+00:52:48 [enc2/text/rotten_tomatoes] vote=0.866 uniform=0.866 best1=0.865 n_val=3191 vram=0.00GB 39s | grade=0.935 inner_auc=0.821 vs conf_auc=0.814
+00:52:53 ===== CYCLE 177 (OUTER -> INNER -> FEEDBACK) =====
+00:54:24 [enc2/text/rotten_tomatoes] vote=0.873 uniform=0.870 best1=0.872 n_val=3216 vram=0.00GB 91s | grade=0.941 inner_auc=0.824 vs conf_auc=0.823
+00:54:38 ===== CYCLE 178 (OUTER -> INNER -> FEEDBACK) =====
+00:57:00 [enc2/text/rotten_tomatoes] vote=0.870 uniform=0.867 best1=0.865 n_val=3222 vram=0.00GB 143s | grade=0.943 inner_auc=0.812 vs conf_auc=0.809
+00:57:12 ===== CYCLE 179 (OUTER -> INNER -> FEEDBACK) =====
+00:58:06 [enc2/text/rotten_tomatoes] vote=0.869 uniform=0.870 best1=0.864 n_val=3141 vram=0.00GB 53s | grade=0.943 inner_auc=0.826 vs conf_auc=0.820
+00:58:12 ===== CYCLE 180 (OUTER -> INNER -> FEEDBACK) =====
+00:58:58 [enc2/text/rotten_tomatoes] vote=0.855 uniform=0.853 best1=0.850 n_val=3185 vram=0.00GB 46s | grade=0.936 inner_auc=0.827 vs conf_auc=0.821
+00:59:04 ===== CYCLE 181 (OUTER -> INNER -> FEEDBACK) =====
+00:25:15 NI run auto_cpu_028 on CPU; hours=2.0 smoke=False
+00:25:15 explicit task list: ['enc2/text/rotten_tomatoes']
+00:25:28 [resume] from checkpoint: next cycle 181, rounds 181, 181 metric rows, inner net restored
+00:25:28 ===== CYCLE 181 (OUTER-ONLY BOOTSTRAP) =====
+00:25:28 [data] enc2/text/rotten_tomatoes: n=10662 C=2 D=768 shards=1
+00:28:40 [enc2/text/rotten_tomatoes] vote=0.864 uniform=0.863 best1=0.858 n_val=3206 vram=0.00GB 192s
+00:29:12 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 181, "n_records": 3206, "n_val": 635, "base_rate": 0.8755905628204346, "inner": {"auc": 0.8096257171478007, "ece": 0.032101098383505514, "brier": 0.09331365674734116, "acc80": 0.9330708384513855}, "outer_conf": {"auc": 0.8010882433293871, "ece": 0.0417446494102478, "brier": 0.09509210288524628, "acc80": 0.9311023354530334}}
+00:29:12 ===== CYCLE 182 (OUTER -> INNER -> FEEDBACK) =====
+00:32:11 [enc2/text/rotten_tomatoes] vote=0.857 uniform=0.859 best1=0.857 n_val=3214 vram=0.00GB 179s | grade=0.942 inner_auc=0.820 vs conf_auc=0.820
+00:32:31 ===== CYCLE 183 (OUTER -> INNER -> FEEDBACK) =====
+00:35:36 [enc2/text/rotten_tomatoes] vote=0.859 uniform=0.860 best1=0.859 n_val=3192 vram=0.00GB 185s | grade=0.942 inner_auc=0.782 vs conf_auc=0.775
+00:35:55 ===== CYCLE 184 (OUTER -> INNER -> FEEDBACK) =====
+00:39:04 [enc2/text/rotten_tomatoes] vote=0.874 uniform=0.873 best1=0.868 n_val=3224 vram=0.00GB 190s | grade=0.940 inner_auc=0.816 vs conf_auc=0.820
+00:39:27 ===== CYCLE 185 (OUTER -> INNER -> FEEDBACK) =====
+00:42:56 [enc2/text/rotten_tomatoes] vote=0.867 uniform=0.865 best1=0.861 n_val=3117 vram=0.00GB 209s | grade=0.944 inner_auc=0.806 vs conf_auc=0.805
+00:43:16 ===== CYCLE 186 (OUTER -> INNER -> FEEDBACK) =====
+00:46:49 [enc2/text/rotten_tomatoes] vote=0.855 uniform=0.853 best1=0.852 n_val=3131 vram=0.00GB 213s | grade=0.939 inner_auc=0.836 vs conf_auc=0.829
+00:47:10 ===== CYCLE 187 (OUTER -> INNER -> FEEDBACK) =====
+00:50:30 [enc2/text/rotten_tomatoes] vote=0.859 uniform=0.860 best1=0.858 n_val=3211 vram=0.00GB 200s | grade=0.942 inner_auc=0.813 vs conf_auc=0.811
+00:50:51 ===== CYCLE 188 (OUTER -> INNER -> FEEDBACK) =====
+00:54:17 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.861 best1=0.859 n_val=3153 vram=0.00GB 207s | grade=0.944 inner_auc=0.833 vs conf_auc=0.837
+00:54:36 ===== CYCLE 189 (OUTER -> INNER -> FEEDBACK) =====
+00:57:38 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.864 best1=0.862 n_val=3270 vram=0.00GB 182s | grade=0.943 inner_auc=0.828 vs conf_auc=0.827
+00:57:57 ===== CYCLE 190 (OUTER -> INNER -> FEEDBACK) =====
+01:01:05 [enc2/text/rotten_tomatoes] vote=0.873 uniform=0.868 best1=0.864 n_val=3146 vram=0.00GB 188s | grade=0.937 inner_auc=0.815 vs conf_auc=0.817
+01:01:24 ===== CYCLE 191 (OUTER -> INNER -> FEEDBACK) =====
+01:04:38 [enc2/text/rotten_tomatoes] vote=0.867 uniform=0.866 best1=0.862 n_val=3149 vram=0.00GB 194s | grade=0.945 inner_auc=0.811 vs conf_auc=0.810
+01:04:57 ===== CYCLE 192 (OUTER -> INNER -> FEEDBACK) =====
+01:08:29 [enc2/text/rotten_tomatoes] vote=0.853 uniform=0.851 best1=0.850 n_val=3210 vram=0.00GB 212s | grade=0.935 inner_auc=0.836 vs conf_auc=0.824
+01:08:52 ===== CYCLE 193 (OUTER -> INNER -> FEEDBACK) =====
+01:11:55 [enc2/text/rotten_tomatoes] vote=0.856 uniform=0.857 best1=0.851 n_val=3188 vram=0.00GB 183s | grade=0.943 inner_auc=0.850 vs conf_auc=0.852
+01:12:15 ===== CYCLE 194 (OUTER -> INNER -> FEEDBACK) =====
+01:15:28 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.862 best1=0.857 n_val=3183 vram=0.00GB 192s | grade=0.943 inner_auc=0.817 vs conf_auc=0.816
+01:15:49 ===== CYCLE 195 (OUTER -> INNER -> FEEDBACK) =====
+01:18:57 [enc2/text/rotten_tomatoes] vote=0.865 uniform=0.869 best1=0.862 n_val=3225 vram=0.00GB 188s | grade=0.940 inner_auc=0.811 vs conf_auc=0.804
+01:19:18 ===== CYCLE 196 (OUTER -> INNER -> FEEDBACK) =====
+01:22:49 [enc2/text/rotten_tomatoes] vote=0.869 uniform=0.868 best1=0.864 n_val=3186 vram=0.00GB 211s | grade=0.942 inner_auc=0.813 vs conf_auc=0.810
+01:23:13 ===== CYCLE 197 (OUTER -> INNER -> FEEDBACK) =====
+01:26:41 [enc2/text/rotten_tomatoes] vote=0.872 uniform=0.872 best1=0.864 n_val=3177 vram=0.00GB 208s | grade=0.942 inner_auc=0.807 vs conf_auc=0.804
+01:27:02 ===== CYCLE 198 (OUTER -> INNER -> FEEDBACK) =====
+01:30:09 [enc2/text/rotten_tomatoes] vote=0.873 uniform=0.872 best1=0.869 n_val=3249 vram=0.00GB 186s | grade=0.943 inner_auc=0.836 vs conf_auc=0.832
+01:30:31 ===== CYCLE 199 (OUTER -> INNER -> FEEDBACK) =====
+01:34:14 [enc2/text/rotten_tomatoes] vote=0.855 uniform=0.853 best1=0.852 n_val=3219 vram=0.00GB 224s | grade=0.933 inner_auc=0.810 vs conf_auc=0.808
+01:34:42 ===== CYCLE 200 (OUTER -> INNER -> FEEDBACK) =====
+01:38:27 [enc2/text/rotten_tomatoes] vote=0.849 uniform=0.850 best1=0.848 n_val=3152 vram=0.00GB 225s | grade=0.937 inner_auc=0.817 vs conf_auc=0.813
+01:38:53 ===== CYCLE 201 (OUTER -> INNER -> FEEDBACK) =====
+01:42:27 [enc2/text/rotten_tomatoes] vote=0.872 uniform=0.874 best1=0.867 n_val=3197 vram=0.00GB 214s | grade=0.934 inner_auc=0.825 vs conf_auc=0.823
+01:42:51 ===== CYCLE 202 (OUTER -> INNER -> FEEDBACK) =====
+01:46:36 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.862 best1=0.858 n_val=3120 vram=0.00GB 225s | grade=0.938 inner_auc=0.826 vs conf_auc=0.821
+01:47:02 ===== CYCLE 203 (OUTER -> INNER -> FEEDBACK) =====
+01:50:39 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.865 best1=0.859 n_val=3242 vram=0.00GB 217s | grade=0.943 inner_auc=0.806 vs conf_auc=0.801
+01:51:04 ===== CYCLE 204 (OUTER -> INNER -> FEEDBACK) =====
+01:54:59 [enc2/text/rotten_tomatoes] vote=0.856 uniform=0.857 best1=0.853 n_val=3232 vram=0.00GB 235s | grade=0.938 inner_auc=0.817 vs conf_auc=0.814
+01:55:27 ===== CYCLE 205 (OUTER -> INNER -> FEEDBACK) =====
+01:59:45 [enc2/text/rotten_tomatoes] vote=0.865 uniform=0.866 best1=0.865 n_val=3211 vram=0.00GB 259s | grade=0.940 inner_auc=0.790 vs conf_auc=0.785
+02:00:11 ===== CYCLE 206 (OUTER -> INNER -> FEEDBACK) =====
+02:03:42 [enc2/text/rotten_tomatoes] vote=0.857 uniform=0.858 best1=0.854 n_val=3129 vram=0.00GB 211s | grade=0.938 inner_auc=0.829 vs conf_auc=0.822
+02:04:08 ===== CYCLE 207 (OUTER -> INNER -> FEEDBACK) =====
+02:08:49 [enc2/text/rotten_tomatoes] vote=0.854 uniform=0.853 best1=0.857 n_val=3240 vram=0.00GB 281s | grade=0.940 inner_auc=0.807 vs conf_auc=0.809
+02:09:19 ===== CYCLE 208 (OUTER -> INNER -> FEEDBACK) =====
+02:13:35 [enc2/text/rotten_tomatoes] vote=0.857 uniform=0.859 best1=0.854 n_val=3242 vram=0.00GB 257s | grade=0.942 inner_auc=0.808 vs conf_auc=0.806
+02:14:06 ===== CYCLE 209 (OUTER -> INNER -> FEEDBACK) =====
+02:18:03 [enc2/text/rotten_tomatoes] vote=0.868 uniform=0.869 best1=0.864 n_val=3207 vram=0.00GB 237s | grade=0.940 inner_auc=0.798 vs conf_auc=0.794
+02:18:35 ===== CYCLE 210 (OUTER -> INNER -> FEEDBACK) =====
+02:23:05 [enc2/text/rotten_tomatoes] vote=0.860 uniform=0.859 best1=0.857 n_val=3168 vram=0.00GB 270s | grade=0.937 inner_auc=0.812 vs conf_auc=0.801
+02:23:34 ===== CYCLE 211 (OUTER -> INNER -> FEEDBACK) =====
+02:27:48 [enc2/text/rotten_tomatoes] vote=0.858 uniform=0.863 best1=0.853 n_val=3219 vram=0.00GB 254s | grade=0.940 inner_auc=0.820 vs conf_auc=0.820
+02:28:24 RUN COMPLETE
+16:19:05 NI run auto_cpu_028 on CPU; hours=2.0 smoke=False
+16:19:05 explicit task list: ['enc2/text/rotten_tomatoes']
+16:19:16 [resume] from checkpoint: next cycle 212, rounds 212, 212 metric rows, inner net restored
+16:19:16 ===== CYCLE 212 (OUTER-ONLY BOOTSTRAP) =====
+16:19:17 [data] enc2/text/rotten_tomatoes: n=10662 C=2 D=768 shards=1
+16:23:42 [enc2/text/rotten_tomatoes] vote=0.866 uniform=0.866 best1=0.866 n_val=3232 vram=0.00GB 266s
+16:24:27 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 212, "n_records": 3232, "n_val": 617, "base_rate": 0.8508914113044739, "inner": {"auc": 0.8095238095238095, "ece": 0.031610538449434254, "brier": 0.10535967350006104, "acc80": 0.9148073196411133}, "outer_conf": {"auc": 0.8026293995859213, "ece": 0.034061199745444075, "brier": 0.10715855658054352, "acc80": 0.9107505083084106}}
+16:24:27 ===== CYCLE 213 (OUTER -> INNER -> FEEDBACK) =====
+16:28:29 [enc2/text/rotten_tomatoes] vote=0.859 uniform=0.856 best1=0.858 n_val=3211 vram=0.00GB 242s | grade=0.941 inner_auc=0.828 vs conf_auc=0.818
+16:28:53 ===== CYCLE 214 (OUTER -> INNER -> FEEDBACK) =====
+16:33:08 [enc2/text/rotten_tomatoes] vote=0.869 uniform=0.870 best1=0.866 n_val=3163 vram=0.00GB 255s | grade=0.939 inner_auc=0.814 vs conf_auc=0.808
+16:33:33 ===== CYCLE 215 (OUTER -> INNER -> FEEDBACK) =====
+16:37:47 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.862 best1=0.861 n_val=3190 vram=0.00GB 254s | grade=0.939 inner_auc=0.828 vs conf_auc=0.828
+16:38:13 ===== CYCLE 216 (OUTER -> INNER -> FEEDBACK) =====
+16:43:00 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.864 best1=0.861 n_val=3139 vram=0.00GB 287s | grade=0.941 inner_auc=0.841 vs conf_auc=0.833
+16:43:29 ===== CYCLE 217 (OUTER -> INNER -> FEEDBACK) =====
+16:47:05 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.866 best1=0.866 n_val=3069 vram=0.00GB 217s | grade=0.941 inner_auc=0.849 vs conf_auc=0.837
+16:47:31 ===== CYCLE 218 (OUTER -> INNER -> FEEDBACK) =====
+16:50:50 [enc2/text/rotten_tomatoes] vote=0.869 uniform=0.870 best1=0.865 n_val=3265 vram=0.00GB 200s | grade=0.940 inner_auc=0.818 vs conf_auc=0.815
+16:51:13 ===== CYCLE 219 (OUTER -> INNER -> FEEDBACK) =====
+16:54:58 [enc2/text/rotten_tomatoes] vote=0.854 uniform=0.854 best1=0.854 n_val=3238 vram=0.00GB 225s | grade=0.933 inner_auc=0.821 vs conf_auc=0.818
+16:55:18 ===== CYCLE 220 (OUTER -> INNER -> FEEDBACK) =====
+16:58:50 [enc2/text/rotten_tomatoes] vote=0.856 uniform=0.860 best1=0.857 n_val=3232 vram=0.00GB 212s | grade=0.941 inner_auc=0.797 vs conf_auc=0.793
+16:59:11 ===== CYCLE 221 (OUTER -> INNER -> FEEDBACK) =====
+17:02:28 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.861 best1=0.859 n_val=3215 vram=0.00GB 196s | grade=0.940 inner_auc=0.829 vs conf_auc=0.825
+17:02:46 ===== CYCLE 222 (OUTER -> INNER -> FEEDBACK) =====
+17:05:58 [enc2/text/rotten_tomatoes] vote=0.859 uniform=0.859 best1=0.860 n_val=3212 vram=0.00GB 192s | grade=0.940 inner_auc=0.837 vs conf_auc=0.826
+17:06:18 ===== CYCLE 223 (OUTER -> INNER -> FEEDBACK) =====
+17:09:53 [enc2/text/rotten_tomatoes] vote=0.853 uniform=0.855 best1=0.855 n_val=3160 vram=0.00GB 215s | grade=0.939 inner_auc=0.796 vs conf_auc=0.794
+17:10:13 ===== CYCLE 224 (OUTER -> INNER -> FEEDBACK) =====
+17:14:47 [enc2/text/rotten_tomatoes] vote=0.870 uniform=0.870 best1=0.868 n_val=3158 vram=0.00GB 274s | grade=0.934 inner_auc=0.823 vs conf_auc=0.827
+17:15:12 ===== CYCLE 225 (OUTER -> INNER -> FEEDBACK) =====
+17:19:29 [enc2/text/rotten_tomatoes] vote=0.854 uniform=0.852 best1=0.848 n_val=3155 vram=0.00GB 257s | grade=0.935 inner_auc=0.781 vs conf_auc=0.778
+17:19:56 ===== CYCLE 226 (OUTER -> INNER -> FEEDBACK) =====
+17:24:21 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.863 best1=0.859 n_val=3202 vram=0.00GB 265s | grade=0.938 inner_auc=0.828 vs conf_auc=0.832
+17:24:49 ===== CYCLE 227 (OUTER -> INNER -> FEEDBACK) =====
+17:28:58 [enc2/text/rotten_tomatoes] vote=0.859 uniform=0.863 best1=0.855 n_val=3147 vram=0.00GB 248s | grade=0.942 inner_auc=0.813 vs conf_auc=0.806
+17:29:23 ===== CYCLE 228 (OUTER -> INNER -> FEEDBACK) =====
+17:33:43 [enc2/text/rotten_tomatoes] vote=0.856 uniform=0.859 best1=0.857 n_val=3202 vram=0.00GB 260s | grade=0.942 inner_auc=0.845 vs conf_auc=0.836
+17:34:08 ===== CYCLE 229 (OUTER -> INNER -> FEEDBACK) =====
+17:37:55 [enc2/text/rotten_tomatoes] vote=0.856 uniform=0.855 best1=0.850 n_val=3278 vram=0.00GB 227s | grade=0.944 inner_auc=0.817 vs conf_auc=0.816
+17:38:18 ===== CYCLE 230 (OUTER -> INNER -> FEEDBACK) =====
+17:42:21 [enc2/text/rotten_tomatoes] vote=0.872 uniform=0.872 best1=0.868 n_val=3208 vram=0.00GB 243s | grade=0.942 inner_auc=0.803 vs conf_auc=0.804
+17:42:47 ===== CYCLE 231 (OUTER -> INNER -> FEEDBACK) =====
+17:47:22 [enc2/text/rotten_tomatoes] vote=0.860 uniform=0.862 best1=0.856 n_val=3130 vram=0.00GB 275s | grade=0.940 inner_auc=0.824 vs conf_auc=0.817
+17:47:47 ===== CYCLE 232 (OUTER -> INNER -> FEEDBACK) =====
+17:52:05 [enc2/text/rotten_tomatoes] vote=0.860 uniform=0.862 best1=0.861 n_val=3192 vram=0.00GB 258s | grade=0.941 inner_auc=0.828 vs conf_auc=0.835
+17:52:34 ===== CYCLE 233 (OUTER -> INNER -> FEEDBACK) =====
+17:57:01 [enc2/text/rotten_tomatoes] vote=0.856 uniform=0.856 best1=0.856 n_val=3170 vram=0.00GB 267s | grade=0.937 inner_auc=0.807 vs conf_auc=0.801
+17:57:24 ===== CYCLE 234 (OUTER -> INNER -> FEEDBACK) =====
+18:02:00 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.864 best1=0.861 n_val=3266 vram=0.00GB 276s | grade=0.942 inner_auc=0.820 vs conf_auc=0.809
+18:02:25 ===== CYCLE 235 (OUTER -> INNER -> FEEDBACK) =====
+18:06:58 [enc2/text/rotten_tomatoes] vote=0.865 uniform=0.864 best1=0.866 n_val=3204 vram=0.00GB 273s | grade=0.941 inner_auc=0.812 vs conf_auc=0.802
+18:07:26 ===== CYCLE 236 (OUTER -> INNER -> FEEDBACK) =====
+18:11:21 [enc2/text/rotten_tomatoes] vote=0.865 uniform=0.868 best1=0.864 n_val=3217 vram=0.00GB 235s | grade=0.944 inner_auc=0.824 vs conf_auc=0.820
+18:11:47 ===== CYCLE 237 (OUTER -> INNER -> FEEDBACK) =====
+18:15:51 [enc2/text/rotten_tomatoes] vote=0.856 uniform=0.858 best1=0.854 n_val=3204 vram=0.00GB 244s | grade=0.938 inner_auc=0.819 vs conf_auc=0.808
+18:16:22 ===== CYCLE 238 (OUTER -> INNER -> FEEDBACK) =====
+18:20:33 [enc2/text/rotten_tomatoes] vote=0.866 uniform=0.867 best1=0.865 n_val=3232 vram=0.00GB 252s | grade=0.937 inner_auc=0.810 vs conf_auc=0.807
+18:21:05 RUN COMPLETE
+19:51:03 NI run auto_cpu_028 on CPU; hours=2.0 smoke=False
+19:51:03 explicit task list: ['enc2/text/rotten_tomatoes']
+19:51:19 [resume] from checkpoint: next cycle 239, rounds 239, 239 metric rows, inner net restored
+19:51:19 ===== CYCLE 239 (OUTER-ONLY BOOTSTRAP) =====
+19:51:20 [data] enc2/text/rotten_tomatoes: n=10662 C=2 D=768 shards=1
+19:55:27 [enc2/text/rotten_tomatoes] vote=0.867 uniform=0.871 best1=0.860 n_val=3194 vram=0.00GB 248s
+19:56:14 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 239, "n_records": 3194, "n_val": 625, "base_rate": 0.8655999898910522, "inner": {"auc": 0.8473945955461667, "ece": 0.029581252527236937, "brier": 0.09319953620433807, "acc80": 0.9279999732971191}, "outer_conf": {"auc": 0.8412551711997184, "ece": 0.04655972628593445, "brier": 0.09462133795022964, "acc80": 0.9359999895095825}}
+19:56:14 ===== CYCLE 240 (OUTER -> INNER -> FEEDBACK) =====
+20:02:03 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.863 best1=0.859 n_val=3183 vram=0.00GB 348s | grade=0.943 inner_auc=0.799 vs conf_auc=0.800
+20:02:41 ===== CYCLE 241 (OUTER -> INNER -> FEEDBACK) =====
+20:08:05 [enc2/text/rotten_tomatoes] vote=0.873 uniform=0.872 best1=0.870 n_val=3156 vram=0.00GB 325s | grade=0.937 inner_auc=0.841 vs conf_auc=0.849
+20:08:40 ===== CYCLE 242 (OUTER -> INNER -> FEEDBACK) =====
+20:13:48 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.862 best1=0.858 n_val=3204 vram=0.00GB 309s | grade=0.938 inner_auc=0.820 vs conf_auc=0.820
+20:14:25 ===== CYCLE 243 (OUTER -> INNER -> FEEDBACK) =====
+20:19:53 [enc2/text/rotten_tomatoes] vote=0.869 uniform=0.867 best1=0.866 n_val=3201 vram=0.00GB 328s | grade=0.941 inner_auc=0.829 vs conf_auc=0.830
+20:20:25 ===== CYCLE 244 (OUTER -> INNER -> FEEDBACK) =====
+20:25:30 [enc2/text/rotten_tomatoes] vote=0.857 uniform=0.854 best1=0.850 n_val=3305 vram=0.00GB 305s | grade=0.935 inner_auc=0.832 vs conf_auc=0.829
+20:26:05 ===== CYCLE 245 (OUTER -> INNER -> FEEDBACK) =====
+20:31:20 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.861 best1=0.859 n_val=3270 vram=0.00GB 315s | grade=0.942 inner_auc=0.840 vs conf_auc=0.836
+20:31:53 ===== CYCLE 246 (OUTER -> INNER -> FEEDBACK) =====
+20:36:46 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.863 best1=0.861 n_val=3133 vram=0.00GB 293s | grade=0.940 inner_auc=0.863 vs conf_auc=0.862
+20:37:16 ===== CYCLE 247 (OUTER -> INNER -> FEEDBACK) =====
+20:41:48 [enc2/text/rotten_tomatoes] vote=0.865 uniform=0.863 best1=0.857 n_val=3208 vram=0.00GB 272s | grade=0.943 inner_auc=0.841 vs conf_auc=0.830
+20:42:15 ===== CYCLE 248 (OUTER -> INNER -> FEEDBACK) =====
+20:47:45 [enc2/text/rotten_tomatoes] vote=0.858 uniform=0.861 best1=0.861 n_val=3203 vram=0.00GB 330s | grade=0.945 inner_auc=0.817 vs conf_auc=0.814
+20:48:15 ===== CYCLE 249 (OUTER -> INNER -> FEEDBACK) =====
+20:52:58 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.861 best1=0.857 n_val=3279 vram=0.00GB 283s | grade=0.942 inner_auc=0.815 vs conf_auc=0.807
+20:53:28 ===== CYCLE 250 (OUTER -> INNER -> FEEDBACK) =====
+20:58:05 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.861 best1=0.860 n_val=3226 vram=0.00GB 277s | grade=0.939 inner_auc=0.807 vs conf_auc=0.806
+20:58:36 ===== CYCLE 251 (OUTER -> INNER -> FEEDBACK) =====
+21:03:36 [enc2/text/rotten_tomatoes] vote=0.870 uniform=0.869 best1=0.867 n_val=3211 vram=0.00GB 300s | grade=0.942 inner_auc=0.787 vs conf_auc=0.766
+21:04:06 ===== CYCLE 252 (OUTER -> INNER -> FEEDBACK) =====
+21:08:30 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.866 best1=0.860 n_val=3208 vram=0.00GB 264s | grade=0.938 inner_auc=0.804 vs conf_auc=0.803
+21:09:05 ===== CYCLE 253 (OUTER -> INNER -> FEEDBACK) =====
+21:13:25 [enc2/text/rotten_tomatoes] vote=0.873 uniform=0.872 best1=0.871 n_val=3235 vram=0.00GB 260s | grade=0.938 inner_auc=0.817 vs conf_auc=0.816
+21:13:59 ===== CYCLE 254 (OUTER -> INNER -> FEEDBACK) =====
+21:18:43 [enc2/text/rotten_tomatoes] vote=0.867 uniform=0.870 best1=0.864 n_val=3160 vram=0.00GB 284s | grade=0.944 inner_auc=0.810 vs conf_auc=0.798
+21:19:17 ===== CYCLE 255 (OUTER -> INNER -> FEEDBACK) =====
+21:24:43 [enc2/text/rotten_tomatoes] vote=0.858 uniform=0.859 best1=0.855 n_val=3296 vram=0.00GB 326s | grade=0.942 inner_auc=0.807 vs conf_auc=0.805
+21:25:10 ===== CYCLE 256 (OUTER -> INNER -> FEEDBACK) =====
+21:29:56 [enc2/text/rotten_tomatoes] vote=0.859 uniform=0.859 best1=0.854 n_val=3186 vram=0.00GB 285s | grade=0.942 inner_auc=0.825 vs conf_auc=0.815
+21:30:24 ===== CYCLE 257 (OUTER -> INNER -> FEEDBACK) =====
+21:34:56 [enc2/text/rotten_tomatoes] vote=0.858 uniform=0.860 best1=0.856 n_val=3261 vram=0.00GB 272s | grade=0.943 inner_auc=0.832 vs conf_auc=0.831
+21:35:26 ===== CYCLE 258 (OUTER -> INNER -> FEEDBACK) =====
+21:39:57 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.862 best1=0.859 n_val=3247 vram=0.00GB 270s | grade=0.944 inner_auc=0.846 vs conf_auc=0.846
+21:40:29 ===== CYCLE 259 (OUTER -> INNER -> FEEDBACK) =====
+21:45:14 [enc2/text/rotten_tomatoes] vote=0.868 uniform=0.873 best1=0.863 n_val=3117 vram=0.00GB 285s | grade=0.943 inner_auc=0.784 vs conf_auc=0.780
+21:45:46 ===== CYCLE 260 (OUTER -> INNER -> FEEDBACK) =====
+21:49:52 [enc2/text/rotten_tomatoes] vote=0.870 uniform=0.872 best1=0.866 n_val=3222 vram=0.00GB 246s | grade=0.944 inner_auc=0.816 vs conf_auc=0.812
+21:50:21 ===== CYCLE 261 (OUTER -> INNER -> FEEDBACK) =====
+21:54:34 [enc2/text/rotten_tomatoes] vote=0.868 uniform=0.872 best1=0.864 n_val=3186 vram=0.00GB 253s | grade=0.944 inner_auc=0.815 vs conf_auc=0.807
+21:55:01 RUN COMPLETE
+16:58:27 NI run auto_cpu_028 on CPU; hours=2.0 smoke=False
+16:58:27 explicit task list: ['enc2/text/rotten_tomatoes']
+16:58:36 [resume] from checkpoint: next cycle 262, rounds 262, 262 metric rows, inner net restored
+16:58:36 ===== CYCLE 262 (OUTER-ONLY BOOTSTRAP) =====
+16:58:37 [data] enc2/text/rotten_tomatoes: n=10662 C=2 D=768 shards=1
+17:01:40 [enc2/text/rotten_tomatoes] vote=0.870 uniform=0.870 best1=0.865 n_val=3136 vram=0.00GB 183s
+17:02:25 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 262, "n_records": 3136, "n_val": 606, "base_rate": 0.8696369528770447, "inner": {"auc": 0.841616025748805, "ece": 0.040404359401255946, "brier": 0.09037213772535324, "acc80": 0.9380165338516235}, "outer_conf": {"auc": 0.8324406120145077, "ece": 0.05360703922734402, "brier": 0.09313289076089859, "acc80": 0.9380165338516235}}
+17:02:25 ===== CYCLE 263 (OUTER -> INNER -> FEEDBACK) =====
+17:05:02 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.862 best1=0.856 n_val=3261 vram=0.00GB 156s | grade=0.940 inner_auc=0.830 vs conf_auc=0.831
+17:05:23 ===== CYCLE 264 (OUTER -> INNER -> FEEDBACK) =====
+17:08:29 [enc2/text/rotten_tomatoes] vote=0.859 uniform=0.862 best1=0.857 n_val=3236 vram=0.00GB 187s | grade=0.943 inner_auc=0.838 vs conf_auc=0.835
+17:08:49 ===== CYCLE 265 (OUTER -> INNER -> FEEDBACK) =====
+17:12:51 [enc2/text/rotten_tomatoes] vote=0.868 uniform=0.868 best1=0.864 n_val=3217 vram=0.00GB 241s | grade=0.941 inner_auc=0.816 vs conf_auc=0.815
+17:13:19 ===== CYCLE 266 (OUTER -> INNER -> FEEDBACK) =====
+17:16:52 [enc2/text/rotten_tomatoes] vote=0.850 uniform=0.852 best1=0.851 n_val=3247 vram=0.00GB 212s | grade=0.931 inner_auc=0.800 vs conf_auc=0.792
+17:17:18 ===== CYCLE 267 (OUTER -> INNER -> FEEDBACK) =====
+17:20:26 [enc2/text/rotten_tomatoes] vote=0.867 uniform=0.868 best1=0.865 n_val=3202 vram=0.00GB 188s | grade=0.935 inner_auc=0.823 vs conf_auc=0.823
+17:20:49 ===== CYCLE 268 (OUTER -> INNER -> FEEDBACK) =====
+17:24:21 [enc2/text/rotten_tomatoes] vote=0.857 uniform=0.856 best1=0.854 n_val=3174 vram=0.00GB 212s | grade=0.940 inner_auc=0.842 vs conf_auc=0.835
+17:24:41 ===== CYCLE 269 (OUTER -> INNER -> FEEDBACK) =====
+17:28:03 [enc2/text/rotten_tomatoes] vote=0.866 uniform=0.865 best1=0.867 n_val=3112 vram=0.00GB 202s | grade=0.940 inner_auc=0.844 vs conf_auc=0.841
+17:28:25 ===== CYCLE 270 (OUTER -> INNER -> FEEDBACK) =====
+17:31:33 [enc2/text/rotten_tomatoes] vote=0.860 uniform=0.863 best1=0.856 n_val=3224 vram=0.00GB 188s | grade=0.944 inner_auc=0.820 vs conf_auc=0.819
+17:31:54 ===== CYCLE 271 (OUTER -> INNER -> FEEDBACK) =====
+17:35:38 [enc2/text/rotten_tomatoes] vote=0.856 uniform=0.858 best1=0.850 n_val=3218 vram=0.00GB 225s | grade=0.944 inner_auc=0.792 vs conf_auc=0.782
+17:36:09 ===== CYCLE 272 (OUTER -> INNER -> FEEDBACK) =====
+14:56:41 NI run auto_cpu_028 on CPU; hours=2.0 smoke=False
+14:56:41 explicit task list: ['enc2/text/rotten_tomatoes']
+14:56:49 [resume] from checkpoint: next cycle 272, rounds 272, 272 metric rows, inner net restored
+14:56:49 ===== CYCLE 272 (OUTER-ONLY BOOTSTRAP) =====
+14:56:49 [data] enc2/text/rotten_tomatoes: n=10662 C=2 D=768 shards=1
+14:59:46 [enc2/text/rotten_tomatoes] vote=0.852 uniform=0.850 best1=0.849 n_val=3209 vram=0.00GB 177s
+15:00:32 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 272, "n_records": 3209, "n_val": 632, "base_rate": 0.8433544039726257, "inner": {"auc": 0.8451494305152841, "ece": 0.0313680598724492, "brier": 0.09986063092947006, "acc80": 0.9267326593399048}, "outer_conf": {"auc": 0.8365266170144219, "ece": 0.05326021104296551, "brier": 0.10242876410484314, "acc80": 0.9306930899620056}}
+15:00:32 ===== CYCLE 273 (OUTER -> INNER -> FEEDBACK) =====
+15:03:48 [enc2/text/rotten_tomatoes] vote=0.860 uniform=0.862 best1=0.857 n_val=3203 vram=0.00GB 196s | grade=0.941 inner_auc=0.827 vs conf_auc=0.813
+15:04:12 ===== CYCLE 274 (OUTER -> INNER -> FEEDBACK) =====
+15:07:37 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.859 best1=0.859 n_val=3213 vram=0.00GB 204s | grade=0.945 inner_auc=0.851 vs conf_auc=0.847
+15:07:59 ===== CYCLE 275 (OUTER -> INNER -> FEEDBACK) =====
+15:11:42 [enc2/text/rotten_tomatoes] vote=0.859 uniform=0.860 best1=0.857 n_val=3229 vram=0.00GB 223s | grade=0.943 inner_auc=0.826 vs conf_auc=0.829
+15:12:01 ===== CYCLE 276 (OUTER -> INNER -> FEEDBACK) =====
+15:15:18 [enc2/text/rotten_tomatoes] vote=0.865 uniform=0.863 best1=0.864 n_val=3128 vram=0.00GB 197s | grade=0.943 inner_auc=0.836 vs conf_auc=0.830
+15:15:45 ===== CYCLE 277 (OUTER -> INNER -> FEEDBACK) =====
+15:19:03 [enc2/text/rotten_tomatoes] vote=0.858 uniform=0.856 best1=0.856 n_val=3162 vram=0.00GB 198s | grade=0.944 inner_auc=0.810 vs conf_auc=0.805
+15:19:29 ===== CYCLE 278 (OUTER -> INNER -> FEEDBACK) =====
+15:23:06 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.860 best1=0.861 n_val=3250 vram=0.00GB 217s | grade=0.942 inner_auc=0.839 vs conf_auc=0.836
+15:23:31 ===== CYCLE 279 (OUTER -> INNER -> FEEDBACK) =====
+15:26:47 [enc2/text/rotten_tomatoes] vote=0.866 uniform=0.867 best1=0.862 n_val=3169 vram=0.00GB 196s | grade=0.941 inner_auc=0.807 vs conf_auc=0.808
+15:27:10 ===== CYCLE 280 (OUTER -> INNER -> FEEDBACK) =====
+15:30:33 [enc2/text/rotten_tomatoes] vote=0.864 uniform=0.866 best1=0.862 n_val=3196 vram=0.00GB 203s | grade=0.942 inner_auc=0.826 vs conf_auc=0.823
+15:30:58 ===== CYCLE 281 (OUTER -> INNER -> FEEDBACK) =====
+15:34:43 [enc2/text/rotten_tomatoes] vote=0.864 uniform=0.868 best1=0.863 n_val=3177 vram=0.00GB 225s | grade=0.949 inner_auc=0.828 vs conf_auc=0.820
+15:35:11 ===== CYCLE 282 (OUTER -> INNER -> FEEDBACK) =====
+15:38:40 [enc2/text/rotten_tomatoes] vote=0.865 uniform=0.867 best1=0.861 n_val=3289 vram=0.00GB 209s | grade=0.943 inner_auc=0.796 vs conf_auc=0.787
+15:39:04 ===== CYCLE 283 (OUTER -> INNER -> FEEDBACK) =====
+15:42:41 [enc2/text/rotten_tomatoes] vote=0.853 uniform=0.856 best1=0.854 n_val=3172 vram=0.00GB 217s | grade=0.937 inner_auc=0.803 vs conf_auc=0.792
+15:43:05 ===== CYCLE 284 (OUTER -> INNER -> FEEDBACK) =====
+15:46:37 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.860 best1=0.859 n_val=3202 vram=0.00GB 211s | grade=0.938 inner_auc=0.836 vs conf_auc=0.833
+15:47:09 ===== CYCLE 285 (OUTER -> INNER -> FEEDBACK) =====
+15:50:32 [enc2/text/rotten_tomatoes] vote=0.856 uniform=0.856 best1=0.854 n_val=3173 vram=0.00GB 203s | grade=0.940 inner_auc=0.824 vs conf_auc=0.822
+15:50:58 ===== CYCLE 286 (OUTER -> INNER -> FEEDBACK) =====
+15:54:32 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.865 best1=0.862 n_val=3178 vram=0.00GB 214s | grade=0.941 inner_auc=0.815 vs conf_auc=0.810
+15:55:01 ===== CYCLE 287 (OUTER -> INNER -> FEEDBACK) =====
+15:58:35 [enc2/text/rotten_tomatoes] vote=0.860 uniform=0.863 best1=0.857 n_val=3261 vram=0.00GB 214s | grade=0.943 inner_auc=0.832 vs conf_auc=0.823
+15:59:04 ===== CYCLE 288 (OUTER -> INNER -> FEEDBACK) =====
+16:02:44 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.866 best1=0.863 n_val=3180 vram=0.00GB 219s | grade=0.940 inner_auc=0.868 vs conf_auc=0.861
+16:03:10 ===== CYCLE 289 (OUTER -> INNER -> FEEDBACK) =====
+16:06:47 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.859 best1=0.859 n_val=3183 vram=0.00GB 217s | grade=0.942 inner_auc=0.821 vs conf_auc=0.809
+16:07:12 ===== CYCLE 290 (OUTER -> INNER -> FEEDBACK) =====
+16:10:58 [enc2/text/rotten_tomatoes] vote=0.862 uniform=0.863 best1=0.861 n_val=3167 vram=0.00GB 226s | grade=0.942 inner_auc=0.857 vs conf_auc=0.854
+16:11:25 ===== CYCLE 291 (OUTER -> INNER -> FEEDBACK) =====
+16:14:58 [enc2/text/rotten_tomatoes] vote=0.861 uniform=0.860 best1=0.858 n_val=3203 vram=0.00GB 213s | grade=0.944 inner_auc=0.797 vs conf_auc=0.777
+16:15:27 ===== CYCLE 292 (OUTER -> INNER -> FEEDBACK) =====
+16:19:05 [enc2/text/rotten_tomatoes] vote=0.860 uniform=0.864 best1=0.858 n_val=3318 vram=0.00GB 218s | grade=0.944 inner_auc=0.786 vs conf_auc=0.786
+16:19:29 ===== CYCLE 293 (OUTER -> INNER -> FEEDBACK) =====
+16:23:08 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.863 best1=0.858 n_val=3164 vram=0.00GB 218s | grade=0.941 inner_auc=0.799 vs conf_auc=0.794
+16:23:34 ===== CYCLE 294 (OUTER -> INNER -> FEEDBACK) =====
+16:27:15 [enc2/text/rotten_tomatoes] vote=0.865 uniform=0.863 best1=0.858 n_val=3249 vram=0.00GB 221s | grade=0.942 inner_auc=0.815 vs conf_auc=0.810
+16:27:40 ===== CYCLE 295 (OUTER -> INNER -> FEEDBACK) =====
+16:31:38 [enc2/text/rotten_tomatoes] vote=0.856 uniform=0.860 best1=0.856 n_val=3190 vram=0.00GB 238s | grade=0.937 inner_auc=0.832 vs conf_auc=0.832
+16:32:01 ===== CYCLE 296 (OUTER -> INNER -> FEEDBACK) =====
+16:35:48 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.867 best1=0.863 n_val=3217 vram=0.00GB 226s | grade=0.939 inner_auc=0.831 vs conf_auc=0.820
+16:36:14 ===== CYCLE 297 (OUTER -> INNER -> FEEDBACK) =====
+16:39:32 [enc2/text/rotten_tomatoes] vote=0.875 uniform=0.874 best1=0.871 n_val=3203 vram=0.00GB 198s | grade=0.938 inner_auc=0.837 vs conf_auc=0.826
+16:39:59 ===== CYCLE 298 (OUTER -> INNER -> FEEDBACK) =====
+16:43:24 [enc2/text/rotten_tomatoes] vote=0.866 uniform=0.867 best1=0.861 n_val=3239 vram=0.00GB 204s | grade=0.941 inner_auc=0.805 vs conf_auc=0.806
+16:43:46 ===== CYCLE 299 (OUTER -> INNER -> FEEDBACK) =====
+16:46:55 [enc2/text/rotten_tomatoes] vote=0.855 uniform=0.858 best1=0.852 n_val=3218 vram=0.00GB 188s | grade=0.939 inner_auc=0.825 vs conf_auc=0.816
+16:47:17 ===== CYCLE 300 (OUTER -> INNER -> FEEDBACK) =====
+16:50:23 [enc2/text/rotten_tomatoes] vote=0.863 uniform=0.863 best1=0.858 n_val=3201 vram=0.00GB 187s | grade=0.939 inner_auc=0.829 vs conf_auc=0.819
+16:50:48 ===== CYCLE 301 (OUTER -> INNER -> FEEDBACK) =====
+16:53:54 [enc2/text/rotten_tomatoes] vote=0.859 uniform=0.859 best1=0.855 n_val=3137 vram=0.00GB 187s | grade=0.942 inner_auc=0.816 vs conf_auc=0.806
+16:54:18 ===== CYCLE 302 (OUTER -> INNER -> FEEDBACK) =====

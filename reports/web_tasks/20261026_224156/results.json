@@ -1,0 +1,891 @@
+{
+ "stamp": "20261026_224156",
+ "summary": {
+  "tasks": 20,
+  "cold": {
+   "success": "9/20",
+   "success_rate": 0.45,
+   "mean_clicks_when_ok": 1.0,
+   "mean_seconds_all": 7.7
+  },
+  "pool": {
+   "success": "11/20",
+   "success_rate": 0.55,
+   "mean_clicks_when_ok": 1.2,
+   "mean_seconds_all": 7.2
+  },
+  "retrieval_top1_correct": "16/20",
+  "retrieval_in_top3": "18/20",
+  "pool_found_nothing": 1,
+  "pool_healed_after_a_stale_path": 4,
+  "pool_ok_by_stored_path_alone": 7,
+  "mean_retrieval_ms": 516,
+  "pool_failures_by_reason": {
+   "the pool had no": 1,
+   "step '": 0,
+   "could not click": 0,
+   "the page did not": 0
+  }
+ },
+ "results": [
+  {
+   "task": {
+    "host": "todoist.com",
+    "site": "Todoist",
+    "url": "https://todoist.com",
+    "category": "",
+    "chain": [
+     "What\u2019s the difference betw",
+     "See full pricing details"
+    ],
+    "label": "See full pricing details",
+    "outcome": "opened a new page",
+    "expect_title": "Pricing | Todoist",
+    "expect_items": [],
+    "stored_goal": "Go to the See full pricing details page on Todoist via What\u2019s the difference betw",
+    "id": 1,
+    "question": "How do I get to See full pricing details on Todoist?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 12.6,
+    "picture": "task_01_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": true,
+    "skipped": [
+     "What\u2019s the difference between the Pro and Business plans?",
+     "See full pricing details"
+    ],
+    "fallback_clicks": 1,
+    "retrieved": "Go to the See full pricing details page on Todoist via What\u2019s the difference betw",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 1753,
+    "pid": "50dc55b7138b99325173",
+    "seconds": 13.7,
+    "picture": "task_01_pool_ok.png",
+    "filed_correction": true
+   }
+  },
+  {
+   "task": {
+    "host": "github.com",
+    "site": "Github",
+    "url": "https://github.com",
+    "category": "",
+    "chain": [
+     "Pricing"
+    ],
+    "label": "Pricing",
+    "outcome": "opened a new page",
+    "expect_title": "GitHub \u00b7 Plans & pricing for every developer and team \u00b7 GitH",
+    "expect_items": [],
+    "stored_goal": "Go to the Pricing page on Github",
+    "id": 2,
+    "question": "How do I get to Pricing on Github?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 10.2,
+    "picture": "task_02_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Pricing page on Github",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 595,
+    "pid": "8a7dd6ba377b241c430b",
+    "seconds": 10.5,
+    "picture": "task_02_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "duckduckgo.com",
+    "site": "Duckduckgo",
+    "url": "https://duckduckgo.com",
+    "category": "",
+    "chain": [
+     "Learn about DuckDuckGo"
+    ],
+    "label": "Learn about DuckDuckGo",
+    "outcome": "opened a new page",
+    "expect_title": "About DuckDuckGo",
+    "expect_items": [],
+    "stored_goal": "Go to the Learn about DuckDuckGo page on Duckduckgo",
+    "id": 3,
+    "question": "How do I get to Learn about DuckDuckGo on Duckduckgo?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 3.5,
+    "picture": "task_03_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Learn about DuckDuckGo page on Duckduckgo",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 73,
+    "pid": "b807f8288432ec30e003",
+    "seconds": 2.7,
+    "picture": "task_03_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "lobste.rs",
+    "site": "Lobste",
+    "url": "https://lobste.rs",
+    "category": "",
+    "chain": [
+     "chat room"
+    ],
+    "label": "chat room",
+    "outcome": "opened a new page",
+    "expect_title": "Chat | Lobsters",
+    "expect_items": [],
+    "stored_goal": "Go to the chat room page on Lobste",
+    "id": 4,
+    "question": "How do I get to chat room on Lobste?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 2.9,
+    "picture": "task_04_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "the stored path failed (skipped ['chat room']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "chat room"
+    ],
+    "fallback_clicks": 0,
+    "retrieved": "Go to the chat room page on Lobste",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 55,
+    "pid": "4e9bdfa6d6cf1bbdf2c4",
+    "seconds": 2.9,
+    "picture": "task_04_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "pypi.org",
+    "site": "Pypi",
+    "url": "https://pypi.org",
+    "category": "",
+    "chain": [
+     "Close",
+     "trademarks"
+    ],
+    "label": "trademarks",
+    "outcome": "opened a new page",
+    "expect_title": "Trademarks \u00b7 PyPI",
+    "expect_items": [],
+    "stored_goal": "Go to the trademarks page on Pypi via Close",
+    "id": 5,
+    "question": "How do I get to trademarks on Pypi?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 3.2,
+    "picture": "task_05_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "healed": true,
+    "skipped": [],
+    "fallback_clicks": 1,
+    "retrieved": "Go to the PyPI Trademarks page on Pypi",
+    "retrieved_correct": false,
+    "in_top3": true,
+    "retrieval_ms": 2034,
+    "pid": "71277a3fb479593f93cc",
+    "seconds": 6.0,
+    "picture": "task_05_pool_ok.png",
+    "filed_correction": true
+   }
+  },
+  {
+   "task": {
+    "host": "time.is",
+    "site": "Time",
+    "url": "https://time.is",
+    "category": "",
+    "chain": [
+     "menu",
+     "Unix clock"
+    ],
+    "label": "Unix clock",
+    "outcome": "opened a new page",
+    "expect_title": "Unix Time.is 1793007628",
+    "expect_items": [],
+    "stored_goal": "Go to the Unix clock page on Time via menu",
+    "id": 6,
+    "question": "How do I get to Unix clock on Time?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 1.1,
+    "picture": "task_06_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "the stored path failed (skipped ['menu', 'Unix clock']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "menu",
+     "Unix clock"
+    ],
+    "fallback_clicks": 0,
+    "retrieved": "Go to the Unix clock page on Time via menu",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 291,
+    "pid": "cde2d65e4cad954fdbab",
+    "seconds": 1.6,
+    "picture": "task_06_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "todoist.com",
+    "site": "Todoist",
+    "url": "https://todoist.com",
+    "category": "",
+    "chain": [
+     "Calendar Layout"
+    ],
+    "label": "Calendar Layout",
+    "outcome": "opened a new page",
+    "expect_title": "Calendar Layout",
+    "expect_items": [],
+    "stored_goal": "Go to the Calendar Layout page on Todoist",
+    "id": 7,
+    "question": "How do I get to Calendar Layout on Todoist?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 13.3,
+    "picture": "task_07_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": true,
+    "skipped": [
+     "Calendar Layout"
+    ],
+    "fallback_clicks": 1,
+    "retrieved": "Go to the Calendar Layout page on Todoist",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 352,
+    "pid": "49be12a0fe39bb3946d9",
+    "seconds": 12.1,
+    "picture": "task_07_pool_ok.png",
+    "filed_correction": true
+   }
+  },
+  {
+   "task": {
+    "host": "openstreetmap.org",
+    "site": "Openstreetmap",
+    "url": "https://openstreetmap.org",
+    "category": "",
+    "chain": [
+     "Copyright and License page"
+    ],
+    "label": "Copyright and License page",
+    "outcome": "opened a new page",
+    "expect_title": "Copyright and License | OpenStreetMap",
+    "expect_items": [],
+    "stored_goal": "Go to the Copyright and License page page on Openstreetmap",
+    "id": 8,
+    "question": "How do I get to Copyright and License page on Openstreetmap?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 6.6,
+    "picture": "task_08_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Copyright and License page page on Openstreetmap",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 385,
+    "pid": "19dc52ec10f4226dca37",
+    "seconds": 5.1,
+    "picture": "task_08_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "docs.python.org",
+    "site": "Python",
+    "url": "https://docs.python.org",
+    "category": "",
+    "chain": [
+     "A"
+    ],
+    "label": "Auto Light Dark",
+    "outcome": "opened a new page",
+    "expect_title": "Index \u2014 Python 3.15.2 documentation",
+    "expect_items": [],
+    "stored_goal": "Go to the Auto Light Dark page on Python",
+    "id": 9,
+    "question": "How do I get to Auto Light Dark on Python?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 1.4,
+    "picture": "task_09_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 1,
+    "why": "the stored path failed (skipped []) and the live page did not help",
+    "healed": false,
+    "skipped": [],
+    "fallback_clicks": 0,
+    "retrieved": "Go to the Auto Light Dark page on Python",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 376,
+    "pid": "54ca7f5683fa35e8ebc8",
+    "seconds": 2.6,
+    "picture": "task_09_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "tinypng.com",
+    "site": "Tinypng",
+    "url": "https://tinypng.com",
+    "category": "",
+    "chain": [
+     "What file formats does Tin",
+     "Compress"
+    ],
+    "label": "Compress",
+    "outcome": "opened a new page",
+    "expect_title": "Compress your photos for free with TinyPNG",
+    "expect_items": [],
+    "stored_goal": "Go to the Compress page on Tinypng via What file formats does Tin",
+    "id": 10,
+    "question": "How do I get to Compress on Tinypng?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 7.2,
+    "picture": "task_10_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": true,
+    "skipped": [
+     "05. How do I compress my e"
+    ],
+    "fallback_clicks": 1,
+    "retrieved": "Open the 05. How do I compress my e menu on Tinypng",
+    "retrieved_correct": false,
+    "in_top3": false,
+    "retrieval_ms": 862,
+    "pid": "289aef517dc318d6b868",
+    "seconds": 8.3,
+    "picture": "task_10_pool_ok.png",
+    "filed_correction": true
+   }
+  },
+  {
+   "task": {
+    "host": "youtube.com",
+    "site": "Youtube",
+    "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+    "category": "",
+    "chain": [
+     "YouTube Home"
+    ],
+    "label": "YouTube Home",
+    "outcome": "opened a new page",
+    "expect_title": "Me at the zoo - YouTube",
+    "expect_items": [],
+    "stored_goal": "Go to the YouTube Home page on Youtube",
+    "id": 11,
+    "question": "How do I get to YouTube Home on Youtube?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 4.3,
+    "picture": "task_11_cold_fail.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the YouTube Home page on Youtube",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 71,
+    "pid": "2b349406eb8bdd64c9e9",
+    "seconds": 10.9,
+    "picture": "task_11_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "time.is",
+    "site": "Time",
+    "url": "https://time.is",
+    "category": "",
+    "chain": [
+     "Vadodara, Gujarat, India"
+    ],
+    "label": "Vadodara, Gujarat, India",
+    "outcome": "opened a new page",
+    "expect_title": "Vadodara: 15:11",
+    "expect_items": [],
+    "stored_goal": "Go to the Vadodara, Gujarat, India page on Time",
+    "id": 12,
+    "question": "How do I get to Vadodara, Gujarat, India on Time?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 1.1,
+    "picture": "task_12_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "the stored path failed (skipped ['Vadodara, Gujarat, India']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "Vadodara, Gujarat, India"
+    ],
+    "fallback_clicks": 0,
+    "retrieved": "Go to the Vadodara, Gujarat, India page on Time",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 417,
+    "pid": "66c1cf854ae413e23636",
+    "seconds": 1.7,
+    "picture": "task_12_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "hn.algolia.com",
+    "site": "Algolia",
+    "url": "https://hn.algolia.com/?q=python",
+    "category": "",
+    "chain": [
+     "Search Hacker News"
+    ],
+    "label": "Search Hacker News",
+    "outcome": "opened a new page",
+    "expect_title": "All | Search powered by Algolia",
+    "expect_items": [],
+    "stored_goal": "Go to the Search Hacker News page on Algolia",
+    "id": 13,
+    "question": "How do I get to Search Hacker News on Algolia?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 4,
+    "why": "nothing on the page matches",
+    "seconds": 10.4,
+    "picture": "task_13_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "the pool had no procedure for the question",
+    "retrieved": null,
+    "retrieval_ms": 250,
+    "seconds": 3.6,
+    "picture": "task_13_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "ebay.com",
+    "site": "Ebay",
+    "url": "https://ebay.com",
+    "category": "",
+    "chain": [
+     "Expand: Motors",
+     "Motorcycle and scooter par"
+    ],
+    "label": "Motorcycle and scooter parts",
+    "outcome": "opened a new page",
+    "expect_title": "Error Page | eBay",
+    "expect_items": [],
+    "stored_goal": "Go to the Motorcycle and scooter parts page on Ebay via Expand: Motors",
+    "id": 14,
+    "question": "How do I get to Motorcycle and scooter parts on Ebay?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 3.1,
+    "picture": "task_14_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "the stored path failed (skipped ['Expand: Motors', 'Motorcycle and scooter parts']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "Expand: Motors",
+     "Motorcycle and scooter parts"
+    ],
+    "fallback_clicks": 0,
+    "retrieved": "Go to the Motorcycle and scooter parts page on Ebay via Expand: Motors",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 356,
+    "pid": "2d1372eee1f9fac8c661",
+    "seconds": 3.2,
+    "picture": "task_14_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "speedtest.net",
+    "site": "Speedtest",
+    "url": "https://speedtest.net",
+    "category": "",
+    "chain": [
+     "Change Server",
+     "Vadodara - NexTech Broadba"
+    ],
+    "label": "Vadodara - NexTech Broadband",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "NexTech Broadband"
+    ],
+    "stored_goal": "Open the Vadodara - NexTech Broadband menu on Speedtest via Change Server",
+    "id": 15,
+    "question": "I want to see the Vadodara - NexTech Broadband menu on Speedtest. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 3,
+    "why": "nothing on the page matches",
+    "seconds": 14.7,
+    "picture": "task_15_cold_fail.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Open the Vadodara - NexTech Broadband menu on Speedtest via Change Server",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 416,
+    "pid": "f8715c5e00ebacde9ea0",
+    "seconds": 9.7,
+    "picture": "task_15_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "ebay.com",
+    "site": "Ebay",
+    "url": "https://ebay.com",
+    "category": "",
+    "chain": [
+     "Expand Watch List"
+    ],
+    "label": "Expand Watch List",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Collapse Watch List",
+     "sign in"
+    ],
+    "stored_goal": "Open the Expand Watch List menu on Ebay",
+    "id": 16,
+    "question": "I want to see the Expand Watch List menu on Ebay. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 2.9,
+    "picture": "task_16_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "the stored path failed (skipped ['Expand Watch List', 'Collapse Watch List']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "Expand Watch List",
+     "Collapse Watch List"
+    ],
+    "fallback_clicks": 0,
+    "retrieved": "Open the Collapse Watch List menu on Ebay via Expand Watch List",
+    "retrieved_correct": false,
+    "in_top3": true,
+    "retrieval_ms": 334,
+    "pid": "a21f7050cfc496765b9b",
+    "seconds": 3.4,
+    "picture": "task_16_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "github.com",
+    "site": "Github",
+    "url": "https://github.com",
+    "category": "",
+    "chain": [
+     "Push protection bypass con"
+    ],
+    "label": "Push protection bypass con",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Insights in security overview",
+     "Scan history API",
+     "Copilot Autofix",
+     "Third party extensibility for code scann"
+    ],
+    "stored_goal": "Open the Push protection bypass con menu on Github",
+    "id": 17,
+    "question": "I want to see the Push protection bypass con menu on Github. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 6,
+    "why": "nothing on the page matches",
+    "seconds": 21.1,
+    "picture": "task_17_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 5,
+    "why": "the stored path failed (skipped ['Push protection bypass con']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "Push protection bypass con"
+    ],
+    "fallback_clicks": 5,
+    "retrieved": "Open the Push protection bypass con menu on Github",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 561,
+    "pid": "43d9fd106e16d3d9e859",
+    "seconds": 14.5,
+    "picture": "task_17_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "khanacademy.org",
+    "site": "Khanacademy",
+    "url": "https://khanacademy.org",
+    "category": "",
+    "chain": [
+     "Show password"
+    ],
+    "label": "Show password",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Hide password"
+    ],
+    "stored_goal": "Open the Show password menu on Khanacademy",
+    "id": 18,
+    "question": "I want to see the Show password menu on Khanacademy. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 8,
+    "why": "budget spent",
+    "seconds": 17.6,
+    "picture": "task_18_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 5,
+    "why": "the stored path failed (skipped ['Show password']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "Show password"
+    ],
+    "fallback_clicks": 5,
+    "retrieved": "Open the Show password menu on Khanacademy",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 358,
+    "pid": "56d3a53b3eff8b145cb4",
+    "seconds": 14.1,
+    "picture": "task_18_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "w3schools.com",
+    "site": "W3schools",
+    "url": "https://w3schools.com",
+    "category": "",
+    "chain": [
+     "References"
+    ],
+    "label": "References",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Close navigation",
+     "Hero plan",
+     "Get W3Schools Certified",
+     "References filter bar"
+    ],
+    "stored_goal": "Open the References menu on W3schools",
+    "id": 19,
+    "question": "I want to see the References menu on W3schools. What do I click?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 8.3,
+    "picture": "task_19_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Open the References menu on W3schools",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 451,
+    "pid": "bc93ac9f2caa047708c6",
+    "seconds": 9.1,
+    "picture": "task_19_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "w3schools.com",
+    "site": "W3schools",
+    "url": "https://w3schools.com",
+    "category": "",
+    "chain": [
+     "Tutorials"
+    ],
+    "label": "Tutorials",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Close navigation",
+     "Hero plan",
+     "Get W3Schools Certified",
+     "Tutorials filter input"
+    ],
+    "stored_goal": "Open the Tutorials menu on W3schools",
+    "id": 20,
+    "question": "I want to see the Tutorials menu on W3schools. What do I click?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 8.2,
+    "picture": "task_20_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Open the Tutorials menu on W3schools",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 326,
+    "pid": "19dec654e17e39bcc4cd",
+    "seconds": 8.8,
+    "picture": "task_20_pool_ok.png",
+    "filed_correction": false
+   }
+  }
+ ]
+}

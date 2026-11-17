@@ -1,0 +1,417 @@
+{
+   "app_metadata": {
+      "app_name": "Air Explorer",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide the user through various features and settings of Air Explorer",
+   "prerequisite_state": "Air Explorer application is installed and open",
+   "total_steps": 14,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the File menu",
+         "ui_target": {
+            "element_name": "File",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The File dropdown opens showing New, Open, Save"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Choose New",
+         "ui_target": {
+            "element_name": "New",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File > New",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A blank untitled document appears in the workspace"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Open Pro version on Windows or the Air Explorer menu on Mac",
+         "ui_target": {
+            "element_name": "Pro version",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Pro version",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Pro version menu options are displayed"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Choose Enter activation code",
+         "ui_target": {
+            "element_name": "Enter activation code",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Pro version > Enter activation code",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The activation code input field is focused"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Paste the activation code",
+         "ui_target": {
+            "element_name": "Activation code input field",
+            "automation_id": null,
+            "hierarchical_path": "Activation code input field",
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "activation code"
+         },
+         "expected_state_change": "The activation code is entered and the license information is confirmed"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Open View and select One panel or Two panels",
+         "ui_target": {
+            "element_name": "View",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > View",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The View dropdown opens showing One panel, Two panels, Four panels"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Choose One panel or Two panels",
+         "ui_target": {
+            "element_name": "One panel",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > View > One panel",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected panel view is displayed"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Choose a local folder or cloud account in each visible panel",
+         "ui_target": {
+            "element_name": "Local folder or cloud account",
+            "automation_id": null,
+            "hierarchical_path": "Panel > Local folder or cloud account",
+            "element_type": "ListItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected folder or account is displayed in the panel"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Open another window when you need an independent workspace",
+         "ui_target": {
+            "element_name": "New window",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > New window",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A new Air Explorer window is opened"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Open Accounts and choose Add account",
+         "ui_target": {
+            "element_name": "Accounts",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Accounts",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Add account dialog is displayed"
+      },
+      {
+         "step_id": 11,
+         "low_level_instruction": "Select the provider, such as Google Drive, OneDrive, Dropbox, S3, FTP, SFTP or WebDAV",
+         "ui_target": {
+            "element_name": "Provider",
+            "automation_id": null,
+            "hierarchical_path": "Add account dialog > Provider",
+            "element_type": "ComboBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected provider's sign-in or connection form is displayed"
+      },
+      {
+         "step_id": 12,
+         "low_level_instruction": "Follow the provider sign-in or connection form and save the account",
+         "ui_target": {
+            "element_name": "Save account",
+            "automation_id": null,
+            "hierarchical_path": "Add account dialog > Save account",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The account is saved and the Accounts manager is updated"
+      },
+      {
+         "step_id": 13,
+         "low_level_instruction": "Open the Accounts manager and choose the import or export option",
+         "ui_target": {
+            "element_name": "Accounts manager",
+            "automation_id": null,
+            "hierarchical_path": "Accounts manager",
+            "element_type": "Window",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The import or export dialog is displayed"
+      },
+      {
+         "step_id": 14,
+         "low_level_instruction": "Select the accounts to include and protect the exported file if requested",
+         "ui_target": {
+            "element_name": "Accounts to include",
+            "automation_id": null,
+            "hierarchical_path": "Import or export dialog > Accounts to include",
+            "element_type": "ListBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected accounts are exported and the file is saved"
+      }
+   ],
+   "_meta": {
+      "source_app": "Air Explorer",
+      "app_key": "air_explorer",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Getting started",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:27:24Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

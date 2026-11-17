@@ -1,0 +1,106 @@
+{
+ "app": "excel",
+ "started": "2026-11-02 06:39:12",
+ "phases": {
+  "read": {
+   "seconds": 8.8,
+   "level": "explored"
+  },
+  "map": {
+   "ran": true,
+   "seconds": 143.3,
+   "level": "explored",
+   "commands": 2907,
+   "with_shortcut": 22,
+   "dialogs": 6,
+   "layout_controls": 1861,
+   "state_variables": 41,
+   "frontier": {
+    "total": 228,
+    "by_status": {
+     "explored": 39,
+     "no_effect": 9,
+     "open": 158,
+     "unsafe": 22
+    },
+    "explorable": 206,
+    "explored_n": 48,
+    "explored_fraction": 0.233
+   }
+  },
+  "ask": {
+   "asked": 4,
+   "answered": 2,
+   "items": [
+    {
+     "q": "In excel, how do I use Analytic Solver?",
+     "status": "ANSWERED",
+     "answer": "To use Analytic Solver in Excel, you need to use the AddCalculatedMember method. Here is a sample code:\n\n```vb\nSub UseCalculatedMember()\n    Dim pvtTable As PivotTable\n    Set pvtTable = ActiveSheet.PivotTables(1)\n    pvtTable.CalculatedMem"
+    },
+    {
+     "q": "In excel, how do I use Hide Ink?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about excel (5000 documents, 13 procedures, 2 shortcuts). How to use Hide Ink in Excel Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In excel, how do I use Spelling...?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about excel (5000 documents, 13 procedures, 2 shortcuts). how to use Spelling... in Excel Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In excel, how do I use Add\u2011ins?",
+     "status": "ANSWERED",
+     "answer": "To use Add-ins in Excel, you can use VBA to install them. For example, to install the Analysis Toolpak add-in, you would use the following VBA code:\n\n```vb\nAddIns(\"analysis toolpak\").Installed = True\n```\n\nEnsure you spell the add-in title e"
+    }
+   ],
+   "seconds": 23.5
+  },
+  "practice": {
+   "written": 5,
+   "tried": 4,
+   "proven_done": 0,
+   "kept_training_rows": 0,
+   "results": [
+    {
+     "task": "open excel, type 'Sales Report 2023' in cell A1, type 'Units Sold' in B1, 'Price' in C1, 'Total' in D1, enter '100' in B2, '20' in C2, calculate total in D2 as '=$B$2*$C$2', fill down to B3 with '150', '30', '4500', use Conditional Formatting to highlight cells in D where total is over 4000, save as 'D:\\new_automation\\data\\practice\\excel\\sales_report_2023.xlsx',",
+     "status": "FAILED",
+     "seconds": 83.3,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'excel': BLOCKED (window hwnd=3279566), 6 verified-loop steps in 49.6s\n    - 'create a new blank document' -> DONE (PASS) [WEAK evidence: the UI"
+    },
+    {
+     "task": "open excel, type 'Population Growth' in cell A1, type 'Year' in B1, 'Population' in C1, 'Growth Rate' in D1, enter '2010' in B2, '1000000' in C2, '2011' in B3, '1020000' in C3, calculate growth rate in D3 as '=(C3-C2)/C2', fill down to B4 with '2012', '1040000', '2013', '1060000', use data tools to create a line chart, save as 'D:\\new_automation\\data\\practice\\excel\\population_growth.xlsx',",
+     "status": "FAILED",
+     "seconds": 68.8,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'excel': BLOCKED (window hwnd=4983088), 6 verified-loop steps in 44.2s\n    - 'create a new blank document' -> DONE (PASS) [WEAK evidence: the UI"
+    },
+    {
+     "task": "open excel, type 'Project Budget' in cell A1, type 'Item' in B1, 'Cost' in C1, 'Notes' in D1, enter 'Office Supplies' in B2, '500' in C2, 'Pens and paper' in D2, 'Software Licenses' in B3, '2000' in C3, 'Annual maintenance' in D3, 'Training' in B4, '1500' in C4, 'Employee development' in D4, use Analytic Solver to perform a what-if analysis on the total cost, save as 'D:\\new_automation\\data\\practice\\excel\\project_budget.xlsx',",
+     "status": "FAILED",
+     "seconds": 70.5,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'excel': BLOCKED (window hwnd=5835102), 6 verified-loop steps in 43.5s\n    - 'create a new blank document' -> DONE (PASS) [WEAK evidence: the UI"
+    },
+    {
+     "task": "open excel, type 'Customer Feedback' in cell A1, type 'Customer' in B1, 'Feedback' in C1, 'Rating' in D1, enter 'John Doe' in B2, 'Great service' in C2, '5' in D2, 'Jane Smith' in B3, 'Good but could be better' in C3, '4' in D3, 'Bob Johnson' in B4, 'Excellent' in C4, '5' in D4, use Spelling to check and correct any errors, save as 'D:\\new_automation\\data\\practice\\excel\\customer_feedback.xlsx',",
+     "status": "FAILED",
+     "seconds": 171.7,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'excel': BLOCKED (window hwnd=4194482), 6 verified-loop steps in 149.9s\n    - 'open the file C:\\path\\to\\file.xlsx' -> DONE (PASS) [WEAK evidence"
+    },
+    {
+     "task": "open excel, type 'Monthly Sales' in cell A1, type 'Month' in B1, 'Sales' in C1, 'Profit' in D1, enter 'January' in B2, '10000' in C2, '8000' in D2, 'February' in B3, '12000' in C3, '9600' in D3, 'March' in B4, '15000' in C4, '12000' in D4, use Insert Statistic Chart to create a pie chart of the profit, save as 'D:\\new_automation\\data\\practice\\excel\\monthly_sales.xlsx']}<tool_call>\nassistant\n{",
+     "status": "SKIPPED",
+     "why": "risky words, a menu-click list, or no checkable end (not saved in the practice folder)"
+    }
+   ],
+   "seconds": 428.9
+  }
+ },
+ "app_key": "excel",
+ "exe": "C:\\Program Files\\Microsoft Office\\Root\\Office16\\EXCEL.EXE",
+ "readiness": {
+  "knows_commands": true,
+  "answers_questions": "2/4",
+  "proven_tasks": "0/4",
+  "verdict": "not ready: nothing proven yet"
+ },
+ "seconds": 609.6
+}

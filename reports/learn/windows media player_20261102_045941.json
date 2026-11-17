@@ -1,0 +1,117 @@
+{
+ "app": "Windows Media Player",
+ "started": "2026-11-02 04:59:45",
+ "phases": {
+  "read": {
+   "program": {
+    "exe": "C:\\Program Files (x86)\\Windows Media Player\\wmplayer.exe",
+    "mb": 0.2,
+    "filed": {
+     "document_chunks": 1,
+     "commands": 0,
+     "hotkeys": 0
+    },
+    "how_to_drive": "plain Win32: tree reflects the standard controls it uses"
+   },
+   "seconds": 5.2,
+   "level": "explored"
+  },
+  "map": {
+   "ran": true,
+   "seconds": 126.3,
+   "level": "explored",
+   "commands": 80,
+   "with_shortcut": 2,
+   "dialogs": 0,
+   "layout_controls": 112,
+   "state_variables": 3,
+   "frontier": {
+    "total": 39,
+    "by_status": {
+     "explored": 3,
+     "no_effect": 16,
+     "open": 17,
+     "unsafe": 3
+    },
+    "explorable": 36,
+    "explored_n": 19,
+    "explored_fraction": 0.528
+   }
+  },
+  "ask": {
+   "asked": 4,
+   "answered": 0,
+   "items": [
+    {
+     "q": "In Windows Media Player, how do I use &Help?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about mediaplayer (1 documents, 0 procedures, 0 shortcuts). how to use &Help in Windows Media Player Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In Windows Media Player, how do I use Album?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about mediaplayer (1 documents, 0 procedures, 0 shortcuts). how to use Album feature in Windows Media Player. Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In Windows Media Player, how do I use Album?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about mediaplayer (1 documents, 0 procedures, 0 shortcuts). how to use Album feature in Windows Media Player. Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In Windows Media Player, how do I use All locations?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about mediaplayer (1 documents, 0 procedures, 0 shortcuts). how to use All locations in Windows Media Player. Reverse engineering or scanning it more would fill this in."
+    }
+   ],
+   "seconds": 6.5
+  },
+  "practice": {
+   "written": 5,
+   "tried": 5,
+   "proven_done": 0,
+   "kept_training_rows": 0,
+   "results": [
+    {
+     "task": "open Windows Media Player, type 'Dhruv Patel' in the search bar, select an audio file, click on 'MetadataIconArt', type 'Singer: Dhruv Patel', click on 'Album', type 'Album: Music for the Soul', click on 'Artist', type 'Artist: Dhruv Patel', click on 'Genre', type 'Genre: Pop', click on 'Length', type 'Length: 3:45', click on 'Details', type 'Track: 1/1', click on 'File name:', type 'File name: Love in the Air', click on 'Burn', type 'Burn: Disc 1', save as 'Dhruv_Patel_Music_for_the_Soul.wpl' in D:\\new_automation\\data\\practice\\windows media player",
+     "status": "FAILED",
+     "seconds": 175.1,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'media player': BLOCKED (window hwnd=396384), 6 verified-loop steps in 146.0s\n    - 'open the file C:\\Windows\\Media\\wmplayer.exe' -> DONE (PASS)"
+    },
+    {
+     "task": "open Windows Media Player, click on 'Music', click on 'All locations', click on 'Pictures', select an audio file, click on 'Details', type 'Track: 2/5', click on 'File name:', type 'File name: Nighttime Dreams', click on 'MetadataIconArt', type 'Singer: Emily Smith', click on 'Album', type 'Album: Dreams in the Night', click on 'Artist', type 'Artist: Emily Smith', click on 'Genre', type 'Genre: Pop', click on 'Length', type 'Length: 4:20', click on 'Burn', type 'Burn: Disc 1', save as 'Emily_Smith_Dreams_in_the_Night.wpl' in D:\\new_automation\\data\\practice\\windows media player",
+     "status": "FAILED",
+     "seconds": 195.4,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'media player': BLOCKED (window hwnd=396384), 10 verified-loop steps in 169.0s\n    - 'open the file C:\\Windows\\Media\\wmplayer.exe' -> DONE (PASS"
+    },
+    {
+     "task": "open Windows Media Player, click on 'Music', click on 'All locations', click on 'Pictures', select an audio file, click on 'Details', type 'Track: 3/5', click on 'File name:', type 'File name: Whispering Winds', click on 'MetadataIconArt', type 'Singer: John Doe', click on 'Album', type 'Album: Sounds of Nature', click on 'Artist', type 'Artist: John Doe', click on 'Genre', type 'Genre: Ambient', click on 'Length', type 'Length: 5:15', click on 'Burn', type 'Burn: Disc 1', save as 'John_Doe_Sounds_of_Nature.wpl' in D:\\new_automation\\data\\practice\\windows media player",
+     "status": "FAILED",
+     "seconds": 90.5,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'media player': BLOCKED (window hwnd=396384), 6 verified-loop steps in 68.2s\n    - 'open the file C:\\Users\\User\\Music\\All locations\\Pictures' ->"
+    },
+    {
+     "task": "open Windows Media Player, click on 'Music', click on 'All locations', click on 'Pictures', select an audio file, click on 'Details', type 'Track: 4/5', click on 'File name:', type 'File name: Serenity', click on 'MetadataIconArt', type 'Singer: Jane Smith', click on 'Album', type 'Album: Peaceful Moments', click on 'Artist', type 'Artist: Jane Smith', click on 'Genre', type 'Genre: Classical', click on 'Length', type 'Length: 6:00', click on 'Burn', type 'Burn: Disc 1', save as 'Jane_Smith_Peaceful_Moments.wpl' in D:\\new_automation\\data\\practice\\windows media player",
+     "status": "FAILED",
+     "seconds": 77.4,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'media player': BLOCKED (window hwnd=396384), 6 verified-loop steps in 54.8s\n    - 'open the file C:\\Users\\User\\Music\\All locations\\Pictures' ->"
+    },
+    {
+     "task": "open Windows Media Player, click on 'Music', click on 'All locations', click on 'Pictures', select an audio file, click on 'Details', type 'Track: 5/5', click on 'File name:', type 'File name: Sunrise', click on 'MetadataIconArt', type 'Singer: Michael Johnson', click on 'Album', type 'Album: Morning Melodies', click on 'Artist', type 'Artist: Michael Johnson', click on 'Genre', type 'Genre: Folk', click on 'Length', type 'Length: 4:45', click on 'Burn', type 'Burn: Disc 1', save as 'Michael_Johnson_Morning_Melodies.wpl' in D:\\new_automation\\data\\practice\\windows media player",
+     "status": "FAILED",
+     "seconds": 76.9,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'media player': BLOCKED (window hwnd=396384), 6 verified-loop steps in 54.6s\n    - 'open the file C:\\Users\\User\\Music\\All locations\\Pictures' ->"
+    }
+   ],
+   "seconds": 652.2
+  }
+ },
+ "app_key": "windows media player",
+ "exe": "C:\\Program Files (x86)\\Windows Media Player\\wmplayer.exe",
+ "readiness": {
+  "knows_commands": true,
+  "answers_questions": "0/4",
+  "proven_tasks": "0/5",
+  "verdict": "not ready: nothing proven yet"
+ },
+ "seconds": 794.7
+}

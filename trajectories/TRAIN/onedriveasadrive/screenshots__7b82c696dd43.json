@@ -1,0 +1,116 @@
+{
+   "app_metadata": {
+      "app_name": "OneDriveAsADrive",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Manually install OneDriveAsADrive and configure it to map OneDrive and SharePoint libraries as network drives.",
+   "prerequisite_state": "User is on a Windows 10 or 11 machine with PowerShell 5.1+ installed.",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download the latest release of OneDriveAsADrive",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User is hovering over the download link."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Extract the downloaded zip file to a desired location",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User is hovering over the extracted folder."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Run OneDriveAsADrive with the `--console` flag",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": ".\\OneDriveAsADrive.exe --console"
+         },
+         "expected_state_change": "The console window opens and prints the `net use` command."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Map the drive using the `net use` command provided by the console",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "net use Z: http://localhost:40323/z/ /user:onedrive <secret> /persistent:yes"
+         },
+         "expected_state_change": "The drive letter `Z:` is mapped to the specified URL."
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Repeat steps 3 and 4 for each additional library to be mounted",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Additional drives are mapped according to the `config.json` settings."
+      }
+   ],
+   "_meta": {
+      "source_app": "OneDriveAsADrive",
+      "app_key": "onedriveasadrive",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Screenshots",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:54:26Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target",
+         "step4_ungrounded_target",
+         "step5_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

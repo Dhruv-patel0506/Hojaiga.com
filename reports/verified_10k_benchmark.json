@@ -1,0 +1,498 @@
+{
+  "timestamp": "2026-10-20 16:34:30",
+  "rag_10k_benchmark": {
+    "total_rag_records": 10080,
+    "heldout_test_total": 3024,
+    "evaluated_sample": 300,
+    "archetype_routing_accuracy_pct": 100.0,
+    "action_modality_accuracy_pct": 100.0,
+    "exact_target_recall_top5_pct": 97.0,
+    "latency_p50_ms": 114.06,
+    "latency_p95_ms": 139.2
+  },
+  "visual_prompt_trimming": {
+    "total": 1305,
+    "trimmed": 897
+  },
+  "qwen_adapter_evaluation": {
+    "selection": {
+      "available": 136,
+      "selected": 16,
+      "max_examples": 16,
+      "seed": 3407,
+      "strategy": "deterministic round-robin by app_key/action"
+    },
+    "base": {
+      "scores": {
+        "n": 16,
+        "valid_json": 0.812,
+        "recoverable_action": 0.875,
+        "action_kind": 0.75,
+        "exact": 0.188
+      },
+      "samples": [
+        {
+          "goal": "Click the View site information button",
+          "gold": {
+            "action": "click",
+            "target_id": 12,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "```json\n[\n  {\n    \"step\": 1,\n    \"action\": \"click\",\n    \"target_id\": 15,\n    \"verify_expectation\": \"The View site information button is clicked and the site information is displayed.\"\n  }\n]\n```",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the StackBlitz button",
+          "gold": {
+            "action": "click",
+            "target_id": 1,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "```json\n[\n  {\n    \"step\": 1,\n    \"action\": \"click|target_id\",\n    \"target_id\": 1\n  }\n]\n```",
+          "valid": true,
+          "action": false,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "press new and they'll create a group chat where you could add",
+          "gold": {
+            "action": "click",
+            "target_id": 5,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "```json\n[\n  {\n    \"step\": 1,\n    \"action\": \"click\",\n    \"target_id\": #11,\n    \"verify_expectation\": \"The screen shows the 'New Group' option, which is the next step in creating a group chat.\"\n  }\n]\n``",
+          "valid": false,
+          "action": false,
+          "exact": false,
+          "strict_json": false
+        },
+        {
+          "goal": "Click the readme.txt item",
+          "gold": {
+            "action": "click",
+            "target_id": 41,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "```json\n[\n  {\n    \"step\": 1,\n    \"action\": \"click\",\n    \"target_id\": 38,\n    \"verify_expectation\": \"The readme.txt file is selected.\"\n  }\n]\n```",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the W3Schools Adventure App - iOS and Android button",
+          "gold": {
+            "action": "click",
+            "target_id": 12,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "```json\n[\n  {\n    \"step\": 1,\n    \"action\": \"click\",\n    \"target_id\": 116,\n    \"hotkey\": null,\n    \"text\": null,\n    \"verify_expectation\": \"The W3Schools app button is visible and clickable.\"\n  }\n]\n```",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the View (Space+drag to pan) button",
+          "gold": {
+            "action": "click",
+            "target_id": 11,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "```json\n[\n  {\n    \"step\": 1,\n    \"action\": \"click\",\n    \"target_id\": 7,\n    \"hotkey\": null,\n    \"text\": null,\n    \"verify_expectation\": \"The View menu is now open.\"\n  }\n]\n```",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the Clear button",
+          "gold": {
+            "action": "click",
+            "target_id": 24,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click|target|target_id\", \"target_id\": 7, \"verify_expectation\": \"The calculator display should show a cleared screen with a new value of 0.\"}]",
+          "valid": true,
+          "action": false,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the Task Pane Options menu item",
+          "gold": {
+            "action": "click",
+            "target_id": 97,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "```json\n[\n  {\n    \"step\": 1,\n    \"action\": \"click\",\n    \"target_id\": 1704,\n    \"hotkey\": null,\n    \"text\": null,\n    \"verify_expectation\": \"The Task Pane Options menu item is visible and clickable.\"\n ",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "tap home to search to DMs",
+          "gold": {
+            "action": "click",
+            "target_id": 44,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "```json\n[\n  {\n    \"step\": 1,\n    \"action\": \"click\",\n    \"target_id\": 44,\n    \"verify_expectation\": \"The screen shows the home page of Discord with the 'Home' text visible.\"\n  },\n  {\n    \"step\": 2,\n   ",
+          "valid": true,
+          "action": true,
+          "exact": true,
+          "strict_json": false
+        },
+        {
+          "goal": "click new",
+          "gold": {
+            "action": "click",
+            "target_id": 33,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 33, \"verify_expectation\": \"The 'New' button is visible on the screen.\"}]",
+          "valid": true,
+          "action": true,
+          "exact": true,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the Opacity \u2014 100% button",
+          "gold": {
+            "action": "click",
+            "target_id": 27,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "```json\n[\n  {\n    \"step\": 1,\n    \"action\": \"click\",\n    \"target_id\": 56,\n    \"verify_expectation\": \"The Opacity \u2014 100% button is clicked and the screen shows the updated opacity setting.\"\n  }\n]\n```",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the Next event button",
+          "gold": {
+            "action": "click",
+            "target_id": 33,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "```json\n[\n  {\n    \"step\": 1,\n    \"action\": \"click\",\n    \"target_id\": 1213,\n    \"hotkey\": null,\n    \"text\": null,\n    \"verify_expectation\": \"Next event button is clicked.\"\n  }\n]\n```",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the Help ? button",
+          "gold": {
+            "action": "click",
+            "target_id": 54,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "```json\n[\n  {\n    \"step\": 1,\n    \"action\": \"click\",\n    \"target_id\": 56,\n    \"verify_expectation\": \"The Help ? button is now highlighted or activated.\"\n  }\n]\n```",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the Untitled. Modified. tab",
+          "gold": {
+            "action": "click",
+            "target_id": 2,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "```json\n[\n  {\n    \"step\": 1,\n    \"action\": \"click\",\n    \"target_id\": 2,\n    \"verify_expectation\": \"The 'Untitled' tab is selected and the text 'Untitled' is visible.\"\n  }\n]\n```",
+          "valid": true,
+          "action": true,
+          "exact": true,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the Search for anything... button",
+          "gold": {
+            "action": "click",
+            "target_id": 14,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "```json\n[\n  {\n    \"step\": 1,\n    \"action\": \"click\",\n    \"target_id\": #14,\n    \"hotkey\": null,\n    \"text\": null,\n    \"verify_expectation\": \"The search bar is activated and ready for input.\"\n  }\n]\n```",
+          "valid": false,
+          "action": false,
+          "exact": false,
+          "strict_json": false
+        },
+        {
+          "goal": "click on start",
+          "gold": {
+            "action": "click",
+            "target_id": 26,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "```json\n[\n  {\n    \"step\": 1,\n    \"action\": \"click\",\n    \"target_id\": \"26\",\n    \"verify_expectation\": \"The 'Start' button is clicked and the onboarding process begins.\"\n  }\n]\n```",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        }
+      ],
+      "tag": "base"
+    },
+    "adapter": {
+      "scores": {
+        "n": 16,
+        "valid_json": 1.0,
+        "recoverable_action": 1.0,
+        "action_kind": 1.0,
+        "exact": 0.375
+      },
+      "samples": [
+        {
+          "goal": "Click the View site information button",
+          "gold": {
+            "action": "click",
+            "target_id": 12,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 13, \"hotkey\": null, \"text\": null, \"verify_expectation\": \"new on screen: View site information\"}]",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the StackBlitz button",
+          "gold": {
+            "action": "click",
+            "target_id": 1,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 1, \"hotkey\": null, \"text\": null, \"verify_expectation\": \"the screen changes\"}]",
+          "valid": true,
+          "action": true,
+          "exact": true,
+          "strict_json": true
+        },
+        {
+          "goal": "press new and they'll create a group chat where you could add",
+          "gold": {
+            "action": "click",
+            "target_id": 5,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 14, \"hotkey\": null, \"text\": null, \"verify_expectation\": \"the screen changes in the region [5L, 136, 1021, 120]\"}]",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the readme.txt item",
+          "gold": {
+            "action": "click",
+            "target_id": 41,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 38, \"hotkey\": null, \"text\": null, \"verify_expectation\": \"the screen changes in the region [50, 126, 399, 16]\"}]",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the W3Schools Adventure App - iOS and Android button",
+          "gold": {
+            "action": "click",
+            "target_id": 12,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 12, \"hotkey\": null, \"text\": null, \"verify_expectation\": \"the screen changes\"}]",
+          "valid": true,
+          "action": true,
+          "exact": true,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the View (Space+drag to pan) button",
+          "gold": {
+            "action": "click",
+            "target_id": 11,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 29, \"hotkey\": null, \"text\": null, \"verify_expectation\": \"the screen changes in the region [11, 41, 139, 75]\"}]",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the Clear button",
+          "gold": {
+            "action": "click",
+            "target_id": 24,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 22, \"hotkey\": null, \"text\": null, \"verify_expectation\": \"the screen changes in the region [10, 117, 1061, 601]\"}]",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the Task Pane Options menu item",
+          "gold": {
+            "action": "click",
+            "target_id": 97,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 57, \"hotkey\": null, \"text\": null, \"verify_expectation\": \"the screen changes in the region [1050, 105, 56, 80]\"}]",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "tap home to search to DMs",
+          "gold": {
+            "action": "click",
+            "target_id": 44,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 44, \"hotkey\": null, \"text\": null, \"verify_expectation\": \"the screen changes in the region [125, 4, 589, 689]\"}]",
+          "valid": true,
+          "action": true,
+          "exact": true,
+          "strict_json": true
+        },
+        {
+          "goal": "click new",
+          "gold": {
+            "action": "click",
+            "target_id": 33,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 56, \"hotkey\": null, \"text\": null, \"verify_expectation\": \"new on screen: Start, Search, Settings, More app, Calendar, Notes, Keep, Date calculation, Formatt",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the Opacity \u2014 100% button",
+          "gold": {
+            "action": "click",
+            "target_id": 27,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 60, \"hotkey\": null, \"text\": null, \"verify_expectation\": \"the screen changes in the region [13, 773, 33, 12]\"}]",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the Next event button",
+          "gold": {
+            "action": "click",
+            "target_id": 33,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 26, \"hotkey\": null, \"text\": null, \"verify_expectation\": \"a page or section related to learning with communities will be displayed\"}]",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the Help ? button",
+          "gold": {
+            "action": "click",
+            "target_id": 54,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 56, \"hotkey\": null, \"text\": null, \"verify_expectation\": \"the screen changes\"}]",
+          "valid": true,
+          "action": true,
+          "exact": false,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the Untitled. Modified. tab",
+          "gold": {
+            "action": "click",
+            "target_id": 2,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 2, \"hotkey\": null, \"text\": null, \"verify_expectation\": \"new on screen: x Untitled\"}]",
+          "valid": true,
+          "action": true,
+          "exact": true,
+          "strict_json": true
+        },
+        {
+          "goal": "Click the Search for anything... button",
+          "gold": {
+            "action": "click",
+            "target_id": 14,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 14, \"hotkey\": null, \"text\": null, \"verify_expectation\": \"the screen changes\"}]",
+          "valid": true,
+          "action": true,
+          "exact": true,
+          "strict_json": true
+        },
+        {
+          "goal": "click on start",
+          "gold": {
+            "action": "click",
+            "target_id": 26,
+            "hotkey": null,
+            "text": null
+          },
+          "reply": "[{\"step\": 1, \"action\": \"click\", \"target_id\": 26, \"hotkey\": null, \"text\": null, \"verify_expectation\": \"the screen changes\"}]",
+          "valid": true,
+          "action": true,
+          "exact": true,
+          "strict_json": true
+        }
+      ],
+      "tag": "adapter"
+    }
+  }
+}

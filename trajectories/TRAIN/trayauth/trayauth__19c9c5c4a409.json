@@ -1,0 +1,139 @@
+{
+   "app_metadata": {
+      "app_name": "TrayAuth",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and use TrayAuth to manage two-factor authentication codes",
+   "prerequisite_state": "No application is open",
+   "total_steps": 4,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install TrayAuth using winget",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": "winget install KlowdfurrRad.TrayAuth"
+         },
+         "expected_state_change": "TrayAuth is installed and available in the Start Menu and Settings → Installed apps"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Open TrayAuth from the Start Menu",
+         "ui_target": {
+            "element_name": "TrayAuth",
+            "automation_id": null,
+            "hierarchical_path": "Start Menu > TrayAuth",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The TrayAuth application window opens with the tray icon and panel"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Add an account by typing the setup key",
+         "ui_target": {
+            "element_name": "Add account",
+            "automation_id": null,
+            "hierarchical_path": "TrayAuth window > + button",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A dialog appears asking for the issuer, account name, and setup key"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Copy a code from the tray icon",
+         "ui_target": {
+            "element_name": "Tray icon",
+            "automation_id": null,
+            "hierarchical_path": "Tray bar > TrayAuth icon",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A right-click menu appears with the account name and code"
+      }
+   ],
+   "_meta": {
+      "source_app": "TrayAuth",
+      "app_key": "trayauth",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "TrayAuth",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T17:57:24Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

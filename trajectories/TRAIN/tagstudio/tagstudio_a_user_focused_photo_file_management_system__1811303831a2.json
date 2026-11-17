@@ -1,0 +1,81 @@
+{
+   "app_metadata": {
+      "app_name": "TagStudio",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Create a new library in TagStudio",
+   "prerequisite_state": "TagStudio is open on its start screen",
+   "total_steps": 2,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the File menu",
+         "ui_target": {
+            "element_name": "File",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The File dropdown opens showing Open/Create Library"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Choose Create Library",
+         "ui_target": {
+            "element_name": "Create Library",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > File > Create Library",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A new library is created from the chosen directory and files are automatically scanned and added to the library"
+      }
+   ],
+   "_meta": {
+      "source_app": "TagStudio",
+      "app_key": "tagstudio",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "TagStudio: A User-Focused Photo & File Management System",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:32:20Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "LRGEX Compress",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Compress a file or folder using LRGEX Compress",
+   "prerequisite_state": "LRGEX Compress is installed and open on the desktop",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Right-click any file or folder",
+         "ui_target": {
+            "element_name": "File or folder",
+            "automation_id": null,
+            "hierarchical_path": "Desktop > File or folder",
+            "element_type": "ListItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A context menu appears with options including 'LRGEX → Compress'"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click 'LRGEX → Compress'",
+         "ui_target": {
+            "element_name": "Compress",
+            "automation_id": null,
+            "hierarchical_path": "Context menu > LRGEX > Compress",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A progress window shows live speed and ETA"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "A progress window shows live speed and ETA",
+         "ui_target": {
+            "element_name": "Progress window",
+            "automation_id": null,
+            "hierarchical_path": "Progress window",
+            "element_type": "Window",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The progress window disappears and a `.zgx` archive appears next to the original file or folder"
+      }
+   ],
+   "_meta": {
+      "source_app": "LRGEX Compress",
+      "app_key": "lrgex_compress",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "Extremely fast. No waiting.",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:21:51Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

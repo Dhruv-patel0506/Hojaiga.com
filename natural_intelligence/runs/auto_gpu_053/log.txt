@@ -1,0 +1,335 @@
+23:23:42 NI run auto_gpu_053 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=1.0 smoke=False
+23:23:42 explicit task list: ['enc2/text/amazon_polarity']
+23:23:42 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+23:23:45 [data] enc2/text/amazon_polarity: n=119986 C=2 D=768 shards=1
+23:24:13 [enc2/text/amazon_polarity] vote=0.958 uniform=0.958 best1=0.957 n_val=35919 vram=1.40GB 29s
+23:24:21 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 35919, "n_val": 7246, "base_rate": 0.9594258666038513, "inner": {"auc": 0.9264030122981298, "ece": 0.0047625852098393895, "brier": 0.029865551739931107, "acc80": 0.9941338896751404}, "outer_conf": {"auc": 0.9227332906695475, "ece": 0.016467185062234192, "brier": 0.030587900429964066, "acc80": 0.9934437274932861}}
+23:24:21 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+23:24:44 [enc2/text/amazon_polarity] vote=0.960 uniform=0.960 best1=0.959 n_val=35914 vram=1.73GB 23s | grade=0.939 inner_auc=0.908 vs conf_auc=0.898
+23:24:47 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+23:25:19 [enc2/text/amazon_polarity] vote=0.960 uniform=0.960 best1=0.959 n_val=35995 vram=1.73GB 32s | grade=0.940 inner_auc=0.904 vs conf_auc=0.897
+23:25:27 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+23:26:17 [enc2/text/amazon_polarity] vote=0.960 uniform=0.960 best1=0.958 n_val=36171 vram=1.73GB 50s | grade=0.942 inner_auc=0.903 vs conf_auc=0.897
+23:26:33 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+23:27:44 [enc2/text/amazon_polarity] vote=0.961 uniform=0.960 best1=0.960 n_val=35797 vram=1.74GB 71s | grade=0.938 inner_auc=0.919 vs conf_auc=0.915
+23:28:02 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+23:29:19 [enc2/text/amazon_polarity] vote=0.960 uniform=0.960 best1=0.959 n_val=36058 vram=1.73GB 77s | grade=0.938 inner_auc=0.904 vs conf_auc=0.900
+23:29:37 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+23:31:04 [enc2/text/amazon_polarity] vote=0.962 uniform=0.962 best1=0.961 n_val=36023 vram=1.73GB 87s | grade=0.937 inner_auc=0.911 vs conf_auc=0.906
+23:31:19 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+23:32:57 [enc2/text/amazon_polarity] vote=0.961 uniform=0.961 best1=0.959 n_val=36105 vram=1.73GB 97s | grade=0.936 inner_auc=0.919 vs conf_auc=0.913
+23:33:12 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+23:34:45 [enc2/text/amazon_polarity] vote=0.961 uniform=0.961 best1=0.959 n_val=35880 vram=1.73GB 93s | grade=0.939 inner_auc=0.911 vs conf_auc=0.908
+23:35:01 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+23:36:29 [enc2/text/amazon_polarity] vote=0.960 uniform=0.960 best1=0.958 n_val=36364 vram=1.73GB 88s | grade=0.939 inner_auc=0.897 vs conf_auc=0.890
+23:36:45 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+23:37:15 [enc2/text/amazon_polarity] vote=0.959 uniform=0.959 best1=0.958 n_val=35917 vram=1.73GB 30s | grade=0.942 inner_auc=0.904 vs conf_auc=0.901
+23:37:19 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+23:37:49 [enc2/text/amazon_polarity] vote=0.962 uniform=0.962 best1=0.960 n_val=36050 vram=1.73GB 30s | grade=0.940 inner_auc=0.918 vs conf_auc=0.911
+23:37:54 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+23:38:19 [enc2/text/amazon_polarity] vote=0.958 uniform=0.958 best1=0.957 n_val=35915 vram=1.73GB 25s | grade=0.938 inner_auc=0.921 vs conf_auc=0.914
+23:38:24 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+23:38:50 [enc2/text/amazon_polarity] vote=0.961 uniform=0.961 best1=0.959 n_val=36141 vram=1.73GB 27s | grade=0.937 inner_auc=0.917 vs conf_auc=0.915
+23:38:56 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+23:39:27 [enc2/text/amazon_polarity] vote=0.961 uniform=0.961 best1=0.959 n_val=35729 vram=1.74GB 30s | grade=0.941 inner_auc=0.901 vs conf_auc=0.899
+23:39:37 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+23:40:31 [enc2/text/amazon_polarity] vote=0.961 uniform=0.961 best1=0.959 n_val=35739 vram=1.74GB 54s | grade=0.936 inner_auc=0.914 vs conf_auc=0.910
+23:40:40 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+23:41:34 [enc2/text/amazon_polarity] vote=0.961 uniform=0.962 best1=0.960 n_val=35794 vram=1.74GB 53s | grade=0.940 inner_auc=0.908 vs conf_auc=0.898
+23:41:45 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+23:42:41 [enc2/text/amazon_polarity] vote=0.962 uniform=0.962 best1=0.960 n_val=35912 vram=1.73GB 56s | grade=0.940 inner_auc=0.914 vs conf_auc=0.911
+23:42:53 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+23:43:51 [enc2/text/amazon_polarity] vote=0.960 uniform=0.960 best1=0.958 n_val=36028 vram=1.73GB 58s | grade=0.936 inner_auc=0.928 vs conf_auc=0.924
+23:44:00 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+23:44:55 [enc2/text/amazon_polarity] vote=0.960 uniform=0.960 best1=0.959 n_val=36068 vram=1.73GB 55s | grade=0.937 inner_auc=0.915 vs conf_auc=0.910
+23:45:06 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+23:45:59 [enc2/text/amazon_polarity] vote=0.962 uniform=0.962 best1=0.962 n_val=35932 vram=1.73GB 54s | grade=0.938 inner_auc=0.921 vs conf_auc=0.916
+23:46:10 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+23:46:56 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:47:04 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+23:47:27 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:47:32 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+23:48:02 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:48:07 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+23:48:24 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:48:28 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+23:48:54 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:48:58 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+23:49:19 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:49:23 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+23:49:46 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:49:50 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+23:50:12 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:50:19 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+23:50:42 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:50:47 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+23:51:05 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:51:10 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+23:51:33 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:51:39 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+23:52:01 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:52:06 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+23:52:28 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:52:34 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+23:52:57 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:53:01 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+23:53:24 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:53:28 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+23:53:51 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:53:58 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+23:54:21 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:54:26 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+23:54:42 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:54:48 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+23:55:15 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:55:20 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+23:55:40 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:55:45 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+23:56:08 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:56:15 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+23:56:38 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:56:44 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+23:57:03 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:57:07 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+23:57:29 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:57:37 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+23:57:55 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:57:59 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+23:58:18 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:58:25 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+23:58:50 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:58:54 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+23:59:11 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:59:18 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+23:59:43 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+23:59:48 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+00:00:12 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:00:18 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+00:00:35 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:00:40 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+00:01:06 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:01:12 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+00:01:34 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:01:40 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+00:02:08 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:02:17 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+00:02:40 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:02:47 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+00:03:09 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:03:16 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+00:03:43 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:03:48 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+00:04:13 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:04:22 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+00:04:46 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:04:53 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+00:05:19 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:05:24 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+00:05:46 ERROR enc2/text/amazon_polarity Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 224, in main
+    tf.flush()
+    ~~~~~~~~^^
+PermissionError: [Errno 13] Permission denied
+
+00:05:46 too many consecutive failures; stopping
+00:05:53 RUN COMPLETE

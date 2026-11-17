@@ -1,0 +1,107 @@
+{
+ "app": "excel",
+ "started": "2026-11-02 05:29:59",
+ "phases": {
+  "read": {
+   "seconds": 9.2,
+   "level": "explored"
+  },
+  "map": {
+   "ran": true,
+   "seconds": 146.6,
+   "level": "explored",
+   "commands": 2850,
+   "with_shortcut": 22,
+   "dialogs": 6,
+   "layout_controls": 1861,
+   "state_variables": 41,
+   "frontier": {
+    "total": 202,
+    "by_status": {
+     "explored": 32,
+     "no_effect": 6,
+     "open": 143,
+     "unsafe": 21
+    },
+    "explorable": 181,
+    "explored_n": 38,
+    "explored_fraction": 0.21
+   }
+  },
+  "ask": {
+   "asked": 4,
+   "answered": 3,
+   "items": [
+    {
+     "q": "In excel, how do I use AutoSum?",
+     "status": "ANSWERED_WEAK",
+     "answer": "I could not find that in what I learned about excel (5000 documents, 13 procedures, 2 shortcuts). instructions for using AutoSum in Excel Reverse engineering or scanning it more would fill this in."
+    },
+    {
+     "q": "In excel, how do I use Insert Function...?",
+     "status": "ANSWERED",
+     "answer": "To use the Insert Function feature in Excel, you should click on the 'Insert Function' button, usually found under the 'Formulas' tab. This opens the 'Insert Function' dialog box where you can search for and select functions to use in your "
+    },
+    {
+     "q": "In excel, how do I use Watch Window?",
+     "status": "ANSWERED",
+     "answer": "(the model's answer was not used because it cited nothing) Here is what I know (this is the evidence itself):\n- [1] (untitled) A collection of all the Watch objects in a specified application. Use the Watches property of the Application obj"
+    },
+    {
+     "q": "In excel, how do I use Allow Edit Ranges?",
+     "status": "ANSWERED",
+     "answer": "(the model's answer was not used because it cited nothing) Here is what I know (this is the evidence itself):\n- [1] (untitled) Represents the cells that can be edited on a protected worksheet. Use the Add method or the Item property of the "
+    }
+   ],
+   "seconds": 27.3
+  },
+  "practice": {
+   "written": 5,
+   "tried": 5,
+   "proven_done": 0,
+   "kept_training_rows": 0,
+   "results": [
+    {
+     "task": "open excel, type 'Sales Data' in cell A1, type 'Month' in cell B1, type 'Revenue' in cell C1, type '1000' in cell B2, type '2000' in cell B3, type '3000' in cell B4, use AutoSum to sum cells B2:B4 in cell B5, use Insert Function... to calculate the average of cells B2:B4 in cell C5, use Flash Fill to fill in '5000' in cell B5, save as D:\\new_automation\\data\\practice\\excel\\sales_data.xlsx",
+     "status": "FAILED",
+     "seconds": 49.7,
+     "proof": "[{'file': 'D:\\\\new_automation\\\\data\\\\practice\\\\excel\\\\sales_data.xlsx', 'holds': \"Sheet1!A1 = 'Sales Data'\\nSheet1!B1 = 'Month'\\nSheet1!C1 = 'Revenue'\\nSheet1!B2 = 1000\\nSheet1!B3 = 2000\\nSheet1!B4 = 3000\\nSheet1!B5 = 5000\\nSheet1!C5 = 'AVERAGE(B2:B4)'\", 'ok': False, 'why': 'missing or wrong: AutoSu"
+    },
+    {
+     "task": "open excel, type 'Population Growth' in cell A1, type 'Year' in cell B1, type 'Population' in cell C1, type '200000' in cell B2, type '250000' in cell B3, type '300000' in cell B4, use AutoSum to sum cells B2:B4 in cell B5, use Insert Function... to calculate the percentage growth from year to year in cells D2:D4, use Flash Fill to fill in the growth percentages in cells D2:D4, save as D:\\new_automation\\data\\practice\\excel\\population_growth.xlsx",
+     "status": "FAILED",
+     "seconds": 170.5,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'excel': BLOCKED (window hwnd=1248064), 5 verified-loop steps in 125.7s\n    - 'type \"'Population Growth' in cell A1\"' -> NOT DONE (WRONG_STATE)\n"
+    },
+    {
+     "task": "open excel, type 'Employee Details' in cell A1, type 'Name' in cell B1, type 'Age' in cell C1, type 'Salary' in cell D1, type 'John Doe' in cell B2, type '30' in cell C2, type '50000' in cell D2, type 'Jane Smith' in cell B3, type '25' in cell C3, type '45000' in cell D3, use AutoSum to sum cells D2:D3 in cell D4, use Insert Function... to calculate the average salary in cell E1, use Flash Fill to fill in the average salary in cell E1, save as D:\\new_automation\\data\\practice\\excel\\employee_details.xlsx",
+     "status": "FAILED",
+     "seconds": 65.0,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'excel': BLOCKED (window hwnd=3410314), 6 verified-loop steps in 42.0s\n    - 'create a new blank document' -> DONE (PASS) [WEAK evidence: the UI"
+    },
+    {
+     "task": "open excel, type 'Sales Forecast' in cell A1, type 'Month' in cell B1, type 'Forecasted Sales' in cell C1, type 'January' in cell B2, type '20000' in cell C2, type 'February' in cell B3, type '25000' in cell C3, type 'March' in cell B4, type '30000' in cell C4, use AutoSum to sum cells C2:C4 in cell C5, use Insert Function... to calculate the average forecasted sales in cell D1, use Flash Fill to fill in the average forecasted sales in cell D1, use Insert Combo Chart to create a chart with 'Month' on the x-axis and 'Forecasted Sales' on the y-axis, save as D:\\new_automation\\data\\practice\\excel\\sales_forecast.xlsx",
+     "status": "FAILED",
+     "seconds": 89.8,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'excel': BLOCKED (window hwnd=3474826), 6 verified-loop steps in 42.1s\n    - 'create a new blank document' -> DONE (PASS) [WEAK evidence: the UI"
+    },
+    {
+     "task": "open excel, type 'Inventory Levels' in cell A1, type 'Product' in cell B1, type 'Quantity' in cell C1, type 'Product A' in cell B2, type '100' in cell C2, type 'Product B' in cell B3, type '150' in cell C3, type 'Product C' in cell B4, type '200' in cell C4, use AutoSum to sum cells C2:C4 in cell C5, use Insert Function... to calculate the average quantity in cell D1, use Flash Fill to fill in the average quantity in cell D1, use Freeze Panes to freeze the first row, save as D:\\new_automation\\data\\practice\\excel\\inventory_levels.xlsx",
+     "status": "FAILED",
+     "seconds": 82.5,
+     "proof": "DETERMINISTIC DESKTOP PASS (the verified autonomy loop ran BEFORE you; every step was judged by a postcondition verifier, not by a language model):\n  App 1 'excel': BLOCKED (window hwnd=3017054), 6 verified-loop steps in 42.1s\n    - 'create a new blank document' -> DONE (PASS) [WEAK evidence: the UI"
+    }
+   ],
+   "seconds": 493.4
+  }
+ },
+ "app_key": "excel",
+ "exe": "C:\\Program Files\\Microsoft Office\\Root\\Office16\\EXCEL.EXE",
+ "readiness": {
+  "knows_commands": true,
+  "answers_questions": "3/4",
+  "proven_tasks": "0/5",
+  "verdict": "not ready: nothing proven yet"
+ },
+ "seconds": 682.8
+}

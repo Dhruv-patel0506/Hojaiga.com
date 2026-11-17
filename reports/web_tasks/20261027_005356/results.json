@@ -1,0 +1,372 @@
+{
+ "stamp": "20261027_005356",
+ "summary": {
+  "tasks": 8,
+  "cold": {
+   "success": "5/8",
+   "success_rate": 0.62,
+   "mean_clicks_when_ok": 1.6,
+   "mean_seconds_all": 6.4
+  },
+  "pool": {
+   "success": "5/8",
+   "success_rate": 0.62,
+   "mean_clicks_when_ok": 1.2,
+   "mean_seconds_all": 5.5
+  },
+  "retrieval_top1_correct": "8/8",
+  "retrieval_in_top3": "8/8",
+  "pool_found_nothing": 0,
+  "pool_healed_after_a_stale_path": 0,
+  "pool_ok_by_stored_path_alone": 5,
+  "mean_retrieval_ms": 147,
+  "pool_failures_by_reason": {
+   "the pool had no": 0,
+   "step '": 0,
+   "could not click": 0,
+   "the page did not": 0
+  }
+ },
+ "results": [
+  {
+   "task": {
+    "host": "postgresql.org",
+    "site": "Postgresql",
+    "url": "https://postgresql.org/docs",
+    "category": "",
+    "chain": [
+     "Support"
+    ],
+    "label": "Support",
+    "outcome": "opened a new page",
+    "expect_title": "PostgreSQL: Support",
+    "expect_items": [],
+    "stored_goal": "Go to the Support page on Postgresql",
+    "id": 1,
+    "question": "How do I get to Support on Postgresql?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 4.1,
+    "picture": "task_01_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Support page on Postgresql",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 207,
+    "pid": "0a8e9e883437d85bad0a",
+    "seconds": 3.9,
+    "picture": "task_01_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "gitlab.com",
+    "site": "Gitlab",
+    "url": "https://gitlab.com",
+    "category": "",
+    "chain": [
+     "Learn more"
+    ],
+    "label": "Learn more",
+    "outcome": "opened a new page",
+    "expect_title": "Cloud Partner Marketplaces",
+    "expect_items": [],
+    "stored_goal": "Go to the Learn more page on Gitlab",
+    "id": 2,
+    "question": "How do I get to Learn more on Gitlab?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 6,
+    "why": "nothing on the page matches",
+    "seconds": 10.3,
+    "picture": "task_02_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 5,
+    "why": "the stored path failed (skipped ['Learn more']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "Learn more"
+    ],
+    "fallback_clicks": 5,
+    "retrieved": "Go to the Learn more page on Gitlab",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 150,
+    "pid": "0dcf9614b79a242b1c44",
+    "seconds": 9.8,
+    "picture": "task_02_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "pypi.org",
+    "site": "Pypi",
+    "url": "https://pypi.org",
+    "category": "",
+    "chain": [
+     "Forgot password?"
+    ],
+    "label": "Forgot password?",
+    "outcome": "opened a new page",
+    "expect_title": "Password reset \u00b7 PyPI",
+    "expect_items": [],
+    "stored_goal": "Go to the Forgot password? page on Pypi",
+    "id": 3,
+    "question": "How do I get to Forgot password? on Pypi?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 1,
+    "why": "nothing on the page matches",
+    "seconds": 2.9,
+    "picture": "task_03_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 1,
+    "why": "the stored path failed (skipped ['Forgot password?']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "Forgot password?"
+    ],
+    "fallback_clicks": 1,
+    "retrieved": "Go to the Forgot password? page on Pypi",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 16,
+    "pid": "d653bf08674e75fa54a3",
+    "seconds": 1.9,
+    "picture": "task_03_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "mastodon.social",
+    "site": "Mastodon",
+    "url": "https://mastodon.social",
+    "category": "",
+    "chain": [
+     "About"
+    ],
+    "label": "About",
+    "outcome": "opened a new page",
+    "expect_title": "Mastodon.social",
+    "expect_items": [],
+    "stored_goal": "Go to the About page on Mastodon",
+    "id": 4,
+    "question": "How do I get to About on Mastodon?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 5.2,
+    "picture": "task_04_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the About page on Mastodon",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 139,
+    "pid": "0b0f9a9ca982f0c5eab2",
+    "seconds": 3.2,
+    "picture": "task_04_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "bbc.com",
+    "site": "Bbc",
+    "url": "https://bbc.com/sport",
+    "category": "",
+    "chain": [
+     "More",
+     "Disability Sport"
+    ],
+    "label": "Disability Sport",
+    "outcome": "opened a new page",
+    "expect_title": "Disability Sport - Latest News & Updates - BBC Sport",
+    "expect_items": [],
+    "stored_goal": "Go to the Disability Sport page on Bbc via More",
+    "id": 5,
+    "question": "How do I get to Disability Sport on Bbc?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 4,
+    "why": "",
+    "seconds": 13.1,
+    "picture": "task_05_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Disability Sport page on Bbc via More",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 162,
+    "pid": "9dc827bf5190664745ee",
+    "seconds": 7.7,
+    "picture": "task_05_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "app.diagrams.net",
+    "site": "Diagrams",
+    "url": "https://app.diagrams.net",
+    "category": "",
+    "chain": [
+     "Options"
+    ],
+    "label": "Options",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Open in New Window",
+     "Duplicate Page",
+     "Remove Page",
+     "Rename Page..."
+    ],
+    "stored_goal": "Open the Options menu on Diagrams",
+    "id": 6,
+    "question": "I want to see the Options menu on Diagrams. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 3,
+    "why": "nothing on the page matches",
+    "seconds": 4.9,
+    "picture": "task_06_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 4,
+    "why": "the stored path failed (skipped []) and the live page did not help",
+    "healed": false,
+    "skipped": [],
+    "fallback_clicks": 3,
+    "retrieved": "Open the Options menu on Diagrams",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 167,
+    "pid": "e3eebf9efbf693079917",
+    "seconds": 5.9,
+    "picture": "task_06_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "tinypng.com",
+    "site": "Tinypng",
+    "url": "https://tinypng.com",
+    "category": "",
+    "chain": [
+     "Solutions"
+    ],
+    "label": "Solutions",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Image Compressor & Converter Compress an",
+     "Website image Analyzer Scan any website ",
+     "More about compression",
+     "More about conversion"
+    ],
+    "stored_goal": "Open the Solutions menu on Tinypng",
+    "id": 7,
+    "question": "I want to see the Solutions menu on Tinypng. What do I click?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 6.2,
+    "picture": "task_07_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Open the Solutions menu on Tinypng",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 200,
+    "pid": "8ebe0847a1ffc5531baa",
+    "seconds": 6.4,
+    "picture": "task_07_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "ocw.mit.edu",
+    "site": "Mit",
+    "url": "https://ocw.mit.edu",
+    "category": "",
+    "chain": [
+     "Open feedback survey"
+    ],
+    "label": "Open feedback survey",
+    "outcome": "opened a dialog",
+    "expect_title": "",
+    "expect_items": [
+     "Close survey"
+    ],
+    "stored_goal": "Open Open feedback survey on Mit",
+    "id": 8,
+    "question": "How do I open Open feedback survey on Mit?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 4.5,
+    "picture": "task_08_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Open Open feedback survey on Mit",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 134,
+    "pid": "b2270b3520d883458118",
+    "seconds": 4.8,
+    "picture": "task_08_pool_ok.png",
+    "filed_correction": false
+   }
+  }
+ ]
+}

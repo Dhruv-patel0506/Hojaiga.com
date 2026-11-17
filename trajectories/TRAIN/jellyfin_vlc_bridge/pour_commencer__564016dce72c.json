@@ -1,0 +1,108 @@
+{
+   "app_metadata": {
+      "app_name": "Jellyfin VLC Bridge",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "high_level_task": "Install and configure Jellyfin VLC Bridge to enable playback of Jellyfin media in VLC.",
+   "prerequisite_state": "Windows 10 or 11 in 64-bit, VLC, Google Chrome, and access to a Jellyfin server.",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the Jellyfin VLC Bridge setup file",
+         "ui_target": {
+            "element_name": "Setup file",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The installation wizard opens."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Connect Jellyfin",
+         "ui_target": {
+            "element_name": "Jellyfin server address",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "TextBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": "http://your-jellyfin-server-address:8096"
+         },
+         "expected_state_change": "The code to authorize is displayed."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Add the Chrome extension",
+         "ui_target": {
+            "element_name": "Chrome extension",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The extension is installed and the 'Lire avec VLC' button appears in the browser."
+      }
+   ],
+   "_meta": {
+      "source_app": "Jellyfin VLC Bridge",
+      "app_key": "jellyfin_vlc_bridge",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Pour commencer",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T13:06:30Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

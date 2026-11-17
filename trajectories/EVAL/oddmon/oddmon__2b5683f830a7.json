@@ -1,0 +1,211 @@
+{
+   "app_metadata": {
+      "app_name": "oddmon",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure oddmon settings via the tray menu",
+   "prerequisite_state": "oddmon is running and its tray icon is visible",
+   "total_steps": 6,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Right-click the oddmon tray icon",
+         "ui_target": {
+            "element_name": "oddmon",
+            "automation_id": null,
+            "hierarchical_path": "Tray icon > Context menu",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The context menu appears with options"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select 'Mute sounds'",
+         "ui_target": {
+            "element_name": "Mute sounds",
+            "automation_id": null,
+            "hierarchical_path": "Tray icon > Context menu > Mute sounds",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The sound settings are toggled"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Select 'Volume'",
+         "ui_target": {
+            "element_name": "Volume",
+            "automation_id": null,
+            "hierarchical_path": "Tray icon > Context menu > Volume",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A volume slider appears"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Drag the volume slider to 50%",
+         "ui_target": {
+            "element_name": "Volume slider",
+            "automation_id": null,
+            "hierarchical_path": "Tray icon > Context menu > Volume slider",
+            "element_type": "Slider",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  50
+               ],
+               [
+                  0,
+                  50
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The volume is set to 50%"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Select 'Disk threshold'",
+         "ui_target": {
+            "element_name": "Disk threshold",
+            "automation_id": null,
+            "hierarchical_path": "Tray icon > Context menu > Disk threshold",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A disk threshold slider appears"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Drag the disk threshold slider to 20%",
+         "ui_target": {
+            "element_name": "Disk threshold slider",
+            "automation_id": null,
+            "hierarchical_path": "Tray icon > Context menu > Disk threshold slider",
+            "element_type": "Slider",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DRAG_AND_DROP",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": [
+               [
+                  0,
+                  20
+               ],
+               [
+                  0,
+                  20
+               ]
+            ],
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The disk threshold is set to 20%"
+      }
+   ],
+   "_meta": {
+      "source_app": "oddmon",
+      "app_key": "oddmon",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "oddmon",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:08:24Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

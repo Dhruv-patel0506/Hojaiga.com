@@ -1,0 +1,172 @@
+# ====================================================================================================================== PR61 popups, file dialogs, clipboard
+def run_pr61() -> TestOutcome:
+    """PR61: dialogs are handled from what they CONTAIN - an Open dialog gets a fixture of the type its own filter asks for, a Save dialog is forced into the sandbox, a message box is answered by wording
+    policy (never 'save my work', never 'allow'), an application form is left to the guide; nothing outside the sandbox is chosen; the person's clipboard is saved before the run writes and put back after
+    (unless the person copied something else meanwhile, or it holds something that cannot be put back); document-local verbs (Remove background) may run in a throw-away editor, closing / files / accounts may not"""
+    import tempfile
+    from types import SimpleNamespace as NS
+    from core_organs.professor import dialogs as DG, executor as X
+    from core_organs.professor.effectors import Effector
+    from core_organs.professor.harvest import Catalog, Verb
+    from core_organs.professor.knowledge import guide_steps as GS
+    from PIL import Image
+
+    # ---- fixtures of every kind a dialog's filter can ask for
+    with tempfile.TemporaryDirectory() as tmp:
+        sb = DG.Sandbox("demo", "t", root=os.path.join(tmp, "sb"))
+        made = {e: sb.fixture("open " + h, [e]) for e, h in (("csv", "passwords"), ("png", "picture"), ("docx", ""), ("xlsx", ""), ("pptx", ""), ("pdf", ""), ("wav", ""), ("html", "bookmarks"), ("json", ""), ("txt", ""))}
+        from docx import Document
+        from openpyxl import load_workbook
+        valid = (Image.open(made["png"]).size == (320, 200) and bool(Document(made["docx"]).paragraphs) and load_workbook(made["xlsx"]).active.max_row == 3 and open(made["pdf"], "rb").read(4) == b"%PDF"
+                 and "NETSCAPE-Bookmark" in open(made["html"], encoding="utf-8").read() and "password" in open(made["csv"], encoding="utf-8").read().split("\n")[0])
+        guess = (sb.pick_ext("choose a picture"), sb.pick_ext("Import Passwords To Chrome"), sb.pick_ext("", ["PNG", "jpg"]), sb.pick_ext("anything"))
+        t1, t2 = sb.save_target("Chrome Passwords", ["csv"]), sb.save_target("report.docx")
+        open(t1, "w").write("x")
+        t3 = sb.save_target("Chrome Passwords", ["csv"])
+        inside = sb.inside(t1) and not sb.inside(os.path.join(tmp, "elsewhere", "x.txt")) and not sb.inside(os.path.join(tmp, "sb", "..", "x.txt"))
+        # ---- reading dialogs
+        real_value = DG._value_of
+        DG._value_of = lambda n: getattr(n, "value", "")
+
+        def nd(i, parent, role, name, pats=(), value="", sel=False):
+            return NS(idx=i, parent=parent, role=role, name=name, pats=list(pats), offscreen=False, enabled=True, selected=sel, value=value, rect=(0, 0, 10, 10), ctype=role.title() + "Control", ctrl=None)
+        import core_organs.fast_uia as FU
+        import core_organs.headless_input as HI
+        real = (FU.snapshot, HI.safe_window_text, HI._class_name)
+        dialogs = {
+            1: ("Import Passwords To Chrome", [nd(0, -1, "window", ""), nd(1, 0, "combobox", "File name:"), nd(2, 1, "edit", "File name:", ["value"], "Chrome Passwords"), nd(3, 0, "combobox", "Files of type:"),
+                                               nd(4, 3, "edit", "Files of type:", ["value"], "Microsoft Excel Comma Separated Values File (*.csv)"), nd(5, 0, "button", "Open"), nd(6, 0, "button", "Cancel")]),
+            2: ("Save As", [nd(0, -1, "combobox", "File name:"), nd(1, 0, "edit", "File name:", ["value"], "Untitled.txt"), nd(2, -1, "combobox", "Save as type:"), nd(3, 2, "edit", "Save as type:", ["value"], "Text Documents (*.txt)"),
+                            nd(4, -1, "button", "Save"), nd(5, -1, "button", "Cancel")]),
+            3: ("Notepad", [nd(0, -1, "text", "Do you want to save changes to Untitled?"), nd(1, -1, "button", "Save"), nd(2, -1, "button", "Don't save"), nd(3, -1, "button", "Cancel")]),
+            4: ("Page setup", [nd(0, -1, "edit", "Left:"), nd(1, -1, "edit", "Right:"), nd(2, -1, "edit", "Top:"), nd(3, -1, "checkbox", "Landscape"), nd(4, -1, "button", "OK"), nd(5, -1, "button", "Cancel")]),
+            5: ("Print", [nd(0, -1, "combobox", "Select Printer"), nd(1, -1, "edit", "Pages"), nd(2, -1, "button", "Print"), nd(3, -1, "button", "Cancel")]),
+            6: ("Confirm Save As", [nd(0, -1, "text", "Chrome Passwords.csv already exists. Do you want to replace it?"), nd(1, -1, "button", "Yes"), nd(2, -1, "button", "No")]),
+            7: ("Notepad", [nd(0, -1, "text", "chrome.exe wants to use your camera. Allow access?"), nd(1, -1, "button", "Allow"), nd(2, -1, "button", "Block")]),
+        }
+        FU.snapshot = lambda h, timeout_ms=0: dialogs[h][1]
+        HI.safe_window_text = lambda h, timeout_ms=150: dialogs[h][0]
+        HI._class_name = lambda h: "#32770"
+        try:
+            infos = {h: DG.inspect(h) for h in dialogs}
+        finally:
+            FU.snapshot, HI.safe_window_text, HI._class_name = real
+        kinds = {h: i.kind for h, i in infos.items()}
+        pick = {h: DG.choose_button(infos[h], True)[0] for h in (3, 6, 7)}
+        pick_outside = DG.choose_button(infos[6], False)[0]
+        # ---- driving an Open dialog (the effector is a recorder)
+        calls = []
+
+        class FakeFx:
+            allowed = True
+
+            def set_value(self, n, text):
+                calls.append(("set", text))
+                n.value = text
+                return True, "UIA SetValue"
+
+            def insert_text(self, text):
+                calls.append(("type", text))
+                return True, "typed"
+
+            def node(self, n):
+                calls.append(("click", n.name))
+                return True, "UIA Invoke"
+        drv = DG.DialogDriver(FakeFx(), 0, sb, history=None)
+        drv._closed = lambda h, max_s=6.0: True
+        drv.windows = lambda: []
+        r_open = drv.drive(infos[1])
+        r_save = drv.drive(infos[2])
+        r_msg = drv.drive(infos[3])
+        r_form = drv.drive(infos[4])
+        r_print = drv.drive(infos[5])
+        set_paths = [c[1] for c in calls if c[0] == "set"]
+        # ---- the clipboard, on a fake
+        store: Dict[str, Any] = {}
+
+        class FakeWC:
+            def EnumClipboardFormats(self, f):
+                ks = sorted(store)
+                return 0 if (not ks or f >= ks[-1]) else next(k for k in ks if k > f)
+
+            def GetClipboardData(self, f):
+                return store[f]
+
+            def SetClipboardData(self, f, d):
+                store[f] = d
+
+            def EmptyClipboard(self):
+                store.clear()
+
+            def CloseClipboard(self):
+                pass
+
+            def GetClipboardFormatName(self, f):
+                return {0xC001: "SomePrivateFormat"}.get(f, "")
+        real_open = DG.ClipboardGuard._open
+        DG.ClipboardGuard._open = staticmethod(lambda retries=15: FakeWC())
+        try:
+            store.clear()
+            store[13] = "the person's text"
+            g1 = DG.ClipboardGuard()
+            g1.put_text("fixture")
+            during = store.get(13)
+            note1 = g1.end()
+            restored = store.get(13) == "the person's text"
+            store.clear()
+            store[13] = "the person's text"
+            g2 = DG.ClipboardGuard()
+            g2.put_text("fixture")
+            store[13] = "something the person copied meanwhile"
+            note2 = g2.end()
+            left_alone = store.get(13) == "something the person copied meanwhile"
+            store.clear()
+            store[13] = "text"
+            store[0xC001] = b"private"
+            g3 = DG.ClipboardGuard()
+            try:
+                g3.put_text("fixture")
+                refused = False
+            except DG.ClipboardBusy:
+                refused = True
+            untouched = store.get(13) == "text"
+            store.clear()
+            g4 = DG.ClipboardGuard()
+            g4.put_text("fixture")
+            g4.end()
+            empty_again = not store
+        finally:
+            DG.ClipboardGuard._open = real_open
+            DG._value_of = real_value
+        # ---- policy: document-local verbs, file steps
+        cat = Catalog(app_key="d", verbs=[])
+        ex = X.Executor(0, Effector(0, allow_input=False), cat, owned=True, archetype="raster_editor")
+        ex.sandboxed = True
+        V = lambda l, p=(): Verb(l, l, list(p), "", "", True, False, "", 0, "", "button", ["uia"], "measured", "unsafe")
+        local = [ex._doc_local(V(x)) for x in ("Remove background", "Delete", "Clear selection")]
+        not_local = [ex._doc_local(V(x)) for x in ("Close tab", "Exit", "Delete browsing data", "Delete all files", "Sign out", "Uninstall")]
+        ex.archetype = "browser_web"
+        browser_local = ex._doc_local(V("Delete"))
+        GS.SANDBOX_FILES = True
+        g_on = GS.parse_steps("1. Select the image you want to open.\n2. Click Open.")
+        how_on = [x.how for x in GS.ground(g_on, cat)]
+        GS.SANDBOX_FILES = False
+        how_off = [x.how for x in GS.ground(GS.parse_steps("1. Select the image you want to open."), cat)]
+        st = lambda goal, kind="unknown": X.Step(0, goal, kind=kind, source="guide")
+        file_steps = [X.Executor._is_file_step(st(g)) for g in ("Select the image you want to open.", "Type a name for your file in the File name box.", "Click Save.", "In the Save As dialog, choose a folder.")]
+        not_file_steps = [X.Executor._is_file_step(st(g)) for g in ("Click File > Open.", "Select the Pencil tool.", "Rotate the picture.")]
+        rx_ok = (bool(DG.COPY_RX.search("Copy Ctrl+C")) and bool(DG.PASTE_RX.search("Paste Ctrl+V")) and not DG.PASTE_RX.search("Pasteboard settings") is None)
+    checks = {"fixtures_are_real_files_of_the_asked_type": valid, "type_comes_from_the_filter_then_the_wording": guess == ("png", "csv", "png", "txt"),
+              "save_target_is_unique_and_in_the_outbox": os.path.basename(t1) == "Chrome_Passwords.csv" and t3 != t1 and t2.endswith("report.docx") and "outbox" in t1 and inside,
+              "dialogs_are_told_apart_by_content": kinds == {1: "file_open", 2: "file_save", 3: "message", 4: "other", 5: "print", 6: "message", 7: "message"},
+              "filter_and_default_name_are_read": infos[1].filter_exts == ["csv"] and infos[1].default_name == "Chrome Passwords" and infos[2].filter_exts == ["txt"],
+              "message_policy": pick == {3: "Don't save", 6: "Yes", 7: "Block"} and pick_outside == "No",
+              "open_dialog_gets_a_csv_fixture_inside_the_sandbox": r_open["ok"] and r_open["path"].endswith(".csv") and sb.inside(r_open["path"]) and ("click", "Open") in calls,
+              "save_dialog_is_forced_into_the_sandbox": r_save["ok"] and "outbox" in r_save["path"] and sb.inside(r_save["path"]) and ("click", "Save") in calls and all(sb.inside(p) for p in set_paths),
+              "message_and_print_answered_form_left_alone": r_msg["ok"] and ("click", "Don't save") in calls and r_print["ok"] and ("click", "Cancel") in calls and r_form.get("left") is True,
+              "clipboard_given_back": during == "fixture" and restored and "put back" in note1 and left_alone and "left alone" in note2 and refused and untouched and empty_again,
+              "document_local_verbs_only_in_an_editor": all(local) and not any(not_local) and browser_local is False,
+              "file_steps_become_dialog_steps_only_with_a_sandbox": how_on[0] == "dialog" and how_off == ["human"],
+              "file_step_wording_vs_ordinary_steps": all(file_steps) and not any(not_file_steps), "copy_paste_wording": rx_ok}
+    return _verdict(checks, f"kinds={kinds} pick={pick} calls={calls[:6]} file_steps={file_steps} not_file={not_file_steps} how_on={how_on}")
+

@@ -1,0 +1,109 @@
+{
+   "app_metadata": {
+      "app_name": "TweakHub",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Download and install TweakHub",
+   "prerequisite_state": "Browser is open and on the TweakHub GitHub releases page",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Click the 'Download latest release' badge",
+         "ui_target": {
+            "element_name": "Download latest release",
+            "automation_id": null,
+            "hierarchical_path": "Badge > Download latest release",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user is redirected to the latest release page"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Click the 'Try the v1.5.0 beta' badge",
+         "ui_target": {
+            "element_name": "Try the v1.5.0 beta",
+            "automation_id": null,
+            "hierarchical_path": "Badge > Try the v1.5.0 beta",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user is redirected to the v1.5.0-beta.1 release page"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Click the 'Download latest release' link",
+         "ui_target": {
+            "element_name": "Download latest release",
+            "automation_id": null,
+            "hierarchical_path": "Link > Download latest release",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The user downloads the latest release archive"
+      }
+   ],
+   "_meta": {
+      "source_app": "TweakHub",
+      "app_key": "tweakhub",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Why TweakHub?",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:35:55Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

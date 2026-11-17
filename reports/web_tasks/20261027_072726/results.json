@@ -1,0 +1,382 @@
+{
+ "stamp": "20261027_072726",
+ "summary": {
+  "tasks": 8,
+  "cold": {
+   "success": "4/8",
+   "success_rate": 0.5,
+   "mean_clicks_when_ok": 1.5,
+   "mean_seconds_all": 6.9
+  },
+  "pool": {
+   "success": "6/8",
+   "success_rate": 0.75,
+   "mean_clicks_when_ok": 1.7,
+   "mean_seconds_all": 7.5
+  },
+  "retrieval_top1_correct": "7/8",
+  "retrieval_in_top3": "7/8",
+  "pool_found_nothing": 0,
+  "pool_healed_after_a_stale_path": 1,
+  "pool_ok_by_stored_path_alone": 5,
+  "mean_retrieval_ms": 224,
+  "pool_failures_by_reason": {
+   "the pool had no": 0,
+   "step '": 0,
+   "could not click": 0,
+   "the page did not": 0
+  }
+ },
+ "results": [
+  {
+   "task": {
+    "host": "learn.microsoft.com",
+    "site": "Microsoft",
+    "url": "https://learn.microsoft.com",
+    "category": "",
+    "chain": [
+     "Learn Azure",
+     "Earn credentials"
+    ],
+    "label": "Earn credentials",
+    "outcome": "opened a new page",
+    "expect_title": "Browse Credentials | Microsoft Learn",
+    "expect_items": [],
+    "stored_goal": "Go to the Earn credentials page on Microsoft via Learn Azure",
+    "id": 1,
+    "question": "How do I get to Earn credentials on Microsoft?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 8.0,
+    "picture": "task_01_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Earn credentials page on Microsoft via Learn Azure",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 258,
+    "pid": "3b10d5870c1b56a72ff4",
+    "seconds": 7.9,
+    "picture": "task_01_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "vimeo.com",
+    "site": "Vimeo",
+    "url": "https://vimeo.com",
+    "category": "",
+    "chain": [
+     "Integrations Connect your favorite tools",
+     "Live Streaming"
+    ],
+    "label": "Live Streaming",
+    "outcome": "opened a new page",
+    "expect_title": "Vimeo Integrations & 3rd-Party Apps",
+    "expect_items": [],
+    "stored_goal": "Go to the Live Streaming page on Vimeo via Integrations Connect your favorite tools",
+    "id": 2,
+    "question": "How do I get to Live Streaming on Vimeo?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 6.7,
+    "picture": "task_02_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Live Streaming page on Vimeo",
+    "retrieved_correct": false,
+    "in_top3": false,
+    "retrieval_ms": 220,
+    "pid": "7ad8024323d32c1196e6",
+    "seconds": 8.1,
+    "picture": "task_02_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "substack.com",
+    "site": "Substack",
+    "url": "https://substack.com",
+    "category": "",
+    "chain": [
+     "Explore",
+     "Business"
+    ],
+    "label": "Business",
+    "outcome": "opened a new page",
+    "expect_title": "Business | Substack",
+    "expect_items": [],
+    "stored_goal": "Go to the Business page on Substack via Explore",
+    "id": 3,
+    "question": "How do I get to Business on Substack?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 4.5,
+    "picture": "task_03_cold_fail.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the Business page on Substack via Explore",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 315,
+    "pid": "df7e9c7c5cffe468a5f5",
+    "seconds": 4.7,
+    "picture": "task_03_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "ebay.com",
+    "site": "Ebay",
+    "url": "https://ebay.com",
+    "category": "",
+    "chain": [
+     "Expand: Motors",
+     "Motorcycle and scooter par"
+    ],
+    "label": "Motorcycle and scooter parts",
+    "outcome": "opened a new page",
+    "expect_title": "Error Page | eBay",
+    "expect_items": [],
+    "stored_goal": "Go to the Motorcycle and scooter parts page on Ebay via Expand: Motors",
+    "id": 4,
+    "question": "How do I get to Motorcycle and scooter parts on Ebay?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 2.1,
+    "picture": "task_04_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "the stored path failed (skipped ['Expand: Motors', 'Motorcycle and scooter parts']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "Expand: Motors",
+     "Motorcycle and scooter parts"
+    ],
+    "fallback_clicks": 0,
+    "retrieved": "Go to the Motorcycle and scooter parts page on Ebay via Expand: Motors",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 31,
+    "pid": "2d1372eee1f9fac8c661",
+    "seconds": 3.2,
+    "picture": "task_04_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "w3schools.com",
+    "site": "W3schools",
+    "url": "https://w3schools.com",
+    "category": "",
+    "chain": [
+     "Tutorials",
+     "C Powerful low-level progr"
+    ],
+    "label": "C Powerful low-level programming",
+    "outcome": "opened a new page",
+    "expect_title": "C Tutorial",
+    "expect_items": [],
+    "stored_goal": "Go to the C Powerful low-level programming page on W3schools via Tutorials",
+    "id": 5,
+    "question": "How do I get to C Powerful low-level programming on W3schools?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 1,
+    "why": "nothing on the page matches",
+    "seconds": 7.9,
+    "picture": "task_05_cold_fail.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Go to the C Powerful low-level programming page on W3schools via Tutorials",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 192,
+    "pid": "c50fb3fac18b20bde868",
+    "seconds": 8.0,
+    "picture": "task_05_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "tradingview.com",
+    "site": "Tradingview",
+    "url": "https://tradingview.com",
+    "category": "",
+    "chain": [
+     "Open user menu"
+    ],
+    "label": "Open user menu",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Log in",
+     "Help Center",
+     "What's new",
+     "themeSwitcher"
+    ],
+    "stored_goal": "Open the Open user menu menu on Tradingview",
+    "id": 6,
+    "question": "I want to see the Open user menu menu on Tradingview. What do I click?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 8.9,
+    "picture": "task_06_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "healed": false,
+    "skipped": [],
+    "retrieved": "Open the Open user menu menu on Tradingview",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 252,
+    "pid": "02ee85a77859824fa7ff",
+    "seconds": 9.1,
+    "picture": "task_06_pool_ok.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "github.com",
+    "site": "Github",
+    "url": "https://github.com",
+    "category": "",
+    "chain": [
+     "Projects"
+    ],
+    "label": "Projects",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Milestones",
+     "Organization and team management",
+     "Pages and wikis",
+     "Multiple issue assignees"
+    ],
+    "stored_goal": "Open the Projects menu on Github",
+    "id": 7,
+    "question": "I want to see the Projects menu on Github. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 8,
+    "why": "budget spent",
+    "seconds": 10.8,
+    "picture": "task_07_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 5,
+    "why": "the stored path failed (skipped ['Projects']) and the live page did not help",
+    "healed": false,
+    "skipped": [
+     "Projects"
+    ],
+    "fallback_clicks": 5,
+    "retrieved": "Open the Projects menu on Github",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 243,
+    "pid": "a9e12125b713e53a3758",
+    "seconds": 11.5,
+    "picture": "task_07_pool_fail.png",
+    "filed_correction": false
+   }
+  },
+  {
+   "task": {
+    "host": "github.com",
+    "site": "Github",
+    "url": "https://github.com",
+    "category": "",
+    "chain": [
+     "GitHub Connect"
+    ],
+    "label": "GitHub Connect",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "50,000 CI/CD minutes/month Free for publ",
+     "50GB of Packages storage Free for public",
+     "Premium support",
+     "GitHub Copilot Get started for free with"
+    ],
+    "stored_goal": "Open the GitHub Connect menu on Github",
+    "id": 8,
+    "question": "I want to see the GitHub Connect menu on Github. What do I click?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 3,
+    "why": "",
+    "seconds": 6.2,
+    "picture": "task_08_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 3,
+    "why": "",
+    "healed": true,
+    "skipped": [
+     "GitHub Connect"
+    ],
+    "fallback_clicks": 3,
+    "retrieved": "Open the GitHub Connect menu on Github",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 283,
+    "pid": "7e19c573a6006a163262",
+    "seconds": 7.1,
+    "picture": "task_08_pool_ok.png",
+    "filed_correction": true
+   }
+  }
+ ]
+}

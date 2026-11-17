@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 238, in <module>
+    notes.append(f"cycle {cycle}: CUDA OOM on {key}"); log("OOM", key); torch.cuda.empty_cache(); fails += 1
+    
+  File "D:\new_automation\natural_intelligence\ni_run.py", line 225, in main
+    inner.train(cycle, steps=400)
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\new_automation\natural_intelligence\ni_inner.py", line 115, in train
+    Xt = torch.as_tensor(self._norm(self.X[tr]), device=self.dev); yt = torch.as_tensor(self.t[tr], device=self.dev)
+RuntimeError: CUDA error: unspecified launch failure
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+

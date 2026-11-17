@@ -1,0 +1,165 @@
+{
+   "app_metadata": {
+      "app_name": "OpenClaw Companion",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure OpenClaw Companion settings and permissions",
+   "prerequisite_state": "OpenClaw Companion is installed and launched",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open Companion Settings… from the tray menu",
+         "ui_target": {
+            "element_name": "Companion Settings…",
+            "automation_id": null,
+            "hierarchical_path": "Tray menu > Companion Settings…",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The settings window opens"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Open Connection and connect to your gateway",
+         "ui_target": {
+            "element_name": "Connection",
+            "automation_id": null,
+            "hierarchical_path": "Settings window > Connection",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The connection status updates and shows any pending pairing approval"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Open Sandbox and choose how agent-run programs should be contained",
+         "ui_target": {
+            "element_name": "Sandbox",
+            "automation_id": null,
+            "hierarchical_path": "Settings window > Sandbox",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The sandbox settings are displayed"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Open Permissions and turn on Node mode",
+         "ui_target": {
+            "element_name": "Permissions",
+            "automation_id": null,
+            "hierarchical_path": "Settings window > Permissions",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Node mode is enabled and the capabilities are listed"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Choose the capabilities this PC should offer",
+         "ui_target": {
+            "element_name": "Capabilities",
+            "automation_id": null,
+            "hierarchical_path": "Settings window > Permissions > Capabilities",
+            "element_type": "ListBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected capabilities are saved and the node is registered with the chosen permissions"
+      }
+   ],
+   "_meta": {
+      "source_app": "OpenClaw Companion",
+      "app_key": "openclaw_companion",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "OpenClaw Windows Hub",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T03:23:27Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

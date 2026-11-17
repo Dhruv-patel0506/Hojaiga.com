@@ -1,0 +1,53 @@
+{
+   "app_metadata": {
+      "app_name": "Microsoft Foundry DevPack",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install the Foundry Toolkit for VS Code",
+   "prerequisite_state": "VS Code is open and the user is on the marketplace page",
+   "total_steps": 1,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Install the Foundry Toolkit for VS Code",
+         "ui_target": {
+            "element_name": "Install Toolkit",
+            "automation_id": null,
+            "hierarchical_path": "Marketplace > Foundry Toolkit for VS Code",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The installation process for the Foundry Toolkit for VS Code starts"
+      }
+   ],
+   "_meta": {
+      "source_app": "Microsoft Foundry DevPack",
+      "app_key": "microsoft_foundry_devpack",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Microsoft Foundry DevTools",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T18:41:23Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

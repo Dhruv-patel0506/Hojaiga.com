@@ -1,0 +1,1 @@
+<!doctype html><meta charset='utf-8'><table id=grid><tr><th><button id=sortname>Name</button></th></tr><tr><td>Zoe</td></tr><tr><td>Amy</td></tr><tr><td>Bob</td></tr></table><script>sortname.onclick=()=>{let rows=[...grid.querySelectorAll('tr')].slice(1);rows.sort((a,b)=>a.textContent.localeCompare(b.textContent));rows.forEach(r=>grid.appendChild(r))}</script>

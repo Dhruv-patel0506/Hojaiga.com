@@ -1,0 +1,169 @@
+{
+   "app_metadata": {
+      "app_name": "NoteGen",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide the user through the initial setup and usage of NoteGen",
+   "prerequisite_state": "NoteGen application is downloaded and installed on the user's device",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download NoteGen for the user's platform",
+         "ui_target": {
+            "element_name": "Download for Windows",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Link",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User is redirected to the download page for the Windows version of NoteGen"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Choose a workspace for the Markdown files",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User selects a directory on their device to store the Markdown files"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Add the first record or create a note directly",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User adds a record or creates a note in the NoteGen application"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Configure an AI provider when using AI features",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User sets up an AI provider in the NoteGen application"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Read the documentation for sync, knowledge base, MCP, Skills, and advanced settings",
+         "ui_target": {
+            "element_name": "documentation",
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": "Link",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User is redirected to the NoteGen documentation page"
+      }
+   ],
+   "_meta": {
+      "source_app": "NoteGen",
+      "app_key": "notegen",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "NoteGen",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T16:18:06Z",
+      "schema_warnings": [
+         "step2_ungrounded_target",
+         "step3_ungrounded_target",
+         "step4_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

@@ -1,0 +1,111 @@
+{
+   "app_metadata": {
+      "app_name": "BentoDesk",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Install and configure BentoDesk",
+   "prerequisite_state": "No application is open",
+   "total_steps": 3,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Download BentoDesk-2.2.0-windows-x64-setup.exe from Releases",
+         "ui_target": {
+            "element_name": null,
+            "automation_id": null,
+            "hierarchical_path": null,
+            "element_type": null,
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Cursor hovers over the download link"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Review and accept the User Agreement and Privacy Policy in Setup",
+         "ui_target": {
+            "element_name": "User Agreement and Privacy Policy",
+            "automation_id": null,
+            "hierarchical_path": "Setup window > User Agreement and Privacy Policy",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "User Agreement and Privacy Policy window opens"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Install BentoDesk or extract the portable ZIP to a writable directory",
+         "ui_target": {
+            "element_name": "Install BentoDesk",
+            "automation_id": null,
+            "hierarchical_path": "Setup window > Install BentoDesk",
+            "element_type": "Button",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "BentoDesk is installed or the portable ZIP is extracted"
+      }
+   ],
+   "_meta": {
+      "source_app": "BentoDesk",
+      "app_key": "bentodesk",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "BentoDesk",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T13:52:00Z",
+      "schema_warnings": [
+         "step1_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

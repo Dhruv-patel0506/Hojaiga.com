@@ -1,0 +1,798 @@
+{
+ "stamp": "20261026_212349",
+ "summary": {
+  "tasks": 20,
+  "cold": {
+   "success": "10/20",
+   "success_rate": 0.5,
+   "mean_clicks_when_ok": 1.3,
+   "mean_seconds_all": 10.5
+  },
+  "pool": {
+   "success": "7/20",
+   "success_rate": 0.35,
+   "mean_clicks_when_ok": 1.3,
+   "mean_seconds_all": 8.2
+  },
+  "retrieval_top1_correct": "18/20",
+  "retrieval_in_top3": "19/20",
+  "pool_found_nothing": 1,
+  "mean_retrieval_ms": 233,
+  "pool_failures_by_reason": {
+   "the pool had no": 0,
+   "step '": 11,
+   "could not click": 0,
+   "the page did not": 1
+  }
+ },
+ "results": [
+  {
+   "task": {
+    "host": "npr.org",
+    "site": "Npr",
+    "url": "https://npr.org",
+    "category": "",
+    "chain": [
+     "Resume Listening NPR 24 Ho",
+     "Books"
+    ],
+    "label": "Books",
+    "outcome": "opened a new page",
+    "expect_title": "Culture : NPR",
+    "expect_items": [],
+    "stored_goal": "Go to the Books page on Npr via Resume Listening NPR 24 Ho",
+    "id": 1,
+    "question": "How do I get to Books on Npr?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "seconds": 22.8,
+    "picture": "task_01_cold_ok.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "step 'Resume Listening NPR 24 Ho' not on the page",
+    "retrieved": "Go to the Books page on Npr via Resume Listening NPR 24 Ho",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 475,
+    "pid": "36d3de93801081ab2e6b",
+    "seconds": 15.9,
+    "picture": "task_01_pool_fail.png"
+   }
+  },
+  {
+   "task": {
+    "host": "docs.python.org",
+    "site": "Python",
+    "url": "https://docs.python.org",
+    "category": "",
+    "chain": [
+     "structures"
+    ],
+    "label": "structures",
+    "outcome": "opened a new page",
+    "expect_title": "struct \u2014 Interpret bytes as packed binary data \u2014 Python 3.15",
+    "expect_items": [],
+    "stored_goal": "Go to the structures page on Python",
+    "id": 2,
+    "question": "How do I get to structures on Python?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 1.1,
+    "picture": "task_02_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "step 'structures' not on the page",
+    "retrieved": "Go to the structures page on Python",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 241,
+    "pid": "002f0ed8fb2ae80112bd",
+    "seconds": 1.3,
+    "picture": "task_02_pool_fail.png"
+   }
+  },
+  {
+   "task": {
+    "host": "pypi.org",
+    "site": "Pypi",
+    "url": "https://pypi.org",
+    "category": "",
+    "chain": [
+     "Forgot password?"
+    ],
+    "label": "Forgot password?",
+    "outcome": "opened a new page",
+    "expect_title": "Password reset \u00b7 PyPI",
+    "expect_items": [],
+    "stored_goal": "Go to the Forgot password? page on Pypi",
+    "id": 3,
+    "question": "How do I get to Forgot password? on Pypi?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 1,
+    "why": "nothing on the page matches",
+    "seconds": 2.1,
+    "picture": "task_03_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "step 'Forgot password?' not on the page",
+    "retrieved": "Go to the Forgot password? page on Pypi",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 256,
+    "pid": "d653bf08674e75fa54a3",
+    "seconds": 1.7,
+    "picture": "task_03_pool_fail.png"
+   }
+  },
+  {
+   "task": {
+    "host": "time.is",
+    "site": "Time",
+    "url": "https://time.is",
+    "category": "",
+    "chain": [
+     "menu",
+     "Time here&there"
+    ],
+    "label": "Time here&there",
+    "outcome": "opened a new page",
+    "expect_title": "Time.is 15:10",
+    "expect_items": [],
+    "stored_goal": "Go to the Time here&there page on Time via menu",
+    "id": 4,
+    "question": "How do I get to Time here&there on Time?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 2.4,
+    "picture": "task_04_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "step 'menu' not on the page",
+    "retrieved": "Go to the Time here&there page on Time via menu",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 236,
+    "pid": "b74cf9fd6cc7cec93f38",
+    "seconds": 1.9,
+    "picture": "task_04_pool_fail.png"
+   }
+  },
+  {
+   "task": {
+    "host": "npr.org",
+    "site": "Npr",
+    "url": "https://npr.org",
+    "category": "",
+    "chain": [
+     "Resume Listening NPR 24 Ho",
+     "Art & Design"
+    ],
+    "label": "Art & Design",
+    "outcome": "opened a new page",
+    "expect_title": "Culture : NPR",
+    "expect_items": [],
+    "stored_goal": "Go to the Art & Design page on Npr via Resume Listening NPR 24 Ho",
+    "id": 5,
+    "question": "How do I get to Art & Design on Npr?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 1,
+    "why": "nothing on the page matches",
+    "seconds": 17.0,
+    "picture": "task_05_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "step 'Resume Listening NPR 24 Ho' not on the page",
+    "retrieved": "Go to the Art & Design page on Npr via Resume Listening NPR 24 Ho",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 189,
+    "pid": "c8e3bd200f5591760d1a",
+    "seconds": 9.5,
+    "picture": "task_05_pool_fail.png"
+   }
+  },
+  {
+   "task": {
+    "host": "coursera.org",
+    "site": "Coursera",
+    "url": "https://coursera.org",
+    "category": "",
+    "chain": [
+     "For Governments"
+    ],
+    "label": "For Governments",
+    "outcome": "opened a new page",
+    "expect_title": "Learning Platform for Government | Coursera for Government",
+    "expect_items": [],
+    "stored_goal": "Go to the For Governments page on Coursera",
+    "id": 6,
+    "question": "How do I get to For Governments on Coursera?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 10.1,
+    "picture": "task_06_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "retrieved": "Go to the For Governments page on Coursera",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 241,
+    "pid": "f74799cac2775e4f7409",
+    "seconds": 9.5,
+    "picture": "task_06_pool_ok.png"
+   }
+  },
+  {
+   "task": {
+    "host": "lobste.rs",
+    "site": "Lobste",
+    "url": "https://lobste.rs",
+    "category": "",
+    "chain": [
+     "Comments"
+    ],
+    "label": "Comments",
+    "outcome": "opened a new page",
+    "expect_title": "Newest Comments | Lobsters",
+    "expect_items": [],
+    "stored_goal": "Go to the Comments page on Lobste",
+    "id": 7,
+    "question": "How do I get to Comments on Lobste?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 4.6,
+    "picture": "task_07_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "retrieved": "Go to the Comments page on Lobste",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 243,
+    "pid": "9acccd03c6909eddbc18",
+    "seconds": 5.1,
+    "picture": "task_07_pool_ok.png"
+   }
+  },
+  {
+   "task": {
+    "host": "coursera.org",
+    "site": "Coursera",
+    "url": "https://coursera.org",
+    "category": "",
+    "chain": [
+     "Software Engineering & IT"
+    ],
+    "label": "Software Engineering & IT",
+    "outcome": "opened a new page",
+    "expect_title": "Explore Career Paths: Find Courses and Build Skills by Job R",
+    "expect_items": [],
+    "stored_goal": "Go to the Software Engineering & IT page on Coursera",
+    "id": 8,
+    "question": "How do I get to Software Engineering & IT on Coursera?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 3,
+    "why": "",
+    "seconds": 11.4,
+    "picture": "task_08_cold_ok.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 1,
+    "why": "the page did not show what the task names",
+    "retrieved": "Open the Software Engineering menu on Coursera",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 217,
+    "pid": "176b11a705db3ab4d976",
+    "seconds": 29.4,
+    "picture": "task_08_pool_fail.png"
+   }
+  },
+  {
+   "task": {
+    "host": "bbc.com",
+    "site": "Bbc",
+    "url": "https://bbc.com",
+    "category": "",
+    "chain": [
+     "Search BBC"
+    ],
+    "label": "Search BBC",
+    "outcome": "opened a new page",
+    "expect_title": "BBC",
+    "expect_items": [],
+    "stored_goal": "Go to the Search BBC page on Bbc",
+    "id": 9,
+    "question": "How do I get to Search BBC on Bbc?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 8.9,
+    "picture": "task_09_cold_ok.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "step 'Search BBC' not on the page",
+    "retrieved": "Go to the Search BBC page on Bbc",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 202,
+    "pid": "43155def86ce4cf56031",
+    "seconds": 7.6,
+    "picture": "task_09_pool_fail.png"
+   }
+  },
+  {
+   "task": {
+    "host": "tinypng.com",
+    "site": "Tinypng",
+    "url": "https://tinypng.com",
+    "category": "",
+    "chain": [
+     "What file formats does Tin",
+     "Get API key"
+    ],
+    "label": "Get API key",
+    "outcome": "opened a new page",
+    "expect_title": "TinyPNG API: Optimize AVIF, WebP, JPEG & PNG Images",
+    "expect_items": [],
+    "stored_goal": "Go to the Get API key page on Tinypng via What file formats does Tin",
+    "id": 10,
+    "question": "How do I get to Get API key on Tinypng?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 10.0,
+    "picture": "task_10_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "retrieved": "Go to the Get your API key page on Tinypng via Solutions",
+    "retrieved_correct": false,
+    "in_top3": true,
+    "retrieval_ms": 244,
+    "pid": "d74faa150b1720eaf103",
+    "seconds": 7.4,
+    "picture": "task_10_pool_ok.png"
+   }
+  },
+  {
+   "task": {
+    "host": "openstreetmap.org",
+    "site": "Openstreetmap",
+    "url": "https://openstreetmap.org",
+    "category": "",
+    "chain": [
+     "About"
+    ],
+    "label": "About",
+    "outcome": "opened a new page",
+    "expect_title": "OpenStreetMap",
+    "expect_items": [],
+    "stored_goal": "Go to the About page on Openstreetmap",
+    "id": 11,
+    "question": "How do I get to About on Openstreetmap?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 5.0,
+    "picture": "task_11_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "retrieved": "Go to the About page on Openstreetmap",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 224,
+    "pid": "732f572202e8c972c73b",
+    "seconds": 4.4,
+    "picture": "task_11_pool_ok.png"
+   }
+  },
+  {
+   "task": {
+    "host": "en.wikipedia.org",
+    "site": "Wikipedia",
+    "url": "https://en.wikipedia.org",
+    "category": "",
+    "chain": [
+     "high-risk templates"
+    ],
+    "label": "high-risk templates",
+    "outcome": "opened a new page",
+    "expect_title": "Wikipedia:High-risk templates - Wikipedia",
+    "expect_items": [],
+    "stored_goal": "Go to the high-risk templates page on Wikipedia",
+    "id": 12,
+    "question": "How do I get to high-risk templates on Wikipedia?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 5,
+    "why": "budget spent",
+    "seconds": 32.3,
+    "picture": "task_12_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "step 'high-risk templates' not on the page",
+    "retrieved": "Go to the high-risk templates page on Wikipedia",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 332,
+    "pid": "31532bc0d1887eb52cfd",
+    "seconds": 2.9,
+    "picture": "task_12_pool_fail.png"
+   }
+  },
+  {
+   "task": {
+    "host": "proton.me",
+    "site": "Proton",
+    "url": "https://proton.me",
+    "category": "",
+    "chain": [
+     "Harga"
+    ],
+    "label": "Harga",
+    "outcome": "opened a new page",
+    "expect_title": "Paket Harga Proton - Paket Gratis & Berbayar | Proton",
+    "expect_items": [],
+    "stored_goal": "Go to the Harga page on Proton",
+    "id": 13,
+    "question": "How do I get to Harga on Proton?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 5,
+    "why": "nothing on the page matches",
+    "seconds": 12.0,
+    "picture": "task_13_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "step 'Harga' not on the page",
+    "retrieved": "Go to the Harga page on Proton",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 164,
+    "pid": "7aa3e93a0b367f559539",
+    "seconds": 5.8,
+    "picture": "task_13_pool_fail.png"
+   }
+  },
+  {
+   "task": {
+    "host": "calculator.net",
+    "site": "Calculator",
+    "url": "https://calculator.net",
+    "category": "",
+    "chain": [
+     "MATH"
+    ],
+    "label": "MATH",
+    "outcome": "opened a new page",
+    "expect_title": "Math Calculators",
+    "expect_items": [],
+    "stored_goal": "Go to the MATH page on Calculator",
+    "id": 14,
+    "question": "How do I get to MATH on Calculator?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 3.6,
+    "picture": "task_14_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "retrieved": "Go to the MATH page on Calculator",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 245,
+    "pid": "2118ae566b561aa44779",
+    "seconds": 3.6,
+    "picture": "task_14_pool_ok.png"
+   }
+  },
+  {
+   "task": {
+    "host": "proton.me",
+    "site": "Proton",
+    "url": "https://proton.me",
+    "category": "",
+    "chain": [
+     "Bagaimana cara membuat kat"
+    ],
+    "label": "Bagaimana cara membuat kat",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "efN83>%ccN2K52k.",
+     "ttX%)eG#1x;N]kPF",
+     "AcSA3%teQdqfc9s@",
+     "se2na%yK83yn4chg"
+    ],
+    "stored_goal": "Open the Bagaimana cara membuat kat menu on Proton",
+    "id": 15,
+    "question": "I want to see the Bagaimana cara membuat kat menu on Proton. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 5,
+    "why": "nothing on the page matches",
+    "seconds": 10.6,
+    "picture": "task_15_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "step 'Bagaimana cara membuat kat' not on the page",
+    "retrieved": "Open the Bagaimana cara membuat kat menu on Proton",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 276,
+    "pid": "cbd431946f77c78370de",
+    "seconds": 5.3,
+    "picture": "task_15_pool_fail.png"
+   }
+  },
+  {
+   "task": {
+    "host": "speedtest.net",
+    "site": "Speedtest",
+    "url": "https://speedtest.net",
+    "category": "",
+    "chain": [
+     "Menu menu",
+     "Key Terms"
+    ],
+    "label": "Key Terms",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Speedtest",
+     "English",
+     "Apps",
+     "Learn"
+    ],
+    "stored_goal": "Open the Key Terms menu on Speedtest via Menu menu",
+    "id": 16,
+    "question": "I want to see the Key Terms menu on Speedtest. What do I click?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 8.1,
+    "picture": "task_16_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 2,
+    "why": "",
+    "retrieved": "Open the Key Terms menu on Speedtest via Menu menu",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 175,
+    "pid": "8e4f910d619987e78f3c",
+    "seconds": 8.5,
+    "picture": "task_16_pool_ok.png"
+   }
+  },
+  {
+   "task": {
+    "host": "youtube.com",
+    "site": "Youtube",
+    "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+    "category": "",
+    "chain": [
+     "Search with your voice"
+    ],
+    "label": "Search with your voice",
+    "outcome": "opened a dialog",
+    "expect_title": "",
+    "expect_items": [
+     "Cancel",
+     "To search by voice, go to your browser s"
+    ],
+    "stored_goal": "Open Search with your voice on Youtube",
+    "id": 17,
+    "question": "How do I open Search with your voice on Youtube?"
+   },
+   "cold": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "seconds": 9.9,
+    "picture": "task_17_cold_ok.png"
+   },
+   "pool": {
+    "ok": true,
+    "clicks": 1,
+    "why": "",
+    "retrieved": "Open Search with your voice on Youtube",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 297,
+    "pid": "ef4c0213c16b28fdf1c5",
+    "seconds": 10.3,
+    "picture": "task_17_pool_ok.png"
+   }
+  },
+  {
+   "task": {
+    "host": "duckduckgo.com",
+    "site": "Duckduckgo",
+    "url": "https://duckduckgo.com",
+    "category": "",
+    "chain": [
+     "Our Story of Protection",
+     "We Hatched"
+    ],
+    "label": "We Hatched",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Our Story of Protection",
+     "We Hatched",
+     "Launch!",
+     "2010 Anonymous"
+    ],
+    "stored_goal": "Open the We Hatched menu on Duckduckgo via Our Story of Protection",
+    "id": 18,
+    "question": "I want to see the We Hatched menu on Duckduckgo. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 5,
+    "why": "nothing on the page matches",
+    "seconds": 6.9,
+    "picture": "task_18_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "step 'Our Story of Protection' not on the page",
+    "retrieved": "Open the We Hatched menu on Duckduckgo via Our Story of Protection",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 195,
+    "pid": "f47f38157debe1d8ebff",
+    "seconds": 2.0,
+    "picture": "task_18_pool_fail.png"
+   }
+  },
+  {
+   "task": {
+    "host": "naukri.com",
+    "site": "Naukri",
+    "url": "https://naukri.com",
+    "category": "",
+    "chain": [
+     "Jobs",
+     "Project Mgmt"
+    ],
+    "label": "Project Mgmt",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "99acres.com",
+     "Jeevansathi.com",
+     "NaukriGulf.com",
+     "Shiksha.com"
+    ],
+    "stored_goal": "Open the Project Mgmt menu on Naukri via Jobs",
+    "id": 19,
+    "question": "I want to see the Project Mgmt menu on Naukri. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "nothing on the page matches",
+    "seconds": 1.2,
+    "picture": "task_19_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "step 'Jobs' not on the page",
+    "retrieved": "Open the Project Mgmt menu on Naukri via Jobs",
+    "retrieved_correct": true,
+    "in_top3": true,
+    "retrieval_ms": 202,
+    "pid": "9a0eff84ee82ff19ef46",
+    "seconds": 1.2,
+    "picture": "task_19_pool_fail.png"
+   }
+  },
+  {
+   "task": {
+    "host": "speedtest.net",
+    "site": "Speedtest",
+    "url": "https://speedtest.net",
+    "category": "",
+    "chain": [
+     "Change Server",
+     "Palej - Charotar Broadband"
+    ],
+    "label": "Palej - Charotar Broadband",
+    "outcome": "revealed a menu / panel",
+    "expect_title": "",
+    "expect_items": [
+     "Charotar Broadband"
+    ],
+    "stored_goal": "Open the Palej - Charotar Broadband menu on Speedtest via Change Server",
+    "id": 20,
+    "question": "I want to see the Palej - Charotar Broadband menu on Speedtest. What do I click?"
+   },
+   "cold": {
+    "ok": false,
+    "clicks": 0,
+    "why": "TimeoutError: Page.goto: Timeout 30000ms exceeded.\nCall log:\n  - navigating to \"https://speedt",
+    "seconds": 30.0,
+    "picture": "task_20_cold_fail.png"
+   },
+   "pool": {
+    "ok": false,
+    "clicks": 0,
+    "why": "TimeoutError: Page.goto: Timeout 30000ms exceeded.\nCall log:\n  - navigating to \"https://speedt",
+    "seconds": 30.0,
+    "picture": "task_20_pool_fail.png"
+   }
+  }
+ ]
+}

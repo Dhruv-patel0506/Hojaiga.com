@@ -1,0 +1,156 @@
+{
+   "app_metadata": {
+      "app_name": "SoundSwitch",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Configure and use SoundSwitch to switch audio devices using hotkeys and system tray icon actions.",
+   "prerequisite_state": "SoundSwitch is installed and its system tray icon is visible.",
+   "total_steps": 5,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Right click the SoundSwitch icon in the system tray.",
+         "ui_target": {
+            "element_name": "SoundSwitch System Tray Icon",
+            "automation_id": null,
+            "hierarchical_path": "System Tray > SoundSwitch Icon",
+            "element_type": "SystemTrayIcon",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "RIGHT_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "right",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "A context menu appears with options to configure SoundSwitch."
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Select 'Settings' from the context menu.",
+         "ui_target": {
+            "element_name": "Settings",
+            "automation_id": null,
+            "hierarchical_path": "System Tray Context Menu > Settings",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The SoundSwitch settings window opens."
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Select the devices between which you want to toggle.",
+         "ui_target": {
+            "element_name": "Devices",
+            "automation_id": null,
+            "hierarchical_path": "Settings Window > Devices",
+            "element_type": "ListBox",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "HOVER",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The selected devices are highlighted."
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Double-click on the SoundSwitch system tray icon.",
+         "ui_target": {
+            "element_name": "SoundSwitch System Tray Icon",
+            "automation_id": null,
+            "hierarchical_path": "System Tray > SoundSwitch Icon",
+            "element_type": "SystemTrayIcon",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "DOUBLE_CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The playback device is cycled through."
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Press `Ctrl` + `Alt` + `F11` to cycle through the playback devices.",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": "none",
+            "modifiers": [
+               "Ctrl",
+               "Alt"
+            ],
+            "text_payload": null
+         },
+         "expected_state_change": "The playback device is cycled through."
+      }
+   ],
+   "_meta": {
+      "source_app": "SoundSwitch",
+      "app_key": "soundswitch",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "✨ Preview",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T15:44:36Z",
+      "schema_warnings": [
+         "step5_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

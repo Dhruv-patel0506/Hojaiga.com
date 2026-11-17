@@ -1,0 +1,309 @@
+{
+   "project": "Create a multi-sheet workbook for financial analysis and reporting",
+   "file": "FinancialAnalysis",
+   "sheets": [
+      {
+         "name": "Data",
+         "purpose": "Input raw financial data",
+         "tab_color": "none",
+         "title_banner": "Financial Data",
+         "headers": [
+            "Product",
+            "Quantity",
+            "Price",
+            "Date"
+         ],
+         "rows": [
+            [
+               "Widget",
+               100,
+               25.5,
+               "2026-01-15"
+            ],
+            [
+               "Gadget",
+               50,
+               15,
+               "2026-01-16"
+            ],
+            [
+               "Tool",
+               20,
+               30,
+               "2026-01-17"
+            ],
+            [
+               "Device",
+               30,
+               20,
+               "2026-01-18"
+            ]
+         ],
+         "formulas": [
+            {
+               "cell": "D2",
+               "formula": "=B2*C2",
+               "why": "total value of Widget"
+            },
+            {
+               "cell": "D3",
+               "formula": "=B3*C3",
+               "why": "total value of Gadget"
+            },
+            {
+               "cell": "D4",
+               "formula": "=B4*C4",
+               "why": "total value of Tool"
+            },
+            {
+               "cell": "D5",
+               "formula": "=B5*C5",
+               "why": "total value of Device"
+            }
+         ],
+         "features": [
+            {
+               "cap": "bold",
+               "range": "A1:D1"
+            },
+            {
+               "cap": "underline",
+               "range": "B1:D1"
+            },
+            {
+               "cap": "autofit_columns",
+               "range": "A1:D1"
+            }
+         ]
+      },
+      {
+         "name": "Calculations",
+         "purpose": "Perform calculations on the raw data",
+         "tab_color": "none",
+         "title_banner": "Calculations",
+         "headers": [
+            "Product",
+            "Total Value"
+         ],
+         "rows": [
+            [
+               "Widget",
+               "=SUMPRODUCT(B2:B5,C2:C5)"
+            ],
+            [
+               "Gadget",
+               "=SUMPRODUCT(B3:B5,C3:C5)"
+            ],
+            [
+               "Tool",
+               "=SUMPRODUCT(B4:B5,C4:C5)"
+            ],
+            [
+               "Device",
+               "=SUMPRODUCT(B5:B5,C5:C5)"
+            ]
+         ],
+         "formulas": [
+            {
+               "cell": "D2",
+               "formula": "=SUMPRODUCT(B2:B5,C2:C5)",
+               "why": "total value of all products"
+            },
+            {
+               "cell": "D3",
+               "formula": "=SUMPRODUCT(B3:B5,C3:C5)",
+               "why": "total value of Gadget and Tool"
+            },
+            {
+               "cell": "D4",
+               "formula": "=SUMPRODUCT(B4:B5,C4:C5)",
+               "why": "total value of Tool and Device"
+            },
+            {
+               "cell": "D5",
+               "formula": "=SUMPRODUCT(B5:B5,C5:C5)",
+               "why": "total value of Device"
+            }
+         ],
+         "features": [
+            {
+               "cap": "bold",
+               "range": "A1:D1"
+            },
+            {
+               "cap": "underline",
+               "range": "B1:D1"
+            },
+            {
+               "cap": "all_borders",
+               "range": "A1:D2"
+            },
+            {
+               "cap": "currency",
+               "range": "D2:D5"
+            }
+         ]
+      },
+      {
+         "name": "Analysis",
+         "purpose": "Analyze the data and display charts",
+         "tab_color": "none",
+         "title_banner": "Analysis",
+         "headers": [
+            "Product",
+            "Quantity",
+            "Price",
+            "Date"
+         ],
+         "rows": [
+            [
+               "Widget",
+               100,
+               25.5,
+               "2026-01-15"
+            ],
+            [
+               "Gadget",
+               50,
+               15,
+               "2026-01-16"
+            ],
+            [
+               "Tool",
+               20,
+               30,
+               "2026-01-17"
+            ],
+            [
+               "Device",
+               30,
+               20,
+               "2026-01-18"
+            ]
+         ],
+         "formulas": [
+            {
+               "cell": "D2",
+               "formula": "=B2*C2",
+               "why": "total value of Widget"
+            },
+            {
+               "cell": "D3",
+               "formula": "=B3*C3",
+               "why": "total value of Gadget"
+            },
+            {
+               "cell": "D4",
+               "formula": "=B4*C4",
+               "why": "total value of Tool"
+            },
+            {
+               "cell": "D5",
+               "formula": "=B5*C5",
+               "why": "total value of Device"
+            }
+         ],
+         "features": [
+            {
+               "cap": "bold",
+               "range": "A1:D1"
+            },
+            {
+               "cap": "underline",
+               "range": "B1:D1"
+            },
+            {
+               "cap": "all_borders",
+               "range": "A1:D2"
+            },
+            {
+               "cap": "currency",
+               "range": "D2:D5"
+            },
+            {
+               "cap": "bar_chart",
+               "range": "B2:C5"
+            },
+            {
+               "cap": "freeze_first_row",
+               "range": "A1:D1"
+            }
+         ]
+      },
+      {
+         "name": "References",
+         "purpose": "Store assumptions and references",
+         "tab_color": "none",
+         "title_banner": "References",
+         "headers": [
+            "Assumption",
+            "Value"
+         ],
+         "rows": [
+            [
+               "Tax Rate",
+               0.15
+            ],
+            [
+               "Discount Rate",
+               0.05
+            ],
+            [
+               "Shipping Cost",
+               10
+            ],
+            [
+               "Handling Fee",
+               5
+            ]
+         ],
+         "formulas": [
+            {
+               "cell": "B2",
+               "formula": "=B1*1.15",
+               "why": "taxed value of Widget"
+            },
+            {
+               "cell": "B3",
+               "formula": "=B1*1.05",
+               "why": "discounted value of Gadget"
+            },
+            {
+               "cell": "B4",
+               "formula": "=B1+10",
+               "why": "shipping cost added to Tool"
+            },
+            {
+               "cell": "B5",
+               "formula": "=B1+5",
+               "why": "handling fee added to Device"
+            }
+         ],
+         "features": [
+            {
+               "cap": "bold",
+               "range": "A1:B1"
+            },
+            {
+               "cap": "underline",
+               "range": "A1:B1"
+            },
+            {
+               "cap": "all_borders",
+               "range": "A1:B5"
+            },
+            {
+               "cap": "font_size",
+               "range": "A1:B1",
+               "value": 14
+            }
+         ]
+      }
+   ],
+   "chart": {
+      "type": "bar",
+      "data": "B2:C5",
+      "cats": "A2:A5"
+   },
+   "_engine": "qwen2.5:7b"
+}

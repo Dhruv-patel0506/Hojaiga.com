@@ -1,0 +1,361 @@
+{
+   "app_metadata": {
+      "app_name": "Betterbird",
+      "dataset_split": "EVAL",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "desktop_gui",
+   "high_level_task": "Guide users on how to report bugs and provide necessary information for support",
+   "prerequisite_state": "User is on the Betterbird support page",
+   "total_steps": 12,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Open the Help menu",
+         "ui_target": {
+            "element_name": "Help",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Help",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Help dropdown opens showing various options"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Choose Troubleshoot Mode",
+         "ui_target": {
+            "element_name": "Troubleshoot Mode",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Help > Troubleshoot Mode",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The application enters troubleshoot mode"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Clear the startup cache",
+         "ui_target": {
+            "element_name": "Clear startup cache",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Help > Troubleshooting Information > Clear startup cache",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The startup cache is cleared"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Check the Error Console",
+         "ui_target": {
+            "element_name": "Error Console",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Tools > Developer Tools > Error Console",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Error Console opens"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Clear the Error Console",
+         "ui_target": {
+            "element_name": "Clear",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Tools > Developer Tools > Error Console > Clear",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The Error Console is cleared"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Enable timestamps in the Error Console",
+         "ui_target": {
+            "element_name": "Timestamps",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Tools > Developer Tools > Error Console > Timestamps",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Timestamps are enabled in the Error Console"
+      },
+      {
+         "step_id": 7,
+         "low_level_instruction": "Check if the issue reproduces with all add-ons disabled",
+         "ui_target": {
+            "element_name": "Troubleshoot Mode",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Help > Troubleshoot Mode",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The application enters troubleshoot mode with add-ons disabled"
+      },
+      {
+         "step_id": 8,
+         "low_level_instruction": "Check if the issue happens in Thunderbird",
+         "ui_target": {
+            "element_name": "Thunderbird",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Help > Troubleshoot Mode > Thunderbird",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Thunderbird opens in troubleshoot mode"
+      },
+      {
+         "step_id": 9,
+         "low_level_instruction": "Check if the issue is Betterbird-specific",
+         "ui_target": {
+            "element_name": "Betterbird",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Help > Troubleshoot Mode > Betterbird",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "Betterbird opens in troubleshoot mode"
+      },
+      {
+         "step_id": 10,
+         "low_level_instruction": "Check if the issue is related to Thunderbird profile compatibility",
+         "ui_target": {
+            "element_name": "Thunderbird profile compatibility",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Help > Troubleshoot Mode > Thunderbird profile compatibility",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The application checks for Thunderbird profile compatibility"
+      },
+      {
+         "step_id": 11,
+         "low_level_instruction": "Check if the issue is related to complex search terms",
+         "ui_target": {
+            "element_name": "Complex search terms",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Help > Troubleshoot Mode > Complex search terms",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The application checks for issues with complex search terms"
+      },
+      {
+         "step_id": 12,
+         "low_level_instruction": "Check if the issue is related to Thunderbird profile compatibility",
+         "ui_target": {
+            "element_name": "Thunderbird profile compatibility",
+            "automation_id": null,
+            "hierarchical_path": "Menu bar > Help > Troubleshoot Mode > Thunderbird profile compatibility",
+            "element_type": "MenuItem",
+            "bounding_box": [
+               0,
+               0,
+               0,
+               0
+            ]
+         },
+         "virtual_mouse_action": {
+            "action_type": "CLICK",
+            "coordinates": {
+               "x": 0,
+               "y": 0
+            },
+            "path_waypoints": null,
+            "button": "left",
+            "modifiers": [],
+            "text_payload": null
+         },
+         "expected_state_change": "The application checks for Thunderbird profile compatibility"
+      }
+   ],
+   "_meta": {
+      "source_app": "Betterbird",
+      "app_key": "betterbird",
+      "dataset_split": "EVAL",
+      "category": "Uncategorized",
+      "guide_title": "Betterbird: Support",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-13T19:32:12Z",
+      "schema_warnings": [],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

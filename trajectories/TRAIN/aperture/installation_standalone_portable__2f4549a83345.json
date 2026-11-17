@@ -1,0 +1,128 @@
+{
+   "app_metadata": {
+      "app_name": "Aperture",
+      "dataset_split": "TRAIN",
+      "scan_prerequisites_met": true
+   },
+   "target_kind": "cli",
+   "high_level_task": "Guide the user through the Quick Start Guide of Aperture",
+   "prerequisite_state": "Aperture is installed and the user is in a terminal or command prompt",
+   "total_steps": 6,
+   "trajectory": [
+      {
+         "step_id": 1,
+         "low_level_instruction": "Press `f` to open the File Lock Search modal",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": null,
+            "modifiers": [],
+            "text_payload": [
+               "f"
+            ]
+         },
+         "expected_state_change": "The File Lock Search modal appears with input mode enabled"
+      },
+      {
+         "step_id": 2,
+         "low_level_instruction": "Press `/` to enter input mode",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": null,
+            "modifiers": [],
+            "text_payload": [
+               "/"
+            ]
+         },
+         "expected_state_change": "The input field in the File Lock Search modal is active"
+      },
+      {
+         "step_id": 3,
+         "low_level_instruction": "Type the full path to the file (e.g., `C:/Users\file.txt`)",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "TYPE_TEXT",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": null,
+            "modifiers": [],
+            "text_payload": "C:\\Users\\file.txt"
+         },
+         "expected_state_change": "The path is entered into the input field"
+      },
+      {
+         "step_id": 4,
+         "low_level_instruction": "Press `Enter` to search",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": null,
+            "modifiers": [],
+            "text_payload": [
+               "Enter"
+            ]
+         },
+         "expected_state_change": "The modal updates to show locking processes for the entered file path"
+      },
+      {
+         "step_id": 5,
+         "low_level_instruction": "Navigate with `j`/`k` and press `K` to kill the process (requires admin)",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": null,
+            "modifiers": [],
+            "text_payload": [
+               "j",
+               "k",
+               "K"
+            ]
+         },
+         "expected_state_change": "The selected process is killed"
+      },
+      {
+         "step_id": 6,
+         "low_level_instruction": "Press `Esc` to close the modal",
+         "ui_target": null,
+         "virtual_mouse_action": {
+            "action_type": "KEY_COMBINATION",
+            "coordinates": null,
+            "path_waypoints": null,
+            "button": null,
+            "modifiers": [],
+            "text_payload": [
+               "Esc"
+            ]
+         },
+         "expected_state_change": "The File Lock Search modal is closed"
+      }
+   ],
+   "_meta": {
+      "source_app": "Aperture",
+      "app_key": "aperture",
+      "dataset_split": "TRAIN",
+      "category": "Uncategorized",
+      "guide_title": "Installation (standalone/portable)",
+      "source_status": "extracted",
+      "generator": "ollama:qwen2.5:7b",
+      "produced": "2026-10-14T04:28:48Z",
+      "schema_warnings": [
+         "step1_ungrounded_target",
+         "step2_ungrounded_target",
+         "step3_ungrounded_target",
+         "step4_ungrounded_target",
+         "step5_ungrounded_target",
+         "step6_ungrounded_target"
+      ],
+      "note": "trajectory JSON produced by the local model; verify against live UIA before caching"
+   }
+}

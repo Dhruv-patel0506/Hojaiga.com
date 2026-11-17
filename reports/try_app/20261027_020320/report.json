@@ -1,0 +1,376 @@
+{
+ "target": "coinmarketcap.com",
+ "labels": [
+  "Checking the proxy and the firewall",
+  "Running Windows Network Diagnostics",
+  "Reload",
+  "Details",
+  "Hide details"
+ ],
+ "recall": {
+  "known": false,
+  "ms": 2667
+ },
+ "digest": {
+  "controls": 5,
+  "labelled": 5,
+  "roles": {
+   "button": 3,
+   "link": 2
+  },
+  "page_shortcuts": [],
+  "walls": [],
+  "canvas_app": false
+ },
+ "recognise": {
+  "status": "ambiguous",
+  "ranked": [
+   [
+    "settings_panel",
+    1.0
+   ],
+   [
+    "browser",
+    0.964
+   ],
+   [
+    "word_processor",
+    0.0
+   ]
+  ],
+  "margin": 0.036,
+  "ms": 2
+ },
+ "scorecard": [
+  [
+   false,
+   "page did NOT load: Error: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://coinmarketcap.com/\nCall log:\n  - navigating to \"https://coinmarketcap.com/\", waiting unt"
+  ],
+  [
+   false,
+   "5 controls found (5 with a readable label)"
+  ],
+  [
+   true,
+   "label coverage 5/5"
+  ],
+  [
+   true,
+   "no login / bot wall in the way"
+  ],
+  [
+   true,
+   "controls read in 0 ms"
+  ],
+  [
+   true,
+   "buttons / menus / tabs clicked: 3 of 3 (100.0%)"
+  ],
+  [
+   true,
+   "deep exploration: 3 clicks, 2 levels down, 0 extra pages, 0 kinds of dialog/menu outcomes, stopped by nothing left to try"
+  ],
+  [
+   null,
+   "new to the pool: this is a first contact, so there is nothing to recall (not a failure)"
+  ],
+  [
+   false,
+   "recognised as 'settings_panel' (ambiguous, score 1.0, margin 0.036)"
+  ]
+ ],
+ "understanding": {
+  "seconds_watching": 67.1,
+  "shortcut_sheet": {
+   "opened": false
+  },
+  "keyboard": {
+   "tab_order": [
+    {
+     "tag": "a",
+     "role": "",
+     "label": "Running Windows Network Diagnostics"
+    },
+    {
+     "tag": "button",
+     "role": "",
+     "label": "Reload"
+    },
+    {
+     "tag": "button",
+     "role": "",
+     "label": "Hide details"
+    },
+    {
+     "tag": "a",
+     "role": "",
+     "label": "Checking the proxy and the firewall"
+    }
+   ],
+   "hotkeys": []
+  },
+  "network": {
+   "requests": 4,
+   "by_kind": {
+    "first-party": 4
+   },
+   "status": {},
+   "hosts": [
+    {
+     "host": "coinmarketcap.com",
+     "kind": "first-party",
+     "n": 4,
+     "types": {
+      "document": 4
+     }
+    }
+   ],
+   "api_endpoints": [],
+   "graphql_operations": {},
+   "websockets": []
+  },
+  "stack": {
+   "cookie_names": [],
+   "cookie_flags": {
+    "n": 0,
+    "analytics_like": []
+   },
+   "headers": {}
+  },
+  "site_files": {},
+  "auth": {
+   "password_form": false,
+   "sso_providers": [],
+   "sso_buttons": [],
+   "captcha": [],
+   "login_wall": false,
+   "forms": [],
+   "reads_as": "public pages are open to a logged-out visitor"
+  },
+  "meaning": {
+   "name": "coinmarketcap.com",
+   "description": "",
+   "headings": [],
+   "navigation": [],
+   "opens_something": [
+    "Details",
+    "Checking the proxy and the firewall"
+   ],
+   "lesson": [
+    "coinmarketcap.com (coinmarketcap.com)",
+    "Menus / buttons that open something: Details, Checking the proxy and the firewall."
+   ]
+  },
+  "_rea": {
+   "api": {
+    "ok": true,
+    "origin": "https://coinmarketcap.com",
+    "tools": [],
+    "records": 0,
+    "other_origin_groups": 1,
+    "unknowns": [
+     "Authorization headers and cookies are structurally excluded from captures; the manifest states no authorization model.",
+     "Recorded statuses and bodies are retained only as pointers to parent records; the manifest states no response semantics.",
+     "Recorded exchanges are independent observations; the manifest states no ordering, side effects or state transitions between tools."
+    ],
+    "coverage": {
+     "reads": {
+      "state": 0,
+      "recorded": 0,
+      "recorded_reasons": {}
+     },
+     "writes": {
+      "served": [],
+      "withheld": []
+     }
+    },
+    "credential_like_members": 0,
+    "evidence_id": "ev_59240fe4c88cb05d3f646f328defb2dd89612ad00df9dc7e5ea4d0261eac0f4d",
+    "seconds": 2.8
+   }
+  }
+ },
+ "scan": {
+  "kind": "web",
+  "url": "https://coinmarketcap.com",
+  "show": false,
+  "minimized": true,
+  "load_error": "Error: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://coinmarketcap.com/\nCall log:\n  - navigating to \"https://coinmarketcap.com/\", waiting unt",
+  "settled_ms": 22630,
+  "explore": {
+   "clicks": 3,
+   "max_depth": 2,
+   "outcomes": {
+    "could not click": 1,
+    "revealed a menu / panel": 3
+   },
+   "nodes": [
+    {
+     "path": "Reload",
+     "outcome": "could not click",
+     "n_new": 0,
+     "depth": 1
+    },
+    {
+     "path": "Details",
+     "depth": 1,
+     "outcome": "revealed a menu / panel",
+     "n_new": 1,
+     "target": "button: Details",
+     "context": [
+      "link: Checking the proxy and the firewall",
+      "link: Running Windows Network Diagnostics",
+      "button: Reload",
+      "button: Details"
+     ],
+     "on_page": "coinmarketcap.com",
+     "url_path": "/",
+     "revealed": [
+      "button: Hide details"
+     ]
+    },
+    {
+     "path": "Details > Hide details",
+     "depth": 2,
+     "outcome": "revealed a menu / panel",
+     "n_new": 1,
+     "target": "button: Hide details",
+     "context": [
+      "link: Checking the proxy and the firewall",
+      "link: Running Windows Network Diagnostics",
+      "button: Reload",
+      "button: Hide details"
+     ],
+     "on_page": "coinmarketcap.com",
+     "url_path": "/",
+     "revealed": [
+      "button: Details"
+     ]
+    },
+    {
+     "path": "Checking the proxy and the firewall",
+     "depth": 1,
+     "outcome": "revealed a menu / panel",
+     "n_new": 1,
+     "target": "link: Checking the proxy and the firewall",
+     "context": [
+      "link: Checking the proxy and the firewall",
+      "link: Running Windows Network Diagnostics",
+      "button: Reload",
+      "button: Details"
+     ],
+     "on_page": "coinmarketcap.com",
+     "url_path": "/",
+     "revealed": [
+      "button: Hide details"
+     ]
+    }
+   ],
+   "tree": [
+    "Reload  ->  could not click",
+    "Details  ->  revealed a menu / panel (1)",
+    "  Hide details  ->  revealed a menu / panel (1)",
+    "Checking the proxy and the firewall  ->  revealed a menu / panel (1)"
+   ],
+   "pages": {},
+   "coverage": {
+    "distinct_controls_seen": 5,
+    "clicked": 4,
+    "not_clicked": {
+     "risky": 1
+    },
+    "left_over_sample": [],
+    "pct_clicked": 100.0,
+    "buttons_seen": 3,
+    "buttons_clicked": 3,
+    "buttons_pct": 100.0,
+    "links_seen": 1,
+    "links_clicked": 1,
+    "links_pct": 100.0,
+    "buttons_left": []
+   },
+   "external": [],
+   "skipped_risky": [
+    "Running Windows Network Diagnostics"
+   ],
+   "stopped_by": "nothing left to try",
+   "seconds_by_phase": {
+    "reach": 0.0,
+    "before_read": 0.1,
+    "click": 2.7,
+    "settle": 1.4,
+    "after_read": 0.0,
+    "hover_try": 0.0
+   },
+   "media": [],
+   "button_clicks": 2,
+   "link_clicks": 1
+  },
+  "media": [],
+  "openers_tried": 3,
+  "canvases": 0,
+  "iframes": 0,
+  "password": false,
+  "title": "coinmarketcap.com",
+  "height": 885,
+  "revealed": [
+   {
+    "opener": "Details",
+    "found": [
+     "button: Hide details"
+    ],
+    "n": 1
+   },
+   {
+    "opener": "Details > Hide details",
+    "found": [
+     "button: Details"
+    ],
+    "n": 1
+   },
+   {
+    "opener": "Checking the proxy and the firewall",
+    "found": [
+     "button: Hide details"
+    ],
+    "n": 1
+   }
+  ],
+  "skipped_risky": [
+   "Running Windows Network Diagnostics"
+  ],
+  "openers_opened": 3,
+  "screenshot_show": "D:\\new_automation\\reports\\try_app\\20261027_020320\\page_show.png",
+  "rea": {
+   "api": {
+    "ok": true,
+    "origin": "https://coinmarketcap.com",
+    "tools": [],
+    "records": 0,
+    "other_origin_groups": 1,
+    "unknowns": [
+     "Authorization headers and cookies are structurally excluded from captures; the manifest states no authorization model.",
+     "Recorded statuses and bodies are retained only as pointers to parent records; the manifest states no response semantics.",
+     "Recorded exchanges are independent observations; the manifest states no ordering, side effects or state transitions between tools."
+    ],
+    "coverage": {
+     "reads": {
+      "state": 0,
+      "recorded": 0,
+      "recorded_reasons": {}
+     },
+     "writes": {
+      "served": [],
+      "withheld": []
+     }
+    },
+    "credential_like_members": 0,
+    "evidence_id": "ev_59240fe4c88cb05d3f646f328defb2dd89612ad00df9dc7e5ea4d0261eac0f4d",
+    "seconds": 2.8
+   }
+  },
+  "total_ms": 134064,
+  "load_ms": 22630,
+  "read_ms": 0
+ }
+}

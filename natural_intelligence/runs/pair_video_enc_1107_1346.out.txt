@@ -1,0 +1,859 @@
+13:47:02 NI run pair_video_enc_1107_1346 on NVIDIA GeForce RTX 3050 6GB Laptop GPU; hours=3.0 smoke=False
+13:47:02 explicit task list: ['enc/video/hmdb51']
+13:47:02 ===== CYCLE 0 (OUTER-ONLY BOOTSTRAP) =====
+13:47:02 [data] enc/video/hmdb51: n=6766 C=51 D=1536 shards=1
+13:47:11 [enc/video/hmdb51] vote=0.605 uniform=0.605 best1=0.636 n_val=2135 vram=1.29GB 9s
+13:47:18 [inner] bootstrap training on the outer's outcome dataset: {"cycle": 0, "n_records": 2135, "n_val": 546, "base_rate": 0.5439560413360596, "inner": {"auc": 0.8410071261476884, "ece": 0.06810999721043058, "brier": 0.16608160734176636, "acc80": 0.6628440618515015}, "outer_conf": {"auc": 0.8034021608318797, "ece": 0.11512206088164788, "brier": 0.1954049915075302, "acc80": 0.6330274939537048}}
+13:47:19 ===== CYCLE 1 (OUTER -> INNER -> FEEDBACK) =====
+13:47:26 [enc/video/hmdb51] vote=0.573 uniform=0.573 best1=0.602 n_val=2019 vram=1.32GB 8s | grade=0.801 inner_auc=0.816 vs conf_auc=0.771
+13:47:28 ===== CYCLE 2 (OUTER -> INNER -> FEEDBACK) =====
+13:47:43 [enc/video/hmdb51] vote=0.586 uniform=0.576 best1=0.613 n_val=2142 vram=1.34GB 15s | grade=0.810 inner_auc=0.830 vs conf_auc=0.792
+13:47:52 ===== CYCLE 3 (OUTER -> INNER -> FEEDBACK) =====
+13:48:11 [enc/video/hmdb51] vote=0.582 uniform=0.572 best1=0.609 n_val=2311 vram=1.34GB 19s | grade=0.811 inner_auc=0.809 vs conf_auc=0.787
+13:48:23 ===== CYCLE 4 (OUTER -> INNER -> FEEDBACK) =====
+13:48:47 [enc/video/hmdb51] vote=0.598 uniform=0.571 best1=0.601 n_val=1989 vram=1.31GB 24s | grade=0.804 inner_auc=0.818 vs conf_auc=0.817
+13:48:58 ===== CYCLE 5 (OUTER -> INNER -> FEEDBACK) =====
+13:49:27 [enc/video/hmdb51] vote=0.585 uniform=0.559 best1=0.600 n_val=1971 vram=1.29GB 29s | grade=0.809 inner_auc=0.814 vs conf_auc=0.757
+13:49:35 ===== CYCLE 6 (OUTER -> INNER -> FEEDBACK) =====
+13:49:53 [enc/video/hmdb51] vote=0.624 uniform=0.587 best1=0.632 n_val=2003 vram=1.31GB 18s | grade=0.801 inner_auc=0.816 vs conf_auc=0.805
+13:50:00 ===== CYCLE 7 (OUTER -> INNER -> FEEDBACK) =====
+13:50:11 [enc/video/hmdb51] vote=0.637 uniform=0.599 best1=0.638 n_val=2060 vram=1.34GB 10s | grade=0.818 inner_auc=0.788 vs conf_auc=0.782
+13:50:15 ===== CYCLE 8 (OUTER -> INNER -> FEEDBACK) =====
+13:50:27 [enc/video/hmdb51] vote=0.609 uniform=0.547 best1=0.611 n_val=1912 vram=1.26GB 12s | grade=0.812 inner_auc=0.793 vs conf_auc=0.787
+13:50:31 ===== CYCLE 9 (OUTER -> INNER -> FEEDBACK) =====
+13:50:43 [enc/video/hmdb51] vote=0.622 uniform=0.579 best1=0.622 n_val=2322 vram=1.34GB 12s | grade=0.823 inner_auc=0.798 vs conf_auc=0.801
+13:50:47 ===== CYCLE 10 (OUTER -> INNER -> FEEDBACK) =====
+13:50:55 [enc/video/hmdb51] vote=0.605 uniform=0.565 best1=0.601 n_val=2219 vram=1.34GB 8s | grade=0.825 inner_auc=0.798 vs conf_auc=0.799
+13:51:01 ===== CYCLE 11 (OUTER -> INNER -> FEEDBACK) =====
+13:51:08 [enc/video/hmdb51] vote=0.651 uniform=0.609 best1=0.644 n_val=2058 vram=1.34GB 7s | grade=0.817 inner_auc=0.840 vs conf_auc=0.835
+13:51:14 ===== CYCLE 12 (OUTER -> INNER -> FEEDBACK) =====
+13:51:23 [enc/video/hmdb51] vote=0.643 uniform=0.590 best1=0.635 n_val=2233 vram=1.34GB 10s | grade=0.842 inner_auc=0.765 vs conf_auc=0.766
+13:51:29 ===== CYCLE 13 (OUTER -> INNER -> FEEDBACK) =====
+13:51:38 [enc/video/hmdb51] vote=0.623 uniform=0.596 best1=0.621 n_val=2316 vram=1.34GB 9s | grade=0.831 inner_auc=0.794 vs conf_auc=0.786
+13:51:44 ===== CYCLE 14 (OUTER -> INNER -> FEEDBACK) =====
+13:51:53 [enc/video/hmdb51] vote=0.611 uniform=0.575 best1=0.610 n_val=2091 vram=1.34GB 9s | grade=0.842 inner_auc=0.797 vs conf_auc=0.789
+13:51:59 ===== CYCLE 15 (OUTER -> INNER -> FEEDBACK) =====
+13:52:11 [enc/video/hmdb51] vote=0.584 uniform=0.562 best1=0.576 n_val=2398 vram=1.34GB 12s | grade=0.821 inner_auc=0.780 vs conf_auc=0.780
+13:52:16 ===== CYCLE 16 (OUTER -> INNER -> FEEDBACK) =====
+13:52:30 [enc/video/hmdb51] vote=0.622 uniform=0.585 best1=0.620 n_val=2014 vram=1.32GB 14s | grade=0.825 inner_auc=0.776 vs conf_auc=0.788
+13:52:38 ===== CYCLE 17 (OUTER -> INNER -> FEEDBACK) =====
+13:52:54 [enc/video/hmdb51] vote=0.615 uniform=0.560 best1=0.612 n_val=2226 vram=1.34GB 16s | grade=0.832 inner_auc=0.753 vs conf_auc=0.750
+13:52:59 ===== CYCLE 18 (OUTER -> INNER -> FEEDBACK) =====
+13:53:15 [enc/video/hmdb51] vote=0.634 uniform=0.595 best1=0.628 n_val=1929 vram=1.27GB 16s | grade=0.841 inner_auc=0.809 vs conf_auc=0.805
+13:53:17 ===== CYCLE 19 (OUTER -> INNER -> FEEDBACK) =====
+13:53:37 [enc/video/hmdb51] vote=0.609 uniform=0.557 best1=0.607 n_val=2156 vram=1.34GB 20s | grade=0.825 inner_auc=0.801 vs conf_auc=0.790
+13:53:40 ===== CYCLE 20 (OUTER -> INNER -> FEEDBACK) =====
+13:53:49 [enc/video/hmdb51] vote=0.611 uniform=0.578 best1=0.614 n_val=2109 vram=1.34GB 9s | grade=0.846 inner_auc=0.731 vs conf_auc=0.728
+13:53:54 ===== CYCLE 21 (OUTER -> INNER -> FEEDBACK) =====
+13:54:01 [enc/video/hmdb51] vote=0.610 uniform=0.573 best1=0.610 n_val=1823 vram=1.21GB 7s | grade=0.841 inner_auc=0.765 vs conf_auc=0.757
+13:54:06 ===== CYCLE 22 (OUTER -> INNER -> FEEDBACK) =====
+13:54:15 [enc/video/hmdb51] vote=0.619 uniform=0.573 best1=0.618 n_val=2189 vram=1.34GB 10s | grade=0.837 inner_auc=0.835 vs conf_auc=0.825
+13:54:18 ===== CYCLE 23 (OUTER -> INNER -> FEEDBACK) =====
+13:54:30 [enc/video/hmdb51] vote=0.593 uniform=0.560 best1=0.592 n_val=2014 vram=1.32GB 12s | grade=0.834 inner_auc=0.769 vs conf_auc=0.771
+13:54:33 ===== CYCLE 24 (OUTER -> INNER -> FEEDBACK) =====
+13:54:41 [enc/video/hmdb51] vote=0.639 uniform=0.585 best1=0.632 n_val=2229 vram=1.34GB 8s | grade=0.822 inner_auc=0.804 vs conf_auc=0.789
+13:54:46 ===== CYCLE 25 (OUTER -> INNER -> FEEDBACK) =====
+13:54:53 [enc/video/hmdb51] vote=0.631 uniform=0.596 best1=0.631 n_val=2022 vram=1.33GB 7s | grade=0.845 inner_auc=0.840 vs conf_auc=0.830
+13:54:56 ===== CYCLE 26 (OUTER -> INNER -> FEEDBACK) =====
+13:55:09 [enc/video/hmdb51] vote=0.609 uniform=0.574 best1=0.607 n_val=2038 vram=1.34GB 13s | grade=0.836 inner_auc=0.758 vs conf_auc=0.751
+13:55:12 ===== CYCLE 27 (OUTER -> INNER -> FEEDBACK) =====
+13:55:20 [enc/video/hmdb51] vote=0.639 uniform=0.616 best1=0.634 n_val=2158 vram=1.34GB 8s | grade=0.833 inner_auc=0.822 vs conf_auc=0.804
+13:55:28 ===== CYCLE 28 (OUTER -> INNER -> FEEDBACK) =====
+13:55:42 [enc/video/hmdb51] vote=0.575 uniform=0.555 best1=0.571 n_val=2048 vram=1.34GB 14s | grade=0.807 inner_auc=0.809 vs conf_auc=0.802
+13:55:52 ===== CYCLE 29 (OUTER -> INNER -> FEEDBACK) =====
+13:56:04 [enc/video/hmdb51] vote=0.633 uniform=0.595 best1=0.632 n_val=1661 vram=1.12GB 12s | grade=0.822 inner_auc=0.816 vs conf_auc=0.803
+13:56:10 ===== CYCLE 30 (OUTER -> INNER -> FEEDBACK) =====
+13:56:27 [enc/video/hmdb51] vote=0.599 uniform=0.560 best1=0.599 n_val=1862 vram=1.23GB 17s | grade=0.825 inner_auc=0.829 vs conf_auc=0.819
+13:56:35 ===== CYCLE 31 (OUTER -> INNER -> FEEDBACK) =====
+13:56:41 [enc/video/hmdb51] vote=0.573 uniform=0.522 best1=0.575 n_val=1955 vram=1.29GB 6s | grade=0.828 inner_auc=0.805 vs conf_auc=0.788
+13:56:47 ===== CYCLE 32 (OUTER -> INNER -> FEEDBACK) =====
+13:56:56 [enc/video/hmdb51] vote=0.613 uniform=0.570 best1=0.608 n_val=2067 vram=1.34GB 9s | grade=0.823 inner_auc=0.761 vs conf_auc=0.751
+13:56:58 ===== CYCLE 33 (OUTER -> INNER -> FEEDBACK) =====
+13:57:10 [enc/video/hmdb51] vote=0.652 uniform=0.604 best1=0.648 n_val=1706 vram=1.14GB 12s | grade=0.828 inner_auc=0.807 vs conf_auc=0.799
+13:57:14 ===== CYCLE 34 (OUTER -> INNER -> FEEDBACK) =====
+13:57:21 [enc/video/hmdb51] vote=0.659 uniform=0.606 best1=0.654 n_val=2064 vram=1.34GB 7s | grade=0.842 inner_auc=0.848 vs conf_auc=0.846
+13:57:26 ===== CYCLE 35 (OUTER -> INNER -> FEEDBACK) =====
+13:57:33 [enc/video/hmdb51] vote=0.622 uniform=0.581 best1=0.620 n_val=2071 vram=1.34GB 7s | grade=0.829 inner_auc=0.857 vs conf_auc=0.841
+13:57:36 ===== CYCLE 36 (OUTER -> INNER -> FEEDBACK) =====
+13:57:48 [enc/video/hmdb51] vote=0.592 uniform=0.562 best1=0.587 n_val=2089 vram=1.34GB 12s | grade=0.827 inner_auc=0.774 vs conf_auc=0.772
+13:57:50 ===== CYCLE 37 (OUTER -> INNER -> FEEDBACK) =====
+13:57:58 [enc/video/hmdb51] vote=0.629 uniform=0.599 best1=0.627 n_val=2045 vram=1.34GB 8s | grade=0.826 inner_auc=0.790 vs conf_auc=0.753
+13:58:04 ===== CYCLE 38 (OUTER -> INNER -> FEEDBACK) =====
+13:58:11 [enc/video/hmdb51] vote=0.652 uniform=0.602 best1=0.645 n_val=1843 vram=1.22GB 7s | grade=0.831 inner_auc=0.783 vs conf_auc=0.759
+13:58:15 ===== CYCLE 39 (OUTER -> INNER -> FEEDBACK) =====
+13:58:28 [enc/video/hmdb51] vote=0.647 uniform=0.592 best1=0.640 n_val=1780 vram=1.19GB 13s | grade=0.840 inner_auc=0.795 vs conf_auc=0.779
+13:58:34 ===== CYCLE 40 (OUTER -> INNER -> FEEDBACK) =====
+13:58:51 [enc/video/hmdb51] vote=0.582 uniform=0.531 best1=0.576 n_val=2184 vram=1.34GB 17s | grade=0.806 inner_auc=0.801 vs conf_auc=0.784
+13:58:59 ===== CYCLE 41 (OUTER -> INNER -> FEEDBACK) =====
+13:59:08 [enc/video/hmdb51] vote=0.645 uniform=0.606 best1=0.639 n_val=1801 vram=1.20GB 9s | grade=0.824 inner_auc=0.822 vs conf_auc=0.798
+13:59:16 ===== CYCLE 42 (OUTER -> INNER -> FEEDBACK) =====
+13:59:25 [enc/video/hmdb51] vote=0.626 uniform=0.606 best1=0.622 n_val=2106 vram=1.34GB 9s | grade=0.838 inner_auc=0.825 vs conf_auc=0.820
+13:59:29 ===== CYCLE 43 (OUTER -> INNER -> FEEDBACK) =====
+13:59:44 [enc/video/hmdb51] vote=0.573 uniform=0.523 best1=0.572 n_val=2434 vram=1.34GB 15s | grade=0.817 inner_auc=0.789 vs conf_auc=0.789
+13:59:52 ===== CYCLE 44 (OUTER -> INNER -> FEEDBACK) =====
+13:59:58 [enc/video/hmdb51] vote=0.657 uniform=0.600 best1=0.657 n_val=1722 vram=1.15GB 7s | grade=0.810 inner_auc=0.787 vs conf_auc=0.779
+14:00:03 ===== CYCLE 45 (OUTER -> INNER -> FEEDBACK) =====
+14:00:10 [enc/video/hmdb51] vote=0.627 uniform=0.593 best1=0.628 n_val=1887 vram=1.25GB 7s | grade=0.840 inner_auc=0.815 vs conf_auc=0.788
+14:00:14 ===== CYCLE 46 (OUTER -> INNER -> FEEDBACK) =====
+14:00:21 [enc/video/hmdb51] vote=0.622 uniform=0.572 best1=0.621 n_val=1948 vram=1.28GB 7s | grade=0.843 inner_auc=0.808 vs conf_auc=0.803
+14:00:24 ===== CYCLE 47 (OUTER -> INNER -> FEEDBACK) =====
+14:00:32 [enc/video/hmdb51] vote=0.632 uniform=0.595 best1=0.630 n_val=2277 vram=1.34GB 8s | grade=0.839 inner_auc=0.739 vs conf_auc=0.728
+14:00:36 ===== CYCLE 48 (OUTER -> INNER -> FEEDBACK) =====
+14:00:45 [enc/video/hmdb51] vote=0.591 uniform=0.541 best1=0.587 n_val=2038 vram=1.34GB 8s | grade=0.816 inner_auc=0.777 vs conf_auc=0.763
+14:00:48 ===== CYCLE 49 (OUTER -> INNER -> FEEDBACK) =====
+14:00:55 [enc/video/hmdb51] vote=0.598 uniform=0.555 best1=0.596 n_val=2472 vram=1.34GB 7s | grade=0.834 inner_auc=0.774 vs conf_auc=0.765
+14:01:00 ===== CYCLE 50 (OUTER -> INNER -> FEEDBACK) =====
+14:01:07 [enc/video/hmdb51] vote=0.606 uniform=0.564 best1=0.604 n_val=2011 vram=1.32GB 7s | grade=0.843 inner_auc=0.783 vs conf_auc=0.770
+14:01:11 ===== CYCLE 51 (OUTER -> INNER -> FEEDBACK) =====
+14:01:19 [enc/video/hmdb51] vote=0.642 uniform=0.603 best1=0.627 n_val=2001 vram=1.31GB 8s | grade=0.828 inner_auc=0.768 vs conf_auc=0.747
+14:01:23 ===== CYCLE 52 (OUTER -> INNER -> FEEDBACK) =====
+14:01:33 [enc/video/hmdb51] vote=0.612 uniform=0.595 best1=0.608 n_val=1851 vram=1.23GB 10s | grade=0.831 inner_auc=0.805 vs conf_auc=0.787
+14:01:38 ===== CYCLE 53 (OUTER -> INNER -> FEEDBACK) =====
+14:01:48 [enc/video/hmdb51] vote=0.613 uniform=0.579 best1=0.609 n_val=2063 vram=1.34GB 10s | grade=0.839 inner_auc=0.813 vs conf_auc=0.808
+14:01:51 ===== CYCLE 54 (OUTER -> INNER -> FEEDBACK) =====
+14:01:56 [enc/video/hmdb51] vote=0.674 uniform=0.621 best1=0.671 n_val=1697 vram=1.14GB 5s | grade=0.822 inner_auc=0.832 vs conf_auc=0.816
+14:02:02 ===== CYCLE 55 (OUTER -> INNER -> FEEDBACK) =====
+14:02:10 [enc/video/hmdb51] vote=0.641 uniform=0.595 best1=0.639 n_val=2090 vram=1.34GB 7s | grade=0.834 inner_auc=0.742 vs conf_auc=0.733
+14:02:12 ===== CYCLE 56 (OUTER -> INNER -> FEEDBACK) =====
+14:02:18 [enc/video/hmdb51] vote=0.608 uniform=0.573 best1=0.601 n_val=1841 vram=1.22GB 6s | grade=0.827 inner_auc=0.865 vs conf_auc=0.869
+14:02:21 ===== CYCLE 57 (OUTER -> INNER -> FEEDBACK) =====
+14:02:26 [enc/video/hmdb51] vote=0.623 uniform=0.607 best1=0.619 n_val=2050 vram=1.34GB 5s | grade=0.841 inner_auc=0.837 vs conf_auc=0.826
+14:02:28 ===== CYCLE 58 (OUTER -> INNER -> FEEDBACK) =====
+14:02:34 [enc/video/hmdb51] vote=0.616 uniform=0.581 best1=0.608 n_val=2120 vram=1.34GB 6s | grade=0.847 inner_auc=0.830 vs conf_auc=0.824
+14:02:37 ===== CYCLE 59 (OUTER -> INNER -> FEEDBACK) =====
+14:02:43 [enc/video/hmdb51] vote=0.659 uniform=0.615 best1=0.650 n_val=1818 vram=1.21GB 6s | grade=0.830 inner_auc=0.764 vs conf_auc=0.751
+14:02:47 ===== CYCLE 60 (OUTER -> INNER -> FEEDBACK) =====
+14:02:53 [enc/video/hmdb51] vote=0.635 uniform=0.608 best1=0.634 n_val=1913 vram=1.26GB 6s | grade=0.836 inner_auc=0.802 vs conf_auc=0.793
+14:02:56 ===== CYCLE 61 (OUTER -> INNER -> FEEDBACK) =====
+14:03:03 [enc/video/hmdb51] vote=0.590 uniform=0.562 best1=0.590 n_val=2201 vram=1.34GB 6s | grade=0.821 inner_auc=0.795 vs conf_auc=0.789
+14:03:07 ===== CYCLE 62 (OUTER -> INNER -> FEEDBACK) =====
+14:03:44 [enc/video/hmdb51] vote=0.619 uniform=0.592 best1=0.617 n_val=1723 vram=1.15GB 37s | grade=0.827 inner_auc=0.865 vs conf_auc=0.845
+14:03:50 ===== CYCLE 63 (OUTER -> INNER -> FEEDBACK) =====
+14:04:18 [enc/video/hmdb51] vote=0.628 uniform=0.593 best1=0.624 n_val=2210 vram=1.34GB 27s | grade=0.843 inner_auc=0.808 vs conf_auc=0.797
+14:04:26 ===== CYCLE 64 (OUTER -> INNER -> FEEDBACK) =====
+14:04:38 [enc/video/hmdb51] vote=0.581 uniform=0.552 best1=0.579 n_val=1944 vram=1.28GB 12s | grade=0.814 inner_auc=0.829 vs conf_auc=0.814
+14:04:46 ===== CYCLE 65 (OUTER -> INNER -> FEEDBACK) =====
+14:04:55 [enc/video/hmdb51] vote=0.616 uniform=0.572 best1=0.614 n_val=1925 vram=1.27GB 9s | grade=0.823 inner_auc=0.782 vs conf_auc=0.775
+14:04:59 ===== CYCLE 66 (OUTER -> INNER -> FEEDBACK) =====
+14:05:08 [enc/video/hmdb51] vote=0.649 uniform=0.595 best1=0.641 n_val=1960 vram=1.29GB 9s | grade=0.825 inner_auc=0.872 vs conf_auc=0.862
+14:05:10 ===== CYCLE 67 (OUTER -> INNER -> FEEDBACK) =====
+14:05:17 [enc/video/hmdb51] vote=0.619 uniform=0.583 best1=0.610 n_val=2002 vram=1.31GB 7s | grade=0.830 inner_auc=0.814 vs conf_auc=0.806
+14:05:20 ===== CYCLE 68 (OUTER -> INNER -> FEEDBACK) =====
+14:05:28 [enc/video/hmdb51] vote=0.607 uniform=0.560 best1=0.610 n_val=2082 vram=1.34GB 8s | grade=0.834 inner_auc=0.803 vs conf_auc=0.790
+14:05:34 ===== CYCLE 69 (OUTER -> INNER -> FEEDBACK) =====
+14:05:43 [enc/video/hmdb51] vote=0.589 uniform=0.550 best1=0.583 n_val=2079 vram=1.34GB 9s | grade=0.835 inner_auc=0.826 vs conf_auc=0.816
+14:05:45 ===== CYCLE 70 (OUTER -> INNER -> FEEDBACK) =====
+14:05:52 [enc/video/hmdb51] vote=0.586 uniform=0.554 best1=0.582 n_val=2039 vram=1.34GB 7s | grade=0.837 inner_auc=0.794 vs conf_auc=0.791
+14:05:55 ===== CYCLE 71 (OUTER -> INNER -> FEEDBACK) =====
+14:06:07 [enc/video/hmdb51] vote=0.598 uniform=0.560 best1=0.590 n_val=2164 vram=1.34GB 12s | grade=0.833 inner_auc=0.807 vs conf_auc=0.776
+14:06:14 ===== CYCLE 72 (OUTER -> INNER -> FEEDBACK) =====
+14:06:26 [enc/video/hmdb51] vote=0.625 uniform=0.599 best1=0.620 n_val=2136 vram=1.34GB 12s | grade=0.830 inner_auc=0.788 vs conf_auc=0.743
+14:06:30 ===== CYCLE 73 (OUTER -> INNER -> FEEDBACK) =====
+14:06:37 [enc/video/hmdb51] vote=0.613 uniform=0.583 best1=0.611 n_val=2154 vram=1.34GB 7s | grade=0.842 inner_auc=0.781 vs conf_auc=0.767
+14:06:40 ===== CYCLE 74 (OUTER -> INNER -> FEEDBACK) =====
+14:06:46 [enc/video/hmdb51] vote=0.623 uniform=0.593 best1=0.621 n_val=1893 vram=1.25GB 6s | grade=0.845 inner_auc=0.773 vs conf_auc=0.759
+14:06:49 ===== CYCLE 75 (OUTER -> INNER -> FEEDBACK) =====
+14:07:02 [enc/video/hmdb51] vote=0.610 uniform=0.571 best1=0.604 n_val=2230 vram=1.34GB 13s | grade=0.837 inner_auc=0.738 vs conf_auc=0.730
+14:07:06 ===== CYCLE 76 (OUTER -> INNER -> FEEDBACK) =====
+14:07:19 [enc/video/hmdb51] vote=0.648 uniform=0.612 best1=0.647 n_val=1665 vram=1.12GB 12s | grade=0.831 inner_auc=0.818 vs conf_auc=0.823
+14:07:22 ===== CYCLE 77 (OUTER -> INNER -> FEEDBACK) =====
+14:07:45 [enc/video/hmdb51] vote=0.590 uniform=0.546 best1=0.592 n_val=2109 vram=1.34GB 23s | grade=0.807 inner_auc=0.797 vs conf_auc=0.798
+14:07:49 ===== CYCLE 78 (OUTER -> INNER -> FEEDBACK) =====
+14:07:56 [enc/video/hmdb51] vote=0.636 uniform=0.577 best1=0.633 n_val=1942 vram=1.28GB 7s | grade=0.821 inner_auc=0.820 vs conf_auc=0.809
+14:07:59 ===== CYCLE 79 (OUTER -> INNER -> FEEDBACK) =====
+14:08:10 [enc/video/hmdb51] vote=0.582 uniform=0.547 best1=0.579 n_val=2138 vram=1.34GB 12s | grade=0.811 inner_auc=0.795 vs conf_auc=0.786
+14:08:16 ===== CYCLE 80 (OUTER -> INNER -> FEEDBACK) =====
+14:08:29 [enc/video/hmdb51] vote=0.635 uniform=0.593 best1=0.635 n_val=1976 vram=1.30GB 13s | grade=0.818 inner_auc=0.831 vs conf_auc=0.815
+14:08:34 ===== CYCLE 81 (OUTER -> INNER -> FEEDBACK) =====
+14:08:47 [enc/video/hmdb51] vote=0.635 uniform=0.596 best1=0.634 n_val=2197 vram=1.34GB 12s | grade=0.844 inner_auc=0.772 vs conf_auc=0.740
+14:08:52 ===== CYCLE 82 (OUTER -> INNER -> FEEDBACK) =====
+14:09:04 [enc/video/hmdb51] vote=0.615 uniform=0.568 best1=0.614 n_val=2039 vram=1.34GB 12s | grade=0.837 inner_auc=0.764 vs conf_auc=0.763
+14:09:08 ===== CYCLE 83 (OUTER -> INNER -> FEEDBACK) =====
+14:09:18 [enc/video/hmdb51] vote=0.625 uniform=0.591 best1=0.622 n_val=2243 vram=1.34GB 9s | grade=0.840 inner_auc=0.831 vs conf_auc=0.819
+14:09:23 ===== CYCLE 84 (OUTER -> INNER -> FEEDBACK) =====
+14:09:32 [enc/video/hmdb51] vote=0.582 uniform=0.545 best1=0.583 n_val=2197 vram=1.34GB 9s | grade=0.820 inner_auc=0.792 vs conf_auc=0.794
+14:09:36 ===== CYCLE 85 (OUTER -> INNER -> FEEDBACK) =====
+14:09:46 [enc/video/hmdb51] vote=0.604 uniform=0.558 best1=0.604 n_val=2345 vram=1.34GB 9s | grade=0.832 inner_auc=0.755 vs conf_auc=0.733
+14:09:51 ===== CYCLE 86 (OUTER -> INNER -> FEEDBACK) =====
+14:09:58 [enc/video/hmdb51] vote=0.638 uniform=0.593 best1=0.634 n_val=1954 vram=1.29GB 8s | grade=0.837 inner_auc=0.827 vs conf_auc=0.813
+14:10:03 ===== CYCLE 87 (OUTER -> INNER -> FEEDBACK) =====
+14:10:15 [enc/video/hmdb51] vote=0.630 uniform=0.601 best1=0.623 n_val=1841 vram=1.22GB 13s | grade=0.841 inner_auc=0.778 vs conf_auc=0.772
+14:10:21 ===== CYCLE 88 (OUTER -> INNER -> FEEDBACK) =====
+14:10:36 [enc/video/hmdb51] vote=0.597 uniform=0.550 best1=0.596 n_val=2218 vram=1.34GB 15s | grade=0.825 inner_auc=0.792 vs conf_auc=0.773
+14:10:42 ===== CYCLE 89 (OUTER -> INNER -> FEEDBACK) =====
+14:10:51 [enc/video/hmdb51] vote=0.614 uniform=0.559 best1=0.615 n_val=1975 vram=1.30GB 9s | grade=0.834 inner_auc=0.787 vs conf_auc=0.782
+14:10:53 ===== CYCLE 90 (OUTER -> INNER -> FEEDBACK) =====
+14:11:48 [enc/video/hmdb51] vote=0.611 uniform=0.569 best1=0.611 n_val=2071 vram=1.34GB 54s | grade=0.840 inner_auc=0.793 vs conf_auc=0.804
+14:12:10 ===== CYCLE 91 (OUTER -> INNER -> FEEDBACK) =====
+14:13:31 [enc/video/hmdb51] vote=0.637 uniform=0.601 best1=0.637 n_val=2262 vram=1.34GB 80s | grade=0.833 inner_auc=0.753 vs conf_auc=0.734
+14:13:45 ===== CYCLE 92 (OUTER -> INNER -> FEEDBACK) =====
+14:14:28 [enc/video/hmdb51] vote=0.622 uniform=0.586 best1=0.620 n_val=1998 vram=1.31GB 43s | grade=0.831 inner_auc=0.817 vs conf_auc=0.774
+14:14:49 ===== CYCLE 93 (OUTER -> INNER -> FEEDBACK) =====
+14:15:40 [enc/video/hmdb51] vote=0.641 uniform=0.631 best1=0.636 n_val=1952 vram=1.29GB 51s | grade=0.842 inner_auc=0.787 vs conf_auc=0.774
+14:15:57 ===== CYCLE 94 (OUTER -> INNER -> FEEDBACK) =====
+14:19:09 [enc/video/hmdb51] vote=0.624 uniform=0.579 best1=0.620 n_val=2214 vram=1.34GB 192s | grade=0.834 inner_auc=0.776 vs conf_auc=0.759
+14:19:27 ===== CYCLE 95 (OUTER -> INNER -> FEEDBACK) =====
+14:20:18 [enc/video/hmdb51] vote=0.641 uniform=0.587 best1=0.641 n_val=2161 vram=1.34GB 52s | grade=0.834 inner_auc=0.814 vs conf_auc=0.798
+14:20:42 ===== CYCLE 96 (OUTER -> INNER -> FEEDBACK) =====
+14:21:27 [enc/video/hmdb51] vote=0.626 uniform=0.584 best1=0.626 n_val=1976 vram=1.30GB 45s | grade=0.835 inner_auc=0.837 vs conf_auc=0.809
+14:21:46 ===== CYCLE 97 (OUTER -> INNER -> FEEDBACK) =====
+14:22:15 [enc/video/hmdb51] vote=0.572 uniform=0.532 best1=0.573 n_val=2338 vram=1.34GB 29s | grade=0.813 inner_auc=0.788 vs conf_auc=0.778
+14:22:19 ===== CYCLE 98 (OUTER -> INNER -> FEEDBACK) =====
+14:22:24 [enc/video/hmdb51] vote=0.635 uniform=0.606 best1=0.630 n_val=2077 vram=1.34GB 5s | grade=0.816 inner_auc=0.783 vs conf_auc=0.769
+14:22:26 ===== CYCLE 99 (OUTER -> INNER -> FEEDBACK) =====
+14:22:31 [enc/video/hmdb51] vote=0.625 uniform=0.570 best1=0.621 n_val=1936 vram=1.28GB 5s | grade=0.840 inner_auc=0.779 vs conf_auc=0.781
+14:22:33 ===== CYCLE 100 (OUTER -> INNER -> FEEDBACK) =====
+14:22:38 [enc/video/hmdb51] vote=0.604 uniform=0.572 best1=0.604 n_val=1875 vram=1.24GB 5s | grade=0.837 inner_auc=0.752 vs conf_auc=0.751
+14:22:42 ===== CYCLE 101 (OUTER -> INNER -> FEEDBACK) =====
+14:22:51 [enc/video/hmdb51] vote=0.603 uniform=0.565 best1=0.601 n_val=2202 vram=1.34GB 9s | grade=0.840 inner_auc=0.792 vs conf_auc=0.789
+14:22:56 ===== CYCLE 102 (OUTER -> INNER -> FEEDBACK) =====
+14:23:05 [enc/video/hmdb51] vote=0.599 uniform=0.546 best1=0.598 n_val=2259 vram=1.34GB 9s | grade=0.840 inner_auc=0.780 vs conf_auc=0.784
+14:23:09 ===== CYCLE 103 (OUTER -> INNER -> FEEDBACK) =====
+14:23:18 [enc/video/hmdb51] vote=0.634 uniform=0.572 best1=0.628 n_val=2054 vram=1.34GB 9s | grade=0.828 inner_auc=0.799 vs conf_auc=0.791
+14:23:20 ===== CYCLE 104 (OUTER -> INNER -> FEEDBACK) =====
+14:23:28 [enc/video/hmdb51] vote=0.634 uniform=0.587 best1=0.632 n_val=1987 vram=1.31GB 7s | grade=0.846 inner_auc=0.776 vs conf_auc=0.755
+14:23:30 ===== CYCLE 105 (OUTER -> INNER -> FEEDBACK) =====
+14:23:37 [enc/video/hmdb51] vote=0.596 uniform=0.555 best1=0.594 n_val=2035 vram=1.33GB 7s | grade=0.824 inner_auc=0.792 vs conf_auc=0.791
+14:23:40 ===== CYCLE 106 (OUTER -> INNER -> FEEDBACK) =====
+14:23:48 [enc/video/hmdb51] vote=0.597 uniform=0.559 best1=0.594 n_val=2234 vram=1.34GB 7s | grade=0.839 inner_auc=0.798 vs conf_auc=0.780
+14:23:52 ===== CYCLE 107 (OUTER -> INNER -> FEEDBACK) =====
+14:24:01 [enc/video/hmdb51] vote=0.591 uniform=0.545 best1=0.593 n_val=2115 vram=1.34GB 8s | grade=0.844 inner_auc=0.751 vs conf_auc=0.750
+14:24:05 ===== CYCLE 108 (OUTER -> INNER -> FEEDBACK) =====
+14:24:15 [enc/video/hmdb51] vote=0.615 uniform=0.578 best1=0.610 n_val=2139 vram=1.34GB 11s | grade=0.835 inner_auc=0.819 vs conf_auc=0.816
+14:24:21 ===== CYCLE 109 (OUTER -> INNER -> FEEDBACK) =====
+14:24:28 [enc/video/hmdb51] vote=0.621 uniform=0.590 best1=0.624 n_val=1915 vram=1.26GB 8s | grade=0.844 inner_auc=0.811 vs conf_auc=0.812
+14:24:32 ===== CYCLE 110 (OUTER -> INNER -> FEEDBACK) =====
+14:24:38 [enc/video/hmdb51] vote=0.571 uniform=0.523 best1=0.569 n_val=2046 vram=1.34GB 6s | grade=0.816 inner_auc=0.793 vs conf_auc=0.767
+14:24:41 ===== CYCLE 111 (OUTER -> INNER -> FEEDBACK) =====
+14:24:48 [enc/video/hmdb51] vote=0.614 uniform=0.588 best1=0.609 n_val=1978 vram=1.30GB 8s | grade=0.827 inner_auc=0.809 vs conf_auc=0.784
+14:24:52 ===== CYCLE 112 (OUTER -> INNER -> FEEDBACK) =====
+14:25:00 [enc/video/hmdb51] vote=0.576 uniform=0.555 best1=0.573 n_val=2073 vram=1.34GB 8s | grade=0.820 inner_auc=0.767 vs conf_auc=0.751
+14:25:04 ===== CYCLE 113 (OUTER -> INNER -> FEEDBACK) =====
+14:25:15 [enc/video/hmdb51] vote=0.605 uniform=0.574 best1=0.603 n_val=1923 vram=1.27GB 10s | grade=0.831 inner_auc=0.771 vs conf_auc=0.770
+14:25:19 ===== CYCLE 114 (OUTER -> INNER -> FEEDBACK) =====
+14:25:27 [enc/video/hmdb51] vote=0.614 uniform=0.589 best1=0.617 n_val=1895 vram=1.25GB 8s | grade=0.842 inner_auc=0.852 vs conf_auc=0.830
+14:25:29 ===== CYCLE 115 (OUTER -> INNER -> FEEDBACK) =====
+14:25:35 [enc/video/hmdb51] vote=0.635 uniform=0.569 best1=0.631 n_val=1820 vram=1.21GB 6s | grade=0.838 inner_auc=0.813 vs conf_auc=0.789
+14:25:38 ===== CYCLE 116 (OUTER -> INNER -> FEEDBACK) =====
+14:25:45 [enc/video/hmdb51] vote=0.634 uniform=0.580 best1=0.630 n_val=2167 vram=1.34GB 7s | grade=0.840 inner_auc=0.769 vs conf_auc=0.745
+14:25:48 ===== CYCLE 117 (OUTER -> INNER -> FEEDBACK) =====
+14:25:54 [enc/video/hmdb51] vote=0.621 uniform=0.586 best1=0.617 n_val=2045 vram=1.34GB 6s | grade=0.837 inner_auc=0.800 vs conf_auc=0.779
+14:25:58 ===== CYCLE 118 (OUTER -> INNER -> FEEDBACK) =====
+14:26:04 [enc/video/hmdb51] vote=0.607 uniform=0.581 best1=0.603 n_val=1917 vram=1.26GB 7s | grade=0.834 inner_auc=0.811 vs conf_auc=0.793
+14:26:09 ===== CYCLE 119 (OUTER -> INNER -> FEEDBACK) =====
+14:26:16 [enc/video/hmdb51] vote=0.611 uniform=0.585 best1=0.607 n_val=2179 vram=1.34GB 7s | grade=0.836 inner_auc=0.793 vs conf_auc=0.784
+14:26:21 ===== CYCLE 120 (OUTER -> INNER -> FEEDBACK) =====
+14:26:32 [enc/video/hmdb51] vote=0.616 uniform=0.595 best1=0.611 n_val=2002 vram=1.31GB 11s | grade=0.843 inner_auc=0.825 vs conf_auc=0.817
+14:26:37 ===== CYCLE 121 (OUTER -> INNER -> FEEDBACK) =====
+14:26:47 [enc/video/hmdb51] vote=0.583 uniform=0.542 best1=0.581 n_val=2408 vram=1.34GB 10s | grade=0.822 inner_auc=0.763 vs conf_auc=0.748
+14:26:52 ===== CYCLE 122 (OUTER -> INNER -> FEEDBACK) =====
+14:27:02 [enc/video/hmdb51] vote=0.620 uniform=0.596 best1=0.614 n_val=1903 vram=1.26GB 10s | grade=0.829 inner_auc=0.819 vs conf_auc=0.768
+14:27:05 ===== CYCLE 123 (OUTER -> INNER -> FEEDBACK) =====
+14:27:11 [enc/video/hmdb51] vote=0.637 uniform=0.578 best1=0.634 n_val=1837 vram=1.22GB 6s | grade=0.837 inner_auc=0.766 vs conf_auc=0.719
+14:27:14 ===== CYCLE 124 (OUTER -> INNER -> FEEDBACK) =====
+14:27:20 [enc/video/hmdb51] vote=0.580 uniform=0.548 best1=0.580 n_val=2133 vram=1.34GB 6s | grade=0.811 inner_auc=0.775 vs conf_auc=0.741
+14:27:23 ===== CYCLE 125 (OUTER -> INNER -> FEEDBACK) =====
+14:27:30 [enc/video/hmdb51] vote=0.638 uniform=0.597 best1=0.634 n_val=2104 vram=1.34GB 8s | grade=0.817 inner_auc=0.826 vs conf_auc=0.806
+14:27:34 ===== CYCLE 126 (OUTER -> INNER -> FEEDBACK) =====
+14:27:44 [enc/video/hmdb51] vote=0.620 uniform=0.581 best1=0.616 n_val=2150 vram=1.34GB 10s | grade=0.834 inner_auc=0.815 vs conf_auc=0.803
+14:27:49 ===== CYCLE 127 (OUTER -> INNER -> FEEDBACK) =====
+14:27:59 [enc/video/hmdb51] vote=0.638 uniform=0.606 best1=0.634 n_val=1941 vram=1.28GB 10s | grade=0.843 inner_auc=0.737 vs conf_auc=0.742
+14:28:03 ===== CYCLE 128 (OUTER -> INNER -> FEEDBACK) =====
+14:28:11 [enc/video/hmdb51] vote=0.637 uniform=0.609 best1=0.634 n_val=1981 vram=1.30GB 8s | grade=0.851 inner_auc=0.815 vs conf_auc=0.801
+14:28:15 ===== CYCLE 129 (OUTER -> INNER -> FEEDBACK) =====
+14:28:23 [enc/video/hmdb51] vote=0.585 uniform=0.543 best1=0.584 n_val=2182 vram=1.34GB 8s | grade=0.818 inner_auc=0.810 vs conf_auc=0.800
+14:28:27 ===== CYCLE 130 (OUTER -> INNER -> FEEDBACK) =====
+14:28:36 [enc/video/hmdb51] vote=0.637 uniform=0.574 best1=0.639 n_val=1940 vram=1.28GB 8s | grade=0.821 inner_auc=0.729 vs conf_auc=0.715
+14:28:40 ===== CYCLE 131 (OUTER -> INNER -> FEEDBACK) =====
+14:28:51 [enc/video/hmdb51] vote=0.633 uniform=0.590 best1=0.628 n_val=2041 vram=1.34GB 10s | grade=0.845 inner_auc=0.797 vs conf_auc=0.772
+14:28:56 ===== CYCLE 132 (OUTER -> INNER -> FEEDBACK) =====
+14:29:07 [enc/video/hmdb51] vote=0.635 uniform=0.612 best1=0.627 n_val=2015 vram=1.32GB 11s | grade=0.848 inner_auc=0.764 vs conf_auc=0.738
+14:29:13 ===== CYCLE 133 (OUTER -> INNER -> FEEDBACK) =====
+14:29:21 [enc/video/hmdb51] vote=0.666 uniform=0.620 best1=0.662 n_val=1952 vram=1.29GB 8s | grade=0.832 inner_auc=0.799 vs conf_auc=0.772
+14:29:23 ===== CYCLE 134 (OUTER -> INNER -> FEEDBACK) =====
+14:29:30 [enc/video/hmdb51] vote=0.645 uniform=0.605 best1=0.644 n_val=1717 vram=1.15GB 7s | grade=0.843 inner_auc=0.800 vs conf_auc=0.783
+14:29:33 ===== CYCLE 135 (OUTER -> INNER -> FEEDBACK) =====
+14:29:40 [enc/video/hmdb51] vote=0.624 uniform=0.599 best1=0.622 n_val=2017 vram=1.32GB 7s | grade=0.832 inner_auc=0.745 vs conf_auc=0.721
+14:29:44 ===== CYCLE 136 (OUTER -> INNER -> FEEDBACK) =====
+14:29:52 [enc/video/hmdb51] vote=0.634 uniform=0.579 best1=0.633 n_val=1745 vram=1.17GB 8s | grade=0.841 inner_auc=0.823 vs conf_auc=0.803
+14:29:55 ===== CYCLE 137 (OUTER -> INNER -> FEEDBACK) =====
+14:30:01 [enc/video/hmdb51] vote=0.608 uniform=0.589 best1=0.602 n_val=2025 vram=1.33GB 6s | grade=0.826 inner_auc=0.799 vs conf_auc=0.750
+14:30:04 ===== CYCLE 138 (OUTER -> INNER -> FEEDBACK) =====
+14:30:13 [enc/video/hmdb51] vote=0.647 uniform=0.608 best1=0.643 n_val=2133 vram=1.34GB 9s | grade=0.827 inner_auc=0.777 vs conf_auc=0.778
+14:30:19 ===== CYCLE 139 (OUTER -> INNER -> FEEDBACK) =====
+14:30:30 [enc/video/hmdb51] vote=0.600 uniform=0.570 best1=0.596 n_val=2062 vram=1.34GB 11s | grade=0.823 inner_auc=0.805 vs conf_auc=0.796
+14:30:36 ===== CYCLE 140 (OUTER -> INNER -> FEEDBACK) =====
+14:30:46 [enc/video/hmdb51] vote=0.635 uniform=0.586 best1=0.633 n_val=2041 vram=1.34GB 10s | grade=0.823 inner_auc=0.801 vs conf_auc=0.789
+14:30:51 ===== CYCLE 141 (OUTER -> INNER -> FEEDBACK) =====
+14:30:59 [enc/video/hmdb51] vote=0.616 uniform=0.590 best1=0.612 n_val=2076 vram=1.34GB 8s | grade=0.831 inner_auc=0.793 vs conf_auc=0.777
+14:31:01 ===== CYCLE 142 (OUTER -> INNER -> FEEDBACK) =====
+14:31:07 [enc/video/hmdb51] vote=0.604 uniform=0.573 best1=0.602 n_val=2103 vram=1.34GB 5s | grade=0.832 inner_auc=0.770 vs conf_auc=0.775
+14:31:09 ===== CYCLE 143 (OUTER -> INNER -> FEEDBACK) =====
+14:31:15 [enc/video/hmdb51] vote=0.616 uniform=0.579 best1=0.612 n_val=2011 vram=1.32GB 6s | grade=0.838 inner_auc=0.795 vs conf_auc=0.758
+14:31:17 ===== CYCLE 144 (OUTER -> INNER -> FEEDBACK) =====
+14:31:23 [enc/video/hmdb51] vote=0.650 uniform=0.604 best1=0.652 n_val=1839 vram=1.22GB 6s | grade=0.836 inner_auc=0.833 vs conf_auc=0.801
+14:31:26 ===== CYCLE 145 (OUTER -> INNER -> FEEDBACK) =====
+14:31:34 [enc/video/hmdb51] vote=0.648 uniform=0.588 best1=0.647 n_val=2099 vram=1.34GB 8s | grade=0.846 inner_auc=0.772 vs conf_auc=0.767
+14:31:39 ===== CYCLE 146 (OUTER -> INNER -> FEEDBACK) =====
+14:31:50 [enc/video/hmdb51] vote=0.604 uniform=0.564 best1=0.601 n_val=2132 vram=1.34GB 11s | grade=0.822 inner_auc=0.788 vs conf_auc=0.768
+14:31:53 ===== CYCLE 147 (OUTER -> INNER -> FEEDBACK) =====
+14:32:00 [enc/video/hmdb51] vote=0.605 uniform=0.554 best1=0.605 n_val=2161 vram=1.34GB 7s | grade=0.847 inner_auc=0.770 vs conf_auc=0.768
+14:32:03 ===== CYCLE 148 (OUTER -> INNER -> FEEDBACK) =====
+14:32:09 [enc/video/hmdb51] vote=0.624 uniform=0.585 best1=0.622 n_val=1919 vram=1.27GB 7s | grade=0.839 inner_auc=0.789 vs conf_auc=0.785
+14:32:12 ===== CYCLE 149 (OUTER -> INNER -> FEEDBACK) =====
+14:32:19 [enc/video/hmdb51] vote=0.649 uniform=0.619 best1=0.646 n_val=1787 vram=1.19GB 7s | grade=0.839 inner_auc=0.839 vs conf_auc=0.813
+14:32:22 ===== CYCLE 150 (OUTER -> INNER -> FEEDBACK) =====
+14:32:31 [enc/video/hmdb51] vote=0.637 uniform=0.582 best1=0.634 n_val=1791 vram=1.19GB 8s | grade=0.839 inner_auc=0.807 vs conf_auc=0.776
+14:32:35 ===== CYCLE 151 (OUTER -> INNER -> FEEDBACK) =====
+14:32:45 [enc/video/hmdb51] vote=0.632 uniform=0.602 best1=0.626 n_val=1966 vram=1.29GB 10s | grade=0.846 inner_auc=0.858 vs conf_auc=0.852
+14:32:49 ===== CYCLE 152 (OUTER -> INNER -> FEEDBACK) =====
+14:32:56 [enc/video/hmdb51] vote=0.642 uniform=0.612 best1=0.639 n_val=1932 vram=1.27GB 7s | grade=0.839 inner_auc=0.797 vs conf_auc=0.776
+14:33:00 ===== CYCLE 153 (OUTER -> INNER -> FEEDBACK) =====
+14:33:09 [enc/video/hmdb51] vote=0.609 uniform=0.582 best1=0.601 n_val=2098 vram=1.34GB 8s | grade=0.825 inner_auc=0.763 vs conf_auc=0.739
+14:33:12 ===== CYCLE 154 (OUTER -> INNER -> FEEDBACK) =====
+14:33:21 [enc/video/hmdb51] vote=0.600 uniform=0.547 best1=0.600 n_val=2215 vram=1.34GB 9s | grade=0.840 inner_auc=0.777 vs conf_auc=0.762
+14:33:25 ===== CYCLE 155 (OUTER -> INNER -> FEEDBACK) =====
+14:33:34 [enc/video/hmdb51] vote=0.636 uniform=0.601 best1=0.636 n_val=1845 vram=1.23GB 8s | grade=0.828 inner_auc=0.734 vs conf_auc=0.727
+14:33:38 ===== CYCLE 156 (OUTER -> INNER -> FEEDBACK) =====
+14:33:48 [enc/video/hmdb51] vote=0.589 uniform=0.558 best1=0.582 n_val=2328 vram=1.34GB 10s | grade=0.812 inner_auc=0.811 vs conf_auc=0.809
+14:33:52 ===== CYCLE 157 (OUTER -> INNER -> FEEDBACK) =====
+14:34:02 [enc/video/hmdb51] vote=0.617 uniform=0.554 best1=0.615 n_val=1923 vram=1.27GB 10s | grade=0.832 inner_auc=0.800 vs conf_auc=0.798
+14:34:08 ===== CYCLE 158 (OUTER -> INNER -> FEEDBACK) =====
+14:34:21 [enc/video/hmdb51] vote=0.604 uniform=0.562 best1=0.596 n_val=2050 vram=1.34GB 12s | grade=0.836 inner_auc=0.773 vs conf_auc=0.753
+14:34:27 ===== CYCLE 159 (OUTER -> INNER -> FEEDBACK) =====
+14:34:39 [enc/video/hmdb51] vote=0.629 uniform=0.602 best1=0.621 n_val=2187 vram=1.34GB 12s | grade=0.830 inner_auc=0.776 vs conf_auc=0.752
+14:34:45 ===== CYCLE 160 (OUTER -> INNER -> FEEDBACK) =====
+14:34:53 [enc/video/hmdb51] vote=0.615 uniform=0.573 best1=0.613 n_val=2085 vram=1.34GB 8s | grade=0.839 inner_auc=0.789 vs conf_auc=0.762
+14:34:57 ===== CYCLE 161 (OUTER -> INNER -> FEEDBACK) =====
+14:35:03 [enc/video/hmdb51] vote=0.634 uniform=0.589 best1=0.625 n_val=2094 vram=1.34GB 6s | grade=0.836 inner_auc=0.752 vs conf_auc=0.733
+14:35:06 ===== CYCLE 162 (OUTER -> INNER -> FEEDBACK) =====
+14:35:12 [enc/video/hmdb51] vote=0.639 uniform=0.603 best1=0.635 n_val=2087 vram=1.34GB 7s | grade=0.844 inner_auc=0.799 vs conf_auc=0.778
+14:35:16 ===== CYCLE 163 (OUTER -> INNER -> FEEDBACK) =====
+14:35:23 [enc/video/hmdb51] vote=0.632 uniform=0.581 best1=0.628 n_val=2009 vram=1.32GB 8s | grade=0.841 inner_auc=0.765 vs conf_auc=0.756
+14:35:27 ===== CYCLE 164 (OUTER -> INNER -> FEEDBACK) =====
+14:35:34 [enc/video/hmdb51] vote=0.620 uniform=0.586 best1=0.609 n_val=1903 vram=1.26GB 7s | grade=0.840 inner_auc=0.769 vs conf_auc=0.762
+14:35:39 ===== CYCLE 165 (OUTER -> INNER -> FEEDBACK) =====
+14:35:48 [enc/video/hmdb51] vote=0.594 uniform=0.545 best1=0.592 n_val=2131 vram=1.34GB 9s | grade=0.831 inner_auc=0.778 vs conf_auc=0.776
+14:35:52 ===== CYCLE 166 (OUTER -> INNER -> FEEDBACK) =====
+14:35:59 [enc/video/hmdb51] vote=0.601 uniform=0.568 best1=0.594 n_val=2224 vram=1.34GB 6s | grade=0.835 inner_auc=0.775 vs conf_auc=0.763
+14:36:01 ===== CYCLE 167 (OUTER -> INNER -> FEEDBACK) =====
+14:36:07 [enc/video/hmdb51] vote=0.641 uniform=0.610 best1=0.640 n_val=1790 vram=1.19GB 6s | grade=0.831 inner_auc=0.877 vs conf_auc=0.848
+14:36:10 ===== CYCLE 168 (OUTER -> INNER -> FEEDBACK) =====
+14:36:17 [enc/video/hmdb51] vote=0.608 uniform=0.567 best1=0.606 n_val=1955 vram=1.29GB 7s | grade=0.829 inner_auc=0.791 vs conf_auc=0.790
+14:36:21 ===== CYCLE 169 (OUTER -> INNER -> FEEDBACK) =====
+14:36:31 [enc/video/hmdb51] vote=0.598 uniform=0.560 best1=0.598 n_val=2075 vram=1.34GB 10s | grade=0.836 inner_auc=0.803 vs conf_auc=0.779
+14:36:35 ===== CYCLE 170 (OUTER -> INNER -> FEEDBACK) =====
+14:36:43 [enc/video/hmdb51] vote=0.605 uniform=0.560 best1=0.602 n_val=2294 vram=1.34GB 8s | grade=0.842 inner_auc=0.801 vs conf_auc=0.798
+14:36:49 ===== CYCLE 171 (OUTER -> INNER -> FEEDBACK) =====
+14:36:54 [enc/video/hmdb51] vote=0.638 uniform=0.576 best1=0.634 n_val=1932 vram=1.27GB 6s | grade=0.832 inner_auc=0.796 vs conf_auc=0.789
+14:36:58 ===== CYCLE 172 (OUTER -> INNER -> FEEDBACK) =====
+14:37:06 [enc/video/hmdb51] vote=0.645 uniform=0.601 best1=0.638 n_val=1840 vram=1.22GB 8s | grade=0.844 inner_auc=0.819 vs conf_auc=0.786
+14:37:10 ===== CYCLE 173 (OUTER -> INNER -> FEEDBACK) =====
+14:37:17 [enc/video/hmdb51] vote=0.608 uniform=0.558 best1=0.606 n_val=2274 vram=1.34GB 7s | grade=0.826 inner_auc=0.779 vs conf_auc=0.779
+14:37:20 ===== CYCLE 174 (OUTER -> INNER -> FEEDBACK) =====
+14:37:26 [enc/video/hmdb51] vote=0.605 uniform=0.554 best1=0.608 n_val=2185 vram=1.34GB 6s | grade=0.843 inner_auc=0.809 vs conf_auc=0.799
+14:37:30 ===== CYCLE 175 (OUTER -> INNER -> FEEDBACK) =====
+14:37:38 [enc/video/hmdb51] vote=0.636 uniform=0.585 best1=0.633 n_val=2190 vram=1.34GB 8s | grade=0.833 inner_auc=0.756 vs conf_auc=0.750
+14:37:42 ===== CYCLE 176 (OUTER -> INNER -> FEEDBACK) =====
+14:37:52 [enc/video/hmdb51] vote=0.601 uniform=0.561 best1=0.596 n_val=1963 vram=1.29GB 11s | grade=0.829 inner_auc=0.823 vs conf_auc=0.813
+14:37:58 ===== CYCLE 177 (OUTER -> INNER -> FEEDBACK) =====
+14:38:09 [enc/video/hmdb51] vote=0.653 uniform=0.617 best1=0.650 n_val=1920 vram=1.27GB 11s | grade=0.817 inner_auc=0.815 vs conf_auc=0.812
+14:38:14 ===== CYCLE 178 (OUTER -> INNER -> FEEDBACK) =====
+14:38:25 [enc/video/hmdb51] vote=0.603 uniform=0.573 best1=0.603 n_val=2061 vram=1.34GB 11s | grade=0.818 inner_auc=0.760 vs conf_auc=0.742
+14:38:28 ===== CYCLE 179 (OUTER -> INNER -> FEEDBACK) =====
+14:38:36 [enc/video/hmdb51] vote=0.607 uniform=0.576 best1=0.604 n_val=2089 vram=1.34GB 8s | grade=0.845 inner_auc=0.792 vs conf_auc=0.782
+14:38:39 ===== CYCLE 180 (OUTER -> INNER -> FEEDBACK) =====
+14:38:48 [enc/video/hmdb51] vote=0.618 uniform=0.578 best1=0.619 n_val=1957 vram=1.29GB 8s | grade=0.835 inner_auc=0.811 vs conf_auc=0.811
+14:38:52 ===== CYCLE 181 (OUTER -> INNER -> FEEDBACK) =====
+14:39:00 [enc/video/hmdb51] vote=0.627 uniform=0.585 best1=0.630 n_val=1809 vram=1.20GB 8s | grade=0.844 inner_auc=0.815 vs conf_auc=0.810
+14:39:03 ===== CYCLE 182 (OUTER -> INNER -> FEEDBACK) =====
+14:39:12 [enc/video/hmdb51] vote=0.644 uniform=0.593 best1=0.647 n_val=1847 vram=1.23GB 9s | grade=0.848 inner_auc=0.812 vs conf_auc=0.789
+14:39:18 ===== CYCLE 183 (OUTER -> INNER -> FEEDBACK) =====
+14:39:28 [enc/video/hmdb51] vote=0.649 uniform=0.613 best1=0.644 n_val=2245 vram=1.34GB 10s | grade=0.851 inner_auc=0.803 vs conf_auc=0.793
+14:39:32 ===== CYCLE 184 (OUTER -> INNER -> FEEDBACK) =====
+14:39:40 [enc/video/hmdb51] vote=0.656 uniform=0.603 best1=0.649 n_val=1924 vram=1.27GB 8s | grade=0.846 inner_auc=0.789 vs conf_auc=0.757
+14:39:44 ===== CYCLE 185 (OUTER -> INNER -> FEEDBACK) =====
+14:39:54 [enc/video/hmdb51] vote=0.654 uniform=0.604 best1=0.645 n_val=1727 vram=1.16GB 10s | grade=0.844 inner_auc=0.780 vs conf_auc=0.769
+14:39:58 ===== CYCLE 186 (OUTER -> INNER -> FEEDBACK) =====
+14:40:07 [enc/video/hmdb51] vote=0.658 uniform=0.622 best1=0.655 n_val=1960 vram=1.29GB 9s | grade=0.850 inner_auc=0.794 vs conf_auc=0.788
+14:40:11 ===== CYCLE 187 (OUTER -> INNER -> FEEDBACK) =====
+14:40:21 [enc/video/hmdb51] vote=0.622 uniform=0.592 best1=0.614 n_val=2112 vram=1.34GB 9s | grade=0.830 inner_auc=0.781 vs conf_auc=0.763
+14:40:26 ===== CYCLE 188 (OUTER -> INNER -> FEEDBACK) =====
+14:40:36 [enc/video/hmdb51] vote=0.677 uniform=0.647 best1=0.675 n_val=2000 vram=1.31GB 10s | grade=0.821 inner_auc=0.813 vs conf_auc=0.796
+14:40:39 ===== CYCLE 189 (OUTER -> INNER -> FEEDBACK) =====
+14:40:46 [enc/video/hmdb51] vote=0.568 uniform=0.540 best1=0.563 n_val=2188 vram=1.34GB 7s | grade=0.784 inner_auc=0.794 vs conf_auc=0.778
+14:40:50 ===== CYCLE 190 (OUTER -> INNER -> FEEDBACK) =====
+14:40:59 [enc/video/hmdb51] vote=0.626 uniform=0.586 best1=0.625 n_val=2126 vram=1.34GB 9s | grade=0.815 inner_auc=0.775 vs conf_auc=0.775
+14:41:04 ===== CYCLE 191 (OUTER -> INNER -> FEEDBACK) =====
+14:41:12 [enc/video/hmdb51] vote=0.637 uniform=0.606 best1=0.628 n_val=1824 vram=1.21GB 8s | grade=0.839 inner_auc=0.759 vs conf_auc=0.734
+14:41:16 ===== CYCLE 192 (OUTER -> INNER -> FEEDBACK) =====
+14:41:25 [enc/video/hmdb51] vote=0.599 uniform=0.568 best1=0.600 n_val=2248 vram=1.34GB 9s | grade=0.825 inner_auc=0.807 vs conf_auc=0.796
+14:41:30 ===== CYCLE 193 (OUTER -> INNER -> FEEDBACK) =====
+14:41:38 [enc/video/hmdb51] vote=0.611 uniform=0.552 best1=0.608 n_val=1899 vram=1.25GB 7s | grade=0.839 inner_auc=0.696 vs conf_auc=0.686
+14:41:42 ===== CYCLE 194 (OUTER -> INNER -> FEEDBACK) =====
+14:41:53 [enc/video/hmdb51] vote=0.593 uniform=0.554 best1=0.588 n_val=2095 vram=1.34GB 11s | grade=0.836 inner_auc=0.748 vs conf_auc=0.739
+14:41:59 ===== CYCLE 195 (OUTER -> INNER -> FEEDBACK) =====
+14:42:10 [enc/video/hmdb51] vote=0.604 uniform=0.563 best1=0.603 n_val=2086 vram=1.34GB 11s | grade=0.838 inner_auc=0.803 vs conf_auc=0.806
+14:42:15 ===== CYCLE 196 (OUTER -> INNER -> FEEDBACK) =====
+14:42:25 [enc/video/hmdb51] vote=0.627 uniform=0.601 best1=0.624 n_val=2440 vram=1.34GB 10s | grade=0.831 inner_auc=0.786 vs conf_auc=0.768
+14:42:28 ===== CYCLE 197 (OUTER -> INNER -> FEEDBACK) =====
+14:42:36 [enc/video/hmdb51] vote=0.599 uniform=0.537 best1=0.596 n_val=2157 vram=1.34GB 7s | grade=0.826 inner_auc=0.798 vs conf_auc=0.802
+14:42:39 ===== CYCLE 198 (OUTER -> INNER -> FEEDBACK) =====
+14:42:47 [enc/video/hmdb51] vote=0.645 uniform=0.602 best1=0.640 n_val=2046 vram=1.34GB 8s | grade=0.824 inner_auc=0.778 vs conf_auc=0.766
+14:42:51 ===== CYCLE 199 (OUTER -> INNER -> FEEDBACK) =====
+14:42:59 [enc/video/hmdb51] vote=0.618 uniform=0.584 best1=0.617 n_val=1948 vram=1.28GB 8s | grade=0.829 inner_auc=0.776 vs conf_auc=0.759
+14:43:02 ===== CYCLE 200 (OUTER -> INNER -> FEEDBACK) =====
+14:43:10 [enc/video/hmdb51] vote=0.587 uniform=0.539 best1=0.585 n_val=2079 vram=1.34GB 8s | grade=0.827 inner_auc=0.830 vs conf_auc=0.818
+14:43:15 ===== CYCLE 201 (OUTER -> INNER -> FEEDBACK) =====
+14:43:25 [enc/video/hmdb51] vote=0.592 uniform=0.574 best1=0.583 n_val=2273 vram=1.34GB 9s | grade=0.840 inner_auc=0.820 vs conf_auc=0.805
+14:43:28 ===== CYCLE 202 (OUTER -> INNER -> FEEDBACK) =====
+14:43:35 [enc/video/hmdb51] vote=0.608 uniform=0.579 best1=0.603 n_val=1888 vram=1.25GB 7s | grade=0.841 inner_auc=0.795 vs conf_auc=0.778
+14:43:39 ===== CYCLE 203 (OUTER -> INNER -> FEEDBACK) =====
+14:43:46 [enc/video/hmdb51] vote=0.662 uniform=0.626 best1=0.659 n_val=2170 vram=1.34GB 7s | grade=0.817 inner_auc=0.823 vs conf_auc=0.802
+14:43:49 ===== CYCLE 204 (OUTER -> INNER -> FEEDBACK) =====
+14:43:58 [enc/video/hmdb51] vote=0.624 uniform=0.589 best1=0.624 n_val=2100 vram=1.34GB 10s | grade=0.825 inner_auc=0.802 vs conf_auc=0.799
+14:44:03 ===== CYCLE 205 (OUTER -> INNER -> FEEDBACK) =====
+14:44:16 [enc/video/hmdb51] vote=0.656 uniform=0.607 best1=0.647 n_val=1845 vram=1.23GB 12s | grade=0.837 inner_auc=0.746 vs conf_auc=0.730
+14:44:22 ===== CYCLE 206 (OUTER -> INNER -> FEEDBACK) =====
+14:44:33 [enc/video/hmdb51] vote=0.635 uniform=0.590 best1=0.632 n_val=2214 vram=1.34GB 12s | grade=0.841 inner_auc=0.775 vs conf_auc=0.771
+14:44:38 ===== CYCLE 207 (OUTER -> INNER -> FEEDBACK) =====
+14:44:46 [enc/video/hmdb51] vote=0.622 uniform=0.574 best1=0.616 n_val=2116 vram=1.34GB 8s | grade=0.835 inner_auc=0.772 vs conf_auc=0.767
+14:44:50 ===== CYCLE 208 (OUTER -> INNER -> FEEDBACK) =====
+14:44:58 [enc/video/hmdb51] vote=0.679 uniform=0.639 best1=0.679 n_val=1962 vram=1.29GB 8s | grade=0.825 inner_auc=0.803 vs conf_auc=0.773
+14:45:02 ===== CYCLE 209 (OUTER -> INNER -> FEEDBACK) =====
+14:45:11 [enc/video/hmdb51] vote=0.618 uniform=0.575 best1=0.613 n_val=1875 vram=1.24GB 9s | grade=0.813 inner_auc=0.794 vs conf_auc=0.773
+14:45:16 ===== CYCLE 210 (OUTER -> INNER -> FEEDBACK) =====
+14:45:24 [enc/video/hmdb51] vote=0.625 uniform=0.601 best1=0.622 n_val=2033 vram=1.33GB 8s | grade=0.840 inner_auc=0.833 vs conf_auc=0.794
+14:45:28 ===== CYCLE 211 (OUTER -> INNER -> FEEDBACK) =====
+14:45:37 [enc/video/hmdb51] vote=0.638 uniform=0.606 best1=0.635 n_val=1989 vram=1.31GB 9s | grade=0.840 inner_auc=0.878 vs conf_auc=0.863
+14:45:42 ===== CYCLE 212 (OUTER -> INNER -> FEEDBACK) =====
+14:45:53 [enc/video/hmdb51] vote=0.626 uniform=0.585 best1=0.623 n_val=2374 vram=1.34GB 12s | grade=0.839 inner_auc=0.806 vs conf_auc=0.800
+14:45:59 ===== CYCLE 213 (OUTER -> INNER -> FEEDBACK) =====
+14:46:10 [enc/video/hmdb51] vote=0.586 uniform=0.538 best1=0.590 n_val=2428 vram=1.34GB 11s | grade=0.820 inner_auc=0.797 vs conf_auc=0.777
+14:46:15 ===== CYCLE 214 (OUTER -> INNER -> FEEDBACK) =====
+14:46:26 [enc/video/hmdb51] vote=0.632 uniform=0.589 best1=0.638 n_val=1671 vram=1.12GB 11s | grade=0.826 inner_auc=0.809 vs conf_auc=0.789
+14:46:29 ===== CYCLE 215 (OUTER -> INNER -> FEEDBACK) =====
+14:46:38 [enc/video/hmdb51] vote=0.667 uniform=0.632 best1=0.658 n_val=1705 vram=1.14GB 9s | grade=0.834 inner_auc=0.833 vs conf_auc=0.812
+14:46:41 ===== CYCLE 216 (OUTER -> INNER -> FEEDBACK) =====
+14:46:47 [enc/video/hmdb51] vote=0.640 uniform=0.633 best1=0.620 n_val=2104 vram=1.34GB 6s | grade=0.831 inner_auc=0.745 vs conf_auc=0.716
+14:46:50 ===== CYCLE 217 (OUTER -> INNER -> FEEDBACK) =====
+14:46:57 [enc/video/hmdb51] vote=0.620 uniform=0.574 best1=0.619 n_val=2001 vram=1.31GB 7s | grade=0.838 inner_auc=0.813 vs conf_auc=0.811
+14:47:00 ===== CYCLE 218 (OUTER -> INNER -> FEEDBACK) =====
+14:47:08 [enc/video/hmdb51] vote=0.637 uniform=0.600 best1=0.634 n_val=1971 vram=1.29GB 8s | grade=0.841 inner_auc=0.829 vs conf_auc=0.821
+14:47:12 ===== CYCLE 219 (OUTER -> INNER -> FEEDBACK) =====
+14:47:22 [enc/video/hmdb51] vote=0.612 uniform=0.570 best1=0.608 n_val=2219 vram=1.34GB 10s | grade=0.829 inner_auc=0.795 vs conf_auc=0.785
+14:47:25 ===== CYCLE 220 (OUTER -> INNER -> FEEDBACK) =====
+14:47:31 [enc/video/hmdb51] vote=0.603 uniform=0.568 best1=0.599 n_val=2105 vram=1.34GB 6s | grade=0.839 inner_auc=0.843 vs conf_auc=0.822
+14:47:34 ===== CYCLE 221 (OUTER -> INNER -> FEEDBACK) =====
+14:47:40 [enc/video/hmdb51] vote=0.639 uniform=0.602 best1=0.635 n_val=2382 vram=1.34GB 6s | grade=0.822 inner_auc=0.825 vs conf_auc=0.812
+14:47:44 ===== CYCLE 222 (OUTER -> INNER -> FEEDBACK) =====
+14:47:50 [enc/video/hmdb51] vote=0.638 uniform=0.594 best1=0.636 n_val=1802 vram=1.20GB 7s | grade=0.848 inner_auc=0.758 vs conf_auc=0.744
+14:47:54 ===== CYCLE 223 (OUTER -> INNER -> FEEDBACK) =====
+14:48:03 [enc/video/hmdb51] vote=0.620 uniform=0.589 best1=0.619 n_val=2003 vram=1.31GB 9s | grade=0.837 inner_auc=0.787 vs conf_auc=0.754
+14:48:08 ===== CYCLE 224 (OUTER -> INNER -> FEEDBACK) =====
+14:48:18 [enc/video/hmdb51] vote=0.618 uniform=0.589 best1=0.616 n_val=1819 vram=1.21GB 10s | grade=0.847 inner_auc=0.803 vs conf_auc=0.788
+14:48:23 ===== CYCLE 225 (OUTER -> INNER -> FEEDBACK) =====
+14:48:29 [enc/video/hmdb51] vote=0.603 uniform=0.559 best1=0.602 n_val=2053 vram=1.34GB 6s | grade=0.839 inner_auc=0.781 vs conf_auc=0.755
+14:48:32 ===== CYCLE 226 (OUTER -> INNER -> FEEDBACK) =====
+14:48:38 [enc/video/hmdb51] vote=0.638 uniform=0.609 best1=0.631 n_val=2127 vram=1.34GB 6s | grade=0.830 inner_auc=0.861 vs conf_auc=0.832
+14:48:42 ===== CYCLE 227 (OUTER -> INNER -> FEEDBACK) =====
+14:48:49 [enc/video/hmdb51] vote=0.590 uniform=0.561 best1=0.585 n_val=2210 vram=1.34GB 7s | grade=0.820 inner_auc=0.793 vs conf_auc=0.767
+14:48:52 ===== CYCLE 228 (OUTER -> INNER -> FEEDBACK) =====
+14:48:59 [enc/video/hmdb51] vote=0.589 uniform=0.565 best1=0.589 n_val=2293 vram=1.34GB 6s | grade=0.837 inner_auc=0.765 vs conf_auc=0.749
+14:49:03 ===== CYCLE 229 (OUTER -> INNER -> FEEDBACK) =====
+14:49:09 [enc/video/hmdb51] vote=0.624 uniform=0.588 best1=0.628 n_val=1951 vram=1.29GB 6s | grade=0.833 inner_auc=0.819 vs conf_auc=0.801
+14:49:13 ===== CYCLE 230 (OUTER -> INNER -> FEEDBACK) =====
+14:49:22 [enc/video/hmdb51] vote=0.644 uniform=0.618 best1=0.639 n_val=1897 vram=1.25GB 10s | grade=0.842 inner_auc=0.802 vs conf_auc=0.778
+14:49:28 ===== CYCLE 231 (OUTER -> INNER -> FEEDBACK) =====
+14:49:41 [enc/video/hmdb51] vote=0.614 uniform=0.591 best1=0.610 n_val=1878 vram=1.24GB 12s | grade=0.835 inner_auc=0.824 vs conf_auc=0.811
+14:49:47 ===== CYCLE 232 (OUTER -> INNER -> FEEDBACK) =====
+14:49:59 [enc/video/hmdb51] vote=0.588 uniform=0.550 best1=0.585 n_val=2093 vram=1.34GB 12s | grade=0.822 inner_auc=0.822 vs conf_auc=0.797
+14:50:05 ===== CYCLE 233 (OUTER -> INNER -> FEEDBACK) =====
+14:50:14 [enc/video/hmdb51] vote=0.585 uniform=0.555 best1=0.586 n_val=2135 vram=1.34GB 9s | grade=0.842 inner_auc=0.791 vs conf_auc=0.785
+14:50:19 ===== CYCLE 234 (OUTER -> INNER -> FEEDBACK) =====
+14:50:27 [enc/video/hmdb51] vote=0.598 uniform=0.557 best1=0.597 n_val=2101 vram=1.34GB 8s | grade=0.833 inner_auc=0.812 vs conf_auc=0.816
+14:50:31 ===== CYCLE 235 (OUTER -> INNER -> FEEDBACK) =====
+14:50:39 [enc/video/hmdb51] vote=0.588 uniform=0.554 best1=0.583 n_val=2287 vram=1.34GB 8s | grade=0.840 inner_auc=0.805 vs conf_auc=0.793
+14:50:43 ===== CYCLE 236 (OUTER -> INNER -> FEEDBACK) =====
+14:50:51 [enc/video/hmdb51] vote=0.637 uniform=0.587 best1=0.627 n_val=2101 vram=1.34GB 8s | grade=0.818 inner_auc=0.811 vs conf_auc=0.782
+14:50:56 ===== CYCLE 237 (OUTER -> INNER -> FEEDBACK) =====
+14:51:06 [enc/video/hmdb51] vote=0.586 uniform=0.541 best1=0.590 n_val=2157 vram=1.34GB 11s | grade=0.815 inner_auc=0.798 vs conf_auc=0.798
+14:51:12 ===== CYCLE 238 (OUTER -> INNER -> FEEDBACK) =====
+14:51:21 [enc/video/hmdb51] vote=0.646 uniform=0.589 best1=0.646 n_val=1789 vram=1.19GB 9s | grade=0.818 inner_auc=0.792 vs conf_auc=0.757
+14:51:24 ===== CYCLE 239 (OUTER -> INNER -> FEEDBACK) =====
+14:51:31 [enc/video/hmdb51] vote=0.636 uniform=0.597 best1=0.636 n_val=2021 vram=1.32GB 6s | grade=0.842 inner_auc=0.852 vs conf_auc=0.833
+14:51:34 ===== CYCLE 240 (OUTER -> INNER -> FEEDBACK) =====
+14:51:42 [enc/video/hmdb51] vote=0.654 uniform=0.608 best1=0.652 n_val=1777 vram=1.19GB 8s | grade=0.840 inner_auc=0.820 vs conf_auc=0.802
+14:51:46 ===== CYCLE 241 (OUTER -> INNER -> FEEDBACK) =====
+14:51:55 [enc/video/hmdb51] vote=0.626 uniform=0.583 best1=0.625 n_val=1971 vram=1.30GB 9s | grade=0.832 inner_auc=0.780 vs conf_auc=0.782
+14:52:01 ===== CYCLE 242 (OUTER -> INNER -> FEEDBACK) =====
+14:52:11 [enc/video/hmdb51] vote=0.627 uniform=0.585 best1=0.620 n_val=2049 vram=1.34GB 10s | grade=0.845 inner_auc=0.779 vs conf_auc=0.753
+14:52:16 ===== CYCLE 243 (OUTER -> INNER -> FEEDBACK) =====
+14:52:24 [enc/video/hmdb51] vote=0.618 uniform=0.584 best1=0.614 n_val=1996 vram=1.31GB 8s | grade=0.841 inner_auc=0.797 vs conf_auc=0.783
+14:52:27 ===== CYCLE 244 (OUTER -> INNER -> FEEDBACK) =====
+14:52:34 [enc/video/hmdb51] vote=0.613 uniform=0.558 best1=0.612 n_val=1902 vram=1.26GB 7s | grade=0.841 inner_auc=0.783 vs conf_auc=0.774
+14:52:38 ===== CYCLE 245 (OUTER -> INNER -> FEEDBACK) =====
+14:52:44 [enc/video/hmdb51] vote=0.641 uniform=0.611 best1=0.637 n_val=1979 vram=1.30GB 7s | grade=0.832 inner_auc=0.835 vs conf_auc=0.839
+14:52:47 ===== CYCLE 246 (OUTER -> INNER -> FEEDBACK) =====
+14:52:54 [enc/video/hmdb51] vote=0.613 uniform=0.579 best1=0.611 n_val=1939 vram=1.28GB 7s | grade=0.828 inner_auc=0.826 vs conf_auc=0.823
+14:52:58 ===== CYCLE 247 (OUTER -> INNER -> FEEDBACK) =====
+14:53:04 [enc/video/hmdb51] vote=0.649 uniform=0.577 best1=0.651 n_val=1816 vram=1.21GB 6s | grade=0.832 inner_auc=0.771 vs conf_auc=0.785
+14:53:07 ===== CYCLE 248 (OUTER -> INNER -> FEEDBACK) =====
+14:53:15 [enc/video/hmdb51] vote=0.621 uniform=0.594 best1=0.621 n_val=2048 vram=1.34GB 8s | grade=0.829 inner_auc=0.808 vs conf_auc=0.803
+14:53:20 ===== CYCLE 249 (OUTER -> INNER -> FEEDBACK) =====
+14:53:31 [enc/video/hmdb51] vote=0.603 uniform=0.559 best1=0.595 n_val=2109 vram=1.34GB 11s | grade=0.831 inner_auc=0.757 vs conf_auc=0.755
+14:53:37 ===== CYCLE 250 (OUTER -> INNER -> FEEDBACK) =====
+14:53:48 [enc/video/hmdb51] vote=0.614 uniform=0.580 best1=0.611 n_val=2436 vram=1.34GB 11s | grade=0.838 inner_auc=0.802 vs conf_auc=0.792
+14:53:54 ===== CYCLE 251 (OUTER -> INNER -> FEEDBACK) =====
+14:54:02 [enc/video/hmdb51] vote=0.693 uniform=0.650 best1=0.693 n_val=1832 vram=1.22GB 7s | grade=0.818 inner_auc=0.759 vs conf_auc=0.730
+14:54:04 ===== CYCLE 252 (OUTER -> INNER -> FEEDBACK) =====
+14:54:11 [enc/video/hmdb51] vote=0.621 uniform=0.612 best1=0.617 n_val=2044 vram=1.34GB 7s | grade=0.816 inner_auc=0.791 vs conf_auc=0.781
+14:54:14 ===== CYCLE 253 (OUTER -> INNER -> FEEDBACK) =====
+14:54:21 [enc/video/hmdb51] vote=0.612 uniform=0.576 best1=0.611 n_val=2168 vram=1.34GB 7s | grade=0.839 inner_auc=0.815 vs conf_auc=0.803
+14:54:24 ===== CYCLE 254 (OUTER -> INNER -> FEEDBACK) =====
+14:54:30 [enc/video/hmdb51] vote=0.599 uniform=0.559 best1=0.593 n_val=2194 vram=1.34GB 6s | grade=0.833 inner_auc=0.830 vs conf_auc=0.801
+14:54:33 ===== CYCLE 255 (OUTER -> INNER -> FEEDBACK) =====
+14:54:41 [enc/video/hmdb51] vote=0.605 uniform=0.569 best1=0.601 n_val=2122 vram=1.34GB 8s | grade=0.840 inner_auc=0.817 vs conf_auc=0.806
+14:54:46 ===== CYCLE 256 (OUTER -> INNER -> FEEDBACK) =====
+14:54:54 [enc/video/hmdb51] vote=0.634 uniform=0.586 best1=0.633 n_val=2187 vram=1.34GB 8s | grade=0.830 inner_auc=0.765 vs conf_auc=0.754
+14:54:57 ===== CYCLE 257 (OUTER -> INNER -> FEEDBACK) =====
+14:55:05 [enc/video/hmdb51] vote=0.614 uniform=0.562 best1=0.611 n_val=2233 vram=1.34GB 8s | grade=0.835 inner_auc=0.787 vs conf_auc=0.753
+14:55:09 ===== CYCLE 258 (OUTER -> INNER -> FEEDBACK) =====
+14:55:19 [enc/video/hmdb51] vote=0.616 uniform=0.579 best1=0.619 n_val=2007 vram=1.32GB 10s | grade=0.846 inner_auc=0.805 vs conf_auc=0.793
+14:55:24 ===== CYCLE 259 (OUTER -> INNER -> FEEDBACK) =====
+14:55:34 [enc/video/hmdb51] vote=0.665 uniform=0.624 best1=0.660 n_val=1708 vram=1.15GB 10s | grade=0.828 inner_auc=0.837 vs conf_auc=0.832
+14:55:40 ===== CYCLE 260 (OUTER -> INNER -> FEEDBACK) =====
+14:55:52 [enc/video/hmdb51] vote=0.632 uniform=0.603 best1=0.624 n_val=1965 vram=1.29GB 12s | grade=0.830 inner_auc=0.828 vs conf_auc=0.807
+14:55:58 ===== CYCLE 261 (OUTER -> INNER -> FEEDBACK) =====
+14:56:09 [enc/video/hmdb51] vote=0.587 uniform=0.555 best1=0.588 n_val=2039 vram=1.34GB 11s | grade=0.822 inner_auc=0.766 vs conf_auc=0.759
+14:56:13 ===== CYCLE 262 (OUTER -> INNER -> FEEDBACK) =====
+14:56:21 [enc/video/hmdb51] vote=0.620 uniform=0.577 best1=0.615 n_val=2049 vram=1.34GB 8s | grade=0.829 inner_auc=0.764 vs conf_auc=0.766
+14:56:25 ===== CYCLE 263 (OUTER -> INNER -> FEEDBACK) =====
+14:56:34 [enc/video/hmdb51] vote=0.640 uniform=0.597 best1=0.637 n_val=1760 vram=1.18GB 9s | grade=0.839 inner_auc=0.802 vs conf_auc=0.790
+14:56:39 ===== CYCLE 264 (OUTER -> INNER -> FEEDBACK) =====
+14:56:47 [enc/video/hmdb51] vote=0.631 uniform=0.588 best1=0.628 n_val=2130 vram=1.34GB 8s | grade=0.838 inner_auc=0.759 vs conf_auc=0.746
+14:56:50 ===== CYCLE 265 (OUTER -> INNER -> FEEDBACK) =====
+14:56:56 [enc/video/hmdb51] vote=0.603 uniform=0.573 best1=0.605 n_val=2111 vram=1.34GB 7s | grade=0.833 inner_auc=0.822 vs conf_auc=0.807
+14:57:00 ===== CYCLE 266 (OUTER -> INNER -> FEEDBACK) =====
+14:57:08 [enc/video/hmdb51] vote=0.612 uniform=0.552 best1=0.610 n_val=2035 vram=1.33GB 8s | grade=0.838 inner_auc=0.740 vs conf_auc=0.713
+14:57:13 ===== CYCLE 267 (OUTER -> INNER -> FEEDBACK) =====
+14:57:25 [enc/video/hmdb51] vote=0.600 uniform=0.545 best1=0.598 n_val=2181 vram=1.34GB 11s | grade=0.836 inner_auc=0.786 vs conf_auc=0.777
+14:57:31 ===== CYCLE 268 (OUTER -> INNER -> FEEDBACK) =====
+14:57:43 [enc/video/hmdb51] vote=0.627 uniform=0.579 best1=0.624 n_val=2157 vram=1.34GB 12s | grade=0.825 inner_auc=0.762 vs conf_auc=0.759
+14:57:49 ===== CYCLE 269 (OUTER -> INNER -> FEEDBACK) =====
+14:57:58 [enc/video/hmdb51] vote=0.628 uniform=0.586 best1=0.623 n_val=1808 vram=1.20GB 9s | grade=0.846 inner_auc=0.811 vs conf_auc=0.804
+14:58:02 ===== CYCLE 270 (OUTER -> INNER -> FEEDBACK) =====
+14:58:09 [enc/video/hmdb51] vote=0.643 uniform=0.608 best1=0.642 n_val=1854 vram=1.23GB 7s | grade=0.839 inner_auc=0.827 vs conf_auc=0.795
+14:58:12 ===== CYCLE 271 (OUTER -> INNER -> FEEDBACK) =====
+14:58:18 [enc/video/hmdb51] vote=0.611 uniform=0.554 best1=0.611 n_val=2046 vram=1.34GB 6s | grade=0.826 inner_auc=0.777 vs conf_auc=0.786
+14:58:21 ===== CYCLE 272 (OUTER -> INNER -> FEEDBACK) =====
+14:58:28 [enc/video/hmdb51] vote=0.642 uniform=0.600 best1=0.642 n_val=2020 vram=1.32GB 7s | grade=0.833 inner_auc=0.773 vs conf_auc=0.770
+14:58:30 ===== CYCLE 273 (OUTER -> INNER -> FEEDBACK) =====
+14:58:39 [enc/video/hmdb51] vote=0.604 uniform=0.567 best1=0.603 n_val=2026 vram=1.33GB 8s | grade=0.822 inner_auc=0.782 vs conf_auc=0.763
+14:58:44 ===== CYCLE 274 (OUTER -> INNER -> FEEDBACK) =====
+14:58:52 [enc/video/hmdb51] vote=0.633 uniform=0.587 best1=0.629 n_val=2000 vram=1.31GB 7s | grade=0.828 inner_auc=0.780 vs conf_auc=0.778
+14:58:54 ===== CYCLE 275 (OUTER -> INNER -> FEEDBACK) =====
+14:59:01 [enc/video/hmdb51] vote=0.614 uniform=0.566 best1=0.617 n_val=2019 vram=1.32GB 7s | grade=0.838 inner_auc=0.806 vs conf_auc=0.798
+14:59:05 ===== CYCLE 276 (OUTER -> INNER -> FEEDBACK) =====
+14:59:13 [enc/video/hmdb51] vote=0.665 uniform=0.630 best1=0.661 n_val=1930 vram=1.27GB 8s | grade=0.830 inner_auc=0.843 vs conf_auc=0.821
+14:59:17 ===== CYCLE 277 (OUTER -> INNER -> FEEDBACK) =====
+14:59:24 [enc/video/hmdb51] vote=0.638 uniform=0.597 best1=0.636 n_val=2181 vram=1.34GB 7s | grade=0.831 inner_auc=0.847 vs conf_auc=0.840
+14:59:29 ===== CYCLE 278 (OUTER -> INNER -> FEEDBACK) =====
+14:59:38 [enc/video/hmdb51] vote=0.624 uniform=0.579 best1=0.622 n_val=2007 vram=1.32GB 9s | grade=0.841 inner_auc=0.813 vs conf_auc=0.786
+14:59:43 ===== CYCLE 279 (OUTER -> INNER -> FEEDBACK) =====
+14:59:53 [enc/video/hmdb51] vote=0.654 uniform=0.624 best1=0.643 n_val=2047 vram=1.34GB 10s | grade=0.826 inner_auc=0.823 vs conf_auc=0.815
+14:59:57 ===== CYCLE 280 (OUTER -> INNER -> FEEDBACK) =====
+15:00:03 [enc/video/hmdb51] vote=0.618 uniform=0.583 best1=0.615 n_val=2180 vram=1.34GB 7s | grade=0.828 inner_auc=0.792 vs conf_auc=0.784
+15:00:07 ===== CYCLE 281 (OUTER -> INNER -> FEEDBACK) =====
+15:00:14 [enc/video/hmdb51] vote=0.615 uniform=0.553 best1=0.614 n_val=2225 vram=1.34GB 7s | grade=0.843 inner_auc=0.727 vs conf_auc=0.735
+15:00:18 ===== CYCLE 282 (OUTER -> INNER -> FEEDBACK) =====
+15:00:26 [enc/video/hmdb51] vote=0.626 uniform=0.583 best1=0.625 n_val=1887 vram=1.25GB 8s | grade=0.843 inner_auc=0.834 vs conf_auc=0.822
+15:00:31 ===== CYCLE 283 (OUTER -> INNER -> FEEDBACK) =====
+15:00:41 [enc/video/hmdb51] vote=0.639 uniform=0.620 best1=0.632 n_val=1865 vram=1.24GB 10s | grade=0.843 inner_auc=0.808 vs conf_auc=0.778
+15:00:46 ===== CYCLE 284 (OUTER -> INNER -> FEEDBACK) =====
+15:00:57 [enc/video/hmdb51] vote=0.626 uniform=0.590 best1=0.619 n_val=2156 vram=1.34GB 11s | grade=0.835 inner_auc=0.787 vs conf_auc=0.768
+15:01:05 ===== CYCLE 285 (OUTER -> INNER -> FEEDBACK) =====
+15:01:18 [enc/video/hmdb51] vote=0.618 uniform=0.591 best1=0.617 n_val=2238 vram=1.34GB 13s | grade=0.841 inner_auc=0.789 vs conf_auc=0.778
+15:01:25 ===== CYCLE 286 (OUTER -> INNER -> FEEDBACK) =====
+15:01:38 [enc/video/hmdb51] vote=0.581 uniform=0.545 best1=0.581 n_val=2123 vram=1.34GB 13s | grade=0.826 inner_auc=0.778 vs conf_auc=0.773
+15:01:45 ===== CYCLE 287 (OUTER -> INNER -> FEEDBACK) =====
+15:01:56 [enc/video/hmdb51] vote=0.593 uniform=0.570 best1=0.587 n_val=2017 vram=1.32GB 11s | grade=0.833 inner_auc=0.810 vs conf_auc=0.799
+15:02:00 ===== CYCLE 288 (OUTER -> INNER -> FEEDBACK) =====
+15:02:09 [enc/video/hmdb51] vote=0.582 uniform=0.553 best1=0.575 n_val=2129 vram=1.34GB 9s | grade=0.832 inner_auc=0.775 vs conf_auc=0.780
+15:02:14 ===== CYCLE 289 (OUTER -> INNER -> FEEDBACK) =====
+15:02:22 [enc/video/hmdb51] vote=0.640 uniform=0.614 best1=0.635 n_val=2004 vram=1.31GB 8s | grade=0.814 inner_auc=0.801 vs conf_auc=0.773
+15:02:27 ===== CYCLE 290 (OUTER -> INNER -> FEEDBACK) =====
+15:02:35 [enc/video/hmdb51] vote=0.625 uniform=0.601 best1=0.622 n_val=2004 vram=1.31GB 8s | grade=0.838 inner_auc=0.818 vs conf_auc=0.797
+15:02:38 ===== CYCLE 291 (OUTER -> INNER -> FEEDBACK) =====
+15:02:47 [enc/video/hmdb51] vote=0.635 uniform=0.600 best1=0.632 n_val=1939 vram=1.28GB 9s | grade=0.841 inner_auc=0.772 vs conf_auc=0.755
+15:02:53 ===== CYCLE 292 (OUTER -> INNER -> FEEDBACK) =====
+15:03:00 [enc/video/hmdb51] vote=0.657 uniform=0.599 best1=0.653 n_val=1690 vram=1.14GB 8s | grade=0.835 inner_auc=0.767 vs conf_auc=0.753
+15:03:04 ===== CYCLE 293 (OUTER -> INNER -> FEEDBACK) =====
+15:03:11 [enc/video/hmdb51] vote=0.598 uniform=0.576 best1=0.592 n_val=1957 vram=1.29GB 6s | grade=0.810 inner_auc=0.771 vs conf_auc=0.768
+15:03:15 ===== CYCLE 294 (OUTER -> INNER -> FEEDBACK) =====
+15:03:22 [enc/video/hmdb51] vote=0.660 uniform=0.615 best1=0.659 n_val=1992 vram=1.31GB 7s | grade=0.813 inner_auc=0.826 vs conf_auc=0.812
+15:03:26 ===== CYCLE 295 (OUTER -> INNER -> FEEDBACK) =====
+15:03:37 [enc/video/hmdb51] vote=0.585 uniform=0.563 best1=0.586 n_val=1983 vram=1.30GB 11s | grade=0.807 inner_auc=0.759 vs conf_auc=0.751
+15:03:43 ===== CYCLE 296 (OUTER -> INNER -> FEEDBACK) =====
+15:03:52 [enc/video/hmdb51] vote=0.622 uniform=0.588 best1=0.620 n_val=2051 vram=1.34GB 9s | grade=0.826 inner_auc=0.825 vs conf_auc=0.814
+15:03:57 ===== CYCLE 297 (OUTER -> INNER -> FEEDBACK) =====
+15:04:04 [enc/video/hmdb51] vote=0.614 uniform=0.579 best1=0.610 n_val=2155 vram=1.34GB 7s | grade=0.842 inner_auc=0.834 vs conf_auc=0.807
+15:04:08 ===== CYCLE 298 (OUTER -> INNER -> FEEDBACK) =====
+15:04:15 [enc/video/hmdb51] vote=0.644 uniform=0.618 best1=0.637 n_val=1939 vram=1.28GB 6s | grade=0.836 inner_auc=0.772 vs conf_auc=0.754
+15:04:19 ===== CYCLE 299 (OUTER -> INNER -> FEEDBACK) =====
+15:04:26 [enc/video/hmdb51] vote=0.640 uniform=0.621 best1=0.642 n_val=1940 vram=1.28GB 7s | grade=0.853 inner_auc=0.802 vs conf_auc=0.780
+15:04:29 ===== CYCLE 300 (OUTER -> INNER -> FEEDBACK) =====
+15:04:36 [enc/video/hmdb51] vote=0.607 uniform=0.575 best1=0.603 n_val=2354 vram=1.34GB 7s | grade=0.827 inner_auc=0.762 vs conf_auc=0.745
+15:04:39 ===== CYCLE 301 (OUTER -> INNER -> FEEDBACK) =====
+15:04:47 [enc/video/hmdb51] vote=0.618 uniform=0.570 best1=0.616 n_val=1839 vram=1.22GB 8s | grade=0.836 inner_auc=0.782 vs conf_auc=0.762
+15:04:53 ===== CYCLE 302 (OUTER -> INNER -> FEEDBACK) =====
+15:05:02 [enc/video/hmdb51] vote=0.601 uniform=0.554 best1=0.598 n_val=2294 vram=1.34GB 9s | grade=0.833 inner_auc=0.832 vs conf_auc=0.823
+15:05:08 ===== CYCLE 303 (OUTER -> INNER -> FEEDBACK) =====
+15:05:20 [enc/video/hmdb51] vote=0.598 uniform=0.575 best1=0.596 n_val=1747 vram=1.17GB 12s | grade=0.845 inner_auc=0.833 vs conf_auc=0.822
+15:05:26 ===== CYCLE 304 (OUTER -> INNER -> FEEDBACK) =====
+15:05:38 [enc/video/hmdb51] vote=0.605 uniform=0.561 best1=0.601 n_val=2181 vram=1.34GB 12s | grade=0.844 inner_auc=0.770 vs conf_auc=0.761
+15:05:42 ===== CYCLE 305 (OUTER -> INNER -> FEEDBACK) =====
+15:05:50 [enc/video/hmdb51] vote=0.664 uniform=0.634 best1=0.658 n_val=1740 vram=1.16GB 8s | grade=0.825 inner_auc=0.850 vs conf_auc=0.830
+15:05:53 ===== CYCLE 306 (OUTER -> INNER -> FEEDBACK) =====
+15:06:00 [enc/video/hmdb51] vote=0.674 uniform=0.642 best1=0.669 n_val=1844 vram=1.23GB 7s | grade=0.843 inner_auc=0.810 vs conf_auc=0.784
+15:06:03 ===== CYCLE 307 (OUTER -> INNER -> FEEDBACK) =====
+15:06:11 [enc/video/hmdb51] vote=0.611 uniform=0.578 best1=0.608 n_val=1931 vram=1.28GB 7s | grade=0.814 inner_auc=0.813 vs conf_auc=0.793
+15:06:15 ===== CYCLE 308 (OUTER -> INNER -> FEEDBACK) =====
+15:06:25 [enc/video/hmdb51] vote=0.603 uniform=0.570 best1=0.599 n_val=1978 vram=1.30GB 10s | grade=0.841 inner_auc=0.790 vs conf_auc=0.784
+15:06:32 ===== CYCLE 309 (OUTER -> INNER -> FEEDBACK) =====
+15:06:43 [enc/video/hmdb51] vote=0.634 uniform=0.585 best1=0.635 n_val=2061 vram=1.34GB 12s | grade=0.830 inner_auc=0.774 vs conf_auc=0.762
+15:06:48 ===== CYCLE 310 (OUTER -> INNER -> FEEDBACK) =====
+15:06:57 [enc/video/hmdb51] vote=0.647 uniform=0.612 best1=0.642 n_val=2033 vram=1.33GB 9s | grade=0.841 inner_auc=0.823 vs conf_auc=0.798
+15:07:02 ===== CYCLE 311 (OUTER -> INNER -> FEEDBACK) =====
+15:07:11 [enc/video/hmdb51] vote=0.618 uniform=0.585 best1=0.618 n_val=1958 vram=1.29GB 9s | grade=0.830 inner_auc=0.829 vs conf_auc=0.794
+15:07:16 ===== CYCLE 312 (OUTER -> INNER -> FEEDBACK) =====
+15:07:27 [enc/video/hmdb51] vote=0.620 uniform=0.569 best1=0.618 n_val=1964 vram=1.29GB 10s | grade=0.845 inner_auc=0.799 vs conf_auc=0.789
+15:07:33 ===== CYCLE 313 (OUTER -> INNER -> FEEDBACK) =====
+15:07:46 [enc/video/hmdb51] vote=0.647 uniform=0.584 best1=0.643 n_val=1998 vram=1.31GB 13s | grade=0.832 inner_auc=0.805 vs conf_auc=0.779
+15:07:53 ===== CYCLE 314 (OUTER -> INNER -> FEEDBACK) =====
+15:08:04 [enc/video/hmdb51] vote=0.629 uniform=0.602 best1=0.621 n_val=2068 vram=1.34GB 11s | grade=0.836 inner_auc=0.799 vs conf_auc=0.777
+15:08:08 ===== CYCLE 315 (OUTER -> INNER -> FEEDBACK) =====
+15:08:14 [enc/video/hmdb51] vote=0.631 uniform=0.593 best1=0.624 n_val=2080 vram=1.34GB 6s | grade=0.842 inner_auc=0.810 vs conf_auc=0.792
+15:08:18 ===== CYCLE 316 (OUTER -> INNER -> FEEDBACK) =====
+15:08:26 [enc/video/hmdb51] vote=0.623 uniform=0.582 best1=0.620 n_val=2299 vram=1.34GB 9s | grade=0.845 inner_auc=0.803 vs conf_auc=0.791
+15:08:32 ===== CYCLE 317 (OUTER -> INNER -> FEEDBACK) =====
+15:08:40 [enc/video/hmdb51] vote=0.599 uniform=0.551 best1=0.594 n_val=2150 vram=1.34GB 9s | grade=0.831 inner_auc=0.794 vs conf_auc=0.789
+15:08:44 ===== CYCLE 318 (OUTER -> INNER -> FEEDBACK) =====
+15:08:51 [enc/video/hmdb51] vote=0.621 uniform=0.567 best1=0.623 n_val=1966 vram=1.29GB 7s | grade=0.832 inner_auc=0.813 vs conf_auc=0.803
+15:08:56 ===== CYCLE 319 (OUTER -> INNER -> FEEDBACK) =====
+15:09:05 [enc/video/hmdb51] vote=0.620 uniform=0.584 best1=0.615 n_val=1843 vram=1.22GB 9s | grade=0.846 inner_auc=0.802 vs conf_auc=0.778
+15:09:12 ===== CYCLE 320 (OUTER -> INNER -> FEEDBACK) =====
+15:09:25 [enc/video/hmdb51] vote=0.623 uniform=0.574 best1=0.623 n_val=2016 vram=1.32GB 12s | grade=0.846 inner_auc=0.838 vs conf_auc=0.832
+15:09:31 ===== CYCLE 321 (OUTER -> INNER -> FEEDBACK) =====
+15:09:43 [enc/video/hmdb51] vote=0.624 uniform=0.594 best1=0.620 n_val=2101 vram=1.34GB 11s | grade=0.844 inner_auc=0.821 vs conf_auc=0.819
+15:09:49 ===== CYCLE 322 (OUTER -> INNER -> FEEDBACK) =====
+15:09:58 [enc/video/hmdb51] vote=0.651 uniform=0.598 best1=0.647 n_val=1730 vram=1.16GB 9s | grade=0.833 inner_auc=0.817 vs conf_auc=0.797
+15:10:02 ===== CYCLE 323 (OUTER -> INNER -> FEEDBACK) =====
+15:10:09 [enc/video/hmdb51] vote=0.620 uniform=0.599 best1=0.617 n_val=2253 vram=1.34GB 8s | grade=0.827 inner_auc=0.782 vs conf_auc=0.763
+15:10:14 ===== CYCLE 324 (OUTER -> INNER -> FEEDBACK) =====
+15:10:22 [enc/video/hmdb51] vote=0.636 uniform=0.591 best1=0.637 n_val=1762 vram=1.18GB 8s | grade=0.841 inner_auc=0.829 vs conf_auc=0.823
+15:10:25 ===== CYCLE 325 (OUTER -> INNER -> FEEDBACK) =====
+15:10:34 [enc/video/hmdb51] vote=0.586 uniform=0.542 best1=0.587 n_val=2122 vram=1.34GB 9s | grade=0.814 inner_auc=0.763 vs conf_auc=0.756
+15:10:40 ===== CYCLE 326 (OUTER -> INNER -> FEEDBACK) =====
+15:10:51 [enc/video/hmdb51] vote=0.630 uniform=0.600 best1=0.624 n_val=1967 vram=1.29GB 11s | grade=0.816 inner_auc=0.815 vs conf_auc=0.789
+15:10:56 ===== CYCLE 327 (OUTER -> INNER -> FEEDBACK) =====
+15:11:04 [enc/video/hmdb51] vote=0.589 uniform=0.550 best1=0.587 n_val=2160 vram=1.34GB 8s | grade=0.815 inner_auc=0.752 vs conf_auc=0.751
+15:11:08 ===== CYCLE 328 (OUTER -> INNER -> FEEDBACK) =====
+15:11:17 [enc/video/hmdb51] vote=0.604 uniform=0.568 best1=0.595 n_val=2183 vram=1.34GB 8s | grade=0.832 inner_auc=0.803 vs conf_auc=0.779
+15:11:22 ===== CYCLE 329 (OUTER -> INNER -> FEEDBACK) =====
+15:11:34 [enc/video/hmdb51] vote=0.631 uniform=0.592 best1=0.634 n_val=1995 vram=1.31GB 12s | grade=0.838 inner_auc=0.803 vs conf_auc=0.790
+15:11:41 ===== CYCLE 330 (OUTER -> INNER -> FEEDBACK) =====
+15:11:52 [enc/video/hmdb51] vote=0.651 uniform=0.623 best1=0.646 n_val=1914 vram=1.26GB 11s | grade=0.840 inner_auc=0.852 vs conf_auc=0.829
+15:11:57 ===== CYCLE 331 (OUTER -> INNER -> FEEDBACK) =====
+15:12:07 [enc/video/hmdb51] vote=0.604 uniform=0.569 best1=0.603 n_val=2182 vram=1.34GB 10s | grade=0.820 inner_auc=0.818 vs conf_auc=0.817
+15:12:13 ===== CYCLE 332 (OUTER -> INNER -> FEEDBACK) =====
+15:12:24 [enc/video/hmdb51] vote=0.634 uniform=0.603 best1=0.634 n_val=2037 vram=1.33GB 11s | grade=0.829 inner_auc=0.829 vs conf_auc=0.810
+15:12:30 ===== CYCLE 333 (OUTER -> INNER -> FEEDBACK) =====
+15:12:40 [enc/video/hmdb51] vote=0.633 uniform=0.601 best1=0.631 n_val=2075 vram=1.34GB 11s | grade=0.847 inner_auc=0.809 vs conf_auc=0.785
+15:12:46 ===== CYCLE 334 (OUTER -> INNER -> FEEDBACK) =====
+15:13:03 [enc/video/hmdb51] vote=0.616 uniform=0.587 best1=0.609 n_val=2161 vram=1.34GB 17s | grade=0.838 inner_auc=0.798 vs conf_auc=0.778
+15:13:09 ===== CYCLE 335 (OUTER -> INNER -> FEEDBACK) =====
+15:13:20 [enc/video/hmdb51] vote=0.624 uniform=0.577 best1=0.620 n_val=2066 vram=1.34GB 12s | grade=0.842 inner_auc=0.803 vs conf_auc=0.792
+15:13:28 ===== CYCLE 336 (OUTER -> INNER -> FEEDBACK) =====
+15:13:43 [enc/video/hmdb51] vote=0.630 uniform=0.602 best1=0.629 n_val=2105 vram=1.34GB 14s | grade=0.848 inner_auc=0.791 vs conf_auc=0.740
+15:13:50 ===== CYCLE 337 (OUTER -> INNER -> FEEDBACK) =====
+15:14:05 [enc/video/hmdb51] vote=0.618 uniform=0.576 best1=0.614 n_val=2103 vram=1.34GB 14s | grade=0.839 inner_auc=0.810 vs conf_auc=0.806
+15:14:12 ===== CYCLE 338 (OUTER -> INNER -> FEEDBACK) =====
+15:14:24 [enc/video/hmdb51] vote=0.630 uniform=0.587 best1=0.626 n_val=1747 vram=1.17GB 11s | grade=0.843 inner_auc=0.699 vs conf_auc=0.687
+15:14:28 ===== CYCLE 339 (OUTER -> INNER -> FEEDBACK) =====
+15:14:40 [enc/video/hmdb51] vote=0.630 uniform=0.598 best1=0.628 n_val=2127 vram=1.34GB 12s | grade=0.847 inner_auc=0.824 vs conf_auc=0.805
+15:14:47 ===== CYCLE 340 (OUTER -> INNER -> FEEDBACK) =====
+15:14:56 [enc/video/hmdb51] vote=0.603 uniform=0.558 best1=0.601 n_val=2002 vram=1.31GB 10s | grade=0.836 inner_auc=0.772 vs conf_auc=0.761
+15:15:01 ===== CYCLE 341 (OUTER -> INNER -> FEEDBACK) =====
+15:15:12 [enc/video/hmdb51] vote=0.657 uniform=0.599 best1=0.657 n_val=1877 vram=1.24GB 11s | grade=0.819 inner_auc=0.841 vs conf_auc=0.814
+15:15:19 ===== CYCLE 342 (OUTER -> INNER -> FEEDBACK) =====
+15:15:32 [enc/video/hmdb51] vote=0.605 uniform=0.547 best1=0.600 n_val=1946 vram=1.28GB 13s | grade=0.811 inner_auc=0.829 vs conf_auc=0.806
+15:15:37 ===== CYCLE 343 (OUTER -> INNER -> FEEDBACK) =====
+15:15:50 [enc/video/hmdb51] vote=0.587 uniform=0.522 best1=0.587 n_val=1999 vram=1.31GB 12s | grade=0.830 inner_auc=0.791 vs conf_auc=0.773
+15:15:54 ===== CYCLE 344 (OUTER -> INNER -> FEEDBACK) =====
+15:16:05 [enc/video/hmdb51] vote=0.601 uniform=0.563 best1=0.595 n_val=1946 vram=1.28GB 11s | grade=0.835 inner_auc=0.799 vs conf_auc=0.792
+15:16:11 ===== CYCLE 345 (OUTER -> INNER -> FEEDBACK) =====
+15:16:28 [enc/video/hmdb51] vote=0.591 uniform=0.553 best1=0.589 n_val=1957 vram=1.29GB 17s | grade=0.836 inner_auc=0.826 vs conf_auc=0.812
+15:16:35 ===== CYCLE 346 (OUTER -> INNER -> FEEDBACK) =====
+15:16:47 [enc/video/hmdb51] vote=0.591 uniform=0.535 best1=0.591 n_val=1933 vram=1.27GB 12s | grade=0.842 inner_auc=0.779 vs conf_auc=0.775
+15:16:52 ===== CYCLE 347 (OUTER -> INNER -> FEEDBACK) =====
+15:17:02 [enc/video/hmdb51] vote=0.590 uniform=0.557 best1=0.590 n_val=1975 vram=1.30GB 10s | grade=0.845 inner_auc=0.820 vs conf_auc=0.788
+15:17:08 ===== CYCLE 348 (OUTER -> INNER -> FEEDBACK) =====
+15:17:20 [enc/video/hmdb51] vote=0.633 uniform=0.588 best1=0.633 n_val=1953 vram=1.29GB 12s | grade=0.818 inner_auc=0.825 vs conf_auc=0.809
+15:17:26 ===== CYCLE 349 (OUTER -> INNER -> FEEDBACK) =====
+15:17:36 [enc/video/hmdb51] vote=0.631 uniform=0.607 best1=0.631 n_val=1866 vram=1.24GB 10s | grade=0.851 inner_auc=0.817 vs conf_auc=0.807
+15:17:41 ===== CYCLE 350 (OUTER -> INNER -> FEEDBACK) =====
+15:17:56 [enc/video/hmdb51] vote=0.586 uniform=0.545 best1=0.587 n_val=2213 vram=1.34GB 15s | grade=0.821 inner_auc=0.777 vs conf_auc=0.763
+15:18:04 ===== CYCLE 351 (OUTER -> INNER -> FEEDBACK) =====
+15:18:20 [enc/video/hmdb51] vote=0.629 uniform=0.594 best1=0.626 n_val=1938 vram=1.28GB 16s | grade=0.828 inner_auc=0.810 vs conf_auc=0.794
+15:18:28 ===== CYCLE 352 (OUTER -> INNER -> FEEDBACK) =====
+15:18:44 [enc/video/hmdb51] vote=0.595 uniform=0.570 best1=0.596 n_val=1980 vram=1.30GB 16s | grade=0.827 inner_auc=0.822 vs conf_auc=0.830
+15:18:51 ===== CYCLE 353 (OUTER -> INNER -> FEEDBACK) =====
+15:19:04 [enc/video/hmdb51] vote=0.616 uniform=0.573 best1=0.614 n_val=2048 vram=1.34GB 13s | grade=0.836 inner_auc=0.791 vs conf_auc=0.780
+15:19:10 ===== CYCLE 354 (OUTER -> INNER -> FEEDBACK) =====
+15:19:22 [enc/video/hmdb51] vote=0.600 uniform=0.564 best1=0.597 n_val=2110 vram=1.34GB 12s | grade=0.836 inner_auc=0.782 vs conf_auc=0.762
+15:19:28 ===== CYCLE 355 (OUTER -> INNER -> FEEDBACK) =====
+15:19:39 [enc/video/hmdb51] vote=0.627 uniform=0.578 best1=0.626 n_val=2110 vram=1.34GB 12s | grade=0.831 inner_auc=0.820 vs conf_auc=0.805
+15:19:46 ===== CYCLE 356 (OUTER -> INNER -> FEEDBACK) =====
+15:20:00 [enc/video/hmdb51] vote=0.636 uniform=0.594 best1=0.637 n_val=1716 vram=1.15GB 14s | grade=0.847 inner_auc=0.769 vs conf_auc=0.779
+15:20:08 ===== CYCLE 357 (OUTER -> INNER -> FEEDBACK) =====
+15:20:19 [enc/video/hmdb51] vote=0.597 uniform=0.578 best1=0.593 n_val=2153 vram=1.34GB 12s | grade=0.823 inner_auc=0.843 vs conf_auc=0.842
+15:20:26 ===== CYCLE 358 (OUTER -> INNER -> FEEDBACK) =====
+15:20:36 [enc/video/hmdb51] vote=0.600 uniform=0.564 best1=0.607 n_val=1834 vram=1.22GB 11s | grade=0.847 inner_auc=0.855 vs conf_auc=0.836
+15:20:41 ===== CYCLE 359 (OUTER -> INNER -> FEEDBACK) =====
+15:20:52 [enc/video/hmdb51] vote=0.657 uniform=0.626 best1=0.655 n_val=2138 vram=1.34GB 11s | grade=0.820 inner_auc=0.826 vs conf_auc=0.800
+15:20:59 ===== CYCLE 360 (OUTER -> INNER -> FEEDBACK) =====
+15:21:12 [enc/video/hmdb51] vote=0.590 uniform=0.550 best1=0.585 n_val=2438 vram=1.34GB 13s | grade=0.811 inner_auc=0.730 vs conf_auc=0.736
+15:21:19 ===== CYCLE 361 (OUTER -> INNER -> FEEDBACK) =====
+15:21:32 [enc/video/hmdb51] vote=0.621 uniform=0.596 best1=0.622 n_val=1811 vram=1.20GB 13s | grade=0.832 inner_auc=0.806 vs conf_auc=0.817
+15:21:38 ===== CYCLE 362 (OUTER -> INNER -> FEEDBACK) =====
+15:21:49 [enc/video/hmdb51] vote=0.590 uniform=0.557 best1=0.588 n_val=2253 vram=1.34GB 11s | grade=0.830 inner_auc=0.795 vs conf_auc=0.788
+15:21:55 ===== CYCLE 363 (OUTER -> INNER -> FEEDBACK) =====
+15:22:05 [enc/video/hmdb51] vote=0.648 uniform=0.619 best1=0.646 n_val=2041 vram=1.34GB 10s | grade=0.818 inner_auc=0.835 vs conf_auc=0.828
+15:22:10 ===== CYCLE 364 (OUTER -> INNER -> FEEDBACK) =====
+15:22:26 [enc/video/hmdb51] vote=0.602 uniform=0.569 best1=0.594 n_val=2165 vram=1.34GB 16s | grade=0.818 inner_auc=0.746 vs conf_auc=0.723
+15:22:34 ===== CYCLE 365 (OUTER -> INNER -> FEEDBACK) =====
+15:22:45 [enc/video/hmdb51] vote=0.644 uniform=0.587 best1=0.642 n_val=2201 vram=1.34GB 11s | grade=0.824 inner_auc=0.794 vs conf_auc=0.780
+15:22:53 ===== CYCLE 366 (OUTER -> INNER -> FEEDBACK) =====
+15:23:09 [enc/video/hmdb51] vote=0.644 uniform=0.599 best1=0.641 n_val=2220 vram=1.34GB 16s | grade=0.846 inner_auc=0.783 vs conf_auc=0.786
+15:23:18 ===== CYCLE 367 (OUTER -> INNER -> FEEDBACK) =====
+15:23:32 [enc/video/hmdb51] vote=0.630 uniform=0.590 best1=0.629 n_val=2176 vram=1.34GB 14s | grade=0.842 inner_auc=0.793 vs conf_auc=0.788
+15:23:40 ===== CYCLE 368 (OUTER -> INNER -> FEEDBACK) =====
+15:23:50 [enc/video/hmdb51] vote=0.615 uniform=0.595 best1=0.613 n_val=2230 vram=1.34GB 10s | grade=0.839 inner_auc=0.819 vs conf_auc=0.804
+15:23:55 ===== CYCLE 369 (OUTER -> INNER -> FEEDBACK) =====
+15:24:06 [enc/video/hmdb51] vote=0.619 uniform=0.572 best1=0.612 n_val=1968 vram=1.29GB 11s | grade=0.845 inner_auc=0.762 vs conf_auc=0.743
+15:24:12 ===== CYCLE 370 (OUTER -> INNER -> FEEDBACK) =====
+15:24:21 [enc/video/hmdb51] vote=0.629 uniform=0.589 best1=0.628 n_val=1731 vram=1.16GB 10s | grade=0.844 inner_auc=0.848 vs conf_auc=0.844
+15:24:26 ===== CYCLE 371 (OUTER -> INNER -> FEEDBACK) =====
+15:24:40 [enc/video/hmdb51] vote=0.631 uniform=0.601 best1=0.629 n_val=2012 vram=1.32GB 13s | grade=0.846 inner_auc=0.796 vs conf_auc=0.763
+15:24:47 ===== CYCLE 372 (OUTER -> INNER -> FEEDBACK) =====
+15:25:06 [enc/video/hmdb51] vote=0.623 uniform=0.595 best1=0.614 n_val=2031 vram=1.33GB 19s | grade=0.836 inner_auc=0.804 vs conf_auc=0.797
+15:25:12 ===== CYCLE 373 (OUTER -> INNER -> FEEDBACK) =====
+15:25:24 [enc/video/hmdb51] vote=0.598 uniform=0.554 best1=0.596 n_val=2044 vram=1.34GB 12s | grade=0.832 inner_auc=0.772 vs conf_auc=0.764
+15:25:31 ===== CYCLE 374 (OUTER -> INNER -> FEEDBACK) =====
+15:25:44 [enc/video/hmdb51] vote=0.615 uniform=0.582 best1=0.616 n_val=2181 vram=1.34GB 13s | grade=0.837 inner_auc=0.804 vs conf_auc=0.790
+15:25:52 ===== CYCLE 375 (OUTER -> INNER -> FEEDBACK) =====
+15:26:08 [enc/video/hmdb51] vote=0.620 uniform=0.599 best1=0.621 n_val=2047 vram=1.34GB 16s | grade=0.839 inner_auc=0.806 vs conf_auc=0.761
+15:26:16 ===== CYCLE 376 (OUTER -> INNER -> FEEDBACK) =====
+15:26:29 [enc/video/hmdb51] vote=0.613 uniform=0.601 best1=0.615 n_val=1923 vram=1.27GB 13s | grade=0.846 inner_auc=0.865 vs conf_auc=0.859
+15:26:35 ===== CYCLE 377 (OUTER -> INNER -> FEEDBACK) =====
+15:26:47 [enc/video/hmdb51] vote=0.624 uniform=0.570 best1=0.628 n_val=1884 vram=1.25GB 12s | grade=0.838 inner_auc=0.728 vs conf_auc=0.708
+15:26:53 ===== CYCLE 378 (OUTER -> INNER -> FEEDBACK) =====
+15:27:04 [enc/video/hmdb51] vote=0.625 uniform=0.599 best1=0.615 n_val=1841 vram=1.22GB 11s | grade=0.846 inner_auc=0.808 vs conf_auc=0.778
+15:27:09 ===== CYCLE 379 (OUTER -> INNER -> FEEDBACK) =====
+15:27:21 [enc/video/hmdb51] vote=0.615 uniform=0.586 best1=0.611 n_val=2085 vram=1.34GB 12s | grade=0.841 inner_auc=0.825 vs conf_auc=0.805
+15:27:28 ===== CYCLE 380 (OUTER -> INNER -> FEEDBACK) =====
+15:27:40 [enc/video/hmdb51] vote=0.583 uniform=0.538 best1=0.586 n_val=2061 vram=1.34GB 12s | grade=0.827 inner_auc=0.798 vs conf_auc=0.790
+15:27:46 ===== CYCLE 381 (OUTER -> INNER -> FEEDBACK) =====
+15:28:00 [enc/video/hmdb51] vote=0.576 uniform=0.552 best1=0.571 n_val=2005 vram=1.32GB 14s | grade=0.839 inner_auc=0.787 vs conf_auc=0.781
+15:28:08 ===== CYCLE 382 (OUTER -> INNER -> FEEDBACK) =====
+15:28:23 [enc/video/hmdb51] vote=0.632 uniform=0.616 best1=0.631 n_val=1880 vram=1.24GB 15s | grade=0.824 inner_auc=0.805 vs conf_auc=0.749
+15:28:31 ===== CYCLE 383 (OUTER -> INNER -> FEEDBACK) =====
+15:28:44 [enc/video/hmdb51] vote=0.642 uniform=0.625 best1=0.636 n_val=1851 vram=1.23GB 13s | grade=0.842 inner_auc=0.827 vs conf_auc=0.795
+15:28:49 ===== CYCLE 384 (OUTER -> INNER -> FEEDBACK) =====
+15:28:58 [enc/video/hmdb51] vote=0.630 uniform=0.590 best1=0.625 n_val=2188 vram=1.34GB 10s | grade=0.838 inner_auc=0.805 vs conf_auc=0.799
+15:29:04 ===== CYCLE 385 (OUTER -> INNER -> FEEDBACK) =====
+15:29:13 [enc/video/hmdb51] vote=0.648 uniform=0.614 best1=0.648 n_val=1941 vram=1.28GB 9s | grade=0.840 inner_auc=0.820 vs conf_auc=0.810
+15:29:18 ===== CYCLE 386 (OUTER -> INNER -> FEEDBACK) =====
+15:29:28 [enc/video/hmdb51] vote=0.631 uniform=0.601 best1=0.624 n_val=1743 vram=1.16GB 10s | grade=0.836 inner_auc=0.856 vs conf_auc=0.843
+15:29:35 ===== CYCLE 387 (OUTER -> INNER -> FEEDBACK) =====
+15:29:47 [enc/video/hmdb51] vote=0.634 uniform=0.596 best1=0.628 n_val=1774 vram=1.18GB 12s | grade=0.843 inner_auc=0.818 vs conf_auc=0.797
+15:29:53 ===== CYCLE 388 (OUTER -> INNER -> FEEDBACK) =====
+15:30:04 [enc/video/hmdb51] vote=0.583 uniform=0.548 best1=0.584 n_val=2199 vram=1.34GB 11s | grade=0.811 inner_auc=0.785 vs conf_auc=0.781
+15:30:09 ===== CYCLE 389 (OUTER -> INNER -> FEEDBACK) =====
+15:30:19 [enc/video/hmdb51] vote=0.658 uniform=0.614 best1=0.655 n_val=2041 vram=1.34GB 9s | grade=0.812 inner_auc=0.826 vs conf_auc=0.809
+15:30:24 ===== CYCLE 390 (OUTER -> INNER -> FEEDBACK) =====
+15:30:35 [enc/video/hmdb51] vote=0.593 uniform=0.571 best1=0.591 n_val=1772 vram=1.18GB 11s | grade=0.814 inner_auc=0.807 vs conf_auc=0.785
+15:30:43 ===== CYCLE 391 (OUTER -> INNER -> FEEDBACK) =====
+15:30:55 [enc/video/hmdb51] vote=0.648 uniform=0.607 best1=0.645 n_val=1942 vram=1.28GB 13s | grade=0.821 inner_auc=0.815 vs conf_auc=0.817
+15:31:03 ===== CYCLE 392 (OUTER -> INNER -> FEEDBACK) =====
+15:31:13 [enc/video/hmdb51] vote=0.617 uniform=0.577 best1=0.613 n_val=2037 vram=1.33GB 10s | grade=0.830 inner_auc=0.786 vs conf_auc=0.767
+15:31:18 ===== CYCLE 393 (OUTER -> INNER -> FEEDBACK) =====
+15:31:31 [enc/video/hmdb51] vote=0.633 uniform=0.580 best1=0.633 n_val=2010 vram=1.32GB 12s | grade=0.839 inner_auc=0.817 vs conf_auc=0.809
+15:31:37 ===== CYCLE 394 (OUTER -> INNER -> FEEDBACK) =====
+15:31:49 [enc/video/hmdb51] vote=0.616 uniform=0.578 best1=0.613 n_val=2141 vram=1.34GB 13s | grade=0.834 inner_auc=0.805 vs conf_auc=0.795
+15:31:56 ===== CYCLE 395 (OUTER -> INNER -> FEEDBACK) =====
+15:32:08 [enc/video/hmdb51] vote=0.617 uniform=0.578 best1=0.611 n_val=1981 vram=1.30GB 12s | grade=0.848 inner_auc=0.804 vs conf_auc=0.790
+15:32:14 ===== CYCLE 396 (OUTER -> INNER -> FEEDBACK) =====
+15:32:27 [enc/video/hmdb51] vote=0.625 uniform=0.580 best1=0.622 n_val=1862 vram=1.23GB 13s | grade=0.845 inner_auc=0.790 vs conf_auc=0.769
+15:32:37 ===== CYCLE 397 (OUTER -> INNER -> FEEDBACK) =====
+15:32:53 [enc/video/hmdb51] vote=0.619 uniform=0.591 best1=0.617 n_val=2166 vram=1.34GB 16s | grade=0.845 inner_auc=0.775 vs conf_auc=0.775
+15:33:01 ===== CYCLE 398 (OUTER -> INNER -> FEEDBACK) =====
+15:33:17 [enc/video/hmdb51] vote=0.610 uniform=0.578 best1=0.609 n_val=1892 vram=1.25GB 16s | grade=0.840 inner_auc=0.788 vs conf_auc=0.779
+15:33:26 ===== CYCLE 399 (OUTER -> INNER -> FEEDBACK) =====
+15:33:39 [enc/video/hmdb51] vote=0.589 uniform=0.535 best1=0.592 n_val=1852 vram=1.23GB 13s | grade=0.833 inner_auc=0.816 vs conf_auc=0.796
+15:33:45 ===== CYCLE 400 (OUTER -> INNER -> FEEDBACK) =====
+15:33:54 [enc/video/hmdb51] vote=0.592 uniform=0.534 best1=0.588 n_val=1956 vram=1.29GB 10s | grade=0.839 inner_auc=0.794 vs conf_auc=0.774
+15:33:59 ===== CYCLE 401 (OUTER -> INNER -> FEEDBACK) =====
+15:34:26 [enc/video/hmdb51] vote=0.601 uniform=0.561 best1=0.595 n_val=2113 vram=1.34GB 27s | grade=0.840 inner_auc=0.770 vs conf_auc=0.748
+15:34:34 ===== CYCLE 402 (OUTER -> INNER -> FEEDBACK) =====
+15:34:45 [enc/video/hmdb51] vote=0.635 uniform=0.609 best1=0.626 n_val=1881 vram=1.24GB 12s | grade=0.833 inner_auc=0.859 vs conf_auc=0.849
+15:34:51 ===== CYCLE 403 (OUTER -> INNER -> FEEDBACK) =====
+15:35:03 [enc/video/hmdb51] vote=0.618 uniform=0.575 best1=0.620 n_val=1963 vram=1.29GB 12s | grade=0.836 inner_auc=0.801 vs conf_auc=0.811
+15:35:08 ===== CYCLE 404 (OUTER -> INNER -> FEEDBACK) =====
+15:35:18 [enc/video/hmdb51] vote=0.621 uniform=0.576 best1=0.621 n_val=1980 vram=1.30GB 10s | grade=0.843 inner_auc=0.816 vs conf_auc=0.771
+15:35:23 ===== CYCLE 405 (OUTER -> INNER -> FEEDBACK) =====
+15:35:34 [enc/video/hmdb51] vote=0.633 uniform=0.592 best1=0.629 n_val=2150 vram=1.34GB 11s | grade=0.843 inner_auc=0.817 vs conf_auc=0.797
+15:35:41 ===== CYCLE 406 (OUTER -> INNER -> FEEDBACK) =====
+15:35:55 [enc/video/hmdb51] vote=0.602 uniform=0.561 best1=0.597 n_val=1766 vram=1.18GB 14s | grade=0.831 inner_auc=0.765 vs conf_auc=0.757
+15:36:02 ===== CYCLE 407 (OUTER -> INNER -> FEEDBACK) =====
+15:36:14 [enc/video/hmdb51] vote=0.593 uniform=0.561 best1=0.590 n_val=2381 vram=1.34GB 12s | grade=0.838 inner_auc=0.791 vs conf_auc=0.789
+15:36:20 ===== CYCLE 408 (OUTER -> INNER -> FEEDBACK) =====
+15:36:33 [enc/video/hmdb51] vote=0.600 uniform=0.553 best1=0.604 n_val=2045 vram=1.34GB 13s | grade=0.838 inner_auc=0.842 vs conf_auc=0.821
+15:36:39 ===== CYCLE 409 (OUTER -> INNER -> FEEDBACK) =====
+15:36:50 [enc/video/hmdb51] vote=0.665 uniform=0.607 best1=0.657 n_val=1756 vram=1.17GB 10s | grade=0.820 inner_auc=0.813 vs conf_auc=0.761
+15:36:55 ===== CYCLE 410 (OUTER -> INNER -> FEEDBACK) =====
+15:37:06 [enc/video/hmdb51] vote=0.620 uniform=0.592 best1=0.616 n_val=2093 vram=1.34GB 11s | grade=0.826 inner_auc=0.801 vs conf_auc=0.785
+15:37:11 ===== CYCLE 411 (OUTER -> INNER -> FEEDBACK) =====
+15:37:26 [enc/video/hmdb51] vote=0.615 uniform=0.599 best1=0.612 n_val=2238 vram=1.34GB 15s | grade=0.845 inner_auc=0.764 vs conf_auc=0.742
+15:37:34 ===== CYCLE 412 (OUTER -> INNER -> FEEDBACK) =====
+15:37:48 [enc/video/hmdb51] vote=0.585 uniform=0.543 best1=0.583 n_val=2176 vram=1.34GB 14s | grade=0.825 inner_auc=0.791 vs conf_auc=0.787
+15:37:55 ===== CYCLE 413 (OUTER -> INNER -> FEEDBACK) =====
+15:38:13 [enc/video/hmdb51] vote=0.636 uniform=0.588 best1=0.626 n_val=2021 vram=1.32GB 18s | grade=0.819 inner_auc=0.757 vs conf_auc=0.741
+15:38:18 ===== CYCLE 414 (OUTER -> INNER -> FEEDBACK) =====
+15:38:34 [enc/video/hmdb51] vote=0.602 uniform=0.584 best1=0.599 n_val=2005 vram=1.32GB 15s | grade=0.829 inner_auc=0.790 vs conf_auc=0.774
+15:38:40 ===== CYCLE 415 (OUTER -> INNER -> FEEDBACK) =====
+15:38:52 [enc/video/hmdb51] vote=0.634 uniform=0.594 best1=0.633 n_val=1940 vram=1.28GB 11s | grade=0.829 inner_auc=0.820 vs conf_auc=0.810
+15:38:58 ===== CYCLE 416 (OUTER -> INNER -> FEEDBACK) =====
+15:39:10 [enc/video/hmdb51] vote=0.621 uniform=0.592 best1=0.614 n_val=1884 vram=1.25GB 13s | grade=0.835 inner_auc=0.791 vs conf_auc=0.766
+15:39:18 ===== CYCLE 417 (OUTER -> INNER -> FEEDBACK) =====
+15:39:31 [enc/video/hmdb51] vote=0.641 uniform=0.600 best1=0.638 n_val=2027 vram=1.33GB 14s | grade=0.834 inner_auc=0.836 vs conf_auc=0.837
+15:39:38 ===== CYCLE 418 (OUTER -> INNER -> FEEDBACK) =====
+15:39:50 [enc/video/hmdb51] vote=0.630 uniform=0.581 best1=0.628 n_val=2001 vram=1.31GB 13s | grade=0.844 inner_auc=0.785 vs conf_auc=0.777
+15:39:57 ===== CYCLE 419 (OUTER -> INNER -> FEEDBACK) =====
+15:40:10 [enc/video/hmdb51] vote=0.634 uniform=0.583 best1=0.635 n_val=2118 vram=1.34GB 13s | grade=0.841 inner_auc=0.794 vs conf_auc=0.765
+15:40:16 ===== CYCLE 420 (OUTER -> INNER -> FEEDBACK) =====
+15:40:29 [enc/video/hmdb51] vote=0.635 uniform=0.610 best1=0.630 n_val=1813 vram=1.21GB 13s | grade=0.843 inner_auc=0.778 vs conf_auc=0.764
+15:40:36 ===== CYCLE 421 (OUTER -> INNER -> FEEDBACK) =====
+15:40:51 [enc/video/hmdb51] vote=0.591 uniform=0.550 best1=0.585 n_val=2015 vram=1.32GB 15s | grade=0.818 inner_auc=0.763 vs conf_auc=0.739
+15:40:59 ===== CYCLE 422 (OUTER -> INNER -> FEEDBACK) =====
+15:41:21 [enc/video/hmdb51] vote=0.605 uniform=0.571 best1=0.604 n_val=2064 vram=1.34GB 22s | grade=0.835 inner_auc=0.884 vs conf_auc=0.873
+15:41:26 ===== CYCLE 423 (OUTER -> INNER -> FEEDBACK) =====
+15:41:40 [enc/video/hmdb51] vote=0.604 uniform=0.576 best1=0.602 n_val=2151 vram=1.34GB 13s | grade=0.839 inner_auc=0.820 vs conf_auc=0.798
+15:41:47 ===== CYCLE 424 (OUTER -> INNER -> FEEDBACK) =====
+15:42:04 [enc/video/hmdb51] vote=0.606 uniform=0.554 best1=0.603 n_val=2109 vram=1.34GB 18s | grade=0.840 inner_auc=0.789 vs conf_auc=0.767
+15:42:11 ===== CYCLE 425 (OUTER -> INNER -> FEEDBACK) =====
+15:42:28 [enc/video/hmdb51] vote=0.616 uniform=0.593 best1=0.612 n_val=2015 vram=1.32GB 17s | grade=0.843 inner_auc=0.794 vs conf_auc=0.778
+15:42:38 ===== CYCLE 426 (OUTER -> INNER -> FEEDBACK) =====
+15:42:58 [enc/video/hmdb51] vote=0.633 uniform=0.593 best1=0.636 n_val=2014 vram=1.32GB 20s | grade=0.837 inner_auc=0.779 vs conf_auc=0.764
+15:43:08 ===== CYCLE 427 (OUTER -> INNER -> FEEDBACK) =====
