@@ -1,24 +1,61 @@
-For the last 12 weeks I built Hojaiga: a Windows assistant meant to learn any app on its own and then do real work in it. Open the app, understand its menus, do the task, and prove the result before saying "done".
+=== PART 1 OF 2 (Nov 18) ===
 
-Today I'm closing it as a research project and opening it to anyone who wants to continue it.
+For 12 weeks I built Hojaiga: a Windows assistant meant to learn any app on its own, do real work in it, and prove the result before saying "done". Today I'm closing it as a research project and publishing everything. Part 1 is what I tried to build and how far it got. Part 2, tomorrow, is what failed and why I stopped.
 
-What I built (Aug to Nov 2026, solo, with AI coding assistants):
-- A scanner that learns an app from its own files and its live interface. PowerPoint's full ribbon (about 360 controls and 980 menu items) mapped in about 5 minutes; a program that was never opened had its menus and shortcuts read from its executable in about 1 second.
-- A "virtual mouse" that clicks, drags and scrolls inside apps without moving the user's real cursor.
-- A proof step: a task only counts as done when the saved file or the window shows the result. Example: a table moved from Excel into PowerPoint, 24 of 24 cells verified.
+The goal
+Hand it any Windows program, even one it has never seen. It reads the program's own files and its live screen, works out the menus, does the task in a hidden window without touching your mouse, and only reports "done" when the saved file or the window shows the result. All of it on a normal laptop, with its own local intelligence and no paid AI API.
+
+What worked (measured on my laptop)
+- Learning an app from its files: a program that was never opened had its menus and shortcuts read from its executable in about 1 second.
+- Learning an app from its screen: PowerPoint's full ribbon (11 tabs, about 360 controls, about 980 menu items) mapped in about 5 minutes.
+- A "virtual mouse" that clicks, drags and scrolls inside apps without moving your real cursor.
+- Proof before "done": a table moved from Excel into PowerPoint invisibly, 24 of 24 cells checked from the saved files.
+- 3D from one sentence: tables, chairs and lamps built in Blender through its own commands and checked from three views.
 - A safety layer that stops and asks before paying, sending or deleting anything.
-- 107 commits, about 230k lines of Python, 29 test suites.
 
-What I learned:
-Small local models (2 to 8B parameters on a 6 GB laptop GPU) were not enough to be both the eyes and the brain. My fine-tuned 4B model scored 39% on held-out tests against 53% for the untouched base model: it got better at choosing actions and worse at seeing. Structure (UI trees, reverse engineering, Office's object model) made things reliable where it existed, and broke on modern apps.
+The numbers
+Aug to Nov 2026, solo, with AI coding assistants. About 230k lines of Python, 60+ modules, 29 test suites.
 
-What finally worked was a hybrid. A strong hosted model, on the user's own API key, teaches; the local "brain" checks every step, keeps only what was proven, and turns the API off as it learns. That is the version I'm releasing.
+How far it got
+The knowledge, the background control, the proof step and the safety layer all held up. The weak part was the decision-maker: small local models could not be the eyes and the brain at once. Tomorrow I'll share those numbers, and the moment I realised someone else had already built the experience I wanted.
 
-Credit where it's due: in October I built Hojaiga's teaching layer (see the screen, point at the button, explain it) after studying Clicky, the open-source AI teacher by Farza. Clicky, now HeyClicky, does that experience better than I could on my own, so instead of competing I'm stopping here and sharing what I built and measured.
+Full report (14 pages, with diagrams, results and failures), attached as images and here as a PDF:
+https://github.com/Dhruv-patel0506/Hojaiga.com/blob/main/reports/hojaiga_closing/HOJAIGA_REPORT.pdf
 
-Full write-up with diagrams, results and failures: [link to report]
-Code: [link to repo]
-
-If you work on computer-use agents, take whatever is useful.
+All the code, tests and experiments:
+https://github.com/Dhruv-patel0506/Hojaiga.com
 
 #AI #ComputerUse #Automation #OpenSource #BuildInPublic
+
+
+=== PART 2 OF 2 (Nov 19) ===
+
+Yesterday I shared what Hojaiga, my Windows assistant that learns any app, managed to do. Today: what did not work, and why I stopped.
+
+1. Small models can't be the eyes and the brain at once
+On a 6 GB laptop GPU, the usable vision models are 2 to 8 billion parameters. The base 4B model scored 12.5% on ScreenSpot-Pro (find the right button on screenshots of professional apps).
+
+2. Fine-tuning made it worse
+I fine-tuned the 4B model on my own data. On 630 held-out test items it scored 39%, against 53% for the untouched model. It got better at choosing the next action (50% to 73%) and much worse at seeing (pointing at a control went from 73% to 7%). My own early tests had looked great because the answers leaked into the questions; held-out testing caught it.
+
+3. Practice alone didn't teach it
+Over five overnight "learn this app" runs, it mapped apps well but proved only 2 of 100 tasks it set itself. Each run exposed a different gap in how steps were carried out.
+
+4. Someone had already built the experience I wanted
+The part I most wanted people to feel was an assistant that looks at your screen, points at the right button and explains it. In October I built that "Professor" layer after studying Clicky, the open-source AI teacher by Farza. Clicky, now HeyClicky, does that experience better than I could on my own, using exactly the large models I had set out to avoid.
+
+How it ended
+Structure made things reliable: program files, UI trees, Office's object model, and checking every result. So the final version keeps all of that and adds a teacher. A strong hosted model (Claude on the user's own key, or a free Gemini or Groq model) suggests each step. The local "brain" checks the suggestion against what is really on screen, keeps only steps that were proven, and is designed to switch the API off once it agrees with the teacher often enough.
+
+What I'd tell anyone building computer-use agents
+- Test on held-out data from day one.
+- Verify every result instead of trusting the model's "done".
+- Check who is already building the experience before you spend months on it.
+
+Everything is open: the report, the code, the tests, the failures.
+Report: https://github.com/Dhruv-patel0506/Hojaiga.com/blob/main/reports/hojaiga_closing/HOJAIGA_REPORT.pdf
+Code: https://github.com/Dhruv-patel0506/Hojaiga.com
+
+Credit to Farza for Clicky (github.com/farzaa/clicky, heyclicky.com).
+
+#AI #MachineLearning #ComputerUse #OpenSource #BuildInPublic
